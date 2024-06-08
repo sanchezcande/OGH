@@ -14,7 +14,7 @@ export const Logo = styled.div`
   font-size: 1.5em;
 `;
 
-export const NavLinks = styled.div`
+export const NavLinks = styled.ul`
   display: flex;
   gap: 15px;
 `;

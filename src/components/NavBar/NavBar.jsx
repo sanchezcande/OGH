@@ -1,14 +1,17 @@
-import React from 'react';
-import { NavBarContainer, Logo, NavLink, NavLinks } from './NavBar.styles';
+import React from "react";
+import { Logo, NavBarContainer, NavLink, NavLinks } from "./NavBar.styles";
 
 const NavBar = () => {
   return (
     <NavBarContainer>
-      <Logo>MiLogo</Logo>
+      <Logo>Logo</Logo>
       <NavLinks>
-        <NavLink to="/">Inicio</NavLink>
-        <NavLink to="/contact">Contacto</NavLink>
-        <NavLink to="/about">Acerca de</NavLink>
+        <li>
+          <NavLink to="/">Home</NavLink>
+        </li>
+        <li>
+          <NavLink to="/contact">Contacto</NavLink>
+        </li>
       </NavLinks>
     </NavBarContainer>
   );
