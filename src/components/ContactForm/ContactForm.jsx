@@ -49,6 +49,7 @@ const ContactForm = () => {
           (result) => {
             setFormStatus('Message sent successfully');
             setIsModalOpen(true);
+            e.target.reset();
           },
           (error) => {
             setFormStatus('Error sending message');
