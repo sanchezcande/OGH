@@ -1,16 +1,21 @@
 import React from "react";
 import { Logo, NavBarContainer, NavLink, NavLinks } from "./NavBar.styles";
 
-const NavBar = () => {
+
+const NavBar = ({ homeRef, contactRef }) => {
+  const handleScroll = (ref) => {
+    ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  
   return (
     <NavBarContainer>
       <Logo>Logo</Logo>
       <NavLinks>
         <li>
-          <NavLink to="/">Home</NavLink>
+          <NavLink href="#home" onClick={(e) => { e.preventDefault(); handleScroll(homeRef); }}>Home</NavLink>
         </li>
         <li>
-          <NavLink to="/contact">Contacto</NavLink>
+          <NavLink href="#contact" onClick={(e) => { e.preventDefault(); handleScroll(contactRef); }}>Contacto</NavLink>
         </li>
       </NavLinks>
     </NavBarContainer>

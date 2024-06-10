@@ -5,7 +5,7 @@ import { Input, TextArea, Error, FormContainer } from "./ContactForm.styles";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
 
-const ContactForm = () => {
+const ContactForm = React.forwardRef((props, ref) => {
   const [formStatus, setFormStatus] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState({});
@@ -67,7 +67,7 @@ const ContactForm = () => {
   };
 
   return (
-    <div>
+    <div ref={ref}>
       <FormContainer className="contact-form" onSubmit={sendEmail} noValidate>
         <Input type="text" name="from_name"  placeholder="Name" />
         {errors.from_name && <Error>{errors.from_name}</Error>}
@@ -83,6 +83,6 @@ const ContactForm = () => {
       {formStatus && !formStatus.includes('successfully') && <Error>{formStatus}</Error>}
     </div>
   );
-};
+});
 
 export default ContactForm;

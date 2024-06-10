@@ -12,6 +12,11 @@ export const Input = styled.input`
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+
+  &::placeholder{
+    color: #999; 
+    font-style: italic;
+  }
 `;
 
 export const TextArea = styled.textarea`
@@ -19,6 +24,11 @@ export const TextArea = styled.textarea`
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+
+  &::placeholder{
+    color: #999; 
+    font-style: italic;
+  }
 `;
 
 

@@ -17,6 +17,7 @@ export const Logo = styled.div`
 export const NavLinks = styled.ul`
   display: flex;
   gap: 15px;
+  list-style: none;
 `;
 
 export const NavLink = styled(Link)`
