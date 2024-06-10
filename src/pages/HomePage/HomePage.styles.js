@@ -9,4 +9,5 @@ export const Title = styled.h1`
   color: ${({ theme }) => theme.colors.primary};
   font-size: 2em;
   margin-bottom: 20px;
+  margin-top: 60px;
 `;

@@ -8,6 +8,8 @@ export const NavBarContainer = styled.nav`
   padding: 10px 20px;
   background-color: #333;
   color: white;
+  position: fixed;
+  width: 100%;
 `;
 
 export const Logo = styled.div`

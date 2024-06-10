@@ -11,10 +11,10 @@ function App() {
   return (
     <Router>
       <GlobalStyles />
-      <NavBar homeRef={homeRef} contactRef={contactRef} />
+      <NavBar homeRef={homeRef} contactRef={contactRef}/>
       <div>
-        <HomePage ref={homeRef} />
-        <ContactForm ref={contactRef} />
+        <HomePage ref={homeRef}/>
+        <ContactForm ref={contactRef}/>
       </div>
     </Router>
   );
