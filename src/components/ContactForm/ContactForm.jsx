@@ -5,6 +5,7 @@ import { Input, TextArea, Error, FormContainer } from "./ContactForm.styles";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
 
+
 const ContactForm = React.forwardRef((props, ref) => {
   const [formStatus, setFormStatus] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
