@@ -46,8 +46,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Deploy to production
+   - name: Deploy to GitHub Pages
       run: npm run deploy
       env:
         NODE_ENV: production
-        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
