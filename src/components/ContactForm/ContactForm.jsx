@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { validateEmail, validateName, validateMessage } from "./validations";
-import Button from "../Button/Button";
+import { DarkButton } from "../Button/Button";
 import { Input, TextArea, Error, FormContainer } from "./ContactForm.styles";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
@@ -78,7 +78,7 @@ const ContactForm = React.forwardRef((props, ref) => {
         <Input type="text" name="subject" placeholder="Subject" />
         <TextArea name="message" placeholder="Message" />
         {errors.message && <Error>{errors.message}</Error>}
-        <Button type="submit">Send</Button>
+        <DarkButton type="submit">Send</DarkButton>
       </FormContainer>
       {isModalOpen && <SuccessModal message={formStatus} onClose={closeModal} />}
       {formStatus && !formStatus.includes('successfully') && <Error>{formStatus}</Error>}

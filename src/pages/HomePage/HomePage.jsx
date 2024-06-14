@@ -1,12 +1,19 @@
 import React from "react";
-import { Container, Title } from "./HomePage.styles";
-import Button from "../../components/Button/Button";
+import { Container, Title, Image, Title2, ButtonsContainer } from "./HomePage.styles";
+import { LightButton } from "../../components/Button/Button";
 
 const HomePage = React.forwardRef((props, ref) => (
   <Container ref={ref}>
-    <Title>Bienvenido a la Página de Inicio</Title>
-    {/* borrar el style */}
-    <Button style={{ marginBottom: "1000px" }} >Click Me</Button>
+    <Image />
+    <Title> <span>We are</span> OpenGateHub</Title>
+    <Title2>
+      Specialized in <span>Web & MobileApp Development</span>, crafting
+      innovative digital solution <span>for business</span>
+    </Title2>
+    <ButtonsContainer>
+      <LightButton>Get Started</LightButton>
+      <LightButton>Contact Us</LightButton>
+    </ButtonsContainer>
   </Container>
 ));
 

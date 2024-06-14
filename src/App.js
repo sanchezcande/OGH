@@ -6,15 +6,20 @@ import GlobalStyles from './styles/GlobalStyles';
 import ContactForm from './components/ContactForm/ContactForm';
 
 function App() {
+
   const homeRef = useRef(null);
-  const contactRef = useRef(null);
+  const aboutUsRef = useRef(null);
+  const servicesRef = useRef(null);
+  const contactUsRef = useRef(null);
+
   return (
     <Router>
       <GlobalStyles />
-      <NavBar homeRef={homeRef} contactRef={contactRef}/>
+      <NavBar homeRef={homeRef} aboutUsRef={aboutUsRef} servicesRef={servicesRef} contactUsRef={contactUsRef}/>
       <div>
         <HomePage ref={homeRef}/>
-        <ContactForm ref={contactRef}/>
+        <ContactForm ref={contactUsRef}/>
+        
       </div>
     </Router>
   );
