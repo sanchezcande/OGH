@@ -24,13 +24,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: List directory contents before build
+        run: ls -la
+
       - name: Build the application
         run: npm run build
 
       - name: List directory contents after build
         run: ls -la
 
-      - name: List build directory contents after build
+      - name: List build directory contents
         run: ls -la build
 
   deploy:
@@ -41,21 +44,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Copy build directory
-        run: cp -r build /home/runner/work/OGH/OGH/build
-
       - name: List directory contents before deploy
-        run: ls -la /home/runner/work/OGH/OGH/
+        run: ls -la
 
       - name: List build directory contents before deploy
-        run: ls -la /home/runner/work/OGH/OGH/build
+        run: ls -la build
 
       - name: Deploy to GitHub Pages
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           npm install -g gh-pages
-          gh-pages -d /home/runner/work/OGH/OGH/build
+          gh-pages -d build
         env:
           NODE_ENV: production
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
