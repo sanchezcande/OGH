@@ -1,15 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.e6c13ad2.css",
-    "main.js": "/static/js/main.dff1c44d.js",
-    "static/js/453.eb0a2572.chunk.js": "/static/js/453.eb0a2572.chunk.js",
-    "index.html": "/index.html",
-    "main.e6c13ad2.css.map": "/static/css/main.e6c13ad2.css.map",
-    "main.dff1c44d.js.map": "/static/js/main.dff1c44d.js.map",
-    "453.eb0a2572.chunk.js.map": "/static/js/453.eb0a2572.chunk.js.map"
+    "main.css": "/react-gh-pages/static/css/main.e6c13ad2.css",
+    "main.js": "/react-gh-pages/static/js/main.cf26a7b1.js",
+    "static/js/453.eb0a2572.chunk.js": "/react-gh-pages/static/js/453.eb0a2572.chunk.js",
+    "static/media/cyberSecurity.svg": "/react-gh-pages/static/media/cyberSecurity.6515bc47136b707f562f13fa57f52f7b.svg",
+    "index.html": "/react-gh-pages/index.html",
+    "static/media/worldIcon.svg": "/react-gh-pages/static/media/worldIcon.c8d4cc6b74dc7e54499ed2de3f7bcaf5.svg",
+    "main.e6c13ad2.css.map": "/react-gh-pages/static/css/main.e6c13ad2.css.map",
+    "main.cf26a7b1.js.map": "/react-gh-pages/static/js/main.cf26a7b1.js.map",
+    "453.eb0a2572.chunk.js.map": "/react-gh-pages/static/js/453.eb0a2572.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.dff1c44d.js"
+    "static/js/main.cf26a7b1.js"
   ]
 }
