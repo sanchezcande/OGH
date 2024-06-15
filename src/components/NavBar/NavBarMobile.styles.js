@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 
 export const MenuIcon = styled.div`
   cursor: pointer;
@@ -50,11 +50,10 @@ export const LangMenuItem = styled.li`
   flex: 1;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 0.5rem;
+  border-radius: 40px;
     padding: 1rem;
   &:hover {
-    background-color: #f0f0f0;
-    color: ${(props) => props.theme.colors.primary};
+  background-color: rgba(21, 62, 108, 0.34);
   }
 `;
 
@@ -96,13 +95,15 @@ export const MenuItem = styled.li`
   text-decoration: none;
   display: block;
   width: 100%;
+  align-items: center;
   padding: 1rem;
   transition: background-color 0.3s ease;
   color: white;
 
   &:hover {
-    background-color: #f0f0f0;
-    color: ${(props) => props.theme.colors.primary};
-    border-radius: 0.5rem;
+    background-color: rgba(21, 62, 108, 0.34);
+
+    border-radius: 40px;
   }
+
 `;

@@ -10,6 +10,7 @@ import {
   LangMenuItem,
   Span,
 } from "./NavBarMobile.styles";
+import { ArrowIcon, WorldIcon, LangMenuContainer } from "./NavBarDesktop.styles";
 import { MagicMotion, motion, LayoutGroup } from "react-magic-motion";
 
 const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
@@ -39,9 +40,9 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
   return (
     <NavBarContainer>
       <LogoIcon>
-      <Logo>
-        OpenGate<Span>Hub</Span>
-      </Logo>
+        <Logo>
+          OpenGate<Span>Hub</Span>
+        </Logo>
         <MenuIcon onClick={toggleMenu}>☰</MenuIcon>
       </LogoIcon>
       <MagicMotion transition={{ type: "spring", stiffness: 200, damping: 15 }}>
@@ -65,9 +66,13 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
                   Contact Us
                 </MenuItem>
                 <MenuItem onClick={toggleLangMenu}>
-                  {selectedLang === "en" ? "Language" : "Idioma"}
+                  <LangMenuContainer>
+                  <WorldIcon />
+                  {selectedLang === "en" ? "Language  " : "Idioma  "}
+                  <ArrowIcon open={showLangMenu} />
+                  </LangMenuContainer>
                 </MenuItem>
-                  <LanguageMenu open={showLangMenu}>
+                <LanguageMenu open={showLangMenu}>
                   <LangMenuItem onClick={() => handleLangChange("en")}>
                     English
                   </LangMenuItem>
