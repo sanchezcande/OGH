@@ -16,8 +16,8 @@ import { MagicTabSelect } from "react-magic-motion";
 
 const pillTabs = [
   { text: "Home", ref: "homeRef", href: "#home" },
-  { text: "About Us", ref: "aboutUsRef", href: "#about-us" },
   { text: "Services", ref: "servicesRef", href: "#services" },
+  { text: "About Us", ref: "aboutUsRef", href: "#about-us" },
   { text: "Contact Us", ref: "contactUsRef", href: "#contact-us" },
 ];
 

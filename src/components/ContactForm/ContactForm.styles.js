@@ -1,4 +1,6 @@
-import styled from 'styled-components';
+import styled from "styled-components";
+import { useSpring, animated } from "react-spring";
+
 
 export const FormContainer = styled.form`
   display: flex;
@@ -7,32 +9,58 @@ export const FormContainer = styled.form`
   margin: auto;
 `;
 
-export const Input = styled.input`
+export const AnimatedInput = styled(animated.input)`
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
+  border: 3px solid #333;
   border-radius: 5px;
+  transition: all 0.3s;
+  background-color: #f0f0f0;
 
-  &::placeholder{
-    color: #999; 
+  &::placeholder {
+    color: #999;
     font-style: italic;
   }
+
+  &:focus {
+    border-color: #0034ee;
+    outline: none;
+  }
+
+  &:hover {
+    border-color: #0034ee;
+  }
+
+`;
+export const AnimatedInputContainer = styled(animated.div)`
+  margin-bottom: 10px;
 `;
 
-export const TextArea = styled.textarea`
+export const AnimatedTextArea = styled(animated.textarea)`
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
+  transition: all 0.3s;
   border-radius: 5px;
+  border: 3px solid #333;
+  background-color: #f0f0f0;
 
-  &::placeholder{
-    color: #999; 
+  &::placeholder {
+    color: #999;
     font-style: italic;
   }
-`;
 
+  &:focus {
+    border-color: #0034ee;
+    outline: none;
+  }
+  &:hover {
+    border-color: #0034ee;
+  }
+`;
 
 export const Error = styled.div`
   color: dark blue;
   margin-bottom: 10px;
+  font-size: 10px;
+  margin-left: 10px;
 `;

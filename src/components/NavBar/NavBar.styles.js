@@ -13,6 +13,8 @@ export const NavBarContainer = styled.nav`
   position: fixed;
   width: 100%;
   background-color: transparent;
+  marging-right:10px;
+
 `;
 
 export const Logo = styled.div`
@@ -48,6 +50,7 @@ export const LangMenuContainer = styled.span`
   align-items: center;
   gap: 5px;
   position: relative;
+  margin-right: 25px;
 `;
 
 const slideDown = keyframes`
@@ -87,7 +90,7 @@ export const LangMenu = styled.ul`
   background-color: transparent;
   padding: 0;
   right: 0;
-  margin-right: 30px;
+  padding-right: 55px;
   border-radius: 5px;
   max-height: 200px;
   overflow: hidden;

@@ -4,7 +4,7 @@ const theme = {
         primaryDark: '#2980b9', 
         secondary: 'white',
         background: '#001f3f',
-        text: '#2c3e50',
+        text: 'white',
       },
       fonts: {
         main: 'Arial, sans-serif',
