@@ -10,6 +10,9 @@ export const LightButton = styled.button`
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:hover {
     background-color: #0034EE;
@@ -25,7 +28,10 @@ export const DarkButton = styled.button`
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 1em;
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   &:hover {
     background-color: rgba(21, 62, 108, 0.34);
     border: 2px solid #0034EE;

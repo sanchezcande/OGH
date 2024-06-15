@@ -34,7 +34,7 @@ export const Image = styled(cyberSecurity)`
   max-height: 500px;
   object-fit: cover;
   margin-bottom: 20px;
-  margin-top: 100px;
+  margin-top: 0;
 `;
 
 export const ButtonsContainer = styled.div`
