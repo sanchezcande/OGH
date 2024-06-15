@@ -33,7 +33,7 @@ export const AnimatedInput = styled(animated.input)`
 
 `;
 export const AnimatedInputContainer = styled(animated.div)`
-  margin-bottom: 10px;
+width: 100% !important;
 `;
 
 export const AnimatedTextArea = styled(animated.textarea)`

@@ -10,7 +10,6 @@ export const NavBarContainer = styled.nav`
   padding: 10px 20px;
   background-color: #333;
   color: white;
-  position: fixed;
   width: 100%;
   background-color: transparent;
   marging-right:10px;
@@ -34,6 +33,7 @@ export const NavLinks = styled.ul`
   background-color: rgba(21, 62, 108, 0.34);
   padding: 15px 30px;
   border: 2px solid #0034ee;
+
 `;
 
 export const NavLink = styled(Link)`

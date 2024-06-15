@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { validateEmail, validateName, validateMessage } from "./validations";
 import { DarkButton } from "../Button/Button";
-import { AnimatedInput, AnimatedTextArea, AnimatedInputContainer, Error, FormContainer } from "./ContactForm.styles";
+import {
+  AnimatedInput,
+  AnimatedTextArea,
+  AnimatedInputContainer,
+  Error,
+  FormContainer,
+} from "./ContactForm.styles";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
 import { useTransition, useSpring, animated } from "react-spring";
@@ -14,7 +20,6 @@ const AnimatedError = ({ show, children }) => {
     config: { tension: 200, friction: 20 },
   });
 
-  
   return transitions(
     (styles, item) =>
       item && <animated.div style={styles}>{children}</animated.div>
@@ -40,9 +45,7 @@ const ContactForm = () => {
   });
 
   const errorTransitions = useTransition(
-    Object.keys(showErrorAnimations).filter(
-      (key) => showErrorAnimations[key]
-    ),
+    Object.keys(showErrorAnimations).filter((key) => showErrorAnimations[key]),
     {
       from: { opacity: 0, transform: "translateY(-10px)" },
       enter: { opacity: 1, transform: "translateY(0)" },
@@ -60,7 +63,7 @@ const ContactForm = () => {
     }
     if (!validateEmail(formData.from_email)) {
       newErrors.from_email = "Please enter a valid email address.";
-    }else {
+    } else {
       newErrors.from_email = "";
     }
     if (!validateMessage(formData.message)) {
@@ -151,8 +154,7 @@ const ContactForm = () => {
   return (
     <div>
       <FormContainer className="contact-form" onSubmit={sendEmail} noValidate>
-      <AnimatedInputContainer style={errorTransitions}>
-      <AnimatedInput
+        <AnimatedInput
           style={useSpring({
             opacity: 1,
             transform: "translateX(0)",
@@ -166,8 +168,7 @@ const ContactForm = () => {
         <AnimatedError show={showErrorAnimations.from_name}>
           {errors.from_name && <Error>{errors.from_name}</Error>}
         </AnimatedError>
-        </AnimatedInputContainer>
-        <AnimatedInputContainer style={errorTransitions}>
+
         <AnimatedInput
           style={useSpring({
             opacity: 1,
@@ -182,20 +183,18 @@ const ContactForm = () => {
         <AnimatedError show={showErrorAnimations.from_email}>
           {errors.from_email && <Error>{errors.from_email}</Error>}
         </AnimatedError>
-        </AnimatedInputContainer>
-        <AnimatedInputContainer style={errorTransitions}>
+
         <AnimatedInput
           style={useSpring({
             opacity: 1,
             transform: "translateY(0)",
-              from: { opacity: 0, transform: "translateY(-10px)" },
+            from: { opacity: 0, transform: "translateY(-10px)" },
           })}
           type="number"
           name="contact_number"
           placeholder="Phone number"
         />
-                </AnimatedInputContainer>
-                <AnimatedInputContainer style={errorTransitions}>
+
         <AnimatedInput
           style={useSpring({
             opacity: 1,
@@ -206,8 +205,7 @@ const ContactForm = () => {
           name="subject"
           placeholder="Subject"
         />
-                 </AnimatedInputContainer>
-                 <AnimatedInputContainer style={errorTransitions}>
+
         <AnimatedTextArea
           style={useSpring({
             opacity: 1,
@@ -221,7 +219,7 @@ const ContactForm = () => {
         <AnimatedError show={showErrorAnimations.message}>
           {errors.message && <Error>{errors.message}</Error>}
         </AnimatedError>
-        </AnimatedInputContainer>
+
         <DarkButton type="submit">Send</DarkButton>
       </FormContainer>
       {isModalOpen && (
