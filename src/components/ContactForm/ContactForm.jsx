@@ -13,13 +13,13 @@ const ContactForm = () => {
   function validateForm(formData) {
     const newErrors = {};
     if (!validateName(formData.from_name)) {
-      newErrors.from_name = 'Your name has to have more than 2 characters';
+      newErrors.from_name = 'Please enter a valid name';
     }
     if (!validateEmail(formData.from_email)) {
-      newErrors.from_email = 'Your email is not valid';
+      newErrors.from_email = 'Please enter a valid email address';
     }
     if (!validateMessage(formData.message)) {
-      newErrors.message = 'Your message has to have more than 10 characters';
+      newErrors.message = 'Please enter a message with more than 10 characters';
     }
     return newErrors;
   }
@@ -72,8 +72,8 @@ const ContactForm = () => {
         {errors.from_name && <Error>{errors.from_name}</Error>}
         <Input type="email" name="from_email" placeholder="Email" />
         {errors.from_email && <Error>{errors.from_email}</Error>}
-        <Input type="number" name="contact_number" placeholder="Phone number"/>
-        <Input type="text" name="subject" placeholder="Subject" />
+        <Input type="number" name="contact_number" placeholder="Phone number (optional)"/>
+        <Input type="text" name="subject" placeholder="Subject (optional)" />
         <TextArea name="message" placeholder="Message" />
         {errors.message && <Error>{errors.message}</Error>}
         <DarkButton type="submit">Send</DarkButton>
