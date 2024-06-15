@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { validateEmail, validateName, validateMessage } from "./validations";
 import { DarkButton } from "../Button/Button";
 import {
@@ -38,21 +38,16 @@ const ContactForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
-  const [showErrorAnimations, setShowErrorAnimations] = useState({
-    from_name: false,
-    from_email: false,
-    message: false,
-  });
+  const [focusedField, setFocusedField] = useState(null);
 
-  const errorTransitions = useTransition(
-    Object.keys(showErrorAnimations).filter((key) => showErrorAnimations[key]),
-    {
-      from: { opacity: 0, transform: "translateY(-10px)" },
-      enter: { opacity: 1, transform: "translateY(0)" },
-      leave: { opacity: 0, transform: "translateY(-10px)" },
-      config: { tension: 200, friction: 20 },
+  useEffect(() => {
+    if (formStatus && !formStatus.includes("successfully")) {
+      const firstErrorElement = document.querySelector(".animated-error");
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
-  );
+  }, [formStatus]);
 
   function validateForm(formData) {
     const newErrors = {};
@@ -90,12 +85,14 @@ const ContactForm = () => {
     });
 
     setErrors(newErrors);
+  }
 
-    setShowErrorAnimations({
-      from_name: !!newErrors.from_name,
-      from_email: !!newErrors.from_email,
-      message: !!newErrors.message,
-    });
+  function handleFocus(e) {
+    setFocusedField(e.target.name);
+  }
+
+  function handleBlur() {
+    setFocusedField(null);
   }
 
   function sendEmail(e) {
@@ -125,11 +122,7 @@ const ContactForm = () => {
             setIsModalOpen(true);
             e.target.reset();
             setErrors({});
-            setShowErrorAnimations({
-              from_name: false,
-              from_email: false,
-              message: false,
-            });
+            setFocusedField(null); // Clear focusedField after successful submission
           },
           (error) => {
             setFormStatus("Error sending message");
@@ -139,11 +132,7 @@ const ContactForm = () => {
         );
     } else {
       setErrors(formErrors);
-      setShowErrorAnimations({
-        from_name: !!formErrors.from_name,
-        from_email: !!formErrors.from_email,
-        message: !!formErrors.message,
-      });
+      setFormStatus("Please fix errors in the form.");
     }
   }
 
@@ -161,11 +150,16 @@ const ContactForm = () => {
             from: { opacity: 0, transform: "translateX(-20px)" },
           })}
           onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           type="text"
           name="from_name"
           placeholder="Name"
         />
-        <AnimatedError show={showErrorAnimations.from_name}>
+        <AnimatedError
+          show={(focusedField === "from_name" || formStatus) && errors.from_name}
+          className="animated-error"
+        >
           {errors.from_name && <Error>{errors.from_name}</Error>}
         </AnimatedError>
 
@@ -176,11 +170,16 @@ const ContactForm = () => {
             from: { opacity: 0, transform: "translateY(-10px)" },
           })}
           onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           type="email"
           name="from_email"
           placeholder="Email"
         />
-        <AnimatedError show={showErrorAnimations.from_email}>
+        <AnimatedError
+          show={(focusedField === "from_email" || formStatus) && errors.from_email}
+          className="animated-error"
+        >
           {errors.from_email && <Error>{errors.from_email}</Error>}
         </AnimatedError>
 
@@ -192,7 +191,7 @@ const ContactForm = () => {
           })}
           type="number"
           name="contact_number"
-          placeholder="Phone number"
+          placeholder="Phone number (optional)"
         />
 
         <AnimatedInput
@@ -203,7 +202,7 @@ const ContactForm = () => {
           })}
           type="text"
           name="subject"
-          placeholder="Subject"
+          placeholder="Subject (optional)"
         />
 
         <AnimatedTextArea
@@ -213,10 +212,15 @@ const ContactForm = () => {
             from: { opacity: 0, transform: "translateY(-10px)" },
           })}
           onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           name="message"
           placeholder="Message"
         />
-        <AnimatedError show={showErrorAnimations.message}>
+        <AnimatedError
+          show={(focusedField === "message" || formStatus) && errors.message}
+          className="animated-error"
+        >
           {errors.message && <Error>{errors.message}</Error>}
         </AnimatedError>
 
