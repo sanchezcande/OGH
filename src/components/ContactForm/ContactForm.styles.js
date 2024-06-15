@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const FormContainer = styled.form`
   display: flex;
@@ -12,6 +12,22 @@ export const Input = styled.input`
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  border: 3px solid #333;
+  transition: all 0.3s;
+  background-color: #f0f0f0;
+
+  &::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  &:focus {
+    border-color: #0034ee;
+    outline: none;
+  }
+  &:hover {
+    border-color: #0034ee;
+  }
 `;
 
 export const TextArea = styled.textarea`
@@ -19,8 +35,23 @@ export const TextArea = styled.textarea`
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-`;
+  border: 3px solid #333;
+  transition: all 0.3s;
+  background-color: #f0f0f0;
 
+  &::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  &:focus {
+    border-color: #0034ee;
+    outline: none;
+  }
+  &:hover {
+    border-color: #0034ee;
+  }
+`;
 
 export const Error = styled.div`
   color: dark blue;
@@ -28,7 +59,6 @@ export const Error = styled.div`
 `;
 
 // import { useSpring, animated } from "react-spring";
-
 
 // export const FormContainer = styled.form`
 //   display: flex;
