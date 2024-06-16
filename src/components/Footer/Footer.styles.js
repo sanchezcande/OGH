@@ -15,6 +15,10 @@ export const FooterContainer = styled.footer`
   left: 0;
   right: 0;
   width: 100%;
+
+  h4{
+    margin-bottom: 10px;
+  }
 `;
 
 export const FooterContent = styled.div`
@@ -57,16 +61,17 @@ export const Github = styled(github)`
     `;
 
 export const Mail = styled(mail)`
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 15px;
     fill: #fff;
     `;
 export const Tel = styled(tel)`
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 15px;
     fill: #fff;
     `;
 export const TelMailContainer = styled.div`
+margin-top:-10px;
     display: flex;
     gap: 10px;
     align-items: center;
