@@ -39,8 +39,8 @@ const Card = ({
 
   useGesture(
     {
-      onDrag: ({ active, offset: [x, y] }) =>
-        api({ x, y, rotateX: 0, rotateY: 0, scale: active ? 1 : 1.1 }),
+      // onDrag: ({ active, offset: [x, y] }) =>
+      //   api({ x, y, rotateX: 0, rotateY: 0, scale: active ? 1 : 1.1 }),
       onPinch: ({ offset: [d, a] }) => api({ zoom: d / 200, rotateZ: a }),
       onMove: ({ xy: [px, py], dragging }) =>
         !dragging &&

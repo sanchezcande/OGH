@@ -42,6 +42,7 @@ export const SocialMediaContainer = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 10px;
+  align-items: center;
 `;
 
 export const Instagram = styled(instagram)`
@@ -55,9 +56,7 @@ export const Linkedin = styled(linkedin)`
     fill: #fff;
     `;
 export const Github = styled(github)`
-    width: 20px;
-    height: 20px;
-    fill: #fff;
+
     `;
 
 export const Mail = styled(mail)`

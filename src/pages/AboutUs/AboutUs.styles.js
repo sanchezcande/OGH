@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { ReactComponent as Developer1 } from '../../assets/images/deloper1.svg';
+import { ReactComponent as Developer1 } from '../../assets/images/developer1.svg';
 
 export const Container = styled.div`
 display: flex;
