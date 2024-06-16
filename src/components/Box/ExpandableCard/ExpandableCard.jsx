@@ -86,7 +86,7 @@ function OpenFullscreenSvg() {
  
 export default function ExpandableCard() {
   const [isCardExpanded, setIsCardExpanded] = useState(false);
- 
+   
   return (
     <MagicCard
       isCardExpanded={isCardExpanded}

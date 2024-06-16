@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useSpring, animated, to } from "@react-spring/web";
 import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
 import { ReactComponent as GraphicDesign } from "../../assets/icons/GraphicDesign.svg";
+import ExpandableCard from "./ExpandableCard/ExpandableCard";
 
 import styles from "./Box.module.css";
 
@@ -21,7 +22,8 @@ const Card = ({
   buttonText,
   height,
   width,
-  marginLeftParagraph
+  marginLeftParagraph,
+  handleButtonClick,
 }) => {
   const domTarget = useRef(null);
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
@@ -78,9 +80,12 @@ const Card = ({
           </div>
           <h1>{title}</h1>
         </div>
-        <p style={{ marginLeft: marginLeftParagraph }} >{description}</p>
+        <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
         {buttonText && (
-          <DarkButton className={styles.customdarkbutton}>
+          <DarkButton
+            className={styles.customdarkbutton}
+            onClick={handleButtonClick}
+          >
             {buttonText}
           </DarkButton>
         )}
@@ -89,15 +94,32 @@ const Card = ({
   );
 };
 
-export default function Box({
+const Box = ({
   buttonText,
   description,
   imagen,
   title,
   height = 200,
   width = 272,
-  marginLeftParagraph = "50px"
-}) {
+  marginLeftParagraph = "50px",
+}) => {
+  const [showExpandableCard, setShowExpandableCard] = useState(false);
+  const handleButtonClick = () => {
+    setShowExpandableCard(!showExpandableCard);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".expandable-card-container")) {
+        setShowExpandableCard(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   return (
     <div className={styles.container}>
       <Card
@@ -108,7 +130,10 @@ export default function Box({
         height={height}
         width={width}
         marginLeftParagraph={marginLeftParagraph}
+        handleButtonClick={handleButtonClick}
       />
+      {showExpandableCard && <ExpandableCard />}
     </div>
   );
-}
+};
+export default Box;
