@@ -1,39 +1,54 @@
-import React from 'react';
+import React from "react";
+import {
+  FooterContainer,
+  FooterContent,
+  FooterText,
+  Tel,
+  Mail,
+  Github,
+  Instagram,
+  Linkedin,
+  SocialMediaContainer,
+  TelMailContainer
+} from "./Footer.styles";
 
 const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-left">
-          <h3>Nombre de la Empresa</h3>
-          <p>Dirección de la Empresa</p>
-          <p>Teléfono: +123456789</p>
-          <p>Email: info@empresa.com</p>
+    <FooterContainer>
+      <FooterContent>
+        <div>
+          <h3>HubOpenGate</h3>
+          <FooterText>Careers</FooterText>
+          <FooterText>News</FooterText>
+          <FooterText>Privacy Policy</FooterText>
+          <h4>Join Our Community</h4>
+          <SocialMediaContainer>
+            <Github /> <Instagram /> <Linkedin />
+          </SocialMediaContainer>
         </div>
-        <div className="footer-center">
-          <h3>Enlaces Rápidos</h3>
-          <ul className="footer-links">
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Servicios</a></li>
-            <li><a href="#">Productos</a></li>
-            <li><a href="#">Nosotros</a></li>
-            <li><a href="#">Contacto</a></li>
-          </ul>
+        <div>
+          <h3>About Us </h3>
+          <FooterText>FAQ</FooterText>
+          <FooterText>Blog</FooterText>
+          <FooterText>Services</FooterText>
+          <FooterText>Testimonials</FooterText>
+          <FooterText>Accesibility</FooterText>
         </div>
-        <div className="footer-right">
-          <h3>Síguenos</h3>
-          <div className="footer-social-icons">
-            <a href="#"><i className="fab fa-facebook-f"></i></a>
-            <a href="#"><i className="fab fa-twitter"></i></a>
-            <a href="#"><i className="fab fa-instagram"></i></a>
-            <a href="#"><i className="fab fa-linkedin"></i></a>
-          </div>
+        <div>
+          <h3>Support</h3>
+          <FooterText>User Guides</FooterText>
+          <FooterText>Social Responsibility</FooterText>
+          <h4>Connect With Us</h4>
+          <TelMailContainer>
+            <Tel />
+            <FooterText>+55121486324986</FooterText>
+          </TelMailContainer>
+          <TelMailContainer>
+            <Mail /> <FooterText>hubopengate@gmail.com</FooterText>
+          </TelMailContainer>
         </div>
-      </div>
-      <div className="footer-bottom">
-        <p>&copy; 2024 Nombre de la Empresa. Todos los derechos reservados.</p>
-      </div>
-    </footer>
+      </FooterContent>
+    </FooterContainer>
   );
 };
 

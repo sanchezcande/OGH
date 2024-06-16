@@ -9,7 +9,10 @@ const GlobalStyles = createGlobalStyle`
 
   body {
     font-family: 'Montserrat', sans-serif;
-    background-color: ${({ theme }) => theme.colors.background};
+    background: 
+    linear-gradient(120deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 50%),
+    linear-gradient(300deg, #001f3f, #001f3f 50%),
+    linear-gradient(60deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 50%);
     color: ${({ theme }) => theme.colors.text};
     margin-left: 20px;
     margin-right: 20px;
