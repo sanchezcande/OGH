@@ -13,7 +13,6 @@ const defaultImagen = () => <GraphicDesign />;
 const defaultTitle = "Default Title";
 const defaultDescription =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore";
-// const defaultButtonText = "Click me";
 
 const Card = ({
   imagen: Imagen = defaultImagen,
