@@ -8,7 +8,7 @@ const ScrollButton = styled.button`
   bottom: 20px;
   right: 20px;
   z-index: 1000;
-  background-color: rgba(21, 62, 108, 0.34);
+  background-color: rgba(21, 62, 108, 0.1);
   color: white;
   border: 2px solid #0034ee;
   padding: 10px;
