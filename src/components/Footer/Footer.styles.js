@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { ReactComponent as instagram } from "../../assets/icons/instagram.svg";
 import { ReactComponent as linkedin } from "../../assets/icons/linkedin.svg";
-import { ReactComponent as github } from "../../assets//icons/github.svg";
-import { ReactComponent as mail } from "../../assets//icons/mail.svg";
-import { ReactComponent as tel } from "../../assets//icons/tel.svg";
+import { ReactComponent as github } from "../../assets/icons/github.svg";
+import { ReactComponent as mail } from "../../assets/icons/mail.svg";
+import { ReactComponent as tel } from "../../assets/icons/tel.svg";
 
 export const FooterContainer = styled.footer`
   background-color:rgba(21, 62, 108, 0.20);
