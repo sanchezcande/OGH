@@ -27,9 +27,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
     "serve": "node server.js",
+    "build": "npx webpack --config webpack.config.js",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build"
   },
