@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MagicCard } from "react-magic-motion";
 import "react-magic-motion/card.css";
 import { Container } from "./ExpandableCard.styles";
@@ -85,7 +85,7 @@ function OpenFullscreenSvg() {
   );
 }
 
-export default function ExpandableCard() {
+export default function ExpandableCard({ closeCard }) {
   const [isCardExpanded, setIsCardExpanded] = useState(false);
 
   return (
@@ -103,6 +103,7 @@ export default function ExpandableCard() {
             flexDirection: "column",
             padding: "1.35rem 0",
             color: isCardExpanded ? "white" : "currentColor",
+            backgroundColor: "rgba(0, 31, 63, 0.8)",
           }}
         >
           <div
@@ -112,6 +113,17 @@ export default function ExpandableCard() {
               alignItems: "center",
             }}
           >
+            <button
+              style={{
+                background: "#001f3f",
+                color: "blue",
+                marginRight: "10px",
+                width: "20px",
+              }}
+              onClick={closeCard}
+            >
+              &times;
+            </button>
             <h3
               style={{
                 fontWeight: 600,
@@ -122,7 +134,13 @@ export default function ExpandableCard() {
             </h3>
 
             <button
-              style={{ position: "absolute", right: 0, zIndex: 9999, background: "#001f3f", color: "blue"}}
+              style={{
+                position: "absolute",
+                right: 0,
+                zIndex: 9999,
+                background: "#001f3f",
+                color: "blue",
+              }}
               onClick={() => setIsCardExpanded(!isCardExpanded)}
             >
               <svg

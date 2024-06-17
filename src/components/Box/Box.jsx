@@ -107,6 +107,9 @@ const Box = ({
   const handleButtonClick = () => {
     setShowExpandableCard(!showExpandableCard);
   };
+  const closeCard = () => {
+    setShowExpandableCard(false);
+  };
 
   return (
     <div className={styles.container}>
@@ -120,7 +123,7 @@ const Box = ({
         marginLeftParagraph={marginLeftParagraph}
         handleButtonClick={handleButtonClick}
       />
-      {showExpandableCard && <ExpandableCard />}
+      {showExpandableCard && <ExpandableCard closeCard={closeCard}/>}
     </div>
   );
 };
