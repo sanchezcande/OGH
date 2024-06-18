@@ -87,9 +87,16 @@ function OpenFullscreenSvg() {
 
 export default function ExpandableCard({ closeCard }) {
   const [isCardExpanded, setIsCardExpanded] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
+  const handleClose = () => {
+    setFadeOut(true);
+    setTimeout(() => {
+      closeCard();
+    }, 500);
+  };
 
   return (
-    <Container>
+    <Container fadeOut={fadeOut}>
       <MagicCard
         isCardExpanded={isCardExpanded}
         onBackgroundFadeClick={() => setIsCardExpanded(false)}
@@ -113,17 +120,19 @@ export default function ExpandableCard({ closeCard }) {
               alignItems: "center",
             }}
           >
-            <button
-              style={{
-                background: "#001f3f",
-                color: "blue",
-                marginRight: "10px",
-                width: "20px",
-              }}
-              onClick={closeCard}
-            >
-              &times;
-            </button>
+            {!isCardExpanded && (
+              <button
+                style={{
+                  background: "#001f3f",
+                  color: "blue",
+                  marginRight: "10px",
+                  width: "20px",
+                }}
+                onClick={handleClose}
+              >
+                &times;
+              </button>
+            )}
             <h3
               style={{
                 fontWeight: 600,

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useSpring, animated, to } from "@react-spring/web";
 import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
@@ -104,8 +104,14 @@ const Box = ({
   marginLeftParagraph = "50px",
 }) => {
   const [showExpandableCard, setShowExpandableCard] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const handleButtonClick = () => {
     setShowExpandableCard(!showExpandableCard);
+
   };
   const closeCard = () => {
     setShowExpandableCard(false);
@@ -123,7 +129,7 @@ const Box = ({
         marginLeftParagraph={marginLeftParagraph}
         handleButtonClick={handleButtonClick}
       />
-      {showExpandableCard && <ExpandableCard closeCard={closeCard}/>}
+      {isMounted && showExpandableCard && <ExpandableCard closeCard={closeCard}  />}
     </div>
   );
 };
