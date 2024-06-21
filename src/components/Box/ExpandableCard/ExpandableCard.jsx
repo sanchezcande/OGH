@@ -108,9 +108,11 @@ export default function ExpandableCard({ closeCard }) {
             gap: "1rem",
             display: "flex",
             flexDirection: "column",
-            padding: "1.35rem 0",
+            padding: "1.35rem 20px",
             color: isCardExpanded ? "white" : "currentColor",
             backgroundColor: "rgba(0, 31, 63, 0.8)",
+            maxWidth: "calc(100% - 40px)",
+            margin: "0 20px",
           }}
         >
           <div

@@ -1,5 +1,7 @@
 # Getting Started with Create React App
+ ## to use webpack:
 
+npx webpack --config webpack.config.js  
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

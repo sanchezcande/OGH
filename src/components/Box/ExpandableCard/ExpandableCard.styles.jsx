@@ -30,8 +30,6 @@ const fadeOutAnimation = keyframes`
 
 export const Container = styled.div`
   z-index: 1000;
-  margin-right: 20px;
-  margin-left: 20px;
   position: absolute;
   animation: ${(props) => (props.fadeOut ? fadeOutAnimation : fadeInAnimation)};
   animation-duration: 0.5s;
