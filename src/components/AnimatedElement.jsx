@@ -1,6 +1,6 @@
-// AnimatedElement.jsx
-import React from 'react';
-import { useInView, animated } from '@react-spring/web';
+import React from "react";
+import { useInView, animated } from "@react-spring/web";
+
 
 export const buildInteractionObserverThreshold = (count = 100) => {
   const threshold = [];
@@ -26,7 +26,7 @@ const AnimatedElement = ({ children }) => {
       },
     }),
     {
-      rootMargin: '-45% 0px -45% 0px',
+      rootMargin: "-45% 0px -45% 0px",
       threshold: buildInteractionObserverThreshold(),
     }
   );

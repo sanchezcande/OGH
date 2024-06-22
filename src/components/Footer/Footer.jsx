@@ -9,7 +9,9 @@ import {
   Instagram,
   Linkedin,
   SocialMediaContainer,
-  TelMailContainer
+  TelMailContainer,
+  Title,
+  Logo,
 } from "./Footer.styles";
 
 const Footer = () => {
@@ -17,35 +19,38 @@ const Footer = () => {
     <FooterContainer>
       <FooterContent>
         <div>
-          <h3>HubOpenGate</h3>
-          <FooterText>Careers</FooterText>
-          <FooterText>News</FooterText>
-          <FooterText>Privacy Policy</FooterText>
           <h4>Join Our Community</h4>
           <SocialMediaContainer>
             <Github /> <Instagram /> <Linkedin />
           </SocialMediaContainer>
+          <FooterText>Privacy Policy</FooterText>
+          <Title>
+            <Logo />
+            OpenGate<span>Hub</span>
+          </Title>
         </div>
         <div>
-          <h3>About Us </h3>
+          <h4>About Us </h4>
           <FooterText>FAQ</FooterText>
-          <FooterText>Blog</FooterText>
           <FooterText>Services</FooterText>
-          <FooterText>Testimonials</FooterText>
-          <FooterText>Accesibility</FooterText>
+          <Title>
+            <Logo />
+            OpenGate<span>Hub</span>
+          </Title>
         </div>
         <div>
-          <h3>Support</h3>
-          <FooterText>User Guides</FooterText>
-          <FooterText>Social Responsibility</FooterText>
           <h4>Connect With Us</h4>
           <TelMailContainer>
             <Tel />
-            <FooterText>+55121486324986</FooterText>
+            <FooterText>+549 11 2348 5638</FooterText>
           </TelMailContainer>
           <TelMailContainer>
-            <Mail /> <FooterText>hubopengate@gmail.com</FooterText>
+            <Mail /> <FooterText>info@opengatehub.com</FooterText>
           </TelMailContainer>
+          <Title>
+            <Logo />
+            OpenGate<span>Hub</span>
+          </Title>
         </div>
       </FooterContent>
     </FooterContainer>
