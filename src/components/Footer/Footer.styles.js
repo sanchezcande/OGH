@@ -4,7 +4,7 @@ import { ReactComponent as linkedin } from "../../assets/icons/linkedin.svg";
 import { ReactComponent as github } from "../../assets/icons/github.svg";
 import { ReactComponent as mail } from "../../assets/icons/mail.svg";
 import { ReactComponent as tel } from "../../assets/icons/tel.svg";
-import { ReactComponent as LogoSvg } from "../../assets/logo/Ogh.svg";
+import { ReactComponent as LogoSvg } from "../../assets/logo/Logo1.svg";
 
 export const FooterContainer = styled.footer`
   background-color: rgba(21, 62, 108, 0.2);
@@ -91,6 +91,6 @@ export const Logo = styled(LogoSvg)`
   height: 30px;
   margin-right: 7px;
   border-radius: 50%;
-  border: 0.7px solid #fff;
+
 `;
 
