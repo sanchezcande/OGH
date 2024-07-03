@@ -4,7 +4,7 @@ import { ContainerSquare } from "./BoxesContainerSquare.styles";
 import { ReactComponent as Security } from "../../assets/icons/Security.svg";
 import { ReactComponent as UXUI } from "../../assets/icons/UXUI.svg";
 import { ReactComponent as GraphicDesign } from "../../assets/icons/GraphicDesign.svg";
-import { ReactComponent as Circle } from "../../assets/icons/Circle.svg";
+import { ReactComponent as UXUI1 } from "../../assets/icons/UXUI1.svg";
 
 export default function BoxesContainer() {
   const boxesData = [
@@ -25,16 +25,16 @@ export default function BoxesContainer() {
     {
       id: 3,
       title: "UX/UI",
-      image: Circle,
+      image: UXUI1,
       description:
-        "Designing intuitive and visually appealing user experiences with a focus on usability and interaction.",
+        "We design intuitive and attractive interfaces to enhance the experience and engagement of your users.",
     },
     {
       id: 4,
       title: "Graphic Design",
       image: GraphicDesign,
       description:
-        "Creating stunning visuals and motion graphics that captivate and communicate your brand's message.",
+        "We merge innovative graphic design with technological development to create exceptional visual experiences.",
     },
   ];
   return (

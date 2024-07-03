@@ -14,20 +14,20 @@ export default function BoxesContainerRows() {
       title: "Company History",
       image: Security,
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo lectus, ac blandit elit tincidunt id. Sed rhoncus, tortor sed eleifend tristique, tortor mauris molestie elit, et lacinia ipsum quam nec dui. Quisque nec mauris sit amet elit iaculis pretium sit amet quis magna. Aenean velit odio, elementum in tempus ut, vehicula eu diam.",
+        "OpenGateHub stands out in the field of digital health, continuously adapting to the changing technological landscape. Our commitment to innovation and excellence is reflected in how we secure our clients' digital resources, ensuring safe and effective solutions that enhance health care and management in the digital age.",
     },
     {
       id: 2,
       title: "Mission and Core Values",
       image: UXUI,
       description:
-       "Pellentesque rhoncus aliquam mattis. Ut vulputate eros sed felis sodales nec vulputate justo hendrerit. A aliquam odio euismod sit amet. Quisque laoreet sem sit amet orci ullamcorper at ultricies metus viverra. Pellentesque arcu mauris, malesuada quis ornare accumsan, blandi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam accumsan, metus ultricies eleifend gravida, nulla nunc varius lectus, nec rutrum justo nibh et metus. " },
+       "At OpenGateHub, our mission is to transform the healthcare sector with innovative technological solutions that enhance the well-being and efficiency of industry businesses. We are guided by values of innovation, excellence, commitment to our clients, and data security, offering personalized and effective solutions to drive progress and security in digital healthcare." },
     {
       id: 3,
-      title: "Expert Team",
+      title: "Technologies",
       image: Circle,
       description:
-        " Integer at quam nec nisi imperdiet laoreet non at dolor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer gravida risus a orci posuere eget tristique libero dictum. Nunc nec ligula elit. Nullam faucibus purus non nisl scelerisque bibendum. Integer eget magna non ligula sollicitudin tempor. Donec accumsan, nulla eget pulvinar ullamcorper, odio velit hendrerit quam, eget gravida augue magna eu purus. Nulla facilisi.",
+        " At OpenGateHub, we master a wide range of key technologies to deliver advanced digital solutions. From graphic design and motion graphics to intuitive interfaces (UX/UI), our capabilities include HTML, CSS, JavaScript, React for dynamic applications, Python, Flask & Django for robust backend, PHP for web scalability, and JAVA with Spring for enterprise applications. We also efficiently manage databases such as MySQL and SQL, ensuring tailored and high-performance solutions.",
     },
     {
       id: 4,

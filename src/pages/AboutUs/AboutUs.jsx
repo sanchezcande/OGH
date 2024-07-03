@@ -2,8 +2,8 @@ import React from "react";
 import { Developer, ImageText } from "./AboutUs.styles";
 import BoxesContainerRows from "../../components/Box/BoxesContainerRow";
 
-const title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-const text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+const title = "Development and Design for the Digital Age";
+const text = "We specialize in turning your ideas into innovative technological solutions. With an expert team in UX/UI, JavaScript, React, Python, and more, we take your project to the next level. From graphic design to backend development, we provide a comprehensive approach for the success of your digital business.";
 
 const AboutUs = React.forwardRef((props, ref) => {
   return (

@@ -11,7 +11,6 @@ const HomePage = React.forwardRef((props, ref) => (
       innovative digital solution <span>for business</span>
     </Title2>
     <ButtonsContainer>
-      <LightButton>Get Started</LightButton>
       <LightButton>Contact Us</LightButton>
     </ButtonsContainer>
   </Container>
