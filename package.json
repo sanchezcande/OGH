@@ -2,7 +2,7 @@
   "name": "ogh",
   "version": "0.1.0",
   "private": true,
-  "homepage": "opengatehub.com",
+  "homepage": "https://opengatehub.com",
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
