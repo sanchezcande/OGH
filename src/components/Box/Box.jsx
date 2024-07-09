@@ -5,7 +5,7 @@ import { DarkButton } from "../Button/Button";
 import { ReactComponent as GraphicDesign } from "../../assets/icons/GraphicDesign.svg";
 import ExpandableCard from "./ExpandableCard/ExpandableCard";
 
-import { card, container, customdarkbutton, imageTitle, textContainer } from "./Box.module.css";
+import styles from "./Box.module.css";
 
 const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 20;
 const calcY = (x, lx) => (x - lx - window.innerWidth / 2) / 20;
@@ -60,7 +60,7 @@ const Card = ({
   return (
     <animated.div
       ref={domTarget}
-      className={card}
+      className={styles.card}
       style={{
         transform: "perspective(600px)",
         x,
@@ -73,9 +73,9 @@ const Card = ({
         width: `${width}px`,
       }}
     >
-      <div className={textContainer}>
-        <div className={imageTitle}>
-          <div className={imagen}>
+      <div className={styles.textContainer}>
+        <div className={styles.imageTitle}>
+          <div className={styles.imagen}>
             <Imagen />
           </div>
           <h1>{title}</h1>
@@ -83,7 +83,7 @@ const Card = ({
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
         {buttonText && (
           <DarkButton
-            className={customdarkbutton}
+            className={styles.customdarkbutton}
             onClick={handleButtonClick}
           >
             {buttonText}
@@ -118,7 +118,7 @@ const Box = ({
   };
 
   return (
-    <div className={container}>
+    <div className={styles.container}>
       <Card
         imagen={imagen || defaultImagen}
         title={title || defaultTitle}
