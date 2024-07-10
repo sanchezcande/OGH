@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ReactComponent as developer } from "../../assets/images/developer.svg";
+
 
 export const Container = styled.div`
   display: grid;
@@ -15,9 +15,10 @@ export const Container = styled.div`
   }
 `;
 
-export const Developer = styled(developer)`
+export const Developer = styled.img`
   width: 100%;
-  height: 100%;
+  height: auto;
+  object-fit: countain;
   @media (max-width: 768px) {
     flex: 1;
   }

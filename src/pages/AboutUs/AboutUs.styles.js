@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { ReactComponent as Developer1 } from '../../assets/images/developer1.svg';
 
 export const Container = styled.div`
 display: flex;
@@ -8,7 +7,7 @@ align-items: center;
 justify-content: center;
 `;
 
-export const Developer = styled(Developer1)`
+export const Developer = styled.img`
 width: 100%;
 height: auto;
 `;
