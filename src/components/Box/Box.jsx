@@ -24,6 +24,7 @@ const Card = ({
   width,
   marginLeftParagraph,
   handleButtonClick,
+  imageBottom,
 }) => {
   const domTarget = useRef(null);
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
@@ -74,13 +75,18 @@ const Card = ({
       }}
     >
       <div className={styles.textContainer}>
-        <div className={styles.imageTitle}>
-          <div className={styles.imagen}>
-            <Imagen />
+        {!imageBottom && (
+          <div className={styles.image}>
+            <Imagen />{" "}
           </div>
-          <h1>{title}</h1>
-        </div>
+        )}
+        <h1>{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
+        {imageBottom && (
+          <div className={styles.image}>
+            <Imagen />{" "}
+          </div>
+        )}
         {buttonText && (
           <DarkButton
             className={styles.customdarkbutton}
@@ -101,7 +107,8 @@ const Box = ({
   title,
   height = 200,
   width = 272,
-  marginLeftParagraph = "50px",
+  marginLeftParagraph = 0,
+  imageBottom = true,
 }) => {
   const [showExpandableCard, setShowExpandableCard] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -111,7 +118,6 @@ const Box = ({
 
   const handleButtonClick = () => {
     setShowExpandableCard(!showExpandableCard);
-
   };
   const closeCard = () => {
     setShowExpandableCard(false);
@@ -128,8 +134,11 @@ const Box = ({
         width={width}
         marginLeftParagraph={marginLeftParagraph}
         handleButtonClick={handleButtonClick}
+        imageBottom={imageBottom}
       />
-      {isMounted && showExpandableCard && <ExpandableCard closeCard={closeCard}  />}
+      {isMounted && showExpandableCard && (
+        <ExpandableCard closeCard={closeCard} />
+      )}
     </div>
   );
 };

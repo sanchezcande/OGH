@@ -45,6 +45,8 @@ export default function BoxesContainer() {
           title={box.title}
           description={box.description}
           imagen={box.image}
+          height={167}
+          width={261}
         />
       ))}
     </ContainerSquare>

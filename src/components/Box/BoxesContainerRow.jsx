@@ -14,27 +14,27 @@ export default function BoxesContainerRows() {
       title: "Company History",
       image: Security,
       description:
-        "OpenGateHub stands out in the field of digital health, continuously adapting to the changing technological landscape. Our commitment to innovation and excellence is reflected in how we secure our clients' digital resources, ensuring safe and effective solutions that enhance health care and management in the digital age.",
+        "OpenGateHub leads in digital health, consistently adapting to new technologies. Our innovative, secure solutions enhance healthcare and management, ensuring data security and improved patient outcomes. We are dedicated to progress and excellence in the industry.",
     },
     {
       id: 2,
       title: "Mission and Core Values",
       image: UXUI,
       description:
-       "At OpenGateHub, our mission is to transform the healthcare sector with innovative technological solutions that enhance the well-being and efficiency of industry businesses. We are guided by values of innovation, excellence, commitment to our clients, and data security, offering personalized and effective solutions to drive progress and security in digital healthcare." },
+       "At OpenGateHub, we innovate healthcare with technology, enhancing efficiency and well-being. Guided by values of excellence, client commitment, and data security, we drive progress in digital healthcare." },
     {
       id: 3,
       title: "Technologies",
       image: Circle,
       description:
-        " At OpenGateHub, we master a wide range of key technologies to deliver advanced digital solutions. From graphic design and motion graphics to intuitive interfaces (UX/UI), our capabilities include HTML, CSS, JavaScript, React for dynamic applications, Python, Flask & Django for robust backend, PHP for web scalability, and JAVA with Spring for enterprise applications. We also efficiently manage databases such as MySQL and SQL, ensuring tailored and high-performance solutions.",
+        "At OpenGateHub, we leverage advanced technologies like UX/UI, React, Python, Flask, Django, Java, MySQL, and Docker to transform healthcare. Our solutions ensure secure, innovative, and efficient patient care and operations.",
     },
     {
       id: 4,
       title: "Commitment to Innovation",
       image: GraphicDesign,
       description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo lectus, ac blandit elit tincidunt id. Sed rhoncus, tortor sed eleifend tristique, tortor mauris molestie elit, et lacinia ipsum quam nec dui. Quisque nec mauris sit amet elit iaculis pretium sit amet quis magna. Aenean velit odio, elementum in tempus ut, vehicula eu diam. Pellentesque rhoncus aliquam mattis.",
+      "At OpenGateHub, innovation is central to our mission in digital healthcare. We explore new technologies to enhance patient outcomes and operational efficiency, ensuring our solutions are impactful and adaptive to industry evolution.",
     },
   ];
   return (
@@ -48,7 +48,8 @@ export default function BoxesContainerRows() {
           buttonText="Learn More"
           height={380}
           width={260}
-          marginLeftParagraph="20px"
+          marginLeftParagraph=""
+          imageBottom={false}
         />
       ))}
     </ContainerRow>
