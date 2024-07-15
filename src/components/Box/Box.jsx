@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { useSpring, animated, to } from "@react-spring/web";
 import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
@@ -24,6 +24,7 @@ const Card = ({
   width,
   marginLeftParagraph,
   handleButtonClick,
+  imageBottom,
 }) => {
   const domTarget = useRef(null);
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
@@ -41,8 +42,6 @@ const Card = ({
 
   useGesture(
     {
-      // onDrag: ({ active, offset: [x, y] }) =>
-      //   api({ x, y, rotateX: 0, rotateY: 0, scale: active ? 1 : 1.1 }),
       onPinch: ({ offset: [d, a] }) => api({ zoom: d / 200, rotateZ: a }),
       onMove: ({ xy: [px, py], dragging }) =>
         !dragging &&
@@ -74,13 +73,18 @@ const Card = ({
       }}
     >
       <div className={styles.textContainer}>
-        <div className={styles.imageTitle}>
-          <div className={styles.imagen}>
-            <Imagen />
+        {!imageBottom && (
+          <div className={styles.image}>
+            <Imagen />{" "}
           </div>
-          <h1>{title}</h1>
-        </div>
+        )}
+        <h1>{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
+        {imageBottom && (
+          <div className={styles.image}>
+            <Imagen />{" "}
+          </div>
+        )}
         {buttonText && (
           <DarkButton
             className={styles.customdarkbutton}
@@ -95,26 +99,20 @@ const Card = ({
 };
 
 const Box = ({
+  id,
   buttonText,
   description,
   imagen,
   title,
   height = 200,
   width = 272,
-  marginLeftParagraph = "50px",
+  marginLeftParagraph = 0,
+  imageBottom = true,
+  handleBoxClick,
+  isOpen,
 }) => {
-  const [showExpandableCard, setShowExpandableCard] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   const handleButtonClick = () => {
-    setShowExpandableCard(!showExpandableCard);
-
-  };
-  const closeCard = () => {
-    setShowExpandableCard(false);
+    handleBoxClick(id);
   };
 
   return (
@@ -128,8 +126,11 @@ const Box = ({
         width={width}
         marginLeftParagraph={marginLeftParagraph}
         handleButtonClick={handleButtonClick}
+        imageBottom={imageBottom}
       />
-      {isMounted && showExpandableCard && <ExpandableCard closeCard={closeCard}  />}
+      {isOpen && (
+        <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />
+      )}
     </div>
   );
 };

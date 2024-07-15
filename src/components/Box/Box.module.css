@@ -9,20 +9,13 @@
   overflow: hidden;
   touch-action: none;
 }
-
+.card .image {
+  margin-bottom: 20px;
+  justify-content: center;
+  display: flex;
+}
 .card:hover {
   box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.4);
-}
-
-.card .imageTitle {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-  align-items: left;
-  align-self: flex-start;
-
 }
 
 .card > div {
@@ -32,13 +25,11 @@
 }
 
 .card > div > * {
-  background-size: cover;
-  background-position: center center;
+
   margin: 0vw 0;
 }
 
 .container {
-  display: flex;
   align-items: center;
   height: 100%;
   justify-content: center;
@@ -47,35 +38,34 @@
 }
 
 .card .textContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
   align-items: center;
-  margin: 10px 10px 30px 0px;
-  padding: 10px 10px 30px 0px;
+  justify-content: center;
+  margin: 10px;
+  padding: 10px;
 }
 
 .card h1 {
   color: white;
   font-size: 16px;
+  text-align: center;
   font-weight: 600;
-  margin-left: 10px;
+  overflow-wrap: break-word;
+
 }
 
 .card p {
   color: white;
   font-size: 12px;
-  text-align: left;
-  margin-bottom: 10px;
+  text-align: center;
 }
 
 .card .customdarkbutton {
   font-size: 12px;
-  align-items: left;
-  align-self: flex-start;
+  align-items: center;
+  align-self: center;
   border-radius: 40px;
-  bottom: 10px;
   margin-left: 20px;
   height: 25px;
-
+  margin-top: 15px;
 }
