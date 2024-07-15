@@ -10,9 +10,6 @@ const HomePage = React.forwardRef((props, ref) => (
       Specialized in <span>Web & MobileApp Development</span>, crafting
       innovative digital solution <span>for business</span>
     </Title2>
-    <ButtonsContainer>
-      <LightButton>Contact Us</LightButton>
-    </ButtonsContainer>
   </Container>
 ));
 

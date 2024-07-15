@@ -44,6 +44,11 @@ export const Container = styled.div`
   animation: ${(props) => (props.fadeOut ? fadeOutAnimation : fadeInAnimation)};
   animation-duration: 0.5s;
   animation-timing-function: ease-in-out;
+
+  @media (max-width: 768px) {
+    left: 0;
+    right: 0;
+  }
 `;
 
 export const CardContent = styled.div`‡
