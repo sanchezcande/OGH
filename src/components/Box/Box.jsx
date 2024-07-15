@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { useSpring, animated, to } from "@react-spring/web";
 import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
@@ -42,8 +42,6 @@ const Card = ({
 
   useGesture(
     {
-      // onDrag: ({ active, offset: [x, y] }) =>
-      //   api({ x, y, rotateX: 0, rotateY: 0, scale: active ? 1 : 1.1 }),
       onPinch: ({ offset: [d, a] }) => api({ zoom: d / 200, rotateZ: a }),
       onMove: ({ xy: [px, py], dragging }) =>
         !dragging &&
@@ -101,6 +99,7 @@ const Card = ({
 };
 
 const Box = ({
+  id,
   buttonText,
   description,
   imagen,
@@ -109,18 +108,11 @@ const Box = ({
   width = 272,
   marginLeftParagraph = 0,
   imageBottom = true,
+  handleBoxClick,
+  isOpen,
 }) => {
-  const [showExpandableCard, setShowExpandableCard] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   const handleButtonClick = () => {
-    setShowExpandableCard(!showExpandableCard);
-  };
-  const closeCard = () => {
-    setShowExpandableCard(false);
+    handleBoxClick(id);
   };
 
   return (
@@ -136,8 +128,8 @@ const Box = ({
         handleButtonClick={handleButtonClick}
         imageBottom={imageBottom}
       />
-      {isMounted && showExpandableCard && (
-        <ExpandableCard closeCard={closeCard} />
+      {isOpen && (
+        <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />
       )}
     </div>
   );

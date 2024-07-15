@@ -1,53 +1,10 @@
 import { useState } from "react";
-import { MagicCard } from "react-magic-motion";
-import "react-magic-motion/card.css";
-import { Container } from "./ExpandableCard.styles";
+import { Container, CardContent, CloseButton, CardTitle, CardImage, CardSection, CardDescription } from "./ExpandableCard.styles";
+import data from "../data";
+import CloseSvg from "../../../assets/icons/closeSvg"; 
 
-function CloseSvg() {
-  return (
-    <>
-      <rect
-        x="1"
-        y="16"
-        width="14"
-        height="15"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M26 5L18 13"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M18 13H22"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M18 13V9"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <rect
-        x="1"
-        y="1"
-        width="30"
-        height="30"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-    </>
-  );
-}
-
-function ExpandableCard({ closeCard }) {
-  const [isCardExpanded, setIsCardExpanded] = useState(true); 
+function ExpandableCard({ closeCard, id }) {
   const [fadeOut, setFadeOut] = useState(false);
-
   const handleClose = () => {
     setFadeOut(true);
     setTimeout(() => {
@@ -55,43 +12,14 @@ function ExpandableCard({ closeCard }) {
     }, 500);
   };
 
+  const card = data.find((item) => item.id === id);
+
   return (
-    <Container fadeOut={fadeOut}>
-      <MagicCard
-        isCardExpanded={isCardExpanded}
-        onBackgroundFadeClick={() => setIsCardExpanded(false)}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      >
-        <div
-          style={{
-            width: "40rem",
-            gap: "1rem",
-            display: "flex",
-            flexDirection: "column",
-            padding: "1.35rem 20px",
-            color: "white",
-            backgroundColor: "rgba(0, 31, 63, 0.8)",
-            maxWidth: "calc(100% - 40px)",
-            margin: "0 20px",
-          }}
-        >
-          <div
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <button
-              style={{
-                position: "absolute",
-                right: 0,
-                zIndex: 9999,
-                background: "#001f3f",
-                color: "blue",
-              }}
-              onClick={handleClose}
-            >
+    <Container fadeOut={fadeOut} >
+      <div>
+        <CardContent>
+          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <CloseButton onClick={handleClose}>
               <svg
                 key="exclude"
                 width="32"
@@ -102,61 +30,20 @@ function ExpandableCard({ closeCard }) {
               >
                 <CloseSvg />
               </svg>
-            </button>
-            <h3
-              style={{
-                fontWeight: 600,
-                fontSize: "1.4em",
-              }}
-            >
-              Mona Lisa
-            </h3>
+            </CloseButton>
+            <CardTitle>{card.title}</CardTitle>
           </div>
           <div style={{ overflowY: "auto" }}>
-            <img
-              style={{
-                width: "24rem",
-                height: "auto",
-              }}
-              alt="Mona Lisa"
-              src="https://react-magic-motion.nyc3.cdn.digitaloceanspaces.com/examples/expandable-card/mona-lisa.jpg"
+            <CardImage
+              alt={card.title}
+              src={card.expandableImage}
             />
-            <section
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
-              }}
-            >
-              <h4 style={{ fontSize: "1.2em", fontWeight: 600 }}>
-                Title: The Enigmatic Smile of Mona Lisa
-              </h4>
-              <p>
-                Unveil the allure of the world-renowned masterpiece, the Mona
-                Lisa, displayed in the heart of the Louvre Museum in Paris.
-                Painted by the illustrious Leonardo da Vinci between 1503 and
-                1506, this portrait is celebrated for Mona Lisa's enigmatic
-                smile that seems to change depending on the viewing angle.
-              </p>
-              <p>
-                The exquisite blending of light and shadow, known as sfumato,
-                contributes to the mystique of her expression. Da Vinci’s
-                remarkable attention to detail is evident in the delicate
-                veiling and the meticulous background landscapes that frame
-                Mona Lisa's serene demeanor.
-              </p>
-              <p>
-                The artistry and the mysteries enveloping the Mona Lisa
-                continue to captivate audiences, making it an enduring symbol
-                of the Renaissance era. Experience the magnetism of the Mona
-                Lisa, a testament to Leonardo da Vinci's genius, and delve into
-                a visual dialogue with a smile that has intrigued the world for
-                centuries.
-              </p>
-            </section>
+            <CardSection>
+              <CardDescription>{card.expandableDescription}</CardDescription>
+            </CardSection>
           </div>
-        </div>
-      </MagicCard>
+        </CardContent>
+      </div>
     </Container>
   );
 }
