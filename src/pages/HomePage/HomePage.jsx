@@ -1,6 +1,5 @@
 import React from "react";
-import { Container, Title, Image, Title2, ButtonsContainer } from "./HomePage.styles";
-import { LightButton } from "../../components/Button/Button";
+import { Container, Title, Image, Title2 } from "./HomePage.styles";
 
 const HomePage = React.forwardRef((props, ref) => (
   <Container ref={ref}>

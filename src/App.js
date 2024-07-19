@@ -11,7 +11,6 @@ const ContactUs = lazy(() => import("./pages/ContactUs/ContactUs"));
 const Services = lazy(() => import("./pages/Services/Services"));
 const AboutUs = lazy(() => import("./pages/AboutUs/AboutUs"));
 
-
 function App() {
   const homeRef = useRef(null);
   const aboutUsRef = useRef(null);
