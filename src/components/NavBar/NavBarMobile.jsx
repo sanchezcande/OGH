@@ -12,8 +12,10 @@ import {
 } from "./NavBarMobile.styles";
 import { ArrowIcon, WorldIcon, LangMenuContainer } from "./NavBarDesktop.styles";
 import { MagicMotion, motion, LayoutGroup } from "react-magic-motion";
+import { useTranslation } from "react-i18next"; 
 
 const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
+  const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
@@ -28,6 +30,7 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
   };
 
   const handleLangChange = (lang) => {
+    i18n.changeLanguage(lang);
     setSelectedLang(lang);
     setShowLangMenu(false);
   };
@@ -55,15 +58,15 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
               exit={{ opacity: 0, height: 0 }}
             >
               <Menu open={menuOpen}>
-                <MenuItem onClick={() => handleScroll(homeRef)}>Home</MenuItem>
+                <MenuItem onClick={() => handleScroll(homeRef)}>       {t("home")} </MenuItem>
                 <MenuItem onClick={() => handleScroll(servicesRef)}>
-                  Services
+                {t("services")} 
                 </MenuItem>
                 <MenuItem onClick={() => handleScroll(aboutUsRef)}>
-                  About Us
+                {t("aboutUs")}
                 </MenuItem>
                 <MenuItem onClick={() => handleScroll(contactUsRef)}>
-                  Contact Us
+                {t("contactUs")} 
                 </MenuItem>
                 <MenuItem onClick={toggleLangMenu}>
                   <LangMenuContainer>
@@ -74,10 +77,10 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
                 </MenuItem>
                 <LanguageMenu open={showLangMenu}>
                   <LangMenuItem onClick={() => handleLangChange("en")}>
-                    English
+                  {t("english")}
                   </LangMenuItem>
                   <LangMenuItem onClick={() => handleLangChange("es")}>
-                    Español
+                  {t("spanish")}
                   </LangMenuItem>
                 </LanguageMenu>
               </Menu>

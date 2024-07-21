@@ -6,7 +6,7 @@ const SuccessModal = ({ message, onClose }) => (
     <ModalContent>
       <h2>Send!</h2>
       <p>{message}</p>
-      <CloseButton onClick={onClose}>Cerrar</CloseButton>
+      <CloseButton onClick={onClose}>Close</CloseButton>
     </ModalContent>
   </ModalOverlay>
 );

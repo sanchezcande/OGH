@@ -1,9 +1,12 @@
 import React, {useState} from "react";
+import { useTranslation } from 'react-i18next';
 import { ContainerRow } from "./BoxesContainerRow.styles";
 import Box from "./Box";
-import data from "./data";
+import DataRow from "./data/dataRow";
 
 export default function BoxesContainerRows() {
+  const { t } = useTranslation();
+  const data = DataRow(); 
   const [openCardId, setOpenCardId] = useState(null);
 
   const handleBoxClick = (id) => {
@@ -18,7 +21,7 @@ export default function BoxesContainerRows() {
           title={box.title}
           description={box.description}
           imagen={box.image}
-          buttonText="Learn More"
+          buttonText={t('learnMoreButtonText')} 
           height={380}
           width={260}
           marginLeftParagraph=""

@@ -10,18 +10,13 @@ import {
   LangMenuItem,
   WorldIcon,
   StyledLangText,
-  ArrowIcon
+  ArrowIcon,
 } from "./NavBarDesktop.styles";
 import { MagicTabSelect } from "react-magic-motion";
-
-const pillTabs = [
-  { text: "Home", ref: "homeRef", href: "#home" },
-  { text: "Services", ref: "servicesRef", href: "#services" },
-  { text: "About Us", ref: "aboutUsRef", href: "#about-us" },
-  { text: "Contact Us", ref: "contactUsRef", href: "#contact-us" },
-];
+import { useTranslation } from "react-i18next";
 
 const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
+  const { t, i18n } = useTranslation();
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(0);
   const [selectedLang, setSelectedLang] = useState("en");
@@ -32,14 +27,20 @@ const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
 
   const toggleLangMenu = () => {
     setShowLangMenu(!showLangMenu);
-
   };
 
   const handleLangChange = (lang) => {
-     setSelectedLang(lang);
+    i18n.changeLanguage(lang);
+    setSelectedLang(lang);
     setShowLangMenu(false);
-    console.log(`Cambiando a ${lang}`);
   };
+  
+  const pillTabs = [
+    { text: t("home"), ref: "homeRef", href: "#home" },
+    { text: t("services"), ref: "servicesRef", href: "#services" },
+    { text: t("aboutUs"), ref: "aboutUsRef", href: "#about-us" },
+    { text: t("contactUs"), ref: "contactUsRef", href: "#contact-us" },
+  ];
 
   const tabsComponents = pillTabs.map((tab, i) => (
     <li key={tab.text}>
@@ -63,23 +64,22 @@ const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
           <MagicTabSelect
             id="pillTabs"
             transition={{ type: "spring", bounce: 0.35 }}
-
           >
             <span
               style={{
                 borderRadius: "999px",
                 position: "absolute",
-                top: '-5px',
-                left: '-30px',
-                right: '-30px',
-                bottom: '-5px',
+                top: "-5px",
+                left: "-30px",
+                right: "-30px",
+                bottom: "-5px",
                 zIndex: -1,
                 backgroundColor: "rgba(21, 62, 108, 0.84)",
               }}
             />
           </MagicTabSelect>
         )}
-        {tab.text}
+       {t(tab.text)}
       </NavLink>
     </li>
   ));
@@ -93,22 +93,20 @@ const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
       <div>
         <LangMenuContainer onClick={toggleLangMenu}>
           <WorldIcon />
-          <StyledLangText>{selectedLang === "en" ? "English" : "Español"}</StyledLangText>
+          <StyledLangText>
+          {selectedLang === "en" ? t("english") : t("spanish")}
+          </StyledLangText>
           <ArrowIcon open={showLangMenu} />
         </LangMenuContainer>
         {showLangMenu && (
           <LangMenu isOpen={showLangMenu}>
             {selectedLang === "en" ? (
-              <LangMenuItem
-                onClick={() => handleLangChange("es")}
-              >
-                Español
+              <LangMenuItem onClick={() => handleLangChange("es")}>
+                {t("spanish")}
               </LangMenuItem>
             ) : (
-              <LangMenuItem
-                onClick={() => handleLangChange("en")}
-              >
-                English
+              <LangMenuItem onClick={() => handleLangChange("en")}>
+                {t("english")}
               </LangMenuItem>
             )}
           </LangMenu>
