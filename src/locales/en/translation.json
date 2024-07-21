@@ -62,5 +62,7 @@
   "uxuiDescription": "We design intuitive and attractive interfaces to enhance the experience and engagement of your users.",
   "graphicDesignTitle": "Graphic Design",
   "graphicDesignDescription": "We merge innovative graphic design with technological development to create exceptional visual experiences.",
-  "learnMoreButtonText": "Learn More"
+  "learnMoreButtonText": "Learn More",
+  "modalSendTitle": "Send!",
+  "modalCloseButtonText": "Close"
 }
