@@ -15,13 +15,6 @@ import {
 import { MagicTabSelect } from "react-magic-motion";
 import { useTranslation } from "react-i18next";
 
-const pillTabs = [
-  { text: "Home", ref: "homeRef", href: "#home" },
-  { text: "Services", ref: "servicesRef", href: "#services" },
-  { text: "About Us", ref: "aboutUsRef", href: "#about-us" },
-  { text: "Contact Us", ref: "contactUsRef", href: "#contact-us" },
-];
-
 const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
   const { t, i18n } = useTranslation();
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -41,6 +34,13 @@ const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
     setSelectedLang(lang);
     setShowLangMenu(false);
   };
+  
+  const pillTabs = [
+    { text: t("home"), ref: "homeRef", href: "#home" },
+    { text: t("services"), ref: "servicesRef", href: "#services" },
+    { text: t("aboutUs"), ref: "aboutUsRef", href: "#about-us" },
+    { text: t("contactUs"), ref: "contactUsRef", href: "#contact-us" },
+  ];
 
   const tabsComponents = pillTabs.map((tab, i) => (
     <li key={tab.text}>

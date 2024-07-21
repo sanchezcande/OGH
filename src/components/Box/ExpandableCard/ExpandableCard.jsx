@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Container, CardContent, CloseButton, CardTitle, CardImage, CardSection, CardDescription } from "./ExpandableCard.styles";
-import data from "../data";
+import Data from "../data/dataRow";
 import CloseSvg from "../../../assets/icons/closeSvg"; 
 
 function ExpandableCard({ closeCard, id }) {
+  const data = Data(); 
   const [fadeOut, setFadeOut] = useState(false);
   const handleClose = () => {
     setFadeOut(true);
