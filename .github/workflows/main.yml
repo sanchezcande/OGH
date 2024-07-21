@@ -39,7 +39,9 @@ jobs:
           git config --global user.name "GitHub Actions"
 
       - name: Deploy to GitHub Pages
-        run: npm run deploy
+        run: |
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+            npm run deploy
         env:
-          NODE_ENV: production
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            NODE_ENV: production
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
