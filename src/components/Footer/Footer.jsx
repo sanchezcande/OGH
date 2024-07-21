@@ -23,7 +23,14 @@ const Footer = () => {
         <div>
         <h4>{t("joinOurCommunity")}</h4>
           <SocialMediaContainer>
-            <Github /> <Instagram /> <Linkedin />
+            <a href="https://github.com/OpenGateHub" target="_blank" rel="noreferrer">
+              {" "}
+              <Github />
+            </a>{" "}
+            <Instagram />{" "}
+            <a href="https://www.linkedin.com/company/opengatehub" target="_blank"  rel="noreferrer">
+              <Linkedin />
+            </a>
           </SocialMediaContainer>
           <FooterText>{t("privacyPolicy")}</FooterText>
           <Title>
