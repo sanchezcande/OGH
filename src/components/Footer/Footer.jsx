@@ -13,13 +13,15 @@ import {
   Title,
   Logo,
 } from "./Footer.styles";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation(); 
   return (
     <FooterContainer>
       <FooterContent>
         <div>
-          <h4>Join Our Community</h4>
+        <h4>{t("joinOurCommunity")}</h4>
           <SocialMediaContainer>
             <a href="https://github.com/OpenGateHub" target="_blank" rel="noreferrer">
               {" "}
@@ -30,23 +32,23 @@ const Footer = () => {
               <Linkedin />
             </a>
           </SocialMediaContainer>
-          <FooterText>Privacy Policy</FooterText>
+          <FooterText>{t("privacyPolicy")}</FooterText>
           <Title>
             <Logo />
             OpenGate<span>Hub</span>
           </Title>
         </div>
         <div>
-          <h4>About Us </h4>
-          <FooterText>FAQ</FooterText>
-          <FooterText>Services</FooterText>
+        <h4>{t("aboutUs")}</h4>
+        <FooterText>{t("faq")}</FooterText>
+          <FooterText>{t("services")}</FooterText>
           <Title>
             <Logo />
             OpenGate<span>Hub</span>
           </Title>
         </div>
         <div>
-          <h4>Connect With Us</h4>
+        <h4>{t("connectWithUs")}</h4>
           <TelMailContainer>
             <Tel />
             <FooterText>+549 11 2348 5638</FooterText>

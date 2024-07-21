@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const ContainerRow = styled.div`
 display: grid;
-grid-template-columns: repeat(4, 1fr); /* Por defecto, 4 columnas */
+grid-template-columns: repeat(4, 1fr); 
 gap: 40px;
 padding: 20px;
 margin: 0 auto;

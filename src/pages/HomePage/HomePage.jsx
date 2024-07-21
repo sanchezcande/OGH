@@ -1,19 +1,22 @@
 import React from "react";
-import { Container, Title, Image, Title2, ButtonsContainer } from "./HomePage.styles";
-import { LightButton } from "../../components/Button/Button";
+import { useTranslation } from 'react-i18next';
+import { Container, Title, Image, Title2 } from "./HomePage.styles";
 
-const HomePage = React.forwardRef((props, ref) => (
-  <Container ref={ref}>
-    <Image />
-    <Title> <span>We are</span> OpenGateHub</Title>
-    <Title2>
-      Specialized in <span>Web & MobileApp Development</span>, crafting
-      innovative digital solution <span>for business</span>
-    </Title2>
-    <ButtonsContainer>
-      <LightButton>Contact Us</LightButton>
-    </ButtonsContainer>
-  </Container>
-));
+const HomePage = React.forwardRef((props, ref) => {
+  const { t } = useTranslation(); 
+
+  return (
+    <Container ref={ref}>
+      <Image />
+      <Title>
+        <span>{t("weAre")}</span> OpenGateHub
+      </Title>
+      <Title2>
+        {t("specializedIn")} <span>{t("webAndMobileApp")}</span>, {t("crafting")}
+        {t("innovativeSolution")} <span>{t("forBusiness")}</span>
+      </Title2>
+    </Container>
+  );
+});
 
 export default HomePage;

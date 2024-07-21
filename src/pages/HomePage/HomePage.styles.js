@@ -15,6 +15,9 @@ export const Title = styled.h1`
   span {
     font-weight: 400;
   }
+  @media (max-width: 768px) {
+    font-size: 30px;
+  }
 `;
 export const Title2 = styled.h2`
   color: ${({ theme }) => theme.colors.secondary};
@@ -26,6 +29,10 @@ export const Title2 = styled.h2`
 
   span {
     font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.5em;
   }
 `;
 

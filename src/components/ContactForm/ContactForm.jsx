@@ -6,12 +6,13 @@ import {
   Error,
   FormContainer,
   StyledButton,
-  
 } from "./ContactForm.styles";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
+import { useTranslation } from "react-i18next";
 
 const ContactForm = () => {
+  const { t } = useTranslation();
   const initialFormData = {
     from_name: "",
     from_email: "",
@@ -27,17 +28,17 @@ const ContactForm = () => {
   function validateForm() {
     const newErrors = {};
     if (!validateName(formData.from_name)) {
-      newErrors.from_name = "Please enter a valid name";
+      newErrors.from_name = t("pleaseEnterValidName");
     } else {
       delete newErrors.from_name;
     }
     if (!validateEmail(formData.from_email)) {
-      newErrors.from_email = "Please enter a valid email address";
+      newErrors.from_email = t("pleaseEnterValidEmail");
     } else {
-     delete newErrors.from_email;
+      delete newErrors.from_email;
     }
     if (!validateMessage(formData.message)) {
-      newErrors.message = "Please enter a message with more than 10 characters";
+      newErrors.message = t("pleaseEnterValidMessage");
     } else {
       delete newErrors.message;
     }
@@ -45,13 +46,13 @@ const ContactForm = () => {
     return newErrors;
   }
 
-const handleInputChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
-    validateForm(); 
+    validateForm();
   };
 
   function sendEmail(e) {
@@ -77,11 +78,11 @@ const handleInputChange = (e) => {
         )
         .then(
           (result) => {
-            setFormStatus("Message sent successfully");
+            setFormStatus(t("messageSentSuccessfully"));
             setIsModalOpen(true);
           },
           (error) => {
-            setFormStatus("Error sending message");
+            setFormStatus(t("errorSendingMessage"));
             setIsModalOpen(true);
             console.log(error.text);
           }
@@ -101,7 +102,7 @@ const handleInputChange = (e) => {
         <Input
           type="text"
           name="from_name"
-          placeholder="Name"
+          placeholder={t("name")}
           onChange={handleInputChange}
           className={errors.from_name ? "error" : "valid"}
         />
@@ -113,7 +114,7 @@ const handleInputChange = (e) => {
         <Input
           type="email"
           name="from_email"
-          placeholder="Email"
+          placeholder={t("email")}
           onChange={handleInputChange}
           className={errors.from_email ? "error" : "valid"}
         />
@@ -125,12 +126,12 @@ const handleInputChange = (e) => {
         <Input
           type="number"
           name="contact_number"
-          placeholder="Phone number (optional)"
+          placeholder={t("phoneNumber")}
         />
-        <Input type="text" name="subject" placeholder="Subject (optional)" />
+        <Input type="text" name="subject" placeholder={t("subject")} />
         <TextArea
           name="message"
-          placeholder="Message"
+          placeholder={t("message")}
           onChange={handleInputChange}
           className={errors.message ? "error" : "valid"}
         />
@@ -144,7 +145,7 @@ const handleInputChange = (e) => {
           className={errors.message ? "error" : "valid"}
           type="submit"
         >
-          Send
+              {t("send")} 
         </StyledButton>
       </FormContainer>
       {isModalOpen && (
