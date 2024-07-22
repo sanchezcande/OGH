@@ -35,6 +35,7 @@
   justify-content: center;
   margin-right: 20px;
   margin-left: 20px;
+  display: flex;
 }
 
 .card .textContainer {

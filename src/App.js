@@ -31,7 +31,7 @@ function App() {
           <AnimatedElement threshold={0.5}>
             <HomePage ref={homeRef} />
           </AnimatedElement>
-          <AnimatedElement threshold={0.8}>
+          <AnimatedElement threshold={0.8} >
             <Services ref={servicesRef} />
           </AnimatedElement>
           <AnimatedElement threshold={0.5}>

@@ -3,6 +3,8 @@ import styled from "styled-components";
 export const MenuIcon = styled.div`
   cursor: pointer;
   font-size: 1.5rem;
+  transition: transform 0.3s ease; 
+  transform: ${({ open }) => (open ? "rotate(-90deg)" : "rotate(0)")};
 `;
 
 export const LanguageMenu = styled.ul`

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import BoxesContainer from "../../components/Box/BoxesContainerSquare";
-import { Developer, Container } from "./Services.styles";
+import { Developer, Container, ContainerContainer } from "./Services.styles";
 import developer from "../../assets/images/developer.png";
 
 const Services = React.forwardRef((props, ref) => {
@@ -16,6 +16,7 @@ const Services = React.forwardRef((props, ref) => {
   }, []);
 
   return (
+    <ContainerContainer>
     <Container ref={ref}>
       {isMobile ? (
         <>
@@ -29,6 +30,7 @@ const Services = React.forwardRef((props, ref) => {
         </>
       )}
     </Container>
+    </ContainerContainer>
   );
 });
 

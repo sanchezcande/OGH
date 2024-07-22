@@ -1,5 +1,11 @@
 import styled from "styled-components";
 
+export const ContainerContainer = styled.div`
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+  }
+`;
 
 export const Container = styled.div`
   display: grid;

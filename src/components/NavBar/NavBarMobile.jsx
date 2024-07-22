@@ -46,7 +46,7 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
         <Logo>
           OpenGate<Span>Hub</Span>
         </Logo>
-        <MenuIcon onClick={toggleMenu}>☰</MenuIcon>
+        <MenuIcon onClick={toggleMenu} open={menuOpen}>☰</MenuIcon>
       </LogoIcon>
       <MagicMotion transition={{ type: "spring", stiffness: 200, damping: 15 }}>
         <LayoutGroup animate>
