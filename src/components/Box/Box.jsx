@@ -24,6 +24,7 @@ const Card = ({
   width,
   marginLeftParagraph,
   handleButtonClick,
+  imageBottom,
 }) => {
   const domTarget = useRef(null);
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
