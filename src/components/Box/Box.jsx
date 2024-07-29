@@ -78,7 +78,7 @@ const Card = ({
             <Imagen />{" "}
           </div>
         )}
-        <h1>{title}</h1>
+        <h1 className={styles.title} >{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
         {imageBottom && (
           <div
