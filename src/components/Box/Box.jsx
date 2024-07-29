@@ -24,7 +24,6 @@ const Card = ({
   width,
   marginLeftParagraph,
   handleButtonClick,
-  imageBottom,
 }) => {
   const domTarget = useRef(null);
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
@@ -81,8 +80,11 @@ const Card = ({
         <h1>{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
         {imageBottom && (
-          <div className={styles.image}>
-            <Imagen />{" "}
+          <div
+            className={`${styles.image}`}
+            style={{ width: "64px", height: "64px", justifySelf: "center" }}
+          >
+            <Imagen />
           </div>
         )}
         {buttonText && (

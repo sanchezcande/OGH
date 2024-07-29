@@ -8,7 +8,7 @@ export default function BoxesContainer() {
   const { t } = useTranslation();
   const boxesData = DataSquare(t);
   return (
-    <ContainerSquare>
+    <ContainerSquare className="boxsquare">
       {boxesData.map((box) => (
         <Box
           key={box.id}

@@ -1,7 +1,7 @@
-import { ReactComponent as Security } from "../../../assets/icons/Security.svg";
-import { ReactComponent as UXUI } from "../../../assets/icons/UXUI.svg";
-import { ReactComponent as GraphicDesign } from "../../../assets/icons/GraphicDesign.svg";
-import { ReactComponent as UXUI1 } from "../../../assets/icons/UXUI1.svg";
+import { ReactComponent as Security } from "../../../assets/icons/FrontEnd(1).svg";
+import { ReactComponent as UXUI } from "../../../assets/icons/BackEnd(1).svg";
+import { ReactComponent as GraphicDesign } from "../../../assets/icons//GraphicDesign(1).svg";
+import { ReactComponent as UXUI1 } from "../../../assets/icons/UxUi(1).svg";
 
 const DataSquare = (t) => [
   {
