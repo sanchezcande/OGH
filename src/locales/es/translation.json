@@ -60,9 +60,9 @@
   "commitmentToInnovationExpandableDescription4": "En OpenGateHub, la innovación no es solo un objetivo, sino una mentalidad que impregna cada aspecto de nuestra organización. Creemos que al adoptar la innovación, podemos desbloquear nuevas posibilidades, mejorar el desarrollo de software y, en última instancia, marcar una diferencia significativa en la eficiencia y éxito de nuestros clientes en todo el mundo.",
   
   "frontendTitle": "Frontend",
-  "frontendDescription": "Creando interfaces de usuario atractivas con HTML, CSS y frameworks de JavaScript como React.",
+  "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
   "backendTitle": "Backend y Base de Datos",
-  "backendDescription": "Construyendo aplicaciones robustas del lado del servidor con bases de datos escalables usando tecnologías modernas para un rendimiento óptimo y soluciones eficientes.",
+  "backendDescription": "Desarrollando interfaces de usuario interactivas y responsivas para una experiencia de navegación fluida y eficiente.",
   "uxuiTitle": "UX/UI",
   "uxuiDescription": "Diseñamos interfaces intuitivas y atractivas para mejorar la experiencia y el compromiso de tus usuarios.",
   "graphicDesignTitle": "Diseño Gráfico",
