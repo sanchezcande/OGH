@@ -1,6 +1,5 @@
 import React from "react";
-import { useInView, animated } from "@react-spring/web";
-
+import { useInView, animated, useSpring } from "@react-spring/web";
 
 export const buildInteractionObserverThreshold = (count = 100) => {
   const threshold = [];
@@ -14,22 +13,24 @@ export const buildInteractionObserverThreshold = (count = 100) => {
 };
 
 const AnimatedElement = ({ children }) => {
-  const [ref, springs] = useInView(
-    () => ({
-      from: {
-        opacity: 0,
-        y: 80,
-      },
-      to: {
-        opacity: 1,
-        y: 0,
-      },
-    }),
-    {
-      rootMargin: "-45% 0px -45% 0px",
-      threshold: buildInteractionObserverThreshold(),
+  const [springs, api] = useSpring(() => ({
+    opacity: 0,
+    y: 80,
+    config: { tension: 220, friction: 120 },
+  }));
+
+  const [ref, inView] = useInView({
+    rootMargin: "-45% 0px -45% 0px",
+    threshold: buildInteractionObserverThreshold(),
+  });
+
+  React.useEffect(() => {
+    if (inView) {
+      api.start({ opacity: 1, y: 0 });
+    } else {
+      api.start({ opacity: 0, y: 80 }); 
     }
-  );
+  }, [inView, api]);
 
   return (
     <animated.div ref={ref} style={springs}>
