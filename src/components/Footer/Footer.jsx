@@ -27,7 +27,9 @@ const Footer = () => {
               {" "}
               <Github />
             </a>{" "}
+            <a href="https://www.instagram.com/opengatehub" target="_blank" rel="noreferrer">
             <Instagram />{" "}
+            </a>
             <a href="https://www.linkedin.com/company/opengatehub" target="_blank"  rel="noreferrer">
               <Linkedin />
             </a>
