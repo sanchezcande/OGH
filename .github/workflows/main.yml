@@ -27,6 +27,9 @@ jobs:
       - name: Build the application
         run: npm run build
 
+      - name: Pre-render with react-snap
+        run: npx react-snap
+
       - name: List directory contents after build
         run: ls -la
 
