@@ -1,4 +1,4 @@
-import React, { useRef, Suspense, lazy } from "react";
+import React, { useRef, Suspense, lazy, useEffect, useState } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import NavBar from "./components/NavBar/NavBar";
 import GlobalStyles from "./styles/GlobalStyles";
@@ -13,6 +13,15 @@ const Services = lazy(() => import("./pages/Services/Services"));
 const AboutUs = lazy(() => import("./pages/AboutUs/AboutUs"));
 
 function App() {
+  const [isRestLoaded, setIsRestLoaded] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsRestLoaded(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const homeRef = useRef(null);
   const aboutUsRef = useRef(null);
   const servicesRef = useRef(null);
@@ -32,15 +41,19 @@ function App() {
           <AnimatedElement threshold={0.5}>
             <HomePage ref={homeRef} />
           </AnimatedElement>
-          <AnimatedElement threshold={0.8}>
-            <Services ref={servicesRef} />
-          </AnimatedElement>
-          <AnimatedElement threshold={0.5}>
-            <AboutUs ref={aboutUsRef} />
-          </AnimatedElement>
-          <AnimatedElement threshold={0.5}>
-            <ContactUs ref={contactUsRef} />
-          </AnimatedElement>
+          {isRestLoaded && (
+            <div>
+              <AnimatedElement threshold={0.8}>
+                <Services ref={servicesRef} />
+              </AnimatedElement>
+              <AnimatedElement threshold={0.5}>
+                <AboutUs ref={aboutUsRef} />
+              </AnimatedElement>
+              <AnimatedElement threshold={0.5}>
+                <ContactUs ref={contactUsRef} />
+              </AnimatedElement>{" "}
+            </div>
+          )}
         </div>
       </Suspense>
       <ScrollToTopButton />
