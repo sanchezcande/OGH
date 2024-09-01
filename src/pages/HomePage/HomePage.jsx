@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import { Container, Title, Image, Title2 } from "./HomePage.styles";
+import favicon from '../../assets/logo/Logo.png';
 
 const HomePage = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ const HomePage = React.forwardRef((props, ref) => {
         <meta name="keywords" content="OpenGateHub, Open Gate Hub, Open GateHub, software develop, web develop, páginas web" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
+        <link rel="icon" href={favicon} type="image/svg+xml" />
       </Helmet>
 
       <Container ref={ref}>
