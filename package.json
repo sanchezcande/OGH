@@ -68,5 +68,13 @@
     "styled-components": "^6.1.11",
     "webpack": "^5.92.0",
     "webpack-bundle-analyzer": "^4.10.2"
+  },
+  "reactSnap": {
+    "crawl": false, 
+    "inlineCss": true,  
+    "puppeteer": {
+      "timeout": 60000 
+    },
+    "minifyHtml": true
   }
 }

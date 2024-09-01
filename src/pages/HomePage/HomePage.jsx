@@ -15,6 +15,9 @@ const HomePage = React.forwardRef((props, ref) => {
         <meta property="og:title" content={t("OpenGateHub")} />
         <meta property="og:description" content={t("pageDescription")} />
         <meta property="og:url" content="https://opengatehub.com/" />
+        <meta name="keywords" content="OpenGateHub, Open Gate Hub, Open GateHub, software develop, web develop, páginas web" />
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow" />
       </Helmet>
 
       <Container ref={ref}>
