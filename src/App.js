@@ -36,26 +36,25 @@ function App() {
         servicesRef={servicesRef}
         contactUsRef={contactUsRef}
       />
-      <Suspense fallback={<Spinner />}>
-        <div>
-          <AnimatedElement threshold={0.5}>
-            <HomePage ref={homeRef} />
-          </AnimatedElement>
-          {isRestLoaded && (
-            <div>
-              <AnimatedElement threshold={0.8}>
-                <Services ref={servicesRef} />
-              </AnimatedElement>
-              <AnimatedElement threshold={0.5}>
-                <AboutUs ref={aboutUsRef} />
-              </AnimatedElement>
-              <AnimatedElement threshold={0.5}>
-                <ContactUs ref={contactUsRef} />
-              </AnimatedElement>{" "}
-            </div>
-          )}
-        </div>
-      </Suspense>
+      <div>
+        <AnimatedElement threshold={0.5}>
+          <HomePage ref={homeRef} />
+        </AnimatedElement>
+        {isRestLoaded && (
+          <Suspense fallback={<Spinner />}>
+            <AnimatedElement threshold={0.8}>
+              <Services ref={servicesRef} />
+            </AnimatedElement>
+            <AnimatedElement threshold={0.5}>
+              <AboutUs ref={aboutUsRef} />
+            </AnimatedElement>
+            <AnimatedElement threshold={0.5}>
+              <ContactUs ref={contactUsRef} />
+            </AnimatedElement>{" "}
+          </Suspense>
+        )}
+      </div>
+
       <ScrollToTopButton />
       <Footer />
     </Router>
