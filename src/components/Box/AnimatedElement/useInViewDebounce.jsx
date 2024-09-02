@@ -32,15 +32,15 @@ const useInViewDebounce = (rootMargin = "0px", threshold = 0.5, delay = 100) => 
         threshold,
       }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
+    const elementRef = ref.current;
+    if (elementRef) {
+      observer.observe(elementRef);
     }
 
     return () => {
       clearTimeout(timeoutId.current);
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (elementRef) {
+        observer.unobserve(elementRef);
       }
     };
   }, [inView, rootMargin, threshold, delay]);
