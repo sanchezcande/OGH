@@ -2,7 +2,7 @@ import React, { useRef, Suspense, lazy, useEffect, useState } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import NavBar from "./components/NavBar/NavBar";
 import GlobalStyles from "./styles/GlobalStyles";
-import AnimatedElement from "./components/AnimatedElement";
+import AnimatedElement from "./components/Box/AnimatedElement/AnimatedElement";
 import Footer from "./components/Footer/Footer";
 import Spinner from "./components/Spinner/Spinner";
 import ScrollToTopButton from "./components/Button/ScrollToTopButton";

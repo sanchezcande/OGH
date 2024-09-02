@@ -9,7 +9,7 @@ margin: 0 auto;
 max-width: 1200px;
 justify-content: center;
 align-items: center;
-margin-top: 100px;
+margin-top: 0px;
 
 @media (max-width: 1240px) {
   grid-template-columns: repeat(2, 1fr);
