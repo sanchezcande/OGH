@@ -16,6 +16,7 @@ margin-top: 0px;
 }
 
 @media (max-width: 768px) {
+  margin-top:50px;
   grid-template-columns: 1fr; 
   grid-gap: 20px;
   padding: 0 20px;

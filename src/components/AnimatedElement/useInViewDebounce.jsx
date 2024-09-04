@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-const useInViewDebounce = (rootMargin = "0px", threshold = 0.5, delay = 100) => {
+const thresholdValue = window.innerWidth < 768 ? 0.01 : 0.5;
+
+
+const useInViewDebounce = (rootMargin = "0px", threshold = thresholdValue, delay = 100) => {
   const [inView, setInView] = useState(false);
   const [hasExited, setHasExited] = useState(false);
   const ref = useRef(null);

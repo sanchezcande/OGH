@@ -1,5 +1,5 @@
 import React from "react";
-import { Developer, ImageText } from "./AboutUs.styles";
+import { Developer, ImageText, Container } from "./AboutUs.styles";
 import BoxesContainerRows from "../../components/Box/BoxesContainerRow";
 import developer1 from '../../assets/images/developer1.png';
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
   return (
-    <div ref={ref}>
+    <Container ref={ref}>
       <ImageText>
         <Developer src={developer1} alt="dev1" />
         <h1>
@@ -15,7 +15,7 @@ const AboutUs = React.forwardRef((props, ref) => {
         </h1>
       </ImageText>
       <BoxesContainerRows />
-    </div>
+    </Container>
   );
 });
 

@@ -5,6 +5,10 @@ display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
+@media (max-width: 768px) {
+  margin-top: 200px;
+  
+}
 `;
 
 export const Developer = styled.img`
