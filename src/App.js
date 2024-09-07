@@ -6,7 +6,7 @@ import AnimatedElement from "./components/AnimatedElement/AnimatedElement";
 import Footer from "./components/Footer/Footer";
 import Spinner from "./components/Spinner/Spinner";
 import ScrollToTopButton from "./components/Button/ScrollToTopButton";
-import useIsDesktop from "./Hooks/useIsDesktop"; 
+import useIsDesktop from "./Hooks/useIsDesktop";
 
 const HomePage = lazy(() => import("./pages/HomePage/HomePage"));
 const ContactUs = lazy(() => import("./pages/ContactUs/ContactUs"));
@@ -15,7 +15,7 @@ const AboutUs = lazy(() => import("./pages/AboutUs/AboutUs"));
 
 function App() {
   const [isRestLoaded, setIsRestLoaded] = useState(false);
-  const isDesktop = useIsDesktop(); // Use the hook to determine if it's desktop
+  const isDesktop = useIsDesktop();
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsRestLoaded(true);
@@ -44,16 +44,23 @@ function App() {
         </AnimatedElement>
         {isRestLoaded && (
           <Suspense fallback={<Spinner />}>
-            <AnimatedElement threshold={0.8}>
-              <Services ref={servicesRef} />
-            </AnimatedElement>
+            {isDesktop ? (
+              <AnimatedElement threshold={0.1}>
+                <Services ref={servicesRef} />
+              </AnimatedElement>
+            ) : (
+              <AnimatedElement threshold={0.01}>
+                <Services ref={servicesRef} />
+              </AnimatedElement>
+            )}
             {isDesktop ? (
               <AnimatedElement threshold={0.1}>
                 <AboutUs ref={aboutUsRef} />
               </AnimatedElement>
             ) : (
-              <AboutUs ref={aboutUsRef} />
-            )}
+              <AnimatedElement threshold={0.001}>
+                <AboutUs ref={aboutUsRef} />
+              </AnimatedElement>            )}
             <AnimatedElement threshold={0.5}>
               <ContactUs ref={contactUsRef} />
             </AnimatedElement>

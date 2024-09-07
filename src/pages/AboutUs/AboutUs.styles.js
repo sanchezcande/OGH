@@ -33,10 +33,17 @@ span {
     font-size:12px;
     font-weight: 400;
       display: block;
+      margin-top: 20px;
+      line-height: 1.5;
 }
 @media (max-width: 768px) {
     grid-template-columns: 1fr; 
     grid-gap: 20px;
     padding: 0 20px;
+    text-align: center;
+
+    span {
+
+    }
   }
 `;
