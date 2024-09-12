@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import {ReactComponent as cyberSecurity} from '../../assets/images/cyberSecurity.svg';
 
 export const Container = styled.div`
   padding: 20px;
@@ -36,12 +35,15 @@ export const Title2 = styled.h2`
   }
 `;
 
-export const Image = styled(cyberSecurity)`
-  width: 100%;
+export const Image = styled.img`
+  width: auto;
   max-height: 500px;
-  object-fit: cover;
   margin-bottom: 20px;
   margin-top: 0;
+
+  @media (max-width: 768px) {
+    max-height: 200px;
+  }
 `;
 
 export const ButtonsContainer = styled.div`

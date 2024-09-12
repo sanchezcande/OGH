@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet";
 import { Container, Title, Image, Title2 } from "./HomePage.styles";
 import logo from "../../assets/logo/Logo.png";
+import cyberSecurity from '../../assets/images/cyberSecurity.png';
+
 
 const HomePage = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
@@ -26,7 +28,7 @@ const HomePage = React.forwardRef((props, ref) => {
       </Helmet>
 
       <Container ref={ref}>
-        <Image />
+        <Image src={cyberSecurity} alt=""/>
         <Title>
           <span>{t("weAre")}</span> OpenGateHub
         </Title>
