@@ -14,7 +14,7 @@ const HomePage = React.forwardRef((props, ref) => {
       <Helmet>
         <title>OpenGateHub</title>
         <meta name="description" content={t("pageDescription")} />
-        <link rel="canonical" href="https:/opengatehub.com/" />
+        <link rel="canonical" href="https://opengatehub.com/" />
         <meta property="og:title" content={t("OpenGateHub")} />
         <meta property="og:description" content={t("pageDescription")} />
         <meta property="og:url" content="https://opengatehub.com/" />
