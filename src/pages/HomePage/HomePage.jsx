@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet";
 import { Container, Title, Image, Title2 } from "./HomePage.styles";
-import logo from "../../../public/Logo.png";
 import cyberSecurity from '../../assets/images/cyberSecurity.png';
 
 
@@ -24,7 +23,7 @@ const HomePage = React.forwardRef((props, ref) => {
         />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
-        <meta property="og:image" content={logo} />{" "}
+        <meta property="og:image" content="/Logo.png" />{" "}
       </Helmet>
 
       <Container ref={ref}>
