@@ -1,8 +1,5 @@
 import styled, { css, keyframes } from "styled-components";
-import { Link } from "react-router-dom";
-import { ReactComponent as worldIcon } from "../../assets/icons/worldIcon.svg";
-import { FaAngleDown } from "react-icons/fa";
-
+import { FaAngleDown, FaGlobe } from "react-icons/fa";
 export const NavBarContainer = styled.nav`
   display: flex;
   justify-content: space-between;
@@ -36,12 +33,33 @@ export const NavLinks = styled.ul`
 
 `;
 
-export const NavLink = styled(Link)`
-position: relative;
-padding: 0.65rem 0.75rem;
-color: white;
-border: 0;
-borderRadius: 999px;
+
+export const NavLink = styled.a`
+  position: relative;
+  padding: 10px 20px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  z-index: 1;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #ddd;
+  }
+`;
+
+export const HighlightBar = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: ${({ hoveredIndex, tabCount }) =>
+    hoveredIndex !== -1 ? `${(hoveredIndex / tabCount) * 100}%` : "0%"};
+  width: ${({ hoveredIndex, tabCount }) =>
+    hoveredIndex !== -1 ? `${100 / tabCount}%` : "0%"};
+  height: 100%;
+  background-color: rgba(21, 62, 108, 0.84);
+  border-radius: 999px;
+  transition: left 0.3s ease, width 0.3s ease;
+  z-index: 0;
 `;
 
 export const LangMenuContainer = styled.span`
@@ -109,7 +127,7 @@ export const LangMenuItem = styled.li`
   }
 `;
 
-export const WorldIcon = styled(worldIcon)`
+export const WorldIcon = styled(FaGlobe)`
   width: 32px;
   height: 32px;
   margin-right: 10px;

@@ -1,10 +1,6 @@
 import styled from "styled-components";
-import { ReactComponent as instagram } from "../../assets/icons/instagram.svg";
-import { ReactComponent as linkedin } from "../../assets/icons/linkedin.svg";
-import { ReactComponent as github } from "../../assets/icons/github.svg";
-import { ReactComponent as mail } from "../../assets/icons/mail.svg";
-import { ReactComponent as tel } from "../../assets/icons/tel.svg";
-import { ReactComponent as LogoSvg } from "../../assets/logo/Logo1.svg";
+import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaPhone } from "react-icons/fa";
+import Image from "next/image";
 
 export const FooterContainer = styled.footer`
   background-color: rgba(21, 62, 108, 0.2);
@@ -46,24 +42,24 @@ export const SocialMediaContainer = styled.div`
   align-items: center;
 `;
 
-export const Instagram = styled(instagram)`
+export const Instagram = styled(FaInstagram)`
   width: 20px;
   height: 20px;
   fill: #fff;
 `;
-export const Linkedin = styled(linkedin)`
+export const Linkedin = styled(FaLinkedin)`
   width: 20px;
   height: 20px;
   fill: #fff;
 `;
-export const Github = styled(github)``;
+export const Github = styled(FaGithub)``;
 
-export const Mail = styled(mail)`
+export const Mail = styled(FaEnvelope)`
   width: 15px;
   height: 15px;
   fill: #fff;
 `;
-export const Tel = styled(tel)`
+export const Tel = styled(FaPhone)`
   width: 15px;
   height: 15px;
   fill: #fff;
@@ -86,11 +82,13 @@ export const Title = styled.h3`
   }
 `;
 
-export const Logo = styled(LogoSvg)`
-  width: 30px;
-  height: 30px;
+export const Logo = styled(Image).attrs({
+  src: "/assets/logo/Logo1.svg",
+  alt: "Logo",
+  width: 30,
+  height: 30,
+})`
   margin-right: 7px;
   border-radius: 50%;
-
 `;
 
