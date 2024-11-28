@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   NavBarContainer,
   Logo,
@@ -72,28 +73,32 @@ const NavBarMobile = () => {
               exit={{ opacity: 0, height: 0 }}
             >
               <Menu open={menuOpen}>
-                <MenuItem onClick={() => {toggleMenu}}>
-                  {" "}
-                  {t("home")}{" "}
+                <MenuItem onClick={toggleMenu}>
+                  <Link href="/">{t("home")}</Link>
                 </MenuItem>
-                <MenuItem onClick={toggleServicesMenu}>
-                  <LangMenuContainer style={{ marginBottom: "10px" }}>
+                <MenuItem>
+                  <LangMenuContainer
+                    style={{ marginBottom: "10px" }}
+                    onClick={toggleServicesMenu}
+                  >
                     {t("services")}
                     <ArrowIcon open={showServicesMenu} />
                   </LangMenuContainer>
-                  <LanguageMenu open={showServicesMenu}>
-                    {servicesList.map((service, index) => (
-                      <LangMenuItem key={index}>
-                        <a href={service.href}>{service.text}</a>
-                      </LangMenuItem>
-                    ))}
-                  </LanguageMenu>
+                  {showServicesMenu && (
+                    <LanguageMenu open={showServicesMenu}>
+                      {servicesList.map((service, index) => (
+                        <LangMenuItem key={index} onClick={toggleMenu}>
+                          <Link href={service.href}>{service.text}</Link>
+                        </LangMenuItem>
+                      ))}
+                    </LanguageMenu>
+                  )}
                 </MenuItem>
-                <MenuItem onClick={() => {toggleMenu}}>
-                  {t("aboutUs")}
+                <MenuItem onClick={toggleMenu}>
+                  <Link href="/about-us">{t("aboutUs")}</Link>
                 </MenuItem>
-                <MenuItem onClick={() => {toggleMenu}}>
-                  {t("contactUs")}
+                <MenuItem onClick={toggleMenu}>
+                  <Link href="/contact-us">{t("contactUs")}</Link>
                 </MenuItem>
                 <MenuItem onClick={toggleLangMenu}>
                   <LangMenuContainer>
@@ -102,14 +107,16 @@ const NavBarMobile = () => {
                     <ArrowIcon open={showLangMenu} />
                   </LangMenuContainer>
                 </MenuItem>
-                <LanguageMenu open={showLangMenu}>
-                  <LangMenuItem onClick={() => handleLangChange("en")}>
-                    {t("english")}
-                  </LangMenuItem>
-                  <LangMenuItem onClick={() => handleLangChange("es")}>
-                    {t("spanish")}
-                  </LangMenuItem>
-                </LanguageMenu>
+                {showLangMenu && (
+                  <LanguageMenu open={showLangMenu}>
+                    <LangMenuItem onClick={() => handleLangChange("en")}>
+                      {t("english")}
+                    </LangMenuItem>
+                    <LangMenuItem onClick={() => handleLangChange("es")}>
+                      {t("spanish")}
+                    </LangMenuItem>
+                  </LanguageMenu>
+                )}
               </Menu>
             </motion.div>
           )}
