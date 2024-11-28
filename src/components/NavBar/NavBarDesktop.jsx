@@ -50,9 +50,10 @@ const NavBarDesktop = () => {
   ];
 
   const servicesList = [
-    { text: t("webDevelopment"), href: "/services/web-development" },
-    { text: t("appDevelopment"), href: "/services/app-development" },
-    { text: t("uiuxDesign"), href: "/services/ui-ux-design" },
+    { text: t("frontendTitle"), href: "/services/web-development" },
+    { text: t("backendTitle"), href: "/services/app-development" },
+    { text: t("uxuiTitle"), href: "/services/ui-ux-design" },
+    { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
   ];
 
   useEffect(() => {
@@ -88,10 +89,10 @@ const NavBarDesktop = () => {
               >
                 {tab.text}
                 {showServicesMenu && (
-                  <ServicesMenu
-                    onMouseLeave={() => setShowServicesMenu(false)}
-                    isOpen={showServicesMenu}
-                  >
+                 <ServicesMenu
+                 onMouseLeave={() => setShowServicesMenu(false)}
+                 isOpen={showServicesMenu}
+               >
                     {servicesList.map((service, index) => (
                       <ServicesMenuItem key={index}>
                         <Link href={service.href}>{service.text}</Link>
@@ -102,14 +103,14 @@ const NavBarDesktop = () => {
               </NavLink>
             ) : (
               <NavLink
-                className="nav-link"
-                onMouseEnter={() => {
-                  setHoveredIndex(i);
-                  setShowServicesMenu(false);
-                }}
-              >
-                {tab.text}
-              </NavLink>
+              className="nav-link"
+              onMouseEnter={() => {
+                setHoveredIndex(i);
+                setShowServicesMenu(false);
+              }}
+            >
+              {tab.text}
+            </NavLink>
             )}
           </li>
         ))}
@@ -141,6 +142,7 @@ const NavBarDesktop = () => {
 };
 
 export default NavBarDesktop;
+
 
 // import React, { useState } from "react";
 // import {
