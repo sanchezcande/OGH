@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import BoxesContainer from "../../../src/components/Box/BoxesContainerSquare";
-import { Developer, Container, ContainerContainer } from "./Services.styles";
-import developer from "../../assets/images/developer.png";
+import BoxesContainer from "../../src/components/Box/BoxesContainerSquare";
+import { Developer, Container, ContainerContainer } from "./index.styles";
+import developer from "../../src/assets/images/developer.png";
 
 const Services = React.forwardRef((props, ref) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);

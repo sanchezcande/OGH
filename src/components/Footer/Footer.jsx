@@ -11,7 +11,6 @@ import {
   SocialMediaContainer,
   TelMailContainer,
   Title,
-  Logo,
 } from "./Footer.styles";
 import { useTranslation } from "react-i18next";
 
@@ -36,7 +35,7 @@ const Footer = () => {
           </SocialMediaContainer>
           <FooterText>{t("privacyPolicy")}</FooterText>
           <Title>
-            <Logo />
+            {/* <Logo /> */}
             OpenGate<span>Hub</span>
           </Title>
         </div>
@@ -45,7 +44,7 @@ const Footer = () => {
         <FooterText>{t("faq")}</FooterText>
           <FooterText>{t("services")}</FooterText>
           <Title>
-            <Logo />
+            {/* <Logo /> */}
             OpenGate<span>Hub</span>
           </Title>
         </div>
@@ -59,7 +58,6 @@ const Footer = () => {
             <Mail /> <FooterText>info@opengatehub.com</FooterText>
           </TelMailContainer>
           <Title>
-            <Logo />
             OpenGate<span>Hub</span>
           </Title>
         </div>

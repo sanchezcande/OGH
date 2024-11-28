@@ -82,13 +82,4 @@ export const Title = styled.h3`
   }
 `;
 
-export const Logo = styled(Image).attrs({
-  src: "/assets/logo/Logo1.svg",
-  alt: "Logo",
-  width: 30,
-  height: 30,
-})`
-  margin-right: 7px;
-  border-radius: 50%;
-`;
 

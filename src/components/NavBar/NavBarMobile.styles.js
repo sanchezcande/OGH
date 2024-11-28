@@ -99,6 +99,7 @@ export const MenuItem = styled.li`
   text-decoration: none;
   display: block;
   width: 100%;
+  border-radius: 40px;
   align-items: center;
   padding: 1rem;
   transition: background-color 0.3s ease;

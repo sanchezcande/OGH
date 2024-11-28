@@ -1,4 +1,4 @@
-import ContactForm from "../../components/ContactForm/ContactForm";
+import ContactForm from "../../src/components/ContactForm/ContactForm";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Container } from "./ContactUs.styles";

@@ -10,16 +10,20 @@ import {
   LangMenuItem,
   Span,
 } from "./NavBarMobile.styles";
-import { ArrowIcon, WorldIcon, LangMenuContainer } from "./NavBarDesktop.styles";
+import {
+  ArrowIcon,
+  WorldIcon,
+  LangMenuContainer,
+} from "./NavBarDesktop.styles";
 import { MagicMotion, motion, LayoutGroup } from "react-magic-motion";
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
 
-const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
+const NavBarMobile = () => {
   const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
-  const [showServicesMenu, setShowServicesMenu] = useState(false); 
+  const [showServicesMenu, setShowServicesMenu] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -41,16 +45,11 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
     setShowLangMenu(false);
   };
 
-  const handleScroll = (ref) => {
-    ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    setMenuOpen(false);
-  };
-
   const servicesList = [
-    { text: t("frontendTitle"), href: "/services/web-development" },
-    { text: t("backendTitle"), href: "/services/app-development" },
-    { text: t("uxuiTitle"), href: "/services/ui-ux-design" },
-    { text: t("graphicDesignTitle"), href: "/services/ui-ux-design" },
+    { text: t("frontendTitle"), href: "/services/front-end" },
+    { text: t("backendTitle"), href: "/services/back-end" },
+    { text: t("uxuiTitle"), href: "/services/ux-ui" },
+    { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
   ];
 
   return (
@@ -59,7 +58,9 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
         <Logo>
           OpenGate<Span>Hub</Span>
         </Logo>
-        <MenuIcon onClick={toggleMenu} open={menuOpen}>☰</MenuIcon>
+        <MenuIcon onClick={toggleMenu} open={menuOpen}>
+          ☰
+        </MenuIcon>
       </LogoIcon>
       <MagicMotion transition={{ type: "spring", stiffness: 200, damping: 15 }}>
         <LayoutGroup animate>
@@ -71,7 +72,10 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
               exit={{ opacity: 0, height: 0 }}
             >
               <Menu open={menuOpen}>
-                <MenuItem onClick={() => handleScroll(homeRef)}>       {t("home")} </MenuItem>
+                <MenuItem onClick={() => {toggleMenu}}>
+                  {" "}
+                  {t("home")}{" "}
+                </MenuItem>
                 <MenuItem onClick={toggleServicesMenu}>
                   <LangMenuContainer style={{ marginBottom: "10px" }}>
                     {t("services")}
@@ -85,25 +89,25 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
                     ))}
                   </LanguageMenu>
                 </MenuItem>
-                <MenuItem onClick={() => handleScroll(aboutUsRef)}>
-                {t("aboutUs")}
+                <MenuItem onClick={() => {toggleMenu}}>
+                  {t("aboutUs")}
                 </MenuItem>
-                <MenuItem onClick={() => handleScroll(contactUsRef)}>
-                {t("contactUs")} 
+                <MenuItem onClick={() => {toggleMenu}}>
+                  {t("contactUs")}
                 </MenuItem>
                 <MenuItem onClick={toggleLangMenu}>
                   <LangMenuContainer>
-                  <WorldIcon />
-                  {selectedLang === "en" ? "Language  " : "Idioma  "}
-                  <ArrowIcon open={showLangMenu} />
+                    <WorldIcon />
+                    {selectedLang === "en" ? "Language  " : "Idioma  "}
+                    <ArrowIcon open={showLangMenu} />
                   </LangMenuContainer>
                 </MenuItem>
                 <LanguageMenu open={showLangMenu}>
                   <LangMenuItem onClick={() => handleLangChange("en")}>
-                  {t("english")}
+                    {t("english")}
                   </LangMenuItem>
                   <LangMenuItem onClick={() => handleLangChange("es")}>
-                  {t("spanish")}
+                    {t("spanish")}
                   </LangMenuItem>
                 </LanguageMenu>
               </Menu>

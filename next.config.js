@@ -1,24 +1,28 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-    webpack(config) {
-      config.module.rules.push({
-        test: /\.svg$/,
-        use: [
-          {
-            loader: "@svgr/webpack",
-            options: {
-              prettier: false,
-              svgo: true,
-              svgoConfig: {
-                plugins: [{ removeViewBox: false }],
-              },
-              titleProp: true,
+  reactStrictMode: true,
+  compiler: {
+    styledComponents: true, 
+  },
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            prettier: false,
+            svgo: true,
+            svgoConfig: {
+              plugins: [{ removeViewBox: false }],
             },
+            titleProp: true,
           },
-        ],
-      });
-      return config;
-    },
-  };
-  
-  module.exports = nextConfig;
-  
+        },
+      ],
+    });
+    return config;
+  },
+};
+
+module.exports = nextConfig;

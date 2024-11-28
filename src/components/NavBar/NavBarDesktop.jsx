@@ -50,9 +50,9 @@ const NavBarDesktop = () => {
   ];
 
   const servicesList = [
-    { text: t("frontendTitle"), href: "/services/web-development" },
-    { text: t("backendTitle"), href: "/services/app-development" },
-    { text: t("uxuiTitle"), href: "/services/ui-ux-design" },
+    { text: t("frontendTitle"), href: "/services/front-end" },
+    { text: t("backendTitle"), href: "/services/back-end" },
+    { text: t("uxuiTitle"), href: "/services/ux-ui" },
     { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
   ];
 
@@ -62,7 +62,7 @@ const NavBarDesktop = () => {
     const offsets = Array.from(navLinks).map((link) => link.offsetLeft);
     setTabWidths(widths);
     setTabOffsets(offsets);
-  }, [pillTabs, selectedLang]);
+  }, []);
 
   return (
     <NavBarContainer>
@@ -72,9 +72,9 @@ const NavBarDesktop = () => {
       <NavLinks>
         {tabOffsets.length > 0 && tabWidths.length > 0 && (
           <HighlightBar
-            hoveredIndex={hoveredIndex}
-            tabWidths={tabWidths}
-            tabOffsets={tabOffsets}
+            $hoveredIndex={hoveredIndex}
+            $tabWidths={tabWidths}
+            $tabOffsets={tabOffsets}
           />
         )}
         {pillTabs.map((tab, i) => (
@@ -87,12 +87,12 @@ const NavBarDesktop = () => {
                   setShowServicesMenu(true);
                 }}
               >
-                {tab.text}
+                <Link href={tab.href}>{tab.text}</Link>
                 {showServicesMenu && (
-                 <ServicesMenu
-                 onMouseLeave={() => setShowServicesMenu(false)}
-                 isOpen={showServicesMenu}
-               >
+                  <ServicesMenu
+                    $isOpen={showServicesMenu}
+                    onMouseLeave={() => setShowServicesMenu(false)}
+                  >
                     {servicesList.map((service, index) => (
                       <ServicesMenuItem key={index}>
                         <Link href={service.href}>{service.text}</Link>
@@ -103,14 +103,14 @@ const NavBarDesktop = () => {
               </NavLink>
             ) : (
               <NavLink
-              className="nav-link"
-              onMouseEnter={() => {
-                setHoveredIndex(i);
-                setShowServicesMenu(false);
-              }}
-            >
-              {tab.text}
-            </NavLink>
+                className="nav-link"
+                onMouseEnter={() => {
+                  setHoveredIndex(i);
+                  setShowServicesMenu(false);
+                }}
+              >
+                <Link href={tab.href}>{tab.text}</Link>
+              </NavLink>
             )}
           </li>
         ))}
@@ -124,7 +124,7 @@ const NavBarDesktop = () => {
           <ArrowIcon open={showLangMenu} />
         </LangMenuContainer>
         {showLangMenu && (
-          <LangMenu isOpen={showLangMenu}>
+          <LangMenu $isOpen={showLangMenu}>
             {selectedLang === "en" ? (
               <LangMenuItem onClick={() => handleLangChange("es")}>
                 {t("spanish")}
@@ -142,7 +142,6 @@ const NavBarDesktop = () => {
 };
 
 export default NavBarDesktop;
-
 
 // import React, { useState } from "react";
 // import {

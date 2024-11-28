@@ -32,9 +32,13 @@ export const NavLinks = styled.ul`
   position: relative;
   justify-content: center;
   gap: 50px;
+
+  @media (max-width: 1165px) {
+    gap: 10px;
+  }
 `;
 
-export const NavLink = styled.a`
+export const NavLink = styled.span`
   position: relative;
   padding: 10px 20px;
   color: white;
@@ -52,12 +56,14 @@ export const NavLink = styled.a`
 export const HighlightBar = styled.div`
   position: absolute;
   bottom: 0;
-  left: ${({ hoveredIndex, tabOffsets }) => tabOffsets[hoveredIndex] - 30 || 0}px;
-  width: ${({ hoveredIndex, tabWidths }) => (tabWidths[hoveredIndex] || 0) + 60}px; 
+  left: ${({ $hoveredIndex, $tabOffsets }) =>
+    $tabOffsets[$hoveredIndex] - 30 || 0}px;
+  width: ${({ $hoveredIndex, $tabWidths }) =>
+    ($tabWidths[$hoveredIndex] || 0) + 60}px;
   height: 100%;
   background-color: rgba(21, 62, 108, 0.84);
   border-radius: 999px;
-  transition: left 0.3s ease, width 0.3s ease; 
+  transition: left 0.3s ease, width 0.3s ease;
   z-index: 0;
 `;
 
@@ -111,7 +117,8 @@ export const LangMenu = styled.ul`
   border-radius: 5px;
   max-height: 200px;
   overflow: hidden;
-  animation: ${(props) => (props.isOpen ? slideDown : slideUp)} 0.4s ease forwards;
+  animation: ${(props) => (props.$isOpen ? slideDown : slideUp)} 0.4s ease
+    forwards;
 `;
 
 export const LangMenuItem = styled.li`
@@ -147,24 +154,24 @@ export const ArrowIcon = styled(FaAngleDown)`
 `;
 
 export const ServicesMenu = styled.ul`
-position: absolute;
-top: 115%;
-left: 50%; 
-transform: translateX(-50%); 
-list-style: none;
-border: 1px solid #0034ee;
-border-radius: 5px;
-background-color: #001f3f;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-z-index: 10;
-overflow: hidden;
-margin: 0;
-padding: 0;
+  position: absolute;
+  top: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  list-style: none;
+  border: 1px solid #0034ee;
+  border-radius: 5px;
+  background-color: #001f3f;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 
-animation: ${(props) => (props.isOpen ? slideDown : slideUp)} 0.4s ease
-  forwards;
-visibility: ${(props) => (props.isOpen ? "visible" : "hidden")}; 
-opacity: ${(props) => (props.isOpen ? 1 : 0)}; 
+  animation: ${(props) => (props.$isOpen ? slideDown : slideUp)} 0.4s ease
+    forwards;
+  visibility: ${(props) => (props.$isOpen ? "visible" : "hidden")};
+  opacity: ${(props) => (props.$isOpen ? 1 : 0)};
 `;
 
 export const ServicesMenuItem = styled.li`
@@ -173,7 +180,7 @@ export const ServicesMenuItem = styled.li`
   color: white;
   text-weight: 100;
   font-size: 14px;
-  min-width: 150px;
+  min-width: 200px;
   transition: background-color 0.5s ease, color 0.5s ease, font-size 0.5s ease;
   &:hover {
     background-color: rgba(21, 62, 108, 0.84);
