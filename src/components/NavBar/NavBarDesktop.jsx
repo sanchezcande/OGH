@@ -45,12 +45,11 @@ const NavBarDesktop = () => {
         OpenGate<Span>Hub</Span>
       </Logo>
       <NavLinks>
-      <HighlightBar hoveredIndex={hoveredIndex} tabCount={pillTabs.length} />
+      <HighlightBar hoveredIndex={hoveredIndex} tabCount={pillTabs.length}/>
         {pillTabs.map((tab, i) => (
           <li key={tab.text}>
               <NavLink
                 onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(-1)}
               >
                 {tab.text}
               </NavLink>

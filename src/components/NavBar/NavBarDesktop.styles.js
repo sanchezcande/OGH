@@ -30,7 +30,8 @@ export const NavLinks = styled.ul`
   background-color: rgba(21, 62, 108, 0.34);
   padding: 15px 30px;
   border: 2px solid #0034ee;
-
+  position: relative;
+  justify-content: center;
 `;
 
 
@@ -49,16 +50,21 @@ export const NavLink = styled.a`
 `;
 
 export const HighlightBar = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: ${({ hoveredIndex, tabCount }) =>
-    hoveredIndex !== -1 ? `${(hoveredIndex / tabCount) * 100}%` : "0%"};
-  width: ${({ hoveredIndex, tabCount }) =>
-    hoveredIndex !== -1 ? `${100 / tabCount}%` : "0%"};
+position: absolute;
+bottom: 0;
+left: 0;
+width: ${({ hoveredIndex }) => {
+  const widths = ["150px", "150px", "150px", "175px"];
+  return widths[hoveredIndex];
+}};
   height: 100%;
   background-color: rgba(21, 62, 108, 0.84);
   border-radius: 999px;
-  transition: left 0.3s ease, width 0.3s ease;
+  transition: transform 0.3s ease;
+  transform: ${({ hoveredIndex }) => {
+    const positions = ["0px", "92%", "195%", "254%"];
+    return `translateX(${positions[hoveredIndex]})`;
+  }};
   z-index: 0;
 `;
 
