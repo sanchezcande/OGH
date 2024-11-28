@@ -53,9 +53,11 @@ export const LangMenuItem = styled.li`
   text-decoration: none;
   cursor: pointer;
   border-radius: 40px;
-    padding: 1rem;
+  padding: 1rem;
   &:hover {
   background-color: rgba(21, 62, 108, 0.34);
+  border-radius: 40px;
+
   }
 `;
 

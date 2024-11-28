@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Link from "next/link"; // Usamos Link de Next.js
+import Link from "next/link";
 import {
   Logo,
   Span,
@@ -13,6 +13,8 @@ import {
   StyledLangText,
   HighlightBar,
   ArrowIcon,
+  ServicesMenu,
+  ServicesMenuItem,
 } from "./NavBarDesktop.styles";
 import { useTranslation } from "react-i18next";
 
@@ -23,9 +25,14 @@ const NavBarDesktop = () => {
   const [selectedLang, setSelectedLang] = useState("en");
   const [tabWidths, setTabWidths] = useState([]);
   const [tabOffsets, setTabOffsets] = useState([]);
+  const [showServicesMenu, setShowServicesMenu] = useState(false);
 
   const toggleLangMenu = () => {
     setShowLangMenu(!showLangMenu);
+  };
+
+  const toggleServicesMenu = () => {
+    setShowServicesMenu(!showServicesMenu);
   };
 
   const handleLangChange = (lang) => {
@@ -38,7 +45,14 @@ const NavBarDesktop = () => {
     { text: t("home"), href: "/" },
     { text: t("services"), href: "/services" },
     { text: t("aboutUs"), href: "/about-us" },
+    { text: t("Blog"), href: "/blog" },
     { text: t("contactUs"), href: "/contact-us" },
+  ];
+
+  const servicesList = [
+    { text: t("webDevelopment"), href: "/services/web-development" },
+    { text: t("appDevelopment"), href: "/services/app-development" },
+    { text: t("uiuxDesign"), href: "/services/ui-ux-design" },
   ];
 
   useEffect(() => {
@@ -47,7 +61,7 @@ const NavBarDesktop = () => {
     const offsets = Array.from(navLinks).map((link) => link.offsetLeft);
     setTabWidths(widths);
     setTabOffsets(offsets);
-  }, [pillTabs, selectedLang]); 
+  }, [pillTabs, selectedLang]);
 
   return (
     <NavBarContainer>
@@ -64,12 +78,39 @@ const NavBarDesktop = () => {
         )}
         {pillTabs.map((tab, i) => (
           <li key={tab.text}>
-            <NavLink
-              className="nav-link"
-              onMouseEnter={() => setHoveredIndex(i)}
-            >
-              {tab.text}
-            </NavLink>
+            {tab.text === t("services") ? (
+              <NavLink
+                className="nav-link"
+                onMouseEnter={() => {
+                  setHoveredIndex(i);
+                  setShowServicesMenu(true);
+                }}
+              >
+                {tab.text}
+                {showServicesMenu && (
+                  <ServicesMenu
+                    onMouseLeave={() => setShowServicesMenu(false)}
+                    isOpen={showServicesMenu}
+                  >
+                    {servicesList.map((service, index) => (
+                      <ServicesMenuItem key={index}>
+                        <Link href={service.href}>{service.text}</Link>
+                      </ServicesMenuItem>
+                    ))}
+                  </ServicesMenu>
+                )}
+              </NavLink>
+            ) : (
+              <NavLink
+                className="nav-link"
+                onMouseEnter={() => {
+                  setHoveredIndex(i);
+                  setShowServicesMenu(false);
+                }}
+              >
+                {tab.text}
+              </NavLink>
+            )}
           </li>
         ))}
       </NavLinks>
@@ -100,7 +141,6 @@ const NavBarDesktop = () => {
 };
 
 export default NavBarDesktop;
-
 
 // import React, { useState } from "react";
 // import {
@@ -138,7 +178,7 @@ export default NavBarDesktop;
 //     setSelectedLang(lang);
 //     setShowLangMenu(false);
 //   };
-  
+
 //   const pillTabs = [
 //     { text: t("home"), ref: "homeRef", href: "#home" },
 //     { text: t("services"), ref: "servicesRef", href: "#services" },

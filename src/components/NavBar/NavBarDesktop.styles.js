@@ -38,6 +38,7 @@ export const NavLink = styled.a`
   position: relative;
   padding: 10px 20px;
   color: white;
+  cursor: pointer;
   text-decoration: none;
   font-size: 16px;
   z-index: 1;
@@ -117,10 +118,10 @@ export const LangMenuItem = styled.li`
   padding: 10px;
   cursor: pointer;
   right: 0;
+  border-radius: 40px;
   transition: background-color 0.5s ease, color 0.5s ease;
   &:hover {
     background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 40px;
     color: ${(props) => props.theme.colors.primary};
   }
 `;
@@ -143,4 +144,39 @@ export const ArrowIcon = styled(FaAngleDown)`
       animation: rotate 0.3s ease-in-out;
       transform: rotate(180deg);
     `}
+`;
+
+export const ServicesMenu = styled.ul`
+position: absolute;
+top: 115%;
+left: 50%; 
+transform: translateX(-50%); 
+list-style: none;
+border: 1px solid #0034ee;
+border-radius: 5px;
+background-color: #001f3f;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+z-index: 10;
+overflow: hidden;
+margin: 0;
+padding: 0;
+
+animation: ${(props) => (props.isOpen ? slideDown : slideUp)} 0.4s ease
+  forwards;
+visibility: ${(props) => (props.isOpen ? "visible" : "hidden")}; 
+opacity: ${(props) => (props.isOpen ? 1 : 0)}; 
+`;
+
+export const ServicesMenuItem = styled.li`
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+  text-weight: 100;
+  font-size: 14px;
+  min-width: 150px;
+  transition: background-color 0.5s ease, color 0.5s ease, font-size 0.5s ease;
+  &:hover {
+    background-color: rgba(21, 62, 108, 0.84);
+    font-size: 15px;
+  }
 `;
