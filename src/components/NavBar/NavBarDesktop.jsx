@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link"; // Usamos Link de Next.js
 import {
   Logo,
@@ -21,6 +21,8 @@ const NavBarDesktop = () => {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(0);
   const [selectedLang, setSelectedLang] = useState("en");
+  const [tabWidths, setTabWidths] = useState([]);
+  const [tabOffsets, setTabOffsets] = useState([]);
 
   const toggleLangMenu = () => {
     setShowLangMenu(!showLangMenu);
@@ -39,20 +41,35 @@ const NavBarDesktop = () => {
     { text: t("contactUs"), href: "/contact-us" },
   ];
 
+  useEffect(() => {
+    const navLinks = document.querySelectorAll(".nav-link");
+    const widths = Array.from(navLinks).map((link) => link.offsetWidth);
+    const offsets = Array.from(navLinks).map((link) => link.offsetLeft);
+    setTabWidths(widths);
+    setTabOffsets(offsets);
+  }, [pillTabs, selectedLang]); 
+
   return (
     <NavBarContainer>
       <Logo>
         OpenGate<Span>Hub</Span>
       </Logo>
       <NavLinks>
-      <HighlightBar hoveredIndex={hoveredIndex} tabCount={pillTabs.length}/>
+        {tabOffsets.length > 0 && tabWidths.length > 0 && (
+          <HighlightBar
+            hoveredIndex={hoveredIndex}
+            tabWidths={tabWidths}
+            tabOffsets={tabOffsets}
+          />
+        )}
         {pillTabs.map((tab, i) => (
           <li key={tab.text}>
-              <NavLink
-                onMouseEnter={() => setHoveredIndex(i)}
-              >
-                {tab.text}
-              </NavLink>
+            <NavLink
+              className="nav-link"
+              onMouseEnter={() => setHoveredIndex(i)}
+            >
+              {tab.text}
+            </NavLink>
           </li>
         ))}
       </NavLinks>
@@ -83,8 +100,6 @@ const NavBarDesktop = () => {
 };
 
 export default NavBarDesktop;
-
-
 
 
 // import React, { useState } from "react";

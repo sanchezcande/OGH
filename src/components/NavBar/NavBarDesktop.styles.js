@@ -1,5 +1,6 @@
 import styled, { css, keyframes } from "styled-components";
 import { FaAngleDown, FaGlobe } from "react-icons/fa";
+
 export const NavBarContainer = styled.nav`
   display: flex;
   justify-content: space-between;
@@ -9,8 +10,7 @@ export const NavBarContainer = styled.nav`
   color: white;
   width: 100%;
   background-color: transparent;
-  marging-right:10px;
-
+  margin-right: 10px;
 `;
 
 export const Logo = styled.div`
@@ -24,7 +24,6 @@ export const Span = styled.span`
 
 export const NavLinks = styled.ul`
   display: flex;
-  gap: 50px;
   list-style: none;
   border-radius: 40px;
   background-color: rgba(21, 62, 108, 0.34);
@@ -32,8 +31,8 @@ export const NavLinks = styled.ul`
   border: 2px solid #0034ee;
   position: relative;
   justify-content: center;
+  gap: 50px;
 `;
-
 
 export const NavLink = styled.a`
   position: relative;
@@ -50,21 +49,14 @@ export const NavLink = styled.a`
 `;
 
 export const HighlightBar = styled.div`
-position: absolute;
-bottom: 0;
-left: 0;
-width: ${({ hoveredIndex }) => {
-  const widths = ["150px", "150px", "150px", "175px"];
-  return widths[hoveredIndex];
-}};
+  position: absolute;
+  bottom: 0;
+  left: ${({ hoveredIndex, tabOffsets }) => tabOffsets[hoveredIndex] - 30 || 0}px;
+  width: ${({ hoveredIndex, tabWidths }) => (tabWidths[hoveredIndex] || 0) + 60}px; 
   height: 100%;
   background-color: rgba(21, 62, 108, 0.84);
   border-radius: 999px;
-  transition: transform 0.3s ease;
-  transform: ${({ hoveredIndex }) => {
-    const positions = ["0px", "92%", "195%", "254%"];
-    return `translateX(${positions[hoveredIndex]})`;
-  }};
+  transition: left 0.3s ease, width 0.3s ease; 
   z-index: 0;
 `;
 
