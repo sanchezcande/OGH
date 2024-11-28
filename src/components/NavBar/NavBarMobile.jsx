@@ -19,14 +19,20 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
+  const [showServicesMenu, setShowServicesMenu] = useState(false); 
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     setShowLangMenu(false);
+    setShowServicesMenu(false);
   };
 
   const toggleLangMenu = () => {
     setShowLangMenu(!showLangMenu);
+  };
+
+  const toggleServicesMenu = () => {
+    setShowServicesMenu(!showServicesMenu);
   };
 
   const handleLangChange = (lang) => {
@@ -39,6 +45,13 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
     ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     setMenuOpen(false);
   };
+
+  const servicesList = [
+    { text: t("frontendTitle"), href: "/services/web-development" },
+    { text: t("backendTitle"), href: "/services/app-development" },
+    { text: t("uxuiTitle"), href: "/services/ui-ux-design" },
+    { text: t("graphicDesignTitle"), href: "/services/ui-ux-design" },
+  ];
 
   return (
     <NavBarContainer>
@@ -59,8 +72,18 @@ const NavBarMobile = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
             >
               <Menu open={menuOpen}>
                 <MenuItem onClick={() => handleScroll(homeRef)}>       {t("home")} </MenuItem>
-                <MenuItem onClick={() => handleScroll(servicesRef)}>
-                {t("services")} 
+                <MenuItem onClick={toggleServicesMenu}>
+                  <LangMenuContainer style={{ marginBottom: "10px" }}>
+                    {t("services")}
+                    <ArrowIcon open={showServicesMenu} />
+                  </LangMenuContainer>
+                  <LanguageMenu open={showServicesMenu}>
+                    {servicesList.map((service, index) => (
+                      <LangMenuItem key={index}>
+                        <a href={service.href}>{service.text}</a>
+                      </LangMenuItem>
+                    ))}
+                  </LanguageMenu>
                 </MenuItem>
                 <MenuItem onClick={() => handleScroll(aboutUsRef)}>
                 {t("aboutUs")}
