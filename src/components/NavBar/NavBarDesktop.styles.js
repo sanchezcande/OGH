@@ -32,10 +32,13 @@ export const NavLinks = styled.ul`
   position: relative;
   justify-content: center;
   gap: 50px;
+  overflow: hidden;
 
   @media (max-width: 1165px) {
     gap: 10px;
   }
+
+
 `;
 
 export const NavLink = styled.span`
@@ -51,6 +54,11 @@ export const NavLink = styled.span`
   &:hover {
     color: #ddd;
   }
+  &.last-item {
+    width: 120px !important; /* Fija un ancho para el último item */
+    text-align: center;
+  }
+ 
 `;
 
 export const HighlightBar = styled.div`
@@ -131,6 +139,7 @@ export const LangMenuItem = styled.li`
     background-color: rgba(255, 255, 255, 0.8);
     color: ${(props) => props.theme.colors.primary};
   }
+
 `;
 
 export const WorldIcon = styled(FaGlobe)`

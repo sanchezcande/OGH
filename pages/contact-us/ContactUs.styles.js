@@ -4,11 +4,9 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
     margin-bottom: 50px;
-    margin-top:250px;
 
 
     @media (max-width: 768px) {
-        margin-top:250px;
         margin-bottom:100px;
       }
 

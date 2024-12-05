@@ -74,7 +74,7 @@ const NavBarMobile = () => {
             >
               <Menu open={menuOpen}>
                 <MenuItem onClick={toggleMenu}>
-                  <Link href="/">{t("home")}</Link>
+                  <Link href="/">{t("home")}</Link> 
                 </MenuItem>
                 <MenuItem>
                   <LangMenuContainer

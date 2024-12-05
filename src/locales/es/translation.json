@@ -3,8 +3,8 @@
   "pageDescription": "OpenGateHub ofrece consultoría IT y soluciones de desarrollo de software a medida. Ayudamos a las empresas a crear aplicaciones web y móviles escalables para impulsar la innovación y la transformación digital.",
   "home": "Inicio",
   "services": "Servicios",
-  "aboutUs": "Sobre Nosotros",
-  "contactUs": "Contactanos",
+  "aboutUs": "Nosotros",
+  "contactUs": "Contacto",
   "english": "Inglés",
   "spanish": "Español",
   "name": "Nombre",
@@ -60,7 +60,7 @@
   "commitmentToInnovationExpandableDescription2": "Fomentamos una cultura de creatividad y curiosidad, alentando a nuestros miembros del equipo a pensar fuera de lo común y desafiar el pensamiento convencional. Este enfoque nos permite anticipar las necesidades futuras y desarrollar proactivamente soluciones que aborden las demandas cambiantes del sector tecnológico. Al abrazar la innovación, no solo mejoramos la efectividad de nuestros servicios, sino que también impulsamos cambios positivos en toda la industria.",
   "commitmentToInnovationExpandableDescription3": "Además, nuestro compromiso con la innovación se extiende más allá de la tecnología para abarcar la mejora de procesos y asociaciones estratégicas. Colaboramos estrechamente con expertos de la industria para co-crear soluciones que aborden desafíos del mundo real y brinden beneficios tangibles. Este enfoque colaborativo nos permite adaptar nuestras ofertas a las necesidades específicas de nuestros clientes, asegurando que nuestras soluciones sean tanto impactantes como sostenibles.",
   "commitmentToInnovationExpandableDescription4": "En OpenGateHub, la innovación no es solo un objetivo, sino una mentalidad que impregna cada aspecto de nuestra organización. Creemos que al adoptar la innovación, podemos desbloquear nuevas posibilidades, mejorar el desarrollo de software y, en última instancia, marcar una diferencia significativa en la eficiencia y éxito de nuestros clientes en todo el mundo.",
-  
+
   "frontendTitle": "Front-end",
   "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
   "backendTitle": "Back-end & Cloud",
@@ -71,5 +71,85 @@
   "graphicDesignDescription": "Fusionamos diseño gráfico innovador con desarrollo tecnológico para crear experiencias visuales excepcionales.",
   "learnMoreButtonText": "Saber Más",
   "modalSendTitle": "¡Enviado!",
-  "modalCloseButtonText": "Cerrar"
+  "modalCloseButtonText": "Cerrar",
+  "frontend": {
+    "title": "Frontend",
+    "description": "En la era digital actual, tener una plataforma rápida y fácil de usar ya no es una ventaja, es una necesidad. Sin embargo, muchas empresas se encuentran con páginas web que no funcionan bien en dispositivos móviles, interfaces que no conectan con los usuarios o experiencias de navegación lentas que alejan a los clientes.",
+    "solutions": {
+      "responsive": "Responsivas, que se adaptan a cualquier pantalla y dispositivo.",
+      "interactive": "Interactivas, garantizando una experiencia de navegación ágil y atractiva.",
+      "customized": "Personalizadas, alineadas con los objetivos de tu negocio y las expectativas de tus usuarios."
+    },
+    "benefits": "Con un enfoque en tecnologías líderes como React y frameworks modernos, optimizamos el rendimiento de tu sitio, mejoramos la retención de usuarios y ayudamos a incrementar tus conversiones al facilitar procesos como compras o registros. Cada detalle se diseña pensando en tus clientes y en cómo brindarles una experiencia única que los invite a regresar.",
+    "stepsTitle": "¿Cómo podemos ayudarte?",
+    "steps": {
+      "step1": "Contáctanos: Escríbenos por correo o llena nuestro formulario de contacto en línea.",
+      "step2": "Cuéntanos tu necesidad: Explícanos tus objetivos, retos o cualquier problema que estés enfrentando.",
+      "step3": "Creamos tu plan: Te proponemos soluciones personalizadas y diseñamos juntos una plataforma que no solo resuelva tus problemas, sino que impulse el crecimiento de tu negocio."
+    },
+    "callToAction": "¿Listo para destacar en el mundo digital? Hablemos y diseñemos juntos una plataforma que haga brillar tu marca."
+  },
+  "backend": {
+    "title": "Backend & Cloud",
+    "description": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde tú, como líder de tu negocio, puedes marcar la diferencia.",
+    "solutions": {
+      "title2": "Soluciones",
+      "scalable": "Sistemas backend escalables con tecnologías como Node.js, Python, Go y Ruby on Rails.",
+      "secure": "Implementación de seguridad robusta para proteger tus datos y garantizar la confianza de tus clientes.",
+      "cloud": "Integraciones cloud con AWS, Google Cloud y Azure para una infraestructura flexible y poderosa.",
+      "efficient": "Optimización de procesos para garantizar tiempos de respuesta rápidos y rendimiento constante."
+    },
+    "benefits": "Con nuestra experiencia en backend y cloud, tú lideras la transformación digital de tu empresa. Te proporcionamos las herramientas tecnológicas necesarias para ofrecer una experiencia impecable a tus usuarios y alcanzar tus objetivos. Al implementar soluciones modernas como bases de datos escalables (PostgreSQL, MongoDB), GraphQL y sistemas de microservicios, construimos un backend que te respalda en cada paso del camino.",
+    "stepsTitle": "¿Cómo hacemos equipo contigo?",
+    "steps": {
+      "step1": "Contáctanos: Comparte tus retos y metas completando nuestro formulario en línea.",
+      "step2": "Planificamos juntos: Diseñamos una solución que responde a tus objetivos específicos.",
+      "step3": "Tu éxito, nuestra prioridad: Implementamos un sistema backend y cloud que potencia tu liderazgo."
+    },
+    "callToAction": "Tú eres el motor de esta transformación. Hablemos y construyamos juntos una infraestructura tecnológica que impulse tu visión de negocio."
+  }, "uxui": {
+    "title": "Diseño UX/UI",
+    "description": "El diseño UX/UI es el puente entre tus ideas y la experiencia de tus usuarios. Una interfaz bien diseñada no solo mejora la estética, sino que también optimiza la funcionalidad, generando mayor satisfacción y fidelización. Sin embargo, muchas empresas se enfrentan a interfaces confusas, flujos poco intuitivos y diseños que no reflejan su identidad.",
+    "solutions": {
+      "title2": "Soluciones",
+      "intuitive": "Diseños intuitivos que hacen que cada interacción sea sencilla y agradable.",
+      "engaging": "Interfaces visualmente atractivas que captan la atención y refuerzan la identidad de tu marca.",
+      "functional": "Experiencias funcionales que reducen fricciones y aumentan la conversión."
+    },
+    "businessImpact": "Con un diseño UX/UI optimizado, los usuarios encuentran lo que buscan más rápido, completan acciones clave con facilidad y se sienten más conectados con tu marca. Esto se traduce en mayores conversiones, retención de clientes y diferenciación frente a la competencia. ¡El diseño adecuado transforma tu plataforma en una herramienta de crecimiento para tu negocio!",
+    "stepsTitle": "¿Cómo transformamos tu experiencia de usuario?",
+    "steps": {
+      "step1": "Explora tus necesidades: Te escuchamos para entender tus objetivos y las expectativas de tus usuarios.",
+      "step2": "Diseñamos conceptos: Creamos wireframes y prototipos que dan vida a tus ideas.",
+      "step3": "Iteramos contigo: Refinamos los diseños con base en tu feedback para lograr la perfección.",
+      "step4": "Implementamos la solución: Desarrollamos una experiencia UX/UI funcional, visual y alineada con tu visión."
+    },
+    "callToAction": "¿Listo para ofrecer una experiencia inolvidable? Contacta a nuestro equipo y juntos diseñaremos una plataforma que cautive a tus usuarios y potencie tu negocio."
+  },
+  "graphicDesign": {
+    "title": "Diseño Gráfico",
+    "questions": {
+      "q1": "¿Tu marca no se distingue en el mercado?",
+      "q2": "¿Tus clientes no conectan con tu identidad visual?",
+      "q3": "¿Sientes que tus materiales gráficos no reflejan la calidad de tus productos o servicios?"
+    },
+    "description": "Un diseño gráfico estratégico puede ser la clave para transformar tu marca en una historia visual poderosa. Sin embargo, muchas empresas se enfrentan a desafíos como falta de coherencia visual, diseños que no conectan con su público y materiales que no transmiten su valor real. Aquí es donde tú, como líder visionario de tu negocio, puedes convertirte en el héroe al transformar estas dificultades en oportunidades.",
+    "solutions": {
+      "branding": "Desarrollamos identidades visuales únicas que diferencian tu marca.",
+      "materials": "Creamos materiales gráficos impactantes, desde presentaciones hasta campañas digitales.",
+      "consistency": "Garantizamos coherencia en todos los elementos visuales, fortaleciendo la confianza de tus clientes."
+    },
+    "vision": "Después de trabajar juntos, tu negocio tendrá una identidad visual memorable que no solo atraerá a tus clientes ideales, sino que también los inspirará a confiar en tu marca. Verás cómo tus gráficos comunican profesionalismo y conectan emocionalmente con tu audiencia, potenciando el crecimiento y el impacto de tu negocio.",
+    "stepsTitle": "¿Cómo trabajamos contigo?",
+    "steps": {
+      "step1": "Descubrimos tu esencia: Analizamos tu marca, tus valores y lo que hace única a tu empresa.",
+      "step2": "Diseñamos soluciones: Creamos propuestas visuales que expresan claramente tu identidad.",
+      "step3": "Refinamos juntos: Ajustamos los diseños hasta que reflejen exactamente tu visión.",
+      "step4": "Elevamos tu marca: Transformamos tus materiales en herramientas visuales que destacan."
+    },
+    "callToAction": "El momento de destacar es ahora. Contacta a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
+  }
+  
+  
+  
 }

@@ -4,7 +4,7 @@
   "home": "Home",
   "services": "Services",
   "aboutUs": "About Us",
-  "contactUs": "Contact Us",
+  "contactUs": "Contact",
   "english": "English",
   "spanish": "Spanish",
   "name": "Name",
@@ -56,7 +56,7 @@
   "commitmentToInnovationExpandableDescription2": "We foster a culture of creativity and curiosity, encouraging our team members to think outside the box and challenge conventional thinking. This approach allows us to anticipate future needs and proactively develop solutions that address the evolving demands of the tech industry. By embracing innovation, we not only enhance the effectiveness of our services but also drive positive change across the industry.",
   "commitmentToInnovationExpandableDescription3": "Moreover, our commitment to innovation extends beyond technology to encompass process improvement and strategic partnerships. We collaborate closely with industry experts to co-create solutions that meet real-world challenges and deliver tangible benefits. This collaborative approach enables us to tailor our offerings to the specific needs of our clients, ensuring that our solutions are both impactful and sustainable.",
   "commitmentToInnovationExpandableDescription4": "At OpenGateHub, innovation is not just a goal but a mindset that permeates every aspect of our organization. We believe that by embracing innovation, we can unlock new possibilities, improve software development, and ultimately, make a meaningful difference in the efficiency and success of our clients worldwide.",
-  
+
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
   "backendTitle": "Back-end & Cloud",
@@ -67,5 +67,86 @@
   "graphicDesignDescription": "We merge innovative graphic design with technological development to create exceptional visual experiences.",
   "learnMoreButtonText": "Learn More",
   "modalSendTitle": "Send!",
-  "modalCloseButtonText": "Close"
+  "modalCloseButtonText": "Close",
+  "frontend": {
+    "title": "Frontend",
+    "description": "In today’s digital age, having a fast and user-friendly platform is not just an advantage—it’s essential. Yet, many businesses struggle with websites that don’t perform well on mobile devices, interfaces that fail to engage users, or slow browsing experiences that drive customers away.",
+    "solutions": {
+      "responsive": "Responsive, seamlessly adapting to any screen or device.",
+      "interactive": "Interactive, ensuring a smooth, fast, and engaging browsing experience.",
+      "customized": "Tailored, aligned with your business goals and user expectations."
+    },
+    "benefits": "With a focus on cutting-edge technologies like React and modern frameworks, we optimize your site’s performance, enhance user retention, and boost conversions by simplifying processes like purchases or registrations. Every detail is designed with your customers in mind, offering a unique experience that keeps them coming back.",
+    "stepsTitle": "How can we help you?",
+    "steps": {
+      "step1": "Reach out to us: Send us an email or fill out our online contact form.",
+      "step2": "Tell us your needs: Share your goals, challenges, or any problems you’re facing.",
+      "step3": "We craft your plan: We’ll propose tailored solutions and work with you to design a platform that not only solves your problems but also drives your business growth."
+    },
+    "callToAction": "Ready to shine in the digital world? Let’s connect and create a platform that elevates your brand."
+  },
+  "backend": {
+    "title": "Backend & Cloud",
+    "description": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can’t scale, slow response times, or infrastructures that don’t harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
+    "solutions": {
+      "title2": "Solutions",
+      "scalable": "Scalable backend systems with technologies like Node.js, Python, Go, and Ruby on Rails.",
+      "secure": "Robust security implementations to protect your data and ensure customer trust.",
+      "cloud": "Cloud integrations with AWS, Google Cloud, and Azure for flexible and powerful infrastructure.",
+      "efficient": "Process optimization to ensure fast response times and consistent performance."
+    },
+    "benefits": "With our expertise in backend and cloud, you lead your company’s digital transformation. We equip you with the technological tools you need to deliver seamless experiences to your users and achieve your goals. By implementing modern solutions like scalable databases (PostgreSQL, MongoDB), GraphQL, and microservices systems, we build a backend that supports you every step of the way.",
+    "stepsTitle": "How do we team up with you?",
+    "steps": {
+      "step1": "Reach out: Share your challenges and goals by completing our online form.",
+      "step2": "Plan together: We design a solution that aligns with your specific objectives.",
+      "step3": "Your success, our priority: We implement a backend and cloud system that empowers your leadership."
+    },
+    "callToAction": "You are the driving force behind this transformation. Let’s talk and build a tech infrastructure that brings your business vision to life."
+  },
+  "uxui": {
+    "title": "UX/UI Design",
+    "description": "UX/UI design bridges the gap between your ideas and the user experience. A well-designed interface not only enhances aesthetics but also optimizes functionality, creating greater satisfaction and loyalty. However, many businesses face challenges like confusing interfaces, unintuitive flows, and designs that don’t reflect their brand identity.",
+    "solutions": {
+      "title2": "Solutions",
+      "intuitive": "Intuitive designs that make every interaction simple and enjoyable.",
+      "engaging": "Visually engaging interfaces that grab attention and reinforce your brand identity.",
+      "functional": "Functional experiences that reduce friction and boost conversions."
+    },
+    "businessImpact": "With an optimized UX/UI design, users find what they need faster, complete key actions effortlessly, and feel more connected to your brand. This translates into higher conversions, customer retention, and a competitive edge. The right design transforms your platform into a growth engine for your business!",
+    "stepsTitle": "How do we transform your user experience?",
+    "steps": {
+      "step1": "Discover your needs: We listen to understand your goals and user expectations.",
+      "step2": "Design concepts: We create wireframes and prototypes that bring your ideas to life.",
+      "step3": "Iterate with you: We refine the designs based on your feedback to achieve perfection.",
+      "step4": "Deliver the solution: We develop a UX/UI experience that’s functional, visual, and aligned with your vision."
+    },
+    "callToAction": "Ready to deliver an unforgettable experience? Contact our team, and together we’ll design a platform that captivates your users and drives your business forward."
+  }, 
+  "graphicDesign": {
+    "title": "Graphic Design",
+    "questions": {
+      "q1": "Is your brand failing to stand out in the market?",
+      "q2": "Are your customers not connecting with your visual identity?",
+      "q3": "Do you feel your graphic materials don’t reflect the quality of your products or services?"
+    },
+    "description": "Strategic graphic design can be the key to transforming your brand into a powerful visual story. However, many businesses face challenges like inconsistent visuals, designs that fail to connect with their audience, and materials that don’t convey their true value. This is where you, as the visionary leader of your business, can become the hero by turning these challenges into opportunities.",
+    "solutions": {
+      "branding": "We craft unique visual identities that make your brand stand out.",
+      "materials": "We create impactful graphic materials, from presentations to digital campaigns.",
+      "consistency": "We ensure consistency across all visual elements, strengthening customer trust."
+    },
+    "vision": "After working with us, your business will have a memorable visual identity that not only attracts your ideal customers but also inspires them to trust your brand. You’ll see how your graphics communicate professionalism and emotionally connect with your audience, driving growth and amplifying your business impact.",
+    "stepsTitle": "How do we work with you?",
+    "steps": {
+      "step1": "Discover your essence: We analyze your brand, values, and what makes your business unique.",
+      "step2": "Design solutions: We create visual proposals that clearly express your identity.",
+      "step3": "Refine together: We adjust the designs until they perfectly match your vision.",
+      "step4": "Elevate your brand: We transform your materials into standout visual tools."
+    },
+    "callToAction": "The time to stand out is now. Contact our team and let’s build a visual identity that drives your success."
+  }
+  
+  
+  
 }

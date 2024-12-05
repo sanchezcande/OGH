@@ -11,17 +11,13 @@ justify-content: center;
 }
 `;
 
-export const Developer = styled.img`
-width: 100%;
-height: auto;
-`;
-
 export const ImageText = styled.div`
 display: grid;
 grid-template-columns: 50% 50%;
 align-items: center;
 color: white;
 padding-right: 20px;
+max-width: 1320px;
 
 h1 {
 
