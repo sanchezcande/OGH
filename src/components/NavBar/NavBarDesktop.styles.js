@@ -37,8 +37,6 @@ export const NavLinks = styled.ul`
   @media (max-width: 1165px) {
     gap: 10px;
   }
-
-
 `;
 
 export const NavLink = styled.span`
@@ -172,16 +170,16 @@ export const ServicesMenu = styled.ul`
   border-radius: 5px;
   background-color: #001f3f;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  overflow: hidden;
+  z-index: 10000;
   margin: 0;
   padding: 0;
 
-  animation: ${(props) => (props.$isOpen ? slideDown : slideUp)} 0.4s ease
-    forwards;
-  visibility: ${(props) => (props.$isOpen ? "visible" : "hidden")};
-  opacity: ${(props) => (props.$isOpen ? 1 : 0)};
-`;
+  animation: ${(props) => (props.$isOpen ? slideDown : slideUp)} 0.4s ease;
+    visibility: ${(props) => {
+      console.log("Prop isOpen en ServicesMenu:", props.$isOpen); 
+      return props.$isOpen ? "visible" : "hidden";
+    }};  opacity: ${(props) => (props.$isOpen ? 1 : 0)};
+  pointer-events: ${(props) => (props.$isOpen ? "auto" : "none")}; `;
 
 export const ServicesMenuItem = styled.li`
   padding: 8px 12px;

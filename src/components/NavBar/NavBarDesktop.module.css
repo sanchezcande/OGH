@@ -1,0 +1,147 @@
+.navBarContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  width: 100%;
+  background-color: transparent;
+  margin-right: 10px;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 28px;
+}
+
+.span {
+  font-weight: 400;
+}
+
+.navLinks {
+  display: flex;
+  list-style: none;
+  border-radius: 40px;
+  background-color: rgba(21, 62, 108, 0.34);
+  padding: 15px 30px;
+  border: 2px solid #0034ee;
+  position: relative;
+  justify-content: center;
+  gap: 50px;
+}
+
+.navLink {
+  position: relative;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.navLink:hover {
+  color: #ddd;
+}
+
+.highlightBar {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  background-color: rgba(21, 62, 108, 0.84);
+  border-radius: 999px;
+  transition: left 0.3s ease, width 0.3s ease;
+  z-index: 0;
+}
+
+.langMenuContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  margin-right: 25px;
+}
+
+.langMenu {
+  position: absolute;
+  list-style-type: none;
+  margin: 0;
+  background-color: transparent;
+  padding: 0;
+  padding-right: 55px;
+  right: 0;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.langMenuItem {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 40px;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.langMenuItem:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #001f3f;
+}
+
+.worldIcon {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+.styledLangText {
+  font-weight: 500;
+}
+
+.arrowIcon {
+  transition: transform 0.3s ease-in-out;
+}
+
+.servicesMenu {
+  position: absolute;
+  top: 115%;
+  left: 50%;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top; 
+  list-style: none;
+  border: 1px solid #0034ee;
+  border-radius: 5px;
+  background-color: #001f3f;
+  z-index: 10000;
+  margin: 0;
+  padding: 0;
+  opacity: 0; 
+  pointer-events: none; 
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  visibility: hidden; 
+}
+
+.servicesMenu.visible {
+  opacity: 1; 
+  pointer-events: auto; 
+  visibility: visible;
+  transform: translateX(-50%) scaleY(1);  
+
+}
+
+
+.servicesMenuItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+  font-weight: 100;
+  font-size: 14px;
+  min-width: 200px;
+  transition: background-color 0.5s ease, color 0.5s ease, font-size 0.5s ease;
+}
+
+.servicesMenuItem:hover {
+  background-color: rgba(21, 62, 108, 0.84);
+  font-size: 15px;
+}
