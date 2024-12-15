@@ -77,11 +77,6 @@ export const CardTitle = styled.h3`
   font-size: 1.4em;
 `;
 
-export const CardImage = styled.img`
-  width: 70%;
-  height: auto;
-`;
-
 export const CardDescription = styled.p`
   margin-top: 1rem;
   font-size: 14px;
@@ -92,4 +87,15 @@ export const CardSection = styled.section`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`;
+
+export const ImageContainer = styled.div`
+
+width: 70%; 
+height: auto;
+z-index: 1000;
+position: relative;
+display: flex;
+align-items: center; 
+
 `;

@@ -10,6 +10,7 @@ max-width: 1200px;
 justify-content: center;
 align-items: center;
 margin-top: 0px;
+padding-bottom: 50px;
 
 @media (max-width: 1240px) {
   grid-template-columns: repeat(2, 1fr);

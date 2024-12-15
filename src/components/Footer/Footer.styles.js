@@ -1,16 +1,16 @@
 import styled from "styled-components";
 import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaPhone } from "react-icons/fa";
-import Image from "next/image";
 
 export const FooterContainer = styled.footer`
-  background-color: rgba(21, 62, 108, 0.2);
+  background-color: rgba(21, 62, 108, 0.3);
   color: #fff;
   padding: 20px;
-  position: absolute;
+  position: sticky;
   margin-left: 0;
   margin-right: 0;
   left: 0;
   right: 0;
+  bottom:0;
   width: 100%;
 
   h4 {

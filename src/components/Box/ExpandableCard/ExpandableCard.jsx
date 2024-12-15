@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Container, CardContent, CloseButton, CardTitle, CardImage, CardSection, CardDescription } from "./ExpandableCard.styles";
+import { Container, CardContent, CloseButton, CardTitle, CardSection, CardDescription, ImageContainer } from "./ExpandableCard.styles";
 import Data from "../data/dataRow";
 import CloseSvg from "../../../assets/icons/closeSvg"; 
+import Image from "next/image";
 
 function ExpandableCard({ closeCard, id }) {
   const data = Data(); 
@@ -34,11 +35,17 @@ function ExpandableCard({ closeCard, id }) {
             </CloseButton>
             <CardTitle>{card.title}</CardTitle>
           </div>
-          <div style={{ overflowY: "auto" }}>
-            <CardImage
+          <div style={{ overflowY: "auto"}}>
+            <ImageContainer>
+            <Image
+               layout="responsive" 
+               width={16} 
+               height={9} 
+               placeholder="blur" 
               alt={card.title}
               src={card.expandableImage}
             />
+            </ImageContainer>
             <CardSection>
               <CardDescription>{card.expandableDescription}</CardDescription>
             </CardSection>
