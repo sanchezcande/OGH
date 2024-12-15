@@ -4,6 +4,7 @@ import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
 import { FaCircle } from "react-icons/fa";
 import ExpandableCard from "./ExpandableCard/ExpandableCard";
+import Image from "next/image";
 
 import styles from "./Box.module.css";
 
@@ -75,7 +76,7 @@ const Card = ({
       <div className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
-            <Imagen />{" "}
+            <Image src={Imagen} alt={title} width={84} />{" "}
           </div>
         )}
         <h1>{title}</h1>
