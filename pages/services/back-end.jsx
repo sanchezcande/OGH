@@ -1,5 +1,13 @@
 import { useTranslation } from "react-i18next";
 import Head from "next/head";
+import {
+  ServiceContainer,
+  ServiceTitle,
+  ServiceList,
+  HighlightText,
+  Divider,
+  Description,
+} from "./Services.styles";
 
 const BackEnd = () => {
   const { t } = useTranslation();
@@ -9,33 +17,39 @@ const BackEnd = () => {
       <Head>
         <title>{t("backend.title")} - OpenGateHub</title>
         <meta name="description" content={t("backend.description")} />
-        <meta name="keywords" content="Backend, back-end, Cloud, Node.js, Python, AWS, Google Cloud, Azure, Scalable Systems" />
+        <meta
+          name="keywords"
+          content="Backend, back-end, Cloud, Node.js, Python, AWS, Google Cloud, Azure, Scalable Systems"
+        />
         <meta name="author" content="OpenGateHub" />
       </Head>
 
-      <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-        <h1>{t("backend.title")}</h1>
-        <p>{t("backend.description")}</p>
+      <ServiceContainer>
+        <ServiceTitle>{t("backend.title")}</ServiceTitle>
+        <Divider />
+        <Description>{t("backend.description")}</Description>
 
-        <h2>{t("backend.solutions.title2")}</h2>
-        <ul>
+        <ServiceTitle titleColor="#00aaff">
+          {t("backend.solutions.title2")}
+        </ServiceTitle>
+        <ServiceList>
           <li>{t("backend.solutions.scalable")}</li>
           <li>{t("backend.solutions.secure")}</li>
           <li>{t("backend.solutions.cloud")}</li>
           <li>{t("backend.solutions.efficient")}</li>
-        </ul>
+        </ServiceList>
 
-        <h2>{t("backend.stepsTitle")}</h2>
-        <ol>
+        <ServiceTitle titleColor="#00aaff">{t("backend.stepsTitle")}</ServiceTitle>
+        <ServiceList>
           <li>{t("backend.steps.step1")}</li>
           <li>{t("backend.steps.step2")}</li>
           <li>{t("backend.steps.step3")}</li>
-        </ol>
+        </ServiceList>
 
-        <p>
-          <strong>{t("backend.callToAction")}</strong>
-        </p>
-      </div>
+        <HighlightText highlightColor="#ffd700">
+          {t("backend.callToAction")}
+        </HighlightText>
+      </ServiceContainer>
     </>
   );
 };
