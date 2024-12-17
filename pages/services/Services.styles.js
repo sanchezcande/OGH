@@ -10,17 +10,14 @@ export const ServiceContainer = styled.section`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 `;
 
-// Título principal estilizado
 export const ServiceTitle = styled.h2`
-  font-family: "Poppins", sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: ${({ titleColor }) => titleColor || "#00d4ff"};
+  color: white;
   text-transform: uppercase;
 `;
 
-// Lista con bullets personalizados
 export const ServiceList = styled.ul`
   list-style: none;
   margin-left: 0;
@@ -47,7 +44,7 @@ export const HighlightText = styled.p`
   font-weight: 600;
   text-align: center;
   margin-top: 2rem;
-  color: ${({ highlightColor }) => highlightColor || "#ffffff"};
+  color: #00d4ff;
 `;
 
 export const Divider = styled.hr`

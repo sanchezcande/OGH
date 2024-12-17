@@ -1,9 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyles = createGlobalStyle`
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
   * {
     margin: 0;
     padding: 0;
@@ -11,7 +8,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Poppins", sans-serif;
     background: 
     linear-gradient(120deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 50%),
     linear-gradient(300deg, #001f3f, #001f3f 50%),
