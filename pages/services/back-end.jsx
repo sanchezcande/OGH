@@ -7,6 +7,7 @@ import {
   HighlightText,
   Divider,
   Description,
+  NumberedList,
 } from "./Services.styles";
 
 const BackEnd = () => {
@@ -40,11 +41,13 @@ const BackEnd = () => {
         </ServiceList>
 
         <ServiceTitle titleColor="#00aaff">{t("backend.stepsTitle")}</ServiceTitle>
-        <ServiceList>
+        <NumberedList>
           <li>{t("backend.steps.step1")}</li>
           <li>{t("backend.steps.step2")}</li>
           <li>{t("backend.steps.step3")}</li>
-        </ServiceList>
+        </NumberedList>
+
+
 
         <HighlightText highlightColor="#ffd700">
           {t("backend.callToAction")}
