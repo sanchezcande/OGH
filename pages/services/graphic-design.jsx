@@ -1,6 +1,68 @@
+import { useTranslation } from "react-i18next";
+import Head from "next/head";
+import {
+  ServiceContainer,
+  ServiceTitle,
+  ServiceList,
+  HighlightText,
+  Divider,
+  Description,
+  NumberedList,
+  ServiceListCross,
+} from "./Services.styles";
+
 const GraphicDesign = () => {
-    return <h1>Graphic Design</h1>;
-  };
-  
-  export default GraphicDesign;
-  
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <Head>
+        <title>{t("graphicDesign.title")} - OpenGateHub</title>
+        <meta name="description" content={t("graphicDesign.description")} />
+        <meta
+          name="keywords"
+          content="Graphic Design, Branding, Visual Identity, Professional Graphics, Digital Campaigns"
+        />
+        <meta name="author" content="OpenGateHub" />
+      </Head>
+
+      <ServiceContainer>
+        <ServiceTitle>{t("graphicDesign.title")}</ServiceTitle>
+        <Divider />
+
+        <ServiceListCross>
+          <li>{t("graphicDesign.questions.q1")}</li>
+          <li>{t("graphicDesign.questions.q2")}</li>
+          <li>{t("graphicDesign.questions.q3")}</li>
+        </ServiceListCross>
+
+        <Description>{t("graphicDesign.description")}</Description>
+
+        <ServiceTitle titleColor="#00aaff">
+          {t("graphicDesign.solutions.title")}
+        </ServiceTitle>
+        <ServiceList>
+          <li>{t("graphicDesign.solutions.branding")}</li>
+          <li>{t("graphicDesign.solutions.materials")}</li>
+          <li>{t("graphicDesign.solutions.consistency")}</li>
+        </ServiceList>
+
+        <Description>{t("graphicDesign.vision")}</Description>
+
+        <ServiceTitle titleColor="#00aaff">{t("graphicDesign.stepsTitle")}</ServiceTitle>
+        <NumberedList>
+          <li>{t("graphicDesign.steps.step1")}</li>
+          <li>{t("graphicDesign.steps.step2")}</li>
+          <li>{t("graphicDesign.steps.step3")}</li>
+          <li>{t("graphicDesign.steps.step4")}</li>
+        </NumberedList>
+
+        <HighlightText highlightColor="#ffd700">
+          {t("graphicDesign.callToAction")}
+        </HighlightText>
+      </ServiceContainer>
+    </>
+  );
+};
+
+export default GraphicDesign;

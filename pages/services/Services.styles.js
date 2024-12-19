@@ -52,27 +52,51 @@ export const ServiceList = styled.ul`
       background-color: #0b2343; 
       transform: scaleX(0); 
       transform-origin: right;
-      transition: transform 0.3s ease-in-out;
+      transition: transform 0.5s ease-in-out;
       z-index: 2; 
     }
 
     &:hover::after {
       transform: scaleX(1); 
-      animation: revealCheck 0.3s ease-in-out forwards; 
+      animation: revealCheck 0.5s ease-in-out forwards; 
     }
   }
 
-  /* Animación para volver a "dibujar" */
+
   @keyframes revealCheck {
     from {
-      transform: scaleX(1); /* Empieza cubriendo */
+      transform: scaleX(1);
     }
     to {
-      transform: scaleX(0); /* Termina revelando */
+      transform: scaleX(0); 
     }
   }
 `;
 
+export const ServiceListCross = styled.ul`
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+
+  li {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 1.5rem; 
+
+    &::before {
+      content: "x";
+      color: #00d4ff;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1; 
+    }
+`;
 
 export const HighlightText = styled.p`
   font-size: 1.3rem;
@@ -83,7 +107,7 @@ export const HighlightText = styled.p`
   transition: -webkit-text-stroke 0.3s ease, color 0.3s ease;
 
   &:hover {
-    -webkit-text-stroke: 1px #00aaff; 
+    -webkit-text-stroke: 0.5px #00aaff; 
   }
 `;
 
@@ -92,8 +116,18 @@ export const Divider = styled.hr`
   height: 3px;
   background-color: #00d4ff;
   margin: 2rem 0;
-  width: 50%;
+  width: 0;
   margin-right: auto;
+  animation: drawLine 1s ease-out forwards;
+
+  @keyframes drawLine {
+    from {
+      width: 0;
+    }
+    to {
+      width: 50%;
+    }
+  }
 `;
 
 export const Description = styled.p`
@@ -109,7 +143,7 @@ export const Description = styled.p`
     padding-left: 0;
   
     li {
-      counter-increment: list-counter; /* Incrementa el contador */
+      counter-increment: list-counter; 
       font-size: 1.1rem;
       line-height: 1.8;
       margin-bottom: 1rem;

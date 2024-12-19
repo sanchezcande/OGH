@@ -72,19 +72,19 @@ export const CloseButton = styled.button`
   color: blue;
   border-radius: 20%;
   width: 38px;
-  height: 38px;
+  height: 34px;
   border: none;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   font-size: 26px;
 
   &:hover {
     background-color: #004aad;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
     color: ${(props) => props.theme.colors.primary};
   }
 `;

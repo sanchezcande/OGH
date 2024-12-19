@@ -30,7 +30,7 @@ span {
     font-weight: 400;
       display: block;
       margin-top: 20px;
-      line-height: 1.5;
+      line-height: 2;
 }
 @media (max-width: 768px) {
     grid-template-columns: 1fr; 
