@@ -1,4 +1,6 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { FaAngleDown, FaGlobe } from "react-icons/fa";
+
 
 export const MenuIcon = styled.div`
   cursor: pointer;
@@ -28,6 +30,8 @@ export const LogoIcon = styled.div`
 export const NavBarContainer = styled.nav`
   margin-top: 10px;
   display: block;
+  margin-left: 1rem;
+  margin-right: 1rem;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
@@ -111,4 +115,28 @@ export const MenuItem = styled.li`
     border-radius: 40px;
   }
 
+`;
+export const ArrowIcon = styled(FaAngleDown)`
+  transition: transform 0.3s ease-in-out;
+  ${({ open }) =>
+    open &&
+    css`
+      animation: rotate 0.3s ease-in-out;
+      transform: rotate(180deg);
+    `}
+`;
+
+export const WorldIcon = styled(FaGlobe)`
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+`;
+
+export const LangMenuContainer = styled.span`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  margin-right: 25px;
 `;

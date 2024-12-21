@@ -2,18 +2,13 @@ import styled from "styled-components";
 import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaPhone } from "react-icons/fa";
 
 export const FooterContainer = styled.footer`
-  background-color: rgba(21, 62, 108, 0.3);
+background-color: rgba(21, 62, 108, 0.3);
   color: #fff;
   padding: 20px;
-  min-width: 100vh;   
-  width: 100%:
-  position: absolute;
-  margin-left: -20px; 
-  margin-right: -20px; 
-  left: 0;
-  right: 0;
-  bottom:0;
-  width: 100%;
+  text-align: center;
+  width: 100%; 
+  min-width: 100vw; 
+  position: relative; 
 
   h4 {
     margin-bottom: 10px;
@@ -26,6 +21,7 @@ export const FooterContent = styled.div`
   padding-left: 20px;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  text-align: left;
 
   @media (max-width: 550px) {
     grid-template-columns: 1fr;
@@ -78,10 +74,15 @@ export const Title = styled.h3`
   font-size: 12px;
   display: flex;
   align-items: center;
+  margin-left_10px;
 
   span {
     font-weight: 400;
   }
 `;
 
-
+export const LogoImgContainer = styled.div`
+  display: flex;
+  gap: 5px;
+  margin-left:-10px;
+`;

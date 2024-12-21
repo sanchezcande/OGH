@@ -141,8 +141,11 @@ const NavBarDesktop = () => {
             }}
           />
         </div>
-        {showLangMenu && (
-          <ul className={styles.langMenu}>
+    
+          <ul className=
+          {`${styles.langMenu} ${
+            showLangMenu ? styles.visible : ""
+          }`}>
             {selectedLang === "en" ? (
               <li
                 className={styles.langMenuItem}
@@ -159,7 +162,7 @@ const NavBarDesktop = () => {
               </li>
             )}
           </ul>
-        )}
+    
       </div>
     </nav>
   );

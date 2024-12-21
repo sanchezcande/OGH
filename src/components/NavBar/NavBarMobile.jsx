@@ -10,12 +10,10 @@ import {
   LanguageMenu,
   LangMenuItem,
   Span,
-} from "./NavBarMobile.styles";
-import {
   ArrowIcon,
   WorldIcon,
   LangMenuContainer,
-} from "./NavBarDesktop.styles";
+} from "./NavBarMobile.styles";
 import { MagicMotion, motion, LayoutGroup } from "react-magic-motion";
 import { useTranslation } from "react-i18next";
 

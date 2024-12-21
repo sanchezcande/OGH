@@ -75,6 +75,19 @@
   border-radius: 5px;
   max-height: 200px;
   overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: scaleY(0);
+  transform-origin: top; 
+  transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.langMenu.visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: scaleY(1);
 }
 
 .langMenuItem {
@@ -130,7 +143,6 @@
 
 }
 
-
 .servicesMenuItem {
   padding: 8px 12px;
   cursor: pointer;
@@ -145,3 +157,10 @@
   background-color: rgba(21, 62, 108, 0.84);
   font-size: 15px;
 }
+
+
+@media screen and (max-width: 1169px) {
+  .navLinks {
+    gap: 20px;
+  }
+ }
