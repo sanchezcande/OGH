@@ -16,8 +16,18 @@ const GlobalStyles = createGlobalStyle`
     color: ${({ theme }) => theme.colors.text};
     margin-left: 20px;
     margin-right: 20px;
+
   }
 
+  #__next {
+    margin: 0 auto;
+    padding: 0;
+    left: 0;
+    width: 100%;
+    right: 0;
+    max-width: 100vw;
+  }
+  
   a {
     text-decoration: none;
     color: inherit;
