@@ -5,9 +5,11 @@ export const FooterContainer = styled.footer`
   background-color: rgba(21, 62, 108, 0.3);
   color: #fff;
   padding: 20px;
-  position: sticky;
-  margin-left: 0;
-  margin-right: 0;
+  min-width: 100vh;   
+  width: 100%:
+  position: absolute;
+  margin-left: -20px; 
+  margin-right: -20px; 
   left: 0;
   right: 0;
   bottom:0;

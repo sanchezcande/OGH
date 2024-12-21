@@ -50,6 +50,7 @@
   justify-content: center;
   margin: 10px;
   padding: 10px;
+  line-height: 1.5;
 }
 
 .card h1 {

@@ -10,8 +10,9 @@ import {
 } from "./ExpandableCard.styles";
 import Data from "../data/dataRow";
 import Image from "next/image";
-import { faRectangleXmark } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
+
 
 function ExpandableCard({ closeCard, id }) {
   const data = Data();
