@@ -9,6 +9,20 @@ import {
   Description,
   NumberedList,
 } from "./Services.styles";
+import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+
+export const ServicesCallToAction = () => {
+  const { t } = useTranslation();
+  const callToAction = t("servicesCallToAction", { returnObjects: true });
+
+  return (
+    <CallToActionBlock
+      title={callToAction.title}
+      description={callToAction.description}
+      buttonText={callToAction.buttonText}
+    />
+  );
+};
 
 const FrontEnd = () => {
   const { t } = useTranslation();
@@ -49,6 +63,7 @@ const FrontEnd = () => {
         <HighlightText highlightColor="#ffd700">
           {t("frontend.callToAction")}
         </HighlightText>
+        <ServicesCallToAction />
       </ServiceContainer>
     </>
   );

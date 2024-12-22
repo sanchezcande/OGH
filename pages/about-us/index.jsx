@@ -4,6 +4,20 @@ import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
 import modeloHtml from "../../src/assets/images/modeloHtml.png";
 import Image from "next/image";
+import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+
+export const AboutUsCallToAction = () => {
+  const { t } = useTranslation();
+  const callToAction = t("aboutUsCallToAction", { returnObjects: true });
+
+  return (
+    <CallToActionBlock
+      title={callToAction.title}
+      description={callToAction.description}
+      buttonText={callToAction.buttonText}
+    />
+  );
+};
 
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
@@ -23,6 +37,7 @@ const AboutUs = React.forwardRef((props, ref) => {
         </h1>
       </ImageText>
       <BoxesContainerRows />
+      <AboutUsCallToAction />
     </Container>
   );
 });

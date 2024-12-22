@@ -1,6 +1,20 @@
 import { useTranslation } from "react-i18next";
 import Head from "next/head";
 import { FAQContainer, FAQTitle,FAQTitle1, FAQList, Question, Answer } from "./FAQs.styles";
+import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+
+export const FAQsCallToAction = () => {
+  const { t } = useTranslation();
+  const callToAction = t("faqsCallToAction", { returnObjects: true });
+
+  return (
+    <CallToActionBlock
+      title={callToAction.title}
+      description={callToAction.description}
+      buttonText={callToAction.buttonText}
+    />
+  );
+};
 
 const FAQs = () => {
   const { t } = useTranslation();
@@ -29,6 +43,7 @@ const FAQs = () => {
             </div>
           ))}
         </FAQList>
+        <FAQsCallToAction />
       </FAQContainer>
     </>
   );

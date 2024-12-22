@@ -10,6 +10,20 @@ import {
   NumberedList,
   ServiceListCross,
 } from "./Services.styles";
+import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+
+export const ServicesCallToAction = () => {
+  const { t } = useTranslation();
+  const callToAction = t("servicesCallToAction", { returnObjects: true });
+
+  return (
+    <CallToActionBlock
+      title={callToAction.title}
+      description={callToAction.description}
+      buttonText={callToAction.buttonText}
+    />
+  );
+};
 
 const GraphicDesign = () => {
   const { t } = useTranslation();
@@ -49,7 +63,9 @@ const GraphicDesign = () => {
 
         <Description>{t("graphicDesign.vision")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">{t("graphicDesign.stepsTitle")}</ServiceTitle>
+        <ServiceTitle titleColor="#00aaff">
+          {t("graphicDesign.stepsTitle")}
+        </ServiceTitle>
         <NumberedList>
           <li>{t("graphicDesign.steps.step1")}</li>
           <li>{t("graphicDesign.steps.step2")}</li>
@@ -60,6 +76,7 @@ const GraphicDesign = () => {
         <HighlightText highlightColor="#ffd700">
           {t("graphicDesign.callToAction")}
         </HighlightText>
+        <ServicesCallToAction />
       </ServiceContainer>
     </>
   );

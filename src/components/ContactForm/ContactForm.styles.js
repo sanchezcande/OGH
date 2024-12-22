@@ -148,7 +148,7 @@ export const Error = styled.div`
 
 export const StyledButton = styled(DarkButton)`
   display: inline-block;
-  &.error {
+    &.error {
     animation: ${bounceIn} 0.5s ease forwards;
   }
 

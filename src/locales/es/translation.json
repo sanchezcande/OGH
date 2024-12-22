@@ -24,15 +24,40 @@
   "connectWithUs": "Conectate con Nosotros",
   "aboutUsTitle": "Construimos Puentes para que tus Ideas Lideren el Futuro Digital",
   "aboutUsText": "En OpenGateHub, creemos que vos sos el centro de esta historia. Cada visión, cada meta y cada desafío que enfrentás son oportunidades para crear algo significativo. Nuestro propósito es acompañarte en ese camino con empatía, brindándote no solo desarrollo tecnológico, sino también identidad visual que refleje quién sos y hacia dónde querés llegar. No somos solo desarrolladores; somos aliados estratégicos que trabajamos codo a codo con vos, escuchando, entendiendo y diseñando soluciones a medida. Porque sabemos que detrás de cada proyecto hay personas con sueños, historias y un propósito claro. Cuando vos triunfás, sentimos que cumplimos nuestra misión. Juntos, podemos transformar desafíos en avances y construir algo que realmente importe.",
-  "contactUsTitle": "¿Tenés una pregunta? ¡Ponete en contacto!",
+  "contactUsTitle": "¡Ponete en contacto!",
   "contactUsSubtitle": "¡Gracias por contactarnos! Por favor, completá el formulario a continuación y nos pondremos en contacto con vos en breve.",
   "weAre": "Somos",
   "companyName": "OpenGateHub",
-  "specializedIn": "Especializados en",
-  "webAndMobileApp": "Desarrollo Web y de Aplicaciones Móviles",
-  "crafting": "creando ",
-  "innovativeSolution": "soluciones digitales innovadoras",
-  "forBusiness": "para negocios",
+  "specializedIn": "Enfocados en tu éxito. Te ayudamos a",
+  "webAndMobileApp": "dar vida a tus ideas",
+  "crafting": " con soluciones digitales a medida. Desde sitios web intuitivos hasta aplicaciones móviles innovadoras, ",
+  "innovativeSolution": "nuestro equipo trabaja para hacer realidad tu visión mientras apoya el",
+  "forBusiness": "crecimiento de tu negocio.",
+  "homeCallToAction": {
+    "title": "¿Listo para llevar tu negocio al siguiente nivel?",
+    "description": "Obtén una consulta gratuita hoy.",
+    "buttonText": "Comienza Ahora"
+  },
+  "faqsCallToAction": {
+    "title": "¿Todavía tienes preguntas?",
+    "description": "Nuestro equipo está aquí para ayudarte a encontrar las soluciones adecuadas.",
+    "buttonText": "Contáctanos"
+  },
+  "servicesCallToAction": {
+    "title": "Descubre cómo podemos ayudarte",
+    "description": "Explora nuestros servicios y lleva tu negocio al siguiente nivel.",
+    "buttonText": "Conoce Más"
+  },
+  "aboutUsCallToAction": {
+    "title": "Trabajemos juntos",
+    "description": "Únete a una comunidad de negocios exitosos impulsados por OpenGateHub.",
+    "buttonText": "Únete Ahora"
+  },
+  "contactUsCallToAction": {
+    "title": "Nos encantaría saber de ti",
+    "description": "Contáctanos y comencemos a construir algo increíble juntos.",
+    "buttonText": "Contáctanos"
+  },
   "companyHistoryTitle": "Nuestra Historia",
   "companyHistoryDescription": "Nuestro camino comenzó en Argentina, impulsados por la visión de apoyar a empresas y emprendedores en su transformación digital. Desde el primer día, nos comprometimos a crear soluciones que conecten tecnología y personas con confianza y calidad.",
   "companyHistoryExpandableDescription1": "OpenGateHub nació en Argentina con una visión clara: combinar nuestra experiencia trabajando para empresas internacionales, principalmente de Estados Unidos, con un enfoque local y cercano.",
@@ -242,46 +267,46 @@
       ]
     }
   },
-    "privacyPolicy1": {
-      "title": "Política de Privacidad",
-      "introduction": "En OpenGateHub, tu privacidad es nuestra prioridad. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información personal cuando interactúas con nuestro sitio web, servicios o productos. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.",
-      "sections": [
-        {
-          "title": "Información que Recopilamos",
-          "content": "Recopilamos los siguientes tipos de información:\n- Información Personal: Nombre, dirección de correo electrónico, número de teléfono u otros detalles que proporciones al contactarnos o usar nuestros servicios.\n- Datos de Uso: Información sobre cómo interactúas con nuestro sitio web, como tu dirección IP, tipo de navegador y tiempo pasado en las páginas.\n- Cookies y Seguimiento: Datos recopilados a través de cookies y otras tecnologías de seguimiento para mejorar tu experiencia en nuestro sitio web."
-        },
-        {
-          "title": "Cómo Usamos tu Información",
-          "content": "Usamos la información que recopilamos para:\n- Proveer y mejorar nuestros servicios.\n- Responder a tus consultas o solicitudes de soporte.\n- Enviar actualizaciones, ofertas promocionales o boletines (solo si has optado por recibirlos).\n- Garantizar la seguridad de nuestro sitio web y prevenir actividades fraudulentas.\n- Analizar el tráfico del sitio web y los patrones de uso para mejorar nuestros servicios."
-        },
-        {
-          "title": "Compartir tu Información",
-          "content": "No vendemos ni alquilamos tu información personal. Podemos compartir tu información con terceros de confianza solo en las siguientes situaciones:\n- Para cumplir con obligaciones legales o hacer cumplir nuestros términos de servicio.\n- Con proveedores de servicios de confianza que nos ayudan a operar nuestro negocio (por ejemplo, proveedores de hosting, plataformas de correo electrónico).\n- Cuando sea necesario para proteger los derechos, la propiedad o la seguridad de OpenGateHub, nuestros usuarios u otros."
-        },
-        {
-          "title": "Cookies y Tecnologías de Seguimiento",
-          "content": "Nuestro sitio web utiliza cookies para mejorar tu experiencia de navegación. Puedes gestionar tus preferencias de cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar algunas funcionalidades del sitio web."
-        },
-        {
-          "title": "Seguridad de los Datos",
-          "content": "Implementamos medidas de seguridad estándar de la industria para proteger tu información personal. Sin embargo, ningún método de transmisión o almacenamiento es 100% seguro, y no podemos garantizar una seguridad absoluta."
-        },
-        {
-          "title": "Tus Derechos",
-          "content": "Tienes derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, contáctanos en [insertar dirección de correo electrónico]."
-        },
-        {
-          "title": "Enlaces a Terceros",
-          "content": "Nuestro sitio web puede contener enlaces a sitios web de terceros. No somos responsables de las prácticas de privacidad de estos sitios externos. Te recomendamos leer sus políticas de privacidad."
-        },
-        {
-          "title": "Cambios en esta Política de Privacidad",
-          "content": "Podemos actualizar esta Política de Privacidad periódicamente. Cualquier cambio se publicará en esta página con una fecha de \"última actualización\" revisada. Revisa esta política regularmente para mantenerte informado sobre cómo protegemos tu información."
-        },
-        {
-          "title": "Contáctanos",
-          "content": "Si tienes preguntas o inquietudes sobre esta Política de Privacidad o cómo manejamos tu información, contáctanos en:\n- Correo electrónico: info@opengatehub.com\n- Teléfono: +54 9 11 2348 5638"
-        }
-      ]
-    }  
+  "privacyPolicy1": {
+    "title": "Política de Privacidad",
+    "introduction": "En OpenGateHub, tu privacidad es nuestra prioridad. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información personal cuando interactúas con nuestro sitio web, servicios o productos. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.",
+    "sections": [
+      {
+        "title": "Información que Recopilamos",
+        "content": "Recopilamos los siguientes tipos de información:\n- Información Personal: Nombre, dirección de correo electrónico, número de teléfono u otros detalles que proporciones al contactarnos o usar nuestros servicios.\n- Datos de Uso: Información sobre cómo interactúas con nuestro sitio web, como tu dirección IP, tipo de navegador y tiempo pasado en las páginas.\n- Cookies y Seguimiento: Datos recopilados a través de cookies y otras tecnologías de seguimiento para mejorar tu experiencia en nuestro sitio web."
+      },
+      {
+        "title": "Cómo Usamos tu Información",
+        "content": "Usamos la información que recopilamos para:\n- Proveer y mejorar nuestros servicios.\n- Responder a tus consultas o solicitudes de soporte.\n- Enviar actualizaciones, ofertas promocionales o boletines (solo si has optado por recibirlos).\n- Garantizar la seguridad de nuestro sitio web y prevenir actividades fraudulentas.\n- Analizar el tráfico del sitio web y los patrones de uso para mejorar nuestros servicios."
+      },
+      {
+        "title": "Compartir tu Información",
+        "content": "No vendemos ni alquilamos tu información personal. Podemos compartir tu información con terceros de confianza solo en las siguientes situaciones:\n- Para cumplir con obligaciones legales o hacer cumplir nuestros términos de servicio.\n- Con proveedores de servicios de confianza que nos ayudan a operar nuestro negocio (por ejemplo, proveedores de hosting, plataformas de correo electrónico).\n- Cuando sea necesario para proteger los derechos, la propiedad o la seguridad de OpenGateHub, nuestros usuarios u otros."
+      },
+      {
+        "title": "Cookies y Tecnologías de Seguimiento",
+        "content": "Nuestro sitio web utiliza cookies para mejorar tu experiencia de navegación. Puedes gestionar tus preferencias de cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar algunas funcionalidades del sitio web."
+      },
+      {
+        "title": "Seguridad de los Datos",
+        "content": "Implementamos medidas de seguridad estándar de la industria para proteger tu información personal. Sin embargo, ningún método de transmisión o almacenamiento es 100% seguro, y no podemos garantizar una seguridad absoluta."
+      },
+      {
+        "title": "Tus Derechos",
+        "content": "Tienes derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, contáctanos en [insertar dirección de correo electrónico]."
+      },
+      {
+        "title": "Enlaces a Terceros",
+        "content": "Nuestro sitio web puede contener enlaces a sitios web de terceros. No somos responsables de las prácticas de privacidad de estos sitios externos. Te recomendamos leer sus políticas de privacidad."
+      },
+      {
+        "title": "Cambios en esta Política de Privacidad",
+        "content": "Podemos actualizar esta Política de Privacidad periódicamente. Cualquier cambio se publicará en esta página con una fecha de \"última actualización\" revisada. Revisa esta política regularmente para mantenerte informado sobre cómo protegemos tu información."
+      },
+      {
+        "title": "Contáctanos",
+        "content": "Si tienes preguntas o inquietudes sobre esta Política de Privacidad o cómo manejamos tu información, contáctanos en:\n- Correo electrónico: info@opengatehub.com\n- Teléfono: +54 9 11 2348 5638"
+      }
+    ]
+  }
 }

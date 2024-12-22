@@ -36,7 +36,7 @@ export const NavBarContainer = styled.nav`
   align-items: center;
   padding: 1rem;
   background-color: rgba(21, 62, 108, 0.34);
-  border: 2px solid #0034ee;
+  border: 2px solid #155ab8;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 60px;
   position: relative;
