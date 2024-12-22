@@ -12,6 +12,7 @@
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^5.17.0",
     "emailjs-com": "^3.2.0",
+    "eslint-config-next": "^15.1.2",
     "express": "^4.19.2",
     "framer-motion": "^11.2.10",
     "glob": "^10.4.1",

@@ -1,4 +1,4 @@
-import { Container, Title, Title2, ImageContainer } from "../../src/styles/pagesStyles/HomePage.styles";
+import { Container, Title, Title2, ImageContainer } from "../src/styles/pagesStyles/HomePage.styles";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import cyberSecurity from "../public/cyberSecurity.png";
