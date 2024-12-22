@@ -241,5 +241,47 @@
         }
       ]
     }
-  }
+  },
+    "privacyPolicy1": {
+      "title": "Política de Privacidad",
+      "introduction": "En OpenGateHub, tu privacidad es nuestra prioridad. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información personal cuando interactúas con nuestro sitio web, servicios o productos. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.",
+      "sections": [
+        {
+          "title": "Información que Recopilamos",
+          "content": "Recopilamos los siguientes tipos de información:\n- Información Personal: Nombre, dirección de correo electrónico, número de teléfono u otros detalles que proporciones al contactarnos o usar nuestros servicios.\n- Datos de Uso: Información sobre cómo interactúas con nuestro sitio web, como tu dirección IP, tipo de navegador y tiempo pasado en las páginas.\n- Cookies y Seguimiento: Datos recopilados a través de cookies y otras tecnologías de seguimiento para mejorar tu experiencia en nuestro sitio web."
+        },
+        {
+          "title": "Cómo Usamos tu Información",
+          "content": "Usamos la información que recopilamos para:\n- Proveer y mejorar nuestros servicios.\n- Responder a tus consultas o solicitudes de soporte.\n- Enviar actualizaciones, ofertas promocionales o boletines (solo si has optado por recibirlos).\n- Garantizar la seguridad de nuestro sitio web y prevenir actividades fraudulentas.\n- Analizar el tráfico del sitio web y los patrones de uso para mejorar nuestros servicios."
+        },
+        {
+          "title": "Compartir tu Información",
+          "content": "No vendemos ni alquilamos tu información personal. Podemos compartir tu información con terceros de confianza solo en las siguientes situaciones:\n- Para cumplir con obligaciones legales o hacer cumplir nuestros términos de servicio.\n- Con proveedores de servicios de confianza que nos ayudan a operar nuestro negocio (por ejemplo, proveedores de hosting, plataformas de correo electrónico).\n- Cuando sea necesario para proteger los derechos, la propiedad o la seguridad de OpenGateHub, nuestros usuarios u otros."
+        },
+        {
+          "title": "Cookies y Tecnologías de Seguimiento",
+          "content": "Nuestro sitio web utiliza cookies para mejorar tu experiencia de navegación. Puedes gestionar tus preferencias de cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar algunas funcionalidades del sitio web."
+        },
+        {
+          "title": "Seguridad de los Datos",
+          "content": "Implementamos medidas de seguridad estándar de la industria para proteger tu información personal. Sin embargo, ningún método de transmisión o almacenamiento es 100% seguro, y no podemos garantizar una seguridad absoluta."
+        },
+        {
+          "title": "Tus Derechos",
+          "content": "Tienes derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, contáctanos en [insertar dirección de correo electrónico]."
+        },
+        {
+          "title": "Enlaces a Terceros",
+          "content": "Nuestro sitio web puede contener enlaces a sitios web de terceros. No somos responsables de las prácticas de privacidad de estos sitios externos. Te recomendamos leer sus políticas de privacidad."
+        },
+        {
+          "title": "Cambios en esta Política de Privacidad",
+          "content": "Podemos actualizar esta Política de Privacidad periódicamente. Cualquier cambio se publicará en esta página con una fecha de \"última actualización\" revisada. Revisa esta política regularmente para mantenerte informado sobre cómo protegemos tu información."
+        },
+        {
+          "title": "Contáctanos",
+          "content": "Si tienes preguntas o inquietudes sobre esta Política de Privacidad o cómo manejamos tu información, contáctanos en:\n- Correo electrónico: info@opengatehub.com\n- Teléfono: +54 9 11 2348 5638"
+        }
+      ]
+    }  
 }

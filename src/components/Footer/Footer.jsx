@@ -62,10 +62,17 @@ const Footer = () => {
         </div>
         <div>
           <h4>{t("aboutUs")}</h4>
+          <FooterText>
           <Link href="/faqs" className="footer-link">
-  {t("faq")}
-</Link>
-          <FooterText>{t("privacyPolicy")}</FooterText>
+            {t("faq")}
+          </Link>
+          </FooterText>
+          <FooterText>
+          <Link href="/privacy-policy" className="footer-link">
+            {t("privacyPolicy")}
+          </Link>{" "}
+          </FooterText>
+
         </div>
         <div>
           <h4>{t("connectWithUs")}</h4>
