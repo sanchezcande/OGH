@@ -4,7 +4,7 @@
   "home": "Home",
   "services": "Services",
   "aboutUs": "About Us",
-  "contactUs": "Contact Us",
+  "contactUs": "Contact",
   "english": "English",
   "spanish": "Spanish",
   "name": "Name",
@@ -22,50 +22,292 @@
   "privacyPolicy": "Privacy Policy",
   "faq": "FAQ",
   "connectWithUs": "Connect With Us",
-  "aboutUsTitle": "Development and Design for the Digital Age",
-  "aboutUsText": "We specialize in turning your ideas into innovative technological solutions. With an expert team in UX/UI, JavaScript, React, Python, and more, we take your project to the next level. From graphic design to backend development, we provide a comprehensive approach for the success of your digital business.",
-  "contactUsTitle": "Have a Question? Reach Out!",
+  "aboutUsTitle": "We Build Bridges to Help Your Ideas Lead the Digital Future",
+  "aboutUsText": "At OpenGateHub, we believe that you are at the heart of this story. Every vision, goal, and challenge you face is an opportunity to create something meaningful. Our purpose is to walk alongside you with empathy, offering not only technological development but also a visual identity that reflects who you are and where you want to go. We are not just developers; we are strategic partners who work hand in hand with you, listening, understanding, and designing tailored solutions. Because we know that behind every project are people with dreams, stories, and a clear purpose. When you succeed, we feel that we’ve fulfilled our mission. Together, we can turn challenges into progress and create something that truly matters.",
+  "contactUsTitle": "Reach Out!",
   "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
   "weAre": "We are",
-  "specializedIn": "Specialized in",
-  "webAndMobileApp": "Web & MobileApp Development",
-  "crafting": "crafting ",
-  "innovativeSolution": "innovative digital solution",
-  "forBusiness": "for business",
-  "companyHistoryTitle": "Company History",
-  "companyHistoryDescription": "OpenGateHub leads in software development and web technologies, consistently adapting to new advancements. Our innovative, secure solutions enhance web applications and operations, ensuring data security and improved performance. We are dedicated to progress and excellence in the industry.",
-  "companyHistoryExpandableDescription1": "OpenGateHub stands out in the field of software and web development, continuously adapting to the changing technological landscape. Our commitment to innovation and excellence is reflected in how we secure our clients' digital resources, ensuring safe and effective solutions that enhance web applications and operations in the digital age.",
-  "companyHistoryExpandableDescription2": "At OpenGateHub, we prioritize the needs of our clients by delivering tailored solutions that streamline processes, improve performance, and reduce operational costs. Our team of experts works diligently to integrate cutting-edge technologies, such as artificial intelligence and machine learning, into our services, providing our clients with the tools they need to stay ahead in an ever-evolving tech industry.",
-  "companyHistoryExpandableDescription3": "We understand the importance of data security and privacy in web applications, and we implement robust measures to protect sensitive information, maintaining the highest standards of compliance and ethical practices. By fostering a culture of continuous learning and development, we ensure that our team remains at the forefront of technological advancements, ready to tackle any challenge that arises.",
-  "companyHistoryExpandableDescription4": "With OpenGateHub, you can trust that your digital transformation journey is in capable hands. We are dedicated to driving progress and innovation in software development and web technologies, making a tangible difference in the performance and success of our clients worldwide.",
+  "specializedIn": "Focused on your success. We help",
+  "webAndMobileApp": "bring your ideas to life",
+  "crafting": " with tailored digital solutions. From intuitive websites to innovative mobile apps,",
+  "innovativeSolution": "our team works to make your vision a reality while supporting your",
+  "forBusiness": "business growth.",
+
+  "homeCallToAction": {
+    "title": "Ready to Elevate Your Business?",
+    "description": "Get a Free Consultation Today",
+    "buttonText": "Get Started"
+  },
+  "faqsCallToAction": {
+    "title": "Still Have Questions?",
+    "description": "Our team is here to help you find the right solutions.",
+    "buttonText": "Contact Us"
+  },
+  "servicesCallToAction": {
+    "title": "Discover How We Can Help",
+    "description": "Explore our services and take your business to the next level.",
+    "buttonText": "Learn More"
+  },
+  "aboutUsCallToAction": {
+    "title": "Let’s Work Together",
+    "description": "Join a community of successful businesses powered by OpenGateHub.",
+    "buttonText": "Join Now"
+  },
+  "contactUsCallToAction": {
+    "title": "We’d Love to Hear From You",
+    "description": "Reach out and let’s start building something amazing together.",
+    "buttonText": "Reach Out"
+  },
+
+  "companyHistoryTitle": "Our History",
+  "companyHistoryDescription": "Our journey began in Argentina, driven by the vision of supporting businesses and entrepreneurs in their digital transformation. From day one, we’ve been committed to creating solutions that connect technology and people with trust and quality.",
+  "companyHistoryExpandableDescription1": "OpenGateHub was born in Argentina with a clear vision: to combine our experience working with international companies, primarily from the United States, with a local and approachable perspective.",
+  "companyHistoryExpandableDescription2": "Our founders have years of experience in the global tech industry, enabling us to understand the needs and expectations of the international market.",
+  "companyHistoryExpandableDescription3": "We focus on delivering technological solutions that address real problems and generate sustainable results.",
+  "companyHistoryExpandableDescription4": "We always prioritize quality, maintenance, and efficiency, building trust with our clients throughout their digital transformation.",
   "missionAndCoreValuesTitle": "Mission and Core Values",
-  "missionAndCoreValuesDescription": "At OpenGateHub, we innovate software and web technologies, enhancing efficiency and productivity. Guided by values of excellence, client commitment, and data security, we drive progress in the tech industry.",
-  "missionAndCoreValuesExpandableDescription1": "At OpenGateHub, our goal is to revolutionize the tech landscape through cutting-edge technological solutions that elevate the effectiveness and productivity of industry businesses. Rooted in innovation, client commitment, and stringent data security, we offer tailored, efficient solutions to foster advancement and safeguard digital operations.",
-  "missionAndCoreValuesExpandableDescription2": "Our proficient team proactively embraces technological advancements to ensure clients benefit from the latest innovations. We customize solutions to meet unique client needs, ensuring seamless integration and intuitive user experiences.",
-  "missionAndCoreValuesExpandableDescription3": "With a steadfast focus on data security and privacy, we uphold rigorous compliance standards, ensuring clients' sensitive information remains safeguarded. Our pursuit of excellence drives continuous service enhancement, empowering clients to achieve their objectives and optimize their digital presence.",
-  "missionAndCoreValuesExpandableDescription4": "At OpenGateHub, we firmly believe in technology's transformative potential within the software and web development sectors. We are dedicated to driving industry progress and effecting meaningful change through innovative solutions, one milestone at a time.",
-  "technologiesTitle": "Technologies",
-  "technologiesDescription": "At OpenGateHub, we leverage advanced technologies like UX/UI, React, Python, Flask, Django, Java, MySQL, and Docker to transform software and web applications. Our solutions ensure secure, innovative, and efficient performance.",
-  "technologiesExpandableDescription1": "At OpenGateHub, our mission is to transform the tech sector with innovative technological solutions that enhance the efficiency and productivity of industry businesses. We are guided by values of innovation, excellence, commitment to our clients, and data security, offering personalized and effective solutions to drive progress and security in digital operations.",
-  "technologiesExpandableDescription2": "Our team of dedicated professionals leverages the latest advancements in technology to develop tailored solutions that meet the unique needs of each client. We strive to create a seamless integration of digital tools that improve performance, streamline operations, and reduce costs. By prioritizing data security and privacy, we ensure that sensitive information is protected, allowing clients to focus on what they do best: delivering quality services.",
-  "technologiesExpandableDescription3": "At OpenGateHub, we believe that innovation is the key to advancing software and web technologies. Our solutions are designed to be adaptable and scalable, ensuring they remain relevant in an ever-changing landscape. We are committed to excellence in every aspect of our work, continuously seeking new ways to improve and evolve. Our clients' success is our success, and we are dedicated to building long-term partnerships based on trust, transparency, and mutual growth.",
-  "technologiesExpandableDescription4": "Our mission is to transform the tech sector with innovative technological solutions that enhance the efficiency and productivity of industry businesses. We are guided by values of innovation, excellence, commitment to our clients, and data security, offering personalized and effective solutions to drive progress and security in digital operations.",
+  "missionAndCoreValuesDescription": "Our mission is to help you achieve your goals with clear and effective solutions. We believe your success is our success, and we work with commitment, transparency, and a human-centered approach to make it happen.",
+  "missionAndCoreValuesExpandableDescription1": "At OpenGateHub, we focus on making technology a tool to drive your goals. We listen to your needs and tailor our solutions to integrate seamlessly, delivering intuitive experiences that truly make a difference.",
+  "missionAndCoreValuesExpandableDescription2": "Data security is our priority. We adhere to high compliance standards to protect your information and ensure it’s always in safe hands.",
+  "missionAndCoreValuesExpandableDescription3": "Our commitment to continuous improvement allows us to support you at every step, helping you optimize your digital presence and achieve your objectives.",
+  "missionAndCoreValuesExpandableDescription4": "We believe in the transformative power of technology and its ability to create real change. Our purpose is to build impactful solutions, moving forward together one step at a time.",
+  "technologiesTitle": "Our Team",
+  "technologiesDescription": "We believe the best ideas come from an environment of respect, empathy, and collaboration. We foster a workplace where every team member feels valued and can contribute their talents authentically, inspiring creativity and continuous learning.",
+  "technologiesExpandableDescription1": "At OpenGateHub, we believe that a motivated and valued team is the key to achieving exceptional results.",
+  "technologiesExpandableDescription2": "That’s why we focus on building a workplace where respect, empathy, and continuous learning are top priorities.",
+  "technologiesExpandableDescription3": "Our goal is not just to develop technological solutions but to develop people.",
+  "technologiesExpandableDescription4": "We believe in creating opportunities, fostering growth, and building a space where everyone feels part of something bigger.",
   "commitmentToInnovationTitle": "Commitment to Innovation",
-  "commitmentToInnovationDescription": "At OpenGateHub, innovation is central to our mission in software and web development. We explore new technologies to enhance performance and efficiency, ensuring our solutions are impactful and adaptive to industry evolution.",
-  "commitmentToInnovationExpandableDescription1": "At OpenGateHub, our commitment to innovation is at the core of everything we do. We strive to push the boundaries of what's possible in software and web development, continuously exploring new technologies and methodologies to improve performance and operational efficiency. Our dedicated research and development team remains at the forefront of industry trends, ensuring that we integrate the latest innovations into our solutions.",
-  "commitmentToInnovationExpandableDescription2": "We foster a culture of creativity and curiosity, encouraging our team members to think outside the box and challenge conventional thinking. This approach allows us to anticipate future needs and proactively develop solutions that address the evolving demands of the tech industry. By embracing innovation, we not only enhance the effectiveness of our services but also drive positive change across the industry.",
-  "commitmentToInnovationExpandableDescription3": "Moreover, our commitment to innovation extends beyond technology to encompass process improvement and strategic partnerships. We collaborate closely with industry experts to co-create solutions that meet real-world challenges and deliver tangible benefits. This collaborative approach enables us to tailor our offerings to the specific needs of our clients, ensuring that our solutions are both impactful and sustainable.",
-  "commitmentToInnovationExpandableDescription4": "At OpenGateHub, innovation is not just a goal but a mindset that permeates every aspect of our organization. We believe that by embracing innovation, we can unlock new possibilities, improve software development, and ultimately, make a meaningful difference in the efficiency and success of our clients worldwide.",
-  
-  "frontendTitle": "Frontend",
+  "commitmentToInnovationDescription": "Innovation means constantly evolving and using cutting-edge technologies to solve problems practically. We adapt to change to deliver efficient solutions that make a real impact.",
+  "commitmentToInnovationExpandableDescription1": "For us, innovation means more than technology; it’s about adapting, learning, and finding effective ways to solve real problems.",
+  "commitmentToInnovationExpandableDescription2": "We stay up to date with cutting-edge technologies to ensure our solutions are efficient and relevant.",
+  "commitmentToInnovationExpandableDescription3": "We believe in a practical approach that combines creativity and functionality, always aiming to make a positive impact.",
+  "commitmentToInnovationExpandableDescription4": "Our goal is not only to deliver solutions but also to grow alongside our clients in a constantly evolving world.",
+  "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
-  "backendTitle": "Backend & Database",
+  "backendTitle": "Back-end & Cloud",
   "backendDescription": "Building robust server-side applications with scalable databases with modern technologies for optimal performance.",
-  "uxuiTitle": "UX/UI",
+  "uxuiTitle": "UX/UI Design",
   "uxuiDescription": "We design intuitive and attractive interfaces to enhance the experience and engagement of your users.",
   "graphicDesignTitle": "Graphic Design",
   "graphicDesignDescription": "We merge innovative graphic design with technological development to create exceptional visual experiences.",
   "learnMoreButtonText": "Learn More",
   "modalSendTitle": "Send!",
-  "modalCloseButtonText": "Close"
+  "modalCloseButtonText": "Close",
+  "frontend": {
+    "title": "Frontend",
+    "description": "In today’s digital age, having a fast and user-friendly platform is not just an advantage—it’s essential. Yet, many businesses struggle with websites that don’t perform well on mobile devices, interfaces that fail to engage users, or slow browsing experiences that drive customers away.",
+    "solutions": {
+      "title": "Solutions",
+      "responsive": "Responsive, seamlessly adapting to any screen or device.",
+      "interactive": "Interactive, ensuring a smooth, fast, and engaging browsing experience.",
+      "customized": "Tailored, aligned with your business goals and user expectations."
+    },
+    "benefits": "With a focus on cutting-edge technologies like React and modern frameworks, we optimize your site’s performance, enhance user retention, and boost conversions by simplifying processes like purchases or registrations. Every detail is designed with your customers in mind, offering a unique experience that keeps them coming back.",
+    "stepsTitle": "How can we help you?",
+    "steps": {
+      "step1": "Reach out to us: Send us an email or fill out our online contact form.",
+      "step2": "Tell us your needs: Share your goals, challenges, or any problems you’re facing.",
+      "step3": "We craft your plan: We’ll propose tailored solutions and work with you to design a platform that not only solves your problems but also drives your business growth."
+    },
+    "callToAction": "Ready to shine in the digital world? Let’s connect and create a platform that elevates your brand."
+  },
+  "backend": {
+    "title": "Backend & Cloud",
+    "description": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can’t scale, slow response times, or infrastructures that don’t harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
+    "solutions": {
+      "title2": "Solutions",
+      "scalable": "Scalable backend systems with technologies like Node.js, Python, Go, and Ruby on Rails.",
+      "secure": "Robust security implementations to protect your data and ensure customer trust.",
+      "cloud": "Cloud integrations with AWS, Google Cloud, and Azure for flexible and powerful infrastructure.",
+      "efficient": "Process optimization to ensure fast response times and consistent performance."
+    },
+    "benefits": "With our expertise in backend and cloud, you lead your company’s digital transformation. We equip you with the technological tools you need to deliver seamless experiences to your users and achieve your goals. By implementing modern solutions like scalable databases (PostgreSQL, MongoDB), GraphQL, and microservices systems, we build a backend that supports you every step of the way.",
+    "stepsTitle": "How do we team up with you?",
+    "steps": {
+      "step1": "Reach out: Share your challenges and goals by completing our online form.",
+      "step2": "Plan together: We design a solution that aligns with your specific objectives.",
+      "step3": "Your success, our priority: We implement a backend and cloud system that empowers your leadership."
+    },
+    "callToAction": "You are the driving force behind this transformation. Let’s talk and build a tech infrastructure that brings your business vision to life."
+  },
+  "uxui": {
+    "title": "UX/UI Design",
+    "description": "UX/UI design bridges the gap between your ideas and the user experience. A well-designed interface not only enhances aesthetics but also optimizes functionality, creating greater satisfaction and loyalty. However, many businesses face challenges like confusing interfaces, unintuitive flows, and designs that don’t reflect their brand identity.",
+    "solutions": {
+      "title2": "Solutions",
+      "intuitive": "Intuitive designs that make every interaction simple and enjoyable.",
+      "engaging": "Visually engaging interfaces that grab attention and reinforce your brand identity.",
+      "functional": "Functional experiences that reduce friction and boost conversions."
+    },
+    "businessImpactTitle": "How will this transform your business?",
+    "businessImpact": "With an optimized UX/UI design, users find what they need faster, complete key actions effortlessly, and feel more connected to your brand. This translates into higher conversions, customer retention, and a competitive edge. The right design transforms your platform into a growth engine for your business!",
+    "stepsTitle": "How do we transform your user experience?",
+    "steps": {
+      "step1": "Discover your needs: We listen to understand your goals and user expectations.",
+      "step2": "Design concepts: We create wireframes and prototypes that bring your ideas to life.",
+      "step3": "Iterate with you: We refine the designs based on your feedback to achieve perfection.",
+      "step4": "Deliver the solution: We develop a UX/UI experience that’s functional, visual, and aligned with your vision."
+    },
+    "callToAction": "Ready to deliver an unforgettable experience? Contact our team, and together we’ll design a platform that captivates your users and drives your business forward."
+  },
+  "graphicDesign": {
+    "title": "Graphic Design",
+    "questions": {
+      "q1": "Is your brand failing to stand out in the market?",
+      "q2": "Are your customers not connecting with your visual identity?",
+      "q3": "Do you feel your graphic materials don’t reflect the quality of your products or services?"
+    },
+    "description": "Strategic graphic design can be the key to transforming your brand into a powerful visual story. However, many businesses face challenges like inconsistent visuals, designs that fail to connect with their audience, and materials that don’t convey their true value. This is where you, as the visionary leader of your business, can become the hero by turning these challenges into opportunities.",
+    "solutions": {
+      "title": "What We Can Create for You",
+      "branding": "We craft unique visual identities that make your brand stand out.",
+      "materials": "We create impactful graphic materials, from presentations to digital campaigns.",
+      "consistency": "We ensure consistency across all visual elements, strengthening customer trust."
+    },
+    "vision": "After working with us, your business will have a memorable visual identity that not only attracts your ideal customers but also inspires them to trust your brand. You’ll see how your graphics communicate professionalism and emotionally connect with your audience, driving growth and amplifying your business impact.",
+    "stepsTitle": "How do we work with you?",
+    "steps": {
+      "step1": "Discover your essence: We analyze your brand, values, and what makes your business unique.",
+      "step2": "Design solutions: We create visual proposals that clearly express your identity.",
+      "step3": "Refine together: We adjust the designs until they perfectly match your vision.",
+      "step4": "Elevate your brand: We transform your materials into standout visual tools."
+    },
+    "callToAction": "The time to stand out is now. Contact our team and let’s build a visual identity that drives your success."
+  },
+  "faqsTitle": "Frequently Asked Questions",
+  "faqs": {
+    "softwareFactory": {
+      "title": "Software Factory FAQs",
+      "questions": [
+        {
+          "question": "What services does OpenGateHub offer?",
+          "answer": "We offer web development, UX/UI design, graphic design, backend solutions, tech consulting, and tailored business solutions."
+        },
+        {
+          "question": "How can I start working with OpenGateHub?",
+          "answer": "You can reach out via our contact form, email us, or schedule an initial meeting."
+        },
+        {
+          "question": "Do you provide technical support after project delivery?",
+          "answer": "Yes, we offer maintenance and support packages to ensure your solution runs smoothly."
+        },
+        {
+          "question": "How long does it take to complete a project?",
+          "answer": "The timeline depends on the project’s complexity and scope, but we work with you to set a clear schedule."
+        },
+        {
+          "question": "What technologies do you use in your projects?",
+          "answer": "We work with React, Next.js, Node.js, Prisma, Tailwind CSS, and other modern technologies for both frontend and backend."
+        },
+        {
+          "question": "Can you work with international companies?",
+          "answer": "Yes, we are a global company accustomed to collaborating with clients across different time zones and countries."
+        },
+        {
+          "question": "Do you have experience integrating third-party APIs?",
+          "answer": "Yes, we have worked with APIs like Stripe, AWS, Firebase, and more to provide complete and integrated solutions."
+        },
+        {
+          "question": "What makes OpenGateHub unique compared to other companies?",
+          "answer": "We focus on creating scalable and customized solutions while maintaining clear and close communication with our clients."
+        },
+        {
+          "question": "What are the costs of your services?",
+          "answer": "Our costs depend on the type of project. Contact us for a personalized, no-obligation quote."
+        },
+        {
+          "question": "Can you help me migrate my current project to modern technologies?",
+          "answer": "Absolutely! We will evaluate your project and help you update it with current tools and frameworks."
+        }
+      ]
+    },
+    "staffOutsourcing": {
+      "title": "Staff Outsourcing FAQs",
+      "questions": [
+        {
+          "question": "What type of tech profiles do you offer for outsourcing?",
+          "answer": "We provide frontend, backend, full-stack developers, UX/UI designers, QA testers, and DevOps specialists, among others."
+        },
+        {
+          "question": "Can I hire developers part-time or for specific projects?",
+          "answer": "Yes, we offer flexible hiring options, whether full-time, part-time, or for specific projects."
+        },
+        {
+          "question": "How do you handle time zone differences?",
+          "answer": "We adapt to the client’s time zone and organize meetings and deliverables according to their needs to ensure efficient collaboration."
+        },
+        {
+          "question": "Are the talents prepared to integrate with existing teams?",
+          "answer": "Yes, our talents are trained to quickly adapt to teams and workflows, such as Scrum, Kanban, or your preferred method."
+        },
+        {
+          "question": "What level of experience do the talents have?",
+          "answer": "We provide developers from junior to senior levels, selected based on the specific requirements of your project."
+        },
+        {
+          "question": "How do you select the ideal talent for my project?",
+          "answer": "We analyze your needs and select candidates through a rigorous technical and cultural evaluation process."
+        },
+        {
+          "question": "Can you assign a full team instead of individual profiles?",
+          "answer": "Of course! We can assign multidisciplinary teams, including technical leads, if your project requires it."
+        },
+        {
+          "question": "What happens if the assigned developer doesn’t meet my expectations?",
+          "answer": "If you’re not satisfied, we provide a quick replacement to ensure your project continues without delays."
+        },
+        {
+          "question": "Does the staff work under my supervision or OpenGateHub’s?",
+          "answer": "You decide: the team can work directly under your supervision, or we can manage it according to your needs."
+        },
+        {
+          "question": "Why should I choose OpenGateHub for IT outsourcing?",
+          "answer": "We understand that every project is unique. That’s why we focus on providing reliable talent, adapting to your needs, and maintaining clear communication every step of the way. Our goal is to become a strategic partner that helps your business grow."
+        }
+      ]
+    }
+  },
+  "privacyPolicy1": {
+    "title": "Privacy Policy",
+    "introduction": "At OpenGateHub, your privacy is our priority. This Privacy Policy outlines how we collect, use, and protect your personal information when you interact with our website, services, or products. By using our services, you agree to the practices described in this policy.",
+    "sections": [
+      {
+        "title": "Information We Collect",
+        "content": "We collect the following types of information:\n- Personal Information: Name, email address, phone number, or other details you provide when contacting us or using our services.\n- Usage Data: Information about how you interact with our website, such as your IP address, browser type, and time spent on pages.\n- Cookies and Tracking: Data collected via cookies and other tracking technologies to enhance your experience on our website."
+      },
+      {
+        "title": "How We Use Your Information",
+        "content": "We use the information we collect to:\n- Provide and improve our services.\n- Respond to your inquiries or support requests.\n- Send updates, promotional offers, or newsletters (only if you’ve opted in).\n- Ensure the security of our website and prevent fraudulent activities.\n- Analyze website traffic and usage patterns to improve our services."
+      },
+      {
+        "title": "Sharing Your Information",
+        "content": "We do not sell or rent your personal information. We may share your information with trusted third parties only in the following situations:\n- To comply with legal obligations or enforce our terms of service.\n- To trusted service providers who help us operate our business (e.g., hosting providers, email platforms).\n- When required to protect the rights, property, or safety of OpenGateHub, our users, or others."
+      },
+      {
+        "title": "Cookies and Tracking Technologies",
+        "content": "Our website uses cookies to enhance your browsing experience. You can manage your cookie preferences through your browser settings. Note that disabling cookies may affect some website functionality."
+      },
+      {
+        "title": "Data Security",
+        "content": "We implement industry-standard security measures to protect your personal information. However, no method of transmission or storage is 100% secure, and we cannot guarantee absolute security."
+      },
+      {
+        "title": "Your Rights",
+        "content": "You have the right to:\n- Access the personal data we hold about you.\n- Request corrections or updates to your information.\n- Request deletion of your personal data, subject to applicable laws.\n- Opt out of marketing communications at any time.\nTo exercise these rights, contact us at [insert email address]."
+      },
+      {
+        "title": "Third-Party Links",
+        "content": "Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. We encourage you to read their privacy policies."
+      },
+      {
+        "title": "Changes to This Privacy Policy",
+        "content": "We may update this Privacy Policy periodically. Any changes will be posted on this page with a revised \"last updated\" date. Please review this policy regularly to stay informed about how we protect your information."
+      },
+      {
+        "title": "Contact Us",
+        "content": "If you have any questions or concerns about this Privacy Policy or how your information is handled, please contact us at:\n- Email: info@opengatehub.com\n- Phone: +54 9 11 2348 5638"
+      }
+    ]
+  }
 }

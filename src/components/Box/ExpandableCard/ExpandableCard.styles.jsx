@@ -1,34 +1,25 @@
 import styled, { keyframes } from "styled-components";
 
 const fadeInAnimation = keyframes`
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  70% {
-    transform: scale(1.2);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+0% {
+  opacity: 0;
+  transform: translateY(20px);
+}
+100% {
+  opacity: 1;
+  transform: translateY(0);
+}
 `;
 
 const fadeOutAnimation = keyframes`
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  75% {
-    transform: scale(1)
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+0% {
+  opacity: 1;
+  transform: translateY(0);
+}
+100% {
+  opacity: 0;
+  transform: translateY(20px);
+}
 `;
 
 export const Container = styled.div`
@@ -66,20 +57,32 @@ export const CardContent = styled.div`‡
 
 export const CloseButton = styled.button`
   position: absolute;
-  right: 0;
+  right: -8px;
   z-index: 9999;
   background: #001f3f;
   color: blue;
+  border-radius: 20%;
+  width: 38px;
+  height: 34px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 26px;
+
+  &:hover {
+    background-color: #004aad;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+    color: ${(props) => props.theme.colors.primary};
+  }
 `;
 
 export const CardTitle = styled.h3`
   font-weight: 600;
   font-size: 1.4em;
-`;
-
-export const CardImage = styled.img`
-  width: 70%;
-  height: auto;
 `;
 
 export const CardDescription = styled.p`
@@ -92,4 +95,13 @@ export const CardSection = styled.section`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`;
+
+export const ImageContainer = styled.div`
+  width: 70%;
+  height: auto;
+  z-index: 1000;
+  position: relative;
+  display: flex;
+  align-items: center;
 `;

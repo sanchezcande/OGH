@@ -1,0 +1,196 @@
+.navBarContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  width: 100%;
+  background-color: transparent;
+  margin-right: 10px;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 28px;
+}
+
+.span {
+  font-weight: 400;
+}
+
+.navLinks {
+  display: flex;
+  list-style: none;
+  border-radius: 40px;
+  background-color: rgba(21, 62, 108, 0.34);
+  padding: 15px 30px;
+  border: 2px solid #155ab8;
+  position: relative;
+  justify-content: center;
+  gap: 50px;
+}
+
+.navLink {
+  position: relative;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.navLink:hover {
+  color: #ddd;
+}
+
+.highlightBar {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  background-color: rgba(21, 62, 108, 0.84);
+  border-radius: 999px;
+  transition: left 0.3s ease, width 0.3s ease;
+  z-index: 0;
+}
+
+.langMenuContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  margin-right: 25px;
+}
+
+.langMenu {
+  position: absolute;
+  list-style-type: none;
+  margin: 0;
+  background-color: transparent;
+  padding: 0;
+  padding-right: 55px;
+  right: 0;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.langMenu.visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: scaleY(1);
+}
+
+.langMenuItem {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 40px;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.langMenuItem:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #001f3f;
+}
+
+.worldIcon {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+.styledLangText {
+  font-weight: 500;
+}
+
+.arrowIcon {
+  transition: transform 0.3s ease-in-out;
+}
+
+.servicesMenu {
+  position: absolute;
+  top: 115%;
+  left: 50%;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top;
+  list-style: none;
+  border: 2px solid #155ab8;
+  border-radius: 8px;
+  background-color: #001f3f;
+  z-index: 10000;
+  margin: 0; 
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+  visibility: hidden;
+}
+
+.servicesMenu.visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateX(-50%) scaleY(1);
+}
+
+.servicesMenuItem {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: white;
+  font-weight: 300;
+  font-size: 15px;
+  min-width: 220px;
+  transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.servicesMenuItem:first-child {
+  margin-top: 0; 
+}
+
+.servicesMenuItem:last-child {
+  border-bottom: none; 
+}
+
+.servicesMenuItem:hover {
+  background-color: #155ab8;
+  font-size: 16px;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+
+
+@media screen and (max-width: 1300px) {
+  .navLinks {
+    gap: 20px;
+  }
+}
+@media screen and (max-width: 1150px) {
+  .navLinks {
+    gap: 10px;
+  }
+}
+
+@media screen and (max-width: 1085px) {
+  .navLinks {
+    gap: 7px;
+  }
+  .navLink {
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+  .highlightBar {
+    visibility: hidden;
+  }
+}

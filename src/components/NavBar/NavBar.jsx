@@ -1,34 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import useMediaQuery from "../../Hooks/useMediaQuery";
 import NavBarDesktop from "./NavBarDesktop";
 import NavBarMobile from "./NavBarMobile";
 
-const NavBar = ({ homeRef, aboutUsRef, servicesRef, contactUsRef }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1040);
+const NavBar = () => {
+  const isMobile = useMediaQuery("(max-width: 1020px)");
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1040);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return isMobile ? (
-    <NavBarMobile
-      homeRef={homeRef}
-      aboutUsRef={aboutUsRef}
-      servicesRef={servicesRef}
-      contactUsRef={contactUsRef}
-    />
-  ) : (
-    <NavBarDesktop
-      homeRef={homeRef}
-      aboutUsRef={aboutUsRef}
-      servicesRef={servicesRef}
-      contactUsRef={contactUsRef}
-    />
-  );
+  return isMobile ? <NavBarMobile /> : <NavBarDesktop />;
 };
 
 export default NavBar;

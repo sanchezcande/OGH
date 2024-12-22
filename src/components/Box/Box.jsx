@@ -2,15 +2,16 @@ import React, { useRef } from "react";
 import { useSpring, animated, to } from "@react-spring/web";
 import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
-import { ReactComponent as GraphicDesign } from "../../assets/icons/GraphicDesign.svg";
+import { FaCircle } from "react-icons/fa";
 import ExpandableCard from "./ExpandableCard/ExpandableCard";
+import Image from "next/image";
 
 import styles from "./Box.module.css";
 
 const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 20;
 const calcY = (x, lx) => (x - lx - window.innerWidth / 2) / 20;
 
-const defaultImagen = () => <GraphicDesign />;
+const defaultImagen = () => <FaCircle />;
 const defaultTitle = "Default Title";
 const defaultDescription =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore";
@@ -75,7 +76,7 @@ const Card = ({
       <div className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
-            <Imagen />{" "}
+            <Image src={Imagen} alt={title} width={84} />{" "}
           </div>
         )}
         <h1>{title}</h1>

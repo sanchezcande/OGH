@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as Security } from "../../../assets/icons/Security.svg";
-import { ReactComponent as UXUI } from "../../../assets/icons/UXUI.svg";
-import { ReactComponent as GraphicDesign } from "../../../assets/icons/GraphicDesign.svg";
-import { ReactComponent as Circle } from "../../../assets/icons/Circle.svg";
 import companyHistory from "../../../assets/images/companyHistory.png";
 import missionAndCoreValues from "../../../assets/images/coreValues.png";
 import technologies from "../../../assets/images/technologies.png";
 import commitmentToInnovation from "../../../assets/images/innovation.png";
+import company from "../../../assets/images/Company.png";
+import techno from "../../../assets/images/Techno.png";
+import commitment from "../../../assets/images/Commitment.png";
+import mission from "../../../assets/images/Mission.png";
+
 
 const DataRow = () => {
   const { t } = useTranslation();
@@ -15,7 +16,7 @@ const DataRow = () => {
   {
     id: 1,
     title: t("companyHistoryTitle"),
-    image: Security,
+    image: company,
     description: t("companyHistoryDescription"),
     expandableImage: companyHistory,
     expandableDescription: (
@@ -36,7 +37,7 @@ const DataRow = () => {
   {
     id: 2,
     title: t("missionAndCoreValuesTitle"),
-    image: UXUI,
+    image: mission,
     description: t("missionAndCoreValuesDescription"),
       expandableImage: missionAndCoreValues,
     expandableDescription: (
@@ -57,7 +58,7 @@ const DataRow = () => {
   {
     id: 3,
     title: t("technologiesTitle"),
-    image: Circle,
+    image: techno,
     description: t("technologiesDescription"),
       expandableImage: technologies,
     expandableDescription: (
@@ -78,7 +79,7 @@ const DataRow = () => {
   {
     id: 4,
     title: t("commitmentToInnovationTitle"),
-    image: GraphicDesign,
+    image: commitment,
     description: t("commitmentToInnovationDescription"),
       expandableImage: commitmentToInnovation,
     expandableDescription: (

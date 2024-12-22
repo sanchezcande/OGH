@@ -1,31 +1,28 @@
-import { ReactComponent as Security } from "../../../assets/icons/FrontEnd(1).svg";
-import { ReactComponent as UXUI } from "../../../assets/icons/BackEnd(1).svg";
-import { ReactComponent as GraphicDesign } from "../../../assets/icons//GraphicDesign(1).svg";
-import { ReactComponent as UXUI1 } from "../../../assets/icons/UxUi(1).svg";
+
 
 const DataSquare = (t) => [
   {
     id: 1,
     title: t('frontendTitle'),
-    image: Security,
+    // image: Security,
     description: t('frontendDescription'),
   },
   {
     id: 2,
     title: t('backendTitle'),
-    image: UXUI,
+    // image: UXUI,
     description: t('backendDescription'),
   },
   {
     id: 3,
     title: t('uxuiTitle'),
-    image: UXUI1,
+    // image: UXUI1,
     description: t('uxuiDescription'),
   },
   {
     id: 4,
     title: t('graphicDesignTitle'),
-    image: GraphicDesign,
+    // image: GraphicDesign,
     description: t('graphicDesignDescription'),
   },
 ];
