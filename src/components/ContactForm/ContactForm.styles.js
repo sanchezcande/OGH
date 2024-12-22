@@ -37,7 +37,7 @@ export const Input = styled.input`
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  border: 3px solid #333;
+  border: 3px solid #155ab8;
   transition: all 0.3s;
   background-color: #f0f0f0;
 
@@ -47,11 +47,11 @@ export const Input = styled.input`
   }
 
   &:focus {
-    border-color: #0034ee;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
     outline: none;
   }
   &:hover {
-    border-color: #0034ee;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
   }
 
   &[type="number"] {
@@ -74,9 +74,8 @@ export const Input = styled.input`
 export const TextArea = styled.textarea`
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
+  border: 3px solid #155ab8;
   border-radius: 5px;
-  border: 3px solid #333;
   transition: all 0.3s;
   background-color: #f0f0f0;
 
@@ -86,11 +85,11 @@ export const TextArea = styled.textarea`
   }
 
   &:focus {
-    border-color: #0034ee;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
     outline: none;
   }
   &:hover {
-    border-color: #0034ee;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
   }
   &.error {
     animation: ${bounceIn} 0.5s ease forwards;
@@ -148,6 +147,13 @@ export const Error = styled.div`
 
 export const StyledButton = styled(DarkButton)`
   display: inline-block;
+  background-color: #155ab8;
+  border: 3px solid #155ab8;
+
+  &:hover {
+    background-color: white;
+    border: 3px solid #0f4c75;
+  }
     &.error {
     animation: ${bounceIn} 0.5s ease forwards;
   }
