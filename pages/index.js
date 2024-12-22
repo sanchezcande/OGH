@@ -29,8 +29,8 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>{t("OpenGateHub")}</title>
-        <meta name="description" content={t("pageDescription")} />
+        <title>OpenGateHub</title>
+        <meta name="description" content="OpenGateHub" />
         <link rel="canonical" href="https://opengatehub.com/" />
         <meta property="og:title" content={t("OpenGateHub")} />
         <meta property="og:description" content={t("pageDescription")} />
@@ -41,18 +41,17 @@ export default function HomePage() {
         />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
-        <meta property="og:image" content="/Logo.png" />
       </Head>
 
       <Container>
         <ImageContainer>
-        <Image
-          src={cyberSecurity}
-          alt="Cyber Security by Open Gate Hub software develop, webapps, paginas web"
-          layout="intrinsic"
-          width={500} 
-          height={300}
-        />
+          <Image
+            src={cyberSecurity}
+            alt="Cyber Security by Open Gate Hub software develop, webapps, paginas web"
+            layout="intrinsic"
+            width={500}
+            height={300}
+          />
         </ImageContainer>
         <Title>
           <span>{t("weAre")}</span> OpenGateHub

@@ -15,7 +15,7 @@
   "send": "Enviar",
   "pleaseEnterValidName": "Por favor ingrese un nombre válido",
   "pleaseEnterValidEmail": "Por favor ingrese una dirección de correo electrónico válida",
-  "pleaseEnterValidMessage": "Por favor ingrese un mensaje con más de 10 caracteres",
+  "pleaseEnterValidMessage": "Por favor ingrese un mensaje con más de 10 caractsos",
   "messageSentSuccessfully": "Mensaje enviado con éxito",
   "errorSendingMessage": "Error al enviar el mensaje",
   "joinOurCommunity": "Unite a Nuestra Comunidad",
@@ -39,13 +39,13 @@
     "buttonText": "Comienza Ahora"
   },
   "faqsCallToAction": {
-    "title": "¿Todavía tienes preguntas?",
+    "title": "¿Todavía tenés preguntas?",
     "description": "Nuestro equipo está aquí para ayudarte a encontrar las soluciones adecuadas.",
-    "buttonText": "Contáctanos"
+    "buttonText": "Contactanos"
   },
   "servicesCallToAction": {
-    "title": "Descubre cómo podemos ayudarte",
-    "description": "Explora nuestros servicios y lleva tu negocio al siguiente nivel.",
+    "title": "Descubrí cómo podemos ayudarte",
+    "description": "Explorá nuestros servicios y llevá tu negocio al siguiente nivel.",
     "buttonText": "Conoce Más"
   },
   "aboutUsCallToAction": {
@@ -55,8 +55,8 @@
   },
   "contactUsCallToAction": {
     "title": "Nos encantaría saber de ti",
-    "description": "Contáctanos y comencemos a construir algo increíble juntos.",
-    "buttonText": "Contáctanos"
+    "description": "Contactanos y comencemos a construir algo increíble juntos.",
+    "buttonText": "Contactanos"
   },
   "companyHistoryTitle": "Nuestra Historia",
   "companyHistoryDescription": "Nuestro camino comenzó en Argentina, impulsados por la visión de apoyar a empresas y emprendedores en su transformación digital. Desde el primer día, nos comprometimos a crear soluciones que conecten tecnología y personas con confianza y calidad.",
@@ -102,18 +102,18 @@
       "interactive": "Interactivas, garantizando una experiencia de navegación ágil y atractiva.",
       "customized": "Personalizadas, alineadas con los objetivos de tu negocio y las expectativas de tus usuarios."
     },
-    "benefits": "Con un enfoque en tecnologías líderes como React y frameworks modernos, optimizamos el rendimiento de tu sitio, mejoramos la retención de usuarios y ayudamos a incrementar tus conversiones al facilitar procesos como compras o registros. Cada detalle se diseña pensando en tus clientes y en cómo brindarles una experiencia única que los invite a regresar.",
+    "benefits": "Con un enfoque en tecnologías lídsos como React y frameworks modernos, optimizamos el rendimiento de tu sitio, mejoramos la retención de usuarios y ayudamos a incrementar tus conversiones al facilitar procesos como compras o registros. Cada detalle se diseña pensando en tus clientes y en cómo brindarles una experiencia única que los invite a regresar.",
     "stepsTitle": "¿Cómo podemos ayudarte?",
     "steps": {
-      "step1": "Contáctanos: Escríbenos por correo o llena nuestro formulario de contacto en línea.",
-      "step2": "Cuéntanos tu necesidad: Explícanos tus objetivos, retos o cualquier problema que estés enfrentando.",
+      "step1": "Contactanos: Escribinos por correo o llena nuestro formulario de contacto en línea.",
+      "step2": "Contanos tu necesidad: Explicanos tus objetivos, retos o cualquier problema que estés enfrentando.",
       "step3": "Creamos tu plan: Te proponemos soluciones personalizadas y diseñamos juntos una plataforma que no solo resuelva tus problemas, sino que impulse el crecimiento de tu negocio."
     },
     "callToAction": "¿Listo para destacar en el mundo digital? Hablemos y diseñemos juntos una plataforma que haga brillar tu marca."
   },
   "backend": {
     "title": "Backend & Cloud",
-    "description": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde tú, como líder de tu negocio, puedes marcar la diferencia.",
+    "description": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
     "solutions": {
       "title2": "Soluciones",
       "scalable": "Sistemas backend escalables con tecnologías como Node.js, Python, Go y Ruby on Rails.",
@@ -121,14 +121,14 @@
       "cloud": "Integraciones cloud con AWS, Google Cloud y Azure para una infraestructura flexible y poderosa.",
       "efficient": "Optimización de procesos para garantizar tiempos de respuesta rápidos y rendimiento constante."
     },
-    "benefits": "Con nuestra experiencia en backend y cloud, tú lideras la transformación digital de tu empresa. Te proporcionamos las herramientas tecnológicas necesarias para ofrecer una experiencia impecable a tus usuarios y alcanzar tus objetivos. Al implementar soluciones modernas como bases de datos escalables (PostgreSQL, MongoDB), GraphQL y sistemas de microservicios, construimos un backend que te respalda en cada paso del camino.",
-    "stepsTitle": "¿Cómo hacemos equipo contigo?",
+    "benefits": "Con nuestra experiencia en backend y cloud, vos lideras la transformación digital de tu empresa. Te proporcionamos las herramientas tecnológicas necesarias para ofrecer una experiencia impecable a tus usuarios y alcanzar tus objetivos. Al implementar soluciones modernas como bases de datos escalables (PostgreSQL, MongoDB), GraphQL y sistemas de microservicios, construimos un backend que te respalda en cada paso del camino.",
+    "stepsTitle": "¿Cómo hacemos equipo con vos?",
     "steps": {
-      "step1": "Contáctanos: Comparte tus retos y metas completando nuestro formulario en línea.",
+      "step1": "Contactanos: Compartí tus retos y metas completando nuestro formulario en línea.",
       "step2": "Planificamos juntos: Diseñamos una solución que responde a tus objetivos específicos.",
       "step3": "Tu éxito, nuestra prioridad: Implementamos un sistema backend y cloud que potencia tu liderazgo."
     },
-    "callToAction": "Tú eres el motor de esta transformación. Hablemos y construyamos juntos una infraestructura tecnológica que impulse tu visión de negocio."
+    "callToAction": "Vos sos el motor de esta transformación. Hablemos y construyamos juntos una infraestructura tecnológica que impulse tu visión de negocio."
   },
   "uxui": {
     "title": "Diseño UX/UI",
@@ -143,12 +143,12 @@
     "businessImpact": "Con un diseño UX/UI optimizado, los usuarios encuentran lo que buscan más rápido, completan acciones clave con facilidad y se sienten más conectados con tu marca. Esto se traduce en mayores conversiones, retención de clientes y diferenciación frente a la competencia. ¡El diseño adecuado transforma tu plataforma en una herramienta de crecimiento para tu negocio!",
     "stepsTitle": "¿Cómo transformamos tu experiencia de usuario?",
     "steps": {
-      "step1": "Explora tus necesidades: Te escuchamos para entender tus objetivos y las expectativas de tus usuarios.",
+      "step1": "Explorá tus necesidades: Te escuchamos para entender tus objetivos y las expectativas de tus usuarios.",
       "step2": "Diseñamos conceptos: Creamos wireframes y prototipos que dan vida a tus ideas.",
-      "step3": "Iteramos contigo: Refinamos los diseños con base en tu feedback para lograr la perfección.",
+      "step3": "Iteramos con vos: Refinamos los diseños con base en tu feedback para lograr la perfección.",
       "step4": "Implementamos la solución: Desarrollamos una experiencia UX/UI funcional, visual y alineada con tu visión."
     },
-    "callToAction": "¿Listo para ofrecer una experiencia inolvidable? Contacta a nuestro equipo y juntos diseñaremos una plataforma que cautive a tus usuarios y potencie tu negocio."
+    "callToAction": "¿Listo para ofrecer una experiencia inolvidable? Contactá a nuestro equipo y juntos diseñaremos una plataforma que cautive a tus usuarios y potencie tu negocio."
   },
   "graphicDesign": {
     "title": "Diseño Gráfico",
@@ -157,7 +157,7 @@
       "q2": "¿Tus clientes no conectan con tu identidad visual?",
       "q3": "¿Sientes que tus materiales gráficos no reflejan la calidad de tus productos o servicios?"
     },
-    "description": "Un diseño gráfico estratégico puede ser la clave para transformar tu marca en una historia visual poderosa. Sin embargo, muchas empresas se enfrentan a desafíos como falta de coherencia visual, diseños que no conectan con su público y materiales que no transmiten su valor real. Aquí es donde tú, como líder visionario de tu negocio, puedes convertirte en el héroe al transformar estas dificultades en oportunidades.",
+    "description": "Un diseño gráfico estratégico puede ser la clave para transformar tu marca en una historia visual poderosa. Sin embargo, muchas empresas se enfrentan a desafíos como falta de coherencia visual, diseños que no conectan con su público y materiales que no transmiten su valor real. Aquí es donde vos, como líder visionario de tu negocio, podés convertirte en el héroe al transformar estas dificultades en oportunidades.",
     "solutions": {
       "title": "Lo que podemos crear para vos",
       "branding": "Desarrollamos identidades visuales únicas que diferencian tu marca.",
@@ -165,14 +165,14 @@
       "consistency": "Garantizamos coherencia en todos los elementos visuales, fortaleciendo la confianza de tus clientes."
     },
     "vision": "Después de trabajar juntos, tu negocio tendrá una identidad visual memorable que no solo atraerá a tus clientes ideales, sino que también los inspirará a confiar en tu marca. Verás cómo tus gráficos comunican profesionalismo y conectan emocionalmente con tu audiencia, potenciando el crecimiento y el impacto de tu negocio.",
-    "stepsTitle": "¿Cómo trabajamos contigo?",
+    "stepsTitle": "¿Cómo trabajamos con vos?",
     "steps": {
       "step1": "Descubrimos tu esencia: Analizamos tu marca, tus valores y lo que hace única a tu empresa.",
       "step2": "Diseñamos soluciones: Creamos propuestas visuales que expresan claramente tu identidad.",
       "step3": "Refinamos juntos: Ajustamos los diseños hasta que reflejen exactamente tu visión.",
       "step4": "Elevamos tu marca: Transformamos tus materiales en herramientas visuales que destacan."
     },
-    "callToAction": "El momento de destacar es ahora. Contacta a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
+    "callToAction": "El momento de destacar es ahora. Contactá a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
   },
   "faqsTitle": "Preguntas Frecuentes",
   "faqs": {
@@ -185,7 +185,7 @@
         },
         {
           "question": "¿Cómo puedo empezar a trabajar con OpenGateHub?",
-          "answer": "Puedes contactarnos a través de nuestro formulario de contacto, enviarnos un correo o programar una reunión inicial."
+          "answer": "podés contactarnos a través de nuestro formulario de contacto, enviarnos un correo o programar una reunión inicial."
         },
         {
           "question": "¿Proveen soporte técnico después de entregar el proyecto?",
@@ -193,7 +193,7 @@
         },
         {
           "question": "¿Cuánto tiempo toma completar un proyecto?",
-          "answer": "La duración depende de la complejidad y el alcance del proyecto, pero trabajamos contigo para establecer un cronograma claro."
+          "answer": "La duración depende de la complejidad y el alcance del proyecto, pero trabajamos con vos para establecer un cronograma claro."
         },
         {
           "question": "¿Qué tecnologías utilizan en los proyectos?",
@@ -213,7 +213,7 @@
         },
         {
           "question": "¿Cuáles son los costos de sus servicios?",
-          "answer": "Nuestros costos dependen del tipo de proyecto. Contáctanos para recibir una cotización personalizada sin compromiso."
+          "answer": "Nuestros costos dependen del tipo de proyecto. Contactanos para recibir una cotización personalizada sin compromiso."
         },
         {
           "question": "¿Pueden ayudarme a migrar mi proyecto actual a tecnologías modernas?",
@@ -250,7 +250,7 @@
         },
         {
           "question": "¿Pueden asignar un equipo completo en lugar de perfiles individuales?",
-          "answer": "¡Claro! Podemos asignar equipos multidisciplinarios completos con líderes técnicos si tu proyecto lo requiere."
+          "answer": "¡Claro! Podemos asignar equipos multidisciplinarios completos con lídsos técnicos si tu proyecto lo requiere."
         },
         {
           "question": "¿Qué pasa si el programador asignado no cumple con mis expectativas?",
@@ -258,7 +258,7 @@
         },
         {
           "question": "¿El staff trabaja bajo mi supervisión o la de OpenGateHub?",
-          "answer": "Tú decides: el equipo puede trabajar directamente bajo tu supervisión o podemos gestionarlo nosotros según tus necesidades."
+          "answer": "Vos decidís: el equipo puede trabajar directamente bajo tu supervisión o podemos gestionarlo nosotros según tus necesidades."
         },
         {
           "question": "¿Por qué debería elegir OpenGateHub para outsourcing de IT?",
@@ -269,11 +269,11 @@
   },
   "privacyPolicy1": {
     "title": "Política de Privacidad",
-    "introduction": "En OpenGateHub, tu privacidad es nuestra prioridad. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información personal cuando interactúas con nuestro sitio web, servicios o productos. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.",
+    "introduction": "En OpenGateHub, tu privacidad es nuestra prioridad. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información personal cuando interacvosas con nuestro sitio web, servicios o productos. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.",
     "sections": [
       {
         "title": "Información que Recopilamos",
-        "content": "Recopilamos los siguientes tipos de información:\n- Información Personal: Nombre, dirección de correo electrónico, número de teléfono u otros detalles que proporciones al contactarnos o usar nuestros servicios.\n- Datos de Uso: Información sobre cómo interactúas con nuestro sitio web, como tu dirección IP, tipo de navegador y tiempo pasado en las páginas.\n- Cookies y Seguimiento: Datos recopilados a través de cookies y otras tecnologías de seguimiento para mejorar tu experiencia en nuestro sitio web."
+        "content": "Recopilamos los siguientes tipos de información:\n- Información Personal: Nombre, dirección de correo electrónico, número de teléfono u otros detalles que proporciones al contactarnos o usar nuestros servicios.\n- Datos de Uso: Información sobre cómo interacvosas con nuestro sitio web, como tu dirección IP, tipo de navegador y tiempo pasado en las páginas.\n- Cookies y Seguimiento: Datos recopilados a través de cookies y otras tecnologías de seguimiento para mejorar tu experiencia en nuestro sitio web."
       },
       {
         "title": "Cómo Usamos tu Información",
@@ -285,7 +285,7 @@
       },
       {
         "title": "Cookies y Tecnologías de Seguimiento",
-        "content": "Nuestro sitio web utiliza cookies para mejorar tu experiencia de navegación. Puedes gestionar tus preferencias de cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar algunas funcionalidades del sitio web."
+        "content": "Nuestro sitio web utiliza cookies para mejorar tu experiencia de navegación. podés gestionar tus preferencias de cookies a través de la configuración de tu navegador. Ten en cuenta que desactivar las cookies puede afectar algunas funcionalidades del sitio web."
       },
       {
         "title": "Seguridad de los Datos",
@@ -293,7 +293,7 @@
       },
       {
         "title": "Tus Derechos",
-        "content": "Tienes derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, contáctanos en [insertar dirección de correo electrónico]."
+        "content": "Tenés derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, Contactanos en [insertar dirección de correo electrónico]."
       },
       {
         "title": "Enlaces a Terceros",
@@ -304,8 +304,8 @@
         "content": "Podemos actualizar esta Política de Privacidad periódicamente. Cualquier cambio se publicará en esta página con una fecha de \"última actualización\" revisada. Revisa esta política regularmente para mantenerte informado sobre cómo protegemos tu información."
       },
       {
-        "title": "Contáctanos",
-        "content": "Si tienes preguntas o inquietudes sobre esta Política de Privacidad o cómo manejamos tu información, contáctanos en:\n- Correo electrónico: info@opengatehub.com\n- Teléfono: +54 9 11 2348 5638"
+        "title": "Contactanos",
+        "content": "Si tenés preguntas o inquietudes sobre esta Política de Privacidad o cómo manejamos tu información, Contactanos en:\n- Correo electrónico: info@opengatehub.com\n- Teléfono: +54 9 11 2348 5638"
       }
     ]
   }

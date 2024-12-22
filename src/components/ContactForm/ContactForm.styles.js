@@ -35,9 +35,7 @@ const bounceOut = keyframes`
 export const Input = styled.input`
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
   border-radius: 5px;
-  border: 3px solid #155ab8;
   transition: all 0.3s;
   background-color: #f0f0f0;
 
@@ -74,7 +72,6 @@ export const Input = styled.input`
 export const TextArea = styled.textarea`
   padding: 10px;
   margin-bottom: 10px;
-  border: 3px solid #155ab8;
   border-radius: 5px;
   transition: all 0.3s;
   background-color: #f0f0f0;
