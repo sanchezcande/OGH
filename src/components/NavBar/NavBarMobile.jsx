@@ -72,7 +72,7 @@ const NavBarMobile = () => {
             >
               <Menu open={menuOpen}>
                 <MenuItem onClick={toggleMenu}>
-                  <Link href="/">{t("home")}</Link> 
+                  <Link href="/">{t("home")}</Link>
                 </MenuItem>
                 <MenuItem>
                   <LangMenuContainer
@@ -94,6 +94,9 @@ const NavBarMobile = () => {
                 </MenuItem>
                 <MenuItem onClick={toggleMenu}>
                   <Link href="/about-us">{t("aboutUs")}</Link>
+                </MenuItem>
+                <MenuItem onClick={toggleMenu}>
+                  <Link href="/faqs">{t("faqsTitle")}</Link>
                 </MenuItem>
                 <MenuItem onClick={toggleMenu}>
                   <Link href="/contact-us">{t("contactUs")}</Link>

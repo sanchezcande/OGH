@@ -16,6 +16,7 @@ import {
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import Logo from "../../assets/logo/Logo2.png";
+import Link from "next/link";
 
 const LogoImg = () => (
   <LogoImgContainer>
@@ -57,14 +58,14 @@ const Footer = () => {
               <Linkedin />
             </a>
           </SocialMediaContainer>
-          <FooterText>{t("privacyPolicy")}</FooterText>
           <LogoImg />
         </div>
         <div>
           <h4>{t("aboutUs")}</h4>
-          <FooterText>{t("faq")}</FooterText>
-          <FooterText>{t("services")}</FooterText>
-          <LogoImg />
+          <Link href="/faqs" className="footer-link">
+  {t("faq")}
+</Link>
+          <FooterText>{t("privacyPolicy")}</FooterText>
         </div>
         <div>
           <h4>{t("connectWithUs")}</h4>
@@ -75,7 +76,6 @@ const Footer = () => {
           <TelMailContainer>
             <Mail /> <FooterText>info@opengatehub.com</FooterText>
           </TelMailContainer>
-          <LogoImg />
         </div>
       </FooterContent>
     </FooterContainer>

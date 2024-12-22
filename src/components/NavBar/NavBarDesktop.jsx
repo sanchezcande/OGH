@@ -51,6 +51,7 @@ const NavBarDesktop = () => {
     { text: t("services"), href: "/services" },
     { text: t("aboutUs"), href: "/about-us" },
     { text: t("Blog"), href: "/blog" },
+    { text: t("FAQs"), href: "/faqs" }, 
     { text: t("contactUs"), href: "/contact-us" },
   ];
 
@@ -66,7 +67,7 @@ const NavBarDesktop = () => {
   const handleMouseLeave = () => {
     hideMenuTimeout = setTimeout(() => {
       setShowServicesMenu(false);
-    }, 200); // Retraso de 200ms
+    }, 200); 
   };
 
   const handleMouseEnter = () => {

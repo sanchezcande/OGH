@@ -6,6 +6,7 @@ const theme = {
         secondary: 'white',
         background: '#001f3f',
         text: 'white',
+        lightBlue: '#00aaff',
       },
       fonts: {
         main: 'Arial, sans-serif',

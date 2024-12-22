@@ -147,5 +147,98 @@
       "step4": "Elevate your brand: We transform your materials into standout visual tools."
     },
     "callToAction": "The time to stand out is now. Contact our team and let’s build a visual identity that drives your success."
+  },
+  "faqsTitle": "Frequently Asked Questions",
+  "faqs": {
+    "softwareFactory": {
+      "title": "Software Factory FAQs",
+      "questions": [
+        {
+          "question": "What services does OpenGateHub offer?",
+          "answer": "We offer web development, UX/UI design, graphic design, backend solutions, tech consulting, and tailored business solutions."
+        },
+        {
+          "question": "How can I start working with OpenGateHub?",
+          "answer": "You can reach out via our contact form, email us, or schedule an initial meeting."
+        },
+        {
+          "question": "Do you provide technical support after project delivery?",
+          "answer": "Yes, we offer maintenance and support packages to ensure your solution runs smoothly."
+        },
+        {
+          "question": "How long does it take to complete a project?",
+          "answer": "The timeline depends on the project’s complexity and scope, but we work with you to set a clear schedule."
+        },
+        {
+          "question": "What technologies do you use in your projects?",
+          "answer": "We work with React, Next.js, Node.js, Prisma, Tailwind CSS, and other modern technologies for both frontend and backend."
+        },
+        {
+          "question": "Can you work with international companies?",
+          "answer": "Yes, we are a global company accustomed to collaborating with clients across different time zones and countries."
+        },
+        {
+          "question": "Do you have experience integrating third-party APIs?",
+          "answer": "Yes, we have worked with APIs like Stripe, AWS, Firebase, and more to provide complete and integrated solutions."
+        },
+        {
+          "question": "What makes OpenGateHub unique compared to other companies?",
+          "answer": "We focus on creating scalable and customized solutions while maintaining clear and close communication with our clients."
+        },
+        {
+          "question": "What are the costs of your services?",
+          "answer": "Our costs depend on the type of project. Contact us for a personalized, no-obligation quote."
+        },
+        {
+          "question": "Can you help me migrate my current project to modern technologies?",
+          "answer": "Absolutely! We will evaluate your project and help you update it with current tools and frameworks."
+        }
+      ]
+    },
+    "staffOutsourcing": {
+      "title": "Staff Outsourcing FAQs",
+      "questions": [
+        {
+          "question": "What type of tech profiles do you offer for outsourcing?",
+          "answer": "We provide frontend, backend, full-stack developers, UX/UI designers, QA testers, and DevOps specialists, among others."
+        },
+        {
+          "question": "Can I hire developers part-time or for specific projects?",
+          "answer": "Yes, we offer flexible hiring options, whether full-time, part-time, or for specific projects."
+        },
+        {
+          "question": "How do you handle time zone differences?",
+          "answer": "We adapt to the client’s time zone and organize meetings and deliverables according to their needs to ensure efficient collaboration."
+        },
+        {
+          "question": "Are the talents prepared to integrate with existing teams?",
+          "answer": "Yes, our talents are trained to quickly adapt to teams and workflows, such as Scrum, Kanban, or your preferred method."
+        },
+        {
+          "question": "What level of experience do the talents have?",
+          "answer": "We provide developers from junior to senior levels, selected based on the specific requirements of your project."
+        },
+        {
+          "question": "How do you select the ideal talent for my project?",
+          "answer": "We analyze your needs and select candidates through a rigorous technical and cultural evaluation process."
+        },
+        {
+          "question": "Can you assign a full team instead of individual profiles?",
+          "answer": "Of course! We can assign multidisciplinary teams, including technical leads, if your project requires it."
+        },
+        {
+          "question": "What happens if the assigned developer doesn’t meet my expectations?",
+          "answer": "If you’re not satisfied, we provide a quick replacement to ensure your project continues without delays."
+        },
+        {
+          "question": "Does the staff work under my supervision or OpenGateHub’s?",
+          "answer": "You decide: the team can work directly under your supervision, or we can manage it according to your needs."
+        },
+        {
+          "question": "Why should I choose OpenGateHub for IT outsourcing?",
+          "answer": "We understand that every project is unique. That’s why we focus on providing reliable talent, adapting to your needs, and maintaining clear communication every step of the way. Our goal is to become a strategic partner that helps your business grow."
+        }
+      ]
+    }
   }
 }

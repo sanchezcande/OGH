@@ -79,7 +79,7 @@
   pointer-events: none;
   visibility: hidden;
   transform: scaleY(0);
-  transform-origin: top; 
+  transform-origin: top;
   transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
 }
 
@@ -121,7 +121,7 @@
   top: 115%;
   left: 50%;
   transform: translateX(-50%) scaleY(0);
-  transform-origin: top; 
+  transform-origin: top;
   list-style: none;
   border: 2px solid #0034ee;
   border-radius: 5px;
@@ -129,18 +129,17 @@
   z-index: 10000;
   margin: 0;
   padding: 0;
-  opacity: 0; 
-  pointer-events: none; 
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  visibility: hidden; 
+  visibility: hidden;
 }
 
 .servicesMenu.visible {
-  opacity: 1; 
-  pointer-events: auto; 
+  opacity: 1;
+  pointer-events: auto;
   visibility: visible;
-  transform: translateX(-50%) scaleY(1);  
-
+  transform: translateX(-50%) scaleY(1);
 }
 
 .servicesMenuItem {
@@ -158,9 +157,26 @@
   font-size: 15px;
 }
 
-
-@media screen and (max-width: 1169px) {
+@media screen and (max-width: 1300px) {
   .navLinks {
     gap: 20px;
   }
- }
+}
+@media screen and (max-width: 1150px) {
+  .navLinks {
+    gap: 10px;
+  }
+}
+
+@media screen and (max-width: 1085px) {
+  .navLinks {
+    gap: 7px;
+  }
+  .navLink {
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+  .highlightBar {
+    visibility: hidden;
+  }
+}

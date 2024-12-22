@@ -23,7 +23,9 @@
   "faq": "Preguntas Frecuentes",
   "connectWithUs": "Conectate con Nosotros",
   "aboutUsTitle": "Construimos Puentes para que tus Ideas Lideren el Futuro Digital",
-  "aboutUsText": "En OpenGateHub, creemos que vos sos el centro de esta historia. Cada visión, cada meta y cada desafío que enfrentás son oportunidades para crear algo significativo. Nuestro propósito es acompañarte en ese camino con empatía, brindándote no solo desarrollo tecnológico, sino también identidad visual que refleje quién sos y hacia dónde querés llegar. No somos solo desarrolladores; somos aliados estratégicos que trabajamos codo a codo con vos, escuchando, entendiendo y diseñando soluciones a medida. Porque sabemos que detrás de cada proyecto hay personas con sueños, historias y un propósito claro. Cuando vos triunfás, sentimos que cumplimos nuestra misión. Juntos, podemos transformar desafíos en avances y construir algo que realmente importe.","contactUsTitle": "¿Tenés una pregunta? ¡Ponete en contacto!","contactUsSubtitle": "¡Gracias por contactarnos! Por favor, completá el formulario a continuación y nos pondremos en contacto con vos en breve.",
+  "aboutUsText": "En OpenGateHub, creemos que vos sos el centro de esta historia. Cada visión, cada meta y cada desafío que enfrentás son oportunidades para crear algo significativo. Nuestro propósito es acompañarte en ese camino con empatía, brindándote no solo desarrollo tecnológico, sino también identidad visual que refleje quién sos y hacia dónde querés llegar. No somos solo desarrolladores; somos aliados estratégicos que trabajamos codo a codo con vos, escuchando, entendiendo y diseñando soluciones a medida. Porque sabemos que detrás de cada proyecto hay personas con sueños, historias y un propósito claro. Cuando vos triunfás, sentimos que cumplimos nuestra misión. Juntos, podemos transformar desafíos en avances y construir algo que realmente importe.",
+  "contactUsTitle": "¿Tenés una pregunta? ¡Ponete en contacto!",
+  "contactUsSubtitle": "¡Gracias por contactarnos! Por favor, completá el formulario a continuación y nos pondremos en contacto con vos en breve.",
   "weAre": "Somos",
   "companyName": "OpenGateHub",
   "specializedIn": "Especializados en",
@@ -146,5 +148,98 @@
       "step4": "Elevamos tu marca: Transformamos tus materiales en herramientas visuales que destacan."
     },
     "callToAction": "El momento de destacar es ahora. Contacta a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
+  },
+  "faqsTitle": "Preguntas Frecuentes",
+  "faqs": {
+    "softwareFactory": {
+      "title": "Software Factory",
+      "questions": [
+        {
+          "question": "¿Qué servicios ofrece OpenGateHub?",
+          "answer": "Ofrecemos desarrollo web, diseño UX/UI, diseño gráfico, soluciones backend, consultoría tecnológica y soluciones a medida para tu negocio."
+        },
+        {
+          "question": "¿Cómo puedo empezar a trabajar con OpenGateHub?",
+          "answer": "Puedes contactarnos a través de nuestro formulario de contacto, enviarnos un correo o programar una reunión inicial."
+        },
+        {
+          "question": "¿Proveen soporte técnico después de entregar el proyecto?",
+          "answer": "Sí, contamos con paquetes de mantenimiento y soporte técnico para garantizar que tu solución funcione sin problemas."
+        },
+        {
+          "question": "¿Cuánto tiempo toma completar un proyecto?",
+          "answer": "La duración depende de la complejidad y el alcance del proyecto, pero trabajamos contigo para establecer un cronograma claro."
+        },
+        {
+          "question": "¿Qué tecnologías utilizan en los proyectos?",
+          "answer": "Trabajamos con React, Next.js, Node.js, Prisma, Tailwind CSS y otras tecnologías modernas para frontend y backend."
+        },
+        {
+          "question": "¿Pueden trabajar con empresas internacionales?",
+          "answer": "Sí, somos una empresa global y estamos acostumbrados a colaborar con clientes de diferentes zonas horarias y países."
+        },
+        {
+          "question": "¿Tienen experiencia integrando APIs de terceros?",
+          "answer": "Sí, hemos trabajado con APIs como Stripe, AWS, Firebase y más para ofrecer soluciones completas e integradas."
+        },
+        {
+          "question": "¿Qué hace único a OpenGateHub frente a otras empresas?",
+          "answer": "Nos enfocamos en crear soluciones escalables y personalizadas mientras mantenemos una comunicación clara y cercana con nuestros clientes."
+        },
+        {
+          "question": "¿Cuáles son los costos de sus servicios?",
+          "answer": "Nuestros costos dependen del tipo de proyecto. Contáctanos para recibir una cotización personalizada sin compromiso."
+        },
+        {
+          "question": "¿Pueden ayudarme a migrar mi proyecto actual a tecnologías modernas?",
+          "answer": "¡Por supuesto! Evaluaremos tu proyecto y te ayudaremos a actualizarlo utilizando herramientas y frameworks actuales."
+        }
+      ]
+    },
+    "staffOutsourcing": {
+      "title": "Outsourcing de Staff",
+      "questions": [
+        {
+          "question": "¿Qué tipo de perfiles tecnológicos ofrecen para outsourcing?",
+          "answer": "Ofrecemos desarrolladores frontend, backend, full stack, diseñadores UX/UI, testers QA y especialistas en DevOps, entre otros."
+        },
+        {
+          "question": "¿Puedo contratar desarrolladores a tiempo parcial o para proyectos específicos?",
+          "answer": "Sí, ofrecemos opciones flexibles de contratación, ya sea a tiempo completo, parcial o para proyectos específicos."
+        },
+        {
+          "question": "¿Cómo manejan las diferencias de zona horaria?",
+          "answer": "Nos adaptamos a la zona horaria del cliente y organizamos reuniones y entregas según sus necesidades para garantizar una colaboración eficiente."
+        },
+        {
+          "question": "¿El talento está preparado para integrarse en equipos existentes?",
+          "answer": "Sí, nuestro talento está capacitado para adaptarse rápidamente a equipos y metodologías de trabajo como Scrum, Kanban o el flujo que prefieras."
+        },
+        {
+          "question": "¿Qué nivel de experiencia tienen los talentos que ofrecen?",
+          "answer": "Contamos con programadores desde nivel junior hasta senior, seleccionados según los requerimientos específicos de tu proyecto."
+        },
+        {
+          "question": "¿Cómo seleccionan al talento ideal para mi proyecto?",
+          "answer": "Realizamos un análisis de tus necesidades y seleccionamos candidatos a través de un riguroso proceso de evaluación técnica y cultural."
+        },
+        {
+          "question": "¿Pueden asignar un equipo completo en lugar de perfiles individuales?",
+          "answer": "¡Claro! Podemos asignar equipos multidisciplinarios completos con líderes técnicos si tu proyecto lo requiere."
+        },
+        {
+          "question": "¿Qué pasa si el programador asignado no cumple con mis expectativas?",
+          "answer": "Si no estás satisfecho, te ofrecemos una rápida sustitución del talento, asegurándonos de que tu proyecto siga avanzando sin problemas."
+        },
+        {
+          "question": "¿El staff trabaja bajo mi supervisión o la de OpenGateHub?",
+          "answer": "Tú decides: el equipo puede trabajar directamente bajo tu supervisión o podemos gestionarlo nosotros según tus necesidades."
+        },
+        {
+          "question": "¿Por qué debería elegir OpenGateHub para outsourcing de IT?",
+          "answer": "Entendemos que cada proyecto es único. Por eso nos enfocamos en ofrecerte talento confiable, adaptarnos a tus necesidades y mantener una comunicación clara en cada paso del camino. Nuestro objetivo es convertirnos en un socio estratégico que haga crecer tu negocio."
+        }
+      ]
+    }
   }
 }
