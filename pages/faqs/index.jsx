@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import Head from "next/head";
-import { FAQContainer, FAQTitle,FAQTitle1, FAQList, Question, Answer } from "./FAQs.styles";
+import { FAQContainer, FAQTitle,FAQTitle1, FAQList, Question, Answer } from "../../src/styles/pagesStyles/FAQs.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const FAQsCallToAction = () => {

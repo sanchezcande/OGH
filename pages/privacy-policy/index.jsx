@@ -6,7 +6,7 @@ import {
   SectionTitle,
   SectionContent,
   List
-} from "./PrivacyPolicy.styles";
+} from "../../src/styles/pagesStyles/PrivacyPolicy.styles";
 import { useTranslation } from "react-i18next";
 
 const PrivacyPolicy = () => {

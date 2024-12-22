@@ -8,7 +8,7 @@ import {
   Divider,
   Description,
   NumberedList,
-} from "./Services.styles";
+} from "../../src/styles/pagesStyles/Services.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const ServicesCallToAction = () => {

@@ -40,8 +40,7 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "next/core-web-vitals"
     ]
   },
   "browserslist": {
@@ -62,7 +61,7 @@
   "devDependencies": {
     "@testing-library/react": "^16.0.0",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9.15.0",
+    "eslint": "^9.17.0",
     "gh-pages": "^6.1.1",
     "postcss": "^8.4.49",
     "styled-components": "^6.1.11",

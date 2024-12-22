@@ -1,5 +1,5 @@
 import React from "react";
-import { ImageText, Container } from "./AboutUs.styles";
+import { ImageText, Container } from "../../src/styles/pagesStyles/AboutUs.styles";
 import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
 import modeloHtml from "../../src/assets/images/modeloHtml.png";
