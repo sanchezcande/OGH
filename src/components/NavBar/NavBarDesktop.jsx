@@ -67,7 +67,7 @@ const NavBarDesktop = () => {
   const handleMouseLeave = () => {
     hideMenuTimeout = setTimeout(() => {
       setShowServicesMenu(false);
-    }, 200); 
+    }, 100); 
   };
 
   const handleMouseEnter = () => {
@@ -106,7 +106,7 @@ const NavBarDesktop = () => {
                 >
                   {servicesList.map((service, index) => (
                     <li key={index} className={styles.servicesMenuItem}>
-                      <Link href={service.href}>{service.text}</Link>
+                      <Link href={service.href} prefetch={true} >{service.text} </Link>
                     </li>
                   ))}
                 </ul>
