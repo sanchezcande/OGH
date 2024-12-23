@@ -1,45 +1,51 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useRef, useState } from "react";
+import { BlogContainer, Gallery, ArticleCard, ScrollToTopButton } from "../../src/styles/pagesStyles/Blog.styles";
+import Link from "next/link";
+import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const BlogContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 50vh;
-  text-align: center;
-  color: white;
-  font-family: Arial, sans-serif;
-`;
 
-const Title = styled.h1`
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: ${({ theme }) => theme.colors.lightBlue};
-`;
+export default function Blog() {
+  const articles = [
+    { title: "Primer artículo", slug: "first-article", summary: "Explora el contenido de este artículo." },
+    { title: "Segundo artículo", slug: "second-article", summary: "Detalles interesantes en este artículo." },
+    { title: "Tercer artículo", slug: "third-article", summary: "Más información sobre este tema." },
+    { title: "Cuarto artículo", slug: "fourth-article", summary: "Descubre más sobre este contenido." },
+    { title: "Quinto artículo", slug: "fifth-article", summary: "Más detalles interesantes aquí." },
+    { title: "Sexto artículo", slug: "sixth-article", summary: "Este es un nuevo artículo interesante." },
+    { title: "Primer artículo", slug: "first-article", summary: "Explora el contenido de este artículo." },
+    { title: "Segundo artículo", slug: "second-article", summary: "Detalles interesantes en este artículo." },
+    { title: "Tercer artículo", slug: "third-article", summary: "Más información sobre este tema." },
+    { title: "Cuarto artículo", slug: "fourth-article", summary: "Descubre más sobre este contenido." },
+    { title: "Quinto artículo", slug: "fifth-article", summary: "Más detalles interesantes aquí." },
+    { title: "Sexto artículo", slug: "sixth-article", summary: "Este es un nuevo artículo interesante." },
+    { title: "Primer artículo", slug: "first-article", summary: "Explora el contenido de este artículo." },
+    { title: "Segundo artículo", slug: "second-article", summary: "Detalles interesantes en este artículo." },
+    { title: "Tercer artículo", slug: "third-article", summary: "Más información sobre este tema." },
+    { title: "Cuarto artículo", slug: "fourth-article", summary: "Descubre más sobre este contenido." },
+    { title: "Quinto artículo", slug: "fifth-article", summary: "Más detalles interesantes aquí." },
+    { title: "Sexto artículo", slug: "sixth-article", summary: "Este es un nuevo artículo interesante." },
+  ];
 
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-`;
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-const WorkingImage = styled.img`
-  width: 150px;
-  height: auto;
-  margin-bottom: 1.5rem;
-`;
-
-const BlogPlaceholder = () => {
   return (
     <BlogContainer>
-      <WorkingImage
-        src="/path-to-your-working-icon.png"
-        alt="Working on it"
-      />
-      <Title>Blog Page Under Construction</Title>
-      <Subtitle>We are working hard to bring you the latest updates. Stay tuned!</Subtitle>
+      <Gallery>
+        {articles.map((article) => (
+          <ArticleCard key={article.slug}>
+            <h2>{article.title}</h2>
+            <p>{article.summary}</p>
+            <Link href={`/blog/${article.slug}`}>
+              Leer más
+            </Link>
+          </ArticleCard>
+        ))}
+      </Gallery>
+      <ScrollToTopButton onClick={scrollToTop}>          <FontAwesomeIcon icon={faArrowUp} size="lg" />
+      </ScrollToTopButton>
     </BlogContainer>
   );
-};
-
-export default BlogPlaceholder;
+}
