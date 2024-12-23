@@ -34,7 +34,8 @@ export const NavBarContainer = styled.nav`
   margin-right: 1rem;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
   background-color: rgba(21, 62, 108, 0.34);
   border: 2px solid #155ab8;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -45,6 +46,7 @@ export const NavBarContainer = styled.nav`
 export const Logo = styled.div`
   font-weight: 700;
   font-size: 24px;
+  margin-top: 10px;
 `;
 
 export const Span = styled.span`

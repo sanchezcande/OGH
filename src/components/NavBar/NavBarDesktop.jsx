@@ -3,6 +3,8 @@ import Link from "next/link";
 import styles from "./NavBarDesktop.module.css";
 import { FaAngleDown, FaGlobe } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import Image from "next/image";
+import Logo4 from "../../../public/Logo4.png";
 
 const NavBarDesktop = () => {
   const { t, i18n } = useTranslation();
@@ -51,7 +53,7 @@ const NavBarDesktop = () => {
     { text: t("services"), href: "/services" },
     { text: t("aboutUs"), href: "/about-us" },
     { text: t("Blog"), href: "/blog" },
-    { text: t("FAQs"), href: "/faqs" }, 
+    { text: t("FAQs"), href: "/faqs" },
     { text: t("contactUs"), href: "/contact-us" },
   ];
 
@@ -67,7 +69,7 @@ const NavBarDesktop = () => {
   const handleMouseLeave = () => {
     hideMenuTimeout = setTimeout(() => {
       setShowServicesMenu(false);
-    }, 100); 
+    }, 100);
   };
 
   const handleMouseEnter = () => {
@@ -78,7 +80,7 @@ const NavBarDesktop = () => {
   return (
     <nav className={styles.navBarContainer}>
       <div className={styles.logo}>
-        OpenGate<span className={styles.span}>Hub</span>
+        <Image src={Logo4} alt="OpenGateHub Logo" width={280} height={60} />
       </div>
       <ul className={styles.navLinks}>
         <div
@@ -101,12 +103,15 @@ const NavBarDesktop = () => {
               >
                 <span>{tab.text}</span>
                 <ul
-                  className={`${styles.servicesMenu} ${showServicesMenu ? styles.visible : ""
-                    }`}
+                  className={`${styles.servicesMenu} ${
+                    showServicesMenu ? styles.visible : ""
+                  }`}
                 >
                   {servicesList.map((service, index) => (
                     <li key={index} className={styles.servicesMenuItem}>
-                      <Link href={service.href} prefetch={true} >{service.text} </Link>
+                      <Link href={service.href} prefetch={true}>
+                        {service.text}{" "}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -124,13 +129,9 @@ const NavBarDesktop = () => {
             )}
           </li>
         ))}
-
       </ul>
       <div>
-        <div
-          className={styles.langMenuContainer}
-          onClick={toggleLangMenu}
-        >
+        <div className={styles.langMenuContainer} onClick={toggleLangMenu}>
           <FaGlobe className={styles.worldIcon} />
           <span className={styles.styledLangText}>
             {selectedLang === "en" ? t("english") : t("spanish")}
@@ -142,28 +143,26 @@ const NavBarDesktop = () => {
             }}
           />
         </div>
-    
-          <ul className=
-          {`${styles.langMenu} ${
-            showLangMenu ? styles.visible : ""
-          }`}>
-            {selectedLang === "en" ? (
-              <li
-                className={styles.langMenuItem}
-                onClick={() => handleLangChange("es")}
-              >
-                {t("spanish")}
-              </li>
-            ) : (
-              <li
-                className={styles.langMenuItem}
-                onClick={() => handleLangChange("en")}
-              >
-                {t("english")}
-              </li>
-            )}
-          </ul>
-    
+
+        <ul
+          className={`${styles.langMenu} ${showLangMenu ? styles.visible : ""}`}
+        >
+          {selectedLang === "en" ? (
+            <li
+              className={styles.langMenuItem}
+              onClick={() => handleLangChange("es")}
+            >
+              {t("spanish")}
+            </li>
+          ) : (
+            <li
+              className={styles.langMenuItem}
+              onClick={() => handleLangChange("en")}
+            >
+              {t("english")}
+            </li>
+          )}
+        </ul>
       </div>
     </nav>
   );

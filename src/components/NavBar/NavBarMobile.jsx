@@ -16,6 +16,8 @@ import {
 } from "./NavBarMobile.styles";
 import { MagicMotion, motion, LayoutGroup } from "react-magic-motion";
 import { useTranslation } from "react-i18next";
+import Image from "next/image";
+import Logo4 from "../../../public/Logo4.png";
 
 const NavBarMobile = () => {
   const { t, i18n } = useTranslation();
@@ -55,7 +57,7 @@ const NavBarMobile = () => {
     <NavBarContainer>
       <LogoIcon>
         <Logo>
-          OpenGate<Span>Hub</Span>
+        <Image src={Logo4} alt="OpenGateHub Logo" width={280} height={60} />
         </Logo>
         <MenuIcon onClick={toggleMenu} open={menuOpen}>
           ☰

@@ -13,6 +13,7 @@
 .logo {
   font-weight: 800;
   font-size: 28px;
+margin-top: 15px;
 }
 
 .span {
@@ -171,18 +172,18 @@
 
 
 
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1340px) {
   .navLinks {
     gap: 20px;
   }
 }
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1210px) {
   .navLinks {
     gap: 10px;
   }
 }
 
-@media screen and (max-width: 1085px) {
+@media screen and (max-width: 1152px) {
   .navLinks {
     gap: 7px;
   }
