@@ -29,6 +29,7 @@ const LogoImg = () => (
 
 const Footer = () => {
   const { t } = useTranslation();
+  const whatsappLink = "https://wa.me/5491123485638";
   return (
     <FooterContainer>
       <FooterContent>
@@ -63,25 +64,33 @@ const Footer = () => {
         <div>
           <h4>{t("aboutUs")}</h4>
           <FooterText>
-          <Link href="/faqs" className="footer-link">
-            {t("faq")}
-          </Link>
+            <Link href="/faqs" className="footer-link">
+              {t("faq")}
+            </Link>
           </FooterText>
           <FooterText>
-          <Link href="/privacy-policy" className="footer-link">
-            {t("privacyPolicy")}
-          </Link>{" "}
+            <Link href="/privacy-policy" className="footer-link">
+              {t("privacyPolicy")}
+            </Link>{" "}
           </FooterText>
 
         </div>
         <div>
           <h4>{t("connectWithUs")}</h4>
           <TelMailContainer>
-            <Tel />
-            <FooterText>+549 11 2348 5638</FooterText>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="WhatsApp"
+            >
+              <Tel />
+              <FooterText>+549 11 2348 5638</FooterText>
+            </a>
           </TelMailContainer>
           <TelMailContainer>
-            <Mail /> <FooterText>info@opengatehub.com</FooterText>
+            <Mail /> <FooterText>    <a href="mailto:info@opengatehub.com">info@opengatehub.com</a>
+            </FooterText>
           </TelMailContainer>
         </div>
       </FooterContent>

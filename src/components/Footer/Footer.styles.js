@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaPhone } from "react-icons/fa";
+import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 
 export const FooterContainer = styled.footer`
 background-color: rgba(21, 62, 108, 0.3);
@@ -31,6 +31,15 @@ export const FooterContent = styled.div`
 export const FooterText = styled.p`
   font-size: 12px;
   margin: 10px 0;
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
 `;
 
 export const SocialMediaContainer = styled.div`
@@ -44,29 +53,55 @@ export const Instagram = styled(FaInstagram)`
   width: 20px;
   height: 20px;
   fill: #fff;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 export const Linkedin = styled(FaLinkedin)`
   width: 20px;
   height: 20px;
   fill: #fff;
+    transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
-export const Github = styled(FaGithub)``;
+export const Github = styled(FaGithub)`
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.1);
+  }`;
 
 export const Mail = styled(FaEnvelope)`
   width: 15px;
   height: 15px;
   fill: #fff;
 `;
-export const Tel = styled(FaPhone)`
-  width: 15px;
-  height: 15px;
+export const Tel = styled(FaWhatsapp)`
+  width: 20px;
+  height: 20px;
   fill: #fff;
+  margin-bottom: 5px;
 `;
 export const TelMailContainer = styled.div`
   margin-top: -10px;
   display: flex;
   gap: 10px;
   align-items: center;
+
+  a {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 export const Title = styled.h3`
@@ -77,6 +112,7 @@ export const Title = styled.h3`
   margin-left_10px;
 
   span {
+  margin-top: 2px;
     font-weight: 400;
   }
 `;

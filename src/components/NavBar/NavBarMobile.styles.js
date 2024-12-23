@@ -47,6 +47,7 @@ export const Logo = styled.div`
   font-weight: 700;
   font-size: 24px;
   margin-top: 10px;
+  width: 60%;
 `;
 
 export const Span = styled.span`
