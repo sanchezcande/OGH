@@ -95,8 +95,12 @@ const NavBarMobile = () => {
                 <MenuItem onClick={toggleMenu}>
                   <Link href="/about-us">{t("aboutUs")}</Link>
                 </MenuItem>
+                
                 <MenuItem onClick={toggleMenu}>
-                  <Link href="/faqs">{t("faqsTitle")}</Link>
+                  <Link href="/blog">Blog</Link>
+                </MenuItem>
+                <MenuItem onClick={toggleMenu}>
+                  <Link href="/faqs">FAQs</Link>
                 </MenuItem>
                 <MenuItem onClick={toggleMenu}>
                   <Link href="/contact-us">{t("contactUs")}</Link>
