@@ -25,7 +25,7 @@ const AboutUs = React.forwardRef((props, ref) => {
   return (
     <Container ref={ref}>
       <Head>
-        <title> {t("aboutUs")}</title>
+        <title>About Us - OpenGateHub</title>
         <meta
           name="description"
           content="Learn about OpenGateHub, our mission, values, and the passionate team driving innovation in digital solutions. Together, we create meaningful change."

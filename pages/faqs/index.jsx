@@ -24,7 +24,7 @@ const FAQs = () => {
   return (
     <>
       <Head>
-        <title>{t("faqsTitle")} - OpenGateHub</title>
+        <title>FAQs - OpenGateHub</title>
         <meta name="description" content={t("faqs.description")} />
       </Head>
 

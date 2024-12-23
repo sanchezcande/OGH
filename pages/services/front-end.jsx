@@ -30,7 +30,7 @@ const FrontEnd = () => {
   return (
     <>
       <Head>
-        <title>{t("frontend.title")} - OpenGateHub</title>
+        <title>Frontend - OpenGateHub</title>
         <meta name="description" content={t("frontend.description")} />
         <meta
           name="keywords"

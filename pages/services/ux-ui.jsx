@@ -31,7 +31,7 @@ const UxUi = () => {
   return (
     <>
       <Head>
-        <title>{t("uxui.title")} - OpenGateHub</title>
+        <title>UxUi - OpenGateHub</title>
         <meta name="description" content={t("uxui.description")} />
         <meta
           name="keywords"

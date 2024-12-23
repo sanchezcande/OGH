@@ -31,7 +31,7 @@ const GraphicDesign = () => {
   return (
     <>
       <Head>
-        <title>{t("graphicDesign.title")} - OpenGateHub</title>
+        <title>Graphic Design - OpenGateHub</title>
         <meta name="description" content={t("graphicDesign.description")} />
         <meta
           name="keywords"
