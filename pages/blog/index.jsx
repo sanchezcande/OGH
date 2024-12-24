@@ -1,31 +1,21 @@
-import React, { useRef, useState } from "react";
-import { BlogContainer, Gallery, ArticleCard, ScrollToTopButton } from "../../src/styles/pagesStyles/Blog.styles";
+import React, { useState } from "react";
+import { BlogContainer, Gallery, ArticleCard, ScrollToTopButton, SearchInput } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
-import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 export default function Blog() {
-  const articles = [
-    { title: "Primer artículo", slug: "first-article", summary: "Explora el contenido de este artículo." },
-    { title: "Segundo artículo", slug: "second-article", summary: "Detalles interesantes en este artículo." },
-    { title: "Tercer artículo", slug: "third-article", summary: "Más información sobre este tema." },
-    { title: "Cuarto artículo", slug: "fourth-article", summary: "Descubre más sobre este contenido." },
-    { title: "Quinto artículo", slug: "fifth-article", summary: "Más detalles interesantes aquí." },
-    { title: "Sexto artículo", slug: "sixth-article", summary: "Este es un nuevo artículo interesante." },
-    { title: "Primer artículo", slug: "first-article", summary: "Explora el contenido de este artículo." },
-    { title: "Segundo artículo", slug: "second-article", summary: "Detalles interesantes en este artículo." },
-    { title: "Tercer artículo", slug: "third-article", summary: "Más información sobre este tema." },
-    { title: "Cuarto artículo", slug: "fourth-article", summary: "Descubre más sobre este contenido." },
-    { title: "Quinto artículo", slug: "fifth-article", summary: "Más detalles interesantes aquí." },
-    { title: "Sexto artículo", slug: "sixth-article", summary: "Este es un nuevo artículo interesante." },
-    { title: "Primer artículo", slug: "first-article", summary: "Explora el contenido de este artículo." },
-    { title: "Segundo artículo", slug: "second-article", summary: "Detalles interesantes en este artículo." },
-    { title: "Tercer artículo", slug: "third-article", summary: "Más información sobre este tema." },
-    { title: "Cuarto artículo", slug: "fourth-article", summary: "Descubre más sobre este contenido." },
-    { title: "Quinto artículo", slug: "fifth-article", summary: "Más detalles interesantes aquí." },
-    { title: "Sexto artículo", slug: "sixth-article", summary: "Este es un nuevo artículo interesante." },
-  ];
+  const { t } = useTranslation(); 
+  const articles = t("articles", { returnObjects: true }) || [];
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredArticles = articles.filter(
+    (article) =>
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.summary.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -33,18 +23,28 @@ export default function Blog() {
 
   return (
     <BlogContainer>
+      <SearchInput
+        type="text"
+        placeholder={t("searchPlaceholder") || "Buscar artículos..."}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
       <Gallery>
-        {articles.map((article) => (
+        {filteredArticles.map((article) => (
           <ArticleCard key={article.slug}>
+            <img src={article.image} alt={article.title} />
             <h2>{article.title}</h2>
             <p>{article.summary}</p>
             <Link href={`/blog/${article.slug}`}>
-              Leer más
+              {t("readMore")}
             </Link>
           </ArticleCard>
         ))}
       </Gallery>
-      <ScrollToTopButton onClick={scrollToTop}>          <FontAwesomeIcon icon={faArrowUp} size="lg" />
+
+      <ScrollToTopButton onClick={scrollToTop}>
+        <FontAwesomeIcon icon={faArrowUp} size="lg" />
       </ScrollToTopButton>
     </BlogContainer>
   );
