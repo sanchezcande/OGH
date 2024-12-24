@@ -44,6 +44,12 @@ export default function Blog() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true); 
+  };
+
   return (
     <BlogContainer>
       <SearchInput
@@ -56,7 +62,7 @@ export default function Blog() {
       <Gallery>
         {filteredArticles.map((article) => (
           <ArticleCard key={article.slug} className="article-card">
-            <img src={article.image} alt={article.title} />
+            <img src={article.image} alt={article.title}    onLoad={handleImageLoad} />
             <h2>{article.title}</h2>
             <p>{article.summary}</p>
             <Link href={`/blog/${article.slug}`}>{t("readMore")}</Link>
