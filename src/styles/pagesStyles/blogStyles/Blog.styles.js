@@ -86,8 +86,7 @@ export const ArticleCard = styled.div`
   }
 
   img {
-    width: 20%;
-    min-width: 250px;
+    width: auto;
     height: 150px;
     object-fit: cover;
     border-radius: 12px;
