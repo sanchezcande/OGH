@@ -44,7 +44,8 @@ export const Gallery = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   width: 100%;
-  justify-items: center;
+  justify-items: left;
+
 `;
 
 export const ScrollToTopButton = styled.button`
@@ -75,9 +76,11 @@ export const ArticleCard = styled.div`
   transition: transform 0.4s, box-shadow 0.4s;
   overflow: hidden;
   width: 100%;
+  max-width: 600px;
 
   img {
     width: 20%;
+    min-width: 250px;
     height: auto;
     object-fit: cover;
     border-radius: 12px;
