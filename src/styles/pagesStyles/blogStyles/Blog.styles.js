@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const BlogContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Aseguramos que todo esté alineado a la izquierda */
+  align-items: flex-start;
   padding: 30px;
   background: linear-gradient(145deg, #0a0f22, #0e162e);
   color: #eaeaea;
@@ -12,32 +12,32 @@ export const BlogContainer = styled.div`
 
 export const SearchBarContainer = styled.div`
   width: 100%;
-  max-width: 300px; /* Limita el ancho del buscador */
+  max-width: 300px;
   margin-bottom: 20px;
 `;
 
 export const SearchInput = styled.input`
   width: 280px;
   padding: 10px 15px;
-  border: none; 
+  border: none;
   border-bottom: 2px solid #1f2e5a;
-  background: transparent; 
+  background: transparent;
   font-size: 1rem;
-  color: #ffffff; 
+  color: #ffffff;
   outline: none;
   margin-left: 10px;
-margin-bottom: 20px;
+  margin-bottom: 20px;
+  transition: border-color 0.3s;
 
   &::placeholder {
-    color: #d1d9e6; 
-    opacity: 0.7; 
+    color: #d1d9e6;
+    opacity: 0.7;
   }
 
   &:focus {
-    border-bottom-color: #00bcd4; 
+    border-bottom-color: #00bcd4;
   }
 `;
-
 
 export const Gallery = styled.div`
   display: grid;
@@ -45,7 +45,6 @@ export const Gallery = styled.div`
   gap: 24px;
   width: 100%;
   justify-items: left;
-
 `;
 
 export const ScrollToTopButton = styled.button`
@@ -73,10 +72,18 @@ export const ArticleCard = styled.div`
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-  transition: transform 0.4s, box-shadow 0.4s;
   overflow: hidden;
   width: 100%;
   max-width: 600px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  /* Clase visible para activar la animación */
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   img {
     width: 20%;

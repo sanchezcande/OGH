@@ -16,7 +16,7 @@ export const FAQTitle = styled.h1`
   margin-bottom: 2rem;
   text-align: left;
   color: white;
-  margin-left: 2.6rem; 
+  margin-left: 2.6rem;
 `;
 
 export const FAQTitle1 = styled.h1`
@@ -35,14 +35,18 @@ export const FAQList = styled.ul`
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     position: relative;
-    padding-left: 2.5rem; 
-    transition: border-color 0.3s ease;
+    padding-left: 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    will-change: opacity, transform;
+    transition: opacity 0.6s ease, transform 0.6s ease;
 
-    &:last-child {
-      border-bottom: none;
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-     &::before {
+    &::before {
       content: '➤';
       position: absolute;
       left: 0;

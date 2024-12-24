@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { ImageText, Container } from "../../src/styles/pagesStyles/AboutUs.styles";
 import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
@@ -22,6 +22,31 @@ export const AboutUsCallToAction = () => {
 
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
+  const imageRef = useRef(null); // Ref para la imagen
+  const textRef = useRef(null); // Ref para el texto
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible"); // Activa la animación
+            observer.unobserve(entry.target); // Deja de observar después de activar
+          }
+        });
+      },
+      { threshold: 0.2 } // Se activa cuando el 20% del elemento es visible
+    );
+
+    if (imageRef.current) observer.observe(imageRef.current);
+    if (textRef.current) observer.observe(textRef.current);
+
+    return () => {
+      if (imageRef.current) observer.unobserve(imageRef.current);
+      if (textRef.current) observer.unobserve(textRef.current);
+    };
+  }, []);
+
   return (
     <Container ref={ref}>
       <Head>
@@ -47,7 +72,7 @@ const AboutUs = React.forwardRef((props, ref) => {
       </Head>
 
       <ImageText>
-        <div className="relative w-full m-auto">
+        <div ref={imageRef} className="image-container">
           <Image
             width={1000}
             height={550}
@@ -55,9 +80,11 @@ const AboutUs = React.forwardRef((props, ref) => {
             alt="Desarrollador web profesional leyendo sobre nuevas tecnologías."
           />
         </div>
-        <h1>
-          {t("aboutUsTitle")} <span>{t("aboutUsText")}</span>
-        </h1>
+        <div ref={textRef}>
+          <h1>
+            {t("aboutUsTitle")} <span>{t("aboutUsText")}</span>
+          </h1>
+        </div>
       </ImageText>
       <BoxesContainerRows />
       <AboutUsCallToAction />

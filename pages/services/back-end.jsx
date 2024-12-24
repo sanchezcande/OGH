@@ -44,7 +44,7 @@ const BackEnd = () => {
         <Divider />
         <Description>{t("backend.description")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle>
           {t("backend.solutions.title2")}
         </ServiceTitle>
         <ServiceList>
@@ -54,7 +54,7 @@ const BackEnd = () => {
           <li>{t("backend.solutions.efficient")}</li>
         </ServiceList>
 
-        <ServiceTitle titleColor="#00aaff">{t("backend.stepsTitle")}</ServiceTitle>
+        <ServiceTitle>{t("backend.stepsTitle")}</ServiceTitle>
         <NumberedList>
           <li>{t("backend.steps.step1")}</li>
           <li>{t("backend.steps.step2")}</li>
@@ -63,7 +63,7 @@ const BackEnd = () => {
 
 
 
-        <HighlightText highlightColor="#ffd700">
+        <HighlightText>
           {t("backend.callToAction")}
         </HighlightText>
         <ServicesCallToAction />

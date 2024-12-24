@@ -45,7 +45,7 @@ const UxUi = () => {
         <Divider />
         <Description>{t("uxui.description")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle>
           {t("uxui.solutions.title2")}
         </ServiceTitle>
         <ServiceList>
@@ -54,12 +54,12 @@ const UxUi = () => {
           <li>{t("uxui.solutions.functional")}</li>
         </ServiceList>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle>
           {t("uxui.businessImpactTitle")}
         </ServiceTitle>
         <Description>{t("uxui.businessImpact")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">{t("uxui.stepsTitle")}</ServiceTitle>
+        <ServiceTitle>{t("uxui.stepsTitle")}</ServiceTitle>
         <NumberedList>
           <li>{t("uxui.steps.step1")}</li>
           <li>{t("uxui.steps.step2")}</li>
@@ -67,7 +67,7 @@ const UxUi = () => {
           <li>{t("uxui.steps.step4")}</li>
         </NumberedList>
 
-        <HighlightText highlightColor="#ffd700">
+        <HighlightText>
           {t("uxui.callToAction")}
         </HighlightText>
         <ServicesCallToAction />

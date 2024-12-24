@@ -1,4 +1,28 @@
-import styled from 'styled-components';
+import styled, { keyframes } from "styled-components";
+
+// Animación desde la derecha
+const slideInFromRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+// Animación desde abajo (por si quieres variar entre texto e imagen)
+const slideInFromBottom = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 export const Container = styled.div`
   display: flex;
@@ -23,6 +47,26 @@ export const ImageText = styled.div`
   max-width: 1320px;
   gap: 20px;
   margin-bottom: 50px;
+
+  .image-container {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .image-container.visible {
+    animation: ${slideInFromRight} 0.6s ease forwards;
+  }
+
+  div {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  div.visible {
+    animation: ${slideInFromRight} 0.6s ease forwards;
+  }
 
   h1 {
     font-size: 34px;

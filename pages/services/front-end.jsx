@@ -44,7 +44,7 @@ const FrontEnd = () => {
         <Divider />
         <Description>{t("frontend.description")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle>
           {t("frontend.solutions.title")}
         </ServiceTitle>
         <ServiceList>
@@ -53,14 +53,14 @@ const FrontEnd = () => {
           <li>{t("frontend.solutions.customized")}</li>
         </ServiceList>
 
-        <ServiceTitle titleColor="#00aaff">{t("frontend.stepsTitle")}</ServiceTitle>
+        <ServiceTitle>{t("frontend.stepsTitle")}</ServiceTitle>
         <NumberedList>
           <li>{t("frontend.steps.step1")}</li>
           <li>{t("frontend.steps.step2")}</li>
           <li>{t("frontend.steps.step3")}</li>
         </NumberedList>
 
-        <HighlightText highlightColor="#ffd700">
+        <HighlightText>
           {t("frontend.callToAction")}
         </HighlightText>
         <ServicesCallToAction />

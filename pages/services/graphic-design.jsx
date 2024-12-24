@@ -52,7 +52,7 @@ const GraphicDesign = () => {
 
         <Description>{t("graphicDesign.description")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle>
           {t("graphicDesign.solutions.title")}
         </ServiceTitle>
         <ServiceList>
@@ -63,7 +63,7 @@ const GraphicDesign = () => {
 
         <Description>{t("graphicDesign.vision")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle>
           {t("graphicDesign.stepsTitle")}
         </ServiceTitle>
         <NumberedList>
@@ -73,7 +73,7 @@ const GraphicDesign = () => {
           <li>{t("graphicDesign.steps.step4")}</li>
         </NumberedList>
 
-        <HighlightText highlightColor="#ffd700">
+        <HighlightText>
           {t("graphicDesign.callToAction")}
         </HighlightText>
         <ServicesCallToAction />
