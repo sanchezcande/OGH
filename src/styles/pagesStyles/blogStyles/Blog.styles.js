@@ -98,6 +98,9 @@ export const ArticleCard = styled.div`
     margin-bottom: 12px;
     color: #00bcd4;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    @media (max-width: 768px) {
+      font-size: 1.4rem;
+    }
   }
 
   p {

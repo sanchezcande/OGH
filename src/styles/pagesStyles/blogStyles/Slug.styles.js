@@ -33,6 +33,10 @@ export const Title = styled.h1`
   text-align: left;
   margin-bottom: 20px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+
+  @media (max-width: 768px) {
+  line-height: 1.2;
+  font-size: 1.3rem;
 `;
 
 export const ImageContainer = styled.div`
