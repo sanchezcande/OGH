@@ -1,11 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useSpring, animated, to } from "@react-spring/web";
 import { useGesture } from "react-use-gesture";
 import { DarkButton } from "../Button/Button";
 import { FaCircle } from "react-icons/fa";
 import ExpandableCard from "./ExpandableCard/ExpandableCard";
 import Image from "next/image";
-
 import styles from "./Box.module.css";
 
 const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 20;
@@ -28,6 +27,9 @@ const Card = ({
   imageBottom,
 }) => {
   const domTarget = useRef(null);
+  const cardRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
     () => ({
       rotateX: 0,
@@ -57,10 +59,30 @@ const Card = ({
     { domTarget, eventOptions: { passive: false } }
   );
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target); // Desactiva la observación después de la primera entrada
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) observer.observe(cardRef.current);
+
+    return () => {
+      if (cardRef.current) observer.unobserve(cardRef.current);
+    };
+  }, []);
+
   return (
     <animated.div
       ref={domTarget}
-      className={styles.card}
+      className={`${styles.card} ${isVisible ? styles.visible : ""}`}
       style={{
         transform: "perspective(600px)",
         x,
@@ -73,11 +95,11 @@ const Card = ({
         width: `${width}px`,
       }}
     >
-      <div className={styles.textContainer}>
+      <div ref={cardRef} className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
             <Image src={Imagen} alt={title} width={84} />{" "}
-          </div>
+            </div>
         )}
         <h1>{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
@@ -87,15 +109,15 @@ const Card = ({
             style={{ width: "64px", height: "64px", justifySelf: "center" }}
           >
             <Imagen />
-          </div>
+            </div>
         )}
         {buttonText && (
-          <DarkButton
-            className={styles.customdarkbutton}
-            onClick={handleButtonClick}
-          >
-            {buttonText}
-          </DarkButton>
+                    <DarkButton
+                    className={styles.customdarkbutton}
+                    onClick={handleButtonClick}
+                  >
+                    {buttonText}
+                  </DarkButton>
         )}
       </div>
     </animated.div>
@@ -139,3 +161,4 @@ const Box = ({
   );
 };
 export default Box;
+
