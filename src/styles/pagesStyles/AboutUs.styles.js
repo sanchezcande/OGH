@@ -1,28 +1,4 @@
-import styled, { keyframes } from "styled-components";
-
-// Animación desde la derecha
-const slideInFromRight = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-// Animación desde abajo (por si quieres variar entre texto e imagen)
-const slideInFromBottom = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
+import styled from "styled-components";
 
 export const Container = styled.div`
   display: flex;
@@ -55,7 +31,7 @@ export const ImageText = styled.div`
   }
 
   .image-container.visible {
-    animation: ${slideInFromRight} 0.6s ease forwards;
+    animation: fadeInUp 0.6s ease forwards; /* Referencia al keyframe global */
   }
 
   div {
@@ -65,7 +41,7 @@ export const ImageText = styled.div`
   }
 
   div.visible {
-    animation: ${slideInFromRight} 0.6s ease forwards;
+    animation: fadeInUp 0.6s ease forwards; /* Referencia al keyframe global */
   }
 
   h1 {
