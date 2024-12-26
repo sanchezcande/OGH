@@ -9,7 +9,7 @@ import {
   Description,
   NumberedList,
   ServiceListCross,
-} from "../../src/styles/pagesStyles/Services.styles";
+} from "../../src/styles/pagesStyles/servicesStyles/Services.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const ServicesCallToAction = () => {

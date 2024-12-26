@@ -8,7 +8,7 @@ import {
   Divider,
   Description,
   NumberedList,
-} from "../../src/styles/pagesStyles/Services.styles";
+} from "../../src/styles/pagesStyles/servicesStyles/Backend.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const ServicesCallToAction = () => {
@@ -64,7 +64,9 @@ const BackEnd = () => {
 
 
         <HighlightText>
+          <span>
           {t("backend.callToAction")}
+          </span>
         </HighlightText>
         <ServicesCallToAction />
       </ServiceContainer>
