@@ -52,6 +52,7 @@ const ContactForm = () => {
       ...formData,
       [name]: value,
     });
+    e.target.classList.add('touched');
     validateForm();
   };
 

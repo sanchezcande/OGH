@@ -6,8 +6,8 @@ export const FormContainer = styled.form`
   flex-direction: column;
   max-width: 500px;
   margin: auto;
+  animation: fadeInUp 0.6s ease-out;
 `;
-
 const bounceIn = keyframes`
   0% {
     transform: translateY(0);
@@ -60,11 +60,12 @@ export const Input = styled.input`
       display: none; /* WebKit */
     }
   }
-  &.error {
+
+  &.error.touched {
     animation: ${bounceIn} 0.5s ease forwards;
   }
 
-  &.valid {
+  &.valid.touched {
     animation: ${bounceOut} 0.5s ease forwards;
   }
 `;
@@ -88,34 +89,13 @@ export const TextArea = styled.textarea`
   &:hover {
     box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
   }
-  &.error {
+
+  &.error.touched {
     animation: ${bounceIn} 0.5s ease forwards;
   }
 
-  &.valid {
+  &.valid.touched {
     animation: ${bounceOut} 0.5s ease forwards;
-  }
-`;
-
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 100px; /* Ajusta este valor según sea necesario */
-  }
-`;
-
-const fadeOut = keyframes`
-  from {
-    opacity: 1;
-    max-height: 100px; /* Ajusta este valor según sea necesario */
-  }
-  to {
-    opacity: 0;
-    max-height: 0;
   }
 `;
 
@@ -132,13 +112,13 @@ export const Error = styled.div`
   &.visible {
     opacity: 1;
     max-height: 100px;
-    animation: ${fadeIn} 0.3s forwards;
+    animation: slideInFromLeft 0.3s forwards;
   }
 
   &.hidden {
     opacity: 0;
     max-height: 0;
-    animation: ${fadeOut} 0.3s forwards;
+    animation: fadeInUp 0.3s forwards;
   }
 `;
 
@@ -151,6 +131,7 @@ export const StyledButton = styled(DarkButton)`
     background-color: white;
     border: 3px solid #0f4c75;
   }
+
     &.error {
     animation: ${bounceIn} 0.5s ease forwards;
   }
@@ -158,4 +139,5 @@ export const StyledButton = styled(DarkButton)`
   &.valid {
     animation: ${bounceOut} 0.5s ease forwards;
   }
+
 `;
