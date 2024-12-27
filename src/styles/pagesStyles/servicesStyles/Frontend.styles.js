@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-// Animaciones
 const fadeInUp = `
   @keyframes fadeInUp {
     from {
@@ -14,7 +13,6 @@ const fadeInUp = `
   }
 `;
 
-// Contenedor principal
 export const ServiceContainer = styled.section`
   background: linear-gradient(145deg, #101b42, #0b2343);
   color: ${({ textColor }) => textColor || "#ffffff"};
@@ -43,7 +41,6 @@ export const ServiceContainer = styled.section`
   }
 `;
 
-// Título con animación
 export const ServiceTitle = styled.h2`
   font-size: 2.8rem;
   font-weight: 800;
@@ -64,8 +61,6 @@ export const ServiceTitle = styled.h2`
 
   
 `;
-
-// Lista con animación
 export const ServiceList = styled.ul`
   list-style: none;
   margin-left: 0;
@@ -83,15 +78,18 @@ export const ServiceList = styled.ul`
     border-left: 4px solid #00d4ff;
     border-radius: 4px;
     overflow: hidden;
-    transition: all 0.3s ease;
+
+    /* Transiciones iniciales */
+    transition: transform 0.3s ease, background 0.3s ease, border-left-color 0.3s ease, opacity 0.3s ease;
+
+    /* Animación inicial reemplazada por transiciones */
     opacity: 0;
     transform: translateY(20px);
 
-
+    /* Clase visible para animar aparición */
     &.visible {
       opacity: 1;
       transform: translateY(0);
-      animation: fadeInUp 0.5s ease forwards;
     }
 
     &::before {
@@ -102,12 +100,15 @@ export const ServiceList = styled.ul`
       animation: iconPulse 1.5s infinite ease-in-out;
     }
 
+    /* Efecto hover */
     &:hover {
       background: rgba(0, 212, 255, 0.2);
       border-left-color: #00ffff;
       transform: scale(1.02);
-    }  }
+    }
+  }
 
+  /* Keyframes para icono pulsante */
   @keyframes iconPulse {
     0%, 100% {
       transform: scale(1);
@@ -118,11 +119,9 @@ export const ServiceList = styled.ul`
       color: #00ffff;
     }
   }
-
-  ${fadeInUp}
 `;
 
-// Descripción con animación
+
 export const Description = styled.p`
   font-size: 1.3rem;
   line-height: 2;
@@ -139,8 +138,6 @@ export const Description = styled.p`
     animation: fadeInUp 0.5s ease forwards;
   }
 `;
-
-// Destacado con animación
 export const HighlightText = styled.div`
   text-align: center;
   margin: 3rem 0;
@@ -159,12 +156,20 @@ export const HighlightText = styled.div`
   &.visible {
     opacity: 1;
     transform: translateY(0);
-    animation: fadeInUp 0.5s ease forwards;
   }
-  ${fadeInUp}
+
+  span {
+    display: inline-block; 
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  span:hover {
+    transform: scale(1.03);
+
+  }
 `;
 
-// Divisor con animación
+
 export const Divider = styled.hr`
   border: none;
   height: 3px;
