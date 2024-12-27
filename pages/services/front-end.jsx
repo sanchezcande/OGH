@@ -61,7 +61,9 @@ const FrontEnd = () => {
         </NumberedList>
 
         <HighlightText>
+          <span>
           {t("frontend.callToAction")}
+          </span>
         </HighlightText>
         <ServicesCallToAction />
       </ServiceContainer>

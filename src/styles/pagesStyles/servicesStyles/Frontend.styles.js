@@ -44,10 +44,12 @@ export const ServiceTitle = styled.h2`
   font-weight: 800;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: #00d4ff;
+  color: white;
+
   text-transform: uppercase;
  &.animated {
     font-size: 2.5rem;
+    color: white;
   }
 `;
 
@@ -110,12 +112,22 @@ export const HighlightText = styled.div`
   margin: 3rem 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #00d4ff;
+  color: white;
   border: 2px dashed #00d4ff;
   padding: 1.2rem;
   border-radius: 12px;
   background: rgba(0, 212, 255, 0.05);
   box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
+
+  span {
+    display: inline-block;
+    position: relative; 
+    z-index: 1;
+    transition: all 0.3s ease;
+    }
+    span:hover {
+        transform: scale(1.02);
+    }
 
   @keyframes dashedGlow {
     0% {
@@ -133,7 +145,7 @@ export const HighlightText = styled.div`
 export const Divider = styled.hr`
   border: none;
   height: 3px;
-  background: linear-gradient(90deg, #00d4ff, #00ffff);
+  background: white;
   margin: 2rem auto;
   width: 60%;
   animation: slideInDivider 1s ease-out forwards;
