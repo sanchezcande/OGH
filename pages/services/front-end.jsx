@@ -8,7 +8,7 @@ import {
   Divider,
   Description,
   NumberedList,
-} from "../../src/styles/pagesStyles/servicesStyles/Services.styles";
+} from "../../src/styles/pagesStyles/servicesStyles/Frontend.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const ServicesCallToAction = () => {
@@ -40,11 +40,11 @@ const FrontEnd = () => {
       </Head>
 
       <ServiceContainer>
-        <ServiceTitle>{t("frontend.title")}</ServiceTitle>
+        <ServiceTitle className="">{t("frontend.title")}</ServiceTitle>
         <Divider />
         <Description>{t("frontend.description")}</Description>
 
-        <ServiceTitle>
+        <ServiceTitle className="animated">
           {t("frontend.solutions.title")}
         </ServiceTitle>
         <ServiceList>
@@ -53,7 +53,7 @@ const FrontEnd = () => {
           <li>{t("frontend.solutions.customized")}</li>
         </ServiceList>
 
-        <ServiceTitle>{t("frontend.stepsTitle")}</ServiceTitle>
+        <ServiceTitle className="animated">{t("frontend.stepsTitle")}</ServiceTitle>
         <NumberedList>
           <li>{t("frontend.steps.step1")}</li>
           <li>{t("frontend.steps.step2")}</li>
