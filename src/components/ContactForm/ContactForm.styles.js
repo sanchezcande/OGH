@@ -123,6 +123,7 @@ export const Error = styled.div`
 `;
 
 export const StyledButton = styled(DarkButton)`
+margin-top: 10px;
   display: inline-block;
   background-color: #155ab8;
   border: 3px solid #155ab8;
