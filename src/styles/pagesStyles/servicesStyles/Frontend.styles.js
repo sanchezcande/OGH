@@ -22,7 +22,6 @@ transition: all 0.3s ease;
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, rgba(0, 212, 255, 0.2), transparent);
-    animation: glowEffect 6s linear infinite;
     z-index: 0;
   }
 
@@ -48,7 +47,6 @@ export const ServiceTitle = styled.h2`
   color: #00d4ff;
   text-transform: uppercase;
  &.animated {
-    animation: fadeInUp 0.6s ease-out 0.2s forwards; 
     font-size: 2.5rem;
   }
 `;
@@ -57,7 +55,6 @@ export const ServiceList = styled.ul`
   list-style: none;
   margin-left: 0;
   padding-left: 0;
-    animation: fadeInUp 0.6s ease-out 0.4s forwards;
 
   li {
     font-size: 1.2rem;
@@ -72,9 +69,6 @@ export const ServiceList = styled.ul`
     border-radius: 4px;
     overflow: hidden;
     transition: all 0.3s ease;
-    animation: fadeInUp 0.6s ease-out forwards; /* Aparece desde abajo */
-    animation-delay: calc(0.4s + var(--index) * 0.1s); /* Efecto en cascada */
-
 
     &::before {
       content: "✨"; 
@@ -109,7 +103,6 @@ export const Description = styled.p`
   margin-bottom: 2rem;
   text-align: center;
   color: #cce7ff;
-    animation: fadeInUp 0.6s ease-out 0.3s forwards; 
 `;
 
 export const HighlightText = styled.div`
@@ -123,7 +116,6 @@ export const HighlightText = styled.div`
   border-radius: 12px;
   background: rgba(0, 212, 255, 0.05);
   box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
-  animation: dashedGlow 3s infinite linear, fadeInUp 0.6s ease-out 0.3s forwards;
 
   @keyframes dashedGlow {
     0% {
@@ -174,10 +166,6 @@ export const NumberedList = styled.ol`
     align-items: center;
     position: relative;
     transition: all 0.3s ease;
-    animation: fadeInUp 0.10s ease-out forwards; 
-    animation-delay: calc(0.4s + var(--index) * 0.1s);
-
-    transform-origin: center;
 
 
 
@@ -196,7 +184,6 @@ export const NumberedList = styled.ol`
       transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
       width: 2.5rem;
       height: 2.5rem;
-      transform-origin: center;
 
       min-width: 2.5rem;
     }
