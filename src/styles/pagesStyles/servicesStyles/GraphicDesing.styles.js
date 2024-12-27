@@ -1,5 +1,47 @@
 import styled from "styled-components";
 
+// Keyframes para animaciones
+const fadeInUp = `
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const glowMove = `
+  @keyframes glowMove {
+    0% {
+      transform: translate(-50%, -50%);
+    }
+    50% {
+      transform: translate(50%, 50%);
+    }
+    100% {
+      transform: translate(-50%, -50%);
+    }
+  }
+`;
+
+const gradientShift = `
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+`;
+
 export const ServiceContainer = styled.section`
   background: linear-gradient(135deg, #0b2343, #152a56);
   color: ${({ textColor }) => textColor || "#f5f5f5"};
@@ -24,17 +66,20 @@ export const ServiceContainer = styled.section`
     animation: glowMove 8s infinite ease-in-out;
   }
 
-  @keyframes glowMove {
-    0% {
-      transform: translate(-50%, -50%);
-    }
-    50% {
-      transform: translate(50%, 50%);
-    }
-    100% {
-      transform: translate(-50%, -50%);
-    }
+  .animate {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
+
+  .animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  ${fadeInUp}
+  ${glowMove}
 `;
 
 export const ServiceTitle = styled.h2`
@@ -52,17 +97,19 @@ export const ServiceTitle = styled.h2`
   -webkit-text-fill-color: transparent;
   animation: gradientShift 5s infinite ease;
 
-  @keyframes gradientShift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
+  &.animate {
+    opacity: 0;
+    transform: translateY(20px);
   }
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  ${fadeInUp}
+  ${gradientShift}
 `;
 
 export const ServiceList = styled.ul`
@@ -70,7 +117,6 @@ export const ServiceList = styled.ul`
   margin-left: 0;
   padding-left: 0;
   position: relative;
-  z-index: 1;
 
   li {
     font-size: 1.2rem;
@@ -80,6 +126,17 @@ export const ServiceList = styled.ul`
     align-items: center;
     position: relative;
     padding-left: 2.8rem;
+
+    &.animate {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeInUp 0.5s ease forwards;
+    }
 
     &::before {
       content: "📝";
@@ -102,6 +159,8 @@ export const ServiceList = styled.ul`
       text-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
     }
   }
+
+  ${fadeInUp}
 `;
 
 export const Divider = styled.hr`
@@ -113,14 +172,18 @@ export const Divider = styled.hr`
   margin-right: auto;
   animation: drawLine 1.5s ease-out forwards;
 
-  @keyframes drawLine {
-    from {
-      width: 0;
-    }
-    to {
-      width: 70%;
-    }
+  &.animate {
+    opacity: 0;
+    transform: translateY(20px);
   }
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  ${fadeInUp}
 `;
 
 export const HighlightText = styled.div`
@@ -130,17 +193,30 @@ export const HighlightText = styled.div`
   margin-top: 2rem;
   color: #ffffff;
   position: relative;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 122, 204, 0.3)); 
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 122, 204, 0.3));
   border: 2px dashed rgba(255, 255, 255, 0.6);
   padding: 1.5rem;
   border-radius: 16px;
   overflow: hidden;
   transition: transform 0.3s ease, background 0.3s ease;
 
+  &.animate {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
   &:hover {
     transform: scale(1.01);
-    background: linear-gradient(135deg, rgba(0, 122, 204, 0.4), rgba(0, 212, 255, 0.4)); 
+    background: linear-gradient(135deg, rgba(0, 122, 204, 0.4), rgba(0, 212, 255, 0.4));
   }
+
+  ${fadeInUp}
 `;
 
 export const Description = styled.p`
@@ -152,68 +228,77 @@ export const Description = styled.p`
   position: relative;
   z-index: 1;
 
-
-
-  @keyframes fadeInLine {
-    from {
-      width: 0;
-      opacity: 0;
-    }
-    to {
-      width: 30%;
-      opacity: 1;
-    }
-  }
-`;export const NumberedList = styled.ol`
-list-style: none;
-counter-reset: list-counter;
-margin-left: 0;
-padding-left: 0;
-
-li {
-  counter-increment: list-counter;
-  font-size: 1.2rem;
-  line-height: 2;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  position: relative; 
-
-  &::before {
-    content: counter(list-counter);
-    background: linear-gradient(135deg, #00d4ff, #007acc);
-    color: white;
-    font-weight: bold;
-    font-size: 1.2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    margin-right: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, background 0.3s ease;
-    width: 2.5rem;
-    height: 2.5rem;
-    position: relative;
-    z-index: 1;
+  &.animate {
+    opacity: 0;
+    transform: translateY(20px);
   }
 
-  &:hover::before {
-    transform: scale(1.3);
-    background: linear-gradient(135deg, #007acc, #00d4ff);
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
   }
 
-  &:hover {
-    color: #007acc;
-    text-shadow: 0 0 8px rgba(0, 122, 204, 0.7);
-  }
-
-  padding: 0.5rem 0; 
-  position: relative;
-}
+  ${fadeInUp}
 `;
 
+export const NumberedList = styled.ol`
+  list-style: none;
+  counter-reset: list-counter;
+  margin-left: 0;
+  padding-left: 0;
 
+  li {
+    counter-increment: list-counter;
+    font-size: 1.2rem;
+    line-height: 2;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    &.animate {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    &::before {
+      content: counter(list-counter);
+      background: ${({ theme }) => theme.colors.lightBlue};
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      margin-right: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, background 0.3s ease;
+      width: 2rem;
+      height: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    &:hover::before {
+      transform: scale(1.3);
+      background: white;
+      color: ${({ theme }) => theme.colors.lightBlue};
+    }
+
+    &:hover {
+      color: #007acc;
+      text-shadow: 0 0 8px rgba(0, 122, 204, 0.7);
+    }
+  }
+`;
 
 export const ServiceListCross = styled.ul`
   list-style: none;
@@ -227,8 +312,18 @@ export const ServiceListCross = styled.ul`
     display: flex;
     align-items: center;
     position: relative;
-    padding-left: 1.5rem; 
-    transition: color 0.3s ease, text-shadow 0.3s ease;
+    padding-left: 1.5rem;
+
+    &.animate {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeInUp 0.5s ease forwards;
+    }
 
     &::before {
       content: "x";
@@ -237,15 +332,19 @@ export const ServiceListCross = styled.ul`
       position: absolute;
       left: 0;
       top: 0;
-      z-index: 1; 
+      z-index: 1;
       transition: transform 0.3s ease;
     }
-          &:hover::before {
+
+    &:hover::before {
       transform: scale(1.3);
     }
-      &:hover {
-        color: red;
-        text-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
-        }
 
+    &:hover {
+      color: red;
+      text-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+    }
+  }
+
+  ${fadeInUp}
 `;

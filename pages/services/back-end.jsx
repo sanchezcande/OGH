@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import Head from "next/head";
 import {
   ServiceContainer,
@@ -27,6 +28,24 @@ export const ServicesCallToAction = () => {
 const BackEnd = () => {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const items = document.querySelectorAll(".animate");
+    items.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <Head>
@@ -40,33 +59,29 @@ const BackEnd = () => {
       </Head>
 
       <ServiceContainer>
-        <ServiceTitle>{t("backend.title")}</ServiceTitle>
-        <Divider />
-        <Description>{t("backend.description")}</Description>
+        <ServiceTitle className="animate">{t("backend.title")}</ServiceTitle>
+        <Divider className="animate" />
+        <Description className="animate">{t("backend.description")}</Description>
 
-        <ServiceTitle>
+        <ServiceTitle className="animate">
           {t("backend.solutions.title2")}
         </ServiceTitle>
         <ServiceList>
-          <li>{t("backend.solutions.scalable")}</li>
-          <li>{t("backend.solutions.secure")}</li>
-          <li>{t("backend.solutions.cloud")}</li>
-          <li>{t("backend.solutions.efficient")}</li>
+          <li className="animate">{t("backend.solutions.scalable")}</li>
+          <li className="animate">{t("backend.solutions.secure")}</li>
+          <li className="animate">{t("backend.solutions.cloud")}</li>
+          <li className="animate">{t("backend.solutions.efficient")}</li>
         </ServiceList>
 
-        <ServiceTitle>{t("backend.stepsTitle")}</ServiceTitle>
+        <ServiceTitle className="animate">{t("backend.stepsTitle")}</ServiceTitle>
         <NumberedList>
-          <li>{t("backend.steps.step1")}</li>
-          <li>{t("backend.steps.step2")}</li>
-          <li>{t("backend.steps.step3")}</li>
+          <li className="animate">{t("backend.steps.step1")}</li>
+          <li className="animate">{t("backend.steps.step2")}</li>
+          <li className="animate">{t("backend.steps.step3")}</li>
         </NumberedList>
 
-
-
-        <HighlightText>
-          <span>
-          {t("backend.callToAction")}
-          </span>
+        <HighlightText className="animate">
+          <span>{t("backend.callToAction")}</span>
         </HighlightText>
         <ServicesCallToAction />
       </ServiceContainer>

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import Head from "next/head";
 import {
   ServiceContainer,
@@ -28,6 +29,24 @@ export const ServicesCallToAction = () => {
 const GraphicDesign = () => {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const items = document.querySelectorAll(".animate");
+    items.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <Head>
@@ -41,39 +60,39 @@ const GraphicDesign = () => {
       </Head>
 
       <ServiceContainer>
-        <ServiceTitle>{t("graphicDesign.title")}</ServiceTitle>
-        <Divider />
+        <ServiceTitle className="animate">{t("graphicDesign.title")}</ServiceTitle>
+        <Divider className="animate" />
 
         <ServiceListCross>
-          <li>{t("graphicDesign.questions.q1")}</li>
-          <li>{t("graphicDesign.questions.q2")}</li>
-          <li>{t("graphicDesign.questions.q3")}</li>
+          <li className="animate">{t("graphicDesign.questions.q1")}</li>
+          <li className="animate">{t("graphicDesign.questions.q2")}</li>
+          <li className="animate">{t("graphicDesign.questions.q3")}</li>
         </ServiceListCross>
 
-        <Description>{t("graphicDesign.description")}</Description>
+        <Description className="animate">{t("graphicDesign.description")}</Description>
 
-        <ServiceTitle>
+        <ServiceTitle className="animate">
           {t("graphicDesign.solutions.title")}
         </ServiceTitle>
         <ServiceList>
-          <li>{t("graphicDesign.solutions.branding")}</li>
-          <li>{t("graphicDesign.solutions.materials")}</li>
-          <li>{t("graphicDesign.solutions.consistency")}</li>
+          <li className="animate">{t("graphicDesign.solutions.branding")}</li>
+          <li className="animate">{t("graphicDesign.solutions.materials")}</li>
+          <li className="animate">{t("graphicDesign.solutions.consistency")}</li>
         </ServiceList>
 
-        <Description>{t("graphicDesign.vision")}</Description>
+        <Description className="animate">{t("graphicDesign.vision")}</Description>
 
-        <ServiceTitle>
+        <ServiceTitle className="animate">
           {t("graphicDesign.stepsTitle")}
         </ServiceTitle>
         <NumberedList>
-          <li>{t("graphicDesign.steps.step1")}</li>
-          <li>{t("graphicDesign.steps.step2")}</li>
-          <li>{t("graphicDesign.steps.step3")}</li>
-          <li>{t("graphicDesign.steps.step4")}</li>
+          <li className="animate">{t("graphicDesign.steps.step1")}</li>
+          <li className="animate">{t("graphicDesign.steps.step2")}</li>
+          <li className="animate">{t("graphicDesign.steps.step3")}</li>
+          <li className="animate">{t("graphicDesign.steps.step4")}</li>
         </NumberedList>
 
-        <HighlightText>
+        <HighlightText className="animate">
           {t("graphicDesign.callToAction")}
         </HighlightText>
         <ServicesCallToAction />
