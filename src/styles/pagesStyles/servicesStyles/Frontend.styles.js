@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const ServiceContainer = styled.section`
-  background: linear-gradient(145deg, #101b42, #152a56);
+  background: linear-gradient(145deg, #101b42, #0b2343);
   color: ${({ textColor }) => textColor || "#ffffff"};
   padding: 3rem 2rem;
   margin: 2rem auto;
