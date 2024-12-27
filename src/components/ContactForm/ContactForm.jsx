@@ -12,6 +12,7 @@ import emailjs from "emailjs-com";
 import { useTranslation } from "react-i18next";
 import ReCAPTCHA from "react-google-recaptcha";
 
+
 const ContactForm = () => {
   const { t } = useTranslation();
   const initialFormData = {
@@ -21,12 +22,12 @@ const ContactForm = () => {
     subject: "",
     message: "",
   };
-
   const [formStatus, setFormStatus] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
   const [captchaToken, setCaptchaToken] = useState(null);
+
 
   function validateForm() {
     const newErrors = {};
@@ -55,10 +56,9 @@ const ContactForm = () => {
       ...formData,
       [name]: value,
     });
-    e.target.classList.add("touched");
+    e.target.classList.add('touched');
     validateForm();
   };
-
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token);
   };
@@ -66,13 +66,22 @@ const ContactForm = () => {
   function sendEmail(e) {
     e.preventDefault();
 
-    const formErrors = validateForm(formData);
+    const formData = {
+      from_name: e.target.from_name.value,
+      from_email: e.target.from_email.value,
+      contact_number: e.target.contact_number.value,
+      subject: e.target.subject.value,
+      message: e.target.message.value,
+    };
 
+    const formErrors = validateForm(formData);
+    
     if (!captchaToken) {
       setFormStatus(t("pleaseCompleteCaptcha"));
       setIsModalOpen(true);
       return;
     }
+
 
     if (Object.keys(formErrors).length === 0) {
       emailjs
@@ -146,18 +155,15 @@ const ContactForm = () => {
             {errors.message}
           </Error>
         )}
-
-        {/* Agregar reCAPTCHA */}
-        <ReCAPTCHA
-          sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-" // Reemplaza con tu clave pública de Google reCAPTCHA
+       <ReCAPTCHA
+          sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-" 
           onChange={handleCaptchaChange}
         />
-
         <StyledButton
           className={errors.message ? "error" : "valid"}
           type="submit"
         >
-          {t("send")}
+              {t("send")} 
         </StyledButton>
       </FormContainer>
       {isModalOpen && (
