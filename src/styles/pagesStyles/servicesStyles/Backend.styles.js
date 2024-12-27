@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-// Animaciones
 const slideInFromLeft = `
   @keyframes slideInFromLeft {
     from {
@@ -78,10 +77,18 @@ export const ServiceTitle = styled.h2`
   text-transform: uppercase;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
   opacity: 0;
-  animation: slideInFromLeft 0.8s ease forwards;
-  ${slideInFromLeft}
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(20px);
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+  ${fadeInUp}
 `;
 
+// Lista de servicios con animación dinámica
 export const ServiceList = styled.ul`
   list-style: none;
   margin-left: 0;
@@ -97,10 +104,14 @@ export const ServiceList = styled.ul`
     border-left: 3px solid #00d4ff;
     padding-left: 1rem;
     opacity: 0;
-    animation: fadeInUp 0.5s ease forwards;
-    animation-delay: calc(var(--order) * 0.2s);
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 
-    ${fadeInUp}
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeInUp 0.5s ease forwards;
+    }
 
     &::before {
       content: "💾";
@@ -123,12 +134,22 @@ export const ServiceList = styled.ul`
   }
 `;
 
+// Descripciones
 export const Description = styled.p`
   font-size: 1.2rem;
   line-height: 1.8;
   margin-bottom: 2rem;
   text-align: justify;
   color: #e0e0e0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
+  }
 `;
 
 export const HighlightText = styled.div`
@@ -147,6 +168,7 @@ export const HighlightText = styled.div`
   }
   ${pulseBorder}
 `;
+
 export const Divider = styled.hr`
   border: none;
   height: 3px;
@@ -180,10 +202,13 @@ export const NumberedList = styled.ol`
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
 
-    &:hover::before {
-      transform: scale(1.3);
-      transition: transform 0.3s ease;
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeInUp 0.5s ease forwards;
     }
 
     &::before {
