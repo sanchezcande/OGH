@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import Head from "next/head";
 import {
   ServiceContainer,
@@ -24,9 +25,26 @@ export const ServicesCallToAction = () => {
   );
 };
 
-
 const UxUi = () => {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const items = document.querySelectorAll(".animate");
+    items.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
@@ -41,33 +59,33 @@ const UxUi = () => {
       </Head>
 
       <ServiceContainer>
-        <ServiceTitle>{t("uxui.title")}</ServiceTitle>
-        <Divider />
-        <Description>{t("uxui.description")}</Description>
+        <ServiceTitle className="animate">{t("uxui.title")}</ServiceTitle>
+        <Divider className="animate" />
+        <Description className="animate">{t("uxui.description")}</Description>
 
-        <ServiceTitle>
+        <ServiceTitle className="animate">
           {t("uxui.solutions.title2")}
         </ServiceTitle>
         <ServiceList>
-          <li>{t("uxui.solutions.intuitive")}</li>
-          <li>{t("uxui.solutions.engaging")}</li>
-          <li>{t("uxui.solutions.functional")}</li>
+          <li className="animate">{t("uxui.solutions.intuitive")}</li>
+          <li className="animate">{t("uxui.solutions.engaging")}</li>
+          <li className="animate">{t("uxui.solutions.functional")}</li>
         </ServiceList>
 
-        <ServiceTitle>
+        <ServiceTitle className="animate">
           {t("uxui.businessImpactTitle")}
         </ServiceTitle>
-        <Description>{t("uxui.businessImpact")}</Description>
+        <Description className="animate">{t("uxui.businessImpact")}</Description>
 
-        <ServiceTitle>{t("uxui.stepsTitle")}</ServiceTitle>
+        <ServiceTitle className="animate">{t("uxui.stepsTitle")}</ServiceTitle>
         <NumberedList>
-          <li>{t("uxui.steps.step1")}</li>
-          <li>{t("uxui.steps.step2")}</li>
-          <li>{t("uxui.steps.step3")}</li>
-          <li>{t("uxui.steps.step4")}</li>
+          <li className="animate">{t("uxui.steps.step1")}</li>
+          <li className="animate">{t("uxui.steps.step2")}</li>
+          <li className="animate">{t("uxui.steps.step3")}</li>
+          <li className="animate">{t("uxui.steps.step4")}</li>
         </NumberedList>
 
-        <HighlightText>
+        <HighlightText className="animate">
           {t("uxui.callToAction")}
         </HighlightText>
         <ServicesCallToAction />
