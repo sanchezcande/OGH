@@ -187,7 +187,6 @@ export const Divider = styled.hr`
     }
   }
 `;
-
 export const NumberedList = styled.ol`
   list-style: none;
   counter-reset: list-counter;
@@ -223,11 +222,15 @@ export const NumberedList = styled.ol`
       border-radius: 50%;
       margin-right: 1rem;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s ease;
       width: 2rem;
       height: 2rem;
       line-height: 2rem;
       min-width: 2rem;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover::before {
+      transform: scale(1.1);
     }
   }
 `;

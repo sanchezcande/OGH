@@ -73,7 +73,6 @@ export const ServiceTitle = styled.h2`
   ${fadeInUp}
 `;
 
-// Lista de servicios
 export const ServiceList = styled.ul`
   list-style: none;
   margin-left: 0;
@@ -108,12 +107,39 @@ export const ServiceList = styled.ul`
       top: 0;
       z-index: 1;
     }
+       &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1.5rem;
+      height: 100%;
+      background-color: #0b2343;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.5s ease-in-out;
+      z-index: 2;
+    }
+
+    &:hover::after {
+      transform: scaleX(1);
+      animation: revealCheck 0.5s ease-in-out forwards;
+    }
+  }
+
+  @keyframes revealCheck {
+    from {
+      transform: scaleX(1);
+    }
+    to {
+      transform: scaleX(0);
+    }
+  }
   }
 
   ${fadeInUp}
 `;
 
-// Texto destacado
 export const HighlightText = styled.p`
   font-size: 1.3rem;
   font-weight: 600;
@@ -140,7 +166,6 @@ export const HighlightText = styled.p`
   ${fadeInUp}
 `;
 
-// Divisor
 export const Divider = styled.hr`
   border: none;
   height: 3px;
@@ -163,7 +188,6 @@ export const Divider = styled.hr`
   ${drawLine}
 `;
 
-// Descripción
 export const Description = styled.p`
   font-size: 1.1rem;
   line-height: 1.8;
@@ -183,7 +207,6 @@ export const Description = styled.p`
   ${fadeInUp}
 `;
 
-// Lista numerada
 export const NumberedList = styled.ol`
   list-style: none;
   counter-reset: list-counter;

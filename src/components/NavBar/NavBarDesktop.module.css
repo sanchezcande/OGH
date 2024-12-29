@@ -194,4 +194,8 @@ margin-top: 15px;
   .highlightBar {
     visibility: hidden;
   }
+  .servicesMenu {
+    transform: translate(-20%) !important;
+    top: 145%;
+  }
 }

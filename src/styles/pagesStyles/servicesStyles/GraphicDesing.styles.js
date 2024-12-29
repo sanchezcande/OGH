@@ -285,6 +285,7 @@ export const NumberedList = styled.ol`
       height: 2rem;
       position: relative;
       z-index: 1;
+      min-width: 2rem;
     }
 
     &:hover::before {

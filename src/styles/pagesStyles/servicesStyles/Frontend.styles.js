@@ -228,7 +228,7 @@ export const NumberedList = styled.ol`
       transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
       width: 2rem;
       height: 2rem;
-            min-width: 2rem;
+      min-width: 2rem;
 
     }
       &:hover::before {
