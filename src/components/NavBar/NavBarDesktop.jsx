@@ -75,17 +75,18 @@ const NavBarDesktop = () => {
   };
 
   const handleMouseLeaveServices = (e) => {
-    // Asegurarse de que el cursor no esté sobre el submenú antes de cerrarlo
     const submenu = document.querySelector(`.${styles.servicesMenu}`);
-    if (!submenu || !submenu.contains(e.relatedTarget)) {
+    const relatedTarget = e.relatedTarget;
+    if (!submenu || !relatedTarget || !submenu.contains(relatedTarget)) {
       setShowServicesMenu(false);
     }
   };
+  
 
   const handleTabClick = (index) => {
-    setActiveIndex(index); // Actualiza el índice persistente al hacer clic
+    setActiveIndex(index); 
     if (pillTabs[index].text !== t("services")) {
-      setShowServicesMenu(false); // Asegura que el submenú se cierre si no es "Services"
+      setShowServicesMenu(false); 
     }
   };
 
@@ -109,46 +110,39 @@ const NavBarDesktop = () => {
           }}
         />
         {pillTabs.map((tab, i) => (
-          <li key={tab.text}>
-            {tab.text === t("services") ? (
-              <span
-                className={`${styles.navLink} nav-link`}
-                onMouseEnter={() => {
-                  setHoveredIndex(i);
-                  handleMouseEnterServices();
-                }}
-                onMouseLeave={(e) => {
-                  setHoveredIndex(-1);
-                  handleMouseLeaveServices(e);
-                }}
-                onClick={() => handleTabClick(i)}
-              >
-                <span>{tab.text}</span>
-                <ul
-                  className={`${styles.servicesMenu} ${
-                    showServicesMenu ? styles.visible : ""
-                  }`}
-                  onMouseEnter={handleMouseEnterServices}
-                  onMouseLeave={(e) => handleMouseLeaveServices(e)}
-                >
-                  {servicesList.map((service, index) => (
-                    <li key={index} className={styles.servicesMenuItem}>
-                      <Link href={service.href}>{service.text}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </span>
-            ) : (
-              <span
-                className={`${styles.navLink} nav-link`}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(-1)}
-                onClick={() => handleTabClick(i)}
-              >
-                <Link href={tab.href}>{tab.text}</Link>
-              </span>
-            )}
-          </li>
+     <li
+     key={tab.text}
+     className={tab.text === t("services") ? styles.navLinkWrapper : ""}
+     onMouseEnter={tab.text === t("services") ? handleMouseEnterServices : null}
+     onMouseLeave={tab.text === t("services") ? handleMouseLeaveServices : null}
+   >
+     {tab.text === t("services") ? (
+       <>
+         <span className={`${styles.navLink} nav-link`}>{tab.text}</span>
+         <ul
+           className={`${styles.servicesMenu} ${
+             showServicesMenu ? styles.visible : ""
+           }`}
+         >
+           {servicesList.map((service, index) => (
+             <li key={index} className={styles.servicesMenuItem}>
+               <Link href={service.href}>{service.text}</Link>
+             </li>
+           ))}
+         </ul>
+       </>
+     ) : (
+       <span
+         className={`${styles.navLink} nav-link`}
+         onMouseEnter={() => setHoveredIndex(i)}
+         onMouseLeave={() => setHoveredIndex(-1)}
+         onClick={() => handleTabClick(i)}
+       >
+         <Link href={tab.href}>{tab.text}</Link>
+       </span>
+     )}
+   </li>
+   
         ))}
       </ul>
       <div>

@@ -119,7 +119,7 @@ margin-top: 15px;
 
 .servicesMenu {
   position: absolute;
-  top: 115%;
+  top: 180% !important;
   left: 50%;
   transform: translateX(-50%) scaleY(0);
   transform-origin: top;
@@ -141,8 +141,24 @@ margin-top: 15px;
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
-  transform: translateX(-50%) scaleY(1);
+  transform: translateX(-25%) scaleY(1);
 }
+.navLinkWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.navLinkWrapper::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  height: 180px;
+  background: transparent; 
+  pointer-events: auto;
+}
+
 
 .servicesMenuItem {
   padding: 10px 16px;

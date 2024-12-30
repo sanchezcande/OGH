@@ -60,11 +60,10 @@ export const ServiceContainer = styled.section`
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   border: 2px solid #1f4068;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
   }
 `;
 
@@ -162,9 +161,11 @@ export const HighlightText = styled.div`
   padding: 1rem;
   border-radius: 8px;
   background: rgba(0, 212, 255, 0.05);
+  transition: transform 0.2s ease;
 
   &:hover {
     animation: pulseBorder 1s infinite ease;
+    transform: scale(1.02)
   }
   ${pulseBorder}
 `;

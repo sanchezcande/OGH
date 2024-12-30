@@ -314,6 +314,8 @@ export const ServiceListCross = styled.ul`
     align-items: center;
     position: relative;
     padding-left: 1.5rem;
+    color: white;
+    transition: color 0.3s ease;
 
     &.animate {
       opacity: 0;

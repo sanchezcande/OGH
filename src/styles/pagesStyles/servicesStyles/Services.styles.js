@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-// Keyframes para animaciones
 const fadeInUp = `
   @keyframes fadeInUp {
     from {
@@ -25,7 +24,6 @@ const drawLine = `
   }
 `;
 
-// Contenedor principal
 export const ServiceContainer = styled.section`
   background: #0b2343;
   color: ${({ textColor }) => textColor || "#e0e0e0"};
@@ -51,7 +49,6 @@ export const ServiceContainer = styled.section`
   ${fadeInUp}
 `;
 
-// Títulos
 export const ServiceTitle = styled.h2`
   font-size: 2.5rem;
   font-weight: 700;
@@ -248,6 +245,11 @@ export const NumberedList = styled.ol`
       height: 2rem;
       line-height: 2rem;
       min-width: 2rem;
+       transition: transform 0.3s ease;
+    }
+
+    &:hover::before {
+      transform: scale(1.1);
     }
   }
 
