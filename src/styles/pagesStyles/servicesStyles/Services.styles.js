@@ -34,15 +34,7 @@ export const ServiceContainer = styled.section`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 
-  .animate {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-
-  .animate.visible {
-    opacity: 1;
-    transform: translateY(0);
+  .visible {
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -56,14 +48,7 @@ export const ServiceTitle = styled.h2`
   color: white;
   text-transform: uppercase;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -84,14 +69,8 @@ export const ServiceList = styled.ul`
     position: relative;
     padding-left: 1.5rem;
 
-    &.animate {
-      opacity: 0;
-      transform: translateY(20px);
-    }
 
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.5s ease forwards;
     }
 
@@ -145,14 +124,8 @@ export const HighlightText = styled.p`
   color: #00d4ff;
   transition: -webkit-text-stroke 0.3s ease, color 0.3s ease;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
 
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -171,14 +144,7 @@ export const Divider = styled.hr`
   width: 0;
   margin-right: auto;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: drawLine 1s ease-out forwards;
   }
 
@@ -190,14 +156,7 @@ export const Description = styled.p`
   line-height: 1.8;
   margin-bottom: 1rem;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -218,14 +177,8 @@ export const NumberedList = styled.ol`
     display: flex;
     align-items: center;
 
-    &.animate {
-      opacity: 0;
-      transform: translateY(20px);
-    }
 
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.5s ease forwards;
     }
 
