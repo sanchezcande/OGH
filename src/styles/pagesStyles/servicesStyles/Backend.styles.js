@@ -76,10 +76,8 @@ export const ServiceTitle = styled.h2`
   text-transform: uppercase;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
   opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
 
   &.visible {
-    opacity: 1;
     animation: fadeInUp 0.5s ease forwards;
   }
   ${fadeInUp}
@@ -99,11 +97,8 @@ export const ServiceList = styled.ul`
     color: #ffffff;
     border-left: 3px solid #00d4ff;
     padding-left: 1rem;
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
 
     &.visible {
-      opacity: 1;
       animation: fadeInUp 0.5s ease forwards;
     }
 
@@ -134,11 +129,8 @@ export const Description = styled.p`
   margin-bottom: 2rem;
   text-align: justify;
   color: #e0e0e0;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
 
   &.visible {
-    opacity: 1;
     animation: fadeInUp 0.5s ease forwards;
   }
 `;
