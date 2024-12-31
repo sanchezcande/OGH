@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-// Keyframes para animaciones
 const fadeInUp = `
   @keyframes fadeInUp {
     from {
@@ -66,15 +65,8 @@ export const ServiceContainer = styled.section`
     animation: glowMove 8s infinite ease-in-out;
   }
 
-  .animate {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
 
   .animate.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -97,14 +89,8 @@ export const ServiceTitle = styled.h2`
   -webkit-text-fill-color: transparent;
   animation: gradientShift 5s infinite ease;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -127,14 +113,9 @@ export const ServiceList = styled.ul`
     position: relative;
     padding-left: 2.8rem;
 
-    &.animate {
-      opacity: 0;
-      transform: translateY(20px);
-    }
+
 
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.5s ease forwards;
     }
 
@@ -172,14 +153,8 @@ export const Divider = styled.hr`
   margin-right: auto;
   animation: drawLine 1.5s ease-out forwards;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -200,14 +175,8 @@ export const HighlightText = styled.div`
   overflow: hidden;
   transition: transform 0.3s ease, background 0.3s ease;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -228,14 +197,7 @@ export const Description = styled.p`
   position: relative;
   z-index: 1;
 
-  &.animate {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
 
@@ -257,14 +219,7 @@ export const NumberedList = styled.ol`
     align-items: center;
     position: relative;
 
-    &.animate {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.5s ease forwards;
     }
 
@@ -317,14 +272,7 @@ export const ServiceListCross = styled.ul`
     color: white;
     transition: color 0.3s ease;
 
-    &.animate {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.5s ease forwards;
     }
 
