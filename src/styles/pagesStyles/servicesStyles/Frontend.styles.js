@@ -48,13 +48,8 @@ export const ServiceTitle = styled.h2`
   text-align: center;
   color: white;
   text-transform: uppercase;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
 
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
   ${fadeInUp}
@@ -78,18 +73,11 @@ export const ServiceList = styled.ul`
     border-left: 4px solid #00d4ff;
     border-radius: 4px;
     overflow: hidden;
-
-    /* Transiciones iniciales */
     transition: transform 0.3s ease, background 0.3s ease, border-left-color 0.3s ease, opacity 0.3s ease;
 
-    /* Animación inicial reemplazada por transiciones */
-    opacity: 0;
-    transform: translateY(20px);
 
-    /* Clase visible para animar aparición */
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
+      animation: fadeInUp 0.5s ease forwards;
     }
 
     &::before {
@@ -128,13 +116,8 @@ export const Description = styled.p`
   margin-bottom: 2rem;
   text-align: center;
   color: #cce7ff;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
 
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
     animation: fadeInUp 0.5s ease forwards;
   }
 `;
@@ -149,13 +132,9 @@ export const HighlightText = styled.div`
   border-radius: 12px;
   background: rgba(0, 212, 255, 0.05);
   box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
 
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+    animation: fadeInUp 0.5s ease forwards;
   }
 
   span {
@@ -208,8 +187,6 @@ export const NumberedList = styled.ol`
     transition: all 0.3s ease;
 
     &.visible {
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.5s ease forwards;
     }
 
