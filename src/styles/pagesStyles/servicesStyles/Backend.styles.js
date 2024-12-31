@@ -186,10 +186,8 @@ export const NumberedList = styled.ol`
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
-    opacity: 0;
 
     &.visible {
-      opacity: 1;
       animation: fadeInUp 0.5s ease forwards;
     }
 
