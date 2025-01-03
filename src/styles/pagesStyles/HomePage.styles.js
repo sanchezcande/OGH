@@ -22,7 +22,7 @@ export const Title = styled.h1`
   }
 
   @media (max-width: 768px) {
-    font-size: 20px;
+    font-size: 18px;
   }
 `;
 
@@ -47,18 +47,28 @@ export const Title2 = styled.h2`
   }
 
   @media (max-width: 768px) {
-    font-size: 15px;
+    font-size: 12px;
   }
 `;
 
 export const ImageContainer = styled.div`
   width: auto;
   max-height: 500px;
-  margin-bottom: 70px;
+  margin-bottom: -150px;
   margin-top: 0;
 
+  video {
+    margin-top: -180px;
+    width: 70%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
   @media (max-width: 768px) {
-    img {
+    video {
+    margin-top: -80px;
+    margin-bottom: 80px;
+
       width: 100%;
       height: auto
   }

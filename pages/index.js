@@ -1,7 +1,5 @@
 import { Container, Title, Title2, ImageContainer } from "../src/styles/pagesStyles/HomePage.styles";
-import Image from "next/image";
 import { useTranslation } from "react-i18next";
-import cyberSecurity from "../public/cyberSecurity.png";
 import Head from "next/head";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 
@@ -45,13 +43,16 @@ export default function HomePage() {
 
       <Container>
         <ImageContainer>
-          <Image
-            src={cyberSecurity}
-            alt="Cyber Security by Open Gate Hub software develop, webapps, paginas web"
-            layout="intrinsic"
-            width={500}
-            height={300}
-          />
+        <video
+        src="/videos/Home.webm"
+        autoPlay
+        loop
+        muted
+        controls
+    
+      >
+        Tu navegador no soporta este video.
+      </video>
         </ImageContainer>
         <Title>
           <span>{t("weAre")}</span> OpenGateHub

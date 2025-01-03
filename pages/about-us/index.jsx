@@ -73,13 +73,20 @@ const AboutUs = React.forwardRef((props, ref) => {
 
       <ImageText>
         <div ref={imageRef} className="image-container">
-          <Image
-            width={1000}
-            height={550}
-            src={modeloHtml}
-            alt="Desarrollador web profesional leyendo sobre nuevas tecnologías."
-          />
-        </div>
+
+      <video
+        src="/videos/AboutUs.webm"
+        autoPlay
+        loop
+        muted
+        controls
+        style={{ display: "block", width: "100%", height: "auto" }}
+      >
+        Tu navegador no soporta este video.
+      </video>
+</div>
+
+
         <div ref={textRef}>
           <h1>
             {t("aboutUsTitle")} <span>{t("aboutUsText")}</span>
