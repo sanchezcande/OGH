@@ -61,7 +61,7 @@ export const ImageContainer = styled.div`
     margin-top: -180px;
     width: 70%;
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: -50px;
   }
 
   @media (max-width: 768px) {
@@ -71,6 +71,15 @@ export const ImageContainer = styled.div`
 
       width: 100%;
       height: auto
+  }
+  }
+  @media (min-width: 768px) and (max-width: 1042px) {
+        video {
+            margin-top: -180px;
+            margin-bottom: -50px;
+          width: 100%;
+          height: auto
+      }
   }
 `;
 
