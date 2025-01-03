@@ -54,7 +54,7 @@ export const Title2 = styled.h2`
 export const ImageContainer = styled.div`
   width: auto;
   max-height: 500px;
-  margin-bottom: -150px;
+  // margin-bottom: -150px;
   margin-top: 0;
 
   video {
