@@ -48,7 +48,7 @@ export default function HomePage() {
         autoPlay
         loop
         muted
-        controls
+        playsInline
     
       >
         Tu navegador no soporta este video.

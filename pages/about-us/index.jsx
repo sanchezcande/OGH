@@ -79,8 +79,9 @@ const AboutUs = React.forwardRef((props, ref) => {
         autoPlay
         loop
         muted
-        controls
         style={{ display: "block", width: "100%", height: "auto" }}
+        playsInline
+
       >
         Tu navegador no soporta este video.
       </video>
