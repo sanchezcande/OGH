@@ -79,7 +79,7 @@ const AboutUs = React.forwardRef((props, ref) => {
         autoPlay
         loop
         muted
-        style={{ display: "block", width: "100%", height: "auto" }}
+        style={{ display: "block", width: "100%", height: "auto",     backgroundColor: 'transparent', }}
         playsInline
 
       >

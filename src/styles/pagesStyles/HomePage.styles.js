@@ -62,6 +62,7 @@ export const ImageContainer = styled.div`
     width: 70%;
     height: auto;
     margin-bottom: -50px;
+    background-color: transparent;
   }
 
   @media (max-width: 768px) {
