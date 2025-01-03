@@ -74,7 +74,7 @@ const AboutUs = React.forwardRef((props, ref) => {
       <ImageText>
         <div ref={imageRef} className="image-container">
 
-      <video
+      {/* <video
         src="/videos/AboutUs.webm"
         autoPlay
         loop
@@ -84,7 +84,7 @@ const AboutUs = React.forwardRef((props, ref) => {
 
       >
         Tu navegador no soporta este video.
-      </video>
+      </video> */}
 </div>
 
 

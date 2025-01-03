@@ -43,7 +43,7 @@ export default function HomePage() {
 
       <Container>
         <ImageContainer>
-        <video
+        {/* <video
         src="/videos/Home.webm"
         autoPlay
         loop
@@ -52,7 +52,7 @@ export default function HomePage() {
     
       >
         Tu navegador no soporta este video.
-      </video>
+      </video> */}
         </ImageContainer>
         <Title>
           <span>{t("weAre")}</span> OpenGateHub
