@@ -89,6 +89,7 @@
   "uxuiTitle": "Diseño UX/UI",
   "uxuiDescription": "Diseñamos interfaces intuitivas y atractivas para mejorar la experiencia y el compromiso de tus usuarios.",
   "graphicDesignTitle": "Diseño Gráfico",
+  "aiTitle": "Inteligencia Artificial",
   "graphicDesignDescription": "Fusionamos diseño gráfico innovador con desarrollo tecnológico para crear experiencias visuales excepcionales.",
   "learnMoreButtonText": "Saber Más",
   "modalSendTitle": "¡Enviado!",
@@ -173,6 +174,30 @@
       "step4": "Elevamos tu marca: Transformamos tus materiales en herramientas visuales que destacan."
     },
     "callToAction": "El momento de destacar es ahora. Contactá a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
+  },
+  "aiSolutions": {
+    "title": "Soluciones de IA",
+    "questions": {
+      "q1": "¿Te cuesta aprovechar el poder de la inteligencia artificial en tu negocio?",
+      "q2": "¿Encuentras complicado automatizar procesos y analizar datos de manera efectiva?",
+      "q3": "¿Tu negocio está perdiendo la ventaja competitiva que la IA puede ofrecer?"
+    },
+    "description": "Las soluciones impulsadas por inteligencia artificial pueden transformar las operaciones de tu negocio, desbloqueando nuevas oportunidades de eficiencia y crecimiento. Sin embargo, muchas empresas enfrentan obstáculos como la falta de experiencia, altos costos de implementación y estrategias poco claras para integrar la IA. Vos, como líder innovador, tienes el poder de superar estos desafíos y llevar tu negocio hacia el futuro.",
+    "solutions": {
+      "title": "¿Qué podemos crear para vos?",
+      "automation": "Diseñamos sistemas de automatización inteligente para optimizar tus operaciones.",
+      "analytics": "Desarrollamos herramientas avanzadas de análisis para obtener información accionable de tus datos.",
+      "customAI": "Construimos modelos de IA personalizados que se alinean con los objetivos de tu negocio."
+    },
+    "vision": "Al asociarte con nosotros, tu negocio obtendrá las herramientas necesarias para aprovechar la IA de manera efectiva. Imagina flujos de trabajo optimizados, decisiones basadas en datos y una ventaja competitiva significativa que impulse tu crecimiento. Juntos, haremos de la IA una piedra angular de tu éxito.",
+    "stepsTitle": "¿Cómo trabajamos con vos?",
+    "steps": {
+      "step1": "Entender tus necesidades: Evaluamos tus objetivos comerciales e identificamos oportunidades de IA.",
+      "step2": "Diseñar soluciones: Creamos estrategias y modelos de IA adaptados a tus necesidades.",
+      "step3": "Colaborar de cerca: Refinamos las soluciones con base en tu retroalimentación y garantizamos una integración sin problemas.",
+      "step4": "Empoderar tu negocio: Entregamos herramientas impulsadas por IA que transforman tus operaciones."
+    },
+    "callToAction": "El futuro es la IA. Contáctanos hoy y llevemos soluciones inteligentes a tu negocio."
   },
   "faqsTitle": "Preguntas Frecuentes",
   "faqs": {
