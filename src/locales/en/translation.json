@@ -27,6 +27,7 @@
   "contactUsTitle": "Reach Out!",
   "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
   "weAre": "We are",
+  "aiTitle": "Artificial Intelligence",
   "specializedIn": "Focused on your success. We help",
   "webAndMobileApp": "bring your ideas to life",
   "crafting": " with tailored digital solutions. From intuitive websites to innovative mobile apps,",
@@ -173,6 +174,30 @@
     },
     "callToAction": "The time to stand out is now. Contact our team and let’s build a visual identity that drives your success."
   },
+    "aiSolutions": {
+      "title": "AI Solutions",
+      "questions": {
+        "q1": "Are you struggling to harness the power of artificial intelligence in your business?",
+        "q2": "Do you find it challenging to automate processes and analyze data effectively?",
+        "q3": "Is your business missing out on the competitive edge AI can provide?"
+      },
+      "description": "AI-driven solutions can transform your business operations, unlocking new opportunities for efficiency and growth. However, many companies face obstacles such as a lack of expertise, high implementation costs, and unclear strategies for AI integration. You, as an innovative leader, have the power to overcome these challenges and lead your business into the future.",
+      "solutions": {
+        "title": "What We Can Create for You",
+        "automation": "We design intelligent automation systems to optimize your operations.",
+        "analytics": "We develop advanced analytics tools to extract actionable insights from your data.",
+        "customAI": "We build tailored AI models that align with your business goals."
+      },
+      "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we’ll make AI a cornerstone of your success.",
+      "stepsTitle": "How do we work with you?",
+      "steps": {
+        "step1": "Understand your needs: We assess your business goals and identify AI opportunities.",
+        "step2": "Design solutions: We create AI strategies and models tailored to your requirements.",
+        "step3": "Collaborate closely: We refine solutions based on your feedback and ensure seamless integration.",
+        "step4": "Empower your business: We deliver AI-driven tools that transform your operations."
+      },
+      "callToAction": "The future is AI. Contact us today and let’s bring intelligent solutions to your business."
+  },  
   "faqsTitle": "Frequently Asked Questions",
   "faqs": {
     "softwareFactory": {

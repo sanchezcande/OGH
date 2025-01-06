@@ -64,6 +64,7 @@ const NavBarDesktop = () => {
   ];
 
   const servicesList = [
+    { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },
     { text: t("backendTitle"), href: "/services/back-end" },
     { text: t("uxuiTitle"), href: "/services/ux-ui" },
