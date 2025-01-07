@@ -2,6 +2,12 @@ import { Container, Title, Title2, ImageContainer } from "../src/styles/pagesSty
 import { useTranslation } from "react-i18next";
 import Head from "next/head";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
+import dynamic from 'next/dynamic';
+
+const LottieAnimation = dynamic(() => import('../src/components/Animations/LottieAnimation'), {
+  ssr: false,
+});
+
 
 export async function getServerSideProps() {
   return {
@@ -43,16 +49,8 @@ export default function HomePage() {
 
       <Container>
         <ImageContainer>
-        {/* <video
-        src="/videos/Home.webm"
-        autoPlay
-        loop
-        muted
-        playsInline
-    
-      >
-        Tu navegador no soporta este video.
-      </video> */}
+        <LottieAnimation animationPath="/animations/aboutUs.json" width="80%" height="auto" />
+
         </ImageContainer>
         <Title>
           <span>{t("weAre")}</span> OpenGateHub

@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { ImageText, Container } from "../../src/styles/pagesStyles/AboutUs.styles";
 import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
-import modeloHtml from "../../src/assets/images/modeloHtml.png";
-import Image from "next/image";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 
@@ -22,20 +20,20 @@ export const AboutUsCallToAction = () => {
 
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
-  const imageRef = useRef(null); // Ref para la imagen
-  const textRef = useRef(null); // Ref para el texto
+  const imageRef = useRef(null); 
+  const textRef = useRef(null); 
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible"); // Activa la animación
-            observer.unobserve(entry.target); // Deja de observar después de activar
+            entry.target.classList.add("visible"); 
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.2 } // Se activa cuando el 20% del elemento es visible
+      { threshold: 0.2 } 
     );
 
     if (imageRef.current) observer.observe(imageRef.current);
@@ -74,17 +72,6 @@ const AboutUs = React.forwardRef((props, ref) => {
       <ImageText>
         <div ref={imageRef} className="image-container">
 
-      {/* <video
-        src="/videos/AboutUs.webm"
-        autoPlay
-        loop
-        muted
-        style={{ display: "block", width: "100%", height: "auto",     backgroundColor: 'transparent', }}
-        playsInline
-
-      >
-        Tu navegador no soporta este video.
-      </video> */}
 </div>
 
 

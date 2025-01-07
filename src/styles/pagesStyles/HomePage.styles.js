@@ -52,36 +52,15 @@ export const Title2 = styled.h2`
 `;
 
 export const ImageContainer = styled.div`
-  width: auto;
-  max-height: 500px;
-  // margin-bottom: -150px;
-  margin-top: 0;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 
-  video {
-    margin-top: -180px;
-    width: 70%;
-    height: auto;
-    margin-bottom: -50px;
-    background-color: transparent;
+  @media (min-width: 1250px) {
+    width: 60%;
+    margin-bottom: -30px;
   }
 
-  @media (max-width: 768px) {
-    video {
-    margin-top: -80px;
-    margin-bottom: 80px;
-
-      width: 100%;
-      height: auto
-  }
-  }
-  @media (min-width: 768px) and (max-width: 1042px) {
-        video {
-            margin-top: -180px;
-            margin-bottom: -50px;
-          width: 100%;
-          height: auto
-      }
-  }
 `;
 
 export const ButtonsContainer = styled.div`
