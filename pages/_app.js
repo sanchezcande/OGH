@@ -8,7 +8,6 @@ import Footer from "../src/components/Footer/Footer";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FaWhatsapp  } from "react-icons/fa";
 
 

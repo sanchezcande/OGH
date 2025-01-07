@@ -57,9 +57,13 @@ const NavBarMobile = () => {
   return (
     <NavBarContainer>
       <LogoIcon>
+      <Link href="/">
+
         <Logo>
         <Image src={Logo4} alt="OpenGateHub Logo" width={210} />
         </Logo>
+        </Link>
+
         <MenuIcon onClick={toggleMenu} open={menuOpen}>
           ☰
         </MenuIcon>
