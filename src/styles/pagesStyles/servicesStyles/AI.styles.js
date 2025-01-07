@@ -91,23 +91,14 @@ export const ServiceTitle = styled.h2`
   font-size: 3.2rem;
   font-weight: 800;
   margin-bottom: 2rem;
-  color: #ffffff;
+  color: white;
   text-align: left;
   text-transform: uppercase;
   letter-spacing: 3px;
-  position: relative;
-  z-index: 1;
-  background: linear-gradient(90deg, #00c6ff, #0072ff, #00ffdd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 6s infinite ease;
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
   }
-
-  ${fadeInUp}
-  ${gradientShift}
 `;
 
 export const ServiceList = styled.ul`
@@ -159,21 +150,6 @@ min-width: 2.5rem;
   ${pulseEffect}
 `;
 
-export const Divider = styled.hr`
-  border: none;
-  height: 3px;
-  background: linear-gradient(90deg, #00c6ff, #00ffdd);
-  margin: 2rem 0;
-  width: 0;
-  margin-right: auto;
-  animation: drawLine 1.5s ease-out forwards;
-
-  &.visible {
-    animation: fadeInUp 0.5s ease forwards;
-  }
-
-  ${fadeInUp}
-`;
 
 export const HighlightText = styled.div`
   font-size: 1.8rem;
@@ -188,20 +164,21 @@ export const HighlightText = styled.div`
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease; /* Se agregó box-shadow */
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
   }
 
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.01);
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.5), rgba(0, 198, 255, 0.5));
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.7);
   }
 
   ${fadeInUp}
 `;
+
 
 export const Description = styled.p`
   font-size: 1.3rem;
@@ -315,3 +292,22 @@ export const ServiceListCross = styled.ul`
 
   ${fadeInUp}
 `;
+export const Divider = styled.hr`
+  border: none;
+  height: 3px;
+  background-color: #00c6ff;
+  margin: 2rem 0;
+  position: relative;
+  width: 0;
+  transform-origin: left;
+
+  &.visible {
+    width: 70%;
+    transition: width 1s ease-in-out;
+  }
+
+  &.hidden {
+    width: 0;
+  }
+`;
+
