@@ -57,8 +57,11 @@ export const ImageContainer = styled.div`
   margin-right: 0;
 
   @media (min-width: 1250px) {
-    width: 60%;
     margin-bottom: -30px;
+  }
+    
+  @media (min-width: 768px) {
+    width: 60%;
   }
 
 `;

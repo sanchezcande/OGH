@@ -49,7 +49,7 @@ export default function HomePage() {
 
       <Container>
         <ImageContainer>
-        <LottieAnimation animationPath="/animations/aboutUs.json" width="80%" height="auto" />
+        <LottieAnimation animationPath="/animations/aboutUs.json" width="100%" height="auto" />
 
         </ImageContainer>
         <Title>
