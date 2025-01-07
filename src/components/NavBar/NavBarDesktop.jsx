@@ -94,7 +94,7 @@ const NavBarDesktop = () => {
   return (
     <nav className={styles.navBarContainer}>
     <Link href="/" className={styles.logo}>
-    <Image src={Logo4} alt="OpenGateHub Logo" width={280} height={60} />
+    <Image src={Logo4} alt="OpenGateHub Logo" width={200} height={45} />
     </Link>
       <ul className={styles.navLinks}>
         <div
