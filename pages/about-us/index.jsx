@@ -4,6 +4,8 @@ import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import Head from "next/head";
+import Image from "next/image";
+
 
 export const AboutUsCallToAction = () => {
   const { t } = useTranslation();
@@ -70,9 +72,10 @@ const AboutUs = React.forwardRef((props, ref) => {
       </Head>
 
       <ImageText>
-        <div ref={imageRef} className="image-container">
-
-</div>
+        <div className="image-container" ref={imageRef}>
+          <Image src="/images/AboutUs.png" width={250} height={250}   layout="responsive" 
+          />
+        </div>
 
 
         <div ref={textRef}>
