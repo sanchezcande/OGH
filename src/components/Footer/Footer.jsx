@@ -20,7 +20,7 @@ import Link from "next/link";
 
 const LogoImg = () => (
   <LogoImgContainer>
-    <Image src={Logo} alt="software development company" width={30} />
+    <Image src={Logo} alt="software development company" width={27} />
     <Title>
       OpenGate<span>Hub</span>
     </Title>
@@ -78,7 +78,7 @@ const Footer = () => {
         <div>
           <h4>{t("connectWithUs")}</h4>
           <TelMailContainer>
-            <a
+            {/* <a
               href={whatsappLink}
               target="_blank"
               rel="noreferrer"
@@ -86,12 +86,15 @@ const Footer = () => {
             >
               <Tel />
               <FooterText>+549 11 2348 5638</FooterText>
-            </a>
+            </a> */}
           </TelMailContainer>
           <TelMailContainer>
             <Mail /> <FooterText>    <a href="mailto:info@opengatehub.com">info@opengatehub.com</a>
             </FooterText>
           </TelMailContainer>
+          <LogoImg />
+          
+
         </div>
       </FooterContent>
     </FooterContainer>

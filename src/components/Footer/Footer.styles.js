@@ -80,14 +80,14 @@ export const Mail = styled(FaEnvelope)`
   height: 15px;
   fill: #fff;
 `;
-export const Tel = styled(FaWhatsapp)`
-  width: 20px;
-  height: 20px;
-  fill: #fff;
-  margin-bottom: 5px;
-`;
+// export const Tel = styled(FaWhatsapp)`
+//   width: 20px;
+//   height: 20px;
+//   fill: #fff;
+//   margin-bottom: 5px;
+// `;
 export const TelMailContainer = styled.div`
-  margin-top: -10px;
+  margin-top: -5px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -120,5 +120,5 @@ export const Title = styled.h3`
 export const LogoImgContainer = styled.div`
   display: flex;
   gap: 5px;
-  margin-left:-10px;
+  margin-left:-6px;
 `;

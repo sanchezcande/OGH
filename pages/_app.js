@@ -8,7 +8,7 @@ import Footer from "../src/components/Footer/Footer";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { FaWhatsapp  } from "react-icons/fa";
+// import { FaWhatsapp  } from "react-icons/fa";
 
 
 const Layout = styled.div`
@@ -122,13 +122,13 @@ export default function MyApp({ Component, pageProps }) {
           <Component {...pageProps} />
         </Main>
         <Footer />
-        <FloatingWhatsAppButton
+        {/* <FloatingWhatsAppButton
   href="https://wa.me/+5491123485638"
   target="_blank"
   rel="noopener noreferrer"
 >
 <FaWhatsapp size={40} color="white" />
-</FloatingWhatsAppButton>
+</FloatingWhatsAppButton> */}
       </Layout>
     </ThemeProvider>
   );
