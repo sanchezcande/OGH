@@ -10,6 +10,8 @@ import {
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
 import { useTranslation } from "react-i18next";
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 const ContactForm = () => {
   const { t } = useTranslation();
@@ -24,6 +26,8 @@ const ContactForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
+  const [captchaToken, setCaptchaToken] = useState(null);
+
 
   function validateForm() {
     const newErrors = {};
@@ -52,7 +56,11 @@ const ContactForm = () => {
       ...formData,
       [name]: value,
     });
+    e.target.classList.add('touched');
     validateForm();
+  };
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token);
   };
 
   function sendEmail(e) {
@@ -67,6 +75,13 @@ const ContactForm = () => {
     };
 
     const formErrors = validateForm(formData);
+    
+    if (!captchaToken) {
+      setFormStatus(t("pleaseCompleteCaptcha"));
+      setIsModalOpen(true);
+      return;
+    }
+
 
     if (Object.keys(formErrors).length === 0) {
       emailjs
@@ -84,7 +99,7 @@ const ContactForm = () => {
           (error) => {
             setFormStatus(t("errorSendingMessage"));
             setIsModalOpen(true);
-            console.log(error.text);
+            console.error(error.text);
           }
         );
     } else {
@@ -140,7 +155,10 @@ const ContactForm = () => {
             {errors.message}
           </Error>
         )}
-
+       <ReCAPTCHA
+          sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-" 
+          onChange={handleCaptchaChange}
+        />
         <StyledButton
           className={errors.message ? "error" : "valid"}
           type="submit"

@@ -47,6 +47,7 @@ const NavBarMobile = () => {
   };
 
   const servicesList = [
+    { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },
     { text: t("backendTitle"), href: "/services/back-end" },
     { text: t("uxuiTitle"), href: "/services/ux-ui" },
@@ -56,9 +57,13 @@ const NavBarMobile = () => {
   return (
     <NavBarContainer>
       <LogoIcon>
+      <Link href="/">
+
         <Logo>
-        <Image src={Logo4} alt="OpenGateHub Logo" width={280} height={60} />
+        <Image src={Logo4} alt="OpenGateHub Logo" width={210} />
         </Logo>
+        </Link>
+
         <MenuIcon onClick={toggleMenu} open={menuOpen}>
           ☰
         </MenuIcon>

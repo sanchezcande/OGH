@@ -27,6 +27,7 @@
   "contactUsTitle": "Reach Out!",
   "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
   "weAre": "We are",
+  "aiTitle": "Artificial Intelligence",
   "specializedIn": "Focused on your success. We help",
   "webAndMobileApp": "bring your ideas to life",
   "crafting": " with tailored digital solutions. From intuitive websites to innovative mobile apps,",
@@ -43,7 +44,6 @@
   "planTitle": "Here\u2019s how we do it:",
   "planSteps": "1. Discovery call: Tell us what you need. \n2. Custom plan: Get matched with aligned developers. \n3. Start building: Integrate, iterate, and scale with confidence.",
   "forBusiness": "business growth.",
-
   "homeCallToAction": {
     "title": "Ready to Elevate Your Business?",
     "description": "Get a Free Consultation Today",
@@ -69,7 +69,6 @@
     "description": "Reach out and let’s start building something amazing together.",
     "buttonText": "Reach Out"
   },
-
   "companyHistoryTitle": "Our History",
   "companyHistoryDescription": "Our journey began in Argentina, driven by the vision of supporting businesses and entrepreneurs in their digital transformation. From day one, we’ve been committed to creating solutions that connect technology and people with trust and quality.",
   "companyHistoryExpandableDescription1": "OpenGateHub was born in Argentina with a clear vision: to combine our experience working with international companies, primarily from the United States, with a local and approachable perspective.",
@@ -186,6 +185,30 @@
     },
     "callToAction": "The time to stand out is now. Contact our team and let’s build a visual identity that drives your success."
   },
+    "aiSolutions": {
+      "title": "AI Solutions",
+      "questions": {
+        "q1": "Are you struggling to harness the power of artificial intelligence in your business?",
+        "q2": "Do you find it challenging to automate processes and analyze data effectively?",
+        "q3": "Is your business missing out on the competitive edge AI can provide?"
+      },
+      "description": "AI-driven solutions can transform your business operations, unlocking new opportunities for efficiency and growth. However, many companies face obstacles such as a lack of expertise, high implementation costs, and unclear strategies for AI integration. You, as an innovative leader, have the power to overcome these challenges and lead your business into the future.",
+      "solutions": {
+        "title": "What We Can Create for You",
+        "automation": "We design intelligent automation systems to optimize your operations.",
+        "analytics": "We develop advanced analytics tools to extract actionable insights from your data.",
+        "customAI": "We build tailored AI models that align with your business goals."
+      },
+      "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we’ll make AI a cornerstone of your success.",
+      "stepsTitle": "How do we work with you?",
+      "steps": {
+        "step1": "Understand your needs: We assess your business goals and identify AI opportunities.",
+        "step2": "Design solutions: We create AI strategies and models tailored to your requirements.",
+        "step3": "Collaborate closely: We refine solutions based on your feedback and ensure seamless integration.",
+        "step4": "Empower your business: We deliver AI-driven tools that transform your operations."
+      },
+      "callToAction": "The future is AI. Contact us today and let’s bring intelligent solutions to your business."
+  },  
   "faqsTitle": "Frequently Asked Questions",
   "faqs": {
     "softwareFactory": {
@@ -320,5 +343,16 @@
         "content": "If you have any questions or concerns about this Privacy Policy or how your information is handled, please contact us at:\n- Email: info@opengatehub.com\n- Phone: +54 9 11 2348 5638"
       }
     ]
-  }
+  },
+  "searchPlaceholder": "Search articles...",
+  "readMore": "Read more",
+  "articles": [
+    {
+      "title": "The crucial role of tailored technological solutions in business growth",
+      "slug": "crucial-role-technological-solutions",
+      "summary": "Learn how tailored technological solutions drive efficiency and business growth.",
+      "image": "/images/article1.jpg",
+      "content": "In the era of digital transformation, businesses face the constant challenge of adapting to a competitive and ever-evolving environment. The implementation of tailored technological solutions has become a determining factor in driving operational efficiency and business growth.\n\nA study by Digital Innovation Trends 2024 reveals that companies adopting technology tools tailored to their needs achieve a 35% increase in productivity compared to those using generic solutions. This underscores the importance of creating technology strategies specifically designed for each business model.\n\nCustomization not only improves internal efficiency but also strengthens customer relationships. Tools such as custom-developed CRM systems allow for uniquely precise interaction management, offering more satisfying experiences and fostering customer loyalty. In this regard, technologies such as artificial intelligence and advanced data analytics are transforming how businesses understand and connect with their audiences.\n\nWhile developing tailored solutions may require a significant initial investment, the long-term benefits are clear: from optimizing internal processes to saving on operational costs. For instance, integrating platforms such as specific APIs or custom-made internal applications reduces response times and simplifies repetitive tasks, freeing up resources to focus on strategy and innovation.\n\nIn a landscape where businesses seek to remain relevant, the ability to quickly adapt to market needs is crucial. Tailored solutions offer flexibility that predefined systems cannot match. Additionally, these tools enable companies to scale organically, integrating new functionalities as they grow.\n\nFurthermore, it is essential to choose technology partners with experience and strategic vision. Specialized software development companies design and deliver technological solutions that not only solve immediate problems but also align tools with the long-term goals of each organization.\n\nThe path to business success in the digital era is clearly marked by innovation and customization. Companies adopting technological solutions specifically designed for their needs are better equipped to overcome the challenges of a fragmented and competitive market, positioning themselves as leaders in their industry."
+    }
+  ]
 }

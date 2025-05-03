@@ -8,6 +8,8 @@ import Footer from "../src/components/Footer/Footer";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+// import { FaWhatsapp  } from "react-icons/fa";
+
 
 const Layout = styled.div`
   display: flex;
@@ -41,6 +43,34 @@ const Loader = styled.div`
     }
   }
 `;
+
+const FloatingWhatsAppButton = styled.a`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer;
+  color: white;
+
+  &:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+`;
+
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -92,6 +122,13 @@ export default function MyApp({ Component, pageProps }) {
           <Component {...pageProps} />
         </Main>
         <Footer />
+        {/* <FloatingWhatsAppButton
+  href="https://wa.me/+5491123485638"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+<FaWhatsapp size={40} color="white" />
+</FloatingWhatsAppButton> */}
       </Layout>
     </ThemeProvider>
   );

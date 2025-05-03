@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import Head from "next/head";
 import {
   ServiceContainer,
@@ -8,7 +9,7 @@ import {
   Divider,
   Description,
   NumberedList,
-} from "../../src/styles/pagesStyles/Services.styles";
+} from "../../src/styles/pagesStyles/servicesStyles/Frontend.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const ServicesCallToAction = () => {
@@ -27,10 +28,28 @@ export const ServicesCallToAction = () => {
 const FrontEnd = () => {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const items = document.querySelectorAll(".animate");
+    items.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <Head>
-        <title>{t("frontend.title")} - OpenGateHub</title>
+        <title>Frontend - OpenGateHub</title>
         <meta name="description" content={t("frontend.description")} />
         <meta
           name="keywords"
@@ -40,28 +59,28 @@ const FrontEnd = () => {
       </Head>
 
       <ServiceContainer>
-        <ServiceTitle>{t("frontend.title")}</ServiceTitle>
-        <Divider />
-        <Description>{t("frontend.description")}</Description>
+        <ServiceTitle className="animate">{t("frontend.title")}</ServiceTitle>
+        <Divider className="animate" />
+        <Description className="animate">{t("frontend.description")}</Description>
 
-        <ServiceTitle titleColor="#00aaff">
+        <ServiceTitle className="animate">
           {t("frontend.solutions.title")}
         </ServiceTitle>
         <ServiceList>
-          <li>{t("frontend.solutions.responsive")}</li>
-          <li>{t("frontend.solutions.interactive")}</li>
-          <li>{t("frontend.solutions.customized")}</li>
+          <li className="animate">{t("frontend.solutions.responsive")}</li>
+          <li className="animate">{t("frontend.solutions.interactive")}</li>
+          <li className="animate">{t("frontend.solutions.customized")}</li>
         </ServiceList>
 
-        <ServiceTitle titleColor="#00aaff">{t("frontend.stepsTitle")}</ServiceTitle>
+        <ServiceTitle className="animate">{t("frontend.stepsTitle")}</ServiceTitle>
         <NumberedList>
-          <li>{t("frontend.steps.step1")}</li>
-          <li>{t("frontend.steps.step2")}</li>
-          <li>{t("frontend.steps.step3")}</li>
+          <li className="animate">{t("frontend.steps.step1")}</li>
+          <li className="animate">{t("frontend.steps.step2")}</li>
+          <li className="animate">{t("frontend.steps.step3")}</li>
         </NumberedList>
 
-        <HighlightText highlightColor="#ffd700">
-          {t("frontend.callToAction")}
+        <HighlightText className="animate">
+          <span>{t("frontend.callToAction")}</span>
         </HighlightText>
         <ServicesCallToAction />
       </ServiceContainer>

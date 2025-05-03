@@ -9,11 +9,15 @@ import {
   CTAButton,
   ImageContainer,
 } from "../src/styles/pagesStyles/HomePage.styles";
-import Image from "next/image";
 import { useTranslation } from "react-i18next";
-import Head from "next/head";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
-import cyberSecurity from "../public/cyberSecurity.png";
+import Head from "next/head";
+import dynamic from 'next/dynamic';
+
+const LottieAnimation = dynamic(() => import('../src/components/Animations/LottieAnimation'), {
+  ssr: false,
+});
+
 
 export async function getServerSideProps() {
   return { props: {} };
@@ -54,13 +58,8 @@ export default function HomePage() {
 
       <Container>
         <ImageContainer>
-        <Image
-            src={cyberSecurity}
-            alt="Cyber Security by Open Gate Hub software develop, webapps, paginas web"
-            layout="intrinsic"
-            width={500}
-            height={300}
-          />
+        <LottieAnimation animationPath="/animations/home.json" width="100%" height="auto" />
+
         </ImageContainer>
 
         <Title>{t("heroTitle")}</Title>

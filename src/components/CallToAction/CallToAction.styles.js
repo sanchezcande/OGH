@@ -9,11 +9,27 @@ export const CallToActionContainer = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: ${({ theme }) => theme.boxShadow};
   max-width: 800px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
+  /* Estado inicial para la animación */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  /* Cuando el componente es visible */
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Interacciones */
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 1rem;
+    margin-right: 1rem;
   }
 `;
 

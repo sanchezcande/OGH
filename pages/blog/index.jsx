@@ -1,45 +1,78 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+import {
+  BlogContainer,
+  Gallery,
+  ArticleCard,
+  ScrollToTopButton,
+  SearchInput,
+} from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
-const BlogContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 50vh;
-  text-align: center;
-  color: white;
-  font-family: Arial, sans-serif;
-`;
+export default function Blog() {
+  const { t } = useTranslation();
+  const articles = t("articles", { returnObjects: true }) || [];
+  const [searchTerm, setSearchTerm] = useState("");
 
-const Title = styled.h1`
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: ${({ theme }) => theme.colors.lightBlue};
-`;
+  const filteredArticles = articles.filter(
+    (article) =>
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.summary.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-`;
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-const WorkingImage = styled.img`
-  width: 150px;
-  height: auto;
-  margin-bottom: 1.5rem;
-`;
+    const cards = document.querySelectorAll(".article-card");
+    cards.forEach((card) => observer.observe(card));
 
-const BlogPlaceholder = () => {
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true); 
+  };
+
   return (
     <BlogContainer>
-      <WorkingImage
-        src="/path-to-your-working-icon.png"
-        alt="Working on it"
+      <SearchInput
+        type="text"
+        placeholder={t("searchPlaceholder") || "Buscar artículos..."}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <Title>Blog Page Under Construction</Title>
-      <Subtitle>We are working hard to bring you the latest updates. Stay tuned!</Subtitle>
+
+      <Gallery>
+        {filteredArticles.map((article) => (
+          <ArticleCard key={article.slug} className="article-card">
+            <img src={article.image} alt={article.title}    onLoad={handleImageLoad} />
+            <h2>{article.title}</h2>
+            <p>{article.summary}</p>
+            <Link href={`/blog/${article.slug}`}>{t("readMore")}</Link>
+          </ArticleCard>
+        ))}
+      </Gallery>
+
+      <ScrollToTopButton onClick={scrollToTop}>
+        <FontAwesomeIcon icon={faArrowUp} size="lg" />
+      </ScrollToTopButton>
     </BlogContainer>
   );
-};
-
-export default BlogPlaceholder;
+}

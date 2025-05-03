@@ -9,7 +9,7 @@ const ContactUs = React.forwardRef((props, ref) => {
   return (
     <Container ref={ref}>
       <Head>
-        <title>{t("contactUsTitle")}</title>
+        <title>Contact Us - OpenGateHub</title>
       </Head>
       <div style={{ marginBottom: "20px" }} />
       <h1>{t("contactUsTitle")}</h1>

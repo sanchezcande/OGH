@@ -12,8 +12,12 @@
 .logo {
   font-weight: 800;
   font-size: 28px;
-  margin-top: 15px;
-  color: #4B5563;
+  margin-top: 10px;
+
+
+}
+.logo a .img {
+  width: 145px !important;
 }
 
 .span {
@@ -124,7 +128,7 @@
 
 .servicesMenu {
   position: absolute;
-  top: 115%;
+  top: 180% !important;
   left: 50%;
   transform: translateX(-50%) scaleY(0);
   transform-origin: top;
@@ -146,8 +150,24 @@
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
-  transform: translateX(-50%) scaleY(1);
+  transform: translateX(-25%) scaleY(1);
 }
+.navLinkWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.navLinkWrapper::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  height: 180px;
+  background: transparent; 
+  pointer-events: auto;
+}
+
 
 .servicesMenuItem {
   padding: 10px 16px;
@@ -196,5 +216,9 @@
   }
   .highlightBar {
     visibility: hidden;
+  }
+  .servicesMenu {
+    transform: translate(-20%) !important;
+    top: 145%;
   }
 }

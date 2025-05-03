@@ -1,6 +1,14 @@
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import Head from "next/head";
-import { FAQContainer, FAQTitle,FAQTitle1, FAQList, Question, Answer } from "../../src/styles/pagesStyles/FAQs.styles";
+import {
+  FAQContainer,
+  FAQTitle,
+  FAQTitle1,
+  FAQList,
+  Question,
+  Answer,
+} from "../../src/styles/pagesStyles/FAQs.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const FAQsCallToAction = () => {
@@ -18,13 +26,30 @@ export const FAQsCallToAction = () => {
 
 const FAQs = () => {
   const { t } = useTranslation();
-
   const faqs = t("faqs", { returnObjects: true });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const items = document.querySelectorAll("li");
+    items.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
       <Head>
-        <title>{t("faqsTitle")} - OpenGateHub</title>
+        <title>FAQs - OpenGateHub</title>
         <meta name="description" content={t("faqs.description")} />
       </Head>
 

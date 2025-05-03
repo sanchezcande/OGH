@@ -17,6 +17,8 @@ export const Container = styled.div`
         font-size: 40px;
         font-weight: 700;
         margin-bottom: 10px;
+        animation: fadeInUp 0.6s ease-out;
+
 
         @media (max-width: 768px) {
             font-size: 30px;
@@ -24,6 +26,7 @@ export const Container = styled.div`
     }
     
     h2 {
+      animation: fadeInUp 0.6s ease-out;
         text-align: center;
         font-size: 30;
         margin-bottom: 20px;

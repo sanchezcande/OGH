@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import styles from "./NavBarDesktop.module.css";
 import { FaAngleDown, FaGlobe } from "react-icons/fa";
@@ -9,38 +9,44 @@ import Logo4 from "../../../public/Logo4.png";
 const NavBarDesktop = () => {
   const { t, i18n } = useTranslation();
   const [showLangMenu, setShowLangMenu] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(0); // Default: Home
   const [selectedLang, setSelectedLang] = useState("en");
   const [tabWidths, setTabWidths] = useState([]);
   const [tabOffsets, setTabOffsets] = useState([]);
   const [showServicesMenu, setShowServicesMenu] = useState(false);
 
-  const toggleLangMenu = () => {
-    setShowLangMenu(!showLangMenu);
-  };
-
-  useEffect(() => {
+  const updateHighlight = useCallback(() => {
     const navLinks = document.querySelectorAll(".nav-link");
     const widths = Array.from(navLinks).map((link) => link.offsetWidth);
     const offsets = Array.from(navLinks).map((link) => link.offsetLeft);
     setTabWidths(widths);
     setTabOffsets(offsets);
-    if (hoveredIndex >= 0 && widths[hoveredIndex] && offsets[hoveredIndex]) {
+
+    const indexToUse = hoveredIndex !== -1 ? hoveredIndex : activeIndex;
+    if (indexToUse >= 0 && widths[indexToUse] && offsets[indexToUse]) {
       document.documentElement.style.setProperty(
         "--highlight-left",
-        `${offsets[hoveredIndex]}px`
+        `${offsets[indexToUse]}px`
       );
       document.documentElement.style.setProperty(
         "--highlight-width",
-        `${widths[hoveredIndex]}px`
-      );
-      console.log(
-        "Updated variables:",
-        `left: ${offsets[hoveredIndex]}px`,
-        `width: ${widths[hoveredIndex]}px`
+        `${widths[indexToUse]}px`
       );
     }
-  }, [hoveredIndex]);
+  }, [hoveredIndex, activeIndex]);
+
+  useEffect(() => {
+    updateHighlight();
+    window.addEventListener("resize", updateHighlight);
+    return () => {
+      window.removeEventListener("resize", updateHighlight);
+    };
+  }, [updateHighlight]);
+
+  const toggleLangMenu = () => {
+    setShowLangMenu((prev) => !prev);
+  };
 
   const handleLangChange = (lang) => {
     i18n.changeLanguage(lang);
@@ -58,76 +64,86 @@ const NavBarDesktop = () => {
   ];
 
   const servicesList = [
+    { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },
     { text: t("backendTitle"), href: "/services/back-end" },
     { text: t("uxuiTitle"), href: "/services/ux-ui" },
     { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
   ];
 
-  let hideMenuTimeout;
-
-  const handleMouseLeave = () => {
-    hideMenuTimeout = setTimeout(() => {
-      setShowServicesMenu(false);
-    }, 100);
+  const handleMouseEnterServices = () => {
+    setShowServicesMenu(true);
   };
 
-  const handleMouseEnter = () => {
-    clearTimeout(hideMenuTimeout);
-    setShowServicesMenu(true);
+  const handleMouseLeaveServices = (e) => {
+    const submenu = document.querySelector(`.${styles.servicesMenu}`);
+    const relatedTarget = e.relatedTarget;
+    if (!submenu || !relatedTarget || !submenu.contains(relatedTarget)) {
+      setShowServicesMenu(false);
+    }
+  };
+  
+
+  const handleTabClick = (index) => {
+    setActiveIndex(index); 
+    if (pillTabs[index].text !== t("services")) {
+      setShowServicesMenu(false); 
+    }
   };
 
   return (
     <nav className={styles.navBarContainer}>
-      <div className={styles.logo}>
-        <Image src={Logo4} alt="OpenGateHub Logo" width={280} height={60} />
-      </div>
+    <Link href="/" className={styles.logo}>
+    <Image src={Logo4} alt="OpenGateHub Logo" width={200} height={45} />
+    </Link>
       <ul className={styles.navLinks}>
         <div
           className={styles.highlightBar}
           style={{
-            left: `${(tabOffsets[hoveredIndex] || 0) - 30}px`,
-            width: `${(tabWidths[hoveredIndex] || 0) + 60}px`,
+            left: `${
+              (tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) -
+              30
+            }px`,
+            width: `${
+              (tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) +
+              60
+            }px`,
           }}
         />
         {pillTabs.map((tab, i) => (
-          <li key={tab.text}>
-            {tab.text === t("services") ? (
-              <span
-                className={`${styles.navLink} nav-link`}
-                onMouseEnter={() => {
-                  setHoveredIndex(i);
-                  handleMouseEnter();
-                }}
-                onMouseLeave={handleMouseLeave}
-              >
-                <span>{tab.text}</span>
-                <ul
-                  className={`${styles.servicesMenu} ${
-                    showServicesMenu ? styles.visible : ""
-                  }`}
-                >
-                  {servicesList.map((service, index) => (
-                    <li key={index} className={styles.servicesMenuItem}>
-                      <Link href={service.href} prefetch={true}>
-                        {service.text}{" "}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </span>
-            ) : (
-              <span
-                className={`${styles.navLink} nav-link`}
-                onMouseEnter={() => {
-                  setHoveredIndex(i);
-                  handleMouseLeave();
-                }}
-              >
-                <Link href={tab.href}>{tab.text}</Link>
-              </span>
-            )}
-          </li>
+     <li
+     key={tab.text}
+     className={tab.text === t("services") ? styles.navLinkWrapper : ""}
+     onMouseEnter={tab.text === t("services") ? handleMouseEnterServices : null}
+     onMouseLeave={tab.text === t("services") ? handleMouseLeaveServices : null}
+   >
+     {tab.text === t("services") ? (
+       <>
+         <span className={`${styles.navLink} nav-link`}>{tab.text}</span>
+         <ul
+           className={`${styles.servicesMenu} ${
+             showServicesMenu ? styles.visible : ""
+           }`}
+         >
+           {servicesList.map((service, index) => (
+             <li key={index} className={styles.servicesMenuItem}>
+               <Link href={service.href}>{service.text}</Link>
+             </li>
+           ))}
+         </ul>
+       </>
+     ) : (
+       <span
+         className={`${styles.navLink} nav-link`}
+         onMouseEnter={() => setHoveredIndex(i)}
+         onMouseLeave={() => setHoveredIndex(-1)}
+         onClick={() => handleTabClick(i)}
+       >
+         <Link href={tab.href}>{tab.text}</Link>
+       </span>
+     )}
+   </li>
+   
         ))}
       </ul>
       <div>
@@ -147,21 +163,12 @@ const NavBarDesktop = () => {
         <ul
           className={`${styles.langMenu} ${showLangMenu ? styles.visible : ""}`}
         >
-          {selectedLang === "en" ? (
-            <li
-              className={styles.langMenuItem}
-              onClick={() => handleLangChange("es")}
-            >
-              {t("spanish")}
-            </li>
-          ) : (
-            <li
-              className={styles.langMenuItem}
-              onClick={() => handleLangChange("en")}
-            >
-              {t("english")}
-            </li>
-          )}
+          <li
+            className={styles.langMenuItem}
+            onClick={() => handleLangChange(selectedLang === "en" ? "es" : "en")}
+          >
+            {selectedLang === "en" ? t("spanish") : t("english")}
+          </li>
         </ul>
       </div>
     </nav>
@@ -169,3 +176,4 @@ const NavBarDesktop = () => {
 };
 
 export default NavBarDesktop;
+

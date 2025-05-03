@@ -10,7 +10,7 @@ import {
   Description,
   NumberedList,
   ServiceListCross,
-} from "../../src/styles/pagesStyles/servicesStyles/GraphicDesing.styles";
+} from "../../src/styles/pagesStyles/servicesStyles/AI.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 
 export const ServicesCallToAction = () => {
@@ -26,7 +26,7 @@ export const ServicesCallToAction = () => {
   );
 };
 
-const GraphicDesign = () => {
+const aiSolutions = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -50,8 +50,8 @@ const GraphicDesign = () => {
   return (
     <>
       <Head>
-        <title>Graphic Design - OpenGateHub</title>
-        <meta name="description" content={t("graphicDesign.description")} />
+        <title>AI - OpenGateHub</title>
+        <meta name="description" content={t("aiSolutions.description")} />
         <meta
           name="keywords"
           content="Graphic Design, Branding, Visual Identity, Professional Graphics, Digital Campaigns"
@@ -60,40 +60,40 @@ const GraphicDesign = () => {
       </Head>
 
       <ServiceContainer>
-        <ServiceTitle className="animate">{t("graphicDesign.title")}</ServiceTitle>
+        <ServiceTitle className="animate">{t("aiSolutions.title")}</ServiceTitle>
         <Divider className="animate" />
 
         <ServiceListCross>
-          <li className="animate">{t("graphicDesign.questions.q1")}</li>
-          <li className="animate">{t("graphicDesign.questions.q2")}</li>
-          <li className="animate">{t("graphicDesign.questions.q3")}</li>
+          <li className="animate">{t("aiSolutions.questions.q1")}</li>
+          <li className="animate">{t("aiSolutions.questions.q2")}</li>
+          <li className="animate">{t("aiSolutions.questions.q3")}</li>
         </ServiceListCross>
 
-        <Description className="animate">{t("graphicDesign.description")}</Description>
+        <Description className="animate">{t("aiSolutions.description")}</Description>
 
         <ServiceTitle className="animate">
-          {t("graphicDesign.solutions.title")}
+          {t("aiSolutions.solutions.title")}
         </ServiceTitle>
         <ServiceList>
-          <li className="animate">{t("graphicDesign.solutions.branding")}</li>
-          <li className="animate">{t("graphicDesign.solutions.materials")}</li>
-          <li className="animate">{t("graphicDesign.solutions.consistency")}</li>
+          <li className="animate">{t("aiSolutions.solutions.automation")}</li>
+          <li className="animate">{t("aiSolutions.solutions.analytics")}</li>
+          <li className="animate">{t("aiSolutions.solutions.customAI")}</li>
         </ServiceList>
 
-        <Description className="animate">{t("graphicDesign.vision")}</Description>
+        <Description className="animate">{t("aiSolutions.vision")}</Description>
 
         <ServiceTitle className="animate">
-          {t("graphicDesign.stepsTitle")}
+          {t("aiSolutions.stepsTitle")}
         </ServiceTitle>
         <NumberedList>
-          <li className="animate">{t("graphicDesign.steps.step1")}</li>
-          <li className="animate">{t("graphicDesign.steps.step2")}</li>
-          <li className="animate">{t("graphicDesign.steps.step3")}</li>
-          <li className="animate">{t("graphicDesign.steps.step4")}</li>
+          <li className="animate">{t("aiSolutions.steps.step1")}</li>
+          <li className="animate">{t("aiSolutions.steps.step2")}</li>
+          <li className="animate">{t("aiSolutions.steps.step3")}</li>
+          <li className="animate">{t("aiSolutions.steps.step4")}</li>
         </NumberedList>
 
         <HighlightText className="animate">
-          {t("graphicDesign.callToAction")}
+          {t("aiSolutions.callToAction")}
         </HighlightText>
         <ServicesCallToAction />
       </ServiceContainer>
@@ -101,4 +101,4 @@ const GraphicDesign = () => {
   );
 };
 
-export default GraphicDesign;
+export default aiSolutions;

@@ -100,6 +100,7 @@
   "uxuiTitle": "Diseño UX/UI",
   "uxuiDescription": "Diseñamos interfaces intuitivas y atractivas para mejorar la experiencia y el compromiso de tus usuarios.",
   "graphicDesignTitle": "Diseño Gráfico",
+  "aiTitle": "Inteligencia Artificial",
   "graphicDesignDescription": "Fusionamos diseño gráfico innovador con desarrollo tecnológico para crear experiencias visuales excepcionales.",
   "learnMoreButtonText": "Saber Más",
   "modalSendTitle": "¡Enviado!",
@@ -184,6 +185,30 @@
       "step4": "Elevamos tu marca: Transformamos tus materiales en herramientas visuales que destacan."
     },
     "callToAction": "El momento de destacar es ahora. Contactá a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
+  },
+  "aiSolutions": {
+    "title": "Soluciones de IA",
+    "questions": {
+      "q1": "¿Te cuesta aprovechar el poder de la inteligencia artificial en tu negocio?",
+      "q2": "¿Encuentras complicado automatizar procesos y analizar datos de manera efectiva?",
+      "q3": "¿Tu negocio está perdiendo la ventaja competitiva que la IA puede ofrecer?"
+    },
+    "description": "Las soluciones impulsadas por inteligencia artificial pueden transformar las operaciones de tu negocio, desbloqueando nuevas oportunidades de eficiencia y crecimiento. Sin embargo, muchas empresas enfrentan obstáculos como la falta de experiencia, altos costos de implementación y estrategias poco claras para integrar la IA. Vos, como líder innovador, tienes el poder de superar estos desafíos y llevar tu negocio hacia el futuro.",
+    "solutions": {
+      "title": "¿Qué podemos crear para vos?",
+      "automation": "Diseñamos sistemas de automatización inteligente para optimizar tus operaciones.",
+      "analytics": "Desarrollamos herramientas avanzadas de análisis para obtener información accionable de tus datos.",
+      "customAI": "Construimos modelos de IA personalizados que se alinean con los objetivos de tu negocio."
+    },
+    "vision": "Al asociarte con nosotros, tu negocio obtendrá las herramientas necesarias para aprovechar la IA de manera efectiva. Imagina flujos de trabajo optimizados, decisiones basadas en datos y una ventaja competitiva significativa que impulse tu crecimiento. Juntos, haremos de la IA una piedra angular de tu éxito.",
+    "stepsTitle": "¿Cómo trabajamos con vos?",
+    "steps": {
+      "step1": "Entender tus necesidades: Evaluamos tus objetivos comerciales e identificamos oportunidades de IA.",
+      "step2": "Diseñar soluciones: Creamos estrategias y modelos de IA adaptados a tus necesidades.",
+      "step3": "Colaborar de cerca: Refinamos las soluciones con base en tu retroalimentación y garantizamos una integración sin problemas.",
+      "step4": "Empoderar tu negocio: Entregamos herramientas impulsadas por IA que transforman tus operaciones."
+    },
+    "callToAction": "El futuro es la IA. Contáctanos hoy y llevemos soluciones inteligentes a tu negocio."
   },
   "faqsTitle": "Preguntas Frecuentes",
   "faqs": {
@@ -319,5 +344,16 @@
         "content": "Si tenés preguntas o inquietudes sobre esta Política de Privacidad o cómo manejamos tu información, Contactanos en:\n- Correo electrónico: info@opengatehub.com\n- Teléfono: +54 9 11 2348 5638"
       }
     ]
-  }
+  },
+  "searchPlaceholder": "Buscar artículos...",
+  "readMore": "Leer más",
+  "articles": [
+    {
+      "title": "El rol crucial de las soluciones tecnológicas personalizadas en el crecimiento empresarial",
+      "slug": "crucial-role-technological-solutions",
+      "summary": "Descubre cómo las soluciones tecnológicas personalizadas impulsan la eficiencia y el crecimiento empresarial.",
+      "image": "/images/article1.jpg",
+      "content": "En la era de la transformación digital, las empresas enfrentan el desafío constante de adaptarse a un entorno competitivo y en constante evolución. La implementación de soluciones tecnológicas personalizadas se ha convertido en un factor determinante para impulsar la eficiencia operativa y el crecimiento empresarial.\n\nUn estudio de Digital Innovation Trends 2024 señala que las empresas que adoptan herramientas tecnológicas adaptadas a sus necesidades logran aumentar en un 35% su productividad, en comparación con aquellas que optan por soluciones genéricas. Este dato resalta la importancia de crear estrategias tecnológicas diseñadas específicamente para cada modelo de negocio.\n\nLa personalización no solo mejora la eficiencia interna, sino que también fortalece la relación con los clientes. Herramientas como sistemas CRM desarrollados a medida permiten gestionar interacciones con una precisión única, ofreciendo experiencias más satisfactorias y fidelizando al cliente. En este sentido, tecnologías como la inteligencia artificial y el análisis avanzado de datos están transformando la manera en que las empresas entienden y se conectan con sus audiencias.\n\nSi bien el desarrollo de soluciones personalizadas puede requerir una inversión inicial significativa, los beneficios a largo plazo son claros: desde la optimización de procesos internos hasta el ahorro en costos operativos. Por ejemplo, la integración de plataformas como APIs específicas o aplicaciones internas hechas a medida permite reducir los tiempos de respuesta y simplificar tareas repetitivas, liberando recursos para enfocarse en la estrategia y la innovación.\n\nEn un panorama donde los negocios buscan mantenerse relevantes, la capacidad de adaptarse rápidamente a las necesidades del mercado es crucial. Las soluciones personalizadas ofrecen una flexibilidad que los sistemas predefinidos no pueden igualar. Además, estas herramientas permiten a las empresas escalar de manera orgánica, integrando nuevas funcionalidades a medida que crecen.\n\nPor otro lado, es esencial elegir socios tecnológicos con experiencia y visión estratégica. Empresas especializadas en desarrollo de software, diseñan y entregan soluciones tecnológicas que no sólo resuelven problemas inmediatos, sino que también alinean las herramientas con los objetivos a largo plazo de cada organización.\n\nEl camino hacia el éxito empresarial en la era digital está claramente marcado por la innovación y la personalización. Aquellas empresas que adoptan soluciones tecnológicas diseñadas específicamente para sus necesidades están mejor equipadas para superar los desafíos de un mercado fragmentado y competitivo, posicionándose como líderes en su industria."
+    }
+  ]
 }

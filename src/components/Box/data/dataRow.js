@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import companyHistory from "../../../assets/images/companyHistory.png";
 import missionAndCoreValues from "../../../assets/images/coreValues.png";
-import technologies from "../../../assets/images/technologies.png";
+import technologies from "../../../assets/images/team.jpg";
 import commitmentToInnovation from "../../../assets/images/innovation.png";
 import company from "../../../assets/images/Company.png";
-import techno from "../../../assets/images/Techno.png";
+import techno from "../../../assets/images/teamsvg.png";
 import commitment from "../../../assets/images/Commitment.png";
 import mission from "../../../assets/images/Mission.png";
 
