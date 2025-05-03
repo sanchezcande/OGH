@@ -48,8 +48,9 @@ export const CardContent = styled.div`‡
   display: flex;
   flex-direction: column;
   padding: 1.35rem 20px;
-  color: white;
-  background-color: rgba(0, 31, 63, 0.8);
+  color: ${({ theme }) => theme.colors.text};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  opacity: 0.95;
   max-width: calc(100% - 40px);
   max-height:90vh;
   margin: 0 20px;
@@ -59,8 +60,8 @@ export const CloseButton = styled.button`
   position: absolute;
   right: -8px;
   z-index: 9999;
-  background: #001f3f;
-  color: blue;
+  background: ${({ theme }) => theme.colors.accent};;
+  color: ${({ theme }) => theme.colors.secondary};
   border-radius: 20%;
   width: 38px;
   height: 34px;
@@ -74,9 +75,9 @@ export const CloseButton = styled.button`
   font-size: 26px;
 
   &:hover {
-    background-color: #004aad;
+    background-color: ${({ theme }) => theme.colors.background};
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.accent};
   }
 `;
 

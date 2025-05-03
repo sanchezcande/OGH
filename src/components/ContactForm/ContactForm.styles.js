@@ -36,6 +36,7 @@ export const Input = styled.input`
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
+  border: 1px;
   transition: all 0.3s;
   background-color: #f0f0f0;
 
@@ -45,11 +46,11 @@ export const Input = styled.input`
   }
 
   &:focus {
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
     outline: none;
   }
   &:hover {
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
   }
 
   &[type="number"] {
@@ -74,6 +75,7 @@ export const TextArea = styled.textarea`
   margin-bottom: 10px;
   border-radius: 5px;
   transition: all 0.3s;
+  border: 1px;
   background-color: #f0f0f0;
 
   &::placeholder {
@@ -82,11 +84,11 @@ export const TextArea = styled.textarea`
   }
 
   &:focus {
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
     outline: none;
   }
   &:hover {
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
   }
   &.error {
     animation: ${bounceIn} 0.5s ease forwards;
@@ -120,7 +122,7 @@ const fadeOut = keyframes`
 `;
 
 export const Error = styled.div`
-  color: white;
+  color:   ${({ theme }) => theme.colors.accentDark};;
   margin-bottom: 10px;
   font-size: 10px;
   margin-left: 10px;
@@ -144,18 +146,14 @@ export const Error = styled.div`
 
 export const StyledButton = styled(DarkButton)`
   display: inline-block;
-  background-color: #155ab8;
-  border: 3px solid #155ab8;
 
-  &:hover {
-    background-color: white;
-    border: 3px solid #0f4c75;
-  }
     &.error {
-    animation: ${bounceIn} 0.5s ease forwards;
+      animation: none;
+
   }
 
   &.valid {
-    animation: ${bounceOut} 0.5s ease forwards;
+    animation: none;
+
   }
 `;

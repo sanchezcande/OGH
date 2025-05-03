@@ -1,7 +1,8 @@
+
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 20px;
+  padding: 40px 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -9,51 +10,52 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: ${({ theme }) => theme.colors.secondary};
-  font-size: 30px;
-  font-weight: 600;
-  text-align: center;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 36px;
+  font-weight: 700;
+  margin-top: 30px;
   span {
     font-weight: 400;
   }
-  @media (max-width: 768px) {
-    font-size: 20px;
-  }
 `;
-export const Title2 = styled.h2`
-  color: ${({ theme }) => theme.colors.secondary};
+
+export const Subtitle = styled.h2`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 40px;
+  max-width: 800px;
+`;
+
+export const Section = styled.section`
+  max-width: 800px;
+  margin: 40px 0;
+  text-align: left;
+`;
+
+export const SectionTitle = styled.h3`
   font-size: 20px;
-  font-weight: 100;
-  margin-bottom: 50px;
-  margin-top: 10px;
-  text-align: center;
-  max-width: 1200px;
+  font-weight: 700;
+  margin-bottom: 10px;
+`;
 
-  span {
-    font-weight: 600;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 15px;
-  }
+export const SectionText = styled.p`
+  font-size: 16px;
+  line-height: 1.5;
 `;
 
 export const ImageContainer = styled.div`
-  width: auto;
   max-height: 500px;
-  margin-bottom: 70px;
-  margin-top: 0;
-
-  @media (max-width: 768px) {
-    img {
-      width: 100%;
-      height: auto
-  }
+  margin-bottom: 40px;
 `;
 
-export const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+export const CTAButton = styled.a`
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: white;
+  padding: 12px 24px;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
   margin-top: 20px;
+  display: inline-block;
 `;

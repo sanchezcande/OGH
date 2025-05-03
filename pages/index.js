@@ -1,15 +1,24 @@
-import { Container, Title, Title2, ImageContainer } from "../src/styles/pagesStyles/HomePage.styles";
+
+import {
+  Container,
+  Title,
+  Subtitle,
+  Section,
+  SectionTitle,
+  SectionText,
+  CTAButton,
+  ImageContainer,
+} from "../src/styles/pagesStyles/HomePage.styles";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
-import cyberSecurity from "../public/cyberSecurity.png";
 import Head from "next/head";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
+import cyberSecurity from "../public/cyberSecurity.png";
 
 export async function getServerSideProps() {
-  return {
-    props: {},
-  };
+  return { props: {} };
 }
+
 export const HomeCallToAction = () => {
   const { t } = useTranslation();
   const callToAction = t("homeCallToAction", { returnObjects: true });
@@ -29,7 +38,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>OpenGateHub</title>
+      <title>OpenGateHub</title>
         <meta name="description" content="OpenGateHub" />
         <link rel="canonical" href="https://opengatehub.com/" />
         <meta property="og:title" content={t("OpenGateHub")} />
@@ -45,7 +54,7 @@ export default function HomePage() {
 
       <Container>
         <ImageContainer>
-          <Image
+        <Image
             src={cyberSecurity}
             alt="Cyber Security by Open Gate Hub software develop, webapps, paginas web"
             layout="intrinsic"
@@ -53,14 +62,25 @@ export default function HomePage() {
             height={300}
           />
         </ImageContainer>
-        <Title>
-          <span>{t("weAre")}</span> OpenGateHub
-        </Title>
-        <Title2>
-          {t("specializedIn")} <span>{t("webAndMobileApp")}</span>,{" "}
-          {t("crafting")} {t("innovativeSolution")}{" "}
-          <span>{t("forBusiness")}</span>
-        </Title2>
+
+        <Title>{t("heroTitle")}</Title>
+        <Subtitle>{t("heroSubtitle")}</Subtitle>
+
+        <Section>
+          <SectionTitle>{t("problemTitle")}</SectionTitle>
+          <SectionText>{t("problemText")}</SectionText>
+        </Section>
+
+        <Section>
+          <SectionTitle>{t("weGetYouTitle")}</SectionTitle>
+          <SectionText>{t("weGetYouText")}</SectionText>
+        </Section>
+
+        <Section>
+          <SectionTitle>{t("planTitle")}</SectionTitle>
+          <SectionText>{t("planSteps")}</SectionText>
+        </Section>
+
         <HomeCallToAction />
       </Container>
     </>

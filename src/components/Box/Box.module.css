@@ -1,14 +1,15 @@
 .card {
   position: relative;
-  background: linear-gradient(155deg, #122a54 0%, #0b1a2b 80%);
+  background: linear-gradient(155deg, #FFF5F5 0%, #FFEAEA 80%);
   border-radius: 10px;
-  box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.5s, opacity 0.5s;
   will-change: transform;
   cursor: grab;
   overflow: hidden;
   touch-action: none;
 }
+
 .card .image {
   margin-bottom: 20px;
   justify-content: center;
@@ -16,12 +17,13 @@
 }
 
 .csl-1 {
- height: 64px;
+  height: 64px;
   width: 64px;
+  fill: #4FC9F8; /* celeste */
 }
 
 .card:hover {
-  box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.15);
 }
 
 .card > div {
@@ -31,7 +33,6 @@
 }
 
 .card > div > * {
-
   margin: 0vw 0;
 }
 
@@ -46,7 +47,7 @@
 
 .card .textContainer {
   display: grid;
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
   align-items: center;
   justify-content: center;
   margin: 10px;
@@ -55,17 +56,16 @@
 }
 
 .card h1 {
-  color: white;
+  color: #1F2937;
   font-size: 16px;
   text-align: center;
   font-weight: 600;
   overflow-wrap: break-word;
   margin-bottom: 0.35rem;
-
 }
 
 .card p {
-  color: white;
+  color: #1F2937;
   font-size: 12px;
   text-align: center;
 }
@@ -82,4 +82,14 @@
   margin-top: 15px;
   width: 70%;
   margin-bottom: 20px;
+  color: #fff;
+  background-color: #2B2B2B;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.card .customdarkbutton:hover {
+  background-color: #F97B72;
+  border: none;
+  color: white;
 }

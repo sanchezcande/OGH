@@ -2,13 +2,12 @@ import styled from 'styled-components';
 
 
 export const LightButton = styled.button`
-  background-color: rgba(21, 62, 108, 0.34);
+  background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.secondary};
   padding: 10px 20px;
-  border: 2px solid #0034EE;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   font-size: 1em;
   display: flex;
   align-items: center;
@@ -16,26 +15,28 @@ export const LightButton = styled.button`
   
   &:hover {
     background-color: #0034EE;
+    transform: translateY(-2px);
+
   }
 `;
 
 export const DarkButton = styled.button`
-  background-color:  #0034EE;
-  color:   ${({ theme }) => theme.colors.secondary};
+  background-color: ${({ theme }) => theme.colors.accent};
+  color:   ${({ theme }) => theme.colors.background};
   padding: 10px 20px;
-  border: 2px solid #0034EE;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, transform 0.3s ease;
   font-size: 1em;
   font-weight: bold;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    background-color: white;
-    color:   ${({ theme }) => theme.colors.primary};
-    border: 2px solid ${({ theme }) => theme.colors.primary};
+    background-color:   ${({ theme }) => theme.colors.accentDark};
+    color:   ${({ theme }) => theme.colors.background};
+    transform: translateY(-2px);
   }
 `;

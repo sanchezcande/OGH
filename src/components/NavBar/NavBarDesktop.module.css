@@ -3,39 +3,41 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #333;
-  color: white;
-  width: 100%;
   background-color: transparent;
+  color: #4B5563;
+  width: 100%;
   margin-right: 10px;
 }
 
 .logo {
   font-weight: 800;
   font-size: 28px;
-margin-top: 15px;
+  margin-top: 15px;
+  color: #4B5563;
 }
 
 .span {
   font-weight: 400;
+  color: #f97b72; /* accent coral */
 }
 
 .navLinks {
   display: flex;
   list-style: none;
   border-radius: 40px;
-  background-color: rgba(21, 62, 108, 0.34);
+  background-color: rgba(249, 123, 114, 0.08); /* coral suave */
   padding: 15px 30px;
-  border: 2px solid #155ab8;
+  border: 2px solid #f97b72;
   position: relative;
   justify-content: center;
   gap: 50px;
+  font-weight: 500;
 }
 
 .navLink {
   position: relative;
   padding: 10px 20px;
-  color: white;
+  color: #4B5563;
   cursor: pointer;
   text-decoration: none;
   font-size: 16px;
@@ -43,14 +45,14 @@ margin-top: 15px;
 }
 
 .navLink:hover {
-  color: #ddd;
+  color: #f97b72;
 }
 
 .highlightBar {
   position: absolute;
   bottom: 0;
   height: 100%;
-  background-color: rgba(21, 62, 108, 0.84);
+  background-color: rgba(249, 123, 114, 0.2);
   border-radius: 999px;
   transition: left 0.3s ease, width 0.3s ease;
   z-index: 0;
@@ -69,7 +71,7 @@ margin-top: 15px;
   position: absolute;
   list-style-type: none;
   margin: 0;
-  background-color: transparent;
+  background-color: white;
   padding: 0;
   padding-right: 55px;
   right: 0;
@@ -82,6 +84,7 @@ margin-top: 15px;
   transform: scaleY(0);
   transform-origin: top;
   transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
 .langMenu.visible {
@@ -96,11 +99,12 @@ margin-top: 15px;
   cursor: pointer;
   border-radius: 40px;
   transition: background-color 0.5s ease, color 0.5s ease;
+  color: #1f2937;
 }
 
 .langMenuItem:hover {
-  background-color: rgba(255, 255, 255, 0.8);
-  color: #001f3f;
+  background-color: rgba(249, 123, 114, 0.2);
+  color: #f97b72;
 }
 
 .worldIcon {
@@ -111,6 +115,7 @@ margin-top: 15px;
 
 .styledLangText {
   font-weight: 500;
+  color: #1f2937;
 }
 
 .arrowIcon {
@@ -124,16 +129,16 @@ margin-top: 15px;
   transform: translateX(-50%) scaleY(0);
   transform-origin: top;
   list-style: none;
-  border: 2px solid #155ab8;
+  border: 2px solid #f97b72;
   border-radius: 8px;
-  background-color: #001f3f;
+  background-color: #fff5f5;
   z-index: 10000;
   margin: 0; 
   padding: 0;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
   visibility: hidden;
 }
 
@@ -147,12 +152,12 @@ margin-top: 15px;
 .servicesMenuItem {
   padding: 10px 16px;
   cursor: pointer;
-  color: white;
+  color: #1f2937;
   font-weight: 300;
   font-size: 15px;
   min-width: 220px;
   transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05); 
 }
 
 .servicesMenuItem:first-child {
@@ -164,14 +169,13 @@ margin-top: 15px;
 }
 
 .servicesMenuItem:hover {
-  background-color: #155ab8;
+  background-color: rgba(249, 123, 114, 0.2);
   font-size: 16px;
   font-weight: 400;
-  color: #ffffff;
+  color: #f97b72;
 }
 
-
-
+/* Media Queries */
 @media screen and (max-width: 1340px) {
   .navLinks {
     gap: 20px;
@@ -182,7 +186,6 @@ margin-top: 15px;
     gap: 10px;
   }
 }
-
 @media screen and (max-width: 1152px) {
   .navLinks {
     gap: 7px;
