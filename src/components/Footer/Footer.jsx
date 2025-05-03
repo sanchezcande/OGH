@@ -3,7 +3,6 @@ import {
   FooterContainer,
   FooterContent,
   FooterText,
-  Tel,
   Mail,
   Github,
   Instagram,
@@ -29,7 +28,6 @@ const LogoImg = () => (
 
 const Footer = () => {
   const { t } = useTranslation();
-  const whatsappLink = "https://wa.me/5491123485638";
   return (
     <FooterContainer>
       <FooterContent>
