@@ -12,7 +12,6 @@ import emailjs from "emailjs-com";
 import { useTranslation } from "react-i18next";
 import ReCAPTCHA from "react-google-recaptcha";
 
-
 const ContactForm = () => {
   const { t } = useTranslation();
   const initialFormData = {
@@ -28,23 +27,16 @@ const ContactForm = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [captchaToken, setCaptchaToken] = useState(null);
 
-
-  function validateForm() {
+  function validateForm(currentData = formData) {
     const newErrors = {};
-    if (!validateName(formData.from_name)) {
+    if (!validateName(currentData.from_name)) {
       newErrors.from_name = t("pleaseEnterValidName");
-    } else {
-      delete newErrors.from_name;
     }
-    if (!validateEmail(formData.from_email)) {
+    if (!validateEmail(currentData.from_email)) {
       newErrors.from_email = t("pleaseEnterValidEmail");
-    } else {
-      delete newErrors.from_email;
     }
-    if (!validateMessage(formData.message)) {
+    if (!validateMessage(currentData.message)) {
       newErrors.message = t("pleaseEnterValidMessage");
-    } else {
-      delete newErrors.message;
     }
     setErrors(newErrors);
     return newErrors;
@@ -52,36 +44,26 @@ const ContactForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
+    const updatedFormData = {
       ...formData,
       [name]: value,
-    });
-    e.target.classList.add('touched');
-    validateForm();
+    };
+    setFormData(updatedFormData);
+    validateForm(updatedFormData);
   };
+
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token);
   };
 
   function sendEmail(e) {
     e.preventDefault();
+    const formErrors = validateForm();
 
-    const formData = {
-      from_name: e.target.from_name.value,
-      from_email: e.target.from_email.value,
-      contact_number: e.target.contact_number.value,
-      subject: e.target.subject.value,
-      message: e.target.message.value,
-    };
-
-    const formErrors = validateForm(formData);
-    
     if (!captchaToken) {
       setFormStatus(t("pleaseCompleteCaptcha"));
-      setIsModalOpen(true);
       return;
     }
-
 
     if (Object.keys(formErrors).length === 0) {
       emailjs
@@ -95,6 +77,7 @@ const ContactForm = () => {
           (result) => {
             setFormStatus(t("messageSentSuccessfully"));
             setIsModalOpen(true);
+            setFormData(initialFormData);
           },
           (error) => {
             setFormStatus(t("errorSendingMessage"));
@@ -102,13 +85,12 @@ const ContactForm = () => {
             console.error(error.text);
           }
         );
-    } else {
-      setErrors(formErrors);
     }
   }
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setFormStatus("");
   };
 
   return (
@@ -118,59 +100,66 @@ const ContactForm = () => {
           type="text"
           name="from_name"
           placeholder={t("name")}
+          value={formData.from_name}
           onChange={handleInputChange}
-          className={errors.from_name ? "error" : "valid"}
+          className={errors.from_name ? "error touched" : "valid touched"}
         />
-        {errors.from_name && (
-          <Error className={errors.from_name ? "visible" : "hidden"}>
-            {errors.from_name}
-          </Error>
-        )}
+        {errors.from_name && <Error className="visible">{errors.from_name}</Error>}
+
         <Input
           type="email"
           name="from_email"
           placeholder={t("email")}
+          value={formData.from_email}
           onChange={handleInputChange}
-          className={errors.from_email ? "error" : "valid"}
+          className={errors.from_email ? "error touched" : "valid touched"}
         />
-        {errors.from_email && (
-          <Error className={errors.from_email ? "visible" : "hidden"}>
-            {errors.from_email}
-          </Error>
-        )}
+        {errors.from_email && <Error className="visible">{errors.from_email}</Error>}
+
         <Input
           type="number"
           name="contact_number"
           placeholder={t("phoneNumber")}
+          value={formData.contact_number}
+          onChange={handleInputChange}
         />
-        <Input type="text" name="subject" placeholder={t("subject")} />
+
+        <Input
+          type="text"
+          name="subject"
+          placeholder={t("subject")}
+          value={formData.subject}
+          onChange={handleInputChange}
+        />
+
         <TextArea
           name="message"
           placeholder={t("message")}
+          value={formData.message}
           onChange={handleInputChange}
-          className={errors.message ? "error" : "valid"}
+          className={errors.message ? "error touched" : "valid touched"}
         />
-        {errors.message && (
-          <Error className={errors.message ? "visible" : "hidden"}>
-            {errors.message}
-          </Error>
-        )}
-       <ReCAPTCHA
-          sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-" 
+        {errors.message && <Error className="visible">{errors.message}</Error>}
+
+        <ReCAPTCHA
+          sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-"
           onChange={handleCaptchaChange}
         />
+
+        {formStatus && !formStatus.includes("successfully") && (
+          <Error className="visible">{formStatus}</Error>
+        )}
+
         <StyledButton
-          className={errors.message ? "error" : "valid"}
+          className={Object.keys(errors).length > 0 ? "error" : "valid"}
           type="submit"
         >
-              {t("send")} 
+          {t("send")}
         </StyledButton>
       </FormContainer>
+
       {isModalOpen && (
         <SuccessModal message={formStatus} onClose={closeModal} />
-      )}
-      {formStatus && !formStatus.includes("successfully") && (
-        <Error className="visible">{formStatus}</Error>
       )}
     </div>
   );

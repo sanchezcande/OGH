@@ -5,8 +5,8 @@ export const BlogContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   padding: 30px;
-  background: linear-gradient(145deg, #0a0f22, #0e162e);
-  color: #eaeaea;
+  background: linear-gradient(145deg, ${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.backgroundAlt});
+  color: ${({ theme }) => theme.colors.text};
   min-height: 100vh;
 `;
 
@@ -20,22 +20,22 @@ export const SearchInput = styled.input`
   width: 280px;
   padding: 10px 15px;
   border: none;
-  border-bottom: 2px solid #1f2e5a;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.primaryDark};
   background: transparent;
   font-size: 1rem;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.text};
   outline: none;
   margin-left: 10px;
   margin-bottom: 20px;
   transition: border-color 0.3s;
 
   &::placeholder {
-    color: #d1d9e6;
+    color: ${({ theme }) => theme.colors.text};
     opacity: 0.7;
   }
 
   &:focus {
-    border-bottom-color: #00bcd4;
+    border-bottom-color: ${({ theme }) => theme.colors.accent};
   }
 `;
 
@@ -51,7 +51,7 @@ export const ScrollToTopButton = styled.button`
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #00bcd4;
+  background: ${({ theme }) => theme.colors.accent};
   border: none;
   color: #ffffff;
   padding: 12px 16px;
@@ -62,13 +62,13 @@ export const ScrollToTopButton = styled.button`
   z-index: 1000;
 
   &:hover {
-    background: #18ffff;
+    background: ${({ theme }) => theme.colors.accentDark};
   }
 `;
 
 export const ArticleCard = styled.div`
-  background: linear-gradient(145deg, #121d40, #192954);
-  border: 2px solid #1f2e5a;
+  background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}, ${theme.colors.background})`};
+  border: 2px solid ${({ theme }) => theme.colors.primaryDark};
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
@@ -79,7 +79,6 @@ export const ArticleCard = styled.div`
   transform: translateY(20px);
   transition: opacity 0.6s ease, transform 0.6s ease;
 
-  /* Clase visible para activar la animación */
   &.visible {
     opacity: 1;
     transform: translateY(0);
@@ -95,15 +94,15 @@ export const ArticleCard = styled.div`
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 12px 24px rgba(31, 50, 90, 0.8);
-    border-color: #3b5998;
+    box-shadow: 0 12px 24px ${({ theme }) => theme.colors.primaryDark}CC;
+    border-color: ${({ theme }) => theme.colors.primaryDark};
   }
 
   h2 {
     font-size: 1.6rem;
     margin-bottom: 12px;
-    color: #00bcd4;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    color: ${({ theme }) => theme.colors.text};
+
     @media (max-width: 768px) {
       font-size: 1.4rem;
     }
@@ -111,19 +110,19 @@ export const ArticleCard = styled.div`
 
   p {
     font-size: 1rem;
-    color: #d1d9e6;
+    color: ${({ theme }) => theme.colors.text};
     line-height: 1.5;
   }
 
   a {
     display: inline-block;
     margin-top: 15px;
-    color: #00bcd4;
+    color: ${({ theme }) => theme.colors.accent};
     font-weight: bold;
     text-decoration: none;
 
     &:hover {
-      color: #18ffff;
+      color: ${({ theme }) => theme.colors.accentDark};
     }
   }
 `;

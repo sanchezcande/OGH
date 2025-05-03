@@ -18,7 +18,7 @@ export const ImageText = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  color: white;
+  color: ${({ theme }) => theme.colors.text};
   padding: 0 20px;
   max-width: 1320px;
   gap: 20px;

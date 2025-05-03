@@ -28,14 +28,16 @@
 .navLinks {
   display: flex;
   list-style: none;
-  border-radius: 40px;
+  border-radius: 4px;
   background-color: rgba(249, 123, 114, 0.08); /* coral suave */
   padding: 15px 30px;
-  border: 2px solid #f97b72;
+  border: 2px solid #2B2B2B;
   position: relative;
   justify-content: center;
   gap: 50px;
   font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
 }
 
 .navLink {
@@ -57,14 +59,12 @@
   bottom: 0;
   height: 100%;
   background-color: rgba(249, 123, 114, 0.2);
-  border-radius: 999px;
+  border-radius: 4px;
   transition: left 0.3s ease, width 0.3s ease;
   z-index: 0;
 }
-
 .langMenuContainer {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 5px;
   position: relative;
@@ -73,43 +73,41 @@
 
 .langMenu {
   position: absolute;
+  right:30px;
+  margin-top: 8px;
   list-style-type: none;
-  margin: 0;
-  background-color: white;
   padding: 0;
-  padding-right: 55px;
-  right: 0;
-  border-radius: 5px;
-  max-height: 200px;
-  overflow: hidden;
+  background-color: white;
+  border-radius: 6px;
   opacity: 0;
-  pointer-events: none;
   visibility: hidden;
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  pointer-events: none;
+  transform: scaleY(0.95);
+  transform-origin: top right;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  min-width: 100px;
+  z-index: 999;
 }
 
 .langMenu.visible {
   opacity: 1;
-  pointer-events: auto;
   visibility: visible;
+  pointer-events: auto;
   transform: scaleY(1);
 }
 
 .langMenuItem {
-  padding: 10px;
+  padding: 10px 16px;
   cursor: pointer;
-  border-radius: 40px;
-  transition: background-color 0.5s ease, color 0.5s ease;
   color: #1f2937;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
 }
 
 .langMenuItem:hover {
-  background-color: rgba(249, 123, 114, 0.2);
-  color: #f97b72;
+  transform: scale(1.1);
 }
+
 
 .worldIcon {
   width: 32px;
@@ -133,8 +131,8 @@
   transform: translateX(-50%) scaleY(0);
   transform-origin: top;
   list-style: none;
-  border: 2px solid #f97b72;
-  border-radius: 8px;
+  border: 2px solid #2B2B2B;
+  border-radius: 4px;
   background-color: #fff5f5;
   z-index: 10000;
   margin: 0; 

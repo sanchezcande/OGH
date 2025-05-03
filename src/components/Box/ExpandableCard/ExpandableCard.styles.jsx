@@ -60,7 +60,7 @@ export const CloseButton = styled.button`
   position: absolute;
   right: -8px;
   z-index: 9999;
-  background: ${({ theme }) => theme.colors.accent};;
+  background: ${({ theme }) => theme.colors.primary};;
   color: ${({ theme }) => theme.colors.secondary};
   border-radius: 20%;
   width: 38px;
@@ -75,9 +75,9 @@ export const CloseButton = styled.button`
   font-size: 26px;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.background};
+    background-color: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
-    color: ${(props) => props.theme.colors.accent};
+    color: ${(props) => props.theme.colors.secondary};
   }
 `;
 

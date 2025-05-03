@@ -11,7 +11,7 @@ const theme = {
     muted: '#E5E7EB'           // Bordes, líneas, detalles sutiles
   },
   fonts: {
-    main: "'Poppins', sans-serif",
+    main: "'Inter', sans-serif",
     code: "'Courier New', monospace"
   },
   spacing: {

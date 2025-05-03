@@ -11,7 +11,7 @@ import {
 import Data from "../data/dataRow";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRectangleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 
 function ExpandableCard({ closeCard, id }) {
@@ -38,7 +38,7 @@ function ExpandableCard({ closeCard, id }) {
             }}
           >
             <CloseButton onClick={handleClose}>
-            <FontAwesomeIcon icon={faRectangleXmark} size="lg"  />
+            <FontAwesomeIcon icon={faXmark} size="lg"  />
             </CloseButton>
             <CardTitle>{card.title}</CardTitle>
           </div>

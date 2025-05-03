@@ -21,7 +21,7 @@ export const LightButton = styled.button`
 `;
 
 export const DarkButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.accent};
+  background-color: ${({ theme }) => theme.colors.primary};
   color:   ${({ theme }) => theme.colors.background};
   padding: 10px 20px;
   border-radius: 4px;
@@ -35,7 +35,7 @@ export const DarkButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background-color:   ${({ theme }) => theme.colors.accentDark};
+    background-color:   ${({ theme }) => theme.colors.accent};
     color:   ${({ theme }) => theme.colors.background};
     transform: translateY(-2px);
   }

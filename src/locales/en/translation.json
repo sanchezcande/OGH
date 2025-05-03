@@ -4,6 +4,7 @@
   "home": "Home",
   "services": "Services",
   "aboutUs": "About Us",
+  "ctaButton": "Book a call",
   "contactUs": "Contact",
   "english": "English",
   "spanish": "Spanish",
@@ -34,7 +35,12 @@
   "innovativeSolution": "our team works to make your vision a reality while supporting your",
   "seoTitle": "Build with People Who Get It | OpenGateHub",
   "seoDescription": "We help visionary founders and VCs scale startups with culturally aligned developers that care about impact.",
-  "heroTitle": "Build with People Who Get It.",
+  "heroAnimatedText": {
+    "part1": "Build with",
+    "highlight1": "People",
+    "part2": "Who",
+    "highlight2": "Get It"
+  },
   "heroSubtitle": "We partner with founders and VCs who believe in scaling with heart, culture, and impact.",
   "heroAlt": "Tech team illustration - OpenGateHub",
   "problemTitle": "You're racing against time.",
@@ -42,8 +48,12 @@
   "weGetYouTitle": "We get it. We\u2019ve been there.",
   "weGetYouText": "We\u2019re not just another agency. We're a team of technical founders who believe in building long-term partnerships, not transactions. We share your values, your urgency, and your ambition to create something meaningful.",
   "planTitle": "Here\u2019s how we do it:",
-  "planSteps": "1. Discovery call: Tell us what you need. \n2. Custom plan: Get matched with aligned developers. \n3. Start building: Integrate, iterate, and scale with confidence.",
-  "forBusiness": "business growth.",
+  "planSteps": {
+    "step1": "Discovery call: Tell us what you need.",
+    "step2": "Custom plan: Get matched with aligned developers.",
+    "step3": "Start building: Integrate, iterate, and scale with confidence."
+  },
+    "forBusiness": "business growth.",
   "homeCallToAction": {
     "title": "Ready to Elevate Your Business?",
     "description": "Get a Free Consultation Today",

@@ -47,7 +47,7 @@ export const CallToActionDescription = styled.p`
   opacity: 0.85;
 `;
 
-export const CallToActionButton = styled.button`
+export const CallToActionButton = styled.a`
   padding: 1rem 2rem;
   font-size: 1rem;
   font-weight: 600;
@@ -62,5 +62,6 @@ export const CallToActionButton = styled.button`
   &:hover {
     background-color: ${({ theme }) => theme.colors.accentDark};
     transform: translateY(-2px);
+    color:white;
   }
 `;

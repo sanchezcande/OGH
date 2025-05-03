@@ -1,14 +1,14 @@
 import styled from "styled-components";
 
-const slideInFromLeft = `
-  @keyframes slideInFromLeft {
+const fadeInUp = `
+  @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateX(-30px);
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
-      transform: translateX(0);
+      transform: translateY(0);
     }
   }
 `;
@@ -24,46 +24,32 @@ const bounce = `
   }
 `;
 
-const fadeInUp = `
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-`;
-
 const pulseBorder = `
   @keyframes pulseBorder {
     0% {
-      border-color: #00d4ff;
+      border-color: ${({ theme }) => theme.colors.primary};
     }
     50% {
-      border-color: #00ffff;
+      border-color: ${({ theme }) => theme.colors.primaryDark};
     }
     100% {
-      border-color: #00d4ff;
+      border-color: ${({ theme }) => theme.colors.primary};
     }
   }
 `;
 
 export const ServiceContainer = styled.section`
-  background: linear-gradient(145deg, #162447, #1f4068);
-  color: ${({ textColor }) => textColor || "#ffffff"};
+  background: linear-gradient(145deg, ${({ theme }) => theme.colors.secondary}, ${({ theme }) => theme.colors.muted});
+  color: ${({ theme }) => theme.colors.text};
   padding: 3rem 2rem;
   margin: 2rem auto;
   max-width: 1200px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  border: 2px solid #1f4068;
+  box-shadow: ${({ theme }) => theme.boxShadow};
   transition: box-shadow 0.3s ease;
 
   &:hover {
-   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -72,9 +58,9 @@ export const ServiceTitle = styled.h2`
   font-weight: 800;
   margin-bottom: 1.5rem;
   text-align: left;
-  color: #00d4ff;
+  color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
 
   &.visible {
@@ -85,8 +71,8 @@ export const ServiceTitle = styled.h2`
 
 export const ServiceList = styled.ul`
   list-style: none;
-  margin-left: 0;
-  padding-left: 0;
+  margin: 0;
+  padding: 0;
 
   li {
     font-size: 1.2rem;
@@ -94,8 +80,8 @@ export const ServiceList = styled.ul`
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
-    color: #ffffff;
-    border-left: 3px solid #00d4ff;
+    color: ${({ theme }) => theme.colors.text};
+    border-left: 3px solid ${({ theme }) => theme.colors.primary};
     padding-left: 1rem;
 
     &.visible {
@@ -106,7 +92,7 @@ export const ServiceList = styled.ul`
       content: "💾";
       font-size: 1.5rem;
       margin-right: 0.5rem;
-      color: #00d4ff;
+      color: ${({ theme }) => theme.colors.primary};
       display: inline-block;
       transition: transform 0.3s ease;
     }
@@ -116,9 +102,10 @@ export const ServiceList = styled.ul`
     }
 
     &:hover {
-      background: rgba(0, 212, 255, 0.1);
-      border-left-color: #00ffff;
+      background: ${({ theme }) => theme.colors.background};
+      border-left-color: ${({ theme }) => theme.colors.primaryDark};
     }
+
     ${bounce}
   }
 `;
@@ -128,7 +115,7 @@ export const Description = styled.p`
   line-height: 1.8;
   margin-bottom: 2rem;
   text-align: justify;
-  color: #e0e0e0;
+  color: ${({ theme }) => theme.colors.text};
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -140,24 +127,25 @@ export const HighlightText = styled.div`
   margin: 3rem 0;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #00d4ff;
-  border: 2px dashed #00d4ff;
+  color: ${({ theme }) => theme.colors.primary};
+  border: 2px dashed ${({ theme }) => theme.colors.primary};
   padding: 1rem;
   border-radius: 8px;
-  background: rgba(0, 212, 255, 0.05);
+  background: rgba(249, 123, 114, 0.08);
   transition: transform 0.2s ease;
 
   &:hover {
     animation: pulseBorder 1s infinite ease;
-    transform: scale(1.02)
+    transform: scale(1.02);
   }
+
   ${pulseBorder}
 `;
 
 export const Divider = styled.hr`
   border: none;
   height: 3px;
-  background-color: #00d4ff;
+  background-color: ${({ theme }) => theme.colors.primary};
   margin: 2rem 0;
   width: 0;
   margin-right: auto;
@@ -172,11 +160,12 @@ export const Divider = styled.hr`
     }
   }
 `;
+
 export const NumberedList = styled.ol`
   list-style: none;
   counter-reset: list-counter;
-  margin-left: 0;
-  padding-left: 0;
+  margin: 0;
+  padding: 0;
 
   li {
     counter-increment: list-counter;
@@ -193,8 +182,8 @@ export const NumberedList = styled.ol`
 
     &::before {
       content: counter(list-counter);
-      background-color: #00d4ff;
-      color: #123456;
+      background-color: ${({ theme }) => theme.colors.primary};
+      color: white;
       font-weight: bold;
       font-size: 1.2rem;
       display: flex;

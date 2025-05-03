@@ -7,8 +7,8 @@ import ExpandableCard from "./ExpandableCard/ExpandableCard";
 import Image from "next/image";
 import styles from "./Box.module.css";
 
-const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 20;
-const calcY = (x, lx) => (x - lx - window.innerWidth / 2) / 20;
+const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 30;
+const calcY = (x, lx) => (x - lx - window.innerWidth / 2) / 30;
 
 const defaultImagen = () => <FaCircle />;
 const defaultTitle = "Default Title";
@@ -51,7 +51,7 @@ const Card = ({
         api({
           rotateX: calcX(py, y.get()),
           rotateY: calcY(px, x.get()),
-          scale: 1.1,
+          scale: 1.03,
         }),
       onHover: ({ hovering }) =>
         !hovering && api({ rotateX: 0, rotateY: 0, scale: 1 }),
@@ -65,11 +65,11 @@ const Card = ({
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-            observer.unobserve(entry.target); // Desactiva la observación después de la primera entrada
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.2 }
     );
 
     if (cardRef.current) observer.observe(cardRef.current);
@@ -84,7 +84,7 @@ const Card = ({
       ref={domTarget}
       className={`${styles.card} ${isVisible ? styles.visible : ""}`}
       style={{
-        transform: "perspective(600px)",
+        transform: "perspective(800px)",
         x,
         y,
         scale: to([scale, zoom], (s, z) => s + z),
@@ -98,26 +98,26 @@ const Card = ({
       <div ref={cardRef} className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
-            <Image src={Imagen} alt={title} width={84} />{" "}
-            </div>
+            <Image src={Imagen} alt={title} width={84} height={64} />
+          </div>
         )}
         <h1>{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
         {imageBottom && (
           <div
-            className={`${styles.image}`}
+            className={styles.image}
             style={{ width: "64px", height: "64px", justifySelf: "center" }}
           >
             <Imagen />
-            </div>
+          </div>
         )}
         {buttonText && (
-                    <DarkButton
-                    className={styles.customdarkbutton}
-                    onClick={handleButtonClick}
-                  >
-                    {buttonText}
-                  </DarkButton>
+          <DarkButton
+            className={styles.customdarkbutton}
+            onClick={handleButtonClick}
+          >
+            {buttonText}
+          </DarkButton>
         )}
       </div>
     </animated.div>
@@ -130,8 +130,8 @@ const Box = ({
   description,
   imagen,
   title,
-  height = 200,
-  width = 272,
+  height = 220,
+  width = 280,
   marginLeftParagraph = 0,
   imageBottom = true,
   handleBoxClick,
@@ -154,11 +154,9 @@ const Box = ({
         handleButtonClick={handleButtonClick}
         imageBottom={imageBottom}
       />
-      {isOpen && (
-        <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />
-      )}
+      {isOpen && <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />}
     </div>
   );
 };
-export default Box;
 
+export default Box;

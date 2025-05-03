@@ -1,23 +1,29 @@
-
 import {
   Container,
+  Hero,
   Title,
   Subtitle,
+  CTAButton,
+  GradientOverlay,
+  Highlight,
   Section,
   SectionTitle,
+  PlanSteps,
   SectionText,
-  CTAButton,
   ImageContainer,
+  Glow,
 } from "../src/styles/pagesStyles/HomePage.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 import Head from "next/head";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const LottieAnimation = dynamic(() => import('../src/components/Animations/LottieAnimation'), {
-  ssr: false,
-});
-
+const LottieAnimation = dynamic(
+  () => import("../src/components/Animations/LottieAnimation"),
+  {
+    ssr: false,
+  }
+);
 
 export async function getServerSideProps() {
   return { props: {} };
@@ -42,7 +48,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-      <title>OpenGateHub</title>
+        <title>OpenGateHub</title>
         <meta name="description" content="OpenGateHub" />
         <link rel="canonical" href="https://opengatehub.com/" />
         <meta property="og:title" content={t("OpenGateHub")} />
@@ -57,13 +63,38 @@ export default function HomePage() {
       </Head>
 
       <Container>
-        <ImageContainer>
-        <LottieAnimation animationPath="/animations/home.json" width="100%" height="auto" />
-
-        </ImageContainer>
-
-        <Title>{t("heroTitle")}</Title>
-        <Subtitle>{t("heroSubtitle")}</Subtitle>
+        <Hero>
+          <GradientOverlay />
+          {/* <ImageContainer>
+            <LottieAnimation
+              animationPath="/animations/home.json"
+              width="100%"
+              height="auto"
+            />
+          </ImageContainer> */}
+          <Glow />
+          <Title>
+            <span className="animated">
+              {t("heroAnimatedText.part1")}{" "}
+              <span className="highlighted-word">
+                {t("heroAnimatedText.highlight1")}
+              </span>{" "}
+              {t("heroAnimatedText.part2")}{" "}
+              <span className="highlighted-word">
+                {t("heroAnimatedText.highlight2")}
+              </span>
+              .
+            </span>
+          </Title>
+          <Subtitle>{t("heroSubtitle")}</Subtitle>
+          <CTAButton
+            href="https://calendly.com/sanchezgcandelaria"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t("ctaButton")}
+          </CTAButton>
+        </Hero>
 
         <Section>
           <SectionTitle>{t("problemTitle")}</SectionTitle>
@@ -77,7 +108,17 @@ export default function HomePage() {
 
         <Section>
           <SectionTitle>{t("planTitle")}</SectionTitle>
-          <SectionText>{t("planSteps")}</SectionText>
+          <PlanSteps>
+            <li>
+              <strong>1.</strong> {t("planSteps.step1")}
+            </li>
+            <li>
+              <strong>2.</strong> {t("planSteps.step2")}
+            </li>
+            <li>
+              <strong>3.</strong> {t("planSteps.step3")}
+            </li>
+          </PlanSteps>
         </Section>
 
         <HomeCallToAction />

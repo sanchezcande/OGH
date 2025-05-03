@@ -1,21 +1,21 @@
 import styled, { css } from "styled-components";
 import { FaAngleDown, FaGlobe } from "react-icons/fa";
 
-
 export const MenuIcon = styled.div`
   cursor: pointer;
   font-size: 1.5rem;
-  transition: transform 0.3s ease; 
+  transition: transform 0.3s ease;
+  color: ${({ theme }) => theme.colors.text};
   transform: ${({ open }) => (open ? "rotate(-90deg)" : "rotate(0)")};
 `;
 
 export const LanguageMenu = styled.ul`
-top: calc(100% + 5px); 
-position: relative;
-width: 100%;
-background-color: transparent;
-display: ${({ open }) => (open ? "flex" : "none")};
-flex-direction: column;
+  top: calc(100% + 5px);
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+  display: ${({ open }) => (open ? "flex" : "none")};
+  flex-direction: column;
 `;
 
 export const LogoIcon = styled.div`
@@ -23,30 +23,23 @@ export const LogoIcon = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  margin-right: 1rem;
-  margin-left: 1rem;
+  margin: 0 1rem;
 `;
 
 export const NavBarContainer = styled.nav`
-  margin-top: 10px;
-  display: block;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  justify-content: space-between;
-  align-items: center;
-  padding-right: 1rem;
-  padding-left: 1rem;
-  background-color: rgba(21, 62, 108, 0.34);
-  border: 2px solid #155ab8;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 60px;
+  margin: 10px 1rem 0 1rem;
+  padding: 0.5rem 1rem;
+  background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  box-shadow: ${({ theme }) => theme.boxShadow};
+  border-radius: ${({ theme }) => theme.borderRadius};
   position: relative;
 `;
 
 export const Logo = styled.div`
   font-weight: 700;
   font-size: 24px;
-  margin-top: 10px;
+  color: ${({ theme }) => theme.colors.primary};
   width: 60%;
 `;
 
@@ -56,15 +49,14 @@ export const Span = styled.span`
 
 export const LangMenuItem = styled.li`
   display: block;
-  flex: 1;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 40px;
   padding: 1rem;
-  &:hover {
-  background-color: rgba(21, 62, 108, 0.34);
-  border-radius: 40px;
+  border-radius: ${({ theme }) => theme.borderRadius};
+  color: ${({ theme }) => theme.colors.text};
+  transition: transform 0.2s ease;
 
+  &:active {
+    transform: scale(1.05);
+    font-weight: 600;
   }
 `;
 
@@ -78,66 +70,54 @@ export const BurgerMenu = styled.div`
 export const BurgerMenuIcon = styled.div`
   width: 25px;
   height: 3px;
-  background-color: #333;
+  background-color: ${({ theme }) => theme.colors.text};
   margin: 4px 0;
 `;
 
 export const Menu = styled.ul`
   list-style: none;
-  top: calc(100% + 10px);
-  left: 0;
-  right: 0;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background-color: transparent;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  width: fit-content;
   margin: 1rem 0;
   padding: 0.75rem;
-  border-radius: 0.5rem;
-  min-width: 12.5rem;
+  background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  border-radius: ${({ theme }) => theme.borderRadius};
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
 export const MenuItem = styled.li`
-  text-decoration: none;
   display: block;
-  width: 100%;
-  border-radius: 40px;
-  align-items: center;
   padding: 1rem;
-  transition: background-color 0.3s ease;
-  color: white;
+  color: ${({ theme }) => theme.colors.text};
+  border-radius: ${({ theme }) => theme.borderRadius};
+  transition: transform 0.2s ease;
 
-  &:hover {
-    background-color: rgba(21, 62, 108, 0.34);
-
-    border-radius: 40px;
+  &:active {
+    transform: scale(1.05);
+    font-weight: 600;
   }
-
 `;
+
 export const ArrowIcon = styled(FaAngleDown)`
   transition: transform 0.3s ease-in-out;
+  color: ${({ theme }) => theme.colors.text};
+
   ${({ open }) =>
     open &&
     css`
-      animation: rotate 0.3s ease-in-out;
       transform: rotate(180deg);
     `}
 `;
 
 export const WorldIcon = styled(FaGlobe)`
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   margin-right: 10px;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const LangMenuContainer = styled.span`
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 5px;
   position: relative;
