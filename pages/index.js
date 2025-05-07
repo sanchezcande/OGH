@@ -8,15 +8,17 @@ import {
   Highlight,
   Section,
   SectionTitle,
+  FloatingBlob,
   PlanSteps,
   SectionText,
   ImageContainer,
   Glow,
-} from "../src/styles/pagesStyles/HomePage.styles";
+} from "../src/styles/pagesStyles/HomePages.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import InteractiveInvertCircle  from "../src/components/Animations/InteractiveCircle";
 
 const LottieAnimation = dynamic(
   () => import("../src/components/Animations/LottieAnimation"),
@@ -63,6 +65,9 @@ export default function HomePage() {
       </Head>
 
       <Container>
+        <FloatingBlob/>
+        <InteractiveInvertCircle />
+
         <Hero>
           <GradientOverlay />
           {/* <ImageContainer>
@@ -72,6 +77,8 @@ export default function HomePage() {
               height="auto"
             />
           </ImageContainer> */}
+           {/* ⬅ este! */}
+
           <Glow />
           <Title>
             <span className="animated">

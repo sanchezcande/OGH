@@ -19,7 +19,7 @@ const theme = {
     medium: '16px',
     large: '24px'
   },
-  borderRadius: '8px',
+  borderRadius: '4px',
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
 };
 
