@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from "react";
-import { ImageText, Container } from "../../src/styles/pagesStyles/AboutUs.styles";
+import {
+  ImageText,
+  Container,
+  HighlightedWord,
+} from "../../src/styles/pagesStyles/AboutUs.styles";
 import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import Image from "next/image";
-
 
 export const AboutUsCallToAction = () => {
   const { t } = useTranslation();
@@ -22,28 +25,31 @@ export const AboutUsCallToAction = () => {
 
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
-  const imageRef = useRef(null); 
-  const textRef = useRef(null); 
+  const imageRef = useRef(null);
+  const textRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible"); 
+            entry.target.classList.add("visible");
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.2 } 
+      { threshold: 0.1 } // Lowered threshold for earlier animation trigger
     );
 
-    if (imageRef.current) observer.observe(imageRef.current);
-    if (textRef.current) observer.observe(textRef.current);
+    const currentImageRef = imageRef.current;
+    const currentTextRef = textRef.current;
+
+    if (currentImageRef) observer.observe(currentImageRef);
+    if (currentTextRef) observer.observe(currentTextRef);
 
     return () => {
-      if (imageRef.current) observer.unobserve(imageRef.current);
-      if (textRef.current) observer.unobserve(textRef.current);
+      if (currentImageRef) observer.unobserve(currentImageRef);
+      if (currentTextRef) observer.unobserve(currentTextRef);
     };
   }, []);
 
@@ -73,14 +79,24 @@ const AboutUs = React.forwardRef((props, ref) => {
 
       <ImageText>
         <div className="image-container" ref={imageRef}>
-          <Image src="/images/AboutUs.png" width={250} height={250}   layout="responsive" 
+          <Image
+            src="/images/AboutUs.png"
+            width={250}
+            height={250}
+            layout="responsive"
+            alt={t("heroAlt") || "OpenGateHub Team"}
+            priority // Consider adding priority if this is LCP
           />
         </div>
 
-
         <div ref={textRef}>
           <h1>
-            {t("aboutUsTitle")} <span>{t("aboutUsText")}</span>
+            {t("aboutUsTitle_part1")}
+            <HighlightedWord className="animate">
+              {t("aboutUsTitle_highlight")}
+            </HighlightedWord>
+            {/* Add part2 if it exists: {t("aboutUsTitle_part2")} */}
+            <span>{t("aboutUsText")}</span>
           </h1>
         </div>
       </ImageText>
@@ -89,5 +105,7 @@ const AboutUs = React.forwardRef((props, ref) => {
     </Container>
   );
 });
+
+AboutUs.displayName = "AboutUs"; // Add display name for forwardRef components
 
 export default AboutUs;

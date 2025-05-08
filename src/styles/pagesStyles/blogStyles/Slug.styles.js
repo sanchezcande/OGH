@@ -20,7 +20,6 @@ export const ArticleContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto 20px auto;
   border-radius: ${({ theme }) => theme.borderRadius};
-  box-shadow: ${({ theme }) => theme.boxShadow};
   animation: ${fadeIn} 0.6s ease-out;
 `;
 

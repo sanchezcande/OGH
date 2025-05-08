@@ -1,3 +1,21 @@
+@keyframes fadeInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px); /* Start slightly above */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);    /* End at its natural position */
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  /*perspective: 1000px; Adding perspective here if needed for 3D transforms on children */
+}
+
 .card {
   position: relative;
   background: linear-gradient(155deg, #FFF5F5 0%, #FFEAEA 80%);
@@ -9,12 +27,16 @@
   overflow: hidden;
   touch-action: none;
   opacity: 0;
-  transform: translateY(30px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .card.visible {
-  opacity: 1;
-  transform: translateY(0);
+  animation-name: fadeInFromTop;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
 }
 
 .card:hover {
@@ -33,9 +55,24 @@
 
 .card .image {
   margin-bottom: 20px;
-  justify-content: center;
-  display: flex;
-  color:#2B2B2B !important;
+  display: flex;            /* Use flex to center the image inside */
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  width: 84px;              /* Match Next/Image width prop from Box.jsx for !imageBottom case */
+  height: 64px;             /* Match Next/Image height prop */
+  /* The following properties might be optional depending on desired appearance */
+  /* border-radius: 50%; */ /* Remove if images are not meant to be circular by default */
+  /* background-color: #f0f0f0; */ /* Remove if no specific background for the image container is needed */
+  overflow: hidden;         /* Keep to prevent overflow if image is larger than container */
+  margin-left: auto;        /* Center the .image div itself */
+  margin-right: auto;       /* Center the .image div itself */
+  /* color:#2B2B2B !important; /* This was likely for an icon font, may not be needed for Next/Image */
+}
+
+.card .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .csl-1 {

@@ -25,10 +25,36 @@ const Card = ({
   marginLeftParagraph,
   handleButtonClick,
   imageBottom,
+  animationDelay,
 }) => {
   const domTarget = useRef(null);
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const currentDomTarget = domTarget.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.visible);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (currentDomTarget) {
+      observer.observe(currentDomTarget);
+    }
+
+    return () => {
+      if (currentDomTarget) {
+        observer.unobserve(currentDomTarget);
+      }
+    };
+  }, []);
 
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
     () => ({
@@ -59,30 +85,10 @@ const Card = ({
     { domTarget, eventOptions: { passive: false } }
   );
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    if (cardRef.current) observer.observe(cardRef.current);
-
-    return () => {
-      if (cardRef.current) observer.unobserve(cardRef.current);
-    };
-  }, []);
-
   return (
     <animated.div
       ref={domTarget}
-      className={`${styles.card} ${isVisible ? styles.visible : ""}`}
+      className={`${styles.card}`}
       style={{
         transform: "perspective(800px)",
         x,
@@ -93,12 +99,13 @@ const Card = ({
         rotateZ,
         height: `${height}px`,
         width: `${width}px`,
+        animationDelay: animationDelay,
       }}
     >
-      <div ref={cardRef} className={styles.textContainer}>
+      <div className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
-            <Image src={Imagen} alt={title} width={84} height={64} />
+            <Image src={Imagen} alt={title || 'Service Icon'} width={84} height={64} />
           </div>
         )}
         <h1>{title}</h1>
@@ -108,7 +115,7 @@ const Card = ({
             className={styles.image}
             style={{ width: "64px", height: "64px", justifySelf: "center" }}
           >
-            <Imagen />
+            {typeof Imagen === 'function' ? <Imagen /> : <Image src={Imagen} alt={title || 'Service Icon'} width={64} height={64} />}
           </div>
         )}
         {buttonText && (
@@ -136,6 +143,7 @@ const Box = ({
   imageBottom = true,
   handleBoxClick,
   isOpen,
+  animationDelay,
 }) => {
   const handleButtonClick = () => {
     handleBoxClick(id);
@@ -153,6 +161,7 @@ const Box = ({
         marginLeftParagraph={marginLeftParagraph}
         handleButtonClick={handleButtonClick}
         imageBottom={imageBottom}
+        animationDelay={animationDelay}
       />
       {isOpen && <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />}
     </div>

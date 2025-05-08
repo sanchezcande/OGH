@@ -17,6 +17,15 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 function ExpandableCard({ closeCard, id }) {
   const data = Data();
   const [fadeOut, setFadeOut] = useState(false);
+
+  const idMapping = {
+    "history": 1,
+    "mission": 2,
+    "people": 3,
+    "innovation": 4,
+  };
+  const numericId = typeof id === 'string' ? idMapping[id] : id;
+
   const handleClose = () => {
     setFadeOut(true);
     setTimeout(() => {
@@ -24,7 +33,12 @@ function ExpandableCard({ closeCard, id }) {
     }, 500);
   };
 
-  const card = data.find((item) => item.id === id);
+  const card = data.find((item) => item.id === numericId);
+
+  if (!card) {
+    console.error(`ExpandableCard: Card with id ${id} (numeric: ${numericId}) not found.`);
+    return null;
+  }
 
   return (
     <Container fadeOut={fadeOut}>

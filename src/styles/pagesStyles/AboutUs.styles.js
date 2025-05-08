@@ -1,4 +1,16 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+// Keyframes for text content (h1 and its span) sliding in from top
+const slideInFromTopText = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 export const Container = styled.div`
   display: flex;
@@ -6,96 +18,150 @@ export const Container = styled.div`
   align-items: center;
   justify-content: center;
   margin: 3rem;
-  padding: 20px;
+  padding: 2rem;
+  background: linear-gradient(145deg, ${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.backgroundAlt});
+  color: ${({ theme }) => theme.colors.text};
+  min-height: 100vh;
 
   @media (max-width: 768px) {
     margin: 2rem 1rem;
     padding: 10px;
   }
+
+  /* H1 styles are now within ImageText for better specificity regarding animation */
 `;
 
 export const ImageText = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.colors.text};
-  padding: 0 20px;
-  max-width: 1320px;
-  gap: 20px;
-  margin-bottom: 50px;
-         :not(:last-child) {
-    width:60%;
-    justify-content: center;
-    justify-items: center;
-    align-items: center;
-    text-align: center;
-    justify-self: center;
-    }
+  justify-content: center;
+  margin-bottom: 3rem;
+  gap: 2rem;
+  flex-wrap: wrap;
 
   .image-container {
+    flex: 1;
+    max-width: 300px;
+    min-width: 200px;
     opacity: 0;
-    transform: translateX(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
+    transform: translateX(-50px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 
-  .image-container.visible {
-    animation: fadeInUp 0.6s ease forwards; /* Referencia al keyframe global */
-  }
-
-
-
-  h1 {
-    font-size: 34px;
-    font-weight: 600;
-    word-wrap: break-word;
-  }
-
-  span {
-    font-size: 12px;
-    font-weight: 400;
-    display: block;
-    margin-top: 20px;
-    line-height: 1.8;
-  }
-
-
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    text-align: center;
- 
-
-    h1 {
-      font-size: 28px;
+    &.visible {
+      opacity: 1;
+      transform: translateX(0);
     }
 
-    span {
-      font-size: 14px;
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      border: 5px solid ${({ theme }) => theme.colors.primary};
+    }
+  }
+
+  div:not(.image-container) { // Text container
+    flex: 2;
+    max-width: 600px;
+    opacity: 0;
+    transform: translateY(-30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition-delay: 0.2s; // Delay for the container itself
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+
+      h1 {
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: ${slideInFromTopText} 0.6s ease-out 0.2s forwards;
+      }
+
+      h1 span:not(.highlighted-class-placeholder) {
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: ${slideInFromTopText} 0.6s ease-out 0.4s forwards;
+      }
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: ${({ theme }) => theme.colors.primaryDark};
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      line-height: 1.2;
+      /* Note: HighlightedWord component will inherit these font styles */
+
+      span:not(.highlighted-class-placeholder) {
+        font-size: 1rem;
+        display: block;
+        margin-top: 10px;
+        color: ${({ theme }) => theme.colors.textAlt};
+        font-weight: 400;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 768px) {
+        font-size: 2rem;
+        span:not(.highlighted-class-placeholder) {
+          font-size: 0.9rem;
+        }
+      }
     }
   }
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0 10px;
+    flex-direction: column;
+    text-align: center;
 
-    h1 {
-      font-size: 24px;
-    }
-
-    span {
-      font-size: 12px;
-      line-height: 1.6;
+    .image-container,
+    div:not(.image-container) {
+      max-width: 100%;
     }
   }
+`;
 
-  @media (max-width: 480px) {
-    h1 {
-      font-size: 20px;
-    }
+// Keyframes for the word highlight animation (remains the same)
+const highlightAnimation = keyframes`
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+`;
 
-    span {
-      font-size: 10px;
-    }
+// Styled component for the highlighted word (remains the same)
+export const HighlightedWord = styled.span.attrs(() => ({
+  className: 'highlighted-class-placeholder' 
+}))`
+  display: inline-block;
+  position: relative;
+  color: white;
+  padding: 0.05em 0.15em; 
+  border-radius: 3px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: ${({ theme }) => theme.colors.accent}; 
+    transform-origin: left;
+    z-index: -1;
+    border-radius: inherit;
+    transform: scaleX(0);
+  }
+
+  &.animate::before {
+    animation: ${highlightAnimation} 0.5s ease-out 0.3s forwards;
   }
 `;
