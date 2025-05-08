@@ -30,9 +30,48 @@ const floatingg = keyframes`
   100% { transform: translate(-50%, -50%) scale(1); }
 `;
 
+const glowAnimation = keyframes`
+  0% { text-shadow: 0 0 10px ${({ theme }) => theme.colors.accent}33; }
+  50% { text-shadow: 0 0 20px ${({ theme }) => theme.colors.accent}66; }
+  100% { text-shadow: 0 0 10px ${({ theme }) => theme.colors.accent}33; }
+`;
+
+const gradientText = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+const slideIn = keyframes`
+  0% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`;
+
+const accentLine = keyframes`
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  100% {
+    width: 30px;
+    opacity: 1;
+  }
+`;
+
+const growLine = keyframes`
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+`;
+
 export const Container = styled.div`
 position: relative;
-background-color: black;
+background-color: white;
 overflow: hidden;
   padding: 40px 20px;
   text-align: center;
@@ -96,18 +135,15 @@ export const FloatingBlob = styled.div`
   z-index: -5; /* MÁS AL FONDO QUE TODO */
 `;
 
-
-
 export const Title = styled.h1`
-color: white;
-mix-blend-mode: difference;
-z-index: 1;
-position: relative;
+  color: ${({ theme }) => theme.colors.text};
+  mix-blend-mode: normal;
+  z-index: 1;
+  position: relative;
   font-size: clamp(2rem, 6vw, 3rem);
   font-weight: 700;
   margin: 20px 0 10px 0;
   text-align: center;
-  // color: ${({ theme }) => theme.colors.text};
   overflow: hidden;
 
   .animated {
@@ -139,45 +175,95 @@ position: relative;
 
   @media (max-width: 768px) {
     font-size: 2rem;
-
   }
   @media (max-width: 610px) {
     font-size: 1.2rem;
-
   }
 `;
 
 export const Subtitle = styled.h2`
-color: white;
-mix-blend-mode: difference;
-z-index: 1;
-position: relative;
-  // color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.text};
+  mix-blend-mode: normal;
+  z-index: 1;
+  position: relative;
   font-size: 1.3rem;
   font-weight: 400;
   margin-bottom: 30px;
   max-width: 800px;
   line-height: 1.6;
+  display: inline-block;
+  padding: 20px;
+  cursor: default;
 `;
 
 export const Section = styled.section`
   max-width: 800px;
-  margin: 40px 0;
+  margin: 40px auto;
   text-align: left;
   animation: ${fadeIn} 0.6s ease;
+  position: relative;
 `;
 
 export const SectionTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 10px;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  position: relative;
+  z-index: 1;
   color: ${({ theme }) => theme.colors.primary};
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  animation: ${slideIn} 0.5s ease forwards;
+  animation-delay: calc(0.2s * var(--i, 0));
+  opacity: 0;
+  transition: transform 0.3s ease;
+  mix-blend-mode: difference;
+
+  &::before {
+    content: '';
+    width: 0;
+    height: 3px;
+    background: ${({ theme }) => theme.colors.accent};
+    animation: ${accentLine} 0.5s ease forwards;
+    animation-delay: calc(0.2s * var(--i, 0) + 0.3s);
+  }
+
+  &:hover {
+    transform: translateX(10px);
+  }
+
+  &:hover::before {
+    background: ${({ theme }) => theme.colors.accentDark};
+  }
+
+  .highlighted-word {
+    color: ${({ theme }) => theme.colors.accent};
+    font-weight: 800;
+    mix-blend-mode: difference;
+  }
 `;
 
 export const SectionText = styled.p`
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.6;
   color: ${({ theme }) => theme.colors.text};
+  position: relative;
+  z-index: 1;
+  mix-blend-mode: difference;
+
+  strong {
+    color: ${({ theme }) => theme.colors.accent};
+    font-weight: 600;
+    mix-blend-mode: difference;
+  }
+
+  em {
+    color: ${({ theme }) => theme.colors.primary};
+    font-style: normal;
+    font-weight: 500;
+    mix-blend-mode: difference;
+  }
 `;
 
 export const CTAButton = styled.a`
@@ -203,24 +289,80 @@ export const CTAButton = styled.a`
 export const PlanSteps = styled.ol`
   list-style: none;
   padding: 0;
-  margin-top: 1rem;
-  border-left: 3px solid ${({ theme }) => theme.colors.accent}66;
-  padding-left: 1rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  position: relative;
+  padding-left: 2rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: ${({ theme }) => theme.colors.accent}66;
+    transform-origin: top;
+    transform: scaleY(0);
+    animation: none;
+  }
+
+  &.in-view::before {
+    animation: ${growLine} 1.5s ease forwards;
+  }
 
   li {
-    font-size: 1rem;
+    font-size: 1.1rem;
     line-height: 1.8;
     margin-bottom: 1.5rem;
     display: flex;
     align-items: start;
     gap: 0.75rem;
     opacity: 0;
-    animation: ${slideInLeft} 0.6s ease forwards;
-    animation-delay: calc(0.2s * var(--i));
+    transform: translateX(-30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition-delay: calc(0.5s + (0.3s * var(--i, 0)));
+    position: relative;
+    z-index: 1;
 
     strong {
-      color: ${({ theme }) => theme.colors.primary};
+      color: ${({ theme }) => theme.colors.accent};
       min-width: 1.5rem;
     }
   }
+
+  &.in-view li {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+export const PlanSection = styled(Section)`
+  .highlighted-word {
+    color: ${({ theme }) => theme.colors.accent};
+    font-weight: 800;
+  }
+
+  ${SectionTitle} {
+    mix-blend-mode: normal;
+    color: ${({ theme }) => theme.colors.text};
+  }
+
+  ${SectionText} {
+    mix-blend-mode: normal;
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+export const InteractiveCircleContainer = styled.div`
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: visible;
+  cursor: default;
 `;

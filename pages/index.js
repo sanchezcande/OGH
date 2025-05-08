@@ -8,17 +8,20 @@ import {
   Highlight,
   Section,
   SectionTitle,
+  InteractiveCircleContainer,
   FloatingBlob,
   PlanSteps,
   SectionText,
   ImageContainer,
   Glow,
+  PlanSection,
 } from "../src/styles/pagesStyles/HomePages.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import dynamic from "next/dynamic";
-import InteractiveInvertCircle  from "../src/components/Animations/InteractiveCircle";
+import InteractiveInvertCircle from "../src/components/Animations/InteractiveCircle";
+import { InView } from "../src/components/InView/InView";
 
 const LottieAnimation = dynamic(
   () => import("../src/components/Animations/LottieAnimation"),
@@ -47,6 +50,17 @@ export const HomeCallToAction = () => {
 export default function HomePage() {
   const { t } = useTranslation();
 
+  const parseHighlightedText = (text) => {
+    if (!text) return [];
+    const parts = text.split(/<highlight>|<\/highlight>/);
+    return parts.map((part, index) => {
+      if (index % 2 === 1) {
+        return <span key={index} className="highlighted-word">{part}</span>;
+      }
+      return part;
+    });
+  };
+
   return (
     <>
       <Head>
@@ -65,9 +79,7 @@ export default function HomePage() {
       </Head>
 
       <Container>
-        <FloatingBlob/>
-        <InteractiveInvertCircle />
-
+        <FloatingBlob />
         <Hero>
           <GradientOverlay />
           {/* <ImageContainer>
@@ -77,7 +89,7 @@ export default function HomePage() {
               height="auto"
             />
           </ImageContainer> */}
-           {/* ⬅ este! */}
+          {/* ⬅ este! */}
 
           <Glow />
           <Title>
@@ -93,7 +105,9 @@ export default function HomePage() {
               .
             </span>
           </Title>
-          <Subtitle>{t("heroSubtitle")}</Subtitle>
+          <Subtitle>
+            {t("heroSubtitle")}
+          </Subtitle>
           <CTAButton
             href="https://calendly.com/sanchezgcandelaria"
             target="_blank"
@@ -102,31 +116,42 @@ export default function HomePage() {
             {t("ctaButton")}
           </CTAButton>
         </Hero>
+        <InteractiveCircleContainer>
+          <InteractiveInvertCircle />
+          <Section>
+            <SectionTitle style={{"--i": 0}}>
+              {parseHighlightedText(t("problemTitle"))}
+            </SectionTitle>
+            <SectionText>{t("problemText")}</SectionText>
+          </Section>
 
-        <Section>
-          <SectionTitle>{t("problemTitle")}</SectionTitle>
-          <SectionText>{t("problemText")}</SectionText>
-        </Section>
-
-        <Section>
-          <SectionTitle>{t("weGetYouTitle")}</SectionTitle>
-          <SectionText>{t("weGetYouText")}</SectionText>
-        </Section>
-
-        <Section>
-          <SectionTitle>{t("planTitle")}</SectionTitle>
-          <PlanSteps>
-            <li>
-              <strong>1.</strong> {t("planSteps.step1")}
-            </li>
-            <li>
-              <strong>2.</strong> {t("planSteps.step2")}
-            </li>
-            <li>
-              <strong>3.</strong> {t("planSteps.step3")}
-            </li>
-          </PlanSteps>
-        </Section>
+          <Section>
+            <SectionTitle style={{"--i": 1}}>
+              {parseHighlightedText(t("weGetYouTitle"))}
+            </SectionTitle>
+            <SectionText>{t("weGetYouText")}</SectionText>
+          </Section>
+        </InteractiveCircleContainer>
+        <PlanSection>
+          <SectionTitle style={{"--i": 2}}>
+            {t("planTitle")}
+          </SectionTitle>
+          <InView>
+            {(isInView) => (
+              <PlanSteps className={isInView ? 'in-view' : ''}>
+                <li style={{"--i": 0}}>
+                  <strong>1.</strong> {t("planSteps.step1")}
+                </li>
+                <li style={{"--i": 1}}>
+                  <strong>2.</strong> {t("planSteps.step2")}
+                </li>
+                <li style={{"--i": 2}}>
+                  <strong>3.</strong> {t("planSteps.step3")}
+                </li>
+              </PlanSteps>
+            )}
+          </InView>
+        </PlanSection>
 
         <HomeCallToAction />
       </Container>

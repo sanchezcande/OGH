@@ -1,16 +1,24 @@
 import styled from "styled-components";
 
 export const InteractiveCircle = styled.div`
-  position: fixed;
+  position: absolute;
   pointer-events: none;
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
-  backdrop-filter: invert(100%);
-  -webkit-backdrop-filter: invert(100%);
-  mix-blend-mode: difference;
-  opacity: 0.8;
-  transition: transform 0.15s ease;
-  z-index: 5;
+  background: ${({ theme }) => `${theme.colors.accentDark}ee`};
+  mix-blend-mode: exclusion;
+  backdrop-filter: invert(100%) contrast(150%);
+  -webkit-backdrop-filter: invert(100%) contrast(150%);
+  transition: transform 0.2s ease;
+  z-index: 9999;
+  will-change: transform;
+
+  &:not([style*="opacity: 0"]) {
+    transform: translate(-50%, -50%);
+  }
+
+  &[style*="opacity: 0"] {
+    transform: translate(-50%, -150%);
+  }
 `;

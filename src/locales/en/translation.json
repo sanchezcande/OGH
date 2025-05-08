@@ -24,7 +24,7 @@
   "faq": "FAQ",
   "connectWithUs": "Connect With Us",
   "aboutUsTitle": "We Build Bridges to Help Your Ideas Lead the Digital Future",
-  "aboutUsText": "At OpenGateHub, we believe that you are at the heart of this story. Every vision, goal, and challenge you face is an opportunity to create something meaningful. Our purpose is to walk alongside you with empathy, offering not only technological development but also a visual identity that reflects who you are and where you want to go. We are not just developers; we are strategic partners who work hand in hand with you, listening, understanding, and designing tailored solutions. Because we know that behind every project are people with dreams, stories, and a clear purpose. When you succeed, we feel that we’ve fulfilled our mission. Together, we can turn challenges into progress and create something that truly matters.",
+  "aboutUsText": "At OpenGateHub, we believe that you are at the heart of this story. Every vision, goal, and challenge you face is an opportunity to create something meaningful. Our purpose is to walk alongside you with empathy, offering not only technological development but also a visual identity that reflects who you are and where you want to go. We are not just developers; we are strategic partners who work hand in hand with you, listening, understanding, and designing tailored solutions. Because we know that behind every project are people with dreams, stories, and a clear purpose. When you succeed, we feel that we've fulfilled our mission. Together, we can turn challenges into progress and create something that truly matters.",
   "contactUsTitle": "Reach Out!",
   "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
   "weAre": "We are",
@@ -43,11 +43,11 @@
   },
   "heroSubtitle": "We partner with founders and VCs who believe in scaling with heart, culture, and impact.",
   "heroAlt": "Tech team illustration - OpenGateHub",
-  "problemTitle": "You're racing against time.",
+  "problemTitle": "You're <highlight>racing</highlight> against <highlight>time</highlight>.",
   "problemText": "You're under pressure to grow your product, meet investor expectations, and build the right team. But hiring in-house is slow. Developers in the US are expensive. And outsourcing often means sacrificing quality\u2014or worse, culture.",
-  "weGetYouTitle": "We get it. We\u2019ve been there.",
-  "weGetYouText": "We\u2019re not just another agency. We're a team of technical founders who believe in building long-term partnerships, not transactions. We share your values, your urgency, and your ambition to create something meaningful.",
-  "planTitle": "Here\u2019s how we do it:",
+  "weGetYouTitle": "We <highlight>get it</highlight>. We've been there.",
+  "weGetYouText": "We've not just another agency. We're a team of technical founders who believe in building long-term partnerships, not transactions. We share your values, your urgency, and your ambition to create something meaningful.",
+  "planTitle": "Here's how we do it:",
   "planSteps": {
     "step1": "Discovery call: Tell us what you need.",
     "step2": "Custom plan: Get matched with aligned developers.",
@@ -70,17 +70,17 @@
     "buttonText": "Learn More"
   },
   "aboutUsCallToAction": {
-    "title": "Let’s Work Together",
+    "title": "Let's Work Together",
     "description": "Join a community of successful businesses powered by OpenGateHub.",
     "buttonText": "Join Now"
   },
   "contactUsCallToAction": {
-    "title": "We’d Love to Hear From You",
-    "description": "Reach out and let’s start building something amazing together.",
+    "title": "We'd Love to Hear From You",
+    "description": "Reach out and let's start building something amazing together.",
     "buttonText": "Reach Out"
   },
   "companyHistoryTitle": "Our History",
-  "companyHistoryDescription": "Our journey began in Argentina, driven by the vision of supporting businesses and entrepreneurs in their digital transformation. From day one, we’ve been committed to creating solutions that connect technology and people with trust and quality.",
+  "companyHistoryDescription": "Our journey began in Argentina, driven by the vision of supporting businesses and entrepreneurs in their digital transformation. From day one, we've been committed to creating solutions that connect technology and people with trust and quality.",
   "companyHistoryExpandableDescription1": "OpenGateHub was born in Argentina with a clear vision: to combine our experience working with international companies, primarily from the United States, with a local and approachable perspective.",
   "companyHistoryExpandableDescription2": "Our founders have years of experience in the global tech industry, enabling us to understand the needs and expectations of the international market.",
   "companyHistoryExpandableDescription3": "We focus on delivering technological solutions that address real problems and generate sustainable results.",
@@ -88,18 +88,18 @@
   "missionAndCoreValuesTitle": "Mission and Core Values",
   "missionAndCoreValuesDescription": "Our mission is to help you achieve your goals with clear and effective solutions. We believe your success is our success, and we work with commitment, transparency, and a human-centered approach to make it happen.",
   "missionAndCoreValuesExpandableDescription1": "At OpenGateHub, we focus on making technology a tool to drive your goals. We listen to your needs and tailor our solutions to integrate seamlessly, delivering intuitive experiences that truly make a difference.",
-  "missionAndCoreValuesExpandableDescription2": "Data security is our priority. We adhere to high compliance standards to protect your information and ensure it’s always in safe hands.",
+  "missionAndCoreValuesExpandableDescription2": "Data security is our priority. We adhere to high compliance standards to protect your information and ensure it's always in safe hands.",
   "missionAndCoreValuesExpandableDescription3": "Our commitment to continuous improvement allows us to support you at every step, helping you optimize your digital presence and achieve your objectives.",
   "missionAndCoreValuesExpandableDescription4": "We believe in the transformative power of technology and its ability to create real change. Our purpose is to build impactful solutions, moving forward together one step at a time.",
   "technologiesTitle": "Our Team",
   "technologiesDescription": "We believe the best ideas come from an environment of respect, empathy, and collaboration. We foster a workplace where every team member feels valued and can contribute their talents authentically, inspiring creativity and continuous learning.",
   "technologiesExpandableDescription1": "At OpenGateHub, we believe that a motivated and valued team is the key to achieving exceptional results.",
-  "technologiesExpandableDescription2": "That’s why we focus on building a workplace where respect, empathy, and continuous learning are top priorities.",
+  "technologiesExpandableDescription2": "That's why we focus on building a workplace where respect, empathy, and continuous learning are top priorities.",
   "technologiesExpandableDescription3": "Our goal is not just to develop technological solutions but to develop people.",
   "technologiesExpandableDescription4": "We believe in creating opportunities, fostering growth, and building a space where everyone feels part of something bigger.",
   "commitmentToInnovationTitle": "Commitment to Innovation",
   "commitmentToInnovationDescription": "Innovation means constantly evolving and using cutting-edge technologies to solve problems practically. We adapt to change to deliver efficient solutions that make a real impact.",
-  "commitmentToInnovationExpandableDescription1": "For us, innovation means more than technology; it’s about adapting, learning, and finding effective ways to solve real problems.",
+  "commitmentToInnovationExpandableDescription1": "For us, innovation means more than technology; it's about adapting, learning, and finding effective ways to solve real problems.",
   "commitmentToInnovationExpandableDescription2": "We stay up to date with cutting-edge technologies to ensure our solutions are efficient and relevant.",
   "commitmentToInnovationExpandableDescription3": "We believe in a practical approach that combines creativity and functionality, always aiming to make a positive impact.",
   "commitmentToInnovationExpandableDescription4": "Our goal is not only to deliver solutions but also to grow alongside our clients in a constantly evolving world.",
@@ -116,25 +116,25 @@
   "modalCloseButtonText": "Close",
   "frontend": {
     "title": "Frontend",
-    "description": "In today’s digital age, having a fast and user-friendly platform is not just an advantage—it’s essential. Yet, many businesses struggle with websites that don’t perform well on mobile devices, interfaces that fail to engage users, or slow browsing experiences that drive customers away.",
+    "description": "In today's digital age, having a fast and user-friendly platform is not just an advantage—it's essential. Yet, many businesses struggle with websites that don't perform well on mobile devices, interfaces that fail to engage users, or slow browsing experiences that drive customers away.",
     "solutions": {
       "title": "Solutions",
       "responsive": "Responsive, seamlessly adapting to any screen or device.",
       "interactive": "Interactive, ensuring a smooth, fast, and engaging browsing experience.",
       "customized": "Tailored, aligned with your business goals and user expectations."
     },
-    "benefits": "With a focus on cutting-edge technologies like React and modern frameworks, we optimize your site’s performance, enhance user retention, and boost conversions by simplifying processes like purchases or registrations. Every detail is designed with your customers in mind, offering a unique experience that keeps them coming back.",
+    "benefits": "With a focus on cutting-edge technologies like React and modern frameworks, we optimize your site's performance, enhance user retention, and boost conversions by simplifying processes like purchases or registrations. Every detail is designed with your customers in mind, offering a unique experience that keeps them coming back.",
     "stepsTitle": "How can we help you?",
     "steps": {
       "step1": "Reach out to us: Send us an email or fill out our online contact form.",
-      "step2": "Tell us your needs: Share your goals, challenges, or any problems you’re facing.",
-      "step3": "We craft your plan: We’ll propose tailored solutions and work with you to design a platform that not only solves your problems but also drives your business growth."
+      "step2": "Tell us your needs: Share your goals, challenges, or any problems you're facing.",
+      "step3": "We craft your plan: We'll propose tailored solutions and work with you to design a platform that not only solves your problems but also drives your business growth."
     },
-    "callToAction": "Ready to shine in the digital world? Let’s connect and create a platform that elevates your brand."
+    "callToAction": "Ready to shine in the digital world? Let's connect and create a platform that elevates your brand."
   },
   "backend": {
     "title": "Backend & Cloud",
-    "description": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can’t scale, slow response times, or infrastructures that don’t harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
+    "description": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
     "solutions": {
       "title2": "Solutions",
       "scalable": "Scalable backend systems with technologies like Node.js, Python, Go, and Ruby on Rails.",
@@ -142,18 +142,18 @@
       "cloud": "Cloud integrations with AWS, Google Cloud, and Azure for flexible and powerful infrastructure.",
       "efficient": "Process optimization to ensure fast response times and consistent performance."
     },
-    "benefits": "With our expertise in backend and cloud, you lead your company’s digital transformation. We equip you with the technological tools you need to deliver seamless experiences to your users and achieve your goals. By implementing modern solutions like scalable databases (PostgreSQL, MongoDB), GraphQL, and microservices systems, we build a backend that supports you every step of the way.",
+    "benefits": "With our expertise in backend and cloud, you lead your company's digital transformation. We equip you with the technological tools you need to deliver seamless experiences to your users and achieve your goals. By implementing modern solutions like scalable databases (PostgreSQL, MongoDB), GraphQL, and microservices systems, we build a backend that supports you every step of the way.",
     "stepsTitle": "How do we team up with you?",
     "steps": {
       "step1": "Reach out: Share your challenges and goals by completing our online form.",
       "step2": "Plan together: We design a solution that aligns with your specific objectives.",
       "step3": "Your success, our priority: We implement a backend and cloud system that empowers your leadership."
     },
-    "callToAction": "You are the driving force behind this transformation. Let’s talk and build a tech infrastructure that brings your business vision to life."
+    "callToAction": "You are the driving force behind this transformation. Let's talk and build a tech infrastructure that brings your business vision to life."
   },
   "uxui": {
     "title": "UX/UI Design",
-    "description": "UX/UI design bridges the gap between your ideas and the user experience. A well-designed interface not only enhances aesthetics but also optimizes functionality, creating greater satisfaction and loyalty. However, many businesses face challenges like confusing interfaces, unintuitive flows, and designs that don’t reflect their brand identity.",
+    "description": "UX/UI design bridges the gap between your ideas and the user experience. A well-designed interface not only enhances aesthetics but also optimizes functionality, creating greater satisfaction and loyalty. However, many businesses face challenges like confusing interfaces, unintuitive flows, and designs that don't reflect their brand identity.",
     "solutions": {
       "title2": "Solutions",
       "intuitive": "Intuitive designs that make every interaction simple and enjoyable.",
@@ -167,25 +167,25 @@
       "step1": "Discover your needs: We listen to understand your goals and user expectations.",
       "step2": "Design concepts: We create wireframes and prototypes that bring your ideas to life.",
       "step3": "Iterate with you: We refine the designs based on your feedback to achieve perfection.",
-      "step4": "Deliver the solution: We develop a UX/UI experience that’s functional, visual, and aligned with your vision."
+      "step4": "Deliver the solution: We develop a UX/UI experience that's functional, visual, and aligned with your vision."
     },
-    "callToAction": "Ready to deliver an unforgettable experience? Contact our team, and together we’ll design a platform that captivates your users and drives your business forward."
+    "callToAction": "Ready to deliver an unforgettable experience? Contact our team, and together we'll design a platform that captivates your users and drives your business forward."
   },
   "graphicDesign": {
     "title": "Graphic Design",
     "questions": {
       "q1": "Is your brand failing to stand out in the market?",
       "q2": "Are your customers not connecting with your visual identity?",
-      "q3": "Do you feel your graphic materials don’t reflect the quality of your products or services?"
+      "q3": "Do you feel your graphic materials don't reflect the quality of your products or services?"
     },
-    "description": "Strategic graphic design can be the key to transforming your brand into a powerful visual story. However, many businesses face challenges like inconsistent visuals, designs that fail to connect with their audience, and materials that don’t convey their true value. This is where you, as the visionary leader of your business, can become the hero by turning these challenges into opportunities.",
+    "description": "Strategic graphic design can be the key to transforming your brand into a powerful visual story. However, many businesses face challenges like inconsistent visuals, designs that fail to connect with their audience, and materials that don't convey their true value. This is where you, as the visionary leader of your business, can become the hero by turning these challenges into opportunities.",
     "solutions": {
       "title": "What We Can Create for You",
       "branding": "We craft unique visual identities that make your brand stand out.",
       "materials": "We create impactful graphic materials, from presentations to digital campaigns.",
       "consistency": "We ensure consistency across all visual elements, strengthening customer trust."
     },
-    "vision": "After working with us, your business will have a memorable visual identity that not only attracts your ideal customers but also inspires them to trust your brand. You’ll see how your graphics communicate professionalism and emotionally connect with your audience, driving growth and amplifying your business impact.",
+    "vision": "After working with us, your business will have a memorable visual identity that not only attracts your ideal customers but also inspires them to trust your brand. You'll see how your graphics communicate professionalism and emotionally connect with your audience, driving growth and amplifying your business impact.",
     "stepsTitle": "How do we work with you?",
     "steps": {
       "step1": "Discover your essence: We analyze your brand, values, and what makes your business unique.",
@@ -193,7 +193,7 @@
       "step3": "Refine together: We adjust the designs until they perfectly match your vision.",
       "step4": "Elevate your brand: We transform your materials into standout visual tools."
     },
-    "callToAction": "The time to stand out is now. Contact our team and let’s build a visual identity that drives your success."
+    "callToAction": "The time to stand out is now. Contact our team and let's build a visual identity that drives your success."
   },
     "aiSolutions": {
       "title": "AI Solutions",
@@ -209,7 +209,7 @@
         "analytics": "We develop advanced analytics tools to extract actionable insights from your data.",
         "customAI": "We build tailored AI models that align with your business goals."
       },
-      "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we’ll make AI a cornerstone of your success.",
+      "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we'll make AI a cornerstone of your success.",
       "stepsTitle": "How do we work with you?",
       "steps": {
         "step1": "Understand your needs: We assess your business goals and identify AI opportunities.",
@@ -217,7 +217,7 @@
         "step3": "Collaborate closely: We refine solutions based on your feedback and ensure seamless integration.",
         "step4": "Empower your business: We deliver AI-driven tools that transform your operations."
       },
-      "callToAction": "The future is AI. Contact us today and let’s bring intelligent solutions to your business."
+      "callToAction": "The future is AI. Contact us today and let's bring intelligent solutions to your business."
   },  
   "faqsTitle": "Frequently Asked Questions",
   "faqs": {
@@ -238,7 +238,7 @@
         },
         {
           "question": "How long does it take to complete a project?",
-          "answer": "The timeline depends on the project’s complexity and scope, but we work with you to set a clear schedule."
+          "answer": "The timeline depends on the project's complexity and scope, but we work with you to set a clear schedule."
         },
         {
           "question": "What technologies do you use in your projects?",
@@ -279,7 +279,7 @@
         },
         {
           "question": "How do you handle time zone differences?",
-          "answer": "We adapt to the client’s time zone and organize meetings and deliverables according to their needs to ensure efficient collaboration."
+          "answer": "We adapt to the client's time zone and organize meetings and deliverables according to their needs to ensure efficient collaboration."
         },
         {
           "question": "Are the talents prepared to integrate with existing teams?",
@@ -298,16 +298,16 @@
           "answer": "Of course! We can assign multidisciplinary teams, including technical leads, if your project requires it."
         },
         {
-          "question": "What happens if the assigned developer doesn’t meet my expectations?",
-          "answer": "If you’re not satisfied, we provide a quick replacement to ensure your project continues without delays."
+          "question": "What happens if the assigned developer doesn't meet my expectations?",
+          "answer": "If you're not satisfied, we provide a quick replacement to ensure your project continues without delays."
         },
         {
-          "question": "Does the staff work under my supervision or OpenGateHub’s?",
+          "question": "Does the staff work under my supervision or OpenGateHub's?",
           "answer": "You decide: the team can work directly under your supervision, or we can manage it according to your needs."
         },
         {
           "question": "Why should I choose OpenGateHub for IT outsourcing?",
-          "answer": "We understand that every project is unique. That’s why we focus on providing reliable talent, adapting to your needs, and maintaining clear communication every step of the way. Our goal is to become a strategic partner that helps your business grow."
+          "answer": "We understand that every project is unique. That's why we focus on providing reliable talent, adapting to your needs, and maintaining clear communication every step of the way. Our goal is to become a strategic partner that helps your business grow."
         }
       ]
     }
@@ -322,7 +322,7 @@
       },
       {
         "title": "How We Use Your Information",
-        "content": "We use the information we collect to:\n- Provide and improve our services.\n- Respond to your inquiries or support requests.\n- Send updates, promotional offers, or newsletters (only if you’ve opted in).\n- Ensure the security of our website and prevent fraudulent activities.\n- Analyze website traffic and usage patterns to improve our services."
+        "content": "We use the information we collect to:\n- Provide and improve our services.\n- Respond to your inquiries or support requests.\n- Send updates, promotional offers, or newsletters (only if you've opted in).\n- Ensure the security of our website and prevent fraudulent activities.\n- Analyze website traffic and usage patterns to improve our services."
       },
       {
         "title": "Sharing Your Information",
