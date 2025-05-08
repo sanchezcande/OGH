@@ -9,6 +9,7 @@ import {
   ReviewsWrapper
 } from "../../styles/components/Reviews.styles";
 import { SectionTitle } from "../../styles/pagesStyles/HomePages.styles";
+import { InView } from "../InView/InView";
 
 export const ReviewsSection = () => {
   const { t } = useTranslation();
@@ -24,38 +25,42 @@ export const ReviewsSection = () => {
   };
 
   return (
-    <ReviewsContainer>
-      <SectionTitle style={{ "--i": 3 }}>
-        {t("reviewsTitle")}
-      </SectionTitle>
-      <ReviewsCarousel>
-        <ReviewsWrapper>
-          <ReviewsTrack style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-            {reviews.map((reviewKey) => (
-              <ReviewCard
-                key={reviewKey}
-                review={t(`reviews.${reviewKey}.text`)}
-                company={t(`reviews.${reviewKey}.company`)}
-                role={t(`reviews.${reviewKey}.role`)}
-              />
-            ))}
-          </ReviewsTrack>
-        </ReviewsWrapper>
-        <CarouselButton
-          className="prev"
-          onClick={handlePrevSlide}
-          aria-label="Previous review"
-        >
-          &#10094;
-        </CarouselButton>
-        <CarouselButton
-          className="next"
-          onClick={handleNextSlide}
-          aria-label="Next review"
-        >
-          &#10095;
-        </CarouselButton>
-      </ReviewsCarousel>
-    </ReviewsContainer>
+    <InView>
+      {(isInView) => (
+        <ReviewsContainer className={isInView ? 'visible' : ''}>
+          <SectionTitle style={{ "--i": 3 }}>
+            {t("reviewsTitle")}
+          </SectionTitle>
+          <ReviewsCarousel>
+            <ReviewsWrapper>
+              <ReviewsTrack style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                {reviews.map((reviewKey) => (
+                  <ReviewCard
+                    key={reviewKey}
+                    review={t(`reviews.${reviewKey}.text`)}
+                    company={t(`reviews.${reviewKey}.company`)}
+                    role={t(`reviews.${reviewKey}.role`)}
+                  />
+                ))}
+              </ReviewsTrack>
+            </ReviewsWrapper>
+            <CarouselButton
+              className="prev"
+              onClick={handlePrevSlide}
+              aria-label="Previous review"
+            >
+              &#10094;
+            </CarouselButton>
+            <CarouselButton
+              className="next"
+              onClick={handleNextSlide}
+              aria-label="Next review"
+            >
+              &#10095;
+            </CarouselButton>
+          </ReviewsCarousel>
+        </ReviewsContainer>
+      )}
+    </InView>
   );
 }; 

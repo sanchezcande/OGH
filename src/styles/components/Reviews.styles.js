@@ -1,4 +1,15 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 export const ReviewsContainer = styled.section`
   width: 100%;
@@ -9,6 +20,14 @@ export const ReviewsContainer = styled.section`
   background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}22, ${theme.colors.background})`};
   border-top: 1px solid ${({ theme }) => theme.colors.accent}22;
   border-bottom: 1px solid ${({ theme }) => theme.colors.accent}22;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   &::after {
     content: '';
