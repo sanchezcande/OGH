@@ -71,43 +71,63 @@ export const ServiceTitle = styled.h2`
 
 export const ServiceList = styled.ul`
   list-style: none;
-  margin: 0;
+  margin: 1rem 0;
   padding: 0;
 
   li {
-    font-size: 1.2rem;
-    line-height: 1.8;
+    font-size: 1.1rem;
+    line-height: 1.6;
     margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
+    padding: 1rem;
+    padding-left: 1.5rem;
     color: ${({ theme }) => theme.colors.text};
-    border-left: 3px solid ${({ theme }) => theme.colors.primary};
-    padding-left: 1rem;
+    background: ${({ theme }) => theme.colors.backgroundAlt};
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    position: relative;
 
     &.visible {
       animation: fadeInUp 0.5s ease forwards;
     }
 
-    &::before {
-      content: "💾";
-      font-size: 1.5rem;
-      margin-right: 0.5rem;
-      color: ${({ theme }) => theme.colors.primary};
-      display: inline-block;
-      transition: transform 0.3s ease;
+    &:nth-child(1).visible {
+      animation-delay: 0.1s;
     }
 
-    &:hover::before {
-      animation: bounce 0.5s ease infinite;
+    &:nth-child(2).visible {
+      animation-delay: 0.2s;
+    }
+
+    &:nth-child(3).visible {
+      animation-delay: 0.3s;
+    }
+
+    &:nth-child(4).visible {
+      animation-delay: 0.4s;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: ${({ theme }) => theme.colors.primary};
+      border-radius: 3px;
     }
 
     &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
       background: ${({ theme }) => theme.colors.background};
-      border-left-color: ${({ theme }) => theme.colors.primaryDark};
     }
-
-    ${bounce}
   }
+
+  ${fadeInUp}
 `;
 
 export const Description = styled.p`

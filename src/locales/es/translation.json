@@ -105,8 +105,8 @@
   "commitmentToInnovationExpandableDescription4": "Nuestra meta es no solo ofrecer soluciones, sino también avanzar junto a nuestros clientes en un mundo en constante evolución.",
   "frontendTitle": "Front-end",
   "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
-  "backendTitle": "Back-end & Cloud",
-  "backendDescription": "Desarrollando interfaces de usuario interactivas y responsivas para una experiencia de navegación fluida y eficiente.",
+  "backendTitle": "Backend & Cloud",
+  "backendDescription": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
   "uxuiTitle": "Diseño UX/UI",
   "uxuiDescription": "Diseñamos interfaces intuitivas y atractivas para mejorar la experiencia y el compromiso de tus usuarios.",
   "graphicDesignTitle": "Diseño Gráfico",
@@ -137,11 +137,11 @@
     "title": "Backend & Cloud",
     "description": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
     "solutions": {
-      "title2": "Soluciones",
-      "scalable": "Sistemas backend escalables con tecnologías como Node.js, Python, Go y Ruby on Rails.",
-      "secure": "Implementación de seguridad robusta para proteger tus datos y garantizar la confianza de tus clientes.",
-      "cloud": "Integraciones cloud con AWS, Google Cloud y Azure para una infraestructura flexible y poderosa.",
-      "efficient": "Optimización de procesos para garantizar tiempos de respuesta rápidos y rendimiento constante."
+      "title2": "Soluciones Empresariales",
+      "scalable": "Arquitectura backend de nivel empresarial utilizando Node.js, Python y Go, con microservicios y containerización para una escalabilidad perfecta.",
+      "secure": "Implementaciones avanzadas de seguridad incluyendo OAuth 2.0, JWT y encriptación end-to-end para garantizar la integridad de datos y el cumplimiento normativo.",
+      "cloud": "Infraestructura multi-cloud aprovechando servicios de AWS, Google Cloud y Azure para alta disponibilidad y recuperación ante desastres.",
+      "efficient": "Optimización de rendimiento mediante estrategias de caché, balanceo de carga y pipelines automatizados de CI/CD."
     },
     "benefits": "Con nuestra experiencia en backend y cloud, vos lideras la transformación digital de tu empresa. Te proporcionamos las herramientas tecnológicas necesarias para ofrecer una experiencia impecable a tus usuarios y alcanzar tus objetivos. Al implementar soluciones modernas como bases de datos escalables (PostgreSQL, MongoDB), GraphQL y sistemas de microservicios, construimos un backend que te respalda en cada paso del camino.",
     "stepsTitle": "¿Cómo hacemos equipo con vos?",
@@ -150,7 +150,7 @@
       "step2": "Planificamos juntos: Diseñamos una solución que responde a tus objetivos específicos.",
       "step3": "Tu éxito, nuestra prioridad: Implementamos un sistema backend y cloud que potencia tu liderazgo."
     },
-    "callToAction": "Vos sos el motor de esta transformación. Hablemos y construyamos juntos una infraestructura tecnológica que impulse tu visión de negocio."
+    "callToAction": "Vos sos la fuerza impulsora detrás de esta transformación. Hablemos y construyamos una infraestructura tecnológica que dé vida a tu visión empresarial."
   },
   "uxui": {
     "title": "Diseño UX/UI",

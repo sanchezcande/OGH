@@ -41,10 +41,24 @@ export const SearchInput = styled.input`
 
 export const Gallery = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
   width: 100%;
-  justify-items: left;
+  justify-content: start;
+  justify-items: stretch;
+  align-items: start;
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 1199px) and (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const ScrollToTopButton = styled.button`
@@ -74,7 +88,6 @@ export const ArticleCard = styled.div`
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   width: 100%;
-  max-width: 600px;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.6s ease, transform 0.6s ease;
@@ -85,15 +98,15 @@ export const ArticleCard = styled.div`
   }
 
   img {
-    width: auto;
-    height: 150px;
+    width: 100%;
+    height: 200px;
     object-fit: cover;
     border-radius: 12px;
     margin-bottom: 12px;
   }
 
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
     box-shadow: 0 12px 24px ${({ theme }) => theme.colors.primaryDark}CC;
     border-color: ${({ theme }) => theme.colors.primaryDark};
   }

@@ -105,8 +105,8 @@
   "commitmentToInnovationExpandableDescription4": "Our goal is not only to deliver solutions but also to grow alongside our clients in a constantly evolving world.",
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
-  "backendTitle": "Back-end & Cloud",
-  "backendDescription": "Building robust server-side applications with scalable databases with modern technologies for optimal performance.",
+  "backendTitle": "Backend & Cloud",
+  "backendDescription": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
   "uxuiTitle": "UX/UI Design",
   "uxuiDescription": "We design intuitive and attractive interfaces to enhance the experience and engagement of your users.",
   "graphicDesignTitle": "Graphic Design",
@@ -136,11 +136,11 @@
     "title": "Backend & Cloud",
     "description": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
     "solutions": {
-      "title2": "Solutions",
-      "scalable": "Scalable backend systems with technologies like Node.js, Python, Go, and Ruby on Rails.",
-      "secure": "Robust security implementations to protect your data and ensure customer trust.",
-      "cloud": "Cloud integrations with AWS, Google Cloud, and Azure for flexible and powerful infrastructure.",
-      "efficient": "Process optimization to ensure fast response times and consistent performance."
+      "title2": "Enterprise Solutions",
+      "scalable": "Enterprise-grade backend architecture utilizing Node.js, Python, and Go, with microservices and containerization for seamless scalability.",
+      "secure": "Advanced security implementations including OAuth 2.0, JWT, and end-to-end encryption to ensure data integrity and compliance.",
+      "cloud": "Multi-cloud infrastructure leveraging AWS, Google Cloud, and Azure services for high availability and disaster recovery.",
+      "efficient": "Performance optimization through caching strategies, load balancing, and automated CI/CD pipelines."
     },
     "benefits": "With our expertise in backend and cloud, you lead your company's digital transformation. We equip you with the technological tools you need to deliver seamless experiences to your users and achieve your goals. By implementing modern solutions like scalable databases (PostgreSQL, MongoDB), GraphQL, and microservices systems, we build a backend that supports you every step of the way.",
     "stepsTitle": "How do we team up with you?",
