@@ -57,11 +57,16 @@ export const CallToActionButton = styled.a`
   border-radius: ${({ theme }) => theme.borderRadius};
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(0, 87, 255, 0.2);
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: inline-block;
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.accentDark};
-    transform: translateY(-2px);
-    color:white;
+    transform: scale(1.1) !important;
+    color: white;
+    box-shadow: 0 6px 20px rgba(249, 123, 114, 0.4);
   }
 `;

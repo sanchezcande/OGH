@@ -26,7 +26,7 @@ export const DarkButton = styled.button`
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: background-color 0.3s ease;
   font-size: 1em;
   font-weight: bold;
   border: none;
@@ -37,6 +37,5 @@ export const DarkButton = styled.button`
   &:hover {
     background-color:   ${({ theme }) => theme.colors.accent};
     color:   ${({ theme }) => theme.colors.background};
-    transform: translateY(-2px);
   }
 `;

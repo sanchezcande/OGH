@@ -44,12 +44,12 @@ export const ImageText = styled.div`
     max-width: 300px;
     min-width: 200px;
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateY(-50px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 
     &.visible {
       opacity: 1;
-      transform: translateX(0);
+      transform: translateY(0);
     }
 
     img {
