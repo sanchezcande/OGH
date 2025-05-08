@@ -19,9 +19,13 @@ export const ReviewsContainer = styled.section`
 
 export const ReviewsCarousel = styled.div`
   position: relative;
-  overflow: hidden;
   margin-top: 3rem;
-  padding: 0 3rem;
+  padding: 0 4rem;
+  width: 100%;
+`;
+
+export const ReviewsWrapper = styled.div`
+  overflow: hidden;
   width: 100%;
 `;
 
@@ -98,7 +102,7 @@ export const AuthorRole = styled.span`
 
 export const CarouselButton = styled.button`
   position: absolute;
-  top: 50%;
+  top: 20%;
   transform: translateY(-50%);
   background: ${({ theme }) => theme.colors.accent};
   color: ${({ theme }) => theme.colors.background};
@@ -111,7 +115,7 @@ export const CarouselButton = styled.button`
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  z-index: 2;
+  z-index: 1000;
   transition: all 0.3s ease;
   font-size: 1.5rem;
   font-weight: bold;
@@ -129,10 +133,10 @@ export const CarouselButton = styled.button`
   }
 
   &.prev {
-    left: 0;
+    left: 20px;
   }
 
   &.next {
-    right: 0;
+    right: 20px;
   }
 `; 
