@@ -70,19 +70,21 @@ const growLine = keyframes`
 `;
 
 export const Container = styled.div`
-position: relative;
-background-color: white;
-overflow: hidden;
+  position: relative;
+  background: radial-gradient(
+    circle at 50% 50%,
+    ${({ theme }) => theme.colors.backgroundAlt}22,
+    ${({ theme }) => theme.colors.background} 70%
+  );
+  overflow: hidden;
   padding: 40px 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   animation: ${fadeIn} 0.8s ease;
-  // background: radial-gradient(circle at 30% 30%, ${({ theme }) => theme.colors.backgroundAlt}, ${({ theme }) => theme.colors.background});
-
   overflow: hidden;
-  z-index:0;
+  z-index: 0;
 `;
 
 export const Hero = styled.div`
@@ -95,6 +97,12 @@ export const Hero = styled.div`
   align-items: center;
   text-align: center;
   overflow: hidden;
+  background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}cc, ${theme.colors.background}dd)`};
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid ${({ theme }) => theme.colors.accent}33;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 `;
 
 export const GradientOverlay = styled.div`

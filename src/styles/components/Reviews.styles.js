@@ -4,16 +4,28 @@ export const ReviewsContainer = styled.section`
   width: 100%;
   max-width: 1200px;
   margin: 6rem auto;
-  padding: 3rem 2rem;
+  padding: 3rem 0;
   position: relative;
   background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}22, ${theme.colors.background})`};
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid ${({ theme }) => theme.colors.accent}22;
+  border-top: 1px solid ${({ theme }) => theme.colors.accent}22;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.accent}22;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 40px;
+    background: ${({ theme }) => theme.colors.accent}11;
+    filter: blur(20px);
+    z-index: -1;
+  }
 
   @media (max-width: 768px) {
     margin: 4rem auto;
-    padding: 2rem 1rem;
+    padding: 2rem 0;
   }
 `;
 
