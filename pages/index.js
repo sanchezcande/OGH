@@ -22,6 +22,7 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 import InteractiveInvertCircle from "../src/components/Animations/InteractiveCircle";
 import { InView } from "../src/components/InView/InView";
+import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 
 const LottieAnimation = dynamic(
   () => import("../src/components/Animations/LottieAnimation"),
@@ -152,6 +153,8 @@ export default function HomePage() {
             )}
           </InView>
         </PlanSection>
+
+        <ReviewsSection />
 
         <HomeCallToAction />
       </Container>

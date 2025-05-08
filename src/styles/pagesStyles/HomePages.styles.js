@@ -218,7 +218,6 @@ export const SectionTitle = styled.h3`
   animation-delay: calc(0.2s * var(--i, 0));
   opacity: 0;
   transition: transform 0.3s ease;
-  mix-blend-mode: difference;
 
   &::before {
     content: '';
@@ -240,7 +239,6 @@ export const SectionTitle = styled.h3`
   .highlighted-word {
     color: ${({ theme }) => theme.colors.accent};
     font-weight: 800;
-    mix-blend-mode: difference;
   }
 `;
 
