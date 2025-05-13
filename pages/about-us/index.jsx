@@ -4,11 +4,11 @@ import {
   Container,
   HighlightedWord,
 } from "../../src/styles/pagesStyles/AboutUs.styles";
-import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import Image from "next/image";
+import AboutTimeline from "../../src/components/Timeline/AboutTimeline";
 
 export const AboutUsCallToAction = () => {
   const { t } = useTranslation();
@@ -68,7 +68,7 @@ const AboutUs = React.forwardRef((props, ref) => {
           content="Discover how OpenGateHub builds bridges to help your ideas lead the digital future. Our team is committed to delivering tailored solutions."
         />
         <meta property="og:url" content="https://opengatehub.com/about-us" />
-        <meta property="og:image" content="/logo/Reducido4.png" />
+        <meta property="og:image" content="/images/og-about-us.png" />
         <meta
           name="keywords"
           content="OpenGateHub, About Us, Mission, Values, Digital Transformation, Technology Solutions, Innovation"
@@ -83,9 +83,9 @@ const AboutUs = React.forwardRef((props, ref) => {
             src="/images/AboutUs.png"
             width={250}
             height={250}
-            layout="responsive"
             alt={t("heroAlt") || "OpenGateHub Team"}
-            priority // Consider adding priority if this is LCP
+            priority
+            style={{ borderRadius: '50%' }}
           />
         </div>
 
@@ -95,17 +95,18 @@ const AboutUs = React.forwardRef((props, ref) => {
             <HighlightedWord className="animate">
               {t("aboutUsTitle_highlight")}
             </HighlightedWord>
-            {/* Add part2 if it exists: {t("aboutUsTitle_part2")} */}
-            <span>{t("aboutUsText")}</span>
           </h1>
+          <p>{t("aboutUsText")}</p>
         </div>
       </ImageText>
-      <BoxesContainerRows />
+
+      <AboutTimeline />
+
       <AboutUsCallToAction />
     </Container>
   );
 });
 
-AboutUs.displayName = "AboutUs"; // Add display name for forwardRef components
+AboutUs.displayName = "AboutUs";
 
 export default AboutUs;
