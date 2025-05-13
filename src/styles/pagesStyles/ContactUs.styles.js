@@ -174,6 +174,21 @@ export const RightColumn = styled.div`
               color: ${({ theme }) => theme.colors.textMuted || '#888'} !important;
           }
       }
+      
+      // Style for the send button to match captcha width
+      button[type="submit"] {
+   // Half width as requested
+          background-color: ${({ theme }) => theme.colors.accent || '#FF6B6B'} !important; // Use accent color (pink)
+          color: white !important;
+          margin-top: 15px;
+          font-weight: bold;
+          transition: all 0.3s ease;
+          
+          &:hover {
+              opacity: 0.9;
+              transform: translateY(-2px);
+          }
+      }
   }
 
   // Add cascade animation to children of RightColumn
