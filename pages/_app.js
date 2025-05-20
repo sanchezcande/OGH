@@ -27,7 +27,7 @@ const Loader = styled.div`
   left: 0;
   width: 100%;
   height: 5px;
-  background-color: #1a73e8;
+  background-color: ${({ theme }) => theme.colors.accent};;
   animation: loader-animation 1s infinite;
   z-index: 9999;
 

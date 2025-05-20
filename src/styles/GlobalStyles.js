@@ -8,16 +8,13 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: "Poppins", sans-serif;
-    background: 
-      linear-gradient(120deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 50%),
-      linear-gradient(300deg, #001f3f, #001f3f 50%),
-      linear-gradient(60deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 50%);
+    font-family: ${({ theme }) => theme.fonts.main};
+    background-color: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.text};
-    margin: 0;
-    padding: 0;
     min-height: 100vh;
     overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
 
   #__next {
@@ -25,10 +22,20 @@ const GlobalStyles = createGlobalStyle`
     flex-direction: column;
     min-height: 100vh; 
   }
-  
+
   a {
     text-decoration: none;
-    color: inherit;
+    color: ${({ theme }) => theme.colors.text};
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: ${({ theme }) => theme.colors.accent};
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
   }
      @keyframes fadeInUp {
     from {

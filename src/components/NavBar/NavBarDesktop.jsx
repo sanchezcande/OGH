@@ -10,7 +10,7 @@ const NavBarDesktop = () => {
   const { t, i18n } = useTranslation();
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(-1);
-  const [activeIndex, setActiveIndex] = useState(0); // Default: Home
+  const [activeIndex, setActiveIndex] = useState(0);
   const [selectedLang, setSelectedLang] = useState("en");
   const [tabWidths, setTabWidths] = useState([]);
   const [tabOffsets, setTabOffsets] = useState([]);
@@ -25,14 +25,8 @@ const NavBarDesktop = () => {
 
     const indexToUse = hoveredIndex !== -1 ? hoveredIndex : activeIndex;
     if (indexToUse >= 0 && widths[indexToUse] && offsets[indexToUse]) {
-      document.documentElement.style.setProperty(
-        "--highlight-left",
-        `${offsets[indexToUse]}px`
-      );
-      document.documentElement.style.setProperty(
-        "--highlight-width",
-        `${widths[indexToUse]}px`
-      );
+      document.documentElement.style.setProperty("--highlight-left", `${offsets[indexToUse]}px`);
+      document.documentElement.style.setProperty("--highlight-width", `${widths[indexToUse]}px`);
     }
   }, [hoveredIndex, activeIndex]);
 
@@ -78,72 +72,72 @@ const NavBarDesktop = () => {
   const handleMouseLeaveServices = (e) => {
     const submenu = document.querySelector(`.${styles.servicesMenu}`);
     const relatedTarget = e.relatedTarget;
-    if (!submenu || !relatedTarget || !submenu.contains(relatedTarget)) {
+    if (
+      !submenu ||
+      !(relatedTarget instanceof Node) || // FIX aplicado
+      !submenu.contains(relatedTarget)
+    ) {
       setShowServicesMenu(false);
     }
   };
-  
 
   const handleTabClick = (index) => {
-    setActiveIndex(index); 
+    setActiveIndex(index);
     if (pillTabs[index].text !== t("services")) {
-      setShowServicesMenu(false); 
+      setShowServicesMenu(false);
     }
   };
 
   return (
     <nav className={styles.navBarContainer}>
-    <Link href="/" className={styles.logo}>
-    <Image src={Logo4} alt="OpenGateHub Logo" width={200} height={45} />
-    </Link>
+      <Link href="/" className={styles.logo}>
+        <Image src={Logo4} alt="OpenGateHub Logo" height={30} />
+      </Link>
       <ul className={styles.navLinks}>
         <div
           className={styles.highlightBar}
           style={{
             left: `${
-              (tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) -
-              30
+              (tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) - 30
             }px`,
             width: `${
-              (tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) +
-              60
+              (tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) + 60
             }px`,
           }}
         />
         {pillTabs.map((tab, i) => (
-     <li
-     key={tab.text}
-     className={tab.text === t("services") ? styles.navLinkWrapper : ""}
-     onMouseEnter={tab.text === t("services") ? handleMouseEnterServices : null}
-     onMouseLeave={tab.text === t("services") ? handleMouseLeaveServices : null}
-   >
-     {tab.text === t("services") ? (
-       <>
-         <span className={`${styles.navLink} nav-link`}>{tab.text}</span>
-         <ul
-           className={`${styles.servicesMenu} ${
-             showServicesMenu ? styles.visible : ""
-           }`}
-         >
-           {servicesList.map((service, index) => (
-             <li key={index} className={styles.servicesMenuItem}>
-               <Link href={service.href}>{service.text}</Link>
-             </li>
-           ))}
-         </ul>
-       </>
-     ) : (
-       <span
-         className={`${styles.navLink} nav-link`}
-         onMouseEnter={() => setHoveredIndex(i)}
-         onMouseLeave={() => setHoveredIndex(-1)}
-         onClick={() => handleTabClick(i)}
-       >
-         <Link href={tab.href}>{tab.text}</Link>
-       </span>
-     )}
-   </li>
-   
+          <li
+            key={tab.text}
+            className={tab.text === t("services") ? styles.navLinkWrapper : ""}
+            onMouseEnter={tab.text === t("services") ? handleMouseEnterServices : null}
+            onMouseLeave={tab.text === t("services") ? handleMouseLeaveServices : null}
+          >
+            {tab.text === t("services") ? (
+              <>
+                <span className={`${styles.navLink} nav-link`}>{tab.text}</span>
+                <ul
+                  className={`${styles.servicesMenu} ${
+                    showServicesMenu ? styles.visible : ""
+                  }`}
+                >
+                  {servicesList.map((service, index) => (
+                    <li key={index} className={styles.servicesMenuItem}>
+                      <Link href={service.href}>{service.text}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <span
+                className={`${styles.navLink} nav-link`}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(-1)}
+                onClick={() => handleTabClick(i)}
+              >
+                <Link href={tab.href}>{tab.text}</Link>
+              </span>
+            )}
+          </li>
         ))}
       </ul>
       <div>
@@ -160,9 +154,7 @@ const NavBarDesktop = () => {
           />
         </div>
 
-        <ul
-          className={`${styles.langMenu} ${showLangMenu ? styles.visible : ""}`}
-        >
+        <ul className={`${styles.langMenu} ${showLangMenu ? styles.visible : ""}`}>
           <li
             className={styles.langMenuItem}
             onClick={() => handleLangChange(selectedLang === "en" ? "es" : "en")}
@@ -176,4 +168,3 @@ const NavBarDesktop = () => {
 };
 
 export default NavBarDesktop;
-

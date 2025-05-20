@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from "react";
-import { ImageText, Container } from "../../src/styles/pagesStyles/AboutUs.styles";
-import BoxesContainerRows from "../../src/components/Box/BoxesContainerRow";
+import {
+  ImageText,
+  Container,
+  HighlightedWord,
+} from "../../src/styles/pagesStyles/AboutUs.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import Image from "next/image";
-
+import AboutTimeline from "../../src/components/Timeline/AboutTimeline";
 
 export const AboutUsCallToAction = () => {
   const { t } = useTranslation();
@@ -22,28 +25,31 @@ export const AboutUsCallToAction = () => {
 
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
-  const imageRef = useRef(null); 
-  const textRef = useRef(null); 
+  const imageRef = useRef(null);
+  const textRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible"); 
+            entry.target.classList.add("visible");
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.2 } 
+      { threshold: 0.1 } // Lowered threshold for earlier animation trigger
     );
 
-    if (imageRef.current) observer.observe(imageRef.current);
-    if (textRef.current) observer.observe(textRef.current);
+    const currentImageRef = imageRef.current;
+    const currentTextRef = textRef.current;
+
+    if (currentImageRef) observer.observe(currentImageRef);
+    if (currentTextRef) observer.observe(currentTextRef);
 
     return () => {
-      if (imageRef.current) observer.unobserve(imageRef.current);
-      if (textRef.current) observer.unobserve(textRef.current);
+      if (currentImageRef) observer.unobserve(currentImageRef);
+      if (currentTextRef) observer.unobserve(currentTextRef);
     };
   }, []);
 
@@ -62,7 +68,7 @@ const AboutUs = React.forwardRef((props, ref) => {
           content="Discover how OpenGateHub builds bridges to help your ideas lead the digital future. Our team is committed to delivering tailored solutions."
         />
         <meta property="og:url" content="https://opengatehub.com/about-us" />
-        <meta property="og:image" content="/logo/Reducido4.png" />
+        <meta property="og:image" content="/images/og-about-us.png" />
         <meta
           name="keywords"
           content="OpenGateHub, About Us, Mission, Values, Digital Transformation, Technology Solutions, Innovation"
@@ -73,21 +79,35 @@ const AboutUs = React.forwardRef((props, ref) => {
 
       <ImageText>
         <div className="image-container" ref={imageRef}>
-          <Image src="/images/AboutUs.png" width={250} height={250}   layout="responsive" 
+          <Image
+            src="/images/Cande.png"
+            width={250}
+            height={250}
+            quality={100}
+            alt={t("heroAlt") || "OpenGateHub Team"}
+            priority
+           
           />
         </div>
 
-
         <div ref={textRef}>
           <h1>
-            {t("aboutUsTitle")} <span>{t("aboutUsText")}</span>
+            {t("aboutUsTitle_part1")}
+            <HighlightedWord className="animate">
+              {t("aboutUsTitle_highlight")}
+            </HighlightedWord>
           </h1>
+          <p>{t("aboutUsText")}</p>
         </div>
       </ImageText>
-      <BoxesContainerRows />
+
+      <AboutTimeline />
+
       <AboutUsCallToAction />
     </Container>
   );
 });
+
+AboutUs.displayName = "AboutUs";
 
 export default AboutUs;

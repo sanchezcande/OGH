@@ -1,33 +1,46 @@
+@keyframes fadeInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px); /* Start slightly above */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);    /* End at its natural position */
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  /*perspective: 1000px; Adding perspective here if needed for 3D transforms on children */
+}
+
 .card {
   position: relative;
-  background: linear-gradient(155deg, #122a54 0%, #0b1a2b 80%);
+  background: linear-gradient(155deg, #FFF5F5 0%, #FFEAEA 80%);
   border-radius: 10px;
   box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.3);
   transition: box-shadow 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
   will-change: transform, opacity;
+  cursor: grab;
   overflow: hidden;
   touch-action: none;
   opacity: 0;
-  transform: translateY(30px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .card.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.card .image {
-  margin-bottom: 20px;
-  justify-content: center;
-  display: flex;
-}
-
-.csl-1 {
- height: 64px;
-  width: 64px;
+  animation-name: fadeInFromTop;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
 }
 
 .card:hover {
-  box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.15);
 }
 
 .card > div {
@@ -37,17 +50,35 @@
 }
 
 .card > div > * {
-
   margin: 0vw 0;
 }
 
-.container {
-  align-items: center;
+.card .image {
+  margin-bottom: 20px;
+  display: flex;            /* Use flex to center the image inside */
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  width: 84px;              /* Match Next/Image width prop from Box.jsx for !imageBottom case */
+  height: 64px;             /* Match Next/Image height prop */
+  /* The following properties might be optional depending on desired appearance */
+  /* border-radius: 50%; */ /* Remove if images are not meant to be circular by default */
+  /* background-color: #f0f0f0; */ /* Remove if no specific background for the image container is needed */
+  overflow: hidden;         /* Keep to prevent overflow if image is larger than container */
+  margin-left: auto;        /* Center the .image div itself */
+  margin-right: auto;       /* Center the .image div itself */
+  /* color:#2B2B2B !important; /* This was likely for an icon font, may not be needed for Next/Image */
+}
+
+.card .image img {
+  width: 100%;
   height: 100%;
-  justify-content: center;
-  margin-right: 20px;
-  margin-left: 20px;
-  display: flex;
+  object-fit: cover;
+}
+
+.csl-1 {
+  height: 64px;
+  width: 64px;
+  fill: #4FC9F8; /* celeste claro */
 }
 
 .card .textContainer {
@@ -61,7 +92,7 @@
 }
 
 .card .textContainer h1 {
-  color: white;
+  color: #1F2937;
   font-size: 16px;
   text-align: center;
   font-weight: 600;
@@ -78,7 +109,7 @@
 }
 
 .card .textContainer p {
-  color: white;
+  color: #1F2937;
   font-size: 12px;
   text-align: center;
   opacity: 0;
@@ -98,17 +129,25 @@
   justify-self: center;
   justify-content: center;
   text-align: center;
-  border-radius: 20px;
+  border-radius: 4px;
   height: 30px;
   margin-top: 15px;
   width: 70%;
   margin-bottom: 20px;
+  background-color: #2B2B2B;
+  color: white;
+  border: none;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease 0.4s;
+  transition: opacity 0.5s ease, transform 0.5s ease 0.4s, background-color 0.3s ease;
 }
 
 .card.visible .customdarkbutton {
   opacity: 1;
   transform: translateY(0);
+}
+
+.card .customdarkbutton:hover {
+  background-color: #F97B72; /* accent coral */
+  color: white;
 }

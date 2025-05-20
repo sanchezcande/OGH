@@ -8,6 +8,7 @@
   "english": "Inglés",
   "spanish": "Español",
   "name": "Nombre",
+  "ctaButton": "Reservá una llamada",
   "email": "Correo electrónico",
   "phoneNumber": "Número de teléfono (opcional)",
   "subject": "Asunto (opcional)",
@@ -21,9 +22,30 @@
   "joinOurCommunity": "Unite a Nuestra Comunidad",
   "privacyPolicy": "Política de Privacidad",
   "faq": "Preguntas Frecuentes",
+  "seoTitle": "Constru\u00ed con personas que lo entienden | OpenGateHub",
+  "seoDescription": "Ayudamos a fundadores y VCs visionarios a escalar startups con desarrolladores alineados culturalmente que valoran el impacto.",
+  "heroAnimatedText": {
+    "part1": "Creá con",
+    "highlight1": "personas",
+    "part2": "que",
+    "highlight2": "sí entienden"
+  },
+  "heroSubtitle": "Nos asociamos con fundadores y VCs que creen en escalar con coraz\u00f3n, cultura e impacto.",
+  "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
+  "problemTitle": "Estás <highlight>contra</highlight> reloj.",
+  "problemText": "Ten\u00e9s presi\u00f3n para escalar tu producto, cumplir con inversores y armar el equipo correcto. Pero contratar internamente lleva tiempo. Los devs en EE.UU. son caros. Y tercerizar muchas veces implica perder calidad, o peor, cultura.",
+  "weGetYouTitle": "Te <highlight>entendemos</highlight>. Ya pasamos por eso.",
+  "weGetYouText": "No somos una agencia m\u00e1s. Somos fundadores t\u00e9cnicos que creen en relaciones a largo plazo, no en transacciones. Compartimos tus valores, tu urgencia y tu ambici\u00f3n por construir algo que importe.",
+  "planTitle": "Así trabajamos:",
+  "planSteps": {
+    "step1": "Llamada inicial: contanos qué necesitás.",
+    "step2": "Plan personalizado: te conectamos con desarrolladores alineados.",
+    "step3": "Ponete en marcha: integrá, iterá y escalá con confianza."
+  },
   "connectWithUs": "Conectate con Nosotros",
-  "aboutUsTitle": "Construimos Puentes para que tus Ideas Lideren el Futuro Digital",
-  "aboutUsText": "En OpenGateHub, creemos que vos sos el centro de esta historia. Cada visión, cada meta y cada desafío que enfrentás son oportunidades para crear algo significativo. Nuestro propósito es acompañarte en ese camino con empatía, brindándote no solo desarrollo tecnológico, sino también identidad visual que refleje quién sos y hacia dónde querés llegar. No somos solo desarrolladores; somos aliados estratégicos que trabajamos codo a codo con vos, escuchando, entendiendo y diseñando soluciones a medida. Porque sabemos que detrás de cada proyecto hay personas con sueños, historias y un propósito claro. Cuando vos triunfás, sentimos que cumplimos nuestra misión. Juntos, podemos transformar desafíos en avances y construir algo que realmente importe.",
+  "aboutUsTitle_part1": "Construyendo Tecnología que Genera ",
+  "aboutUsTitle_highlight": "Impacto",
+  "aboutUsText": "No somos solo otra empresa de tecnología. Somos un equipo de innovadores apasionados que creen que la tecnología puede ser una fuerza para el bien. Nos asociamos con fundadores e inversores visionarios que comparten nuestro compromiso de crear soluciones que no solo generen ganancias, sino también impacto ambiental y social positivo. Ya seas un fundador de startup que busca escalar de manera sostenible o un VC que busca construir un portfolio de empresas con impacto, entendemos los desafíos únicos que enfrentás. Nuestro enfoque combina la excelencia técnica con una profunda comprensión de métricas de impacto, ayudándote a construir soluciones que alineen el beneficio con el propósito. Hemos estado en tu lugar y sabemos que detrás de cada línea de código hay una oportunidad para hacer del mundo un lugar mejor.",
   "contactUsTitle": "¡Ponete en contacto!",
   "contactUsSubtitle": "¡Gracias por contactarnos! Por favor, completá el formulario a continuación y nos pondremos en contacto con vos en breve.",
   "weAre": "Somos",
@@ -58,34 +80,37 @@
     "description": "Contactanos y comencemos a construir algo increíble juntos.",
     "buttonText": "Contactanos"
   },
-  "companyHistoryTitle": "Nuestra Historia",
-  "companyHistoryDescription": "Nuestro camino comenzó en Argentina, impulsados por la visión de apoyar a empresas y emprendedores en su transformación digital. Desde el primer día, nos comprometimos a crear soluciones que conecten tecnología y personas con confianza y calidad.",
-  "companyHistoryExpandableDescription1": "OpenGateHub nació en Argentina con una visión clara: combinar nuestra experiencia trabajando para empresas internacionales, principalmente de Estados Unidos, con un enfoque local y cercano.",
-  "companyHistoryExpandableDescription2": "Nuestros fundadores cuentan con años de trayectoria en la industria tecnológica global, lo que nos permite comprender las necesidades y expectativas del mercado internacional.",
-  "companyHistoryExpandableDescription3": "Nos enfocamos en ofrecer soluciones tecnológicas que resuelvan problemas reales y generen resultados sostenibles.",
-  "companyHistoryExpandableDescription4": "Siempre priorizamos la calidad, el mantenimiento y la eficiencia, construyendo relaciones de confianza con nuestros clientes a lo largo de su transformación digital.",
-  "missionAndCoreValuesTitle": "Misión y Valores Fundamentales",
-  "missionAndCoreValuesDescription": "Nuestra misión es ayudarte a alcanzar tus metas con soluciones claras y efectivas. Creemos que tu éxito es nuestro éxito, y trabajamos con compromiso, transparencia y un enfoque humano para lograrlo.",
-  "missionAndCoreValuesExpandableDescription1": "En OpenGateHub, trabajamos para que la tecnología sea una herramienta que impulse tus objetivos. Escuchamos tus necesidades y adaptamos nuestras soluciones para integrarlas de manera fluida y ofrecer experiencias intuitivas que realmente hagan la diferencia.",
-  "missionAndCoreValuesExpandableDescription2": "La seguridad de tus datos es una prioridad. Seguimos altos estándares de cumplimiento para proteger tu información y garantizar que siempre esté en buenas manos.",
-  "missionAndCoreValuesExpandableDescription3": "Nuestro compromiso con la mejora continua asegura que podamos acompañarte en cada paso, ayudándote a optimizar tu presencia digital y a alcanzar tus metas.",
-  "missionAndCoreValuesExpandableDescription4": "Creemos en el potencial transformador de la tecnología y en su capacidad para generar cambios reales. Nuestro propósito es construir soluciones que tengan impacto, avanzando juntos un paso a la vez.",
-  "technologiesTitle": "Nuestro Equipo",
-  "technologiesDescription": "Nosotros creemos que las mejores ideas surgen en un ambiente de respeto, empatía y colaboración. Fomentamos un entorno donde cada integrante se sienta valorado y pueda aportar su talento de manera auténtica, inspirando creatividad y aprendizaje constante.",
-  "technologiesExpandableDescription1": "En OpenGateHub, estamos convencidos de que un equipo motivado y valorado es la clave para lograr resultados excepcionales.",
-  "technologiesExpandableDescription2": "Por eso, trabajamos para construir un ambiente laboral donde el respeto, la empatía y el aprendizaje constante sean una prioridad.",
-  "technologiesExpandableDescription3": "Nuestro objetivo no es solo desarrollar soluciones tecnológicas, sino también desarrollar personas.",
-  "technologiesExpandableDescription4": "Creemos en dar oportunidades, fomentar el crecimiento y crear un espacio donde todos se sientan parte de algo más grande.",
-  "commitmentToInnovationTitle": "Compromiso con la Innovación",
-  "commitmentToInnovationDescription": "Innovar es renovarnos constantemente y usar las tecnologías más avanzadas para resolver problemas de manera práctica. Nos adaptamos a los cambios para ofrecer soluciones eficientes y con impacto real.",
-  "commitmentToInnovationExpandableDescription1": "La innovación para nosotros significa más que tecnología; es adaptarnos, aprender y encontrar formas efectivas de resolver problemas reales.",
-  "commitmentToInnovationExpandableDescription2": "Nos mantenemos al día con las tecnologías más avanzadas para garantizar que nuestras soluciones sean eficientes y relevantes.",
-  "commitmentToInnovationExpandableDescription3": "Creemos en un enfoque práctico que combine creatividad y funcionalidad, siempre con el objetivo de generar un impacto positivo.",
-  "commitmentToInnovationExpandableDescription4": "Nuestra meta es no solo ofrecer soluciones, sino también avanzar junto a nuestros clientes en un mundo en constante evolución.",
+  "companyHistoryTitle": "Nuestro Camino",
+  "companyHistoryDescription": "Nuestra historia comenzó con una simple creencia: que la tecnología debe servir a un propósito superior. Desde nuestras raíces en Argentina hasta nuestro alcance global actual, hemos tenido el privilegio de trabajar con líderes que se atreven a pensar diferente sobre el éxito.",
+  "companyHistoryExpandableDescription1": "Iniciamos OpenGateHub con la visión de cerrar la brecha entre la innovación tecnológica y el impacto significativo. Nuestra experiencia trabajando con empresas estadounidenses nos enseñó que las mejores soluciones surgen cuando el beneficio se encuentra con el propósito.",
+  "companyHistoryExpandableDescription2": "Nuestros fundadores han pasado años tanto en el ecosistema de startups como en el espacio de inversión de impacto, dándonos una perspectiva única sobre cómo escalar de manera sostenible mientras maximizamos el impacto positivo.",
+  "companyHistoryExpandableDescription3": "Nos enfocamos en soluciones que abordan desafíos del mundo real mientras crean beneficios sociales y ambientales medibles.",
+  "companyHistoryExpandableDescription4": "Cada proyecto que asumimos es evaluado no solo por su mérito técnico, sino por su potencial para crear un cambio positivo duradero.",
+  "missionAndCoreValuesTitle_part1": "Nuestra Misión y ",
+  "missionAndCoreValuesTitle_highlight": "Valores",
+  "missionAndCoreValuesDescription": "Creemos que las empresas más exitosas del mañana serán aquellas que creen valor para todos los stakeholders - inversores, usuarios, sociedad y nuestro planeta. Nuestra misión es empoderar a líderes visionarios para construir estas empresas hoy.",
+  "missionAndCoreValuesExpandableDescription1": "Nos asociamos con fundadores e inversores que ven más allá de las métricas tradicionales de éxito, ayudándoles a aprovechar la tecnología para crear tanto retornos como impacto.",
+  "missionAndCoreValuesExpandableDescription2": "La transparencia y la confianza son innegociables. Creemos en construir relaciones a largo plazo basadas en valores compartidos y un compromiso con el cambio positivo.",
+  "missionAndCoreValuesExpandableDescription3": "Nuestro enfoque combina experiencia técnica rigurosa con marcos de medición de impacto, asegurando que tus soluciones creen valor sostenible.",
+  "missionAndCoreValuesExpandableDescription4": "Estamos comprometidos con el aprendizaje y la adaptación continua, manteniéndonos a la vanguardia tanto de las tendencias tecnológicas como de los estándares de impacto en evolución.",
+  "technologiesTitle_part1": "Nuestra ",
+  "technologiesTitle_highlight": "Gente",
+  "technologiesDescription": "Detrás de cada venture de impacto exitosa hay un equipo que realmente lo entiende. Nuestra gente no son solo desarrolladores calificados - son individuos impulsados por una misión que entienden los desafíos únicos de construir para el impacto.",
+  "technologiesExpandableDescription1": "Hemos construido un equipo que combina excelencia técnica con una profunda comprensión de métricas de impacto y principios ESG.",
+  "technologiesExpandableDescription2": "Nuestra cultura está construida sobre la empatía, la innovación y un compromiso compartido de usar la tecnología como una fuerza para el bien.",
+  "technologiesExpandableDescription3": "Invertimos en el crecimiento de nuestro equipo, fomentando un ambiente donde tanto las habilidades técnicas como la comprensión del impacto pueden florecer.",
+  "technologiesExpandableDescription4": "Cada miembro del equipo aporta su perspectiva única, enriqueciendo nuestra capacidad para resolver desafíos complejos mientras creamos cambios positivos.",
+  "commitmentToInnovationTitle_part1": "Innovación con ",
+  "commitmentToInnovationTitle_highlight": "Propósito",
+  "commitmentToInnovationDescription": "En un mundo que enfrenta desafíos sin precedentes, la innovación no se trata solo de construir algo nuevo - se trata de construir algo mejor. Te ayudamos a aprovechar la tecnología de punta para crear soluciones que importan.",
+  "commitmentToInnovationExpandableDescription1": "Creemos que las innovaciones más impactantes ocurren en la intersección del beneficio y el propósito, donde el éxito empresarial impulsa el cambio positivo.",
+  "commitmentToInnovationExpandableDescription2": "Nuestro enfoque de la innovación es holístico, considerando no solo la viabilidad técnica sino también el impacto social y la sostenibilidad ambiental.",
+  "commitmentToInnovationExpandableDescription3": "Nos mantenemos a la vanguardia tanto de los avances tecnológicos como de las metodologías de medición de impacto, asegurando que tus soluciones sean tanto innovadoras como significativas.",
+  "commitmentToInnovationExpandableDescription4": "Nuestro objetivo es ayudarte a construir soluciones que no solo resuelvan los problemas de hoy sino que ayuden a crear un mejor mañana.",
   "frontendTitle": "Front-end",
   "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
-  "backendTitle": "Back-end & Cloud",
-  "backendDescription": "Desarrollando interfaces de usuario interactivas y responsivas para una experiencia de navegación fluida y eficiente.",
+  "backendTitle": "Backend & Cloud",
+  "backendDescription": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
   "uxuiTitle": "Diseño UX/UI",
   "uxuiDescription": "Diseñamos interfaces intuitivas y atractivas para mejorar la experiencia y el compromiso de tus usuarios.",
   "graphicDesignTitle": "Diseño Gráfico",
@@ -116,11 +141,11 @@
     "title": "Backend & Cloud",
     "description": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
     "solutions": {
-      "title2": "Soluciones",
-      "scalable": "Sistemas backend escalables con tecnologías como Node.js, Python, Go y Ruby on Rails.",
-      "secure": "Implementación de seguridad robusta para proteger tus datos y garantizar la confianza de tus clientes.",
-      "cloud": "Integraciones cloud con AWS, Google Cloud y Azure para una infraestructura flexible y poderosa.",
-      "efficient": "Optimización de procesos para garantizar tiempos de respuesta rápidos y rendimiento constante."
+      "title2": "Soluciones Empresariales",
+      "scalable": "Arquitectura backend de nivel empresarial utilizando Node.js, Python y Go, con microservicios y containerización para una escalabilidad perfecta.",
+      "secure": "Implementaciones avanzadas de seguridad incluyendo OAuth 2.0, JWT y encriptación end-to-end para garantizar la integridad de datos y el cumplimiento normativo.",
+      "cloud": "Infraestructura multi-cloud aprovechando servicios de AWS, Google Cloud y Azure para alta disponibilidad y recuperación ante desastres.",
+      "efficient": "Optimización de rendimiento mediante estrategias de caché, balanceo de carga y pipelines automatizados de CI/CD."
     },
     "benefits": "Con nuestra experiencia en backend y cloud, vos lideras la transformación digital de tu empresa. Te proporcionamos las herramientas tecnológicas necesarias para ofrecer una experiencia impecable a tus usuarios y alcanzar tus objetivos. Al implementar soluciones modernas como bases de datos escalables (PostgreSQL, MongoDB), GraphQL y sistemas de microservicios, construimos un backend que te respalda en cada paso del camino.",
     "stepsTitle": "¿Cómo hacemos equipo con vos?",
@@ -129,7 +154,7 @@
       "step2": "Planificamos juntos: Diseñamos una solución que responde a tus objetivos específicos.",
       "step3": "Tu éxito, nuestra prioridad: Implementamos un sistema backend y cloud que potencia tu liderazgo."
     },
-    "callToAction": "Vos sos el motor de esta transformación. Hablemos y construyamos juntos una infraestructura tecnológica que impulse tu visión de negocio."
+    "callToAction": "Vos sos la fuerza impulsora detrás de esta transformación. Hablemos y construyamos una infraestructura tecnológica que dé vida a tu visión empresarial."
   },
   "uxui": {
     "title": "Diseño UX/UI",
@@ -343,6 +368,50 @@
       "summary": "Descubre cómo las soluciones tecnológicas personalizadas impulsan la eficiencia y el crecimiento empresarial.",
       "image": "/images/article1.jpg",
       "content": "En la era de la transformación digital, las empresas enfrentan el desafío constante de adaptarse a un entorno competitivo y en constante evolución. La implementación de soluciones tecnológicas personalizadas se ha convertido en un factor determinante para impulsar la eficiencia operativa y el crecimiento empresarial.\n\nUn estudio de Digital Innovation Trends 2024 señala que las empresas que adoptan herramientas tecnológicas adaptadas a sus necesidades logran aumentar en un 35% su productividad, en comparación con aquellas que optan por soluciones genéricas. Este dato resalta la importancia de crear estrategias tecnológicas diseñadas específicamente para cada modelo de negocio.\n\nLa personalización no solo mejora la eficiencia interna, sino que también fortalece la relación con los clientes. Herramientas como sistemas CRM desarrollados a medida permiten gestionar interacciones con una precisión única, ofreciendo experiencias más satisfactorias y fidelizando al cliente. En este sentido, tecnologías como la inteligencia artificial y el análisis avanzado de datos están transformando la manera en que las empresas entienden y se conectan con sus audiencias.\n\nSi bien el desarrollo de soluciones personalizadas puede requerir una inversión inicial significativa, los beneficios a largo plazo son claros: desde la optimización de procesos internos hasta el ahorro en costos operativos. Por ejemplo, la integración de plataformas como APIs específicas o aplicaciones internas hechas a medida permite reducir los tiempos de respuesta y simplificar tareas repetitivas, liberando recursos para enfocarse en la estrategia y la innovación.\n\nEn un panorama donde los negocios buscan mantenerse relevantes, la capacidad de adaptarse rápidamente a las necesidades del mercado es crucial. Las soluciones personalizadas ofrecen una flexibilidad que los sistemas predefinidos no pueden igualar. Además, estas herramientas permiten a las empresas escalar de manera orgánica, integrando nuevas funcionalidades a medida que crecen.\n\nPor otro lado, es esencial elegir socios tecnológicos con experiencia y visión estratégica. Empresas especializadas en desarrollo de software, diseñan y entregan soluciones tecnológicas que no sólo resuelven problemas inmediatos, sino que también alinean las herramientas con los objetivos a largo plazo de cada organización.\n\nEl camino hacia el éxito empresarial en la era digital está claramente marcado por la innovación y la personalización. Aquellas empresas que adoptan soluciones tecnológicas diseñadas específicamente para sus necesidades están mejor equipadas para superar los desafíos de un mercado fragmentado y competitivo, posicionándose como líderes en su industria."
+    },
+    {
+      "title": "La IA puede guiarte. Pero no debe reemplazarte",
+      "slug": "ai-guide-not-replace",
+      "summary": "Descubre cómo la IA puede mejorar tus decisiones empresariales manteniendo el juicio humano en el centro de tu estrategia.",
+      "image": "/images/article2.jpg",
+      "content": "Se habla mucho sobre cómo la IA está transformando todo.\n\nY sí, es poderosa. Puede analizar más datos de los que jamás podríamos. Puede escribir, optimizar, predecir. Es rápida, incansable y (seamos honestos) a menudo impresionante.\n\nPero aquí está el punto:\n\nLa IA no puede entender tu negocio como tú lo haces.\n\nNo conoce tus valores, la dinámica de tu equipo, ni lo que realmente motiva a tu cliente. Ese es tu trabajo.\n\nLas empresas que triunfan con la IA no son las que automatizan todo a ciegas. Son las que combinan la IA con la intuición humana, la empatía y el conocimiento del mundo real.\n\nPorque el contexto sigue importando. La experiencia sigue importando. El juicio sigue importando.\n\nLa IA es un excelente copiloto. Pero los mejores resultados siguen viniendo de las personas que saben cuándo tomar el control.\n\nAsí que la próxima vez que te enfrentes a una decisión, pregúntate: ¿Es este un momento para automatizar o un momento para liderar?\n\nLa IA puede guiarte. Pero no debe reemplazarte."
+    },
+    {
+      "title": "Ciberseguridad: El Fundamento del Crecimiento Empresarial en la Era Digital",
+      "slug": "cybersecurity-business-growth",
+      "summary": "Descubre cómo las medidas robustas de ciberseguridad pueden proteger e impulsar el crecimiento de tu negocio en el panorama digital actual.",
+      "image": "/images/article3.jpg",
+      "content": "En un mundo cada vez más conectado, la ciberseguridad se ha convertido en una piedra angular para las empresas que buscan no solo proteger sus operaciones, sino también asegurar un crecimiento sostenible. Según un estudio reciente de IBM, el costo promedio de una violación de datos en 2023 alcanzó los $4.45 millones, destacando el impacto financiero que pueden tener las amenazas digitales.\n\nMás allá de los números, la ciberseguridad impacta directamente en la confianza de clientes y socios comerciales. Una empresa con sistemas de protección robustos demuestra un compromiso con la privacidad y la integridad de los datos, fortaleciendo su reputación y posicionamiento en el mercado.\n\nAmenazas Comunes y Soluciones Clave\n\nEl panorama de riesgos incluye desde phishing y ransomware hasta ataques de denegación de servicio (DDoS) y vulnerabilidades en sistemas desactualizados. Para combatir estas amenazas, las empresas deben adoptar un enfoque integral que incluya:\n\nAnálisis de Riesgos: Identificar activos críticos y evaluar posibles vulnerabilidades.\nCapacitación de Empleados: La primera línea de defensa siempre serán los empleados informados.\nTecnología Avanzada: Implementar firewalls, sistemas de detección de intrusiones (IDS) y soluciones de seguridad basadas en IA.\nPlanes de Respuesta a Incidentes: Prepararse para reaccionar rápidamente ante cualquier brecha de seguridad.\n\nCiberseguridad y Crecimiento Empresarial\n\nInvertir en ciberseguridad no es solo un gasto; es una estrategia que impulsa el crecimiento. Al proteger sus operaciones, las empresas aseguran la continuidad del servicio, previenen pérdidas financieras y fomentan un entorno de confianza con sus clientes.\n\nEn un panorama digital en constante evolución, la ciberseguridad ya no es opcional. Es una necesidad para cualquier empresa que busque crecer, innovar y prosperar."
+    },
+    {
+      "title": "Inteligencia Artificial y Automatización: El Futuro del Éxito Empresarial",
+      "slug": "ai-automation-business-success",
+      "summary": "Descubre cómo la IA y la automatización están transformando las empresas y creando nuevas oportunidades de crecimiento e innovación.",
+      "image": "/images/article4.jpg",
+      "content": "En un mundo donde la tecnología avanza a un ritmo sin precedentes, la inteligencia artificial (IA) y la automatización están revolucionando la forma en que las empresas operan y crecen. Desde la optimización de procesos internos hasta la mejora de las experiencias de los clientes, estas tecnologías son la clave para mantener la competitividad en el mercado actual.\n\n¿Por qué invertir en IA y automatización? Las empresas que adoptan estas herramientas no solo reducen costos y tiempos operativos, sino que también liberan recursos para enfocarse en la innovación y el desarrollo estratégico. Según Gartner, el 70% de las organizaciones utilizarán tecnologías de IA en al menos una función clave para 2025.\n\nAplicaciones Prácticas en las Empresas\n\nOptimización de Procesos: Automatización de tareas repetitivas como la gestión de inventario, seguimiento de pedidos o servicio al cliente a través de chatbots.\nAnálisis Predictivo: La IA permite analizar grandes volúmenes de datos para anticipar tendencias, identificar riesgos y tomar decisiones informadas.\nPersonalización del Cliente: Los algoritmos avanzados hacen posible ofrecer experiencias únicas y relevantes que mejoran la fidelidad del cliente.\nCiberseguridad Avanzada: Los sistemas basados en IA detectan amenazas en tiempo real, protegiendo los datos sensibles de ciberataques.\n\nEl Impacto en el Crecimiento Empresarial\n\nLa IA y la automatización no solo mejoran la eficiencia, sino que también abren el camino a nuevas oportunidades de negocio. Las empresas que han adoptado estas tecnologías reportan aumentos significativos en la productividad y la satisfacción del cliente, lo que conduce a un crecimiento sostenible.\n\nOpenGateHub: Tu Socio en IA y Automatización\n\nEn OpenGateHub, entendemos que cada empresa enfrenta desafíos únicos. Por eso, entregamos soluciones personalizadas de IA y automatización adaptadas a tus necesidades, asegurando resultados reales y tangibles.\n\nEl futuro es ahora, y con la IA y la automatización, el éxito está al alcance de tu empresa."
     }
-  ]
+  ],
+  "reviewsTitle": "Lo que dicen nuestros clientes",
+  "reviews": {
+    "skylar": {
+      "text": "Estamos realmente muy contentos con el trabajo que hizo OpenGateHub para nuestro emprendimiento. Supieron captar desde el primer momento lo que queríamos transmitir y lo plasmaron en una página web moderna, intuitiva y visualmente impecable. Además, su atención fue excelente: siempre disponibles, rápidos para responder y con mucha predisposición para resolver cada duda o necesidad que surgía. Se nota que trabajan con compromiso, profesionalismo y experiencia. Los recomendamos sin dudar.",
+      "company": "Skylar",
+      "role": "Fundador"
+    },
+    "techvision": {
+      "text": "El equipo de OpenGateHub superó todas nuestras expectativas. Su atención al detalle y soluciones creativas nos ayudaron a destacar en nuestro mercado.",
+      "company": "TechVision",
+      "role": "Director de Tecnología"
+    },
+    "greenleaf": {
+      "text": "Trabajar con OpenGateHub fue un cambio radical para nuestro negocio. Crearon un sitio web que representa perfectamente nuestra marca y valores.",
+      "company": "GreenLeaf",
+      "role": "Director de Marketing"
+    },
+    "innovatelab": {
+      "text": "Servicio excepcional y resultados sobresalientes. El equipo fue profesional, receptivo y entregó nuestro proyecto antes de lo programado.",
+      "company": "InnovateLab",
+      "role": "Gerente de Producto"
+    }
+  }
 }

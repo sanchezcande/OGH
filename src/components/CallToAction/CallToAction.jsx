@@ -39,7 +39,7 @@ const CallToActionBlock = ({ title, description, buttonText }) => {
     <CallToActionContainer ref={ref} className={isVisible ? "visible" : ""}>
       <CallToActionTitle>{title}</CallToActionTitle>
       <CallToActionDescription>{description}</CallToActionDescription>
-      <CallToActionButton onClick={() => (window.location.href = "/contact-us")}>
+      <CallToActionButton href="https://calendly.com/sanchezgcandelaria" target="_blank" rel="noopener noreferrer">
         {buttonText}
       </CallToActionButton>
     </CallToActionContainer>

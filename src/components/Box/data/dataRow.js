@@ -7,21 +7,21 @@ import company from "../../../assets/images/Company.png";
 import techno from "../../../assets/images/teamsvg.png";
 import commitment from "../../../assets/images/Commitment.png";
 import mission from "../../../assets/images/Mission.png";
-
+import { HighlightedWord } from "../../../styles/pagesStyles/AboutUs.styles";
 
 const DataRow = () => {
   const { t } = useTranslation();
 
-  return[
-  {
-    id: 1,
-    title: t("companyHistoryTitle"),
-    image: company,
-    description: t("companyHistoryDescription"),
-    expandableImage: companyHistory,
-    expandableDescription: (
-      <>
-        {t("companyHistoryExpandableDescription1")}
+  return [
+    {
+      id: 1,
+      title: t("companyHistoryTitle"),
+      image: company,
+      description: t("companyHistoryDescription"),
+      expandableImage: companyHistory,
+      expandableDescription: (
+        <>
+          {t("companyHistoryExpandableDescription1")}
           <br />
           <br />
           {t("companyHistoryExpandableDescription2")}
@@ -31,18 +31,25 @@ const DataRow = () => {
           <br />
           <br />
           {t("companyHistoryExpandableDescription4")}
-      </>
-    ),
-  },
-  {
-    id: 2,
-    title: t("missionAndCoreValuesTitle"),
-    image: mission,
-    description: t("missionAndCoreValuesDescription"),
+        </>
+      ),
+    },
+    {
+      id: 2,
+      title: (
+        <>
+          {t("missionAndCoreValuesTitle_part1")}
+          <HighlightedWord className="animate">
+            {t("missionAndCoreValuesTitle_highlight")}
+          </HighlightedWord>
+        </>
+      ),
+      image: mission,
+      description: t("missionAndCoreValuesDescription"),
       expandableImage: missionAndCoreValues,
-    expandableDescription: (
-      <>
-        {t("missionAndCoreValuesExpandableDescription1")}
+      expandableDescription: (
+        <>
+          {t("missionAndCoreValuesExpandableDescription1")}
           <br />
           <br />
           {t("missionAndCoreValuesExpandableDescription2")}
@@ -52,18 +59,25 @@ const DataRow = () => {
           <br />
           <br />
           {t("missionAndCoreValuesExpandableDescription4")}
-      </>
-    ),
-  },
-  {
-    id: 3,
-    title: t("technologiesTitle"),
-    image: techno,
-    description: t("technologiesDescription"),
+        </>
+      ),
+    },
+    {
+      id: 3,
+      title: (
+        <>
+          {t("technologiesTitle_part1")}
+          <HighlightedWord className="animate">
+            {t("technologiesTitle_highlight")}
+          </HighlightedWord>
+        </>
+      ),
+      image: techno,
+      description: t("technologiesDescription"),
       expandableImage: technologies,
-    expandableDescription: (
-      <>
-       {t("technologiesExpandableDescription1")}
+      expandableDescription: (
+        <>
+          {t("technologiesExpandableDescription1")}
           <br />
           <br />
           {t("technologiesExpandableDescription2")}
@@ -73,18 +87,25 @@ const DataRow = () => {
           <br />
           <br />
           {t("technologiesExpandableDescription4")}
-      </>
-    ),
-  },
-  {
-    id: 4,
-    title: t("commitmentToInnovationTitle"),
-    image: commitment,
-    description: t("commitmentToInnovationDescription"),
+        </>
+      ),
+    },
+    {
+      id: 4,
+      title: (
+        <>
+          {t("commitmentToInnovationTitle_part1")}
+          <HighlightedWord className="animate">
+            {t("commitmentToInnovationTitle_highlight")}
+          </HighlightedWord>
+        </>
+      ),
+      image: commitment,
+      description: t("commitmentToInnovationDescription"),
       expandableImage: commitmentToInnovation,
-    expandableDescription: (
-      <>
-        {t("commitmentToInnovationExpandableDescription1")}
+      expandableDescription: (
+        <>
+          {t("commitmentToInnovationExpandableDescription1")}
           <br />
           <br />
           {t("commitmentToInnovationExpandableDescription2")}
@@ -94,9 +115,9 @@ const DataRow = () => {
           <br />
           <br />
           {t("commitmentToInnovationExpandableDescription4")}
-      </>
-    ),
-  },
-];
+        </>
+      ),
+    },
+  ];
 };
 export default DataRow;

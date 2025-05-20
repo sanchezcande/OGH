@@ -2,8 +2,8 @@ import styled from "styled-components";
 import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 
 export const FooterContainer = styled.footer`
-background-color: rgba(21, 62, 108, 0.3);
-  color: #fff;
+background-color: #FFF5F5;
+  color: ${({ theme }) => theme.colors.text};
   padding: 20px;
   text-align: center;
   width: 100%; 
@@ -13,6 +13,10 @@ background-color: rgba(21, 62, 108, 0.3);
   h4 {
     margin-bottom: 10px;
     font-size: 14px;
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+  a {
+    text-decoration: underline;
   }
 `;
 
@@ -25,21 +29,15 @@ export const FooterContent = styled.div`
 
   @media (max-width: 550px) {
     grid-template-columns: 1fr;
+    text-align: center;
+    padding-left: 0;
   }
 `;
 
 export const FooterText = styled.p`
   font-size: 12px;
   margin: 10px 0;
-
-  a {
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const SocialMediaContainer = styled.div`
@@ -47,9 +45,20 @@ export const SocialMediaContainer = styled.div`
   gap: 20px;
   margin-top: 10px;
   align-items: center;
+
+  a svg {
+    fill: ${({ theme }) => theme.colors.primaryDark};
+    transition: all 0.3s ease;
+    text-decoration: underline !important;
+  }
+
+  a:hover svg {
+    fill: ${({ theme }) => theme.colors.accent};
+    transform: scale(1.1);
+  }
 `;
 
-export const Instagram = styled(FaInstagram)`
+const iconBase = `
   width: 20px;
   height: 20px;
   fill: #fff;
@@ -78,7 +87,7 @@ export const Github = styled(FaGithub)`
 export const Mail = styled(FaEnvelope)`
   width: 15px;
   height: 15px;
-  fill: #fff;
+  fill: ${({ theme }) => theme.colors.primaryDark};
 `;
 // export const Tel = styled(FaWhatsapp)`
 //   width: 20px;
@@ -109,11 +118,12 @@ export const Title = styled.h3`
   font-size: 12px;
   display: flex;
   align-items: center;
-  margin-left_10px;
+  margin-left: 10px;
 
   span {
   margin-top: 2px;
     font-weight: 400;
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -121,4 +131,14 @@ export const LogoImgContainer = styled.div`
   display: flex;
   gap: 5px;
   margin-left:-6px;
+`;
+export const Instagram = styled(FaInstagram)`
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 `;

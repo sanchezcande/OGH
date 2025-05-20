@@ -66,6 +66,8 @@ const FrontEnd = () => {
         <ServiceTitle className="animate">
           {t("frontend.solutions.title")}
         </ServiceTitle>
+        <Divider className="animate" />
+
         <ServiceList>
           <li className="animate">{t("frontend.solutions.responsive")}</li>
           <li className="animate">{t("frontend.solutions.interactive")}</li>
@@ -73,6 +75,8 @@ const FrontEnd = () => {
         </ServiceList>
 
         <ServiceTitle className="animate">{t("frontend.stepsTitle")}</ServiceTitle>
+        <Divider className="animate" />
+
         <NumberedList>
           <li className="animate">{t("frontend.steps.step1")}</li>
           <li className="animate">{t("frontend.steps.step2")}</li>

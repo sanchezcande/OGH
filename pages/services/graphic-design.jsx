@@ -61,7 +61,7 @@ const GraphicDesign = () => {
 
       <ServiceContainer>
         <ServiceTitle className="animate">{t("graphicDesign.title")}</ServiceTitle>
-        <Divider className="animate" />
+ 
 
         <ServiceListCross>
           <li className="animate">{t("graphicDesign.questions.q1")}</li>

@@ -7,8 +7,8 @@ import ExpandableCard from "./ExpandableCard/ExpandableCard";
 import Image from "next/image";
 import styles from "./Box.module.css";
 
-const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 20;
-const calcY = (x, lx) => (x - lx - window.innerWidth / 2) / 20;
+const calcX = (y, ly) => -(y - ly - window.innerHeight / 2) / 30;
+const calcY = (x, lx) => (x - lx - window.innerWidth / 2) / 30;
 
 const defaultImagen = () => <FaCircle />;
 const defaultTitle = "Default Title";
@@ -25,10 +25,36 @@ const Card = ({
   marginLeftParagraph,
   handleButtonClick,
   imageBottom,
+  animationDelay,
 }) => {
   const domTarget = useRef(null);
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const currentDomTarget = domTarget.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.visible);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (currentDomTarget) {
+      observer.observe(currentDomTarget);
+    }
+
+    return () => {
+      if (currentDomTarget) {
+        observer.unobserve(currentDomTarget);
+      }
+    };
+  }, []);
 
   const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(
     () => ({
@@ -51,7 +77,7 @@ const Card = ({
         api({
           rotateX: calcX(py, y.get()),
           rotateY: calcY(px, x.get()),
-          scale: 1.1,
+          scale: 1.03,
         }),
       onHover: ({ hovering }) =>
         !hovering && api({ rotateX: 0, rotateY: 0, scale: 1 }),
@@ -59,32 +85,12 @@ const Card = ({
     { domTarget, eventOptions: { passive: false } }
   );
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.unobserve(entry.target); // Desactiva la observación después de la primera entrada
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (cardRef.current) observer.observe(cardRef.current);
-
-    return () => {
-      if (cardRef.current) observer.unobserve(cardRef.current);
-    };
-  }, []);
-
   return (
     <animated.div
       ref={domTarget}
-      className={`${styles.card} ${isVisible ? styles.visible : ""}`}
+      className={`${styles.card}`}
       style={{
-        transform: "perspective(600px)",
+        transform: "perspective(800px)",
         x,
         y,
         scale: to([scale, zoom], (s, z) => s + z),
@@ -93,31 +99,32 @@ const Card = ({
         rotateZ,
         height: `${height}px`,
         width: `${width}px`,
+        animationDelay: animationDelay,
       }}
     >
-      <div ref={cardRef} className={styles.textContainer}>
+      <div className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
-            <Image src={Imagen} alt={title} width={84} />{" "}
-            </div>
+            <Image src={Imagen} alt={title || 'Service Icon'} width={84} height={64} />
+          </div>
         )}
         <h1>{title}</h1>
         <p style={{ marginLeft: marginLeftParagraph }}>{description}</p>
         {imageBottom && (
           <div
-            className={`${styles.image}`}
+            className={styles.image}
             style={{ width: "64px", height: "64px", justifySelf: "center" }}
           >
-            <Imagen />
-            </div>
+            {typeof Imagen === 'function' ? <Imagen /> : <Image src={Imagen} alt={title || 'Service Icon'} width={64} height={64} />}
+          </div>
         )}
         {buttonText && (
-                    <DarkButton
-                    className={styles.customdarkbutton}
-                    onClick={handleButtonClick}
-                  >
-                    {buttonText}
-                  </DarkButton>
+          <DarkButton
+            className={styles.customdarkbutton}
+            onClick={handleButtonClick}
+          >
+            {buttonText}
+          </DarkButton>
         )}
       </div>
     </animated.div>
@@ -130,12 +137,13 @@ const Box = ({
   description,
   imagen,
   title,
-  height = 200,
-  width = 272,
+  height = 220,
+  width = 280,
   marginLeftParagraph = 0,
   imageBottom = true,
   handleBoxClick,
   isOpen,
+  animationDelay,
 }) => {
   const handleButtonClick = () => {
     handleBoxClick(id);
@@ -153,12 +161,11 @@ const Box = ({
         marginLeftParagraph={marginLeftParagraph}
         handleButtonClick={handleButtonClick}
         imageBottom={imageBottom}
+        animationDelay={animationDelay}
       />
-      {isOpen && (
-        <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />
-      )}
+      {isOpen && <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />}
     </div>
   );
 };
-export default Box;
 
+export default Box;

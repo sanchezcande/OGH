@@ -15,6 +15,7 @@ export default function Blog() {
   const { t } = useTranslation();
   const articles = t("articles", { returnObjects: true }) || [];
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const filteredArticles = articles.filter(
     (article) =>
@@ -38,10 +39,21 @@ export default function Blog() {
     cards.forEach((card) => observer.observe(card));
 
     return () => observer.disconnect();
-  }, []);
+  }, [filteredArticles]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setIsSearching(true);
+  };
+
+  const handleSearchBlur = () => {
+    if (searchTerm === "") {
+      setIsSearching(false);
+    }
   };
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -56,13 +68,19 @@ export default function Blog() {
         type="text"
         placeholder={t("searchPlaceholder") || "Buscar artículos..."}
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleSearch}
+        onBlur={handleSearchBlur}
       />
 
       <Gallery>
         {filteredArticles.map((article) => (
           <ArticleCard key={article.slug} className="article-card">
-            <img src={article.image} alt={article.title}    onLoad={handleImageLoad} />
+            <img 
+              src={article.image} 
+              alt={article.title}
+              loading="lazy"
+              onLoad={handleImageLoad}
+            />
             <h2>{article.title}</h2>
             <p>{article.summary}</p>
             <Link href={`/blog/${article.slug}`}>{t("readMore")}</Link>

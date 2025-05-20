@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 export const PrivacyPolicyContainer = styled.section`
-  background: ${({ theme }) => theme.colors.primary};
-  color: #f4f4f4;
+  background: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
   padding: 3rem 2rem;
   margin: 2rem auto;
   max-width: 1200px;
@@ -15,7 +15,7 @@ export const PrivacyPolicyTitle = styled.h1`
   font-weight: bold;
   margin-bottom: 2rem;
   text-align: center;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const PrivacyPolicySection = styled.div`
@@ -26,13 +26,13 @@ export const SectionTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #ffffff;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const SectionContent = styled.p`
   font-size: 1rem;
   line-height: 1.8;
-  color: #cccccc;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 1rem;
 `;
 
@@ -42,5 +42,6 @@ export const List = styled.ul`
 
   li {
     margin-bottom: 0.5rem;
+    color: ${({ theme }) => theme.colors.text};
   }
 `;

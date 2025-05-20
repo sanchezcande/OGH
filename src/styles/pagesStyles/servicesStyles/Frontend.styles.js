@@ -14,129 +14,74 @@ const fadeInUp = `
 `;
 
 export const ServiceContainer = styled.section`
-  background: linear-gradient(145deg, #101b42, #0b2343);
-  color: ${({ textColor }) => textColor || "#ffffff"};
+  background: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
   padding: 3rem 2rem;
   margin: 2rem auto;
   max-width: 1200px;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: ${({ theme }) => theme.boxShadow};
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(0, 212, 255, 0.2), transparent);
-    z-index: 0;
+  .animate.visible {
+    animation: fadeInUp 0.5s ease forwards;
   }
 
-  &:hover {
-    box-shadow: 0 10px 20px rgba(0, 212, 255, 0.5);
-  }
+  ${fadeInUp}
 `;
 
 export const ServiceTitle = styled.h2`
-  font-size: 2.8rem;
-  font-weight: 800;
+  font-size: 2.4rem;
+  font-weight: 700;
   margin-bottom: 1.5rem;
-  text-align: center;
-  color: white;
+  text-align: left;
+  color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
-
-  &.visible {
-    animation: fadeInUp 0.5s ease forwards;
-  }
-  ${fadeInUp}
-
-  
 `;
+
 export const ServiceList = styled.ul`
   list-style: none;
-  margin-left: 0;
   padding-left: 0;
 
   li {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+    padding-left: 1.8rem;
     position: relative;
-    padding-left: 1rem;
-    background: linear-gradient(90deg, rgba(0, 212, 255, 0.1), transparent);
-    border-left: 4px solid #00d4ff;
-    border-radius: 4px;
-    overflow: hidden;
-    transition: transform 0.3s ease, background 0.3s ease, border-left-color 0.3s ease, opacity 0.3s ease;
-
-
-    &.visible {
-      animation: fadeInUp 0.5s ease forwards;
-    }
 
     &::before {
-      content: "✨";
-      font-size: 1.5rem;
-      margin-right: 0.5rem;
-      color: #00d4ff;
-      animation: iconPulse 1.5s infinite ease-in-out;
-    }
-
-    /* Efecto hover */
-    &:hover {
-      background: rgba(0, 212, 255, 0.2);
-      border-left-color: #00ffff;
-      transform: scale(1.02);
-    }
-  }
-
-  /* Keyframes para icono pulsante */
-  @keyframes iconPulse {
-    0%, 100% {
-      transform: scale(1);
-      color: #00d4ff;
-    }
-    50% {
-      transform: scale(1.3);
-      color: #00ffff;
+      content: "";
+      width: 10px;
+      height: 10px;
+      background-color: ${({ theme }) => theme.colors.accent};
+      border-radius: 50%;
+      position: absolute;
+      left: 0;
+      top: 0.6rem;
     }
   }
 `;
-
 
 export const Description = styled.p`
-  font-size: 1.3rem;
-  line-height: 2;
+  font-size: 1.2rem;
+  line-height: 1.9;
   margin-bottom: 2rem;
-  text-align: center;
-  color: #cce7ff;
-
-  &.visible {
-    animation: fadeInUp 0.5s ease forwards;
-  }
+  text-align: left;
+  color: ${({ theme }) => theme.colors.text};
 `;
+
 export const HighlightText = styled.div`
-  text-align: center;
   margin: 3rem 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  border: 2px dashed #00d4ff;
-  padding: 1.2rem;
-  border-radius: 12px;
-  background: rgba(0, 212, 255, 0.05);
-  box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
-
-  &.visible {
-    animation: fadeInUp 0.5s ease forwards;
-  }
-
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  padding: 1.5rem;
+  border-radius: ${({ theme }) => theme.borderRadius};
+  background: ${({ theme }) => theme.colors.backgroundAlt};
+  text-align: center;
   span {
     display: inline-block; 
     transition: transform 0.3s ease, color 0.3s ease;
@@ -148,24 +93,13 @@ export const HighlightText = styled.div`
   }
 `;
 
-
 export const Divider = styled.hr`
   border: none;
   height: 3px;
-  background: white;
-  margin: 2rem auto;
+  margin-left: 0 !important;
+  background: ${({ theme }) => theme.colors.accent};
+  margin: 2rem;
   width: 60%;
-    animation: slideInDivider 1s ease-out forwards;
-
-
-  @keyframes slideInDivider {
-    from {
-      width: 0;
-    }
-    to {
-      width: 60%;
-    }
-  }
 `;
 
 export const NumberedList = styled.ol`
@@ -192,7 +126,7 @@ export const NumberedList = styled.ol`
 
     &::before {
       content: counter(list-counter);
-      background: linear-gradient(135deg, #00d4ff, #007acc);
+      background-color: ${({ theme }) => theme.colors.accent};
       color: white;
       font-weight: bold;
       font-size: 1.2rem;
@@ -208,13 +142,5 @@ export const NumberedList = styled.ol`
       min-width: 2rem;
 
     }
-      &:hover::before {
-      transform: rotate(360deg) scale(1.2);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    &:hover {
-        text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
-        }
   }
 `;

@@ -25,8 +25,8 @@ const drawLine = `
 `;
 
 export const ServiceContainer = styled.section`
-  background: #0b2343;
-  color: ${({ textColor }) => textColor || "#e0e0e0"};
+  background: ${({ theme }) => theme.colors.backgroundAlt}; 
+  color: ${({ theme }) => theme.colors.text};
   padding: 3rem 2rem;
   margin: 2rem auto;
   max-width: 1200px;
@@ -45,7 +45,7 @@ export const ServiceTitle = styled.h2`
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: white;
+  color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
 
   &.visible {
@@ -76,7 +76,7 @@ export const ServiceList = styled.ul`
 
     &::before {
       content: "✓";
-      color: #00d4ff;
+      color: ${({ theme }) => theme.colors.accent};
       font-weight: bold;
       position: absolute;
       left: 0;
@@ -90,7 +90,7 @@ export const ServiceList = styled.ul`
       top: 0;
       width: 1.5rem;
       height: 100%;
-      background-color: #0b2343;
+      background-color: ${({ theme }) => theme.colors.backgroundAlt};
       transform: scaleX(0);
       transform-origin: right;
       transition: transform 0.5s ease-in-out;
@@ -121,7 +121,7 @@ export const HighlightText = styled.p`
   font-weight: 600;
   text-align: center;
   margin-top: 2rem;
-  color: #00d4ff;
+  color: ${({ theme }) => theme.colors.accent};
   transition: -webkit-text-stroke 0.3s ease, color 0.3s ease;
 
 
@@ -130,7 +130,7 @@ export const HighlightText = styled.p`
   }
 
   &:hover {
-    -webkit-text-stroke: 0.5px #00aaff;
+    -webkit-text-stroke: 0.5px ${({ theme }) => theme.colors.accentDark};
   }
 
   ${fadeInUp}
@@ -139,7 +139,7 @@ export const HighlightText = styled.p`
 export const Divider = styled.hr`
   border: none;
   height: 3px;
-  background-color: #00d4ff;
+  background-color: ${({ theme }) => theme.colors.accent};
   margin: 2rem 0;
   width: 0;
   margin-right: auto;
@@ -184,8 +184,8 @@ export const NumberedList = styled.ol`
 
     &::before {
       content: counter(list-counter);
-      background-color: #00d4ff;
-      color: #123456;
+      background-color: ${({ theme }) => theme.colors.accent};
+      color: ${({ theme }) => theme.colors.background};
       font-weight: bold;
       font-size: 1.2rem;
       display: flex;
@@ -208,3 +208,4 @@ export const NumberedList = styled.ol`
 
   ${fadeInUp}
 `;
+  
