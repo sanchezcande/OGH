@@ -57,7 +57,8 @@ export const ImageText = styled.div`
       height: auto;
       border-radius: 50%;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      border: 5px solid ${({ theme }) => theme.colors.primary};
+      background-color: ${({ theme }) => theme.colors.accent + "90"};
+      border: px solid ${({ theme }) => theme.colors.accent};
     }
   }
 

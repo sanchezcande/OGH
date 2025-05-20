@@ -80,12 +80,13 @@ const AboutUs = React.forwardRef((props, ref) => {
       <ImageText>
         <div className="image-container" ref={imageRef}>
           <Image
-            src="/images/AboutUs.png"
+            src="/images/Cande.png"
             width={250}
             height={250}
+            quality={100}
             alt={t("heroAlt") || "OpenGateHub Team"}
             priority
-            style={{ borderRadius: '50%' }}
+           
           />
         </div>
 
