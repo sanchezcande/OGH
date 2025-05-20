@@ -5,6 +5,7 @@ export default function InteractiveInvertCircle() {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef(null);
+  const lastValidPosition = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -20,9 +21,12 @@ export default function InteractiveInvertCircle() {
       if (isOverContainer) {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
+        lastValidPosition.current = { x, y };
         setCoords({ x, y });
         setIsVisible(true);
       } else {
+        // When leaving the container, keep the last position for the fade-out
+        setCoords(lastValidPosition.current);
         setIsVisible(false);
       }
     };
@@ -48,8 +52,8 @@ export default function InteractiveInvertCircle() {
         style={{ 
           left: `${coords.x}px`, 
           top: `${coords.y}px`,
-          visibility: isVisible ? 'visible' : 'hidden',
-          opacity: 1
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 0.3s ease'
         }} 
       />
     </div>

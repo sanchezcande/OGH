@@ -10,15 +10,8 @@ export const InteractiveCircle = styled.div`
   mix-blend-mode: exclusion;
   backdrop-filter: invert(100%) contrast(150%);
   -webkit-backdrop-filter: invert(100%) contrast(150%);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.3s ease;
   z-index: 9999;
-  will-change: transform;
-
-  &:not([style*="opacity: 0"]) {
-    transform: translate(-50%, -50%);
-  }
-
-  &[style*="opacity: 0"] {
-    transform: translate(-50%, -150%);
-  }
+  will-change: transform, opacity;
+  transform: translate(-50%, -50%);
 `;
