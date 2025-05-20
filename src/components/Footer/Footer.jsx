@@ -19,10 +19,8 @@ import Link from "next/link";
 
 const LogoImg = () => (
   <LogoImgContainer>
-    <Image src={Logo} alt="software development company" width={27} />
-    <Title>
-      OpenGate<span>Hub</span>
-    </Title>
+    <Image src={Logo} alt="software development company" width={130} />
+
   </LogoImgContainer>
 );
 
