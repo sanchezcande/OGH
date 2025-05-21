@@ -413,5 +413,36 @@
       "company": "InnovateLab",
       "role": "Gerente de Producto"
     }
+  },
+  "homeServicesSection": {
+    "title": "Nuestros Servicios",
+    "subtitle": "Ofrecemos soluciones personalizadas que ayudan a fundadores y VCs visionarios a escalar con impacto",
+    "startJourneyButton": "Comienza tu viaje",
+    "cards": {
+      "softwareDevelopment": {
+        "title": "Desarrollo de Software",
+        "description": "Soluciones personalizadas que escalan con tu negocio, desde aplicaciones web hasta sistemas empresariales."
+      },
+      "uxUiDesign": {
+        "title": "Diseño UX/UI",
+        "description": "Interfaces atractivas que conectan con los usuarios y aumentan las conversiones mediante diseño basado en investigación."
+      },
+      "aiSolutions": {
+        "title": "Soluciones de IA",
+        "description": "Aprovecha el poder de la inteligencia artificial para automatizar procesos y obtener valiosos insights."
+      },
+      "dataAnalytics": {
+        "title": "Analítica de Datos",
+        "description": "Convierte tus datos en inteligencia accionable con análisis avanzados y visualizaciones."
+      },
+      "cybersecurity": {
+        "title": "Ciberseguridad",
+        "description": "Protege tus activos digitales con soluciones de seguridad integrales y mejores prácticas."
+      },
+      "mobileDevelopment": {
+        "title": "Desarrollo Móvil",
+        "description": "Crea experiencias nativas potentes para iOS y Android que capten a tus usuarios en cualquier dispositivo."
+      }
+    }
   }
 }
