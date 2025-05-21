@@ -23,6 +23,8 @@ import dynamic from "next/dynamic";
 import InteractiveInvertCircle from "../src/components/Animations/InteractiveCircle";
 import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 const LottieAnimation = dynamic(
   () => import("../src/components/Animations/LottieAnimation"),
@@ -48,6 +50,179 @@ export const HomeCallToAction = () => {
   );
 };
 
+const ServiceBox = ({ icon, title, description, delay = 0 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <motion.div 
+      className="service-box"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay }}
+      whileHover={{ 
+        scale: 1.05,
+        boxShadow: "0 15px 30px rgba(249, 123, 114, 0.25)"
+      }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      style={{
+        background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
+        borderRadius: "16px",
+        padding: "2rem",
+        height: "100%",
+        cursor: "pointer",
+        position: "relative",
+        overflow: "hidden",
+        border: "1px solid rgba(249, 123, 114, 0.2)",
+        transition: "all 0.3s ease"
+      }}
+    >
+      <motion.div
+        initial={{ scale: 1 }}
+        animate={isHovered ? { scale: 1.2, rotate: 5 } : { scale: 1, rotate: 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          fontSize: "3rem",
+          color: "var(--color-accent, #FF6B6B)",
+          marginBottom: "1rem",
+          display: "inline-block"
+        }}
+      >
+        {icon}
+      </motion.div>
+      
+      <h3 style={{ 
+        fontSize: "1.5rem", 
+        fontWeight: "700", 
+        marginBottom: "1rem",
+        color: "var(--color-text, #333)",
+        transition: "color 0.3s ease",
+        ...(isHovered ? { color: "#E35A52" } : {})
+      }}>
+        {title}
+      </h3>
+      
+      <p style={{ 
+        fontSize: "1rem", 
+        lineHeight: "1.6",
+        color: "#444444"
+      }}>
+        {description}
+      </p>
+      
+      <motion.div 
+        className="service-bg-circle"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={isHovered ? { scale: 1, opacity: 0.1 } : { scale: 0, opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          position: "absolute",
+          width: "300px",
+          height: "300px",
+          borderRadius: "50%",
+          background: "var(--color-accent, #FF6B6B)",
+          right: "-150px",
+          bottom: "-150px",
+          zIndex: "-1"
+        }}
+      />
+    </motion.div>
+  );
+};
+
+const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <motion.div 
+      className="testimonial-card"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay }}
+      whileHover={{ 
+        y: -10,
+        boxShadow: "0 15px 30px rgba(249, 123, 114, 0.2)"
+      }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      style={{
+        background: "#fff",
+        borderRadius: "16px",
+        padding: "2rem",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+        border: "1px solid rgba(249, 123, 114, 0.2)",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        transition: "all 0.3s ease-out",
+        position: "relative",
+        overflow: "hidden"
+      }}
+    >
+      {isHovered && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.05 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "var(--color-accent, #FF6B6B)",
+            zIndex: 0
+          }}
+        />
+      )}
+      
+      <motion.div 
+        style={{ 
+          fontSize: "2rem", 
+          color: "var(--color-accent, #FF6B6B)",
+          marginBottom: "1rem",
+          position: "relative",
+          zIndex: 1
+        }}
+        animate={isHovered ? { scale: 1.2, rotate: 5 } : { scale: 1, rotate: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        "
+      </motion.div>
+      
+      <p style={{ 
+        fontSize: "1rem", 
+        lineHeight: "1.8",
+        flex: 1,
+        marginBottom: "1.5rem",
+        position: "relative",
+        zIndex: 1
+      }}>
+        {content}
+      </p>
+      
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <p style={{ 
+          fontWeight: "700", 
+          fontSize: "1.1rem",
+          marginBottom: "0.2rem",
+          color: isHovered ? "#E35A52" : "var(--color-text, #333)",
+          transition: "color 0.3s ease"
+        }}>
+          {company}
+        </p>
+        <p style={{ 
+          fontSize: "0.9rem", 
+          color: "var(--color-text-muted, #666)" 
+        }}>
+          {role}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
 export default function HomePage() {
   const { t } = useTranslation();
 
@@ -61,6 +236,29 @@ export default function HomePage() {
       return part;
     });
   };
+
+  const testimonialData = [
+    {
+      content: t("reviews.skylar.text"),
+      company: t("reviews.skylar.company"),
+      role: t("reviews.skylar.role")
+    },
+    {
+      content: t("reviews.techvision.text"),
+      company: t("reviews.techvision.company"),
+      role: t("reviews.techvision.role")
+    },
+    {
+      content: t("reviews.greenleaf.text"),
+      company: t("reviews.greenleaf.company"),
+      role: t("reviews.greenleaf.role")
+    },
+    {
+      content: t("reviews.innovatelab.text"),
+      company: t("reviews.innovatelab.company"),
+      role: t("reviews.innovatelab.role")
+    }
+  ];
 
   return (
     <>
@@ -113,10 +311,12 @@ export default function HomePage() {
             href="https://calendly.com/sanchezgcandelaria"
             target="_blank"
             rel="noopener noreferrer"
+            className="primary-cta"
           >
             {t("ctaButton")}
           </CTAButton>
         </Hero>
+        
         <InteractiveCircleContainer>
           <InteractiveInvertCircle />
           <Section>
@@ -133,6 +333,81 @@ export default function HomePage() {
             <SectionText>{t("weGetYouText")}</SectionText>
           </Section>
         </InteractiveCircleContainer>
+        
+        {/* Services Section with Interactive Boxes */}
+        <Section className="full-width">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ textAlign: "center", marginBottom: "3rem" }}
+          >
+            <h2 style={{ 
+              fontSize: "2.8rem", 
+              fontWeight: "800",
+              marginBottom: "1rem"
+            }}>
+              <span style={{ color: "var(--color-accent, #FF6B6B)" }}>{t("homeServicesSection.title")}</span>
+            </h2>
+            <p style={{ 
+              fontSize: "1.2rem", 
+              maxWidth: "800px", 
+              margin: "0 auto", 
+              color: "var(--color-text-muted, #666)"
+            }}>
+              {t("homeServicesSection.subtitle")}
+            </p>
+          </motion.div>
+          
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "2rem",
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 1rem"
+          }}>
+            <ServiceBox 
+              icon="💻"
+              title={t("homeServicesSection.cards.softwareDevelopment.title")}
+              description={t("homeServicesSection.cards.softwareDevelopment.description")}
+              delay={0.2}
+            />
+            <ServiceBox 
+              icon="🎨"
+              title={t("homeServicesSection.cards.uxUiDesign.title")}
+              description={t("homeServicesSection.cards.uxUiDesign.description")}
+              delay={0.3}
+            />
+            <ServiceBox 
+              icon="🤖"
+              title={t("homeServicesSection.cards.aiSolutions.title")}
+              description={t("homeServicesSection.cards.aiSolutions.description")}
+              delay={0.4}
+            />
+            <ServiceBox 
+              icon="📊"
+              title={t("homeServicesSection.cards.dataAnalytics.title")}
+              description={t("homeServicesSection.cards.dataAnalytics.description")}
+              delay={0.5}
+            />
+            <ServiceBox 
+              icon="🔒"
+              title={t("homeServicesSection.cards.cybersecurity.title")}
+              description={t("homeServicesSection.cards.cybersecurity.description")}
+              delay={0.6}
+            />
+            <ServiceBox 
+              icon="📱"
+              title={t("homeServicesSection.cards.mobileDevelopment.title")}
+              description={t("homeServicesSection.cards.mobileDevelopment.description")}
+              delay={0.7}
+            />
+          </div>
+        </Section>
+        
+        {/* Original Plan Section */}
         <PlanSection>
           <SectionTitle style={{"--i": 2}}>
             {t("planTitle")}
@@ -152,10 +427,70 @@ export default function HomePage() {
               </PlanSteps>
             )}
           </InView>
+          
+          {/* New CTA button below plan section */}
+          <div style={{textAlign: "center", marginTop: "3rem"}}>
+            <CTAButton
+              href="https://calendly.com/sanchezgcandelaria"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="secondary-cta"
+            >
+              {t("homeServicesSection.startJourneyButton")}
+            </CTAButton>
+          </div>
         </PlanSection>
+        
+        {/* Testimonials / Social Proof Section */}
+        <Section className="full-width testimonials-section" style={{
+          background: "#f9f9f9",
+          padding: "4rem 1rem",
+          margin: "4rem 0"
+        }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ textAlign: "center", marginBottom: "3rem" }}
+          >
+            <h2 style={{ 
+              fontSize: "2.8rem", 
+              fontWeight: "800",
+              marginBottom: "1rem"
+            }}>
+              {t("reviewsTitle")}
+            </h2>
+            <p style={{ 
+              fontSize: "1.2rem", 
+              maxWidth: "800px", 
+              margin: "0 auto", 
+              color: "#444444"
+            }}>
+              Don't just take our word for it - hear from the visionary founders and leaders we've helped succeed
+            </p>
+          </motion.div>
+          
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "2rem",
+            maxWidth: "1200px",
+            margin: "0 auto"
+          }}>
+            {testimonialData.map((testimonial, index) => (
+              <TestimonialCard 
+                key={index}
+                content={testimonial.content}
+                company={testimonial.company}
+                role={testimonial.role}
+                delay={index * 0.1 + 0.2}
+              />
+            ))}
+          </div>
+        </Section>
 
-        <ReviewsSection />
-
+        {/* Final CTA Section */}
         <HomeCallToAction />
       </Container>
     </>

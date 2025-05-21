@@ -415,5 +415,36 @@
   },
   "missionAndCoreValuesTitle": "Our Mission & Values",
   "technologiesTitle": "Our People",
-  "commitmentToInnovationTitle": "Innovation with Purpose"
+  "commitmentToInnovationTitle": "Innovation with Purpose",
+  "homeServicesSection": {
+    "title": "Our Services",
+    "subtitle": "We deliver tailored solutions that help visionary founders and VCs scale with impact",
+    "startJourneyButton": "Start Your Journey",
+    "cards": {
+      "softwareDevelopment": {
+        "title": "Software Development",
+        "description": "Custom solutions that scale with your business, from web apps to enterprise systems."
+      },
+      "uxUiDesign": {
+        "title": "UX/UI Design",
+        "description": "Beautiful interfaces that engage users and increase conversions through research-driven design."
+      },
+      "aiSolutions": {
+        "title": "AI Solutions",
+        "description": "Harness the power of artificial intelligence to automate processes and gain valuable insights."
+      },
+      "dataAnalytics": {
+        "title": "Data Analytics",
+        "description": "Turn your data into actionable intelligence with advanced analytics and visualizations."
+      },
+      "cybersecurity": {
+        "title": "Cybersecurity",
+        "description": "Protect your digital assets with comprehensive security solutions and best practices."
+      },
+      "mobileDevelopment": {
+        "title": "Mobile Development",
+        "description": "Create powerful, native experiences for iOS and Android that engage users on any device."
+      }
+    }
+  }
 }
