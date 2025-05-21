@@ -56,13 +56,18 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
   return (
     <motion.div 
       className="service-box"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ 
+        duration: 0.25, 
+        delay: delay * 0.5, 
+        ease: "easeOut" 
+      }}
       whileHover={{ 
-        scale: 1.05,
-        boxShadow: "0 15px 30px rgba(249, 123, 114, 0.25)"
+        scale: 1.03,
+        boxShadow: "0 12px 20px rgba(249, 123, 114, 0.2)",
+        transition: { duration: 0.2, ease: "easeOut" }
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -75,13 +80,13 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         position: "relative",
         overflow: "hidden",
         border: "1px solid rgba(249, 123, 114, 0.2)",
-        transition: "all 0.3s ease"
+        transition: "all 0.2s ease"
       }}
     >
       <motion.div
         initial={{ scale: 1 }}
-        animate={isHovered ? { scale: 1.2, rotate: 5 } : { scale: 1, rotate: 0 }}
-        transition={{ duration: 0.3 }}
+        animate={isHovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         style={{
           fontSize: "3rem",
           color: "var(--color-accent, #FF6B6B)",
@@ -97,7 +102,7 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         fontWeight: "700", 
         marginBottom: "1rem",
         color: "var(--color-text, #333)",
-        transition: "color 0.3s ease",
+        transition: "color 0.2s ease",
         ...(isHovered ? { color: "#E35A52" } : {})
       }}>
         {title}
@@ -115,7 +120,7 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         className="service-bg-circle"
         initial={{ scale: 0, opacity: 0 }}
         animate={isHovered ? { scale: 1, opacity: 0.1 } : { scale: 0, opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: "absolute",
           width: "300px",
@@ -137,13 +142,14 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
   return (
     <motion.div 
       className="testimonial-card"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.25, delay: delay * 0.6, ease: "easeOut" }}
       whileHover={{ 
-        y: -10,
-        boxShadow: "0 15px 30px rgba(249, 123, 114, 0.2)"
+        y: -8,
+        boxShadow: "0 12px 20px rgba(249, 123, 114, 0.15)",
+        transition: { duration: 0.2, ease: "easeOut" }
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -156,7 +162,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        transition: "all 0.3s ease-out",
+        transition: "all 0.2s ease",
         position: "relative",
         overflow: "hidden"
       }}
@@ -165,6 +171,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.05 }}
+          transition={{ duration: 0.2 }}
           style={{
             position: "absolute",
             top: 0,
@@ -185,8 +192,8 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
           position: "relative",
           zIndex: 1
         }}
-        animate={isHovered ? { scale: 1.2, rotate: 5 } : { scale: 1, rotate: 0 }}
-        transition={{ duration: 0.3 }}
+        animate={isHovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
         "
       </motion.div>
@@ -208,7 +215,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
           fontSize: "1.1rem",
           marginBottom: "0.2rem",
           color: isHovered ? "#E35A52" : "var(--color-text, #333)",
-          transition: "color 0.3s ease"
+          transition: "color 0.2s ease"
         }}>
           {company}
         </p>
@@ -337,10 +344,10 @@ export default function HomePage() {
         {/* Services Section with Interactive Boxes */}
         <Section className="full-width">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             style={{ textAlign: "center", marginBottom: "3rem" }}
           >
             <h2 style={{ 
@@ -372,37 +379,37 @@ export default function HomePage() {
               icon="💻"
               title={t("homeServicesSection.cards.softwareDevelopment.title")}
               description={t("homeServicesSection.cards.softwareDevelopment.description")}
-              delay={0.2}
+              delay={0.1}
             />
             <ServiceBox 
               icon="🎨"
               title={t("homeServicesSection.cards.uxUiDesign.title")}
               description={t("homeServicesSection.cards.uxUiDesign.description")}
-              delay={0.3}
+              delay={0.15}
             />
             <ServiceBox 
               icon="🤖"
               title={t("homeServicesSection.cards.aiSolutions.title")}
               description={t("homeServicesSection.cards.aiSolutions.description")}
-              delay={0.4}
+              delay={0.2}
             />
             <ServiceBox 
               icon="📊"
               title={t("homeServicesSection.cards.dataAnalytics.title")}
               description={t("homeServicesSection.cards.dataAnalytics.description")}
-              delay={0.5}
+              delay={0.25}
             />
             <ServiceBox 
               icon="🔒"
               title={t("homeServicesSection.cards.cybersecurity.title")}
               description={t("homeServicesSection.cards.cybersecurity.description")}
-              delay={0.6}
+              delay={0.3}
             />
             <ServiceBox 
               icon="📱"
               title={t("homeServicesSection.cards.mobileDevelopment.title")}
               description={t("homeServicesSection.cards.mobileDevelopment.description")}
-              delay={0.7}
+              delay={0.35}
             />
           </div>
         </Section>
@@ -448,10 +455,10 @@ export default function HomePage() {
           margin: "4rem 0"
         }}>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             style={{ textAlign: "center", marginBottom: "3rem" }}
           >
             <h2 style={{ 
@@ -484,7 +491,7 @@ export default function HomePage() {
                 content={testimonial.content}
                 company={testimonial.company}
                 role={testimonial.role}
-                delay={index * 0.1 + 0.2}
+                delay={index * 0.05 + 0.1}
               />
             ))}
           </div>

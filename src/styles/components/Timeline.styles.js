@@ -37,22 +37,33 @@ const drawLine = keyframes`
 
 // New component for the header box
 export const TimelineHeader = styled.div`
-  display: inline-flex; // Use inline-flex to wrap content snugly
+  display: inline-flex;
   align-items: center;
   background-color: ${({ theme }) => theme.colors.backgroundAlt};
   padding: 8px 16px;
   border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px; // Space below the header
-  position: relative; // Needed for absolute positioning of the connecting line if desired
-  z-index: 4; // Above the line and dots
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 4;
   opacity: 0;
   transform: translateY(-20px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 
+  /* Cambiamos a usar animación en lugar de transición */
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+    animation: fadeDown 0.6s ease-out forwards;
+  }
+  
+  /* Definimos keyframes específicos */
+  @keyframes fadeDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   // Small dot inside the header box
@@ -61,7 +72,7 @@ export const TimelineHeader = styled.div`
     display: inline-block;
     width: 10px;
     height: 10px;
-    background-color: ${({ theme }) => theme.colors.accent}; // Accent color dot
+    background-color: ${({ theme }) => theme.colors.accent};
     border-radius: 50%;
     margin-right: 10px;
   }
@@ -94,23 +105,33 @@ export const TimelineLine = styled.div`
   left: 50%;
   top: 70px; 
   bottom: 0;
-  width: 1px; // Made the line thinner (e.g., 2px)
-  // background-color: ${({ theme }) => theme.colors.accent}; // Remove solid background color
+  width: 1px;
   background-image: linear-gradient(
     to bottom, 
-    grey 70%, // Color of the dash
-    transparent 30% // Space between dashes
+    grey 70%,
+    transparent 30%
   );
-  background-size: 100% 10px; // Controls dash length and gap (e.g., 7px dash, 3px gap)
-  background-color: transparent; // Explicitly set background to transparent for gradient
-
-  transform: translateX(-50%) scaleY(0); 
-  transform-origin: top; 
-  transition: transform 3.5s ease-out; 
+  background-size: 100% 10px;
+  background-color: transparent;
+  
+  /* Cambiamos la forma en que se aplica la transformación para que sea más directa */
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top;
   z-index: 1;
-
+  
+  /* Usamos animación en lugar de transición para mayor control */
   &.visible {
-      transform: translateX(-50%) scaleY(1); 
+    animation: growLine 3.5s ease-out forwards;
+  }
+  
+  /* Definimos keyframes específicos para esta animación */
+  @keyframes growLine {
+    0% {
+      transform: translateX(-50%) scaleY(0);
+    }
+    100% {
+      transform: translateX(-50%) scaleY(1);
+    }
   }
 `;
 
@@ -136,70 +157,79 @@ export const TimelineDot = styled.div`
 
 export const TimelineItem = styled.div`
   position: relative;
-  width: 100%; // Take full width to manage internal spacing
-  max-width: 900px; // Max width for the whole item row
-  margin-bottom: 30px; // Reduced vertical spacing
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 30px;
   z-index: 2;
-  display: flex; // Use flex for side-by-side content
-  justify-content: space-between; // Push content to sides
-  align-items: flex-start; // Align items at the top
-  opacity: 0; 
-  transform: translateY(50px); 
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out; 
-  transition-delay: 0.2s; 
-  padding: 0 20px; // Add some padding from the edges
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  opacity: 0;
+  transform: translateY(50px);
+  padding: 0 20px;
 
-  // Calculate space needed for line and gap between content and line
-  --gap-from-line: 40px; 
+  /* Cambiamos a usar animación en lugar de transición */
+  --gap-from-line: 40px;
 
   &.visible {
-      opacity: 1; 
-      transform: translateY(0); 
-
-      h3::after {
-           animation: ${drawLine} 0.6s ease-out forwards;
-           animation-delay: 0.3s; 
-      }
-      
-      ${TimelineDot} { 
-          opacity: 1; // Make dot fully visible when parent becomes visible
-          animation: ${pulseDot} 2s infinite 0.6s; // Begin pulse animation after dot appears
-      }
+    animation: fadeInUp 0.6s ease-out forwards;
+    
+    h3::after {
+      animation: ${drawLine} 0.6s ease-out forwards;
+      animation-delay: 0.3s;
+    }
+    
+    ${TimelineDot} {
+      opacity: 1;
+      animation: ${pulseDot} 2s infinite 0.6s;
+    }
+  }
+  
+  /* Definimos keyframes específicos */
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   // Left side item (Image Left, Text Right)
   &.left {
-    justify-content: flex-start; // Align content to the start
+    justify-content: flex-start;
     .image-content {
-        width: calc(50% - var(--gap-from-line));
-        margin-right: var(--gap-from-line);
+      width: calc(50% - var(--gap-from-line));
+      margin-right: var(--gap-from-line);
     }
-     .text-content {
-         width: calc(50% - var(--gap-from-line));
-         margin-left: var(--gap-from-line);
-         text-align: left;
-         h3::after {
-            left: 0;
-            transform-origin: left;
-         }
+    .text-content {
+      width: calc(50% - var(--gap-from-line));
+      margin-left: var(--gap-from-line);
+      text-align: left;
+      h3::after {
+        left: 0;
+        transform-origin: left;
+      }
     }
   }
 
   // Right side item (Text Left, Image Right)
   &.right {
-     justify-content: flex-end; // Align content to the end
-      .text-content {
-         width: calc(50% - var(--gap-from-line));
-         margin-right: var(--gap-from-line);
-         text-align: right;
-          h3::after {
-            right: 0;
-            transform-origin: right;
-         }
+    justify-content: flex-end;
+    .text-content {
+      width: calc(50% - var(--gap-from-line));
+      margin-right: var(--gap-from-line);
+      text-align: right;
+      h3::after {
+        right: 0;
+        transform-origin: right;
+      }
     }
-     .image-content {
-         width: calc(50% - var(--gap-from-line));
-         margin-left: var(--gap-from-line);
+    .image-content {
+      width: calc(50% - var(--gap-from-line));
+      margin-left: var(--gap-from-line);
     }
   }
 
@@ -209,34 +239,34 @@ export const TimelineItem = styled.div`
   
   // Responsive adjustments for stacked layout
   @media (max-width: 768px) {
-    flex-direction: column; // Stack items vertically
-    align-items: center; // Center items horizontally
-    width: 85%; 
-    margin-left: auto; 
+    flex-direction: column;
+    align-items: center;
+    width: 85%;
+    margin-left: auto;
     margin-right: auto;
     padding: 0;
     margin-bottom: 40px;
 
     &.left, &.right {
-        justify-content: center; // Center content when stacked
-        .text-content,
-        .image-content {
-             width: 100%; // Full width on mobile
-             max-width: 400px; // Limit content width on mobile
-             margin: 0 0 15px 0 !important; // Remove horizontal margins, add bottom margin
-             text-align: center !important; // Center text
-        }
-        .text-content {
-            order: 1;
-        }
-        .image-content {
-             order: 2;
-        }
+      justify-content: center;
+      .text-content,
+      .image-content {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 0 15px 0 !important;
+        text-align: center !important;
+      }
+      .text-content {
+        order: 1;
+      }
+      .image-content {
+        order: 2;
+      }
     }
 
     &.visible {
       h3::after {
-        transform: translateX(-50%) scaleX(1) !important; // Only change the scaleX part
+        transform: translateX(-50%) scaleX(1) !important;
       }
     }
   }
