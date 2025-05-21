@@ -128,14 +128,14 @@ const NavBarDesktop = () => {
                 </ul>
               </>
             ) : (
-              <span
+              <Link href={tab.href}
                 className={`${styles.navLink} nav-link`}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(-1)}
                 onClick={() => handleTabClick(i)}
               >
-                <Link href={tab.href}>{tab.text}</Link>
-              </span>
+                {tab.text}
+              </Link>
             )}
           </li>
         ))}

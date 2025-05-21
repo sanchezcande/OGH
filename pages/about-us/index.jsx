@@ -86,8 +86,12 @@ const AboutUs = React.forwardRef((props, ref) => {
             quality={100}
             alt={t("heroAlt") || "OpenGateHub Team"}
             priority
-           
           />
+          
+          <div className="founder-info">
+            <h3 className="founder-name">Candelaria Sanchez</h3>
+            <p className="founder-role">Co-founder & CTO</p>
+          </div>
         </div>
 
         <div ref={textRef}>

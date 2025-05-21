@@ -43,9 +43,16 @@ export const ImageText = styled.div`
     flex: 1;
     max-width: 300px;
     min-width: 200px;
-    opacity: 0;
-    transform: translateY(-50px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Remove opacity and transform for testing */
+    /* opacity: 0;
+    transform: translateY(-50px); */
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    /* transition: opacity 0.6s ease-out, transform 0.6s ease-out; */
 
     &.visible {
       opacity: 1;
@@ -59,6 +66,36 @@ export const ImageText = styled.div`
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
       background-color: ${({ theme }) => theme.colors.accent + "90"};
       border: px solid ${({ theme }) => theme.colors.accent};
+    }
+
+    .founder-info {
+      visibility: visible;
+      opacity: 1;
+      margin-top: 40px;
+      padding: 0;
+      background-color: transparent;
+      width: 100%;
+      max-width: 250px;
+      text-align: center;
+      
+      .founder-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333333;
+        margin: 0 0 3px 0;
+        text-align: center;
+        display: block;
+      }
+      
+      .founder-role {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #555555;
+        text-align: center;
+        display: block;
+        font-style: italic;
+        margin: 0;
+      }
     }
   }
 
