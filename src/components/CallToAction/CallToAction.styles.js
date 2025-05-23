@@ -128,17 +128,23 @@ export const CallToActionButton = styled.a`
   z-index: 1;
   transition: all 0.3s ease;
   animation: ${pulse} 3s infinite;
+  overflow: hidden;
 
   &::before {
     content: "";
     position: absolute;
     top: 0;
-    left: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, ${({ theme }) => theme.colors.accent}, ${({ theme }) => theme.colors.accentDark});
-    z-index: -1;
-    transition: all 0.4s ease;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    z-index: 1;
+    transition: left 0.7s ease;
     border-radius: 8px;
   }
 
@@ -146,6 +152,10 @@ export const CallToActionButton = styled.a`
     transform: translateY(-5px);
     color: white;
     box-shadow: 0 10px 25px rgba(249, 123, 114, 0.5);
+    
+    &::before {
+      left: 100%;
+    }
   }
   
   @media (max-width: 768px) {

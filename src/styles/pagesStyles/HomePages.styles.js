@@ -409,36 +409,26 @@ export const CTAButton = styled.a`
     content: "";
     position: absolute;
     top: 0;
-    left: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, ${({ theme }) => theme.colors.accent}, ${({ theme }) => theme.colors.accentDark});
-    z-index: -1;
-    transition: all 0.4s ease;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    z-index: 1;
+    transition: left 0.7s ease;
   }
   
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: ${({ theme }) => theme.colors.accentDark};
-    z-index: 2;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.4s ease;
-  }
-
   &:hover {
     transform: translateY(-5px);
     color: white;
     box-shadow: 0 10px 25px rgba(249, 123, 114, 0.4);
     
-    &::after {
-      transform: scaleX(1);
-      transform-origin: left;
+    &::before {
+      left: 100%;
     }
   }
   
@@ -457,7 +447,12 @@ export const CTAButton = styled.a`
     box-shadow: none;
     
     &::before {
-      background: transparent;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(249, 123, 114, 0.1) 50%,
+        transparent 100%
+      );
     }
     
     &:hover {
