@@ -109,7 +109,7 @@ export default function MyApp({ Component, pageProps }) {
           property="og:description"
           content="OpenGateHub specializes in innovative software development for businesses worldwide."
         />
-        <meta property="og:image" content="https://opengatehub.com/Logo4.png" />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4.png" />
         <meta property="og:url" content="https://opengatehub.com/" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
