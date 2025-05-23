@@ -8,7 +8,7 @@
   "english": "Inglés",
   "spanish": "Español",
   "name": "Nombre",
-  "ctaButton": "Reservá una llamada",
+  "ctaButton": "Reservá tu consulta gratis",
   "email": "Correo electrónico",
   "phoneNumber": "Número de teléfono (opcional)",
   "subject": "Asunto (opcional)",
@@ -58,29 +58,29 @@
   "innovativeSolution": "nuestro equipo trabaja para hacer realidad tu visión mientras apoya el",
   "forBusiness": "crecimiento de tu negocio.",
   "homeCallToAction": {
-    "title": "¿Listo para llevar tu negocio al siguiente nivel?",
-    "description": "Obtén una consulta gratuita hoy.",
-    "buttonText": "Comienza Ahora"
+    "title": "¿Listo para transformar tu negocio?",
+    "description": "Reservá tu consultoría gratuita de 30 minutos hoy",
+    "buttonText": "Reservar Consulta Gratis"
   },
   "faqsCallToAction": {
     "title": "¿Todavía tenés preguntas?",
-    "description": "Nuestro equipo está aquí para ayudarte a encontrar las soluciones adecuadas.",
-    "buttonText": "Contactanos"
+    "description": "Programa una consulta gratuita con nuestros expertos.",
+    "buttonText": "Consultar con Expertos"
   },
   "servicesCallToAction": {
-    "title": "Descubrí cómo podemos ayudarte",
-    "description": "Explorá nuestros servicios y llevá tu negocio al siguiente nivel.",
-    "buttonText": "Conoce Más"
+    "title": "¿Listo para innovar?",
+    "description": "Reservá una sesión estratégica gratuita para discutir tus necesidades.",
+    "buttonText": "Reservar Sesión Gratis"
   },
   "aboutUsCallToAction": {
-    "title": "Trabajemos juntos",
-    "description": "Únete a una comunidad de negocios exitosos impulsados por OpenGateHub.",
-    "buttonText": "Únete Ahora"
+    "title": "Creemos algo increíble juntos",
+    "description": "Programa una consulta gratuita e inicia tu transformación digital.",
+    "buttonText": "Reservar Consulta Gratis"
   },
   "contactUsCallToAction": {
-    "title": "Nos encantaría saber de ti",
-    "description": "Contactanos y comencemos a construir algo increíble juntos.",
-    "buttonText": "Contactanos"
+    "title": "¿Listo para hablar soluciones?",
+    "description": "Programa una llamada gratuita con nuestro equipo para discutir tu proyecto.",
+    "buttonText": "Reservar Llamada Ahora"
   },
   "companyHistoryTitle": "Nuestro Camino",
   "companyHistoryDescription": "Nuestra historia comenzó con una simple creencia: que la tecnología debe servir a un propósito superior. Desde nuestras raíces en Argentina hasta nuestro alcance global actual, hemos tenido el privilegio de trabajar con líderes que se atreven a pensar diferente sobre el éxito.",

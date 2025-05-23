@@ -234,6 +234,15 @@ export const Title = styled.h1`
 
   @media (max-width: 768px) {
     font-size: 2rem;
+    
+    .animated {
+      white-space: normal;
+      border-right: none;
+    }
+    
+    .highlighted-word {
+      display: inline;
+    }
   }
   @media (max-width: 610px) {
     font-size: 1.2rem;
@@ -346,6 +355,11 @@ export const SectionTitle = styled.h3`
   
   @media (max-width: 768px) {
     font-size: 1.8rem;
+    flex-wrap: wrap;
+    
+    .highlighted-word {
+      display: inline;
+    }
   }
 `;
 
@@ -474,6 +488,15 @@ export const InteractiveCircleContainer = styled.div`
   align-items: center;
   gap: 4rem;
   margin: 4rem 0;
+  
+  ${SectionTitle} {
+    @media (max-width: 768px) {
+      word-break: normal;
+      word-wrap: break-word;
+      hyphens: auto;
+      padding-right: 0.5rem;
+    }
+  }
   
   @media (max-width: 768px) {
     padding: 2rem 1rem;

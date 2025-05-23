@@ -24,6 +24,7 @@ export const LogoIcon = styled.div`
   align-items: center;
   flex-direction: row;
   margin: 0 1rem;
+
 `;
 
 export const NavBarContainer = styled.nav`
@@ -41,6 +42,7 @@ export const Logo = styled.div`
   font-size: 24px;
   color: ${({ theme }) => theme.colors.primary};
   width: 60%;
+  margin-top: 0.6rem;
 `;
 
 export const Span = styled.span`

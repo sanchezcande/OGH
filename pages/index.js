@@ -25,6 +25,7 @@ import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import React from "react";
 
 const LottieAnimation = dynamic(
   () => import("../src/components/Animations/LottieAnimation"),
@@ -240,7 +241,7 @@ export default function HomePage() {
       if (index % 2 === 1) {
         return <span key={index} className="highlighted-word">{part}</span>;
       }
-      return part;
+      return <React.Fragment key={index}>{part}</React.Fragment>;
     });
   };
 
