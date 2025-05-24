@@ -445,6 +445,7 @@ export const CTAButton = styled.a`
     color: ${({ theme }) => theme.colors.accent};
     border: 2px solid ${({ theme }) => theme.colors.accent};
     box-shadow: none;
+    position: relative;
     
     &::before {
       background: linear-gradient(
@@ -455,10 +456,29 @@ export const CTAButton = styled.a`
       );
     }
     
+    /* Línea inferior solo para el botón secundario */
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: ${({ theme }) => theme.colors.accent};
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s ease;
+    }
+    
     &:hover {
       background-color: ${({ theme }) => theme.colors.accent}11;
       color: ${({ theme }) => theme.colors.accent};
       box-shadow: 0 5px 15px rgba(249, 123, 114, 0.15);
+      
+      &::after {
+        transform: scaleX(1);
+        transform-origin: left;
+      }
     }
   }
   
