@@ -100,7 +100,7 @@ export default function MyApp({ Component, pageProps }) {
           name="description"
           content="OpenGateHub specializes in innovative software development for businesses worldwide. Transform your ideas into powerful digital solutions."
         />
-        <link rel="icon" href="/Reducido4.png" type="image/png" />
+        <link rel="icon" href="/browser-link-logo.png" type="image/png" />
         <meta
           property="og:title"
           content="OpenGateHub - Your Trusted Development Partner"
@@ -109,7 +109,7 @@ export default function MyApp({ Component, pageProps }) {
           property="og:description"
           content="OpenGateHub specializes in innovative software development for businesses worldwide."
         />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4.png" />
+        <meta property="og:image" content="https://opengatehub.com/circular-bgw.png" />
         <meta property="og:url" content="https://opengatehub.com/" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
