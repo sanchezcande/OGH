@@ -270,28 +270,36 @@ export const Subtitle = styled.h2`
   }
 `;
 
-export const Section = styled.section`
-  max-width: 1200px;
-  margin: 80px auto;
-  text-align: left;
-  animation: ${fadeIn} 0.6s ease;
-  position: relative;
+export const Section = styled.div`
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
   
-  &.process-section {
-    background: #fff;
-    border-radius: 16px;
-    padding: 5rem 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    margin: 6rem auto;
+  &.full-width {
+    max-width: none;
+    padding: 4rem 2rem;
+    background: ${({ theme }) => `${theme.colors.backgroundAlt}11`};
+  }
+
+  &.serious-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: none;
+    text-align: left;
+    padding: 2.5rem 2rem 2rem 2rem;
+    box-shadow: none;
   }
   
   @media (max-width: 768px) {
-    margin: 60px auto;
-    
-    &.process-section {
-      padding: 3rem 1.5rem;
-      margin: 4rem auto;
+    padding: 1rem;
+    &.full-width {
+      padding: 3rem 1rem;
+    }
+    &.serious-block {
+      padding: 1.5rem 0.5rem 1rem 0.5rem;
     }
   }
 `;
@@ -490,33 +498,6 @@ export const CTAButton = styled.a`
       padding: 16px 36px;
       font-size: 1.1rem;
     }
-  }
-`;
-
-export const InteractiveCircleContainer = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  padding: 3rem 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4rem;
-  margin: 4rem 0;
-  
-  ${SectionTitle} {
-    @media (max-width: 768px) {
-      word-break: normal;
-      word-wrap: break-word;
-      hyphens: auto;
-      padding-right: 0.5rem;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    padding: 2rem 1rem;
-    gap: 3rem;
-    margin: 3rem 0;
   }
 `;
 

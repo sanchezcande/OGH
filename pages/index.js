@@ -8,7 +8,6 @@ import {
   Highlight,
   Section,
   SectionTitle,
-  InteractiveCircleContainer,
   FloatingBlob,
   PlanSteps,
   SectionText,
@@ -20,7 +19,6 @@ import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import dynamic from "next/dynamic";
-import InteractiveInvertCircle from "../src/components/Animations/InteractiveCircle";
 import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import { motion } from "framer-motion";
@@ -325,22 +323,33 @@ export default function HomePage() {
           </CTAButton>
         </Hero>
         
-        <InteractiveCircleContainer>
-          <InteractiveInvertCircle />
-          <Section>
+        <Section className="serious-block">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
             <SectionTitle style={{"--i": 0}}>
               {parseHighlightedText(t("problemTitle"))}
             </SectionTitle>
             <SectionText>{t("problemText")}</SectionText>
-          </Section>
+          </motion.div>
+        </Section>
 
-          <Section>
+        <Section className="serious-block">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
             <SectionTitle style={{"--i": 1}}>
               {parseHighlightedText(t("weGetYouTitle"))}
             </SectionTitle>
             <SectionText>{t("weGetYouText")}</SectionText>
-          </Section>
-        </InteractiveCircleContainer>
+          </motion.div>
+        </Section>
         
         {/* Services Section with Interactive Boxes */}
         <Section className="full-width">
