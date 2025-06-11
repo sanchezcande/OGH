@@ -23,9 +23,12 @@
   "privacyPolicy": "Privacy Policy",
   "faq": "FAQ",
   "connectWithUs": "Connect With Us",
-  "aboutUsTitle_part1": "Building Technology That Makes a ",
-  "aboutUsTitle_highlight": "Difference",
-  "aboutUsText": "We're not a dev shop. We're a team built by developers who've been in the trenches — scaling real products, working with real startups, solving real problems.\n\nAt OpenGateHub, we believe code is power. And we use it to build solutions that don't just scale fast, but scale right — with ethics, strategy and soul.\n\nWhether you're a founder building your MVP or a VC scaling a portfolio, we're your unfair advantage in LATAM.",
+  "aboutUsTitle_part1": "We build technology that makes your life ",
+  "aboutUsTitle_highlight": " easier",
+  "aboutUsSubtitle": "— and your product stronger",
+  "aboutUsText": "We're not just another dev agency.\nWe're a team of developers who know what it takes to build, scale, and support products that matter.\nAt OpenGateHub, we believe tech should feel like support — not stress.\nWe care about how things are built — with purpose, clarity, and soul.",
+  "aboutUsLastLine": "Our job is simple: ",
+  "aboutUsTextBold": "make the hard work feel lighter.",
   "aboutUsFounder": "Candelaria Sanchez",
   "aboutUsFounderRole": "Co-founder & CTO, OpenGateHub",
   "contactUsTitle": "Reach Out!",
@@ -39,27 +42,27 @@
   "seoTitle": "Build with People Who Get It | OpenGateHub",
   "seoDescription": "We help visionary founders and VCs scale startups with culturally aligned developers that care about impact.",
   "heroAnimatedText": {
-    "part1": "Build with",
-    "highlight1": "People",
-    "part2": "Who",
-    "highlight2": "Get It"
+    "part1": "A software ",
+    "highlight1": " Partner",
+    "part2": "with",
+    "highlight2": "Soul"
   },
-  "heroSubtitle": "We partner with founders and VCs who believe in scaling with heart, culture, and impact.",
+  "heroSubtitle": "Making your life easier — with real humans who care.",
   "heroAlt": "Tech team illustration - OpenGateHub",
-  "problemTitle": "You're <highlight>racing</highlight> against <highlight>time</highlight>.",
-  "problemText": "You're under pressure to grow your product, meet investor expectations, and build the right team. But hiring in-house is slow. Developers in the US are expensive. And outsourcing often means sacrificing quality\u2014or worse, culture.",
-  "weGetYouTitle": "We <highlight>get it</highlight>. We've been there.",
-  "weGetYouText": "We've not just another agency. We're a team of technical founders who believe in building long-term partnerships, not transactions. We share your values, your urgency, and your ambition to create something meaningful.",
+  "problemTitle": "You're holding <highlight>a lot</highlight> right now.",
+  "problemText": "You're building a product you care about. Trying to meet expectations, grow fast, and find the right people to do it with. But hiring takes time. And outsourcing often means compromising — on quality, on culture, or both.",
+  "weGetYouTitle": "We <highlight>see you</highlight>. We've been there.",
+  "weGetYouText": "That's why we created OpenGateHub —  a software partner that makes your life easier,  with quality you can trust and humans who care deeply. We're here to support you with heart, culture, and clarity —  so you don't have to do it all alone.",
   "planTitle": "Here's how we do it:",
   "planSteps": {
-    "step1": "Discovery call: Tell us what you need.",
-    "step2": "Custom plan: Get matched with aligned developers.",
-    "step3": "Start building: Integrate, iterate, and scale with confidence."
+    "step1": "Discovery Call: We listen. Tell us where you are, what you need, and what matters most to you.",
+    "step2": "Custom Plan: We put together a clear plan and match you with developers aligned with your goals and culture.",
+    "step3": "Build & Grow: We integrate smoothly, communicate openly, and scale with intention and care."
   },
-    "forBusiness": "business growth.",
+  "forBusiness": "business growth.",
   "homeCallToAction": {
-    "title": "Ready to Transform Your Business?",
-    "description": "Book a Free 30-Minute Consulting Call Today",
+    "title": "Ready to build something that feels aligned?",
+    "description": "Let's talk about your vision and what kind of support would actually feel good.",
     "buttonText": "Book a Free Consulting Call"
   },
   "faqsCallToAction": {
@@ -72,43 +75,31 @@
     "description": "Book a free strategy session to discuss your project needs.",
     "buttonText": "Book Free Strategy Call"
   },
-  "aboutUsCallToAction": {
-    "title": "Let's Create Something Amazing",
-    "description": "Schedule a free consultation and start your digital transformation.",
-    "buttonText": "Book Free Consultation"
-  },
+"aboutUsCallToAction": {
+  "title": "Let's Build Something That Feels Right",
+  "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
+  "buttonText": "Book a Free Call"
+},
+
   "contactUsCallToAction": {
     "title": "Ready to Talk Solutions?",
     "description": "Schedule a free call with our team to discuss your project.",
     "buttonText": "Book Free Call Now"
-  },
-  "companyHistoryTitle": "Our Journey",
-  "companyHistoryDescription": "Our story began with a simple belief: that technology should serve a higher purpose. From our roots in Argentina to our global reach today, we've been privileged to work with leaders who dare to think differently about success.",
-  "companyHistoryExpandableDescription1": "We started OpenGateHub with a vision to bridge the gap between technological innovation and meaningful impact. Our experience working with US companies taught us that the best solutions emerge when profit meets purpose.",
-  "companyHistoryExpandableDescription2": "Our founders have spent years in both the startup ecosystem and impact investing space, giving us a unique perspective on how to scale sustainably while maximizing positive impact.",
-  "companyHistoryExpandableDescription3": "We focus on solutions that address real-world challenges while creating measurable social and environmental benefits.",
-  "companyHistoryExpandableDescription4": "Every project we take on is evaluated not just for its technical merit, but for its potential to create lasting positive change.",
-  "missionAndCoreValuesTitle_part1": "Our Mission & ",
-  "missionAndCoreValuesTitle_highlight": "Values",
-  "missionAndCoreValuesDescription": "We believe that the most successful businesses of tomorrow will be those that create value for all stakeholders - investors, users, society, and our planet. Our mission is to empower visionary leaders to build these businesses today.",
-  "missionAndCoreValuesExpandableDescription1": "We partner with founders and investors who see beyond traditional metrics of success, helping them leverage technology to create both returns and impact.",
-  "missionAndCoreValuesExpandableDescription2": "Transparency and trust are non-negotiable. We believe in building long-term relationships based on shared values and a commitment to positive change.",
-  "missionAndCoreValuesExpandableDescription3": "Our approach combines rigorous technical expertise with impact measurement frameworks, ensuring your solutions create sustainable value.",
-  "missionAndCoreValuesExpandableDescription4": "We're committed to continuous learning and adaptation, staying ahead of both technological trends and evolving impact standards.",
-  "technologiesTitle_part1": "Our ",
-  "technologiesTitle_highlight": "People",
-  "technologiesDescription": "Behind every successful impact venture is a team that truly gets it. Our people aren't just skilled developers - they're mission-driven individuals who understand the unique challenges of building for impact.",
-  "technologiesExpandableDescription1": "We've built a team that combines technical excellence with a deep understanding of impact metrics and ESG principles.",
-  "technologiesExpandableDescription2": "Our culture is built on empathy, innovation, and a shared commitment to using technology as a force for good.",
-  "technologiesExpandableDescription3": "We invest in our team's growth, fostering an environment where both technical skills and impact understanding can flourish.",
-  "technologiesExpandableDescription4": "Every team member brings their unique perspective to the table, enriching our ability to solve complex challenges while creating positive change.",
-  "commitmentToInnovationTitle_part1": "Innovation with ",
-  "commitmentToInnovationTitle_highlight": "Purpose",
-  "commitmentToInnovationDescription": "In a world facing unprecedented challenges, innovation isn't just about building something new - it's about building something better. We help you leverage cutting-edge technology to create solutions that matter.",
-  "commitmentToInnovationExpandableDescription1": "We believe that the most impactful innovations happen at the intersection of profit and purpose, where business success drives positive change.",
-  "commitmentToInnovationExpandableDescription2": "Our approach to innovation is holistic, considering not just technical feasibility but also social impact and environmental sustainability.",
-  "commitmentToInnovationExpandableDescription3": "We stay at the forefront of both technological advances and impact measurement methodologies, ensuring your solutions are both cutting-edge and meaningful.",
-  "commitmentToInnovationExpandableDescription4": "Our goal is to help you build solutions that don't just solve today's problems but help create a better tomorrow.",
+  },"companyHistoryTitle": "Our Journey",
+"companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
+
+"missionAndCoreValuesTitle_part1": "Our Mission & ",
+"missionAndCoreValuesTitle_highlight": "Values",
+"missionAndCoreValuesDescription": "We believe in doing meaningful work — with people who care. Our mission is to support founders and teams who want to create value with integrity, for their users, their investors, and the world they're part of.",
+
+"technologiesTitle_part1": "Our ",
+"technologiesTitle_highlight": "People",
+"technologiesDescription": "The strength of what we build comes from who we build it with. Our team isn't just talented — they're thoughtful, reliable, and genuinely committed to creating products with purpose.",
+
+"commitmentToInnovationTitle_part1": "Innovation with ",
+"commitmentToInnovationTitle_highlight": "Purpose",
+"commitmentToInnovationDescription": "We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.",
+
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
   "backendTitle": "Backend & Cloud",
@@ -201,30 +192,30 @@
     },
     "callToAction": "The time to stand out is now. Contact our team and let's build a visual identity that drives your success."
   },
-    "aiSolutions": {
-      "title": "AI Solutions",
-      "questions": {
-        "q1": "Are you struggling to harness the power of artificial intelligence in your business?",
-        "q2": "Do you find it challenging to automate processes and analyze data effectively?",
-        "q3": "Is your business missing out on the competitive edge AI can provide?"
-      },
-      "description": "AI-driven solutions can transform your business operations, unlocking new opportunities for efficiency and growth. However, many companies face obstacles such as a lack of expertise, high implementation costs, and unclear strategies for AI integration. You, as an innovative leader, have the power to overcome these challenges and lead your business into the future.",
-      "solutions": {
-        "title": "What We Can Create for You",
-        "automation": "We design intelligent automation systems to optimize your operations.",
-        "analytics": "We develop advanced analytics tools to extract actionable insights from your data.",
-        "customAI": "We build tailored AI models that align with your business goals."
-      },
-      "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we'll make AI a cornerstone of your success.",
-      "stepsTitle": "How do we work with you?",
-      "steps": {
-        "step1": "Understand your needs: We assess your business goals and identify AI opportunities.",
-        "step2": "Design solutions: We create AI strategies and models tailored to your requirements.",
-        "step3": "Collaborate closely: We refine solutions based on your feedback and ensure seamless integration.",
-        "step4": "Empower your business: We deliver AI-driven tools that transform your operations."
-      },
-      "callToAction": "The future is AI. Contact us today and let's bring intelligent solutions to your business."
-  },  
+  "aiSolutions": {
+    "title": "AI Solutions",
+    "questions": {
+      "q1": "Are you struggling to harness the power of artificial intelligence in your business?",
+      "q2": "Do you find it challenging to automate processes and analyze data effectively?",
+      "q3": "Is your business missing out on the competitive edge AI can provide?"
+    },
+    "description": "AI-driven solutions can transform your business operations, unlocking new opportunities for efficiency and growth. However, many companies face obstacles such as a lack of expertise, high implementation costs, and unclear strategies for AI integration. You, as an innovative leader, have the power to overcome these challenges and lead your business into the future.",
+    "solutions": {
+      "title": "What We Can Create for You",
+      "automation": "We design intelligent automation systems to optimize your operations.",
+      "analytics": "We develop advanced analytics tools to extract actionable insights from your data.",
+      "customAI": "We build tailored AI models that align with your business goals."
+    },
+    "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we'll make AI a cornerstone of your success.",
+    "stepsTitle": "How do we work with you?",
+    "steps": {
+      "step1": "Understand your needs: We assess your business goals and identify AI opportunities.",
+      "step2": "Design solutions: We create AI strategies and models tailored to your requirements.",
+      "step3": "Collaborate closely: We refine solutions based on your feedback and ensure seamless integration.",
+      "step4": "Empower your business: We deliver AI-driven tools that transform your operations."
+    },
+    "callToAction": "The future is AI. Contact us today and let's bring intelligent solutions to your business."
+  },
   "faqsTitle": "Frequently Asked Questions",
   "faqs": {
     "softwareFactory": {
@@ -392,7 +383,8 @@
       "content": "In a world where technology is advancing at an unprecedented pace, artificial intelligence (AI) and automation are revolutionizing the way businesses operate and grow. From streamlining internal processes to enhancing customer experiences, these technologies are the key to staying competitive in today's market.\n\nWhy invest in AI and automation? Companies that embrace these tools not only reduce costs and operational times but also free up resources to focus on innovation and strategic development. According to Gartner, 70% of organizations will be using AI technologies in at least one key function by 2025.\n\nPractical Applications in Businesses\n\nProcess Optimization: Automating repetitive tasks such as inventory management, order tracking, or customer service through chatbots.\nPredictive Analysis: AI enables the analysis of large volumes of data to anticipate trends, identify risks, and make informed decisions.\nCustomer Personalization: Advanced algorithms make it possible to deliver unique and relevant experiences that enhance customer loyalty.\nAdvanced Cybersecurity: AI-based systems detect threats in real time, protecting sensitive data from cyberattacks.\n\nThe Impact on Business Growth\n\nAI and automation not only enhance efficiency but also pave the way for new business opportunities. Companies that have adopted these technologies report significant increases in productivity and customer satisfaction, leading to sustainable growth.\n\nOpenGateHub: Your Partner in AI and Automation\n\nAt OpenGateHub, we understand that every business faces unique challenges. That's why we deliver customized AI and automation solutions tailored to your needs, ensuring real and tangible results.\n\nThe future is now, and with AI and automation, success is within your business's reach."
     }
   ],
-  "reviewsTitle": "What our clients say",
+  "reviewsTitle": "From those we've partnered with",
+  "reviewsSubtitle": "Real stories from founders and leaders who've trusted us to grow with them.",
   "reviews": {
     "skylar": {
       "text": "We are truly delighted with the work OpenGateHub did for our venture. They understood from the very beginning what we wanted to convey and translated it into a modern, intuitive, and visually flawless website. Moreover, their service was excellent: always available, quick to respond, and very willing to resolve any doubts or needs that arose. It's evident that they work with commitment, professionalism, and experience. We recommend them without hesitation.",
@@ -420,32 +412,32 @@
   "commitmentToInnovationTitle": "Innovation with Purpose",
   "homeServicesSection": {
     "title": "Our Services",
-    "subtitle": "We deliver tailored solutions that help visionary founders and VCs scale with impact",
+    "subtitle": "We work with people who care about the how, not just the what.   \nCustom solutions for founders who want to scale with flow, trust, and culture.",
     "startJourneyButton": "Start Your Journey",
     "cards": {
       "softwareDevelopment": {
         "title": "Software Development",
-        "description": "Custom solutions that scale with your business, from web apps to enterprise systems."
+        "description": "Custom software that feels tailored to you. We co-create what you need — from MVPs to powerful systems — with clarity, care, and flow."
       },
       "uxUiDesign": {
         "title": "UX/UI Design",
-        "description": "Beautiful interfaces that engage users and increase conversions through research-driven design."
+        "description": "Design that feels good — and works. We create thoughtful, intuitive interfaces your users will actually want to use."
       },
       "aiSolutions": {
         "title": "AI Solutions",
-        "description": "Harness the power of artificial intelligence to automate processes and gain valuable insights."
+        "description": "Let tech take weight off your plate. We bring AI into your product in ways that feel natural, smart, and aligned with your goals."
       },
       "dataAnalytics": {
         "title": "Data Analytics",
-        "description": "Turn your data into actionable intelligence with advanced analytics and visualizations."
+        "description": "Your data has a story to tell. We turn it into insights you can actually use — no fluff, just clarity."
       },
       "cybersecurity": {
         "title": "Cybersecurity",
-        "description": "Protect your digital assets with comprehensive security solutions and best practices."
+        "description": "You shouldn't have to worry about what's under the hood. We protect what matters so you can focus on building."
       },
       "mobileDevelopment": {
         "title": "Mobile Development",
-        "description": "Create powerful, native experiences for iOS and Android that engage users on any device."
+        "description": "From your idea to their pocket. We create native apps that feel intuitive, responsive and on brand — every time."
       }
     }
   }

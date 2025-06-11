@@ -33,7 +33,7 @@ export const Container = styled.div`
 
 export const ImageText = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   margin-bottom: 3rem;
   gap: 2rem;
@@ -102,6 +102,9 @@ export const ImageText = styled.div`
   div:not(.image-container) { // Text container
     flex: 2;
     max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     opacity: 0;
     transform: translateY(-30px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
@@ -127,8 +130,8 @@ export const ImageText = styled.div`
     h1 {
       font-size: 2.5rem;
       color: ${({ theme }) => theme.colors.primaryDark};
-      text-align: center;
-      margin-bottom: 1rem;
+      text-align: left;
+      margin: 0;
       font-weight: 700;
       line-height: 1.2;
       /* Note: HighlightedWord component will inherit these font styles */
@@ -144,13 +147,36 @@ export const ImageText = styled.div`
         margin-right: auto;
         line-height: 1.6;
       }
+    }
 
-      @media (max-width: 768px) {
-        font-size: 2rem;
-        span:not(.highlighted-class-placeholder) {
-          font-size: 0.9rem;
-        }
-      }
+    h1 + h2.subtitle {
+      margin-top: 0.5rem;
+    }
+
+    h2.subtitle {
+      font-size: 1.5rem;
+      color: ${({ theme }) => theme.colors.primaryDark};
+      text-align: left;
+      margin: 0;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+
+    h2.subtitle + p {
+      margin-top: 1.5rem;
+    }
+
+    p {
+      white-space: pre-line;
+      text-align: left;
+      color: ${({ theme }) => theme.colors.textMuted};
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .bold-text {
+      font-weight: 600;
+      color: ${({ theme }) => theme.colors.primaryDark};
     }
   }
 

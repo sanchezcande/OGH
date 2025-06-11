@@ -475,7 +475,8 @@ export default function HomePage() {
               margin: "0 auto", 
               color: "#444444"
             }}>
-              Don't just take our word for it - hear from the visionary founders and leaders we've helped succeed
+               {t("reviewsSubtitle")}
+          
             </p>
           </motion.div>
           

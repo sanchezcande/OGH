@@ -101,7 +101,12 @@ const AboutUs = React.forwardRef((props, ref) => {
               {t("aboutUsTitle_highlight")}
             </HighlightedWord>
           </h1>
-          <p>{t("aboutUsText")}</p>
+          <h2 className="subtitle">{t("aboutUsSubtitle")}</h2>
+          <p>
+            {t("aboutUsText")}
+            {t("aboutUsLastLine")}
+            <span className="bold-text">{t("aboutUsTextBold")}</span>
+          </p>
         </div>
       </ImageText>
 

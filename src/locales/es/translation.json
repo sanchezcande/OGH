@@ -25,12 +25,12 @@
   "seoTitle": "Constru\u00ed con personas que lo entienden | OpenGateHub",
   "seoDescription": "Ayudamos a fundadores y VCs visionarios a escalar startups con desarrolladores alineados culturalmente que valoran el impacto.",
   "heroAnimatedText": {
-    "part1": "Creá con",
-    "highlight1": "personas",
-    "part2": "que",
-    "highlight2": "sí entienden"
+    "part1": "Tu socio ",
+    "highlight1": "tech",
+    "part2": "con",
+    "highlight2": "alma"
   },
-  "heroSubtitle": "Nos asociamos con fundadores y VCs que creen en escalar con coraz\u00f3n, cultura e impacto.",
+  "heroSubtitle": "Haciendo tu vida más fácil — con humanos reales que se preocupan.",
   "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
   "problemTitle": "Estás <highlight>contra</highlight> reloj.",
   "problemText": "Ten\u00e9s presi\u00f3n para escalar tu producto, cumplir con inversores y armar el equipo correcto. Pero contratar internamente lleva tiempo. Los devs en EE.UU. son caros. Y tercerizar muchas veces implica perder calidad, o peor, cultura.",
@@ -43,9 +43,12 @@
     "step3": "Ponete en marcha: integrá, iterá y escalá con confianza."
   },
   "connectWithUs": "Conectate con Nosotros",
-  "aboutUsTitle_part1": "Construyendo Tecnología que Genera ",
-  "aboutUsTitle_highlight": "Impacto",
-  "aboutUsText": "No somos una simple agencia de desarrollo. Somos un equipo construido por desarrolladores que han estado en las trincheras — escalando productos reales, trabajando con startups reales, resolviendo problemas reales.\n\nEn OpenGateHub, creemos que el código es poder. Y lo usamos para construir soluciones que no solo escalan rápido, sino que escalan correctamente — con ética, estrategia y alma.\n\nTanto si eres un fundador construyendo tu MVP o un VC escalando un portfolio, somos tu ventaja competitiva en LATAM.",
+  "aboutUsTitle_part1": "Construimos tecnología que hace tu vida ",
+  "aboutUsTitle_highlight": "más fácil",
+  "aboutUsSubtitle": "— y tu producto más fuerte",
+  "aboutUsText": "No somos solo otra agencia de desarrollo.\nSomos un equipo de desarrolladores que sabe lo que se necesita para construir, escalar y mantener productos que importan.\nEn OpenGateHub, creemos que la tecnología debería sentirse como un apoyo — no como estrés.\nNos importa cómo se construyen las cosas — con propósito, claridad y alma.",
+  "aboutUsLastLine": "Nuestro trabajo es simple: ",
+  "aboutUsTextBold": "hacer que el trabajo duro se sienta más liviano.",
   "aboutUsFounder": "Candelaria Sanchez",
   "aboutUsFounderRole": "Co-fundadora y CTO, OpenGateHub",
   "contactUsTitle": "¡Ponete en contacto!",
