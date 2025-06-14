@@ -47,10 +47,10 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
   return (
     <motion.div 
       className="service-box"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.2, delay: delay * 0.2 }}
+      transition={{ duration: 0.15, delay: delay * 0.1 }}
       whileHover={{ 
         scale: 1.02,
         transition: { duration: 0.1 }
@@ -66,7 +66,7 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         position: "relative",
         overflow: "hidden",
         border: "1px solid rgba(249, 123, 114, 0.2)",
-        transition: "all 0.2s ease"
+        transition: "all 0.15s ease"
       }}
     >
       <motion.div
@@ -128,10 +128,10 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
   return (
     <motion.div 
       className="testimonial-card"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.2, delay: delay * 0.2 }}
+      transition={{ duration: 0.15, delay: delay * 0.1 }}
       whileHover={{ 
         y: -4,
         transition: { duration: 0.1 }
@@ -147,7 +147,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        transition: "all 0.2s ease",
+        transition: "all 0.15s ease",
         position: "relative",
         overflow: "hidden"
       }}
@@ -311,10 +311,10 @@ export default function HomePage() {
         
         <Section className="serious-block">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             <SectionTitle style={{"--i": 0}}>
               {parseHighlightedText(t("problemTitle"))}
@@ -325,10 +325,10 @@ export default function HomePage() {
 
         <Section className="serious-block">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             <SectionTitle style={{"--i": 1}}>
               {parseHighlightedText(t("weGetYouTitle"))}
