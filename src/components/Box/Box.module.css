@@ -1,18 +1,18 @@
 @keyframes fadeInFromTop {
   0% {
     opacity: 0;
-    transform: translateY(-30px); /* Start slightly above */
+    transform: translateY(-30px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);    /* End at its natural position */
+    transform: translateY(0);
   }
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
   /*perspective: 1000px; Adding perspective here if needed for 3D transforms on children */
 }
 
@@ -21,32 +21,30 @@
   background: linear-gradient(155deg, #FFF5F5 0%, #FFEAEA 80%);
   border-radius: 10px;
   box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.3);
-  transition: box-shadow 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
-  will-change: transform, opacity;
-  cursor: grab;
+  transition: box-shadow 0.3s ease;
+  will-change: transform;
+  cursor: pointer;
   overflow: hidden;
-  touch-action: none;
   opacity: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .card.visible {
-  animation-name: fadeInFromTop;
-  animation-duration: 0.5s;
-  animation-fill-mode: forwards;
+  animation: fadeInFromTop 0.5s forwards;
 }
 
 .card:hover {
-  box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 15px 50px -10px rgba(0, 0, 0, 0.15);
 }
 
 .card > div {
-  will-change: transform;
   height: 100%;
-  margin: 0vw 0;
+  margin: 0;
 }
 
 .card > div > * {
@@ -55,24 +53,24 @@
 
 .card .image {
   margin-bottom: 20px;
-  display: flex;            /* Use flex to center the image inside */
-  justify-content: center;  /* Center horizontally */
-  align-items: center;      /* Center vertically */
-  width: 84px;              /* Match Next/Image width prop from Box.jsx for !imageBottom case */
-  height: 64px;             /* Match Next/Image height prop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 84px;
+  height: 64px;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
   /* The following properties might be optional depending on desired appearance */
   /* border-radius: 50%; */ /* Remove if images are not meant to be circular by default */
   /* background-color: #f0f0f0; */ /* Remove if no specific background for the image container is needed */
-  overflow: hidden;         /* Keep to prevent overflow if image is larger than container */
-  margin-left: auto;        /* Center the .image div itself */
-  margin-right: auto;       /* Center the .image div itself */
-  /* color:#2B2B2B !important; /* This was likely for an icon font, may not be needed for Next/Image */
 }
 
 .card .image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: translateZ(0);
 }
 
 .csl-1 {
@@ -100,7 +98,7 @@
   margin-bottom: 0.35rem;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .card.visible .textContainer h1 {
@@ -114,7 +112,7 @@
   text-align: center;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease 0.2s;
+  transition: opacity 0.3s ease, transform 0.3s ease 0.1s;
 }
 
 .card.visible .textContainer p {

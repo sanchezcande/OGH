@@ -48,6 +48,7 @@ const NavBarMobile = () => {
 
   const servicesList = [
     { text: t("aiTitle"), href: "/services/AI" },
+    { text: "n8n Automation", href: "/services/n8n-automation" },
     { text: t("frontendTitle"), href: "/services/front-end" },
     { text: t("backendTitle"), href: "/services/back-end" },
     { text: t("uxuiTitle"), href: "/services/ux-ui" },

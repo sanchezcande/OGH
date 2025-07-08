@@ -24,6 +24,7 @@ import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import React from "react";
+import { FaProjectDiagram } from "react-icons/fa";
 
 const LottieAnimation = dynamic(
   () => import("../src/components/Animations/LottieAnimation"),
@@ -410,9 +411,9 @@ export default function HomePage() {
               delay={0.25}
             />
             <ServiceBox 
-              icon="🔒"
-              title={t("homeServicesSection.cards.cybersecurity.title")}
-              description={t("homeServicesSection.cards.cybersecurity.description")}
+              icon={<FaProjectDiagram style={{ color: '#E35A52' }}/>} // ícono de automatización
+              title={t("homeServicesSection.cards.n8nAutomation.title")}
+              description={t("homeServicesSection.cards.n8nAutomation.description")}
               delay={0.3}
             />
             <ServiceBox 
