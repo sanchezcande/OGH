@@ -18,20 +18,12 @@ import {
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import React from "react";
 import { FaProjectDiagram } from "react-icons/fa";
-
-const LottieAnimation = dynamic(
-  () => import("../src/components/Animations/LottieAnimation"),
-  {
-    ssr: false,
-  }
-);
 
 export async function getServerSideProps() {
   return { props: {} };
@@ -56,18 +48,13 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
   return (
     <motion.div 
       className="service-box"
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ 
-        duration: 0.25, 
-        delay: delay * 0.5, 
-        ease: "easeOut" 
-      }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.15, delay: delay * 0.1 }}
       whileHover={{ 
-        scale: 1.03,
-        boxShadow: "0 12px 20px rgba(249, 123, 114, 0.2)",
-        transition: { duration: 0.2, ease: "easeOut" }
+        scale: 1.02,
+        transition: { duration: 0.1 }
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -80,13 +67,13 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         position: "relative",
         overflow: "hidden",
         border: "1px solid rgba(249, 123, 114, 0.2)",
-        transition: "all 0.2s ease"
+        transition: "all 0.15s ease"
       }}
     >
       <motion.div
         initial={{ scale: 1 }}
-        animate={isHovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
+        animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
+        transition={{ duration: 0.1 }}
         style={{
           fontSize: "3rem",
           color: "var(--color-accent, #FF6B6B)",
@@ -142,14 +129,13 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
   return (
     <motion.div 
       className="testimonial-card"
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.25, delay: delay * 0.6, ease: "easeOut" }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.15, delay: delay * 0.1 }}
       whileHover={{ 
-        y: -8,
-        boxShadow: "0 12px 20px rgba(249, 123, 114, 0.15)",
-        transition: { duration: 0.2, ease: "easeOut" }
+        y: -4,
+        transition: { duration: 0.1 }
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -162,7 +148,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        transition: "all 0.2s ease",
+        transition: "all 0.15s ease",
         position: "relative",
         overflow: "hidden"
       }}
@@ -192,8 +178,8 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
           position: "relative",
           zIndex: 1
         }}
-        animate={isHovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
+        animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
+        transition={{ duration: 0.1 }}
       >
         "
       </motion.div>
@@ -326,10 +312,10 @@ export default function HomePage() {
         
         <Section className="serious-block">
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.15 }}
           >
             <SectionTitle style={{"--i": 0}}>
               {parseHighlightedText(t("problemTitle"))}
@@ -340,10 +326,10 @@ export default function HomePage() {
 
         <Section className="serious-block">
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.15 }}
           >
             <SectionTitle style={{"--i": 1}}>
               {parseHighlightedText(t("weGetYouTitle"))}
@@ -355,10 +341,10 @@ export default function HomePage() {
         {/* Services Section with Interactive Boxes */}
         <Section className="full-width">
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.2 }}
             style={{ textAlign: "center", marginBottom: "3rem" }}
           >
             <h2 style={{ 
@@ -466,10 +452,10 @@ export default function HomePage() {
           margin: "4rem 0"
         }}>
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.2 }}
             style={{ textAlign: "center", marginBottom: "3rem" }}
           >
             <h2 style={{ 

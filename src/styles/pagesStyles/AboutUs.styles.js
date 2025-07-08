@@ -12,6 +12,17 @@ const slideInFromTopText = keyframes`
   }
 `;
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -19,7 +30,7 @@ export const Container = styled.div`
   justify-content: center;
   margin: 3rem;
   padding: 2rem;
-  background: linear-gradient(145deg, ${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.backgroundAlt});
+  background: #ffffff;
   color: ${({ theme }) => theme.colors.text};
   min-height: 100vh;
 
@@ -46,37 +57,38 @@ export const ImageText = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Remove opacity and transform for testing */
-    /* opacity: 0;
-    transform: translateY(-50px); */
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-    /* transition: opacity 0.6s ease-out, transform 0.6s ease-out; */
-
-    &.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    opacity: 0;
+    animation: ${fadeIn} 0.8s ease-out forwards;
 
     img {
       width: 100%;
       height: auto;
       border-radius: 50%;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      background-color: ${({ theme }) => theme.colors.accent + "90"};
-      border: px solid ${({ theme }) => theme.colors.accent};
+      box-shadow: 
+        0 10px 20px rgba(0, 0, 0, 0.1),
+        0 6px 6px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+      background-color: #ffffff;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+          0 15px 30px rgba(0, 0, 0, 0.12),
+          0 8px 8px rgba(0, 0, 0, 0.12),
+          0 0 0 1px rgba(0, 0, 0, 0.05);
+      }
     }
 
     .founder-info {
-      visibility: visible;
-      opacity: 1;
-      margin-top: 40px;
-      padding: 0;
-      background-color: transparent;
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #ffffff;
       width: 100%;
       max-width: 250px;
       text-align: center;
+      opacity: 0;
+      animation: ${fadeIn} 0.8s ease-out 0.3s forwards;
       
       .founder-name {
         font-size: 1.2rem;
