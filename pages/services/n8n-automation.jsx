@@ -252,9 +252,24 @@ const N8nAutomation = () => {
       <ServiceContainer>
         {/* Hero Section */}
         <HeroSection>
-          <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>
+          <div style={{ 
+            fontSize: "4rem", 
+            marginBottom: "1rem",
+            animation: "float 3s ease-in-out infinite",
+            display: "inline-block"
+          }}>
             <FaProjectDiagram />
           </div>
+          <style>{`
+            @keyframes float {
+              0%, 100% { 
+                transform: translateY(0px) rotate(0deg); 
+              }
+              50% { 
+                transform: translateY(-10px) rotate(5deg); 
+              }
+            }
+          `}</style>
           <h1 style={{ 
             fontSize: "2.5rem", 
             fontWeight: "700", 
