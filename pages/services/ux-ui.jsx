@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import Head from "next/head";
-import { FaUserCheck, FaMobileAlt, FaExclamationTriangle, FaPaintBrush, FaUsers, FaEye, FaCheckCircle, FaArrowRight, FaRegSadTear, FaRegGrinStars, FaPalette, FaMousePointer } from "react-icons/fa";
+import { FaUserCheck, FaMobileAlt, FaExclamationTriangle, FaPaintBrush, FaUsers, FaEye, FaCheckCircle, FaArrowRight, FaRegSadTear, FaRegGrinStars, FaPalette, FaMousePointer, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import React from "react";
 
@@ -147,19 +147,8 @@ const UxUi = () => {
               textAlign: "center",
               flex: "1 1 240px",
               animationDelay: `${0.15 + i * 0.07}s`,
-              border: "1px solid rgba(35, 41, 70, 0.06)",
-              position: "relative"
+              border: "1px solid rgba(35, 41, 70, 0.06)"
             }}>
-              <div style={{ 
-                position: "absolute",
-                top: 0,
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: 60,
-                height: 3,
-                background: "linear-gradient(90deg, #F97B72 0%, #e85d64 100%)",
-                borderRadius: "0 0 3px 3px"
-              }} />
               <div style={{ 
                 fontSize: 36, 
                 color: "#F97B72", 
@@ -194,14 +183,15 @@ const UxUi = () => {
             }}>
               <div style={{ 
                 position: "absolute",
-                top: 0,
+                top: -8,
                 left: "50%",
                 transform: "translateX(-50%)",
-                width: 60,
-                height: 3,
-                background: "linear-gradient(90deg, #F97B72 0%, #e85d64 100%)",
-                borderRadius: "0 0 3px 3px"
-              }} />
+                fontSize: 18,
+                color: "#F97B72",
+                opacity: 0.7
+              }}>
+                <FaArrowDown />
+              </div>
               <div style={{ 
                 fontSize: 36, 
                 color: "#F97B72", 
@@ -299,19 +289,8 @@ const UxUi = () => {
         textAlign: "center", 
         boxShadow: "0 4px 20px rgba(35, 41, 70, 0.08), 0 1px 3px rgba(35, 41, 70, 0.1)", 
         animationDelay: "0.9s",
-        border: "1px solid rgba(35, 41, 70, 0.06)",
-        position: "relative"
+        border: "1px solid rgba(35, 41, 70, 0.06)"
       }}>
-        <div style={{
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 80,
-          height: 3,
-          background: "linear-gradient(90deg, #F97B72 0%, #e85d64 100%)",
-          borderRadius: "0 0 3px 3px"
-        }} />
         <h2 style={{ fontWeight: 800, fontSize: "1.6rem", marginBottom: 12 }}>
           {lang === "es" ? "¿Listo para transformar la experiencia de tus clientes?" : "Ready to transform your clients' experience?"}
         </h2>
