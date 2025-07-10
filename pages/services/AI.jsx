@@ -26,15 +26,16 @@ import React from "react";
 const HeroSection = ({ children, style }) => (
   <div
     style={{
-      background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+      background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
       borderRadius: "16px",
-      padding: "3rem 2rem",
-      marginBottom: "3rem",
+      padding: "2.5rem 2rem",
+      marginTop: "1rem",
+      marginBottom: "2rem",
       textAlign: "center",
-      color: "#2B2B2B",
+      color: "white",
       position: "relative",
       overflow: "hidden",
-      border: "1px solid #e5e7eb",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
       ...style,
     }}
   >
@@ -46,11 +47,8 @@ const HeroSection = ({ children, style }) => (
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 20% 80%, rgba(249, 123, 114, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(249, 123, 114, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 40% 40%, rgba(249, 123, 114, 0.05) 0%, transparent 50%)
-        `,
+        background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"circles\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.1)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23circles)\"/></svg>')",
+        opacity: 0.4,
         zIndex: 1,
       }}
     />
@@ -64,7 +62,7 @@ const HeroSection = ({ children, style }) => (
         right: "-20%",
         width: "200px",
         height: "200px",
-        background: "rgba(249, 123, 114, 0.1)",
+        background: "rgba(249, 123, 114, 0.2)",
         borderRadius: "50%",
         zIndex: 1,
       }}
@@ -263,10 +261,37 @@ const aiSolutions = () => {
         .visible { opacity: 1 !important; transform: translateY(0) !important; }
       `}</style>
 
-      <ServiceContainer>
-        {/* Hero Section */}
-        <HeroSection style={{ marginBottom: "3rem" }}>
-          <div className="animate" style={{ fontSize: "4rem", marginBottom: "1rem", animationDelay: "0.05s" }}>
+      {/* Hero Section - Full Width */}
+      <section style={{ 
+        background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
+        padding: "3rem 2rem",
+        marginTop: "1rem",
+        marginBottom: "2rem",
+        textAlign: "center",
+        color: "white",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        {/* Patrón de fondo sutil */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"circles\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.1)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23circles)\"/></svg>')",
+            opacity: 0.4,
+          }}
+        />
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
+          <div className="animate" style={{ 
+            fontSize: "4rem", 
+            marginBottom: "1rem", 
+            animationDelay: "0.05s",
+            color: "#F97B72",
+            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)"
+          }}>
             <FaBrain />
           </div>
           <h1 className="animate" style={{ fontSize: "2.5rem", fontWeight: "700", marginBottom: "1rem", animationDelay: "0.1s" }}>
@@ -278,8 +303,11 @@ const aiSolutions = () => {
               : "Power your business with artificial intelligence"
             }
           </p>
-        </HeroSection>
+        </div>
+      </section>
 
+      {/* Main Content - Full Width */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2rem" }}>
         {/* Main Description */}
         <div className="animate" style={{ position: "relative", padding: "2rem", marginBottom: "2rem", borderRadius: "12px", overflow: "hidden", animationDelay: "0.2s" }}>
           {/* Patrón de fondo sutil */}
@@ -383,29 +411,145 @@ const aiSolutions = () => {
             </ul>
           </div>
         </ProfessionalCard>
+      </div>
 
-        {/* Use Cases */}
-        <ProfessionalCard className="animate" style={{ animationDelay: "0.8s" }}>
-          <SectionTitle>{lang === "es" ? "Casos de uso de IA" : "AI use cases"}</SectionTitle>
+      {/* Use Cases - Full Width Section */}
+      <section className="animate" style={{ 
+        background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
+        padding: "3rem 2rem",
+        marginBottom: "2rem",
+        textAlign: "center",
+        color: "white",
+        position: "relative",
+        overflow: "hidden",
+        animationDelay: "0.8s"
+      }}>
+        {/* Patrón de fondo sutil */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"circles\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.1)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23circles)\"/></svg>')",
+            opacity: 0.4,
+          }}
+        />
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
+          <h2 style={{ 
+            fontSize: "2rem", 
+            fontWeight: "700", 
+            marginBottom: "1.5rem",
+            color: "white"
+          }}>
+            {lang === "es" ? "Casos de uso de IA" : "AI use cases"}
+          </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1.5rem" }}>
-            <div className="animate" style={{ padding: "1.5rem", background: "white", borderRadius: "8px", border: "1px solid #E5E7EB", animationDelay: "0.85s" }}>
-              <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "1rem", textAlign: "center" }}><FaUsers /></div>
-              <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center" }}>{lang === "es" ? "Chatbots inteligentes" : "Smart chatbots"}</h4>
-              <p style={{ fontSize: "0.95rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5" }}>{lang === "es" ? "Atención al cliente 24/7 con respuestas inteligentes y personalizadas" : "24/7 customer service with intelligent and personalized responses"}</p>
-            </div>
-            <div className="animate" style={{ padding: "1.5rem", background: "white", borderRadius: "8px", border: "1px solid #E5E7EB", animationDelay: "0.9s" }}>
-              <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "1rem", textAlign: "center" }}><FaChartLine /></div>
-              <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center" }}>{lang === "es" ? "Predicción de tendencias" : "Trend prediction"}</h4>
-              <p style={{ fontSize: "0.95rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5" }}>{lang === "es" ? "Anticipa el comportamiento del mercado y las necesidades de los clientes" : "Anticipate market behavior and customer needs"}</p>
-            </div>
-            <div className="animate" style={{ padding: "1.5rem", background: "white", borderRadius: "8px", border: "1px solid #E5E7EB", animationDelay: "0.95s" }}>
-              <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "1rem", textAlign: "center" }}><FaCogs /></div>
-              <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center" }}>{lang === "es" ? "Optimización de procesos" : "Process optimization"}</h4>
-              <p style={{ fontSize: "0.95rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5" }}>{lang === "es" ? "Mejora la eficiencia operativa con IA que optimiza automáticamente" : "Improve operational efficiency with AI that automatically optimizes"}</p>
-            </div>
+          <div 
+            className="ai-use-case-card animate" 
+            style={{ 
+              padding: "1.5rem", 
+              background: "white", 
+              borderRadius: "8px", 
+              border: "1px solid #E5E7EB", 
+              animationDelay: "0.85s",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              transform: "translateY(0)"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
+              e.currentTarget.style.borderColor = "rgba(249, 123, 114, 0.3)";
+              e.currentTarget.querySelector("div").style.transform = "scale(1.1)";
+              e.currentTarget.querySelector("div").style.color = "#ff6b6b";
+              e.currentTarget.querySelector("h4").style.color = "#F97B72";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+              e.currentTarget.style.borderColor = "#E5E7EB";
+              e.currentTarget.querySelector("div").style.transform = "scale(1)";
+              e.currentTarget.querySelector("div").style.color = "#F97B72";
+              e.currentTarget.querySelector("h4").style.color = "#2B2B2B";
+            }}
+          >
+            <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "1rem", textAlign: "center", transition: "all 0.3s ease" }}><FaUsers /></div>
+            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>{lang === "es" ? "Chatbots inteligentes" : "Smart chatbots"}</h4>
+            <p style={{ fontSize: "0.95rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>{lang === "es" ? "Atención al cliente 24/7 con respuestas inteligentes y personalizadas" : "24/7 customer service with intelligent and personalized responses"}</p>
           </div>
-        </ProfessionalCard>
+          <div 
+            className="ai-use-case-card animate" 
+            style={{ 
+              padding: "1.5rem", 
+              background: "white", 
+              borderRadius: "8px", 
+              border: "1px solid #E5E7EB", 
+              animationDelay: "0.9s",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              transform: "translateY(0)"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
+              e.currentTarget.style.borderColor = "rgba(249, 123, 114, 0.3)";
+              e.currentTarget.querySelector("div").style.transform = "scale(1.1)";
+              e.currentTarget.querySelector("div").style.color = "#ff6b6b";
+              e.currentTarget.querySelector("h4").style.color = "#F97B72";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+              e.currentTarget.style.borderColor = "#E5E7EB";
+              e.currentTarget.querySelector("div").style.transform = "scale(1)";
+              e.currentTarget.querySelector("div").style.color = "#F97B72";
+              e.currentTarget.querySelector("h4").style.color = "#2B2B2B";
+            }}
+          >
+            <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "1rem", textAlign: "center", transition: "all 0.3s ease" }}><FaChartLine /></div>
+            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>{lang === "es" ? "Predicción de tendencias" : "Trend prediction"}</h4>
+            <p style={{ fontSize: "0.95rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>{lang === "es" ? "Anticipa el comportamiento del mercado y las necesidades de los clientes" : "Anticipate market behavior and customer needs"}</p>
+          </div>
+          <div 
+            className="ai-use-case-card animate" 
+            style={{ 
+              padding: "1.5rem", 
+              background: "white", 
+              borderRadius: "8px", 
+              border: "1px solid #E5E7EB", 
+              animationDelay: "0.95s",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              transform: "translateY(0)"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
+              e.currentTarget.style.borderColor = "rgba(249, 123, 114, 0.3)";
+              e.currentTarget.querySelector("div").style.transform = "scale(1.1)";
+              e.currentTarget.querySelector("div").style.color = "#ff6b6b";
+              e.currentTarget.querySelector("h4").style.color = "#F97B72";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+              e.currentTarget.style.borderColor = "#E5E7EB";
+              e.currentTarget.querySelector("div").style.transform = "scale(1)";
+              e.currentTarget.querySelector("div").style.color = "#F97B72";
+              e.currentTarget.querySelector("h4").style.color = "#2B2B2B";
+            }}
+          >
+            <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "1rem", textAlign: "center", transition: "all 0.3s ease" }}><FaCogs /></div>
+            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>{lang === "es" ? "Optimización de procesos" : "Process optimization"}</h4>
+            <p style={{ fontSize: "0.95rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>{lang === "es" ? "Mejora la eficiencia operativa con IA que optimiza automáticamente" : "Improve operational efficiency with AI that automatically optimizes"}</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
+      <ServiceContainer>
         {/* Call to Action */}
         <ProfessionalCard className="animate" style={{ background: "#FFF5F5", textAlign: "center", animationDelay: "1s" }}>
           <h3 style={{ fontSize: "1.5rem", fontWeight: "600", marginBottom: "1rem", color: "#2B2B2B" }}>{lang === "es" ? "¿Listo para el futuro con IA?" : "Ready for the AI future?"}</h3>

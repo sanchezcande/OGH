@@ -97,7 +97,7 @@ const FrontEnd = () => {
 
       {/* HERO SECTION - Split Layout */}
       <section style={{ 
-        minHeight: "80vh", 
+        minHeight: "60vh", 
         display: "flex", 
         alignItems: "center", 
         background: "linear-gradient(135deg, #4a5568 0%, #2d3748 100%)",
@@ -141,9 +141,9 @@ const FrontEnd = () => {
             </div>
             
             <h1 style={{ 
-              fontSize: "3.5rem", 
+              fontSize: "3rem", 
               fontWeight: 800, 
-              marginBottom: "24px",
+              marginBottom: "20px",
               lineHeight: 1.1,
               color: "white"
             }}>
@@ -151,9 +151,9 @@ const FrontEnd = () => {
             </h1>
             
             <p style={{ 
-              fontSize: "1.3rem", 
+              fontSize: "1.2rem", 
               opacity: 0.9, 
-              marginBottom: "32px",
+              marginBottom: "24px",
               lineHeight: 1.6
             }}>
               {lang === "es" 

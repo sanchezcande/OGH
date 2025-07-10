@@ -25,15 +25,16 @@ import {
 const HeroSection = ({ children, style }) => (
   <div
     style={{
-      background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+      background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
       borderRadius: "16px",
-      padding: "3rem 2rem",
-      marginBottom: "3rem",
+      padding: "2.5rem 2rem",
+      marginTop: "1rem",
+      marginBottom: "2rem",
       textAlign: "center",
-      color: "#2B2B2B",
+      color: "white",
       position: "relative",
       overflow: "hidden",
-      border: "1px solid #e5e7eb",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
       ...style,
     }}
   >
@@ -45,11 +46,8 @@ const HeroSection = ({ children, style }) => (
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 20% 80%, rgba(249, 123, 114, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(249, 123, 114, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 40% 40%, rgba(249, 123, 114, 0.05) 0%, transparent 50%)
-        `,
+        background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"circles\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.1)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23circles)\"/></svg>')",
+        opacity: 0.4,
         zIndex: 1,
       }}
     />
@@ -63,7 +61,7 @@ const HeroSection = ({ children, style }) => (
         right: "-20%",
         width: "200px",
         height: "200px",
-        background: "rgba(249, 123, 114, 0.1)",
+        background: "rgba(249, 123, 114, 0.2)",
         borderRadius: "50%",
         zIndex: 1,
       }}
@@ -249,14 +247,37 @@ const N8nAutomation = () => {
         <meta name="author" content="OpenGateHub" />
       </Head>
 
-      <ServiceContainer>
-        {/* Hero Section */}
-        <HeroSection>
+      {/* Hero Section - Full Width */}
+      <section style={{ 
+        background: "linear-gradient(135deg, #6a7c8d 0%, #4d5a6a 100%)",
+        padding: "3rem 2rem",
+        marginTop: "1rem",
+        marginBottom: "2rem",
+        textAlign: "center",
+        color: "white",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        {/* Patrón de fondo tecnológico */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"hex\" width=\"40\" height=\"35\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0l20 11.5v23L20 46 0 34.5v-23L20 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><path d=\"M40 0l20 11.5v23L40 46 20 34.5v-23L40 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><circle cx=\"20\" cy=\"23\" r=\"1.5\" fill=\"rgba(255,255,255,0.08)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23hex)\"/></svg>')",
+            opacity: 0.7,
+          }}
+        />
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ 
             fontSize: "4rem", 
             marginBottom: "1rem",
             animation: "float 3s ease-in-out infinite",
-            display: "inline-block"
+            display: "inline-block",
+            color: "#F97B72",
+            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)"
           }}>
             <FaProjectDiagram />
           </div>
@@ -273,7 +294,8 @@ const N8nAutomation = () => {
           <h1 style={{ 
             fontSize: "2.5rem", 
             fontWeight: "700", 
-            marginBottom: "1rem" 
+            marginBottom: "1rem",
+            color: "white"
           }}>
             n8n Automation
           </h1>
@@ -288,8 +310,11 @@ const N8nAutomation = () => {
               : "Connect your tools and automate workflows without code"
             }
           </p>
-        </HeroSection>
+        </div>
+      </section>
 
+      {/* Main Content - Full Width */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2rem" }}>
         {/* Main Description */}
         <div style={{ 
           position: "relative",
@@ -297,27 +322,9 @@ const N8nAutomation = () => {
           marginBottom: "2rem",
           borderRadius: "12px",
           overflow: "hidden",
+          background: "#f8f9fa",
         }}>
-          {/* Patrón de fondo sutil */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `
-                linear-gradient(45deg, rgba(249, 123, 114, 0.03) 25%, transparent 25%),
-                linear-gradient(-45deg, rgba(249, 123, 114, 0.03) 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, rgba(249, 123, 114, 0.03) 75%),
-                linear-gradient(-45deg, transparent 75%, rgba(249, 123, 114, 0.03) 75%)
-              `,
-              backgroundSize: "20px 20px",
-              backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
-              zIndex: 1,
-            }}
-          />
-          <div style={{ position: "relative", zIndex: 2 }}>
+          <div>
             <SectionTitle>
               {lang === "es" ? "¿Qué es n8n?" : "What is n8n?"}
             </SectionTitle>
@@ -372,56 +379,135 @@ const N8nAutomation = () => {
             delay={6}
           />
         </FeatureGrid>
+      </div>
 
-        {/* Use Cases */}
-        <ProfessionalCard>
-          <SectionTitle>
+      {/* Use Cases - Full Width Section */}
+      <section style={{ 
+        background: "linear-gradient(135deg, #6a7c8d 0%, #4d5a6a 100%)",
+        padding: "3rem 2rem",
+        marginBottom: "2rem",
+        textAlign: "center",
+        color: "white",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        {/* Patrón de fondo tecnológico */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"hex2\" width=\"40\" height=\"35\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0l20 11.5v23L20 46 0 34.5v-23L20 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><path d=\"M40 0l20 11.5v23L40 46 20 34.5v-23L40 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><circle cx=\"20\" cy=\"23\" r=\"1.5\" fill=\"rgba(255,255,255,0.08)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23hex2)\"/></svg>')",
+            opacity: 0.7,
+          }}
+        />
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
+          <h2 style={{ 
+            fontSize: "2rem", 
+            fontWeight: "700", 
+            marginBottom: "1.5rem",
+            color: "white"
+          }}>
             {lang === "es" ? "Casos de uso comunes" : "Common use cases"}
-          </SectionTitle>
+          </h2>
           <div style={{ 
             display: "grid", 
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
             gap: "1.5rem"
           }}>
-            <div style={{ padding: "1rem" }}>
-              <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem" }}>
-                <FaUsers />
-              </div>
-              <h4 style={{ fontWeight: "600", marginBottom: "0.5rem" }}>
-                {lang === "es" ? "Sincronización de datos" : "Data synchronization"}
-              </h4>
-              <p style={{ fontSize: "0.9rem", color: "#6B7280" }}>
-                {lang === "es" ? "Sincroniza información entre CRM, email marketing y sistemas de soporte" : "Sync information between CRM, email marketing and support systems"}
-              </p>
+          <div 
+            className="use-case-card"
+            style={{ 
+              padding: "1.5rem", 
+              background: "white", 
+              borderRadius: "8px", 
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "1px solid rgba(0,0,0,0.05)",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              transform: "translateY(0)"
+            }}
+          >
+            <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
+              <FaUsers />
             </div>
-            <div style={{ padding: "1rem" }}>
-              <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem" }}>
-                <FaRocket />
-              </div>
-              <h4 style={{ fontWeight: "600", marginBottom: "0.5rem" }}>
-                {lang === "es" ? "Gestión de leads" : "Lead management"}
-              </h4>
-              <p style={{ fontSize: "0.9rem", color: "#6B7280" }}>
-                {lang === "es" ? "Captura leads y automatiza el seguimiento y notificaciones" : "Capture leads and automate follow-up and notifications"}
-              </p>
-            </div>
-            <div style={{ padding: "1rem" }}>
-              <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem" }}>
-                <FaCogs />
-              </div>
-              <h4 style={{ fontWeight: "600", marginBottom: "0.5rem" }}>
-                {lang === "es" ? "Procesamiento de pedidos" : "Order processing"}
-              </h4>
-              <p style={{ fontSize: "0.9rem", color: "#6B7280" }}>
-                {lang === "es" ? "Automatiza el cumplimiento de pedidos y gestión de inventario" : "Automate order fulfillment and inventory management"}
-              </p>
-            </div>
+            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>
+              {lang === "es" ? "Sincronización de datos" : "Data synchronization"}
+            </h4>
+            <p style={{ fontSize: "0.9rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>
+              {lang === "es" ? "Sincroniza información entre CRM, email marketing y sistemas de soporte" : "Sync information between CRM, email marketing and support systems"}
+            </p>
           </div>
-        </ProfessionalCard>
+          <div 
+            className="use-case-card"
+            style={{ 
+              padding: "1.5rem", 
+              background: "white", 
+              borderRadius: "8px", 
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "1px solid rgba(0,0,0,0.05)",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              transform: "translateY(0)"
+            }}
+          >
+            <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
+              <FaRocket />
+            </div>
+            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>
+              {lang === "es" ? "Gestión de leads" : "Lead management"}
+            </h4>
+            <p style={{ fontSize: "0.9rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>
+              {lang === "es" ? "Captura leads y automatiza el seguimiento y notificaciones" : "Capture leads and automate follow-up and notifications"}
+            </p>
+          </div>
+          <div 
+            className="use-case-card"
+            style={{ 
+              padding: "1.5rem", 
+              background: "white", 
+              borderRadius: "8px", 
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "1px solid rgba(0,0,0,0.05)",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              transform: "translateY(0)"
+            }}
+          >
+            <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
+              <FaCogs />
+            </div>
+            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>
+              {lang === "es" ? "Procesamiento de pedidos" : "Order processing"}
+            </h4>
+            <p style={{ fontSize: "0.9rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>
+              {lang === "es" ? "Automatiza el cumplimiento de pedidos y gestión de inventario" : "Automate order fulfillment and inventory management"}
+            </p>
+          </div>
+        </div>
+        <style>{`
+          .use-case-card:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+            border-color: rgba(249, 123, 114, 0.3) !important;
+          }
+          .use-case-card:hover > div:first-child {
+            transform: scale(1.1);
+            color: #ff6b6b !important;
+          }
+          .use-case-card:hover h4 {
+            color: #F97B72 !important;
+          }
+        `}</style>
+      </div>
+    </section>
 
+      <ServiceContainer>
         {/* Call to Action */}
         <ProfessionalCard style={{ 
-          background: "#FFF5F5",
+          background: "#f8f9fa",
           textAlign: "center"
         }}>
           <h3 style={{ 
