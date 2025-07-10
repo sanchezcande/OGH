@@ -290,10 +290,23 @@ const aiSolutions = () => {
             marginBottom: "1rem", 
             animationDelay: "0.05s",
             color: "#F97B72",
-            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)"
+            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
+            animation: "brainPulse 3s ease-in-out infinite"
           }}>
             <FaBrain />
           </div>
+          <style>{`
+            @keyframes brainPulse {
+              0%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+              }
+              50% { 
+                transform: scale(1.05);
+                opacity: 0.9;
+              }
+            }
+          `}</style>
           <h1 className="animate" style={{ fontSize: "2.5rem", fontWeight: "700", marginBottom: "1rem", animationDelay: "0.1s" }}>
             AI Solutions
           </h1>
