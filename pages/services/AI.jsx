@@ -413,7 +413,7 @@ const aiSolutions = () => {
         </ProfessionalCard>
 
         <div className="animate" style={{ animationDelay: "1.05s" }}>
-          <ServicesCallToAction />
+        <ServicesCallToAction />
         </div>
       </ServiceContainer>
     </>
