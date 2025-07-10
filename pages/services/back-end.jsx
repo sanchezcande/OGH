@@ -113,22 +113,40 @@ const BackEnd = () => {
           transform: translateY(-6px) scale(1.025);
           z-index: 2;
         }
+        .tech-card-hover {
+          transition: all 0.3s ease;
+        }
+        .tech-card-hover:hover {
+          transform: translateY(-8px) scale(1.05);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.2) !important;
+          background: rgba(255,255,255,0.15) !important;
+          border-color: rgba(255,255,255,0.3) !important;
+        }
       `}</style>
       {/* HERO */}
       <section style={{
-        background: "#f7f7fa",
-        color: "#232946",
-        padding: "3.5rem 2rem 2.5rem 2rem",
+        background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
+        color: "white",
+        padding: "4rem 2rem 3rem 2rem",
         borderRadius: "0 0 32px 32px",
         position: "relative",
         overflow: "hidden",
         marginBottom: "2.5rem",
-        boxShadow: "0 2px 16px #23294608"
+        boxShadow: "0 4px 24px rgba(35, 41, 70, 0.08)"
       }}>
-        <div className="animate" style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", animationDelay: "0.05s" }}>
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grid\" width=\"10\" height=\"10\" patternUnits=\"userSpaceOnUse\"><path d=\"M 10 0 L 0 0 0 10\" fill=\"none\" stroke=\"rgba(255,255,255,0.1)\" stroke-width=\"0.5\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grid)\"/></svg>')",
+          opacity: 0.3
+        }} />
+        <div className="animate" style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", animationDelay: "0.05s", position: "relative", zIndex: 1 }}>
           <FaCloud style={{ fontSize: 44, color: "#F97B72", marginBottom: 12, filter: "drop-shadow(0 2px 8px #f97b7244)" }} />
           <h1 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: 10, letterSpacing: -1 }}>{lang === "es" ? "Backend & Cloud Solutions" : "Backend & Cloud Solutions"}</h1>
-          <p style={{ fontSize: "1.15rem", opacity: 0.92, maxWidth: 600, margin: "0 auto" }}>{lang === "es" ? "Nuestro trabajo es que nunca tengas que preocuparte por lo que pasa detrás de escena." : "Our job is to make sure you never have to worry about what’s behind the scenes."}</p>
+          <p style={{ fontSize: "1.15rem", opacity: 0.92, maxWidth: 600, margin: "0 auto" }}>{lang === "es" ? "Nuestro trabajo es que nunca tengas que preocuparte por lo que pasa detrás de escena." : "Our job is to make sure you never have to worry about what's behind the scenes."}</p>
         </div>
       </section>
 
@@ -185,25 +203,42 @@ const BackEnd = () => {
       </section>
 
       {/* TECNOLOGÍAS */}
-      <section style={{ background: "#f7f7fa", padding: "2.2rem 0 1.5rem 0", marginBottom: "2.5rem" }}>
-        <div className="animate" style={{ textAlign: "center", fontWeight: 700, fontSize: "1.13rem", marginBottom: 20, animationDelay: "0.6s" }}>
+      <section style={{ 
+        background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)", 
+        padding: "3rem 2rem 2rem 2rem", 
+        marginBottom: "2.5rem",
+        position: "relative",
+        overflow: "hidden"
+      }}>
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grid\" width=\"10\" height=\"10\" patternUnits=\"userSpaceOnUse\"><path d=\"M 10 0 L 0 0 0 10\" fill=\"none\" stroke=\"rgba(255,255,255,0.1)\" stroke-width=\"0.5\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grid)\"/></svg>')",
+          opacity: 0.3
+        }} />
+        <div className="animate" style={{ textAlign: "center", fontWeight: 700, fontSize: "1.3rem", marginBottom: 24, animationDelay: "0.6s", color: "white", position: "relative", zIndex: 1 }}>
           {lang === "es" ? "Tecnologías que usamos" : "Technologies we use"}
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "2rem" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "2rem", position: "relative", zIndex: 1 }}>
           {techIcons.map((t, i) => (
-            <div key={t.name} className="animate card-hover" style={{
-              background: "#fff",
-              borderRadius: 12,
-              boxShadow: "0 2px 12px #23294608",
-              padding: "1.1rem 2rem",
-              minWidth: 110,
+            <div key={t.name} className="animate tech-card-hover" style={{
+              background: "rgba(255,255,255,0.1)",
+              borderRadius: 16,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              padding: "1.5rem 2rem",
+              minWidth: 120,
               textAlign: "center",
-              fontSize: 28,
-              color: "#232946",
-              animationDelay: `${0.65 + i * 0.07}s`
+              fontSize: 32,
+              color: "white",
+              animationDelay: `${0.65 + i * 0.07}s`,
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.2)"
             }}>
               {t.icon}
-              <div style={{ fontSize: 14, marginTop: 7, fontWeight: 600 }}>{t.name}</div>
+              <div style={{ fontSize: 14, marginTop: 8, fontWeight: 600, opacity: 0.9 }}>{t.name}</div>
             </div>
           ))}
         </div>
