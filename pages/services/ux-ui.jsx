@@ -89,25 +89,14 @@ const UxUi = () => {
 
       {/* HERO */}
       <section style={{ 
-        background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)", 
+        background: "#fff", 
         color: "#232946", 
         padding: "4rem 2rem 3rem 2rem", 
         borderRadius: "0 0 32px 32px", 
         marginBottom: "3rem", 
-        boxShadow: "0 4px 24px rgba(35, 41, 70, 0.08)",
-        position: "relative",
-        overflow: "hidden"
+        boxShadow: "0 2px 16px rgba(35, 41, 70, 0.06)"
       }}>
-        <div style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "radial-gradient(circle at 20% 80%, rgba(249, 123, 114, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(249, 123, 114, 0.03) 0%, transparent 50%)",
-          pointerEvents: "none"
-        }} />
-        <div className="animate" style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", animationDelay: "0.05s", position: "relative", zIndex: 1 }}>
+        <div className="animate" style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", animationDelay: "0.05s" }}>
           <div style={{ 
             display: "inline-flex", 
             alignItems: "center", 
