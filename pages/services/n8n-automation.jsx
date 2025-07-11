@@ -209,6 +209,7 @@ export const ServicesCallToAction = () => {
       title={callToAction.title}
       description={callToAction.description}
       buttonText={callToAction.buttonText}
+      highlightWord="innovate"
     />
   );
 };

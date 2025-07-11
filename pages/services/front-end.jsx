@@ -555,6 +555,7 @@ const FrontEnd = () => {
             title={lang === "es" ? "¡Iniciá tu proyecto!" : "Start your project!"}
             description={lang === "es" ? "Descubrí cómo podemos transformar tu idea en una experiencia digital." : "Discover how we can transform your idea into a digital experience."}
             buttonText={lang === "es" ? "Quiero saber más" : "I want to know more"}
+            highlightWord="your"
           />
         </div>
       </section>

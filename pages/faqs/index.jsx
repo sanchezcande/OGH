@@ -20,6 +20,7 @@ export const FAQsCallToAction = () => {
       title={callToAction.title}
       description={callToAction.description}
       buttonText={callToAction.buttonText}
+      highlightWord="Questions"
     />
   );
 };

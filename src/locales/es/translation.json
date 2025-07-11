@@ -34,8 +34,10 @@
   "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
   "problemTitle": "Estás <highlight>contra</highlight> reloj.",
   "problemText": "Ten\u00e9s presi\u00f3n para escalar tu producto, cumplir con inversores y armar el equipo correcto. Pero contratar internamente lleva tiempo. Los devs en EE.UU. son caros. Y tercerizar muchas veces implica perder calidad, o peor, cultura.",
-  "weGetYouTitle": "Te <highlight>entendemos</highlight>. Ya pasamos por eso.",
-  "weGetYouText": "No somos una agencia m\u00e1s. Somos fundadores t\u00e9cnicos que creen en relaciones a largo plazo, no en transacciones. Compartimos tus valores, tu urgencia y tu ambici\u00f3n por construir algo que importe.",
+  "weGetYouTitle": "Te <highlight>vemos</highlight>. Hemos estado ahí.",
+  "weGetYouText": "Por eso creamos OpenGateHub — un socio de software que hace tu vida más fácil, con calidad en la que puedes confiar y humanos que se preocupan profundamente. Estamos aquí para apoyarte con corazón, cultura y claridad — para que no tengas que hacerlo todo solo.",
+  "servicesTitle": "Nuestros Servicios",
+  "servicesText": "Trabajamos con personas que se preocupan por el cómo, no solo por el qué. Soluciones personalizadas para fundadores que quieren escalar con fluidez, confianza y cultura.",
   "planTitle": "Así trabajamos:",
   "planSteps": {
     "step1": "Llamada inicial: contanos qué necesitás.",

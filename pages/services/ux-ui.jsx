@@ -268,30 +268,14 @@ const UxUi = () => {
       </section>
 
       {/* CTA FINAL */}
-      <section className="animate" style={{ 
-        background: "#fff", 
-        color: "#232946", 
-        borderRadius: 20, 
-        maxWidth: 900, 
-        margin: "0 auto 3rem auto", 
-        padding: "2.5rem 2.2rem 2rem 2.2rem", 
-        textAlign: "center", 
-        boxShadow: "0 4px 20px rgba(35, 41, 70, 0.08), 0 1px 3px rgba(35, 41, 70, 0.1)", 
-        animationDelay: "0.9s",
-        border: "1px solid rgba(35, 41, 70, 0.06)"
-      }}>
-        <h2 style={{ fontWeight: 800, fontSize: "1.6rem", marginBottom: 12 }}>
-          {lang === "es" ? "¿Listo para transformar la experiencia de tus clientes?" : "Ready to transform your clients' experience?"}
-        </h2>
-        <p style={{ fontSize: "1.1rem", marginBottom: 24, opacity: 0.85 }}>
-          {lang === "es" ? "Hablemos de tu UX/UI." : "Let's talk about your UX/UI."}
-        </p>
+      <div style={{ textAlign: "center", marginBottom: "3rem" }}>
         <CallToActionBlock
-          title={lang === "es" ? "¡Quiero mejorar mi UX/UI!" : "I want to improve my UX/UI!"}
+          title={lang === "es" ? "¡Diseñemos algo que tus usuarios amen!" : "Let's design something your users will love!"}
           description={lang === "es" ? "Descubrí cómo podemos transformar la experiencia de tus usuarios." : "Discover how we can transform your users' experience."}
           buttonText={lang === "es" ? "Quiero saber más" : "I want to know more"}
+          highlightWord="love"
         />
-      </section>
+      </div>
     </>
   );
 };

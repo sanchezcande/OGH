@@ -19,6 +19,7 @@ export const AboutUsCallToAction = () => {
       title={callToAction.title}
       description={callToAction.description}
       buttonText={callToAction.buttonText}
+      highlightWord="Right"
     />
   );
 };

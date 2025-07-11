@@ -21,9 +21,10 @@ import Head from "next/head";
 import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import { FaProjectDiagram } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
 
 export async function getServerSideProps() {
   return { props: {} };
@@ -38,7 +39,258 @@ export const HomeCallToAction = () => {
       title={callToAction.title}
       description={callToAction.description}
       buttonText={callToAction.buttonText}
+      highlightWord="aligned"
     />
+  );
+};
+
+const TestimonialsCarousel = ({ testimonials }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const nextSlide = () => {
+    if (!isAnimating) {
+      setIsAnimating(true);
+      setCurrentSlide((prev) => (prev + 1) % testimonials.length);
+      setTimeout(() => setIsAnimating(false), 300);
+    }
+  };
+
+  const prevSlide = () => {
+    if (!isAnimating) {
+      setIsAnimating(true);
+      setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      setTimeout(() => setIsAnimating(false), 300);
+    }
+  };
+
+  const goToSlide = (index) => {
+    if (!isAnimating && index !== currentSlide) {
+      setIsAnimating(true);
+      setCurrentSlide(index);
+      setTimeout(() => setIsAnimating(false), 300);
+    }
+  };
+
+  // Auto-play
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [currentSlide, isAnimating]);
+
+  return (
+    <div style={{
+      maxWidth: "1000px",
+      margin: "0 auto",
+      position: "relative",
+      padding: "0 2rem"
+    }}>
+      {/* Main Carousel */}
+      <div style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "20px",
+        background: "white",
+        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
+        minHeight: "400px"
+      }}>
+        {/* Navigation Buttons */}
+        <button
+          onClick={prevSlide}
+          disabled={isAnimating}
+          style={{
+            position: "absolute",
+            left: "20px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(255, 255, 255, 0.9)",
+            border: "none",
+            borderRadius: "50%",
+            width: "50px",
+            height: "50px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            zIndex: 10,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            opacity: isAnimating ? 0.5 : 1,
+            "@media (max-width: 768px)": {
+              width: "40px",
+              height: "40px",
+              left: "10px"
+            }
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = "translateY(-50%) scale(1.1)";
+            e.target.style.background = "rgba(255, 255, 255, 1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = "translateY(-50%) scale(1)";
+            e.target.style.background = "rgba(255, 255, 255, 0.9)";
+          }}
+        >
+          <FaChevronLeft style={{ color: "#F97B72", fontSize: "1.2rem" }} />
+        </button>
+
+        <button
+          onClick={nextSlide}
+          disabled={isAnimating}
+          style={{
+            position: "absolute",
+            right: "20px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(255, 255, 255, 0.9)",
+            border: "none",
+            borderRadius: "50%",
+            width: "50px",
+            height: "50px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            zIndex: 10,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            opacity: isAnimating ? 0.5 : 1,
+            "@media (max-width: 768px)": {
+              width: "40px",
+              height: "40px",
+              right: "10px"
+            }
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = "translateY(-50%) scale(1.1)";
+            e.target.style.background = "rgba(255, 255, 255, 1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = "translateY(-50%) scale(1)";
+            e.target.style.background = "rgba(255, 255, 255, 0.9)";
+          }}
+        >
+          <FaChevronRight style={{ color: "#F97B72", fontSize: "1.2rem" }} />
+        </button>
+
+        {/* Slides Container */}
+        <div style={{
+          display: "flex",
+          transition: "transform 0.3s ease",
+          transform: `translateX(-${currentSlide * 100}%)`,
+          height: "100%"
+        }}>
+          {testimonials.map((testimonial, index) => (
+            <div
+              key={index}
+              style={{
+                minWidth: "100%",
+                padding: "3rem 4rem",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+                position: "relative",
+                "@media (max-width: 768px)": {
+                  padding: "2rem 1.5rem"
+                }
+              }}
+            >
+              {/* Quote Icon */}
+              <div style={{
+                position: "absolute",
+                top: "2rem",
+                left: "2rem",
+                fontSize: "3rem",
+                color: "#F97B72",
+                opacity: 0.1,
+                "@media (max-width: 768px)": {
+                  top: "1rem",
+                  left: "1rem",
+                  fontSize: "2rem"
+                }
+              }}>
+                <FaQuoteLeft />
+              </div>
+
+              {/* Content */}
+              <p style={{
+                fontSize: "1.3rem",
+                lineHeight: "1.8",
+                color: "#333",
+                marginBottom: "2rem",
+                fontStyle: "italic",
+                maxWidth: "600px",
+                "@media (max-width: 768px)": {
+                  fontSize: "1.1rem",
+                  marginBottom: "1.5rem"
+                }
+              }}>
+                "{testimonial.content}"
+              </p>
+
+              {/* Author Info */}
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.5rem"
+              }}>
+                <p style={{
+                  fontWeight: "700",
+                  fontSize: "1.2rem",
+                  color: "#F97B72",
+                  margin: 0,
+                  "@media (max-width: 768px)": {
+                    fontSize: "1.1rem"
+                  }
+                }}>
+                  {testimonial.company}
+                </p>
+                <p style={{
+                  fontSize: "1rem",
+                  color: "#666",
+                  margin: 0,
+                  "@media (max-width: 768px)": {
+                    fontSize: "0.9rem"
+                  }
+                }}>
+                  {testimonial.role}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Dots Indicator */}
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "0.5rem",
+        marginTop: "2rem"
+      }}>
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            style={{
+              width: index === currentSlide ? "30px" : "12px",
+              height: "12px",
+              borderRadius: "6px",
+              border: "none",
+              background: index === currentSlide ? "#F97B72" : "#ddd",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              opacity: isAnimating ? 0.5 : 1
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -416,21 +668,20 @@ export default function HomePage() {
           <SectionTitle style={{"--i": 2}}>
             {t("planTitle")}
           </SectionTitle>
-          <InView>
-            {(isInView) => (
-              <PlanSteps className={isInView ? 'in-view' : ''}>
-                <li style={{"--i": 0}}>
-                  <strong>1.</strong> {t("planSteps.step1")}
-                </li>
-                <li style={{"--i": 1}}>
-                  <strong>2.</strong> {t("planSteps.step2")}
-                </li>
-                <li style={{"--i": 2}}>
-                  <strong>3.</strong> {t("planSteps.step3")}
-                </li>
-              </PlanSteps>
-            )}
-          </InView>
+          <PlanSteps>
+            <li style={{"--i": 0}}>
+              <strong>1</strong>
+              {t("planSteps.step1")}
+            </li>
+            <li style={{"--i": 1}}>
+              <strong>2</strong>
+              {t("planSteps.step2")}
+            </li>
+            <li style={{"--i": 2}}>
+              <strong>3</strong>
+              {t("planSteps.step3")}
+            </li>
+          </PlanSteps>
           
           {/* New CTA button below plan section */}
           <div style={{textAlign: "center", marginTop: "3rem"}}>
@@ -445,9 +696,9 @@ export default function HomePage() {
           </div>
         </PlanSection>
         
-        {/* Testimonials / Social Proof Section */}
+        {/* Testimonials Carousel Section */}
         <Section className="full-width testimonials-section" style={{
-          background: "#f9f9f9",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
           padding: "4rem 1rem",
           margin: "4rem 0"
         }}>
@@ -471,28 +722,11 @@ export default function HomePage() {
               margin: "0 auto", 
               color: "#444444"
             }}>
-               {t("reviewsSubtitle")}
-          
+              {t("reviewsSubtitle")}
             </p>
           </motion.div>
           
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "2rem",
-            maxWidth: "1200px",
-            margin: "0 auto"
-          }}>
-            {testimonialData.map((testimonial, index) => (
-              <TestimonialCard 
-                key={index}
-                content={testimonial.content}
-                company={testimonial.company}
-                role={testimonial.role}
-                delay={index * 0.05 + 0.1}
-              />
-            ))}
-          </div>
+          <TestimonialsCarousel testimonials={testimonialData} />
         </Section>
 
         {/* Final CTA Section */}

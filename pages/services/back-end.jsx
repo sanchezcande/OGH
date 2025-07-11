@@ -284,6 +284,7 @@ const BackEnd = () => {
           title={lang === "es" ? "¡Contáctanos hoy!" : "Contact us today!"}
           description={lang === "es" ? "Descubrí cómo podemos potenciar tu infraestructura digital." : "Discover how we can boost your digital infrastructure."}
           buttonText={lang === "es" ? "Quiero saber más" : "I want to know more"}
+          highlightWord="today"
         />
       </section>
     </>

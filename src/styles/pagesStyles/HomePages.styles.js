@@ -107,20 +107,45 @@ export const Container = styled.div`
 
 export const Hero = styled.div`
   position: relative;
-  width: 100%;
-  max-width: 1200px;
-  padding: 40px 20px;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 100px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   overflow: hidden;
-  background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}cc, ${theme.colors.background}dd)`};
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border: 1px solid ${({ theme }) => theme.colors.accent}33;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  margin-bottom: 4rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  color: white;
+  position: relative;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+    z-index: 1;
+  }
+  
+  & > * {
+    position: relative;
+    z-index: 2;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 80px 15px;
+    margin-bottom: 3rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 60px 10px;
+    margin-bottom: 2rem;
+  }
 `;
 
 export const GradientOverlay = styled.div`
@@ -175,11 +200,11 @@ export const FloatingBlob = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: ${({ theme }) => theme.colors.text};
+  color: white;
   mix-blend-mode: normal;
   z-index: 1;
   position: relative;
-  font-size: clamp(2rem, 6vw, 3rem);
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
   margin: 20px 0 10px 0;
   text-align: center;
@@ -229,11 +254,11 @@ export const Title = styled.h1`
   }
 
   @media (max-width: 900px) {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 
   @media (max-width: 768px) {
-    font-size: 2rem;
+    font-size: 2.5rem;
     
     .animated {
       white-space: normal;
@@ -245,27 +270,27 @@ export const Title = styled.h1`
     }
   }
   @media (max-width: 610px) {
-    font-size: 1.2rem;
+    font-size: 2rem;
   }
 `;
 
 export const Subtitle = styled.h2`
-  color: #333333;
+  color: rgba(255, 255, 255, 0.9);
   mix-blend-mode: normal;
   z-index: 1;
   position: relative;
-  font-size: 1.3rem;
-  font-weight: 500;
+  font-size: 1.4rem;
+  font-weight: 400;
   margin-bottom: 30px;
   max-width: 800px;
   line-height: 1.6;
   display: inline-block;
   padding: 20px;
   cursor: default;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     padding: 10px;
   }
 `;
@@ -396,14 +421,14 @@ export const SectionText = styled.p`
 `;
 
 export const CTAButton = styled.a`
-  background-color: ${({ theme }) => theme.colors.accent};
+  background: ${({ theme }) => theme.colors.accent};
   color: white;
-  padding: 16px 36px;
-  font-weight: bold;
+  padding: 16px 32px;
+  font-weight: 600;
   font-size: 1.1rem;
-  border-radius: ${({ theme }) => theme.borderRadius || '8px'};
+  border-radius: 8px;
   text-decoration: none;
-  margin-top: 25px;
+  margin-top: 30px;
   display: inline-block;
   transition: all 0.3s ease;
   position: relative;
@@ -411,7 +436,7 @@ export const CTAButton = styled.a`
   z-index: 1;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(249, 123, 114, 0.3);
+  box-shadow: 0 4px 12px rgba(249, 123, 114, 0.3);
   
   &::before {
     content: "";
@@ -427,29 +452,39 @@ export const CTAButton = styled.a`
       transparent 100%
     );
     z-index: 1;
-    transition: left 0.7s ease;
+    transition: left 0.5s ease;
   }
   
   &:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
     color: white;
-    box-shadow: 0 10px 25px rgba(249, 123, 114, 0.4);
+    box-shadow: 0 6px 20px rgba(249, 123, 114, 0.4);
+    background: ${({ theme }) => theme.colors.accentDark};
     
     &::before {
       left: 100%;
     }
   }
   
+  &:active {
+    transform: translateY(0);
+  }
+  
   &.primary-cta {
-    padding: 18px 40px;
+    padding: 18px 36px;
     font-weight: 700;
     font-size: 1.2rem;
-    letter-spacing: 0.5px;
-    animation: ${pulse} 3s infinite;
+    background: ${({ theme }) => theme.colors.accent};
+    box-shadow: 0 6px 16px rgba(249, 123, 114, 0.4);
+    
+    &:hover {
+      background: ${({ theme }) => theme.colors.accentDark};
+      box-shadow: 0 8px 24px rgba(249, 123, 114, 0.5);
+    }
   }
   
   &.secondary-cta {
-    background-color: transparent;
+    background: transparent;
     color: ${({ theme }) => theme.colors.accent};
     border: 2px solid ${({ theme }) => theme.colors.accent};
     box-shadow: none;
@@ -464,7 +499,6 @@ export const CTAButton = styled.a`
       );
     }
     
-    /* Línea inferior solo para el botón secundario */
     &::after {
       content: "";
       position: absolute;
@@ -475,13 +509,13 @@ export const CTAButton = styled.a`
       background: ${({ theme }) => theme.colors.accent};
       transform: scaleX(0);
       transform-origin: right;
-      transition: transform 0.4s ease;
+      transition: transform 0.3s ease;
     }
     
     &:hover {
       background-color: ${({ theme }) => theme.colors.accent}11;
       color: ${({ theme }) => theme.colors.accent};
-      box-shadow: 0 5px 15px rgba(249, 123, 114, 0.15);
+      box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
       
       &::after {
         transform: scaleX(1);
@@ -491,11 +525,11 @@ export const CTAButton = styled.a`
   }
   
   @media (max-width: 768px) {
-    padding: 14px 30px;
+    padding: 14px 28px;
     font-size: 1rem;
     
     &.primary-cta {
-      padding: 16px 36px;
+      padding: 16px 32px;
       font-size: 1.1rem;
     }
   }
@@ -504,79 +538,141 @@ export const CTAButton = styled.a`
 export const PlanSteps = styled.ul`
   list-style: none;
   padding: 0;
-  margin: 2rem auto;
-  max-width: 600px;
-  position: relative;
-  padding-left: 2rem;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 3px;
-    background: ${({ theme }) => theme.colors.accent}66;
-    transform-origin: top;
-    transform: scaleY(0);
-    animation: none;
-  }
-
-  &.in-view::before {
-    animation: ${growLine} 1.5s ease forwards;
-  }
-
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  
   li {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: start;
-    gap: 0.75rem;
-    opacity: 0;
-    transform: translateX(-30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    transition-delay: calc(0.5s + (0.3s * var(--i, 0)));
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    min-width: 280px;
+    max-width: 320px;
+    text-align: center;
     position: relative;
-    z-index: 1;
-
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: calc(0.2s * var(--i, 0));
+    
+    &:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+    
     strong {
-      color: ${({ theme }) => theme.colors.accent};
-      min-width: 1.5rem;
+      display: block;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #F97B72;
+      margin-bottom: 1rem;
+    }
+    
+    /* Flecha entre tarjetas */
+    &:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: #F97B72;
+      font-weight: bold;
+      z-index: 3;
     }
   }
-
-  &.in-view li {
-    opacity: 1;
-    transform: translateX(0);
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    
+    li {
+      min-width: 280px;
+      max-width: 320px;
+      
+      &:not(:last-child)::after {
+        content: "↓";
+        right: 50%;
+        top: auto;
+        bottom: -1.5rem;
+        transform: translateX(50%);
+      }
+    }
   }
 `;
 
 export const PlanSection = styled.section`
-  max-width: 800px;
-  margin: 60px auto;
-  text-align: left;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin: 60px 0;
+  text-align: center;
   position: relative;
-  padding: 20px;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%);
+  color: white;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  overflow: hidden;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+    z-index: 1;
+  }
+  
+  & > * {
+    position: relative;
+    z-index: 2;
+  }
   
   .highlighted-word {
-    color: ${({ theme }) => theme.colors.accent};
+    color: #F97B72;
     font-weight: 800;
   }
 
   ${SectionTitle} {
     mix-blend-mode: normal;
-    color: ${({ theme }) => theme.colors.text};
+    color: white;
+    margin-bottom: 3rem;
+    
+    &::before {
+      background: #F97B72;
+    }
   }
 
   ${SectionText} {
     mix-blend-mode: normal;
-    color: ${({ theme }) => theme.colors.text};
+    color: rgba(255, 255, 255, 0.9);
   }
   
   @media (max-width: 768px) {
-    margin: 40px auto;
-    padding: 10px;
+    padding: 40px 15px;
   }
 `;
 

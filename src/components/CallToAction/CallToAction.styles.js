@@ -5,28 +5,22 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(249, 123, 114, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(249, 123, 114, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(249, 123, 114, 0); }
-`;
-
 export const CallToActionContainer = styled.div`
   text-align: center;
-  margin: 5rem auto;
-  padding: 4rem 2rem;
-  background: linear-gradient(145deg, ${({ theme }) => theme.colors.accent}11, ${({ theme }) => theme.colors.accent}22);
-  color: ${({ theme }) => theme.colors.text};
-  border-radius: 16px;
-  box-shadow: ${({ theme }) => theme.boxShadow || '0 10px 30px rgba(0, 0, 0, 0.1)'};
-  max-width: 1000px;
+  margin: 6rem auto;
+  padding: 4rem 3rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 900px;
   position: relative;
-  overflow: hidden;
+  border: 1px solid #e2e8f0;
 
   /* Estado inicial para la animación */
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.6s ease;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
 
   /* Cuando el componente es visible */
   &.visible {
@@ -34,102 +28,66 @@ export const CallToActionContainer = styled.div`
     transform: translateY(0);
   }
 
-  /* Background elements */
-  &::before {
-    content: "";
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    background: ${({ theme }) => theme.colors.accent}22;
-    border-radius: 50%;
-    top: -150px;
-    right: -150px;
-    z-index: 0;
-  }
-  
-  &::after {
-    content: "";
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    background: ${({ theme }) => theme.colors.accent}22;
-    border-radius: 50%;
-    bottom: -100px;
-    left: -100px;
-    z-index: 0;
-  }
-
   @media (max-width: 768px) {
-    margin: 3rem 1rem;
-    padding: 3rem 1.5rem;
+    margin: 4rem 1rem;
+    padding: 3rem 2rem;
   }
 `;
 
 export const CallToActionTitle = styled.h2`
-  font-size: 2.8rem;
-  font-weight: 900;
+  font-size: 2.5rem;
+  font-weight: 700;
   margin-bottom: 1.5rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: #1e293b;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  line-height: 1.2;
   
   span {
-    color: ${({ theme }) => theme.colors.accent};
-    position: relative;
-    display: inline-block;
-    
-    &::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 0.2em;
-      bottom: 0.05em;
-      left: 0;
-      background-color: ${({ theme }) => theme.colors.accent}22;
-      z-index: -1;
-    }
+    color: #F97B72;
+    font-weight: 800;
   }
   
   @media (max-width: 768px) {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 `;
 
 export const CallToActionDescription = styled.p`
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   margin-bottom: 2.5rem;
-  color: ${({ theme }) => theme.colors.text};
-  opacity: 0.85;
-  max-width: 700px;
+  color: #475569;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  line-height: 1.6;
   
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin-bottom: 2rem;
   }
 `;
 
 export const CallToActionButton = styled.a`
-  padding: 1rem 2.5rem;
+  background: transparent;
+  color: #F97B72;
+  padding: 16px 32px;
+  font-weight: 600;
   font-size: 1.1rem;
-  font-weight: 700;
-  color: white;
-  background-color: ${({ theme }) => theme.colors.accent};
-  border: none;
   border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 6px 15px rgba(249, 123, 114, 0.3);
-  display: inline-block;
   text-decoration: none;
-  position: relative;
-  z-index: 1;
+  margin-top: 0;
+  display: inline-block;
   transition: all 0.3s ease;
-  animation: ${pulse} 3s infinite;
+  position: relative;
   overflow: hidden;
-
+  z-index: 2;
+  border: 2px solid #F97B72;
+  cursor: pointer;
+  box-shadow: none;
+  
   &::before {
     content: "";
     position: absolute;
@@ -140,26 +98,48 @@ export const CallToActionButton = styled.a`
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.2) 50%,
+      rgba(249, 123, 114, 0.1) 50%,
       transparent 100%
     );
     z-index: 1;
-    transition: left 0.7s ease;
-    border-radius: 8px;
+    transition: left 0.5s ease;
   }
-
+  
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #F97B72;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  
   &:hover {
-    transform: translateY(-5px);
-    color: white;
-    box-shadow: 0 10px 25px rgba(249, 123, 114, 0.5);
+    background-color: #F97B7211;
+    color: #F97B72;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
     
     &::before {
       left: 100%;
     }
+    
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
   
   @media (max-width: 768px) {
-    padding: 0.9rem 2rem;
+    padding: 14px 28px;
     font-size: 1rem;
   }
 `;

@@ -550,9 +550,10 @@ const GraphicDesign = () => {
               }
             </p>
             <CallToActionBlock
-              title={lang === "es" ? "¡Iniciá tu proyecto!" : "Start your project!"}
+              title={lang === "es" ? "¡Diseñemos algo que destaque!" : "Let's design something that stands out!"}
               description={lang === "es" ? "Descubrí cómo podemos transformar tu idea en un diseño increíble." : "Discover how we can transform your idea into an amazing design."}
               buttonText={lang === "es" ? "Quiero saber más" : "I want to know more"}
+              highlightWord="stands"
             />
           </div>
         </div>
