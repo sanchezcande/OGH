@@ -568,7 +568,7 @@ export const PlanSteps = styled.ul`
       border-color: rgba(255, 255, 255, 0.3);
       box-shadow: 0 12px 40px rgba(0,0,0,0.2);
     }
-    
+
     strong {
       display: block;
       font-size: 2rem;
@@ -590,14 +590,14 @@ export const PlanSteps = styled.ul`
       z-index: 3;
     }
   }
-  
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
       transform: translateY(20px);
     }
     to {
-      opacity: 1;
+    opacity: 1;
       transform: translateY(0);
     }
   }

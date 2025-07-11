@@ -71,8 +71,8 @@ export const CallToActionDescription = styled.p`
 `;
 
 export const CallToActionButton = styled.a`
-  background: transparent;
-  color: #F97B72;
+  background: #F97B72;
+  color: white;
   padding: 16px 32px;
   font-weight: 600;
   font-size: 1.1rem;
@@ -86,7 +86,7 @@ export const CallToActionButton = styled.a`
   z-index: 2;
   border: 2px solid #F97B72;
   cursor: pointer;
-  box-shadow: none;
+  box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
   
   &::before {
     content: "";
@@ -98,7 +98,7 @@ export const CallToActionButton = styled.a`
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(249, 123, 114, 0.1) 50%,
+      rgba(255, 255, 255, 0.1) 50%,
       transparent 100%
     );
     z-index: 1;
@@ -111,18 +111,19 @@ export const CallToActionButton = styled.a`
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 2px;
-    background: #F97B72;
+    height: 3px;
+    background: white;
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.3s ease;
   }
   
   &:hover {
-    background-color: #F97B7211;
-    color: #F97B72;
+    background-color: #e06a5f;
+    color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
+    box-shadow: 0 6px 20px rgba(249, 123, 114, 0.3);
+    border-color: #e06a5f;
     
     &::before {
       left: 100%;
