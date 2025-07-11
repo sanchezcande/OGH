@@ -3,6 +3,7 @@ import Head from "next/head";
 import { FaUserCheck, FaMobileAlt, FaExclamationTriangle, FaPaintBrush, FaUsers, FaEye, FaCheckCircle, FaArrowRight, FaRegSadTear, FaRegGrinStars, FaPalette, FaMousePointer, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import React from "react";
+import useMediaQuery from "../../src/Hooks/useMediaQuery";
 
 const problems = (lang) => [
   {
@@ -56,6 +57,8 @@ const UxUi = () => {
     items.forEach((item) => observer.observe(item));
     return () => observer.disconnect();
   }, []);
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
     <>
@@ -198,7 +201,14 @@ const UxUi = () => {
         <div className="animate" style={{ fontWeight: 700, fontSize: "1.2rem", textAlign: "center", marginBottom: 32, animationDelay: "0.5s" }}>
           {lang === "es" ? "¿Cómo cambia tu negocio?" : "How does your business change?"}
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "2rem", alignItems: "center" }}>
+        <div style={{ 
+          display: "flex", 
+          flexDirection: isMobile ? "column" : "row", 
+          flexWrap: "wrap", 
+          justifyContent: "center", 
+          gap: "2rem", 
+          alignItems: "center"
+        }}>
           <div className="animate card-hover" style={{ 
             background: "#fff", 
             borderRadius: 20, 
@@ -219,9 +229,15 @@ const UxUi = () => {
             <div style={{ color: "#232946", fontWeight: 700, fontSize: "1.2rem", marginBottom: 12 }}>{lang === "es" ? "Antes" : "Before"}</div>
             <div style={{ color: "#232946", fontSize: "1rem", opacity: 0.8, lineHeight: 1.5 }}>{lang === "es" ? "Frustración, abandono, baja conversión." : "Frustration, abandonment, low conversion."}</div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FaArrowRight style={{ fontSize: 36, color: "#F97B72", filter: "drop-shadow(0 2px 8px rgba(249, 123, 114, 0.2))" }} />
-          </div>
+          {isMobile ? (
+            <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", margin: "-1rem 0 -1rem 0" }}>
+              <FaArrowDown style={{ fontSize: 36, color: "#F97B72", filter: "drop-shadow(0 2px 8px rgba(249, 123, 114, 0.2))" }} />
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FaArrowRight style={{ fontSize: 36, color: "#F97B72", filter: "drop-shadow(0 2px 8px rgba(249, 123, 114, 0.2))" }} />
+            </div>
+          )}
           <div className="animate card-hover" style={{ 
             background: "#fff", 
             borderRadius: 20, 

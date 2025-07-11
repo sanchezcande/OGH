@@ -31,6 +31,15 @@ export const FooterContent = styled.div`
     grid-template-columns: 1fr;
     text-align: center;
     padding-left: 0;
+    justify-items: center;
+    align-items: center;
+    > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
   }
 `;
 
@@ -42,47 +51,72 @@ export const FooterText = styled.p`
 
 export const SocialMediaContainer = styled.div`
   display: flex;
-  gap: 20px;
-  margin-top: 10px;
+  gap: 16px;
+  margin: 0 0 8px 0;
   align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
 
   a svg {
+    width: 22px;
+    height: 22px;
     fill: ${({ theme }) => theme.colors.primaryDark};
     transition: all 0.3s ease;
-    text-decoration: underline !important;
+    vertical-align: middle;
+    display: block;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
   }
 
   a:hover svg {
     fill: ${({ theme }) => theme.colors.accent};
     transform: scale(1.1);
   }
-`;
 
-const iconBase = `
-  width: 20px;
-  height: 20px;
-  fill: #fff;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.1);
+  @media (max-width: 550px) {
+    margin: 0 auto 8px auto;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
   }
 `;
-export const Linkedin = styled(FaLinkedin)`
-  width: 20px;
-  height: 20px;
-  fill: #fff;
-    transition: transform 0.3s ease;
 
+export const Linkedin = styled(FaLinkedin)`
+  width: 22px;
+  height: 22px;
+  fill: ${({ theme }) => theme.colors.primaryDark};
+  transition: transform 0.3s ease;
+  display: block;
   &:hover {
     transform: scale(1.1);
   }
 `;
 export const Github = styled(FaGithub)`
+  width: 22px;
+  height: 22px;
+  fill: ${({ theme }) => theme.colors.primaryDark};
   transition: transform 0.3s ease;
+  display: block;
   &:hover {
     transform: scale(1.1);
-  }`;
+  }
+`;
+export const Instagram = styled(FaInstagram)`
+  width: 22px;
+  height: 22px;
+  fill: ${({ theme }) => theme.colors.primaryDark};
+  transition: transform 0.3s ease;
+  display: block;
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
 
 export const Mail = styled(FaEnvelope)`
   width: 15px;
@@ -131,14 +165,4 @@ export const LogoImgContainer = styled.div`
   display: flex;
   gap: 5px;
   margin-left:-6px;
-`;
-export const Instagram = styled(FaInstagram)`
-  width: 20px;
-  height: 20px;
-  fill: #fff;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.1);
-  }
 `;

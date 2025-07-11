@@ -2,8 +2,9 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import Head from "next/head";
-import { FaPalette, FaEye, FaBrush, FaLayerGroup, FaCheckCircle, FaRocket, FaUsers, FaStar, FaPaintBrush, FaImage, FaPenNib, FaMagic, FaArrowRight } from "react-icons/fa";
+import { FaPalette, FaEye, FaBrush, FaLayerGroup, FaCheckCircle, FaRocket, FaUsers, FaStar, FaPaintBrush, FaImage, FaPenNib, FaMagic, FaArrowRight, FaArrowDown } from "react-icons/fa";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+import useMediaQuery from "../../src/Hooks/useMediaQuery";
 
 const GraphicDesign = () => {
   const { t, i18n } = useTranslation();
@@ -82,6 +83,8 @@ const GraphicDesign = () => {
     { color: "#DDA0DD", name: "Purple" }
   ];
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   return (
     <>
       <Head>
@@ -140,7 +143,11 @@ const GraphicDesign = () => {
         background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
         color: "white",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
+        marginTop: "1rem",
+        "@media (max-width: 768px)": {
+          marginTop: "2rem"
+        }
       }}>
         <div style={{
           position: "absolute",
@@ -409,19 +416,24 @@ const GraphicDesign = () => {
                     {step.desc}
                   </p>
                 </div>
-                
                 {index < process.length - 1 && (
-                  <div className="animate" style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#F97B72",
-                    fontSize: "1.5rem",
-                    animationDelay: `${0.6 + index * 0.1}s`,
-                    margin: "0 0.5rem"
-                  }}>
-                    <FaArrowRight />
-                  </div>
+                  isMobile ? (
+                    <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", margin: "-0.5rem 0 -0.5rem 0" }}>
+                      <FaArrowDown style={{ fontSize: "1.5rem", color: "#F97B72" }} />
+                    </div>
+                  ) : (
+                    <div className="animate" style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#F97B72",
+                      fontSize: "1.5rem",
+                      animationDelay: `${0.6 + index * 0.1}s`,
+                      margin: "0 0.5rem"
+                    }}>
+                      <FaArrowRight />
+                    </div>
+                  )
                 )}
               </React.Fragment>
             ))}

@@ -103,7 +103,11 @@ const FrontEnd = () => {
         background: "linear-gradient(135deg, #4a5568 0%, #2d3748 100%)",
         color: "white",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
+        marginTop: "1rem",
+        "@media (max-width: 768px)": {
+          marginTop: "2rem"
+        }
       }}>
         <div style={{
           position: "absolute",

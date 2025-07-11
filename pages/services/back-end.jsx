@@ -132,7 +132,11 @@ const BackEnd = () => {
         position: "relative",
         overflow: "hidden",
         marginBottom: "2.5rem",
-        boxShadow: "0 4px 24px rgba(35, 41, 70, 0.08)"
+        boxShadow: "0 4px 24px rgba(35, 41, 70, 0.08)",
+        marginTop: "1rem",
+        "@media (max-width: 768px)": {
+          marginTop: "2rem"
+        }
       }}>
         <div style={{
           position: "absolute",
