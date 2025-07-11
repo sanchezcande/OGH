@@ -109,6 +109,7 @@ export const Hero = styled.div`
   position: relative;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
   padding: 100px 20px;
   display: flex;
   flex-direction: column;
@@ -138,11 +139,17 @@ export const Hero = styled.div`
   }
   
   @media (max-width: 768px) {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
     padding: 80px 15px;
     margin-bottom: 3rem;
   }
   
   @media (max-width: 480px) {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
     padding: 60px 10px;
     margin-bottom: 2rem;
   }
@@ -253,12 +260,29 @@ export const Title = styled.h1`
     50% { border-color: ${({ theme }) => theme.colors.accent}; }
   }
 
+  /* Desktop and mobile visibility classes */
+  .desktop-only {
+    display: inline-block;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+
   @media (max-width: 900px) {
     font-size: 3rem;
   }
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
+    
+    .desktop-only {
+      display: none;
+    }
+    
+    .mobile-only {
+      display: inline-block;
+    }
     
     .animated {
       white-space: normal;
@@ -269,6 +293,7 @@ export const Title = styled.h1`
       display: inline;
     }
   }
+  
   @media (max-width: 610px) {
     font-size: 2rem;
   }

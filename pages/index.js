@@ -537,7 +537,21 @@ export default function HomePage() {
 
           <Glow />
           <Title>
-            <span className="animated">
+            {/* Desktop version with animation */}
+            <span className="animated desktop-only">
+              {t("heroAnimatedText.part1")}{" "}
+              <span className="highlighted-word">
+                {t("heroAnimatedText.highlight1")}
+              </span>{" "}
+              {t("heroAnimatedText.part2")}{" "}
+              <span className="highlighted-word">
+                {t("heroAnimatedText.highlight2")}
+              </span>
+              .
+            </span>
+            
+            {/* Mobile version without animation */}
+            <span className="mobile-only">
               {t("heroAnimatedText.part1")}{" "}
               <span className="highlighted-word">
                 {t("heroAnimatedText.highlight1")}
