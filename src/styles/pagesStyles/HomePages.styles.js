@@ -421,7 +421,7 @@ export const SectionText = styled.p`
 `;
 
 export const CTAButton = styled.a`
-  background: ${({ theme }) => theme.colors.accent};
+  background: #d85a4f;
   color: white;
   padding: 16px 32px;
   font-weight: 600;
@@ -455,14 +455,32 @@ export const CTAButton = styled.a`
     transition: left 0.5s ease;
   }
   
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  
   &:hover {
     transform: translateY(-2px);
     color: white;
     box-shadow: 0 6px 20px rgba(249, 123, 114, 0.4);
-    background: ${({ theme }) => theme.colors.accentDark};
+    background: #d88a82;
     
     &::before {
       left: 100%;
+    }
+    
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
     }
   }
   
