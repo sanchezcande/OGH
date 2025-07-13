@@ -54,12 +54,18 @@ export const LangMenuItem = styled.li`
   padding: 1rem;
   border-radius: ${({ theme }) => theme.borderRadius};
   color: ${({ theme }) => theme.colors.text};
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 
   &:active {
-    transform: scale(1.05);
+    transform: scale(1.02);
     font-weight: 600;
   }
+
+
 `;
 
 export const BurgerMenu = styled.div`
@@ -92,12 +98,15 @@ export const MenuItem = styled.li`
   padding: 1rem;
   color: ${({ theme }) => theme.colors.text};
   border-radius: ${({ theme }) => theme.borderRadius};
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+ 
 
   &:active {
-    transform: scale(1.05);
+    transform: scale(1.02);
     font-weight: 600;
   }
+
+
 `;
 
 export const ArrowIcon = styled(FaAngleDown)`

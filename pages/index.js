@@ -25,6 +25,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { FaProjectDiagram } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
+import useMediaQuery from "../src/Hooks/useMediaQuery";
 
 export async function getServerSideProps() {
   return { props: {} };
@@ -45,6 +46,7 @@ export const HomeCallToAction = () => {
 };
 
 const TestimonialsCarousel = ({ testimonials }) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -82,19 +84,21 @@ const TestimonialsCarousel = ({ testimonials }) => {
 
   return (
     <div style={{
-      maxWidth: "1000px",
-      margin: "0 auto",
+      maxWidth: isMobile ? "100%" : "1000px",
+      margin: isMobile ? 0 : "0 auto",
       position: "relative",
-      padding: "0 2rem"
+      padding: isMobile ? 0 : "0 2rem"
     }}>
       {/* Main Carousel */}
       <div style={{
         position: "relative",
         overflow: "hidden",
-        borderRadius: "20px",
+        borderRadius: isMobile ? 0 : "20px",
         background: "white",
         boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
-        minHeight: "400px"
+        minHeight: isMobile ? "350px" : "400px",
+        margin: 0,
+        padding: isMobile ? 0 : undefined
       }}>
         {/* Navigation Buttons */}
         <button
@@ -102,27 +106,22 @@ const TestimonialsCarousel = ({ testimonials }) => {
           disabled={isAnimating}
           style={{
             position: "absolute",
-            left: "20px",
+            left: isMobile ? 6 : "20px",
             top: "50%",
             transform: "translateY(-50%)",
-            background: "rgba(255, 255, 255, 0.9)",
+            background: isMobile ? "none" : "rgba(255, 255, 255, 0.9)",
             border: "none",
             borderRadius: "50%",
-            width: "50px",
-            height: "50px",
+            width: isMobile ? 28 : 50,
+            height: isMobile ? 28 : 50,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
             zIndex: 10,
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            boxShadow: isMobile ? "none" : "0 4px 20px rgba(0, 0, 0, 0.1)",
             transition: "all 0.3s ease",
-            opacity: isAnimating ? 0.5 : 1,
-            "@media (max-width: 768px)": {
-              width: "40px",
-              height: "40px",
-              left: "10px"
-            }
+            opacity: isMobile ? 0.4 : (isAnimating ? 0.5 : 1)
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = "translateY(-50%) scale(1.1)";
@@ -133,7 +132,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
             e.target.style.background = "rgba(255, 255, 255, 0.9)";
           }}
         >
-          <FaChevronLeft style={{ color: "#F97B72", fontSize: "1.2rem" }} />
+          <FaChevronLeft style={{ color: isMobile ? "#F97B72" : "#F97B72", fontSize: isMobile ? "1rem" : "1.2rem", opacity: isMobile ? 1 : 1 }} />
         </button>
 
         <button
@@ -141,27 +140,22 @@ const TestimonialsCarousel = ({ testimonials }) => {
           disabled={isAnimating}
           style={{
             position: "absolute",
-            right: "20px",
+            right: isMobile ? 6 : "20px",
             top: "50%",
             transform: "translateY(-50%)",
-            background: "rgba(255, 255, 255, 0.9)",
+            background: isMobile ? "none" : "rgba(255, 255, 255, 0.9)",
             border: "none",
             borderRadius: "50%",
-            width: "50px",
-            height: "50px",
+            width: isMobile ? 28 : 50,
+            height: isMobile ? 32 : 50,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
             zIndex: 10,
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            boxShadow: isMobile ? "none" : "0 4px 20px rgba(0, 0, 0, 0.1)",
             transition: "all 0.3s ease",
-            opacity: isAnimating ? 0.5 : 1,
-            "@media (max-width: 768px)": {
-              width: "40px",
-              height: "40px",
-              right: "10px"
-            }
+            opacity: isMobile ? 0.4 : (isAnimating ? 0.5 : 1)
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = "translateY(-50%) scale(1.1)";
@@ -172,7 +166,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
             e.target.style.background = "rgba(255, 255, 255, 0.9)";
           }}
         >
-          <FaChevronRight style={{ color: "#F97B72", fontSize: "1.2rem" }} />
+          <FaChevronRight style={{ color: isMobile ? "#F97B72" : "#F97B72", fontSize: isMobile ? "1rem" : "1.2rem", opacity: isMobile ? 1 : 1, paddingTop: isMobile ? 2 : 0 }} />
         </button>
 
         {/* Slides Container */}
@@ -187,7 +181,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
               key={index}
               style={{
                 minWidth: "100%",
-                padding: "3rem 4rem",
+                padding: isMobile ? "1.5rem 0" : "3rem 4rem",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -195,7 +189,8 @@ const TestimonialsCarousel = ({ testimonials }) => {
                 textAlign: "center",
                 position: "relative",
                 "@media (max-width: 768px)": {
-                  padding: "2rem 1.5rem"
+                  padding: "1.5rem 0",
+                  minHeight: "350px"
                 }
               }}
             >
@@ -218,16 +213,17 @@ const TestimonialsCarousel = ({ testimonials }) => {
 
               {/* Content */}
               <p style={{
-                fontSize: "1.3rem",
-                lineHeight: "1.8",
+                fontSize: isMobile ? "1rem" : "1.3rem",
+                lineHeight: isMobile ? "1.6" : "1.8",
                 color: "#333",
-                marginBottom: "2rem",
+                marginBottom: isMobile ? "1.5rem" : "2rem",
                 fontStyle: "italic",
                 maxWidth: "600px",
-                "@media (max-width: 768px)": {
-                  fontSize: "1.1rem",
-                  marginBottom: "1.5rem"
-                }
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                hyphens: "auto",
+                textAlign: "left",
+                padding: isMobile ? "0 12px" : 0
               }}>
                 "{testimonial.content}"
               </p>
@@ -683,19 +679,19 @@ export default function HomePage() {
             {t("planTitle")}
           </SectionTitle>
           <PlanSteps>
-            <li style={{"--i": 0}}>
+                <li style={{"--i": 0}}>
               <strong>1</strong>
               {t("planSteps.step1")}
-            </li>
-            <li style={{"--i": 1}}>
+                </li>
+                <li style={{"--i": 1}}>
               <strong>2</strong>
               {t("planSteps.step2")}
-            </li>
-            <li style={{"--i": 2}}>
+                </li>
+                <li style={{"--i": 2}}>
               <strong>3</strong>
               {t("planSteps.step3")}
-            </li>
-          </PlanSteps>
+                </li>
+              </PlanSteps>
           
           {/* New CTA button below plan section */}
           <div style={{textAlign: "center", marginTop: "3rem"}}>
@@ -736,7 +732,7 @@ export default function HomePage() {
               margin: "0 auto", 
               color: "#444444"
             }}>
-              {t("reviewsSubtitle")}
+               {t("reviewsSubtitle")}
             </p>
           </motion.div>
           

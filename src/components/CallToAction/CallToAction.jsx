@@ -42,12 +42,12 @@ const CallToActionBlock = ({ title, description, buttonText, highlightWord }) =>
     
     // If no highlightWord is provided, highlight the first word (default behavior)
     if (!highlightWord) {
-      const words = title.split(" ");
-      if (words.length <= 1) return title;
-      
-      return (
-        <>
-          <span>{words[0]}</span> {words.slice(1).join(" ")}
+    const words = title.split(" ");
+    if (words.length <= 1) return title;
+    
+    return (
+      <>
+        <span>{words[0]}</span> {words.slice(1).join(" ")}
         </>
       );
     }

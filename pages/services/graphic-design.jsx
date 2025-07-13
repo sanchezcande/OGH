@@ -422,17 +422,17 @@ const GraphicDesign = () => {
                       <FaArrowDown style={{ fontSize: "1.5rem", color: "#F97B72" }} />
                     </div>
                   ) : (
-                    <div className="animate" style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#F97B72",
-                      fontSize: "1.5rem",
-                      animationDelay: `${0.6 + index * 0.1}s`,
-                      margin: "0 0.5rem"
-                    }}>
-                      <FaArrowRight />
-                    </div>
+                  <div className="animate" style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#F97B72",
+                    fontSize: "1.5rem",
+                    animationDelay: `${0.6 + index * 0.1}s`,
+                    margin: "0 0.5rem"
+                  }}>
+                    <FaArrowRight />
+                  </div>
                   )
                 )}
               </React.Fragment>

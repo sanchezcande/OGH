@@ -352,19 +352,46 @@ const aiSolutions = () => {
         {/* Business Challenges Section */}
         <ProfessionalCard className="animate" style={{ animationDelay: "0.25s" }}>
           <SectionTitle>{lang === "es" ? "¿Te identificás con estos desafíos?" : "Do you face these challenges?"}</SectionTitle>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "1rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1.5rem", marginBottom: "1rem" }}>
             {/* Cada card de desafío */}
-            <div className="animate" style={{ padding: "1.5rem", background: "#FEF2F2", borderRadius: "8px", border: "1px solid #FECACA", animationDelay: "0.3s" }}>
+            <div className="animate" style={{ 
+              padding: "1.5rem", 
+              background: "#FEF2F2", 
+              borderRadius: "8px", 
+              border: "1px solid #FECACA", 
+              animationDelay: "0.3s",
+              minWidth: "240px",
+              maxWidth: "280px",
+              flex: "1 1 240px"
+            }}>
               <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "0.5rem" }}><FaCogs /></div>
               <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#2B2B2B" }}>{lang === "es" ? "Procesos manuales" : "Manual processes"}</h4>
               <p style={{ fontSize: "0.95rem", color: "#6B7280", lineHeight: "1.5" }}>{lang === "es" ? "¿Te cuesta automatizar procesos y analizar datos de manera efectiva?" : "Do you find it challenging to automate processes and analyze data effectively?"}</p>
             </div>
-            <div className="animate" style={{ padding: "1.5rem", background: "#FEF2F2", borderRadius: "8px", border: "1px solid #FECACA", animationDelay: "0.35s" }}>
+            <div className="animate" style={{ 
+              padding: "1.5rem", 
+              background: "#FEF2F2", 
+              borderRadius: "8px", 
+              border: "1px solid #FECACA", 
+              animationDelay: "0.35s",
+              minWidth: "240px",
+              maxWidth: "280px",
+              flex: "1 1 240px"
+            }}>
               <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "0.5rem" }}><FaBrain /></div>
               <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#2B2B2B" }}>{lang === "es" ? "Falta de expertise" : "Lack of expertise"}</h4>
               <p style={{ fontSize: "0.95rem", color: "#6B7280", lineHeight: "1.5" }}>{lang === "es" ? "¿No tenés el conocimiento interno para implementar IA en tu negocio?" : "Do you lack the internal expertise to implement AI in your business?"}</p>
             </div>
-            <div className="animate" style={{ padding: "1.5rem", background: "#FEF2F2", borderRadius: "8px", border: "1px solid #FECACA", animationDelay: "0.4s" }}>
+            <div className="animate" style={{ 
+              padding: "1.5rem", 
+              background: "#FEF2F2", 
+              borderRadius: "8px", 
+              border: "1px solid #FECACA", 
+              animationDelay: "0.4s",
+              minWidth: "240px",
+              maxWidth: "280px",
+              flex: "1 1 240px"
+            }}>
               <div style={{ fontSize: "2rem", color: "#F97B72", marginBottom: "0.5rem" }}><FaRocket /></div>
               <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", color: "#2B2B2B" }}>{lang === "es" ? "Ventaja competitiva" : "Competitive edge"}</h4>
               <p style={{ fontSize: "0.95rem", color: "#6B7280", lineHeight: "1.5" }}>{lang === "es" ? "¿Tu negocio se está perdiendo la ventaja competitiva que puede brindar la IA?" : "Is your business missing out on the competitive edge AI can provide?"}</p>

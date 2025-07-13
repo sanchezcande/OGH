@@ -101,7 +101,7 @@ export const CallToActionButton = styled.a`
       rgba(255, 255, 255, 0.1) 50%,
       transparent 100%
     );
-    z-index: 1;
+  z-index: 1;
     transition: left 0.5s ease;
   }
   
@@ -117,7 +117,7 @@ export const CallToActionButton = styled.a`
     transform-origin: right;
     transition: transform 0.3s ease;
   }
-  
+
   &:hover {
     background-color: #e06a5f;
     color: white;

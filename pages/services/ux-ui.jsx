@@ -234,9 +234,9 @@ const UxUi = () => {
               <FaArrowDown style={{ fontSize: 36, color: "#F97B72", filter: "drop-shadow(0 2px 8px rgba(249, 123, 114, 0.2))" }} />
             </div>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <FaArrowRight style={{ fontSize: 36, color: "#F97B72", filter: "drop-shadow(0 2px 8px rgba(249, 123, 114, 0.2))" }} />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FaArrowRight style={{ fontSize: 36, color: "#F97B72", filter: "drop-shadow(0 2px 8px rgba(249, 123, 114, 0.2))" }} />
+          </div>
           )}
           <div className="animate card-hover" style={{ 
             background: "#fff", 

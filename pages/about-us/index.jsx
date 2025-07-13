@@ -39,7 +39,7 @@ const AboutUs = React.forwardRef((props, ref) => {
           }
         });
       },
-      { threshold: 0.1 } // Lowered threshold for earlier animation trigger
+      { threshold: 0.2, rootMargin: "0px 0px -50px 0px" }
     );
 
     const currentImageRef = imageRef.current;

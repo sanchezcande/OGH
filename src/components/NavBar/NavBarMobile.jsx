@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import {
   NavBarContainer,
   Logo,
@@ -21,30 +22,64 @@ import Logo4 from "../../../public/Logo4.png";
 
 const NavBarMobile = () => {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
   const [showServicesMenu, setShowServicesMenu] = useState(false);
 
-  const toggleMenu = () => {
+  const closeAllMenus = useCallback(() => {
+    setMenuOpen(false);
+    setShowLangMenu(false);
+    setShowServicesMenu(false);
+  }, []);
+
+  const toggleMenu = useCallback(() => {
     setMenuOpen(!menuOpen);
     setShowLangMenu(false);
     setShowServicesMenu(false);
-  };
+  }, [menuOpen]);
 
-  const toggleLangMenu = () => {
+  const toggleLangMenu = useCallback(() => {
     setShowLangMenu(!showLangMenu);
-  };
+  }, [showLangMenu]);
 
-  const toggleServicesMenu = () => {
+  const toggleServicesMenu = useCallback(() => {
     setShowServicesMenu(!showServicesMenu);
-  };
+  }, [showServicesMenu]);
 
-  const handleLangChange = (lang) => {
+  const handleLangChange = useCallback((lang) => {
     i18n.changeLanguage(lang);
     setSelectedLang(lang);
     setShowLangMenu(false);
-  };
+  }, [i18n]);
+
+  const handleNavigation = useCallback((href) => {
+    closeAllMenus();
+    // Prevent double clicks and ensure smooth navigation
+    router.push(href);
+  }, [closeAllMenus, router]);
+
+  // Close menu when clicking outside
+  const menuRef = useRef(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        closeAllMenus();
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [menuOpen, closeAllMenus]);
 
   const servicesList = [
     { text: t("aiTitle"), href: "/services/AI" },
@@ -56,7 +91,7 @@ const NavBarMobile = () => {
   ];
 
   return (
-    <NavBarContainer>
+    <NavBarContainer ref={menuRef}>
       <LogoIcon>
       <Link href="/">
 
@@ -79,8 +114,8 @@ const NavBarMobile = () => {
               exit={{ opacity: 0, height: 0 }}
             >
               <Menu open={menuOpen}>
-                <MenuItem onClick={toggleMenu}>
-                  <Link href="/">{t("home")}</Link>
+                <MenuItem onClick={() => handleNavigation("/")}>
+                  {t("home")}
                 </MenuItem>
                 <MenuItem>
                   <LangMenuContainer
@@ -93,25 +128,28 @@ const NavBarMobile = () => {
                   {showServicesMenu && (
                     <LanguageMenu open={showServicesMenu}>
                       {servicesList.map((service, index) => (
-                        <LangMenuItem key={index} onClick={toggleMenu}>
-                          <Link href={service.href}>{service.text}</Link>
+                        <LangMenuItem 
+                          key={index} 
+                          onClick={() => handleNavigation(service.href)}
+                        >
+                          {service.text}
                         </LangMenuItem>
                       ))}
                     </LanguageMenu>
                   )}
                 </MenuItem>
-                <MenuItem onClick={toggleMenu}>
-                  <Link href="/about-us">{t("aboutUs")}</Link>
+                <MenuItem onClick={() => handleNavigation("/about-us")}>
+                  {t("aboutUs")}
                 </MenuItem>
                 
-                <MenuItem onClick={toggleMenu}>
-                  <Link href="/blog">Blog</Link>
+                <MenuItem onClick={() => handleNavigation("/blog")}>
+                  Blog
                 </MenuItem>
-                <MenuItem onClick={toggleMenu}>
-                  <Link href="/faqs">FAQs</Link>
+                <MenuItem onClick={() => handleNavigation("/faqs")}>
+                  FAQs
                 </MenuItem>
-                <MenuItem onClick={toggleMenu}>
-                  <Link href="/contact-us">{t("contactUs")}</Link>
+                <MenuItem onClick={() => handleNavigation("/contact-us")}>
+                  {t("contactUs")}
                 </MenuItem>
                 <MenuItem onClick={toggleLangMenu}>
                   <LangMenuContainer>

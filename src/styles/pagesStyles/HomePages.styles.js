@@ -346,7 +346,7 @@ export const Section = styled.div`
   @media (max-width: 768px) {
     padding: 1rem;
     &.full-width {
-      padding: 3rem 1rem;
+      padding: 0;
     }
     &.serious-block {
       padding: 1.5rem 0.5rem 1rem 0.5rem;

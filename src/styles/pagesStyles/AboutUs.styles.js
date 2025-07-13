@@ -40,6 +40,9 @@ export const Container = styled.div`
   }
 
   /* H1 styles are now within ImageText for better specificity regarding animation */
+  
+  /* Smooth scrolling for better animation experience */
+  scroll-behavior: smooth;
 `;
 
 export const ImageText = styled.div`
@@ -58,7 +61,13 @@ export const ImageText = styled.div`
     flex-direction: column;
     align-items: center;
     opacity: 0;
-    animation: ${fadeIn} 0.8s ease-out forwards;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     img {
       width: 100%;
@@ -88,7 +97,13 @@ export const ImageText = styled.div`
       max-width: 250px;
       text-align: center;
       opacity: 0;
-      animation: ${fadeIn} 0.8s ease-out 0.3s forwards;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out 0.3s, transform 0.6s ease-out 0.3s;
+
+      .image-container.visible & {
+        opacity: 1;
+        transform: translateY(0);
+      }
       
       .founder-name {
         font-size: 1.2rem;
