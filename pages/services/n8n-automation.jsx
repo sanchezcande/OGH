@@ -292,19 +292,21 @@ const N8nAutomation = () => {
               }
             }
           `}</style>
-          <h1 style={{ 
+          <h1 className="animate" style={{ 
             fontSize: "2.5rem", 
             fontWeight: "700", 
             marginBottom: "1rem",
-            color: "white"
+            color: "white",
+            animationDelay: "0.1s"
           }}>
             n8n Automation
           </h1>
-          <p style={{ 
+          <p className="animate" style={{ 
             fontSize: "1.2rem", 
             opacity: 0.9,
             maxWidth: "600px",
-            margin: "0 auto"
+            margin: "0 auto",
+            animationDelay: "0.2s"
           }}>
             {lang === "es" 
               ? "Conectá tus herramientas y automatizá flujos de trabajo sin código"
@@ -317,32 +319,28 @@ const N8nAutomation = () => {
       {/* Main Content - Full Width */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2rem" }}>
         {/* Main Description */}
-        <div style={{ 
+        <div className="animate" style={{ 
           position: "relative",
           padding: "2rem",
           marginBottom: "2rem",
           borderRadius: "12px",
           overflow: "hidden",
           background: "#f8f9fa",
+          animationDelay: "0.3s"
         }}>
           <div>
-            <SectionTitle>
-              {lang === "es" ? "¿Qué es n8n?" : "What is n8n?"}
-            </SectionTitle>
-            <Subtitle>
-              {lang === "es"
+            <SectionTitle><span className="animate" style={{animationDelay: "0.35s"}}>{lang === "es" ? "¿Qué es n8n?" : "What is n8n?"}</span></SectionTitle>
+            <Subtitle><span className="animate" style={{animationDelay: "0.4s"}}>{lang === "es"
                 ? "n8n es una plataforma visual de automatización de flujos de trabajo de código abierto. Permite conectar aplicaciones, automatizar procesos y crear integraciones personalizadas sin necesidad de programar."
                 : "n8n is an open-source, visual workflow automation platform. It empowers businesses and teams to connect apps, automate processes, and build custom integrations—no coding required."
-              }
-            </Subtitle>
+              }</span></Subtitle>
           </div>
         </div>
 
         {/* Key Benefits */}
-        <SectionTitle>
-          {lang === "es" ? "¿Por qué elegir n8n?" : "Why choose n8n?"}
-        </SectionTitle>
+        <SectionTitle><span className="animate" style={{animationDelay: "0.45s"}}>{lang === "es" ? "¿Por qué elegir n8n?" : "Why choose n8n?"}</span></SectionTitle>
         <FeatureGrid>
+          {/* FeatureCards ya tienen la clase animate */}
           <FeatureCard
             icon={<FaCogs />}
             title={lang === "es" ? "Open Source" : "Open Source"}
@@ -405,11 +403,12 @@ const N8nAutomation = () => {
           }}
         />
         <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
-          <h2 style={{ 
+          <h2 className="animate" style={{ 
             fontSize: "2rem", 
             fontWeight: "700", 
             marginBottom: "1.5rem",
-            color: "white"
+            color: "white",
+            animationDelay: "0.55s"
           }}>
             {lang === "es" ? "Casos de uso comunes" : "Common use cases"}
           </h2>
@@ -419,7 +418,7 @@ const N8nAutomation = () => {
             gap: "1.5rem"
           }}>
           <div 
-            className="use-case-card"
+            className="use-case-card animate"
             style={{ 
               padding: "1.5rem", 
               background: "white", 
@@ -428,7 +427,8 @@ const N8nAutomation = () => {
               border: "1px solid rgba(0,0,0,0.05)",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              transform: "translateY(0)"
+              transform: "translateY(0)",
+              animationDelay: "0.6s"
             }}
           >
             <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
@@ -442,7 +442,7 @@ const N8nAutomation = () => {
             </p>
           </div>
           <div 
-            className="use-case-card"
+            className="use-case-card animate"
             style={{ 
               padding: "1.5rem", 
               background: "white", 
@@ -451,7 +451,8 @@ const N8nAutomation = () => {
               border: "1px solid rgba(0,0,0,0.05)",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              transform: "translateY(0)"
+              transform: "translateY(0)",
+              animationDelay: "0.7s"
             }}
           >
             <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
@@ -465,7 +466,7 @@ const N8nAutomation = () => {
             </p>
           </div>
           <div 
-            className="use-case-card"
+            className="use-case-card animate"
             style={{ 
               padding: "1.5rem", 
               background: "white", 
@@ -474,7 +475,8 @@ const N8nAutomation = () => {
               border: "1px solid rgba(0,0,0,0.05)",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              transform: "translateY(0)"
+              transform: "translateY(0)",
+              animationDelay: "0.8s"
             }}
           >
             <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
@@ -511,21 +513,23 @@ const N8nAutomation = () => {
           background: "#f8f9fa",
           textAlign: "center"
         }}>
-          <h3 style={{ 
+          <h3 className="animate" style={{ 
             fontSize: "1.5rem", 
             fontWeight: "600", 
             marginBottom: "1rem",
-            color: "#2B2B2B"
+            color: "#2B2B2B",
+            animationDelay: "0.9s"
           }}>
             {lang === "es" 
               ? "¿Listo para automatizar tu negocio?" 
               : "Ready to automate your business?"
             }
           </h3>
-          <p style={{ 
+          <p className="animate" style={{ 
             fontSize: "1.1rem", 
             color: "#6B7280",
-            marginBottom: "2rem"
+            marginBottom: "2rem",
+            animationDelay: "1.0s"
           }}>
             {lang === "es"
               ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
