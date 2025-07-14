@@ -272,13 +272,16 @@ const N8nAutomation = () => {
           }}
         />
         <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
-          <div style={{ 
+          <div className="animate" style={{ 
             fontSize: "4rem", 
             marginBottom: "1rem",
-            animation: "float 3s ease-in-out infinite",
+            animation: "float 3s ease-in-out infinite, fadeInUp 0.6s forwards",
             display: "inline-block",
             color: "#F97B72",
-            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)"
+            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
+            opacity: 0,
+            transform: "translateY(20px)",
+            animationDelay: "0s, 0s"
           }}>
             <FaProjectDiagram />
           </div>
@@ -291,21 +294,37 @@ const N8nAutomation = () => {
                 transform: translateY(-10px) rotate(5deg); 
               }
             }
+            @keyframes fadeInUp {
+              from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+              }
+              to { 
+                opacity: 1; 
+                transform: translateY(0); 
+              }
+            }
           `}</style>
           <h1 className="animate" style={{ 
             fontSize: "2.5rem", 
             fontWeight: "700", 
             marginBottom: "1rem",
             color: "white",
+            animationDelay: "0.1s",
+            opacity: 0,
+            transform: "translateY(20px)",
+            animation: "fadeInUp 0.6s forwards",
             animationDelay: "0.1s"
           }}>
             n8n Automation
           </h1>
           <p className="animate" style={{ 
             fontSize: "1.2rem", 
-            opacity: 0.9,
+            opacity: 0,
             maxWidth: "600px",
             margin: "0 auto",
+            transform: "translateY(20px)",
+            animation: "fadeInUp 0.6s forwards",
             animationDelay: "0.2s"
           }}>
             {lang === "es" 
