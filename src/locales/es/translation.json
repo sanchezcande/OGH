@@ -451,5 +451,24 @@
         "description": "Crea experiencias nativas potentes para iOS y Android que capten a tus usuarios en cualquier dispositivo."
       }
     }
+  },
+  "featuredWorkSection": {
+    "title": "Trabajos Destacados",
+    "subtitle": "Proyectos reales que muestran nuestra experiencia e impacto",
+    "smartersCity": {
+      "title": "Smarters City",
+      "description": "SaaS de gestión de activos urbanos para mapeo y mantenimiento en tiempo real de semáforos, luces de tráfico y más.",
+      "metrics": ["35% carga más rápida", "0 bugs críticos", "1er contrato municipal"]
+    },
+    "estudioSab": {
+      "title": "Estudio Sab",
+      "description": "Desarrollo web full-stack para un estudio de diseño creativo.",
+      "metrics": ["Desarrollo completo", "Diseño moderno", "Sitio web en vivo"]
+    },
+    "skylar": {
+      "title": "Skylar",
+      "description": "Plataforma de e-commerce para una marca líder de útiles escolares en Argentina.",
+      "metrics": ["≤2s TTI", "+28% conversiones", "Catálogo en vivo"]
+    }
   }
 }
