@@ -105,7 +105,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
       >
         <div style={{
           position: "relative",
-          width: "360px",
+          width: "320px",
           textAlign: "center",
           zIndex: 999999
         }}>
@@ -115,7 +115,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
             alignItems: "center",
             width: "100%"
           }}>
-            <motion.img 
+            <img 
               src={image} 
               alt={title}
               style={{
@@ -124,13 +124,12 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                 height: "auto",
                 maxHeight: "120px",
                 objectFit: "contain",
-                transition: "all 0.3s ease",
-                filter: "grayscale(20%)"
+                transition: "transform 0.3s ease-out",
+                filter: "grayscale(20%)",
+                cursor: "pointer"
               }}
-              whileHover={{ 
-                scale: 1.02,
-                transition: { duration: 0.15, ease: "easeOut" }
-              }}
+              onMouseEnter={(e) => e.target.style.transform = "scale(1.02)"}
+              onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
             />
             <div style={{
               marginTop: "0.25rem",
@@ -933,6 +932,17 @@ export default function HomePage() {
                 badges: ["≤2s TTI", "+28% conversions", "Live catalog"],
                 category: "commerce",
                 delay: 0.3
+              },
+              {
+                image: "/GBS.png",
+                title: "GBS Abogados",
+                description: "Plataforma web moderna y optimizada",
+                metrics: ["+40% velocidad", "99.9% uptime", "SEO optimizado"],
+                link: "#",
+                hoverContent: <><strong>Web Development</strong> — modern platform, optimized performance.</>,
+                badges: ["Dynamic transitions", "SEO ready", "Always on"],
+                category: "web-performance",
+                delay: 0.4
               }
             ];
 
@@ -943,9 +953,9 @@ export default function HomePage() {
             return (
               <div style={{ 
                 display: "grid", 
-                gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
-                gap: "2rem",
-                maxWidth: "1200px",
+                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                gap: "1.5rem",
+                maxWidth: "1400px",
                 margin: "0 auto",
                 position: "relative",
                 zIndex: 999999
