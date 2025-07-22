@@ -923,7 +923,7 @@ export default function HomePage() {
                 delay: 0.2
               },
               {
-                image: "/skylar.png",
+                image: "/Skylar.png",
                 title: t("featuredWorkSection.skylar.title"),
                 description: t("featuredWorkSection.skylar.description"),
                 metrics: t("featuredWorkSection.skylar.metrics", { returnObjects: true }),
