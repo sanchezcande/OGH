@@ -23,9 +23,198 @@ import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import React from "react";
-import { FaProjectDiagram } from "react-icons/fa";
+import { createPortal } from "react-dom";
+import { FaProjectDiagram, FaExternalLinkAlt } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
 import useMediaQuery from "../src/Hooks/useMediaQuery";
+
+// Tabs Component
+const ProjectTabs = ({ activeTab, onTabChange }) => {
+  const tabs = [
+    { id: 'all', label: 'All' },
+    { id: 'saas', label: 'SaaS' },
+    { id: 'web-performance', label: 'Web Performance' },
+    { id: 'commerce', label: 'Commerce' }
+  ];
+
+  return (
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      gap: "0.5rem",
+      marginBottom: "2rem",
+      flexWrap: "wrap"
+    }}>
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.id)}
+          style={{
+            padding: "0.5rem 1rem",
+            borderRadius: "20px",
+            border: "none",
+            background: activeTab === tab.id ? "#F97B72" : "#f3f4f6",
+            color: activeTab === tab.id ? "white" : "#6B7280",
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// Featured Work Card Component
+const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverContent, delay = 0, badges = ["35% faster", "0 bugs", "Live product"], category }) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [showHover, setShowHover] = useState(false);
+  
+  const handleMouseEnter = () => {
+    setShowHover(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setShowHover(false);
+  };
+  
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay }}
+        style={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "2rem",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          zIndex: 999999
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={() => window.open(link, '_blank', 'noopener,noreferrer')}
+      >
+        <div style={{
+          position: "relative",
+          width: "320px",
+          textAlign: "center",
+          zIndex: 999999
+        }}>
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%"
+          }}>
+            <img 
+              src={image} 
+              alt={title}
+              style={{
+                width: "auto",
+                maxWidth: "200px",
+                height: "auto",
+                maxHeight: "120px",
+                objectFit: "contain",
+                transition: "transform 0.3s ease-out",
+                filter: "grayscale(20%)",
+                cursor: "pointer"
+              }}
+              onMouseEnter={(e) => e.target.style.transform = "scale(1.02)"}
+              onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+            />
+            <div style={{
+              marginTop: "0.25rem",
+              fontSize: "0.8rem",
+              color: "#6B7280",
+              fontWeight: "500"
+            }}>
+              {title}
+            </div>
+          </div>
+          
+          {/* Hover Card */}
+          {showHover && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: "0",
+                background: "white",
+                borderRadius: "12px",
+                padding: "1rem",
+                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                border: "1px solid #e5e7eb",
+                width: "100%",
+                zIndex: 99999999,
+                pointerEvents: "none",
+                marginTop: "10px",
+                textAlign: "center"
+              }}
+            >
+              <div style={{
+                position: "absolute",
+                top: "-8px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "0",
+                height: "0",
+                borderLeft: "8px solid transparent",
+                borderRight: "8px solid transparent",
+                borderBottom: "8px solid white"
+              }} />
+              
+              <div style={{
+                fontSize: "0.9rem",
+                lineHeight: "1.4",
+                color: "#6B7280",
+                marginBottom: "1rem",
+                textAlign: "center"
+              }}>
+                {hoverContent}
+              </div>
+              
+              <div style={{
+                display: "flex",
+                gap: "0.75rem",
+                flexWrap: "wrap",
+                justifyContent: "center"
+              }}>
+                {badges.map((badge, index) => (
+                  <span key={index} style={{
+                    background: "#F97B72",
+                    color: "white",
+                    padding: "0.3rem 0.8rem",
+                    borderRadius: "16px",
+                    fontSize: "0.75rem",
+                    fontWeight: "600",
+                    whiteSpace: "nowrap"
+                  }}>
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
+      
+
+    </>
+  );
+};
 
 export async function getServerSideProps() {
   return { props: {} };
@@ -466,6 +655,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
 
 export default function HomePage() {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState('all');
 
   const parseHighlightedText = (text) => {
     if (!text) return [];
@@ -671,6 +861,122 @@ export default function HomePage() {
               delay={0.35}
             />
           </div>
+        </Section>
+        
+        {/* Featured Work Section */}
+        <Section className="full-width" style={{
+          padding: "2rem 1rem",
+          margin: "2rem 0",
+          borderTop: "1px solid #e5e7eb",
+          borderBottom: "1px solid #e5e7eb",
+          position: "relative",
+          zIndex: 999999
+        }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.2 }}
+            style={{ textAlign: "center", marginBottom: "2rem" }}
+          >
+            <h3 style={{ 
+              fontSize: "1.5rem", 
+              fontWeight: "600",
+              marginBottom: "0.5rem",
+              color: "#6B7280"
+            }}>
+              {t("featuredWorkSection.title")}
+            </h3>
+            <p style={{ 
+              fontSize: "1rem", 
+              maxWidth: "600px", 
+              margin: "0 auto", 
+              color: "#9CA3AF"
+            }}>
+              {t("featuredWorkSection.subtitle")}
+            </p>
+          </motion.div>
+          
+          <ProjectTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          
+          {(() => {
+            const projects = [
+              {
+                image: "/smarters-card.png",
+                title: t("featuredWorkSection.smartersCity.title"),
+                description: t("featuredWorkSection.smartersCity.description"),
+                metrics: t("featuredWorkSection.smartersCity.metrics", { returnObjects: true }),
+                link: "https://smarters.city/",
+                hoverContent: <><strong>Embedded Dev Partners</strong> — boosted UI + APIs, kept their roadmap on track</>,
+                category: "saas",
+                delay: 0.1
+              },
+              {
+                image: "/estudio-sab.png",
+                title: t("featuredWorkSection.estudioSab.title"),
+                description: t("featuredWorkSection.estudioSab.description"),
+                metrics: t("featuredWorkSection.estudioSab.metrics", { returnObjects: true }),
+                link: "https://estudiosab.com/",
+                hoverContent: <><strong>All-In Dev Studio</strong> — designed, built, shipped.</>,
+                badges: ["Fast pages", "SEO ready", "Always on"],
+                category: "web-performance",
+                delay: 0.2
+              },
+              {
+                image: "/skylar.png",
+                title: t("featuredWorkSection.skylar.title"),
+                description: t("featuredWorkSection.skylar.description"),
+                metrics: t("featuredWorkSection.skylar.metrics", { returnObjects: true }),
+                link: "https://skylar.ar/",
+                hoverContent: <><strong>Code-Side Overhaul</strong> — rebuilt store, conversions up 28%</>,
+                badges: ["≤2s TTI", "+28% conversions", "Live catalog"],
+                category: "commerce",
+                delay: 0.3
+              },
+              {
+                image: "/GBS.png",
+                title: "GBS Abogados",
+                description: "Plataforma web moderna y optimizada",
+                metrics: ["+40% velocidad", "99.9% uptime", "SEO optimizado"],
+                link: "#",
+                hoverContent: <><strong>Web Development</strong> — modern platform, optimized performance.</>,
+                badges: ["Dynamic transitions", "SEO ready", "Always on"],
+                category: "web-performance",
+                delay: 0.4
+              }
+            ];
+
+            const filteredProjects = projects.filter(project => 
+              activeTab === 'all' || project.category === activeTab
+            );
+
+            return (
+              <div style={{ 
+                display: "grid", 
+                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                gap: "1.5rem",
+                maxWidth: "1400px",
+                margin: "0 auto",
+                position: "relative",
+                zIndex: 999999
+              }}>
+                {filteredProjects.map((project, index) => (
+                  <FeaturedWorkCard
+                    key={project.title}
+                    image={project.image}
+                    title={project.title}
+                    description={project.description}
+                    metrics={project.metrics}
+                    link={project.link}
+                    hoverContent={project.hoverContent}
+                    badges={project.badges}
+                    category={project.category}
+                    delay={project.delay}
+                  />
+                ))}
+              </div>
+            );
+          })()}
         </Section>
         
         {/* Original Plan Section */}

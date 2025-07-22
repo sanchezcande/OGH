@@ -442,5 +442,24 @@
         "description": "From your idea to their pocket. We create native apps that feel intuitive, responsive and on brand — every time."
       }
     }
+  },
+  "featuredWorkSection": {
+    "title": "Featured Work",
+    "subtitle": "Real projects that showcase our expertise and impact",
+    "smartersCity": {
+      "title": "Smarters City",
+      "description": "Urban Asset-Management SaaS for real-time mapping & maintenance of streetlights, traffic lights and more.",
+      "metrics": ["35% faster load", "0 critical bugs", "1st municipal contract"]
+    },
+    "estudioSab": {
+      "title": "Estudio Sab",
+      "description": "Full-stack web development for a creative design studio.",
+      "metrics": ["Full development", "Modern design", "Live website"]
+    },
+    "skylar": {
+      "title": "Skylar",
+      "description": "E-commerce platform for a leading school supplies brand in Argentina.",
+      "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
+    }
   }
 }
