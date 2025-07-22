@@ -78,7 +78,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
     if (!isMobile) {
       setShowHover(true);
       // Aumentar z-index cuando se hace hover
-      event.currentTarget.style.zIndex = "999999999";
+      event.currentTarget.style.zIndex = "99999999999";
     }
   };
   
@@ -95,7 +95,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
       event.preventDefault();
       setShowHover(!showHover);
       // Aumentar z-index cuando se activa
-      event.currentTarget.style.zIndex = showHover ? "999999" : "999999999";
+      event.currentTarget.style.zIndex = showHover ? "999999" : "9999999999";
     }
   };
   
@@ -114,13 +114,12 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
           padding: "2rem",
           cursor: "pointer",
           transition: "all 0.3s ease",
-          zIndex: 999999
+          zIndex: showHover ? "99999999999" : "999999"
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
         onClick={() => {
-          if (!isMobile || !showHover) {
+          if (!isMobile) {
             window.open(link, '_blank', 'noopener,noreferrer');
           }
         }}
@@ -129,7 +128,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
           position: "relative",
           width: "320px",
           textAlign: "center",
-          zIndex: 999999
+          zIndex: showHover ? "99999999999" : "999999"
         }}>
           <div style={{
             display: "flex",
@@ -164,12 +163,47 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
             {isMobile && (
               <div style={{
                 marginTop: "0.5rem",
-                fontSize: "0.7rem",
-                color: "#F97B72",
-                fontWeight: "500",
-                opacity: 0.8
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                alignItems: "center"
               }}>
-                Tap to see details
+                <div 
+                  style={{
+                    fontSize: "0.7rem",
+                    color: "#F97B72",
+                    fontWeight: "500",
+                    opacity: 0.8,
+                    padding: "0.3rem 0.8rem",
+                    border: "1px solid #F97B72",
+                    borderRadius: "12px",
+                    cursor: "pointer"
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowHover(!showHover);
+                  }}
+                >
+                  {showHover ? "Hide details" : "See details"}
+                </div>
+                <div 
+                  style={{
+                    fontSize: "0.7rem",
+                    color: "#6B7280",
+                    fontWeight: "500",
+                    opacity: 0.8,
+                    padding: "0.3rem 0.8rem",
+                    border: "1px solid #6B7280",
+                    borderRadius: "12px",
+                    cursor: "pointer"
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(link, '_blank', 'noopener,noreferrer');
+                  }}
+                >
+                  Visit website
+                </div>
               </div>
             )}
           </div>
@@ -191,7 +225,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                 boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
                 border: "1px solid #e5e7eb",
                 width: "100%",
-                zIndex: 999999999,
+                zIndex: 99999999999,
                 pointerEvents: "none",
                 marginTop: "10px",
                 textAlign: "center"
