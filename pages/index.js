@@ -75,15 +75,28 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
   const [showHover, setShowHover] = useState(false);
   
   const handleMouseEnter = (event) => {
-    setShowHover(true);
-    // Aumentar z-index cuando se hace hover
-    event.currentTarget.style.zIndex = "999999999";
+    if (!isMobile) {
+      setShowHover(true);
+      // Aumentar z-index cuando se hace hover
+      event.currentTarget.style.zIndex = "999999999";
+    }
   };
   
   const handleMouseLeave = (event) => {
-    setShowHover(false);
-    // Restaurar z-index cuando se quita el hover
-    event.currentTarget.style.zIndex = "999999";
+    if (!isMobile) {
+      setShowHover(false);
+      // Restaurar z-index cuando se quita el hover
+      event.currentTarget.style.zIndex = "999999";
+    }
+  };
+
+  const handleTouchStart = (event) => {
+    if (isMobile) {
+      event.preventDefault();
+      setShowHover(!showHover);
+      // Aumentar z-index cuando se activa
+      event.currentTarget.style.zIndex = showHover ? "999999" : "999999999";
+    }
   };
   
   return (
@@ -105,7 +118,12 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={() => window.open(link, '_blank', 'noopener,noreferrer')}
+        onTouchStart={handleTouchStart}
+        onClick={() => {
+          if (!isMobile || !showHover) {
+            window.open(link, '_blank', 'noopener,noreferrer');
+          }
+        }}
       >
         <div style={{
           position: "relative",
@@ -130,10 +148,10 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                 objectFit: "contain",
                 transition: "transform 0.3s ease-out",
                 filter: "grayscale(20%)",
-                cursor: "pointer"
+                cursor: isMobile ? "default" : "pointer"
               }}
-              onMouseEnter={(e) => e.target.style.transform = "scale(1.02)"}
-              onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+              onMouseEnter={(e) => !isMobile && (e.target.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => !isMobile && (e.target.style.transform = "scale(1)")}
             />
             <div style={{
               marginTop: "0.25rem",
@@ -143,6 +161,17 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
             }}>
               {title}
             </div>
+            {isMobile && (
+              <div style={{
+                marginTop: "0.5rem",
+                fontSize: "0.7rem",
+                color: "#F97B72",
+                fontWeight: "500",
+                opacity: 0.8
+              }}>
+                Tap to see details
+              </div>
+            )}
           </div>
           
           {/* Hover Card */}
