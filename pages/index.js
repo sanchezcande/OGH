@@ -74,12 +74,16 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showHover, setShowHover] = useState(false);
   
-  const handleMouseEnter = () => {
+  const handleMouseEnter = (event) => {
     setShowHover(true);
+    // Aumentar z-index cuando se hace hover
+    event.currentTarget.style.zIndex = "999999999";
   };
   
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event) => {
     setShowHover(false);
+    // Restaurar z-index cuando se quita el hover
+    event.currentTarget.style.zIndex = "999999";
   };
   
   return (
@@ -158,7 +162,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                 boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
                 border: "1px solid #e5e7eb",
                 width: "100%",
-                zIndex: 99999999,
+                zIndex: 999999999,
                 pointerEvents: "none",
                 marginTop: "10px",
                 textAlign: "center"
