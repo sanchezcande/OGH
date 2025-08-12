@@ -461,5 +461,26 @@
       "description": "E-commerce platform for a leading school supplies brand in Argentina.",
       "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
     }
+  },
+  "teamSection": {
+    "title": "The Faces Behind the Code",
+    "subtitle": "Meet the people who turn challenges into solutions and ideas into reality.",
+    "members": {
+                     "javier": {
+                 "name": "Javier",
+                 "role": "Senior Frontend Engineer",
+                 "description": "Javier has been building web apps long enough to know what works and what doesn't. He's our go-to guy for React, Vue, and cloud-based architectures, and he has a knack for solving tough problems without overcomplicating things. Experienced, reliable, and easy to work with — that's why we trust him with the big stuff."
+               },
+                     "giuliano": {
+                 "name": "Giuliano",
+                 "role": "Full Stack Engineer",
+                 "description": "Giuliano can jump from backend to frontend without missing a beat. Skilled in Node.js, PHP, .NET, React, and modern UI frameworks, he's always exploring new tech to make our projects better. Fast learner, team player, and problem-solver — he's the one who keeps things moving smoothly from idea to delivery."
+               },
+                     "laura": {
+                 "name": "Laura",
+                 "role": "Web Designer & SEO Specialist",
+                 "description": "Laura knows how to make a website look great and show up where it matters. She's worked on over 50 projects for clients in Argentina, Spain, and the U.S., combining WordPress, Elementor, and SEO to create sites people actually enjoy using. With a background in visual arts and a passion for painting, she brings a unique creative touch to every project — making sure our work not only looks good, but gets found."
+               }
+    }
   }
 }

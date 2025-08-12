@@ -9,6 +9,7 @@ import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import Image from "next/image";
 import AboutTimeline from "../../src/components/Timeline/AboutTimeline";
+import TeamSection from "../../src/components/TeamSection/TeamSection";
 
 export const AboutUsCallToAction = () => {
   const { t } = useTranslation();
@@ -112,6 +113,8 @@ const AboutUs = React.forwardRef((props, ref) => {
       </ImageText>
 
       <AboutTimeline />
+
+      <TeamSection />
 
       <AboutUsCallToAction />
     </Container>

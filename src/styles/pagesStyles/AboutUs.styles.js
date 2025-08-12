@@ -256,3 +256,119 @@ export const HighlightedWord = styled.span.attrs(() => ({
     animation: ${highlightAnimation} 0.5s ease-out 0.3s forwards;
   }
 `;
+
+export const TeamSection = styled.section`
+  width: 100%;
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 2rem 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .team-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: ${({ theme }) => theme.colors.primaryDark};
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .team-subtitle {
+    text-align: center;
+    font-size: 1.2rem;
+    color: ${({ theme }) => theme.colors.textMuted};
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+`;
+
+export const TeamMemberCard = styled.div`
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.1),
+      0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .member-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    overflow: hidden;
+    border: 3px solid ${({ theme }) => theme.colors.accent};
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      border-color: ${({ theme }) => theme.colors.primaryDark};
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .member-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: ${({ theme }) => theme.colors.primaryDark};
+    margin: 0 0 0.5rem 0;
+  }
+
+  .member-role {
+    font-size: 1rem;
+    color: ${({ theme }) => theme.colors.accent};
+    font-weight: 500;
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .member-description {
+    font-size: 0.9rem;
+    color: ${({ theme }) => theme.colors.textMuted};
+    line-height: 1.6;
+    margin: 0;
+  }
+`;
