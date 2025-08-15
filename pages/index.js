@@ -20,6 +20,7 @@ import CallToActionBlock from "../src/components/CallToAction/CallToAction";
 import Head from "next/head";
 import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
+import MetricsSection from "../src/components/Metrics/MetricsSection";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import React from "react";
@@ -929,6 +930,9 @@ export default function HomePage() {
             />
           </div>
         </Section>
+
+        {/* Metrics Section */}
+        <MetricsSection />
         
         {/* Featured Work Section */}
         <Section className="full-width" style={{

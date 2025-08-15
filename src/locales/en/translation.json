@@ -479,6 +479,42 @@
       "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
     }
   },
+  "metricsSection": {
+    "title": "Proven Results",
+    "subtitle": "Data-driven performance that speaks for itself",
+    "metrics": {
+      "avgKickoff": {
+        "value": "7.3",
+        "unit": "days",
+        "label": "Average Kickoff Time",
+        "description": "From contract signing to first code commit (last 6 projects)"
+      },
+      "onTimeDelivery": {
+        "value": "87",
+        "unit": "%",
+        "label": "On-Time Delivery",
+        "description": "Milestones/sprints delivered on time (last 9 months)"
+      },
+      "npsScore": {
+        "value": "9.7",
+        "unit": "/10",
+        "label": "NPS Score",
+        "description": "Net Promoter Score from client feedback (4 surveys)"
+      },
+      "sprintsShipped": {
+        "value": "50+",
+        "unit": "",
+        "label": "Sprints Shipped",
+        "description": "Successful sprint deliveries across multiple client projects in 2024-2025"
+      },
+      "cycleTimeReduction": {
+        "value": "28",
+        "unit": "%",
+        "label": "Cycle Time Reduction",
+        "description": "vs. client's initial baseline (average 18-28%)"
+      }
+    }
+  },
   "teamSection": {
     "title": "The Faces Behind the Code",
     "subtitle": "Meet the people who turn challenges into solutions and ideas into reality.",

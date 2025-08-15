@@ -488,6 +488,42 @@
       "metrics": ["≤2s TTI", "+28% conversiones", "Catálogo en vivo"]
     }
   },
+  "metricsSection": {
+    "title": "Resultados Comprobados",
+    "subtitle": "Rendimiento basado en datos que habla por sí mismo",
+    "metrics": {
+      "avgKickoff": {
+        "value": "7.3",
+        "unit": "días",
+        "label": "Tiempo Promedio de Inicio",
+        "description": "Desde firma de contrato hasta primer commit de código (últimos 6 proyectos)"
+      },
+      "onTimeDelivery": {
+        "value": "87",
+        "unit": "%",
+        "label": "Entrega a Tiempo",
+        "description": "Hitos/sprints entregados en fecha (últimos 9 meses)"
+      },
+      "npsScore": {
+        "value": "9.7",
+        "unit": "/10",
+        "label": "Puntuación NPS",
+        "description": "Net Promoter Score del feedback de clientes (4 encuestas)"
+      },
+      "sprintsShipped": {
+        "value": "50+",
+        "unit": "",
+        "label": "Sprints Entregados",
+        "description": "Entregas exitosas de sprints en múltiples proyectos de clientes en 2024-2025"
+      },
+      "cycleTimeReduction": {
+        "value": "28",
+        "unit": "%",
+        "label": "Reducción del Tiempo del Ciclo",
+        "description": "vs. baseline inicial del cliente (promedio 18-28%)"
+      }
+    }
+  },
   "teamSection": {
     "title": "Los Rostros Detrás del Código",
     "subtitle": "Conoce a las personas que convierten desafíos en soluciones e ideas en realidad.",
