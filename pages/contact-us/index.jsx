@@ -21,7 +21,6 @@ const ContactUs = React.forwardRef((props, ref) => {
   const mainWrapperRef = useRef(null);
 
   const contactDetails = {
-    phone: t('contactPage.phone', "+54 9 11 2348-5638"),
     email: t('contactPage.email', "info@opengatehub.com"),
   };
 
@@ -68,13 +67,6 @@ const ContactUs = React.forwardRef((props, ref) => {
             {t("contactPage.getInTouchSubtitleNew", "Let's connect! We're here to understand your vision and explore how we can create impactful solutions together.")}
           </SubTitle>
           <ContactInfo>
-            <ContactItem>
-              <IconWrapper><FaPhone /></IconWrapper>
-              <div>
-                <span>{t("contactPage.phoneNumberLabel", "Phone Number")}</span>
-                <p>{contactDetails.phone}</p>
-              </div>
-            </ContactItem>
             <ContactItem>
               <IconWrapper><FaEnvelope /></IconWrapper>
               <div>
