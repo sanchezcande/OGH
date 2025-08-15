@@ -3,6 +3,7 @@ import {
   ImageText,
   Container,
   HighlightedWord,
+  CompanyDescription,
 } from "../../src/styles/pagesStyles/AboutUs.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
@@ -29,6 +30,7 @@ const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
   const imageRef = useRef(null);
   const textRef = useRef(null);
+  const companyDescRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -45,13 +47,16 @@ const AboutUs = React.forwardRef((props, ref) => {
 
     const currentImageRef = imageRef.current;
     const currentTextRef = textRef.current;
+    const currentCompanyDescRef = companyDescRef.current;
 
     if (currentImageRef) observer.observe(currentImageRef);
     if (currentTextRef) observer.observe(currentTextRef);
+    if (currentCompanyDescRef) observer.observe(currentCompanyDescRef);
 
     return () => {
       if (currentImageRef) observer.unobserve(currentImageRef);
       if (currentTextRef) observer.unobserve(currentTextRef);
+      if (currentCompanyDescRef) observer.unobserve(currentCompanyDescRef);
     };
   }, []);
 
@@ -79,6 +84,21 @@ const AboutUs = React.forwardRef((props, ref) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
+      <CompanyDescription ref={companyDescRef}>
+        <h1>
+          {t("aboutUsTitle_part1")}
+          <HighlightedWord className="animate">
+            {t("aboutUsTitle_highlight")}
+          </HighlightedWord>
+        </h1>
+        <h2 className="subtitle">{t("aboutUsSubtitle")}</h2>
+        <p>
+          {t("aboutUsText")}
+          {t("aboutUsLastLine")}
+          <span className="bold-text">{t("aboutUsTextBold")}</span>
+        </p>
+      </CompanyDescription>
+
       <ImageText>
         <div className="image-container" ref={imageRef}>
           <Image
@@ -96,18 +116,9 @@ const AboutUs = React.forwardRef((props, ref) => {
           </div>
         </div>
 
-        <div ref={textRef}>
-          <h1>
-            {t("aboutUsTitle_part1")}
-            <HighlightedWord className="animate">
-              {t("aboutUsTitle_highlight")}
-            </HighlightedWord>
-          </h1>
-          <h2 className="subtitle">{t("aboutUsSubtitle")}</h2>
-          <p>
-            {t("aboutUsText")}
-            {t("aboutUsLastLine")}
-            <span className="bold-text">{t("aboutUsTextBold")}</span>
+        <div className="founder-bio" ref={textRef}>
+          <p className="bio-text">
+            {t("aboutUsFounderBio")}
           </p>
         </div>
       </ImageText>

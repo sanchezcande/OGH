@@ -46,10 +46,11 @@ export const Container = styled.div`
 `;
 
 export const ImageText = styled.div`
+margin-top: 1rem;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
   gap: 2rem;
   flex-wrap: wrap;
 
@@ -60,6 +61,7 @@ export const ImageText = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 1rem;
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
@@ -126,7 +128,7 @@ export const ImageText = styled.div`
     }
   }
 
-  div:not(.image-container) { // Text container
+  .founder-bio {
     flex: 2;
     max-width: 600px;
     display: flex;
@@ -135,75 +137,21 @@ export const ImageText = styled.div`
     opacity: 0;
     transform: translateY(-30px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    transition-delay: 0.2s; // Delay for the container itself
+    transition-delay: 0.2s;
 
     &.visible {
       opacity: 1;
       transform: translateY(0);
-
-      h1 {
-        opacity: 0;
-        transform: translateY(-20px);
-        animation: ${slideInFromTopText} 0.6s ease-out 0.2s forwards;
-      }
-
-      h1 span:not(.highlighted-class-placeholder) {
-        opacity: 0;
-        transform: translateY(-20px);
-        animation: ${slideInFromTopText} 0.6s ease-out 0.4s forwards;
-      }
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      color: ${({ theme }) => theme.colors.primaryDark};
-      text-align: left;
-      margin: 0;
-      font-weight: 700;
-      line-height: 1.2;
-      /* Note: HighlightedWord component will inherit these font styles */
-
-      span:not(.highlighted-class-placeholder) {
-        font-size: 1rem;
-        display: block;
-        margin-top: 10px;
-        color: ${({ theme }) => theme.colors.textAlt};
-        font-weight: 400;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.6;
-      }
     }
 
-    h1 + h2.subtitle {
-      margin-top: 0.5rem;
-    }
-
-    h2.subtitle {
-      font-size: 1.5rem;
-      color: ${({ theme }) => theme.colors.primaryDark};
-      text-align: left;
-      margin: 0;
-      font-weight: 400;
-      line-height: 1.2;
-    }
-
-    h2.subtitle + p {
-      margin-top: 1.5rem;
-    }
-
-    p {
+    .bio-text {
       white-space: pre-line;
       text-align: left;
       color: ${({ theme }) => theme.colors.textMuted};
-      line-height: 1.45;
+      line-height: 1.6;
       margin: 0;
-    }
-
-    .bold-text {
-      font-weight: 600;
-      color: ${({ theme }) => theme.colors.primaryDark};
+      font-size: 1rem;
+      font-weight: 400;
     }
   }
 
@@ -212,7 +160,7 @@ export const ImageText = styled.div`
     text-align: center;
 
     .image-container,
-    div:not(.image-container) {
+    .founder-bio {
       max-width: 100%;
     }
   }
@@ -370,5 +318,106 @@ export const TeamMemberCard = styled.div`
     color: ${({ theme }) => theme.colors.textMuted};
     line-height: 1.6;
     margin: 0;
+  }
+`;
+
+export const CompanyDescription = styled.div`
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+
+    h1 {
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: ${slideInFromTopText} 0.6s ease-out 0.2s forwards;
+    }
+
+    h1 span:not(.highlighted-class-placeholder) {
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: ${slideInFromTopText} 0.6s ease-out 0.4s forwards;
+    }
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: ${({ theme }) => theme.colors.primaryDark};
+    text-align: center;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.2;
+
+    span:not(.highlighted-class-placeholder) {
+      font-size: 1rem;
+      display: block;
+      margin-top: 10px;
+      color: ${({ theme }) => theme.colors.textAlt};
+      font-weight: 400;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+  }
+
+  h1 + h2.subtitle {
+    margin-top: 1rem;
+  }
+
+  h2.subtitle {
+    font-size: 1.5rem;
+    color: ${({ theme }) => theme.colors.primaryDark};
+    text-align: center;
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  h2.subtitle + p {
+    margin-top: 2rem;
+  }
+
+  p {
+    white-space: pre-line;
+    text-align: center;
+    color: ${({ theme }) => theme.colors.textMuted};
+    line-height: 1.6;
+    margin: 0;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.1rem;
+  }
+
+  .bold-text {
+    font-weight: 600;
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 1rem 2rem 1rem;
+    padding: 1rem;
+    
+    h1 {
+      font-size: 2rem;
+    }
+    
+    h2.subtitle {
+      font-size: 1.3rem;
+    }
+    
+    p {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
   }
 `;

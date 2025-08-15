@@ -39,20 +39,27 @@ const TeamSection = () => {
   const teamMembers = [
     {
       id: 1,
+      name: t("teamSection.members.gustavo.name"),
+      role: t("teamSection.members.gustavo.role"),
+      image: "/team/gus.jpg",
+      description: t("teamSection.members.gustavo.description")
+    },
+    {
+      id: 2,
       name: t("teamSection.members.javier.name"),
       role: t("teamSection.members.javier.role"),
       image: "/team/javi.jpg",
       description: t("teamSection.members.javier.description")
     },
     {
-      id: 2,
+      id: 3,
       name: t("teamSection.members.giuliano.name"),
       role: t("teamSection.members.giuliano.role"),
       image: "/team/giuli.jpg",
       description: t("teamSection.members.giuliano.description")
     },
     {
-      id: 3,
+      id: 4,
       name: t("teamSection.members.laura.name"),
       role: t("teamSection.members.laura.role"),
       image: "/team/lau.jpg",

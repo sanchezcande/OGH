@@ -48,11 +48,12 @@
   "aboutUsTitle_part1": "Construimos tecnología que hace tu vida ",
   "aboutUsTitle_highlight": "más fácil",
   "aboutUsSubtitle": "— y tu producto más fuerte",
-  "aboutUsText": "No somos solo otra agencia de desarrollo.\nSomos un equipo de desarrolladores que sabe lo que se necesita para construir, escalar y mantener productos que importan.\nEn OpenGateHub, creemos que la tecnología debería sentirse como un apoyo — no como estrés.\nNos importa cómo se construyen las cosas — con propósito, claridad y alma.",
-  "aboutUsLastLine": "Nuestro trabajo es simple: ",
+  "aboutUsText": "No somos solo otra agencia de desarrollo. Somos un equipo de desarrolladores que sabe lo que se necesita para construir, escalar y mantener productos que importan.\nEn OpenGateHub, creemos que la tecnología debería sentirse como un apoyo — no como estrés.\nNos importa cómo se construyen las cosas — con propósito, claridad y alma.",
+  "aboutUsLastLine": " Nuestro trabajo es simple: ",
   "aboutUsTextBold": "hacer que el trabajo duro se sienta más liviano.",
   "aboutUsFounder": "Candelaria Sanchez",
   "aboutUsFounderRole": "Co-fundadora y CTO, OpenGateHub",
+  "aboutUsFounderBio": "Candelaria Sanchez es ingeniera de software y co-fundadora de OpenGateHub, un socio tecnológico para equipos estadounidenses impulsados por el impacto. No comenzó en salas de juntas, comenzó detrás del volante de un Uber, donde una conversación casual la llevó a su primer rol en tecnología. Esa experiencia moldeó el propósito de OpenGateHub: abrir puertas para otros mientras ayuda a empresas éticas y orientadas a la misión a moverse más rápido.\n\nSu equipo integra escuadras senior alineadas con la misión, en zonas horarias cercanas desde América Latina, directamente en los rituales de ingeniería estadounidenses - standups, revisiones de sprint, puertas de QA, reduciendo el tiempo del ciclo sin agregar sobrecarga de gestión. Candelaria lidera con una mentalidad centrada en las personas, pruebas sobre promesas: sprints claros, ajuste cultural, resultados medibles. El objetivo no es solo enviar funciones, es usar la tecnología de manera responsable para hacer los negocios y el mundo un mejor lugar para todos.",
   "contactUsTitle": "¡Ponete en contacto!",
   "contactUsSubtitle": "¡Gracias por contactarnos! Por favor, completá el formulario a continuación y nos pondremos en contacto con vos en breve.",
   "weAre": "Somos",
@@ -489,6 +490,11 @@
                  "name": "Laura",
                  "role": "Desarrolladora Frontend",
                  "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
+               },
+                     "gustavo": {
+                 "name": "Gustavo",
+                 "role": "Arquitecto de Software",
+                 "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
                }
     }
   }

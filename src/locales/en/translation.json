@@ -26,11 +26,12 @@
   "aboutUsTitle_part1": "We build technology that makes your life ",
   "aboutUsTitle_highlight": " easier",
   "aboutUsSubtitle": "— and your product stronger",
-  "aboutUsText": "We're not just another dev agency.\nWe're a team of developers who know what it takes to build, scale, and support products that matter.\nAt OpenGateHub, we believe tech should feel like support — not stress.\nWe care about how things are built — with purpose, clarity, and soul.",
-  "aboutUsLastLine": "Our job is simple: ",
+  "aboutUsText": "We're not just another dev agency. We're a team of developers who know what it takes to build, scale, and support products that matter.\nAt OpenGateHub, we believe tech should feel like support — not stress. We care about how things are built — with purpose, clarity, and soul.",
+  "aboutUsLastLine": " Our job is simple: ",
   "aboutUsTextBold": "make the hard work feel lighter.",
   "aboutUsFounder": "Candelaria Sanchez",
   "aboutUsFounderRole": "Co-founder & CTO, OpenGateHub",
+  "aboutUsFounderBio": "Candelaria Sanchez is a software engineer and the co-founder of OpenGateHub, a software partner for impact-driven U.S. teams. She didn't start in boardrooms, she started behind the wheel of an Uber, where a chance conversation led to her first role in tech. That experience shaped OpenGateHub's purpose: open doors for others while helping ethical, mission-driven companies move faster.\n\nHer team embeds mission-aligned, near-time-zone senior squads from Latin America directly into U.S. engineering rituals-standups, sprint reviews, QA gates, cutting cycle time without adding management overhead. Candelaria leads with a people-first, proof-over-promises mindset: clear sprints, cultural fit, measurable outcomes. The goal isn't just shipping features, it's using technology responsibly to improve business and make the world a better place for all.",
   "contactUsTitle": "Reach Out!",
   "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
   "weAre": "We are",
@@ -480,6 +481,11 @@
                  "name": "Laura",
                  "role": "Web Designer & SEO Specialist",
                  "description": "Laura knows how to make a website look great and show up where it matters. She's worked on over 50 projects for clients in Argentina, Spain, and the U.S., combining WordPress, Elementor, and SEO to create sites people actually enjoy using. With a background in visual arts and a passion for painting, she brings a unique creative touch to every project — making sure our work not only looks good, but gets found."
+               },
+                     "gustavo": {
+                 "name": "Gustavo",
+                 "role": "Software Architect",
+                 "description": "Gustavo is a seasoned tech leader with a mastery of an impressive range of technologies — from PHP, Java, and Python to modern frameworks like Angular, Node.js, Express, and Laravel. Over the years, he's built and led the development of large-scale, high-performance systems, always with an eye for scalability and quality. He sees the big picture, solves complex problems without breaking a sweat, and knows how to guide a team to deliver their best work."
                }
     }
   }
