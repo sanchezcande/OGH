@@ -17,8 +17,11 @@
   "pleaseEnterValidName": "Please enter a valid name",
   "pleaseEnterValidEmail": "Please enter a valid email address",
   "pleaseEnterValidMessage": "Please enter a message with more than 10 characters",
+  "pleaseCompleteCaptcha": "Please complete the captcha verification",
   "messageSentSuccessfully": "Message sent successfully",
   "errorSendingMessage": "Error sending message",
+  "modalSendTitle": "Message Status",
+  "modalCloseButtonText": "Close",
   "joinOurCommunity": "Join Our Community",
   "privacyPolicy": "Privacy Policy",
   "faq": "FAQ",
@@ -88,6 +91,19 @@
     "title": "Ready to Talk Solutions?",
     "description": "Schedule a free call with our team to discuss your project.",
     "buttonText": "Book Free Call Now"
+  },
+  "contactUsMetaTitle": "Contact Us - OpenGateHub",
+  "contactUsMetaDescription": "Get in touch with OpenGateHub. We are here to help you with your digital transformation needs.",
+  "contactPage": {
+    "getIn": "Get in",
+    "touch": "Touch",
+    "getInTouchSubtitleNew": "Let's connect! We're here to understand your vision and explore how we can create impactful solutions together.",
+    "phoneNumberLabel": "Phone Number",
+    "emailLabel": "Email",
+    "phone": "+54 9 11 2348-5638",
+    "email": "info@opengatehub.com",
+    "comeAnd": "Come and",
+    "joinUs": "Join Us"
   },"companyHistoryTitle": "Our Journey",
 "companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
 
