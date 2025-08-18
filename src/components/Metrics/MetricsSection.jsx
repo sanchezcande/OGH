@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   MetricsSection as StyledMetricsSection,
@@ -11,6 +11,8 @@ import {
   MetricLabel,
   MetricDescription,
   MetricIcon,
+  HowWeMeasureLink,
+  Tooltip,
 } from "../../styles/pagesStyles/Metrics.styles";
 import { 
   FaRocket, 
@@ -37,6 +39,7 @@ import {
 
 const MetricsSection = () => {
   const { t } = useTranslation();
+  const [hoveredMetric, setHoveredMetric] = useState(null);
 
   const metrics = [
     {
@@ -77,6 +80,7 @@ const MetricsSection = () => {
         <MetricsGrid>
           {metrics.map((metric) => {
             const metricData = t(`metricsSection.metrics.${metric.key}`, { returnObjects: true });
+            const measurementDetail = t(`metricsSection.measurementDetails.${metric.key}`);
             
             return (
               <MetricCard key={metric.key} delay={metric.delay}>
@@ -89,6 +93,17 @@ const MetricsSection = () => {
                 </MetricValue>
                 <MetricLabel>{metricData.label}</MetricLabel>
                 <MetricDescription>{metricData.description}</MetricDescription>
+                <HowWeMeasureLink
+                  onMouseEnter={() => setHoveredMetric(metric.key)}
+                  onMouseLeave={() => setHoveredMetric(null)}
+                >
+                  {t("metricsSection.howWeMeasure")}
+                  {hoveredMetric === metric.key && (
+                    <Tooltip>
+                      {measurementDetail}
+                    </Tooltip>
+                  )}
+                </HowWeMeasureLink>
               </MetricCard>
             );
           })}

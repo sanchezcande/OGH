@@ -491,37 +491,45 @@
   "metricsSection": {
     "title": "Resultados Comprobados",
     "subtitle": "Rendimiento basado en datos que habla por sí mismo",
+    "howWeMeasure": "Cómo medimos",
     "metrics": {
       "avgKickoff": {
         "value": "7.3",
         "unit": "días",
         "label": "Tiempo Promedio de Inicio",
-        "description": "Desde firma de contrato hasta primer commit de código (últimos 6 proyectos)"
+        "description": "Desde firma de SOW hasta primer PR mergeado (n=6 proyectos, actualizado: ago 2025)"
       },
       "onTimeDelivery": {
         "value": "87",
         "unit": "%",
         "label": "Entrega a Tiempo",
-        "description": "Hitos/sprints entregados en fecha (últimos 9 meses)"
+        "description": "Hitos/sprints entregados en fecha (n=9 meses, actualizado: ago 2025)"
       },
       "npsScore": {
         "value": "9.7",
         "unit": "/10",
-        "label": "Puntuación NPS",
-        "description": "Net Promoter Score del feedback de clientes (4 encuestas)"
+        "label": "Puntuación CSAT",
+        "description": "Customer Satisfaction Score del feedback de clientes (n=4 encuestas, actualizado: ago 2025)"
       },
       "sprintsShipped": {
         "value": "50+",
         "unit": "",
         "label": "Sprints Entregados",
-        "description": "Entregas exitosas de sprints en múltiples proyectos de clientes en 2024-2025"
+        "description": "Entregas exitosas de sprints en múltiples proyectos de clientes (n=6 proyectos, actualizado: ago 2025)"
       },
       "cycleTimeReduction": {
         "value": "28",
         "unit": "%",
         "label": "Reducción del Tiempo del Ciclo",
-        "description": "vs. baseline inicial del cliente (promedio 18-28%)"
+        "description": "vs. baseline inicial del cliente (n=2 proyectos, promedio 18-28%, actualizado: ago 2025)"
       }
+    },
+    "measurementDetails": {
+      "avgKickoff": "Medimos desde la firma del Statement of Work (SOW) hasta el primer Pull Request mergeado en el repositorio del cliente. Esto incluye setup del entorno, configuración inicial y primer código funcional.",
+      "onTimeDelivery": "Calculamos el porcentaje de milestones y sprints que se entregaron en la fecha acordada o antes. Consideramos 'a tiempo' si se cumple dentro de ±2 días de la fecha objetivo.",
+      "npsScore": "Utilizamos encuestas de satisfacción post-proyecto con escala del 1-10. Los clientes evalúan calidad del código, comunicación, cumplimiento de deadlines y valor entregado.",
+      "sprintsShipped": "Contamos sprints completados exitosamente que incluyen features funcionales, testing aprobado y deployment a producción. Solo contamos sprints con aceptación del cliente.",
+      "cycleTimeReduction": "Comparamos el tiempo promedio de desarrollo por feature antes y después de nuestra implementación. Incluye tiempo de coding, testing y deployment."
     }
   },
   "teamSection": {

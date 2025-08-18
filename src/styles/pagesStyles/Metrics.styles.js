@@ -191,3 +191,65 @@ export const MetricIcon = styled.div`
     font-size: 1.2rem;
   }
 `;
+
+export const HowWeMeasureLink = styled.div`
+  position: relative;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    border-color: #94a3b8;
+    color: #334155;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+`;
+
+export const Tooltip = styled.div`
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.5rem;
+  padding: 1rem;
+  background: #1e293b;
+  color: white;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  max-width: 280px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  white-space: normal;
+  text-align: left;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 240px;
+    font-size: 0.75rem;
+    padding: 0.8rem;
+  }
+`;

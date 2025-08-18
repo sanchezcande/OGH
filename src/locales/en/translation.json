@@ -482,37 +482,45 @@
   "metricsSection": {
     "title": "Proven Results",
     "subtitle": "Data-driven performance that speaks for itself",
+    "howWeMeasure": "How we measure",
     "metrics": {
       "avgKickoff": {
         "value": "7.3",
         "unit": "days",
         "label": "Average Kickoff Time",
-        "description": "From contract signing to first code commit (last 6 projects)"
+        "description": "From signed SOW to first merged PR (n=6 projects, updated: Aug 2025)"
       },
       "onTimeDelivery": {
         "value": "87",
         "unit": "%",
         "label": "On-Time Delivery",
-        "description": "Milestones/sprints delivered on time (last 9 months)"
+        "description": "Milestones/sprints delivered on time (n=9 months, updated: Aug 2025)"
       },
       "npsScore": {
         "value": "9.7",
         "unit": "/10",
-        "label": "NPS Score",
-        "description": "Net Promoter Score from client feedback (4 surveys)"
+        "label": "CSAT Score",
+        "description": "Customer Satisfaction Score from client feedback (n=4 surveys, updated: Aug 2025)"
       },
       "sprintsShipped": {
         "value": "50+",
         "unit": "",
         "label": "Sprints Shipped",
-        "description": "Successful sprint deliveries across multiple client projects in 2024-2025"
+        "description": "Successful sprint deliveries across multiple client projects (n=6 projects, updated: Aug 2025)"
       },
       "cycleTimeReduction": {
         "value": "28",
         "unit": "%",
         "label": "Cycle Time Reduction",
-        "description": "vs. client's initial baseline (average 18-28%)"
+        "description": "vs. client's initial baseline (n=2 projects, average 18-28%, updated: Aug 2025)"
       }
+    },
+    "measurementDetails": {
+      "avgKickoff": "We measure from signed Statement of Work (SOW) to first merged Pull Request in the client's repository. This includes environment setup, initial configuration, and first functional code.",
+      "onTimeDelivery": "We calculate the percentage of milestones and sprints delivered on or before the agreed date. We consider 'on time' if delivered within ±2 days of the target date.",
+      "npsScore": "We use post-project satisfaction surveys with a 1-10 scale. Clients evaluate code quality, communication, deadline compliance, and value delivered.",
+      "sprintsShipped": "We count successfully completed sprints that include functional features, approved testing, and production deployment. We only count sprints with client acceptance.",
+      "cycleTimeReduction": "We compare average development time per feature before and after our implementation. This includes coding, testing, and deployment time."
     }
   },
   "teamSection": {
