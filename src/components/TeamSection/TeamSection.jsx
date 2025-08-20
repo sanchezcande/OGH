@@ -64,6 +64,13 @@ const TeamSection = () => {
       role: t("teamSection.members.laura.role"),
       image: "/team/lau.jpg",
       description: t("teamSection.members.laura.description")
+    },
+    {
+      id: 5,
+      name: t("teamSection.members.alejandria.name"),
+      role: t("teamSection.members.alejandria.role"),
+      image: "/team/ale.jpg",
+      description: t("teamSection.members.alejandria.description")
     }
   ];
 

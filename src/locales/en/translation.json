@@ -546,6 +546,11 @@
                  "name": "Gustavo",
                  "role": "Software Architect",
                  "description": "Gustavo is a seasoned tech leader with a mastery of an impressive range of technologies — from PHP, Java, and Python to modern frameworks like Angular, Node.js, Express, and Laravel. Over the years, he's built and led the development of large-scale, high-performance systems, always with an eye for scalability and quality. He sees the big picture, solves complex problems without breaking a sweat, and knows how to guide a team to deliver their best work."
+               },
+                     "alejandria": {
+                 "name": "Alejandría",
+                 "role": "QA Analyst",
+                 "description": "Alejandría makes sure what we ship actually works. She plans and runs functional, regression, and integration tests across web and mobile, keeps coverage organized in Xray/Jira, and validates APIs with Postman. With SQL skills, she checks data at the source and catches edge cases early. Her UX/UI background helps her think like a user, write clear bug reports, and push for reliable, easy‑to‑use releases. Reliable and detail-oriented, she's the one who makes sure nothing slips through the cracks before launch."
                }
     }
   }

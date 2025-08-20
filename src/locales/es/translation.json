@@ -555,6 +555,11 @@
                  "name": "Gustavo",
                  "role": "Arquitecto de Software",
                  "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
+               },
+                     "alejandria": {
+                 "name": "Alejandría",
+                 "role": "Analista QA",
+                 "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
                }
     }
   }
