@@ -110,6 +110,10 @@ export default function MyApp({ Component, pageProps }) {
           name="description"
           content="OpenGateHub specializes in innovative software development for businesses worldwide. Transform your ideas into powerful digital solutions."
         />
+        <meta
+          name="keywords"
+          content="software development, web design, mobile apps, nextjs, react, argentina, colombia, outsourcing, software agency, tech partner, custom development, IA, ai, LLM"
+        />
         <link rel="icon" href="/browser-link-logo.png" type="image/png" />
 
         {/* --- SEO CORREGIDO --- */}
