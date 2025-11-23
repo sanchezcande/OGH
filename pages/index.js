@@ -1014,7 +1014,18 @@ export default function HomePage() {
                 badges: ["Dynamic transitions", "SEO ready", "Always on"],
                 category: "web-performance",
                 delay: 0.4
-              }
+              },
+              {
+                image: "/valthor-logo.e3b5a398.png",
+                title: "Valthor CRM",
+                description: "Plataforma CRM moderna y optimizada con IA",
+                metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
+                link: "#",
+                hoverContent: <><strong>Modern CRM platform</strong> — powered with <strong>AI</strong>.</>,
+                badges: ["CRM", "AI", "Always on"],
+                category: "saas",
+                delay: 0.5
+              },
             ];
 
             const filteredProjects = projects.filter(project => 
