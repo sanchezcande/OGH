@@ -77,7 +77,7 @@ export default function MyApp({ Component, pageProps }) {
 
   // --- LÓGICA SEO AGREGADA ---
   // 1. Definimos el dominio base
-  const siteUrl = 'https://www.opengatehub.com';
+  const siteUrl = 'https://opengatehub.com';
 
   // 2. Obtenemos la ruta limpia
   const path = router.asPath.split('?')[0];
