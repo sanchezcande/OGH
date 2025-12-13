@@ -764,10 +764,7 @@ export default function HomePage() {
       <Head>
         <title>OpenGateHub</title>
         <meta name="description" content="OpenGateHub" />
-        <link rel="canonical" href="https://opengatehub.com/" />
         <meta property="og:title" content={t("OpenGateHub")} />
-        <meta property="og:description" content={t("pageDescription")} />
-        <meta property="og:url" content="https://opengatehub.com/" />
         <meta
           name="keywords"
           content="OpenGateHub, Open Gate Hub, Open GateHub, software develop, web develop, páginas web"
@@ -1025,6 +1022,17 @@ export default function HomePage() {
                 badges: ["CRM", "AI", "Always on"],
                 category: "saas",
                 delay: 0.5
+              },
+              {
+                image: "/vivabots_azul.png",
+                title: "Vivabots RPA",
+                description: "Plataforma RPA moderna y optimizada",
+                metrics: ["99.9% uptime", "99.9% efficienty"],
+                link: "https://vivabots.com/",
+                hoverContent: <>Modern and Powerful <strong>RPA platform</strong> </>,
+                badges: ["RPA", "Automation", "Always on"],
+                category: "saas",
+                delay: 0.6
               },
             ];
 

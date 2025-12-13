@@ -73,8 +73,7 @@ const AboutUs = React.forwardRef((props, ref) => {
           property="og:description"
           content="Discover how OpenGateHub builds bridges to help your ideas lead the digital future. Our team is committed to delivering tailored solutions."
         />
-        <meta property="og:url" content="https://www.opengatehub.com/about-us" />
-        <meta property="og:image" content="https://www.opengatehub.com/images/og-about-us.png" />
+        <meta property="og:image" content="https://opengatehub.com/images/og-about-us.png" />
         <meta
           name="keywords"
           content="OpenGateHub, About Us, Mission, Values, Digital Transformation, Technology Solutions, Innovation"
