@@ -1024,7 +1024,7 @@ export default function HomePage() {
                 delay: 0.5
               },
               {
-                image: "/valthor-logo.e3b5a398.png",
+                image: "/vivabots_azul.png",
                 title: "Vivabots RPA",
                 description: "Plataforma RPA moderna y optimizada",
                 metrics: ["99.9% uptime", "99.9% efficienty"],
