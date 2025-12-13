@@ -15,7 +15,7 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  async redirects() {
+  /*async redirects() {
     return [
       {
         source: '/:path*',
@@ -24,7 +24,7 @@ const nextConfig = {
         permanent: true,
       },
     ];
-  },
+  },*/
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
