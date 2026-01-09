@@ -29,17 +29,17 @@
   "articleNotFound": "Artículo no encontrado. Por favor, visita el índice de nuestro blog para ver las publicaciones recientes.",
   "seoDescription": "Ayudamos a fundadores y VCs visionarios a escalar startups con desarrolladores alineados culturalmente que valoran el impacto.",
   "heroAnimatedText": {
-    "part1": "Tu socio ",
-    "highlight1": "tech",
-    "part2": "con",
-    "highlight2": "alma"
+    "part1": "Alianzas tech ",
+    "highlight1": "humanas",
+    "part2": " primero",
+    "highlight2": ""
   },
-  "heroSubtitle": "Haciendo tu vida más fácil — con humanos reales que se preocupan.",
+  "heroSubtitle": "Encontramos desarrolladores que encajan con tu equipo, no solo con tus requerimientos.",
   "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
-  "problemTitle": "Estás <highlight>contra</highlight> reloj.",
-  "problemText": "Construir un producto es difícil. Querés avanzar rápido, mantener la calidad y rodearte de gente confiable. Pero contratar lleva tiempo y tercerizar suele implicar perder control o cultura.",
-  "weGetYouTitle": "Te <highlight>vemos</highlight>.",
-  "weGetYouText": "Te entendemos. Por eso creamos OpenGateHub: para hacer tu trabajo más liviano, con un equipo que cuida la calidad y se adapta a tu forma de trabajar. No tenés que hacerlo solo.",
+  "problemTitle": "Contratar desarrolladores es <highlight>difícil</highlight>.",
+  "problemText": "Necesitás escalar tu equipo, pero encontrar desarrolladores que encajen con tu cultura y entreguen trabajo de calidad lleva tiempo. La contratación tradicional es lenta, y la mayoría de las agencias priorizan habilidades sobre el match cultural.",
+  "weGetYouTitle": "Nosotros <highlight>priorizamos el fit</highlight>.",
+  "weGetYouText": "Por eso nos enfocamos en Staff Augmentation: te conectamos con desarrolladores que se alinean con tus valores y forma de trabajar. El match cultural y la calidad humana van primero—sin olvidar las habilidades técnicas sólidas.",
   "servicesTitle": "Nuestros Servicios",
   "servicesText": "Trabajamos con personas que se preocupan por el cómo, no solo por el qué. Soluciones personalizadas para fundadores que quieren escalar con fluidez, confianza y cultura.",
   "planTitle": "Así trabajamos:",
@@ -444,6 +444,10 @@
     "subtitle": "Ofrecemos soluciones personalizadas que ayudan a fundadores y VCs visionarios a escalar con impacto",
     "startJourneyButton": "Comienza tu viaje",
     "cards": {
+      "staffAugmentation": {
+        "title": "Staff Augmentation",
+        "description": "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar, no solo habilidades técnicas."
+      },
       "softwareDevelopment": {
         "title": "Desarrollo de Software",
         "description": "Soluciones personalizadas que escalan con tu negocio, desde aplicaciones web hasta sistemas empresariales."
@@ -452,17 +456,13 @@
         "title": "Diseño UX/UI",
         "description": "Interfaces atractivas que conectan con los usuarios y aumentan las conversiones mediante diseño basado en investigación."
       },
-      "aiSolutions": {
-        "title": "Soluciones de IA",
-        "description": "Aprovecha el poder de la inteligencia artificial para automatizar procesos y obtener valiosos insights."
+      "aiAndAutomation": {
+        "title": "IA y Automatización",
+        "description": "Aprovecha el poder de la inteligencia artificial y automatiza flujos de trabajo sin código. Conectamos tus herramientas y construimos integraciones poderosas que hacen que tu negocio funcione más suavemente."
       },
       "dataAnalytics": {
         "title": "Analítica de Datos",
         "description": "Convierte tus datos en inteligencia accionable con análisis avanzados y visualizaciones."
-      },
-      "n8nAutomation": {
-        "title": "Automatización n8n",
-        "description": "Conecta tus herramientas y automatiza flujos de trabajo sin código. Construimos integraciones poderosas que hacen que tu negocio funcione más suavemente."
       },
       "mobileDevelopment": {
         "title": "Desarrollo Móvil",

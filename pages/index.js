@@ -25,7 +25,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import React from "react";
 import { createPortal } from "react-dom";
-import { FaProjectDiagram, FaExternalLinkAlt } from "react-icons/fa";
+import { FaProjectDiagram, FaExternalLinkAlt, FaUsers } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
 import useMediaQuery from "../src/Hooks/useMediaQuery";
 
@@ -962,6 +962,12 @@ export default function HomePage() {
             padding: "0 1rem"
           }}>
             <ServiceBox 
+              icon={<FaUsers style={{ color: '#E35A52', fontSize: '3rem' }}/>}
+              title={t("homeServicesSection.cards.staffAugmentation.title")}
+              description={t("homeServicesSection.cards.staffAugmentation.description")}
+              delay={0.05}
+            />
+            <ServiceBox 
               icon="💻"
               title={t("homeServicesSection.cards.softwareDevelopment.title")}
               description={t("homeServicesSection.cards.softwareDevelopment.description")}
@@ -975,8 +981,8 @@ export default function HomePage() {
             />
             <ServiceBox 
               icon="🤖"
-              title={t("homeServicesSection.cards.aiSolutions.title")}
-              description={t("homeServicesSection.cards.aiSolutions.description")}
+              title={t("homeServicesSection.cards.aiAndAutomation.title")}
+              description={t("homeServicesSection.cards.aiAndAutomation.description")}
               delay={0.2}
             />
             <ServiceBox 
@@ -986,16 +992,10 @@ export default function HomePage() {
               delay={0.25}
             />
             <ServiceBox 
-              icon={<FaProjectDiagram style={{ color: '#E35A52' }}/>} // ícono de automatización
-              title={t("homeServicesSection.cards.n8nAutomation.title")}
-              description={t("homeServicesSection.cards.n8nAutomation.description")}
-              delay={0.3}
-            />
-            <ServiceBox 
               icon="📱"
               title={t("homeServicesSection.cards.mobileDevelopment.title")}
               description={t("homeServicesSection.cards.mobileDevelopment.description")}
-              delay={0.35}
+              delay={0.3}
             />
           </div>
         </Section>

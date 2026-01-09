@@ -82,8 +82,9 @@ const NavBarMobile = () => {
   }, [menuOpen, closeAllMenus]);
 
   const servicesList = [
-    { text: t("aiTitle"), href: "/services/AI" },
+    { text: "Staff Augmentation", href: "/services/staff-augmentation", featured: true },
     { text: "n8n Automation", href: "/services/n8n-automation" },
+    { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },
     { text: t("backendTitle"), href: "/services/back-end" },
     { text: t("uxuiTitle"), href: "/services/ux-ui" },
@@ -131,8 +132,17 @@ const NavBarMobile = () => {
                         <LangMenuItem 
                           key={index} 
                           onClick={() => handleNavigation(service.href)}
+                          style={service.featured ? { 
+                            background: "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
+                            borderLeft: "3px solid #F97B72",
+                            fontWeight: "500"
+                          } : {}}
                         >
                           {service.text}
+                          {service.featured && <span style={{ 
+                            marginLeft: "8px", 
+                            fontSize: "0.75rem"
+                          }}>⭐</span>}
                         </LangMenuItem>
                       ))}
                     </LanguageMenu>

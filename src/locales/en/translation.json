@@ -47,17 +47,17 @@
   "articleNotFound": "We couldn't find this article. Please visit our blog's homepage to browse our latest posts.",
   "seoDescription": "We help visionary founders and VCs scale startups with culturally aligned developers that care about impact.",
   "heroAnimatedText": {
-    "part1": "A software ",
-    "highlight1": " Partner",
-    "part2": "with",
-    "highlight2": "Soul"
+    "part1": "Human-",
+    "highlight1": "first",
+    "part2": " tech ",
+    "highlight2": "partnerships"
   },
-  "heroSubtitle": "Making your life easier — with real people who care.",
+  "heroSubtitle": "We find developers who fit your team, not just your requirements.",
   "heroAlt": "Tech team illustration - OpenGateHub",
-  "problemTitle": "You're holding <highlight>a lot</highlight> right now.",
-  "problemText": "Building a product is hard. You want to move fast, keep quality high, and find people you trust. But hiring is slow, and outsourcing often means giving up control or culture.",
-  "weGetYouTitle": "We <highlight>see you</highlight>.",
-  "weGetYouText": "We get it. That’s why we built OpenGateHub: to make your work lighter, with a team that cares about quality and fits your way of working. You don’t have to do it all alone.",
+  "problemTitle": "Hiring developers is <highlight>hard</highlight>.",
+  "problemText": "You need to scale your team, but finding developers who fit your culture and deliver quality work takes time. Traditional hiring is slow, and most agencies prioritize skills over cultural fit.",
+  "weGetYouTitle": "We <highlight>prioritize fit</highlight>.",
+  "weGetYouText": "That's why we focus on Staff Augmentation: we match you with developers who align with your values and way of working. Cultural fit and human quality come first—without overlooking solid technical skills.",
   "servicesTitle": "Our Services",
   "servicesText": "We work with people who care about the how, not just the what. Custom solutions for founders who want to scale with flow, trust, and culture.",
   "planTitle": "Here's how we do it:",
@@ -435,6 +435,10 @@
     "subtitle": "We work with people who care about the how, not just the what.   \nCustom solutions for founders who want to scale with flow, trust, and culture.",
     "startJourneyButton": "Start Your Journey",
     "cards": {
+      "staffAugmentation": {
+        "title": "Staff Augmentation",
+        "description": "We scale your team prioritizing cultural fit and human quality. We select developers who align with your values and way of working, not just technical skills."
+      },
       "softwareDevelopment": {
         "title": "Software Development",
         "description": "Custom software that feels tailored to you. We co-create what you need — from MVPs to powerful systems — with clarity, care, and flow."
@@ -443,17 +447,13 @@
         "title": "UX/UI Design",
         "description": "Design that feels good — and works. We create thoughtful, intuitive interfaces your users will actually want to use."
       },
-      "aiSolutions": {
-        "title": "AI Solutions",
-        "description": "Let tech take weight off your plate. We bring AI into your product in ways that feel natural, smart, and aligned with your goals."
+      "aiAndAutomation": {
+        "title": "AI & Automation",
+        "description": "Let tech take weight off your plate. We bring AI into your product and automate workflows without code. We connect your tools and build powerful integrations that make your business run smoother."
       },
       "dataAnalytics": {
         "title": "Data Analytics",
         "description": "Your data has a story to tell. We turn it into insights you can actually use — no fluff, just clarity."
-      },
-      "n8nAutomation": {
-        "title": "n8n Automation",
-        "description": "Connect your tools and automate workflows without code. We build powerful integrations that make your business run smoother."
       },
       "mobileDevelopment": {
         "title": "Mobile Development",
