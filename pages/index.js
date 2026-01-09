@@ -86,10 +86,21 @@ const FeaturedWorkCard = ({
   badges = ["35% faster", "0 bugs", "Live product"],
   category,
 }) => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isMobile, setIsMobile] = useState(false);
   const [showHover, setShowHover] = useState(false);
   const [hoverPosition, setHoverPosition] = useState(null);
   const cardRef = React.useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
+  }, []);
 
   const handleMouseEnter = (event) => {
     if (!isMobile) {
@@ -399,9 +410,20 @@ export const HomeCallToAction = () => {
 };
 
 const TestimonialsCarousel = ({ testimonials }) => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isMobile, setIsMobile] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
+  }, []);
 
   const nextSlide = () => {
     if (!isAnimating) {
@@ -867,10 +889,25 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("all");
   const [carouselPaused, setCarouselPaused] = useState(false);
   const carouselTrackRef = React.useRef(null);
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
+  }, []);
 
   // Inyectar estilos del carrusel
   useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
     const styleId = "infinite-carousel-styles";
     let styleElement = document.getElementById(styleId);
 
