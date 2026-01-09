@@ -25,7 +25,7 @@ const drawLine = `
 `;
 
 export const ServiceContainer = styled.section`
-  background: ${({ theme }) => theme.colors.backgroundAlt}; 
+  background: ${({ theme }) => theme.colors.backgroundAlt};
   color: ${({ theme }) => theme.colors.text};
   padding: 3rem 2rem;
   margin: 2rem auto;
@@ -122,8 +122,9 @@ export const HighlightText = styled.p`
   text-align: center;
   margin-top: 2rem;
   color: ${({ theme }) => theme.colors.accent};
-  transition: -webkit-text-stroke 0.3s ease, color 0.3s ease;
-
+  transition:
+    -webkit-text-stroke 0.3s ease,
+    color 0.3s ease;
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -177,7 +178,6 @@ export const NumberedList = styled.ol`
     display: flex;
     align-items: center;
 
-
     &.visible {
       animation: fadeInUp 0.5s ease forwards;
     }
@@ -198,7 +198,7 @@ export const NumberedList = styled.ol`
       height: 2rem;
       line-height: 2rem;
       min-width: 2rem;
-       transition: transform 0.3s ease;
+      transition: transform 0.3s ease;
     }
 
     &:hover::before {
@@ -208,4 +208,3 @@ export const NumberedList = styled.ol`
 
   ${fadeInUp}
 `;
-  

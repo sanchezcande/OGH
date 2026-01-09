@@ -15,7 +15,6 @@ import {
   WorldIcon,
   LangMenuContainer,
 } from "./NavBarMobile.styles";
-import { MagicMotion, motion, LayoutGroup } from "react-magic-motion";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 import Logo4 from "../../../public/Logo4.png";
@@ -48,21 +47,27 @@ const NavBarMobile = () => {
     setShowServicesMenu(!showServicesMenu);
   }, [showServicesMenu]);
 
-  const handleLangChange = useCallback((lang) => {
-    i18n.changeLanguage(lang);
-    setSelectedLang(lang);
-    setShowLangMenu(false);
-  }, [i18n]);
+  const handleLangChange = useCallback(
+    (lang) => {
+      i18n.changeLanguage(lang);
+      setSelectedLang(lang);
+      setShowLangMenu(false);
+    },
+    [i18n],
+  );
 
-  const handleNavigation = useCallback((href) => {
-    closeAllMenus();
-    // Prevent double clicks and ensure smooth navigation
-    router.push(href);
-  }, [closeAllMenus, router]);
+  const handleNavigation = useCallback(
+    (href) => {
+      closeAllMenus();
+      // Prevent double clicks and ensure smooth navigation
+      router.push(href);
+    },
+    [closeAllMenus, router],
+  );
 
   // Close menu when clicking outside
   const menuRef = useRef(null);
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -71,18 +76,22 @@ const NavBarMobile = () => {
     };
 
     if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [menuOpen, closeAllMenus]);
 
   const servicesList = [
-    { text: "Staff Augmentation", href: "/services/staff-augmentation", featured: true },
+    {
+      text: "Staff Augmentation",
+      href: "/services/staff-augmentation",
+      featured: true,
+    },
     { text: "n8n Automation", href: "/services/n8n-automation" },
     { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },
@@ -94,95 +103,88 @@ const NavBarMobile = () => {
   return (
     <NavBarContainer ref={menuRef}>
       <LogoIcon>
-      <Link href="/">
-
-        <Logo>
-        <Image src={Logo4} alt="OpenGateHub Logo" width={210} />
-        </Logo>
+        <Link href="/">
+          <Logo>
+            <Image src={Logo4} alt="OpenGateHub Logo" width={210} />
+          </Logo>
         </Link>
 
         <MenuIcon onClick={toggleMenu} open={menuOpen}>
           ☰
         </MenuIcon>
       </LogoIcon>
-      <MagicMotion transition={{ type: "spring", stiffness: 200, damping: 15 }}>
-        <LayoutGroup animate>
-          {menuOpen && (
-            <motion.div
-              key="menu"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
+      {menuOpen && (
+        <Menu open={menuOpen}>
+          <MenuItem onClick={() => handleNavigation("/")}>{t("home")}</MenuItem>
+          <MenuItem>
+            <LangMenuContainer
+              style={{ marginBottom: "10px" }}
+              onClick={toggleServicesMenu}
             >
-              <Menu open={menuOpen}>
-                <MenuItem onClick={() => handleNavigation("/")}>
-                  {t("home")}
-                </MenuItem>
-                <MenuItem>
-                  <LangMenuContainer
-                    style={{ marginBottom: "10px" }}
-                    onClick={toggleServicesMenu}
-                  >
-                    {t("services")}
-                    <ArrowIcon open={showServicesMenu} />
-                  </LangMenuContainer>
-                  {showServicesMenu && (
-                    <LanguageMenu open={showServicesMenu}>
-                      {servicesList.map((service, index) => (
-                        <LangMenuItem 
-                          key={index} 
-                          onClick={() => handleNavigation(service.href)}
-                          style={service.featured ? { 
-                            background: "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
+              {t("services")}
+              <ArrowIcon open={showServicesMenu} />
+            </LangMenuContainer>
+            {showServicesMenu && (
+              <LanguageMenu open={showServicesMenu}>
+                {servicesList.map((service, index) => (
+                  <LangMenuItem
+                    key={index}
+                    onClick={() => handleNavigation(service.href)}
+                    style={
+                      service.featured
+                        ? {
+                            background:
+                              "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
                             borderLeft: "3px solid #F97B72",
-                            fontWeight: "500"
-                          } : {}}
-                        >
-                          {service.text}
-                          {service.featured && <span style={{ 
-                            marginLeft: "8px", 
-                            fontSize: "0.75rem"
-                          }}>⭐</span>}
-                        </LangMenuItem>
-                      ))}
-                    </LanguageMenu>
-                  )}
-                </MenuItem>
-                <MenuItem onClick={() => handleNavigation("/about-us")}>
-                  {t("aboutUs")}
-                </MenuItem>
-                
-                <MenuItem onClick={() => handleNavigation("/blog")}>
-                  Blog
-                </MenuItem>
-                <MenuItem onClick={() => handleNavigation("/faqs")}>
-                  FAQs
-                </MenuItem>
-                <MenuItem onClick={() => handleNavigation("/contact-us")}>
-                  {t("contactUs")}
-                </MenuItem>
-                <MenuItem onClick={toggleLangMenu}>
-                  <LangMenuContainer>
-                    <WorldIcon />
-                    {selectedLang === "en" ? "Language  " : "Idioma  "}
-                    <ArrowIcon open={showLangMenu} />
-                  </LangMenuContainer>
-                </MenuItem>
-                {showLangMenu && (
-                  <LanguageMenu open={showLangMenu}>
-                    <LangMenuItem onClick={() => handleLangChange("en")}>
-                      {t("english")}
-                    </LangMenuItem>
-                    <LangMenuItem onClick={() => handleLangChange("es")}>
-                      {t("spanish")}
-                    </LangMenuItem>
-                  </LanguageMenu>
-                )}
-              </Menu>
-            </motion.div>
+                            fontWeight: "500",
+                          }
+                        : {}
+                    }
+                  >
+                    {service.text}
+                    {service.featured && (
+                      <span
+                        style={{
+                          marginLeft: "8px",
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        ⭐
+                      </span>
+                    )}
+                  </LangMenuItem>
+                ))}
+              </LanguageMenu>
+            )}
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation("/about-us")}>
+            {t("aboutUs")}
+          </MenuItem>
+
+          <MenuItem onClick={() => handleNavigation("/blog")}>Blog</MenuItem>
+          <MenuItem onClick={() => handleNavigation("/faqs")}>FAQs</MenuItem>
+          <MenuItem onClick={() => handleNavigation("/contact-us")}>
+            {t("contactUs")}
+          </MenuItem>
+          <MenuItem onClick={toggleLangMenu}>
+            <LangMenuContainer>
+              <WorldIcon />
+              {selectedLang === "en" ? "Language  " : "Idioma  "}
+              <ArrowIcon open={showLangMenu} />
+            </LangMenuContainer>
+          </MenuItem>
+          {showLangMenu && (
+            <LanguageMenu open={showLangMenu}>
+              <LangMenuItem onClick={() => handleLangChange("en")}>
+                {t("english")}
+              </LangMenuItem>
+              <LangMenuItem onClick={() => handleLangChange("es")}>
+                {t("spanish")}
+              </LangMenuItem>
+            </LanguageMenu>
           )}
-        </LayoutGroup>
-      </MagicMotion>
+        </Menu>
+      )}
     </NavBarContainer>
   );
 };

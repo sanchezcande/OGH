@@ -18,7 +18,7 @@
 
 .card {
   position: relative;
-  background: linear-gradient(155deg, #FFF5F5 0%, #FFEAEA 80%);
+  background: linear-gradient(155deg, #fff5f5 0%, #ffeaea 80%);
   border-radius: 10px;
   box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.3);
   transition: box-shadow 0.3s ease;
@@ -76,7 +76,7 @@
 .csl-1 {
   height: 64px;
   width: 64px;
-  fill: #4FC9F8; /* celeste claro */
+  fill: #4fc9f8; /* celeste claro */
 }
 
 .card .textContainer {
@@ -90,7 +90,7 @@
 }
 
 .card .textContainer h1 {
-  color: #1F2937;
+  color: #1f2937;
   font-size: 16px;
   text-align: center;
   font-weight: 600;
@@ -98,7 +98,9 @@
   margin-bottom: 0.35rem;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .card.visible .textContainer h1 {
@@ -107,12 +109,14 @@
 }
 
 .card .textContainer p {
-  color: #1F2937;
+  color: #1f2937;
   font-size: 12px;
   text-align: center;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease 0.1s;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease 0.1s;
 }
 
 .card.visible .textContainer p {
@@ -132,12 +136,15 @@
   margin-top: 15px;
   width: 70%;
   margin-bottom: 20px;
-  background-color: #2B2B2B;
+  background-color: #2b2b2b;
   color: white;
   border: none;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease 0.4s, background-color 0.3s ease;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease 0.4s,
+    background-color 0.3s ease;
 }
 
 .card.visible .customdarkbutton {
@@ -146,6 +153,6 @@
 }
 
 .card .customdarkbutton:hover {
-  background-color: #F97B72; /* accent coral */
+  background-color: #f97b72; /* accent coral */
   color: white;
 }

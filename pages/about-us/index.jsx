@@ -42,7 +42,7 @@ const AboutUs = React.forwardRef((props, ref) => {
           }
         });
       },
-      { threshold: 0.2, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.2, rootMargin: "0px 0px -50px 0px" },
     );
 
     const currentImageRef = imageRef.current;
@@ -73,7 +73,10 @@ const AboutUs = React.forwardRef((props, ref) => {
           property="og:description"
           content="Discover how OpenGateHub builds bridges to help your ideas lead the digital future. Our team is committed to delivering tailored solutions."
         />
-        <meta property="og:image" content="https://opengatehub.com/images/og-about-us.png" />
+        <meta
+          property="og:image"
+          content="https://opengatehub.com/images/og-about-us.png"
+        />
         <meta
           name="keywords"
           content="OpenGateHub, About Us, Mission, Values, Digital Transformation, Technology Solutions, Innovation"
@@ -88,7 +91,6 @@ const AboutUs = React.forwardRef((props, ref) => {
           <HighlightedWord className="animate">
             {t("aboutUsTitle_highlight")}
           </HighlightedWord>
-          {t("aboutUsTitle_part2")}
         </h1>
         <h2 className="subtitle">{t("aboutUsSubtitle")}</h2>
         <p>
@@ -108,7 +110,7 @@ const AboutUs = React.forwardRef((props, ref) => {
             alt={t("heroAlt") || "OpenGateHub Team"}
             priority
           />
-          
+
           <div className="founder-info">
             <h3 className="founder-name">Candelaria Sanchez</h3>
             <p className="founder-role">Co-founder & CTO</p>
@@ -116,9 +118,7 @@ const AboutUs = React.forwardRef((props, ref) => {
         </div>
 
         <div className="founder-bio" ref={textRef}>
-          <p className="bio-text">
-            {t("aboutUsFounderBio")}
-          </p>
+          <p className="bio-text">{t("aboutUsFounderBio")}</p>
         </div>
       </ImageText>
 

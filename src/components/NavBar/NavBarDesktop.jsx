@@ -25,8 +25,14 @@ const NavBarDesktop = () => {
 
     const indexToUse = hoveredIndex !== -1 ? hoveredIndex : activeIndex;
     if (indexToUse >= 0 && widths[indexToUse] && offsets[indexToUse]) {
-      document.documentElement.style.setProperty("--highlight-left", `${offsets[indexToUse]}px`);
-      document.documentElement.style.setProperty("--highlight-width", `${widths[indexToUse]}px`);
+      document.documentElement.style.setProperty(
+        "--highlight-left",
+        `${offsets[indexToUse]}px`,
+      );
+      document.documentElement.style.setProperty(
+        "--highlight-width",
+        `${widths[indexToUse]}px`,
+      );
     }
   }, [hoveredIndex, activeIndex]);
 
@@ -58,7 +64,11 @@ const NavBarDesktop = () => {
   ];
 
   const servicesList = [
-    { text: "Staff Augmentation", href: "/services/staff-augmentation", featured: true },
+    {
+      text: "Staff Augmentation",
+      href: "/services/staff-augmentation",
+      featured: true,
+    },
     { text: "n8n Automation", href: "/services/n8n-automation" },
     { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },
@@ -100,10 +110,12 @@ const NavBarDesktop = () => {
           className={styles.highlightBar}
           style={{
             left: `${
-              (tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) - 30
+              (tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
+                0) - 30
             }px`,
             width: `${
-              (tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] || 0) + 60
+              (tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
+                0) + 60
             }px`,
           }}
         />
@@ -111,8 +123,12 @@ const NavBarDesktop = () => {
           <li
             key={tab.text}
             className={tab.text === t("services") ? styles.navLinkWrapper : ""}
-            onMouseEnter={tab.text === t("services") ? handleMouseEnterServices : null}
-            onMouseLeave={tab.text === t("services") ? handleMouseLeaveServices : null}
+            onMouseEnter={
+              tab.text === t("services") ? handleMouseEnterServices : null
+            }
+            onMouseLeave={
+              tab.text === t("services") ? handleMouseLeaveServices : null
+            }
           >
             {tab.text === t("services") ? (
               <>
@@ -123,24 +139,40 @@ const NavBarDesktop = () => {
                   }`}
                 >
                   {servicesList.map((service, index) => (
-                    <li key={index} className={styles.servicesMenuItem} style={service.featured ? { 
-                      background: "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
-                      borderLeft: "3px solid #F97B72",
-                      fontWeight: "500"
-                    } : {}}>
+                    <li
+                      key={index}
+                      className={styles.servicesMenuItem}
+                      style={
+                        service.featured
+                          ? {
+                              background:
+                                "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
+                              borderLeft: "3px solid #F97B72",
+                              fontWeight: "500",
+                            }
+                          : {}
+                      }
+                    >
                       <Link href={service.href}>
                         {service.text}
-                        {service.featured && <span style={{ 
-                          marginLeft: "8px", 
-                          fontSize: "0.75rem"
-                        }}>⭐</span>}
+                        {service.featured && (
+                          <span
+                            style={{
+                              marginLeft: "8px",
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            ⭐
+                          </span>
+                        )}
                       </Link>
                     </li>
                   ))}
                 </ul>
               </>
             ) : (
-              <Link href={tab.href}
+              <Link
+                href={tab.href}
                 className={`${styles.navLink} nav-link`}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(-1)}
@@ -166,10 +198,14 @@ const NavBarDesktop = () => {
           />
         </div>
 
-        <ul className={`${styles.langMenu} ${showLangMenu ? styles.visible : ""}`}>
+        <ul
+          className={`${styles.langMenu} ${showLangMenu ? styles.visible : ""}`}
+        >
           <li
             className={styles.langMenuItem}
-            onClick={() => handleLangChange(selectedLang === "en" ? "es" : "en")}
+            onClick={() =>
+              handleLangChange(selectedLang === "en" ? "es" : "en")
+            }
           >
             {selectedLang === "en" ? t("spanish") : t("english")}
           </li>

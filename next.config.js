@@ -2,14 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   compiler: {
-    styledComponents: true, 
-  },  eslint: {
-    ignoreDuringBuilds: true, 
+    styledComponents: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    formats: ['image/webp'],
+    formats: ["image/webp"],
     minimumCacheTTL: 60,
   },
   compress: true,

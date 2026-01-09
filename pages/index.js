@@ -30,22 +30,26 @@ import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
 import useMediaQuery from "../src/Hooks/useMediaQuery";
 
 // Tabs Component
-const ProjectTabs = ({ activeTab, onTabChange }) => {
+const ProjectTabs = ({ activeTab, onTabChange, isMobile }) => {
   const tabs = [
-    { id: 'all', label: 'All' },
-    { id: 'saas', label: 'SaaS' },
-    { id: 'web-performance', label: 'Web Performance' },
-    { id: 'commerce', label: 'Commerce' }
+    { id: "all", label: "All" },
+    { id: "saas", label: "SaaS" },
+    { id: "web-performance", label: "Web Performance" },
+    { id: "commerce", label: "Commerce" },
   ];
 
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      gap: "0.5rem",
-      marginBottom: "2rem",
-      flexWrap: "wrap"
-    }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "0.5rem",
+        marginBottom: "2rem",
+        flexWrap: "wrap",
+        paddingLeft: isMobile ? "1.5rem" : "1rem",
+        paddingRight: isMobile ? "1.5rem" : "1rem",
+      }}
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -60,7 +64,7 @@ const ProjectTabs = ({ activeTab, onTabChange }) => {
             fontWeight: "500",
             cursor: "pointer",
             transition: "all 0.2s ease",
-            whiteSpace: "nowrap"
+            whiteSpace: "nowrap",
           }}
         >
           {tab.label}
@@ -71,12 +75,22 @@ const ProjectTabs = ({ activeTab, onTabChange }) => {
 };
 
 // Featured Work Card Component
-const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverContent, delay = 0, badges = ["35% faster", "0 bugs", "Live product"], category }) => {
+const FeaturedWorkCard = ({
+  image,
+  title,
+  description,
+  metrics,
+  link,
+  hoverContent,
+  delay = 0,
+  badges = ["35% faster", "0 bugs", "Live product"],
+  category,
+}) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showHover, setShowHover] = useState(false);
   const [hoverPosition, setHoverPosition] = useState(null);
   const cardRef = React.useRef(null);
-  
+
   const handleMouseEnter = (event) => {
     if (!isMobile) {
       // Calcular posición ANTES de mostrar el hover
@@ -84,10 +98,10 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
         const rect = cardRef.current.getBoundingClientRect();
         // Usar el centro exacto del div interno (donde está el logo) - width: 320px
         // El hover también tiene width: 320px, así que deben alinearse perfectamente
-        const centerX = rect.left + (rect.width / 2);
+        const centerX = rect.left + rect.width / 2;
         setHoverPosition({
           top: rect.bottom + 5,
-          left: centerX
+          left: centerX,
         });
       }
       setShowHover(true);
@@ -95,7 +109,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
       event.currentTarget.style.zIndex = "99999999999";
     }
   };
-  
+
   const handleMouseLeave = (event) => {
     if (!isMobile) {
       setShowHover(false);
@@ -103,7 +117,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
       event.currentTarget.style.zIndex = "999999";
     }
   };
-  
+
   // Actualizar posición cuando se hace scroll o resize
   useEffect(() => {
     if (showHover && cardRef.current) {
@@ -111,24 +125,24 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
         if (cardRef.current) {
           const rect = cardRef.current.getBoundingClientRect();
           // Usar el centro del div interno (donde está el logo) - width: 320px
-          const centerX = rect.left + (rect.width / 2);
+          const centerX = rect.left + rect.width / 2;
           setHoverPosition({
             top: rect.bottom + 5,
-            left: centerX
+            left: centerX,
           });
         }
       };
-      
+
       // Pequeño delay para asegurar que el DOM esté actualizado
       const timeoutId = setTimeout(updatePosition, 10);
-      
-      window.addEventListener('scroll', updatePosition, true);
-      window.addEventListener('resize', updatePosition);
-      
+
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("resize", updatePosition);
+
       return () => {
         clearTimeout(timeoutId);
-        window.removeEventListener('scroll', updatePosition, true);
-        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener("scroll", updatePosition, true);
+        window.removeEventListener("resize", updatePosition);
       };
     }
   }, [showHover]);
@@ -141,7 +155,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
       event.currentTarget.style.zIndex = showHover ? "999999" : "9999999999";
     }
   };
-  
+
   return (
     <>
       <motion.div
@@ -153,36 +167,38 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "2rem",
+          padding: isMobile ? "0.5rem" : "2rem",
           cursor: "pointer",
           transition: "all 0.3s ease",
-          zIndex: showHover ? "999999999999" : "999999"
+          zIndex: showHover ? "999999999999" : "999999",
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={() => {
           if (!isMobile) {
-            window.open(link, '_blank', 'noopener,noreferrer');
+            window.open(link, "_blank", "noopener,noreferrer");
           }
         }}
       >
-        <div 
+        <div
           ref={cardRef}
           style={{
             position: "relative",
             width: "320px",
             textAlign: "center",
-            zIndex: showHover ? "999999999999" : "999999"
+            zIndex: showHover ? "999999999999" : "999999",
           }}
         >
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "100%"
-          }}>
-            <img 
-              src={image} 
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <img
+              src={image}
               alt={title}
               style={{
                 width: "auto",
@@ -192,28 +208,36 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                 objectFit: "contain",
                 transition: "transform 0.3s ease-out",
                 filter: "grayscale(20%)",
-                cursor: isMobile ? "default" : "pointer"
+                cursor: isMobile ? "default" : "pointer",
               }}
-              onMouseEnter={(e) => !isMobile && (e.target.style.transform = "scale(1.02)")}
-              onMouseLeave={(e) => !isMobile && (e.target.style.transform = "scale(1)")}
+              onMouseEnter={(e) =>
+                !isMobile && (e.target.style.transform = "scale(1.02)")
+              }
+              onMouseLeave={(e) =>
+                !isMobile && (e.target.style.transform = "scale(1)")
+              }
             />
-            <div style={{
-              marginTop: "0.25rem",
-              fontSize: "0.8rem",
-              color: "#6B7280",
-              fontWeight: "500"
-            }}>
+            <div
+              style={{
+                marginTop: "0.25rem",
+                fontSize: "0.8rem",
+                color: "#6B7280",
+                fontWeight: "500",
+              }}
+            >
               {title}
             </div>
             {isMobile && (
-              <div style={{
-                marginTop: "0.5rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                alignItems: "center"
-              }}>
-                <div 
+              <div
+                style={{
+                  marginTop: "0.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                  alignItems: "center",
+                }}
+              >
+                <div
                   style={{
                     fontSize: "0.7rem",
                     color: "#F97B72",
@@ -222,16 +246,24 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                     padding: "0.3rem 0.8rem",
                     border: "1px solid #F97B72",
                     borderRadius: "12px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
+                    if (cardRef.current) {
+                      const rect = cardRef.current.getBoundingClientRect();
+                      const centerX = rect.left + rect.width / 2;
+                      setHoverPosition({
+                        top: rect.bottom + 5,
+                        left: centerX,
+                      });
+                    }
                     setShowHover(!showHover);
                   }}
                 >
                   {showHover ? "Hide details" : "See details"}
                 </div>
-                <div 
+                <div
                   style={{
                     fontSize: "0.7rem",
                     color: "#6B7280",
@@ -240,11 +272,11 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                     padding: "0.3rem 0.8rem",
                     border: "1px solid #6B7280",
                     borderRadius: "12px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    window.open(link, '_blank', 'noopener,noreferrer');
+                    window.open(link, "_blank", "noopener,noreferrer");
                   }}
                 >
                   Visit website
@@ -252,81 +284,98 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
               </div>
             )}
           </div>
-          
+
           {/* Hover Card - Renderizado con portal para evitar overflow */}
-          {showHover && typeof window !== 'undefined' && hoverPosition && hoverPosition.top > 0 && createPortal(
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              style={{
-                position: "fixed",
-                top: `${hoverPosition.top}px`,
-                left: `${hoverPosition.left - 160}px`, // Restar la mitad del ancho (320px / 2 = 160px) para centrar
-                background: "white",
-                borderRadius: "12px",
-                padding: "1rem",
-                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                border: "1px solid #e5e7eb",
-                width: "320px",
-                maxWidth: "320px",
-                minWidth: "320px",
-                boxSizing: "border-box",
-                zIndex: 999999999999,
-                pointerEvents: "none",
-                textAlign: "center"
-              }}
-            >
-              <div style={{
-                position: "absolute",
-                top: "-8px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "0",
-                height: "0",
-                borderLeft: "8px solid transparent",
-                borderRight: "8px solid transparent",
-                borderBottom: "8px solid white"
-              }} />
-              
-              <div style={{
-                fontSize: "0.9rem",
-                lineHeight: "1.4",
-                color: "#6B7280",
-                marginBottom: "1rem",
-                textAlign: "center"
-              }}>
-                {hoverContent}
-              </div>
-              
-              <div style={{
-                display: "flex",
-                gap: "0.75rem",
-                flexWrap: "wrap",
-                justifyContent: "center"
-              }}>
-                {badges.map((badge, index) => (
-                  <span key={index} style={{
-                    background: "#F97B72",
-                    color: "white",
-                    padding: "0.3rem 0.8rem",
-                    borderRadius: "16px",
-                    fontSize: "0.75rem",
-                    fontWeight: "600",
-                    whiteSpace: "nowrap"
-                  }}>
-                    {badge}
-                  </span>
-                ))}
-              </div>
-            </motion.div>,
-            document.body
-          )}
+          {showHover &&
+            typeof window !== "undefined" &&
+            hoverPosition &&
+            hoverPosition.top > 0 &&
+            hoverContent &&
+            Array.isArray(badges) &&
+            (() => {
+              if (typeof document === "undefined" || !document.body)
+                return null;
+              return createPortal(
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    position: "fixed",
+                    top: `${hoverPosition.top}px`,
+                    left: `${hoverPosition.left - 160}px`, // Restar la mitad del ancho (320px / 2 = 160px) para centrar
+                    background: "white",
+                    borderRadius: "12px",
+                    padding: "1rem",
+                    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                    border: "1px solid #e5e7eb",
+                    width: "320px",
+                    maxWidth: "320px",
+                    minWidth: "320px",
+                    boxSizing: "border-box",
+                    zIndex: 999999999999,
+                    pointerEvents: "none",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-8px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: "0",
+                      height: "0",
+                      borderLeft: "8px solid transparent",
+                      borderRight: "8px solid transparent",
+                      borderBottom: "8px solid white",
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      fontSize: "0.9rem",
+                      lineHeight: "1.4",
+                      color: "#6B7280",
+                      marginBottom: "1rem",
+                      textAlign: "center",
+                    }}
+                  >
+                    {hoverContent}
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.75rem",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {badges.map((badge, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          background: "#F97B72",
+                          color: "white",
+                          padding: "0.3rem 0.8rem",
+                          borderRadius: "16px",
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>,
+                document.body,
+              );
+            })()}
         </div>
       </motion.div>
-      
-
     </>
   );
 };
@@ -365,7 +414,9 @@ const TestimonialsCarousel = ({ testimonials }) => {
   const prevSlide = () => {
     if (!isAnimating) {
       setIsAnimating(true);
-      setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      setCurrentSlide(
+        (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+      );
       setTimeout(() => setIsAnimating(false), 300);
     }
   };
@@ -387,23 +438,27 @@ const TestimonialsCarousel = ({ testimonials }) => {
   }, [currentSlide, isAnimating]);
 
   return (
-    <div style={{
-      maxWidth: isMobile ? "100%" : "1000px",
-      margin: isMobile ? 0 : "0 auto",
-      position: "relative",
-      padding: isMobile ? 0 : "0 2rem"
-    }}>
-      {/* Main Carousel */}
-      <div style={{
+    <div
+      style={{
+        maxWidth: isMobile ? "100%" : "1000px",
+        margin: isMobile ? 0 : "0 auto",
         position: "relative",
-        overflow: "hidden",
-        borderRadius: isMobile ? 0 : "20px",
-        background: "white",
-        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
-        minHeight: isMobile ? "350px" : "400px",
-        margin: 0,
-        padding: isMobile ? 0 : undefined
-      }}>
+        padding: isMobile ? 0 : "0 2rem",
+      }}
+    >
+      {/* Main Carousel */}
+      <div
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          borderRadius: isMobile ? 0 : "20px",
+          background: "white",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
+          minHeight: isMobile ? "350px" : "400px",
+          margin: 0,
+          padding: isMobile ? 0 : undefined,
+        }}
+      >
         {/* Navigation Buttons */}
         <button
           onClick={prevSlide}
@@ -425,7 +480,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
             zIndex: 10,
             boxShadow: isMobile ? "none" : "0 4px 20px rgba(0, 0, 0, 0.1)",
             transition: "all 0.3s ease",
-            opacity: isMobile ? 0.4 : (isAnimating ? 0.5 : 1)
+            opacity: isMobile ? 0.4 : isAnimating ? 0.5 : 1,
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = "translateY(-50%) scale(1.1)";
@@ -436,7 +491,13 @@ const TestimonialsCarousel = ({ testimonials }) => {
             e.target.style.background = "rgba(255, 255, 255, 0.9)";
           }}
         >
-          <FaChevronLeft style={{ color: isMobile ? "#F97B72" : "#F97B72", fontSize: isMobile ? "1rem" : "1.2rem", opacity: isMobile ? 1 : 1 }} />
+          <FaChevronLeft
+            style={{
+              color: isMobile ? "#F97B72" : "#F97B72",
+              fontSize: isMobile ? "1rem" : "1.2rem",
+              opacity: isMobile ? 1 : 1,
+            }}
+          />
         </button>
 
         <button
@@ -459,7 +520,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
             zIndex: 10,
             boxShadow: isMobile ? "none" : "0 4px 20px rgba(0, 0, 0, 0.1)",
             transition: "all 0.3s ease",
-            opacity: isMobile ? 0.4 : (isAnimating ? 0.5 : 1)
+            opacity: isMobile ? 0.4 : isAnimating ? 0.5 : 1,
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = "translateY(-50%) scale(1.1)";
@@ -470,16 +531,25 @@ const TestimonialsCarousel = ({ testimonials }) => {
             e.target.style.background = "rgba(255, 255, 255, 0.9)";
           }}
         >
-          <FaChevronRight style={{ color: isMobile ? "#F97B72" : "#F97B72", fontSize: isMobile ? "1rem" : "1.2rem", opacity: isMobile ? 1 : 1, paddingTop: isMobile ? 2 : 0 }} />
+          <FaChevronRight
+            style={{
+              color: isMobile ? "#F97B72" : "#F97B72",
+              fontSize: isMobile ? "1rem" : "1.2rem",
+              opacity: isMobile ? 1 : 1,
+              paddingTop: isMobile ? 2 : 0,
+            }}
+          />
         </button>
 
         {/* Slides Container */}
-        <div style={{
-          display: "flex",
-          transition: "transform 0.3s ease",
-          transform: `translateX(-${currentSlide * 100}%)`,
-          height: "100%"
-        }}>
+        <div
+          style={{
+            display: "flex",
+            transition: "transform 0.3s ease",
+            transform: `translateX(-${currentSlide * 100}%)`,
+            height: "100%",
+          }}
+        >
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
@@ -494,70 +564,80 @@ const TestimonialsCarousel = ({ testimonials }) => {
                 position: "relative",
                 "@media (max-width: 768px)": {
                   padding: "1.5rem 0",
-                  minHeight: "350px"
-                }
+                  minHeight: "350px",
+                },
               }}
             >
               {/* Quote Icon */}
-              <div style={{
-                position: "absolute",
-                top: "2rem",
-                left: "2rem",
-                fontSize: "3rem",
-                color: "#F97B72",
-                opacity: 0.1,
-                "@media (max-width: 768px)": {
-                  top: "1rem",
-                  left: "1rem",
-                  fontSize: "2rem"
-                }
-              }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "2rem",
+                  left: "2rem",
+                  fontSize: "3rem",
+                  color: "#F97B72",
+                  opacity: 0.1,
+                  "@media (max-width: 768px)": {
+                    top: "1rem",
+                    left: "1rem",
+                    fontSize: "2rem",
+                  },
+                }}
+              >
                 <FaQuoteLeft />
               </div>
 
               {/* Content */}
-              <p style={{
-                fontSize: isMobile ? "1rem" : "1.3rem",
-                lineHeight: isMobile ? "1.6" : "1.8",
-                color: "#333",
-                marginBottom: isMobile ? "1.5rem" : "2rem",
-                fontStyle: "italic",
-                maxWidth: "600px",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-                hyphens: "auto",
-                textAlign: "left",
-                padding: isMobile ? "0 12px" : 0
-              }}>
+              <p
+                style={{
+                  fontSize: isMobile ? "1rem" : "1.3rem",
+                  lineHeight: isMobile ? "1.6" : "1.8",
+                  color: "#333",
+                  marginBottom: isMobile ? "1.5rem" : "2rem",
+                  fontStyle: "italic",
+                  maxWidth: "600px",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                  hyphens: "auto",
+                  textAlign: "left",
+                  padding: isMobile ? "0 12px" : 0,
+                }}
+              >
                 "{testimonial.content}"
               </p>
 
               {/* Author Info */}
-              <div style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "0.5rem"
-              }}>
-                <p style={{
-                  fontWeight: "700",
-                  fontSize: "1.2rem",
-                  color: "#F97B72",
-                  margin: 0,
-                  "@media (max-width: 768px)": {
-                    fontSize: "1.1rem"
-                  }
-                }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <p
+                  style={{
+                    fontWeight: "700",
+                    fontSize: "1.2rem",
+                    color: "#F97B72",
+                    margin: 0,
+                    "@media (max-width: 768px)": {
+                      fontSize: "1.1rem",
+                    },
+                  }}
+                >
                   {testimonial.company}
                 </p>
-                <p style={{
-                  fontSize: "1rem",
-                  color: "#666",
-                  margin: 0,
-                  "@media (max-width: 768px)": {
-                    fontSize: "0.9rem"
-                  }
-                }}>
+                <p
+                  style={{
+                    fontSize: "1rem",
+                    color: "#666",
+                    margin: 0,
+                    "@media (max-width: 768px)": {
+                      fontSize: "0.9rem",
+                    },
+                  }}
+                >
                   {testimonial.role}
                 </p>
               </div>
@@ -567,12 +647,14 @@ const TestimonialsCarousel = ({ testimonials }) => {
       </div>
 
       {/* Dots Indicator */}
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "0.5rem",
-        marginTop: "2rem"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "0.5rem",
+          marginTop: "2rem",
+        }}
+      >
         {testimonials.map((_, index) => (
           <button
             key={index}
@@ -585,7 +667,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
               background: index === currentSlide ? "#F97B72" : "#ddd",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              opacity: isAnimating ? 0.5 : 1
+              opacity: isAnimating ? 0.5 : 1,
             }}
           />
         ))}
@@ -596,17 +678,17 @@ const TestimonialsCarousel = ({ testimonials }) => {
 
 const ServiceBox = ({ icon, title, description, delay = 0 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
-    <motion.div 
+    <motion.div
       className="service-box"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.15, delay: delay * 0.1 }}
-      whileHover={{ 
+      whileHover={{
         scale: 1.02,
-        transition: { duration: 0.1 }
+        transition: { duration: 0.1 },
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -619,7 +701,7 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         position: "relative",
         overflow: "hidden",
         border: "1px solid rgba(249, 123, 114, 0.2)",
-        transition: "all 0.15s ease"
+        transition: "all 0.15s ease",
       }}
     >
       <motion.div
@@ -630,35 +712,41 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
           fontSize: "3rem",
           color: "var(--color-accent, #FF6B6B)",
           marginBottom: "1rem",
-          display: "inline-block"
+          display: "inline-block",
         }}
       >
         {icon}
       </motion.div>
-      
-      <h3 style={{ 
-        fontSize: "1.5rem", 
-        fontWeight: "700", 
-        marginBottom: "1rem",
-        color: "var(--color-text, #333)",
-        transition: "color 0.2s ease",
-        ...(isHovered ? { color: "#E35A52" } : {})
-      }}>
+
+      <h3
+        style={{
+          fontSize: "1.5rem",
+          fontWeight: "700",
+          marginBottom: "1rem",
+          color: "var(--color-text, #333)",
+          transition: "color 0.2s ease",
+          ...(isHovered ? { color: "#E35A52" } : {}),
+        }}
+      >
         {title}
       </h3>
-      
-      <p style={{ 
-        fontSize: "1rem", 
-        lineHeight: "1.6",
-        color: "#444444"
-      }}>
+
+      <p
+        style={{
+          fontSize: "1rem",
+          lineHeight: "1.6",
+          color: "#444444",
+        }}
+      >
         {description}
       </p>
-      
-      <motion.div 
+
+      <motion.div
         className="service-bg-circle"
         initial={{ scale: 0, opacity: 0 }}
-        animate={isHovered ? { scale: 1, opacity: 0.1 } : { scale: 0, opacity: 0 }}
+        animate={
+          isHovered ? { scale: 1, opacity: 0.1 } : { scale: 0, opacity: 0 }
+        }
         transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: "absolute",
@@ -668,7 +756,7 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
           background: "var(--color-accent, #FF6B6B)",
           right: "-150px",
           bottom: "-150px",
-          zIndex: "-1"
+          zIndex: "-1",
         }}
       />
     </motion.div>
@@ -677,17 +765,17 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
 
 const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
-    <motion.div 
+    <motion.div
       className="testimonial-card"
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.15, delay: delay * 0.1 }}
-      whileHover={{ 
+      whileHover={{
         y: -4,
-        transition: { duration: 0.1 }
+        transition: { duration: 0.1 },
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -702,11 +790,11 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
         flexDirection: "column",
         transition: "all 0.15s ease",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       {isHovered && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.05 }}
           transition={{ duration: 0.2 }}
@@ -717,50 +805,56 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
             right: 0,
             bottom: 0,
             background: "var(--color-accent, #FF6B6B)",
-            zIndex: 0
+            zIndex: 0,
           }}
         />
       )}
-      
-      <motion.div 
-        style={{ 
-          fontSize: "2rem", 
+
+      <motion.div
+        style={{
+          fontSize: "2rem",
           color: "var(--color-accent, #FF6B6B)",
           marginBottom: "1rem",
           position: "relative",
-          zIndex: 1
+          zIndex: 1,
         }}
         animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
         transition={{ duration: 0.1 }}
       >
         "
       </motion.div>
-      
-      <p style={{ 
-        fontSize: "1rem", 
-        lineHeight: "1.8",
-        flex: 1,
-        marginBottom: "1.5rem",
-        position: "relative",
-        zIndex: 1
-      }}>
+
+      <p
+        style={{
+          fontSize: "1rem",
+          lineHeight: "1.8",
+          flex: 1,
+          marginBottom: "1.5rem",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         {content}
       </p>
-      
+
       <div style={{ position: "relative", zIndex: 1 }}>
-        <p style={{ 
-          fontWeight: "700", 
-          fontSize: "1.1rem",
-          marginBottom: "0.2rem",
-          color: isHovered ? "#E35A52" : "var(--color-text, #333)",
-          transition: "color 0.2s ease"
-        }}>
+        <p
+          style={{
+            fontWeight: "700",
+            fontSize: "1.1rem",
+            marginBottom: "0.2rem",
+            color: isHovered ? "#E35A52" : "var(--color-text, #333)",
+            transition: "color 0.2s ease",
+          }}
+        >
           {company}
         </p>
-        <p style={{ 
-          fontSize: "0.9rem", 
-          color: "var(--color-text-muted, #666)" 
-        }}>
+        <p
+          style={{
+            fontSize: "0.9rem",
+            color: "var(--color-text-muted, #666)",
+          }}
+        >
           {role}
         </p>
       </div>
@@ -770,21 +864,22 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
 
 export default function HomePage() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState("all");
   const [carouselPaused, setCarouselPaused] = useState(false);
   const carouselTrackRef = React.useRef(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Inyectar estilos del carrusel
   useEffect(() => {
-    const styleId = 'infinite-carousel-styles';
+    const styleId = "infinite-carousel-styles";
     let styleElement = document.getElementById(styleId);
-    
+
     if (!styleElement) {
-      styleElement = document.createElement('style');
+      styleElement = document.createElement("style");
       styleElement.id = styleId;
       document.head.appendChild(styleElement);
     }
-    
+
     styleElement.textContent = `
       @keyframes infiniteScrollCarousel {
         0% {
@@ -802,7 +897,11 @@ export default function HomePage() {
     const parts = text.split(/<highlight>|<\/highlight>/);
     return parts.map((part, index) => {
       if (index % 2 === 1) {
-        return <span key={index} className="highlighted-word">{part}</span>;
+        return (
+          <span key={index} className="highlighted-word">
+            {part}
+          </span>
+        );
       }
       return <React.Fragment key={index}>{part}</React.Fragment>;
     });
@@ -812,23 +911,23 @@ export default function HomePage() {
     {
       content: t("reviews.skylar.text"),
       company: t("reviews.skylar.company"),
-      role: t("reviews.skylar.role")
+      role: t("reviews.skylar.role"),
     },
     {
       content: t("reviews.techvision.text"),
       company: t("reviews.techvision.company"),
-      role: t("reviews.techvision.role")
+      role: t("reviews.techvision.role"),
     },
     {
       content: t("reviews.greenleaf.text"),
       company: t("reviews.greenleaf.company"),
-      role: t("reviews.greenleaf.role")
+      role: t("reviews.greenleaf.role"),
     },
     {
       content: t("reviews.innovatelab.text"),
       company: t("reviews.innovatelab.company"),
-      role: t("reviews.innovatelab.role")
-    }
+      role: t("reviews.innovatelab.role"),
+    },
   ];
 
   return (
@@ -872,7 +971,7 @@ export default function HomePage() {
               </span>
               .
             </span>
-            
+
             {/* Mobile version without animation */}
             <span className="mobile-only">
               {t("heroAnimatedText.part1")}{" "}
@@ -886,9 +985,7 @@ export default function HomePage() {
               .
             </span>
           </Title>
-          <Subtitle>
-            {t("heroSubtitle")}
-          </Subtitle>
+          <Subtitle>{t("heroSubtitle")}</Subtitle>
           <CTAButton
             href="https://calendly.com/sanchezgcandelaria"
             target="_blank"
@@ -898,35 +995,47 @@ export default function HomePage() {
             {t("ctaButton")}
           </CTAButton>
         </Hero>
-        
-        <Section className="serious-block">
+
+        <Section
+          className="serious-block"
+          style={{
+            paddingLeft: isMobile ? "20px" : undefined,
+            paddingRight: isMobile ? "20px" : undefined,
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.15 }}
           >
-            <SectionTitle style={{"--i": 0}}>
+            <SectionTitle style={{ "--i": 0 }}>
               {parseHighlightedText(t("problemTitle"))}
             </SectionTitle>
             <SectionText>{t("problemText")}</SectionText>
           </motion.div>
         </Section>
 
-        <Section className="serious-block">
+        <Section
+          className="serious-block"
+          style={{
+            paddingLeft: isMobile ? "20px" : undefined,
+            paddingRight: isMobile ? "20px" : undefined,
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.15 }}
           >
-            <SectionTitle style={{"--i": 1}}>
+            <SectionTitle style={{ "--i": 1 }}>
               {parseHighlightedText(t("weGetYouTitle"))}
             </SectionTitle>
             <SectionText>{t("weGetYouText")}</SectionText>
           </motion.div>
         </Section>
-        
+
         {/* Services Section with Interactive Boxes */}
         <Section className="full-width">
           <motion.div
@@ -936,65 +1045,85 @@ export default function HomePage() {
             transition={{ duration: 0.2 }}
             style={{ textAlign: "center", marginBottom: "3rem" }}
           >
-            <h2 style={{ 
-              fontSize: "2.8rem", 
-              fontWeight: "800",
-              marginBottom: "1rem"
-            }}>
-              <span style={{ color: "var(--color-accent, #FF6B6B)" }}>{t("homeServicesSection.title")}</span>
+            <h2
+              style={{
+                fontSize: "2.8rem",
+                fontWeight: "800",
+                marginBottom: "1rem",
+              }}
+            >
+              <span style={{ color: "var(--color-accent, #FF6B6B)" }}>
+                {t("homeServicesSection.title")}
+              </span>
             </h2>
-            <p style={{ 
-              fontSize: "1.2rem", 
-              maxWidth: "800px", 
-              margin: "0 auto", 
-              color: "var(--color-text-muted, #666)"
-            }}>
+            <p
+              style={{
+                fontSize: "1.2rem",
+                maxWidth: "800px",
+                margin: "0 auto",
+                color: "var(--color-text-muted, #666)",
+              }}
+            >
               {t("homeServicesSection.subtitle")}
             </p>
           </motion.div>
-          
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "2rem",
-            maxWidth: "1200px",
-            margin: "0 auto",
-            padding: "0 1rem"
-          }}>
-            <ServiceBox 
-              icon={<FaUsers style={{ color: '#E35A52', fontSize: '3rem' }}/>}
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "2rem",
+              maxWidth: "1200px",
+              margin: "0 auto",
+              padding: "0 1rem",
+            }}
+          >
+            <ServiceBox
+              icon={<FaUsers style={{ color: "#E35A52", fontSize: "3rem" }} />}
               title={t("homeServicesSection.cards.staffAugmentation.title")}
-              description={t("homeServicesSection.cards.staffAugmentation.description")}
+              description={t(
+                "homeServicesSection.cards.staffAugmentation.description",
+              )}
               delay={0.05}
             />
-            <ServiceBox 
+            <ServiceBox
               icon="💻"
               title={t("homeServicesSection.cards.softwareDevelopment.title")}
-              description={t("homeServicesSection.cards.softwareDevelopment.description")}
+              description={t(
+                "homeServicesSection.cards.softwareDevelopment.description",
+              )}
               delay={0.1}
             />
-            <ServiceBox 
+            <ServiceBox
               icon="🎨"
               title={t("homeServicesSection.cards.uxUiDesign.title")}
-              description={t("homeServicesSection.cards.uxUiDesign.description")}
+              description={t(
+                "homeServicesSection.cards.uxUiDesign.description",
+              )}
               delay={0.15}
             />
-            <ServiceBox 
+            <ServiceBox
               icon="🤖"
               title={t("homeServicesSection.cards.aiAndAutomation.title")}
-              description={t("homeServicesSection.cards.aiAndAutomation.description")}
+              description={t(
+                "homeServicesSection.cards.aiAndAutomation.description",
+              )}
               delay={0.2}
             />
-            <ServiceBox 
+            <ServiceBox
               icon="📊"
               title={t("homeServicesSection.cards.dataAnalytics.title")}
-              description={t("homeServicesSection.cards.dataAnalytics.description")}
+              description={t(
+                "homeServicesSection.cards.dataAnalytics.description",
+              )}
               delay={0.25}
             />
-            <ServiceBox 
+            <ServiceBox
               icon="📱"
               title={t("homeServicesSection.cards.mobileDevelopment.title")}
-              description={t("homeServicesSection.cards.mobileDevelopment.description")}
+              description={t(
+                "homeServicesSection.cards.mobileDevelopment.description",
+              )}
               delay={0.3}
             />
           </div>
@@ -1002,127 +1131,196 @@ export default function HomePage() {
 
         {/* Metrics Section */}
         <MetricsSection />
-        
+
         {/* Featured Work Section */}
-        <div style={{ background: "white", marginTop: "-1px" }}>
-          <Section className="full-width" style={{
-            padding: "2rem 1rem",
-            margin: "0",
-            borderTop: "none",
-            borderBottom: "1px solid #e5e7eb",
-            position: "relative",
-            zIndex: 999999,
-            overflow: "visible",
-            background: "white"
-          }}>
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.2 }}
-            style={{ textAlign: "center", marginBottom: "2rem" }}
+        <div
+          style={{
+            background: "white",
+            marginTop: "-1px",
+            width: "100%",
+            overflow: "hidden",
+          }}
+        >
+          <Section
+            className="full-width"
+            style={{
+              padding: "2rem 0",
+              margin: "0",
+              borderTop: "none",
+              borderBottom: "1px solid #e5e7eb",
+              position: "relative",
+              zIndex: 999999,
+              overflow: "visible",
+              background: "white",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
           >
-            <h3 style={{ 
-              fontSize: "1.5rem", 
-              fontWeight: "600",
-              marginBottom: "0.5rem",
-              color: "#6B7280"
-            }}>
-              {t("featuredWorkSection.title")}
-            </h3>
-            <p style={{ 
-              fontSize: "1rem", 
-              maxWidth: "600px", 
-              margin: "0 auto", 
-              color: "#9CA3AF"
-            }}>
-              {t("featuredWorkSection.subtitle")}
-            </p>
-          </motion.div>
-          
-          <ProjectTabs activeTab={activeTab} onTabChange={setActiveTab} />
-          
-          {(() => {
-            const projects = [
-              {
-                image: "/smarters-card.png",
-                title: t("featuredWorkSection.smartersCity.title"),
-                description: t("featuredWorkSection.smartersCity.description"),
-                metrics: t("featuredWorkSection.smartersCity.metrics", { returnObjects: true }),
-                link: "https://smarters.city/",
-                hoverContent: <><strong>Embedded Dev Partners</strong> — boosted UI + APIs, kept their roadmap on track</>,
-                category: "saas",
-                delay: 0.1
-              },
-              {
-                image: "/estudio-sab.png",
-                title: t("featuredWorkSection.estudioSab.title"),
-                description: t("featuredWorkSection.estudioSab.description"),
-                metrics: t("featuredWorkSection.estudioSab.metrics", { returnObjects: true }),
-                link: "https://estudiosab.com/",
-                hoverContent: <><strong>All-In Dev Studio</strong> — designed, built, shipped.</>,
-                badges: ["Fast pages", "SEO ready", "Always on"],
-                category: "web-performance",
-                delay: 0.2
-              },
-              {
-                image: "/Skylar.png",
-                title: t("featuredWorkSection.skylar.title"),
-                description: t("featuredWorkSection.skylar.description"),
-                metrics: t("featuredWorkSection.skylar.metrics", { returnObjects: true }),
-                link: "https://skylar.ar/",
-                hoverContent: <><strong>Code-Side Overhaul</strong> — rebuilt store, conversions up 28%</>,
-                badges: ["≤2s TTI", "+28% conversions", "Live catalog"],
-                category: "commerce",
-                delay: 0.3
-              },
-              {
-                image: "/GBS.png",
-                title: "GBS Abogados",
-                description: "Plataforma web moderna y optimizada",
-                metrics: ["+40% velocidad", "99.9% uptime", "SEO optimizado"],
-                link: "#",
-                hoverContent: <><strong>Web Development</strong> — modern platform, optimized performance.</>,
-                badges: ["Dynamic transitions", "SEO ready", "Always on"],
-                category: "web-performance",
-                delay: 0.4
-              },
-              {
-                image: "/valthor-logo.e3b5a398.png",
-                title: "Valthor CRM",
-                description: "Plataforma CRM moderna y optimizada con IA",
-                metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
-                link: "#",
-                hoverContent: <><strong>Modern CRM platform</strong> — powered with <strong>AI</strong>.</>,
-                badges: ["CRM", "AI", "Always on"],
-                category: "saas",
-                delay: 0.5
-              },
-              {
-                image: "/vivabots_azul.png",
-                title: "Vivabots RPA",
-                description: "Plataforma RPA moderna y optimizada",
-                metrics: ["99.9% uptime", "99.9% efficienty"],
-                link: "https://vivabots.com/",
-                hoverContent: <>Modern and Powerful <strong>RPA platform</strong> </>,
-                badges: ["RPA", "Automation", "Always on"],
-                category: "saas",
-                delay: 0.6
-              },
-            ];
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.2 }}
+              style={{
+                textAlign: "center",
+                marginBottom: "2rem",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  color: "#6B7280",
+                  paddingLeft: isMobile ? "1.5rem" : "1rem",
+                  paddingRight: isMobile ? "1.5rem" : "1rem",
+                }}
+              >
+                {t("featuredWorkSection.title")}
+              </h3>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  maxWidth: "600px",
+                  margin: "auto",
+                  color: "#9CA3AF",
+                  paddingLeft: isMobile ? "1.5rem" : "1rem",
+                  paddingRight: isMobile ? "1.5rem" : "1rem",
+                }}
+              >
+                {t("featuredWorkSection.subtitle")}
+              </p>
+            </motion.div>
 
-            const filteredProjects = projects.filter(project => 
-              activeTab === 'all' || project.category === activeTab
-            );
+            <ProjectTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              isMobile={isMobile}
+            />
 
-            // Duplicar proyectos para efecto infinito
-            // Si hay pocas tarjetas, duplicar más veces para que el carrusel se vea mejor
-            const minDuplications = filteredProjects.length <= 3 ? 4 : 2;
-            const duplicatedProjects = Array(minDuplications).fill(filteredProjects).flat();
-            
-            return (
-              <>
-                <style dangerouslySetInnerHTML={{__html: `
+            {(() => {
+              const projects = [
+                {
+                  image: "/smarters-card.png",
+                  title: t("featuredWorkSection.smartersCity.title"),
+                  description: t(
+                    "featuredWorkSection.smartersCity.description",
+                  ),
+                  metrics: t("featuredWorkSection.smartersCity.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://smarters.city/",
+                  hoverContent: (
+                    <>
+                      <strong>Embedded Dev Partners</strong> — boosted UI +
+                      APIs, kept their roadmap on track
+                    </>
+                  ),
+                  category: "saas",
+                  delay: 0.1,
+                },
+                {
+                  image: "/estudio-sab.png",
+                  title: t("featuredWorkSection.estudioSab.title"),
+                  description: t("featuredWorkSection.estudioSab.description"),
+                  metrics: t("featuredWorkSection.estudioSab.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://estudiosab.com/",
+                  hoverContent: (
+                    <>
+                      <strong>All-In Dev Studio</strong> — designed, built,
+                      shipped.
+                    </>
+                  ),
+                  badges: ["Fast pages", "SEO ready", "Always on"],
+                  category: "web-performance",
+                  delay: 0.2,
+                },
+                {
+                  image: "/Skylar.png",
+                  title: t("featuredWorkSection.skylar.title"),
+                  description: t("featuredWorkSection.skylar.description"),
+                  metrics: t("featuredWorkSection.skylar.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://skylar.ar/",
+                  hoverContent: (
+                    <>
+                      <strong>Code-Side Overhaul</strong> — rebuilt store,
+                      conversions up 28%
+                    </>
+                  ),
+                  badges: ["≤2s TTI", "+28% conversions", "Live catalog"],
+                  category: "commerce",
+                  delay: 0.3,
+                },
+                {
+                  image: "/GBS.png",
+                  title: "GBS Abogados",
+                  description: "Plataforma web moderna y optimizada",
+                  metrics: ["+40% velocidad", "99.9% uptime", "SEO optimizado"],
+                  link: "#",
+                  hoverContent: (
+                    <>
+                      <strong>Web Development</strong> — modern platform,
+                      optimized performance.
+                    </>
+                  ),
+                  badges: ["Dynamic transitions", "SEO ready", "Always on"],
+                  category: "web-performance",
+                  delay: 0.4,
+                },
+                {
+                  image: "/valthor-logo.e3b5a398.png",
+                  title: "Valthor CRM",
+                  description: "Plataforma CRM moderna y optimizada con IA",
+                  metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
+                  link: "#",
+                  hoverContent: (
+                    <>
+                      <strong>Modern CRM platform</strong> — powered with{" "}
+                      <strong>AI</strong>.
+                    </>
+                  ),
+                  badges: ["CRM", "AI", "Always on"],
+                  category: "saas",
+                  delay: 0.5,
+                },
+                {
+                  image: "/vivabots_azul.png",
+                  title: "Vivabots RPA",
+                  description: "Plataforma RPA moderna y optimizada",
+                  metrics: ["99.9% uptime", "99.9% efficienty"],
+                  link: "https://vivabots.com/",
+                  hoverContent: (
+                    <>
+                      Modern and Powerful <strong>RPA platform</strong>{" "}
+                    </>
+                  ),
+                  badges: ["RPA", "Automation", "Always on"],
+                  category: "saas",
+                  delay: 0.6,
+                },
+              ];
+
+              const filteredProjects = projects.filter(
+                (project) =>
+                  activeTab === "all" || project.category === activeTab,
+              );
+
+              // Duplicar proyectos para efecto infinito
+              // Si hay pocas tarjetas, duplicar más veces para que el carrusel se vea mejor
+              const minDuplications = filteredProjects.length <= 3 ? 4 : 2;
+              const duplicatedProjects = Array(minDuplications)
+                .fill(filteredProjects)
+                .flat();
+
+              return (
+                <>
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: `
                   @keyframes infiniteScrollCarousel {
                     0% {
                       transform: translateX(0);
@@ -1131,88 +1329,88 @@ export default function HomePage() {
                       transform: translateX(-50%);
                     }
                   }
-                `}} />
-                <div 
-                  style={{
-                    width: "100%",
-                    maxWidth: "1400px",
-                    margin: "0 auto",
-                    position: "relative",
-                    zIndex: 999999,
-                    overflow: "hidden",
-                    padding: "1rem 0",
-                    display: "flex",
-                    alignItems: "center",
-                    minHeight: "280px",
-                    height: "280px"
-                  }}
-                  onMouseEnter={() => setCarouselPaused(true)}
-                  onMouseLeave={() => setCarouselPaused(false)}
-                >
-                  <div 
-                    ref={carouselTrackRef}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: "0.75rem",
-                      animation: "infiniteScrollCarousel 40s linear infinite",
-                      width: "fit-content",
-                      willChange: "transform",
-                      animationPlayState: carouselPaused ? "paused" : "running"
+                `,
                     }}
+                  />
+                  <div
+                    style={{
+                      width: "100%",
+                      position: "relative",
+                      zIndex: 999999,
+                      overflow: "hidden",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                      minHeight: "280px",
+                      height: "280px",
+                    }}
+                    onMouseEnter={() => setCarouselPaused(true)}
+                    onMouseLeave={() => setCarouselPaused(false)}
                   >
-                    {duplicatedProjects.map((project, index) => (
-                      <div 
-                        key={`${project.title}-${index}`} 
-                        style={{
-                          flexShrink: 0,
-                          flexGrow: 0
-                        }}
-                      >
-                        <FeaturedWorkCard
-                          image={project.image}
-                          title={project.title}
-                          description={project.description}
-                          metrics={project.metrics}
-                          link={project.link}
-                          hoverContent={project.hoverContent}
-                          badges={project.badges}
-                          category={project.category}
-                          delay={0}
-                        />
-                      </div>
-                    ))}
+                    <div
+                      ref={carouselTrackRef}
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: isMobile ? "-2rem" : "0.75rem",
+                        animation: "infiniteScrollCarousel 40s linear infinite",
+                        width: "fit-content",
+                        willChange: "transform",
+                        animationPlayState: carouselPaused
+                          ? "paused"
+                          : "running",
+                      }}
+                    >
+                      {duplicatedProjects.map((project, index) => (
+                        <div
+                          key={`${project.title}-${index}`}
+                          style={{
+                            flexShrink: 0,
+                            flexGrow: 0,
+                          }}
+                        >
+                          <FeaturedWorkCard
+                            image={project.image}
+                            title={project.title}
+                            description={project.description}
+                            metrics={project.metrics}
+                            link={project.link}
+                            hoverContent={project.hoverContent}
+                            badges={project.badges}
+                            category={project.category}
+                            delay={0}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </>
-            );
-          })()}
+                </>
+              );
+            })()}
           </Section>
         </div>
-        
+
         {/* Original Plan Section */}
         <PlanSection>
-          <SectionTitle style={{"--i": 2}}>
-            {t("planTitle")}
-          </SectionTitle>
+          <SectionTitle style={{ "--i": 2 }}>{t("planTitle")}</SectionTitle>
           <PlanSteps>
-                <li style={{"--i": 0}}>
+            <li style={{ "--i": 0 }}>
               <strong>1</strong>
               {t("planSteps.step1")}
-                </li>
-                <li style={{"--i": 1}}>
+            </li>
+            <li style={{ "--i": 1 }}>
               <strong>2</strong>
               {t("planSteps.step2")}
-                </li>
-                <li style={{"--i": 2}}>
+            </li>
+            <li style={{ "--i": 2 }}>
               <strong>3</strong>
               {t("planSteps.step3")}
-                </li>
-              </PlanSteps>
-          
+            </li>
+          </PlanSteps>
+
           {/* New CTA button below plan section */}
-          <div style={{textAlign: "center", marginTop: "3rem"}}>
+          <div style={{ textAlign: "center", marginTop: "3rem" }}>
             <CTAButton
               href="https://calendly.com/sanchezgcandelaria"
               target="_blank"
@@ -1223,13 +1421,16 @@ export default function HomePage() {
             </CTAButton>
           </div>
         </PlanSection>
-        
+
         {/* Testimonials Carousel Section */}
-        <Section className="full-width testimonials-section" style={{
-          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-          padding: "4rem 1rem",
-          margin: "4rem 0"
-        }}>
+        <Section
+          className="full-width testimonials-section"
+          style={{
+            background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+            padding: "4rem 1rem",
+            margin: "4rem 0",
+          }}
+        >
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -1237,23 +1438,27 @@ export default function HomePage() {
             transition={{ duration: 0.2 }}
             style={{ textAlign: "center", marginBottom: "3rem" }}
           >
-            <h2 style={{ 
-              fontSize: "2.8rem", 
-              fontWeight: "800",
-              marginBottom: "1rem"
-            }}>
+            <h2
+              style={{
+                fontSize: "2.8rem",
+                fontWeight: "800",
+                marginBottom: "1rem",
+              }}
+            >
               {t("reviewsTitle")}
             </h2>
-            <p style={{ 
-              fontSize: "1.2rem", 
-              maxWidth: "800px", 
-              margin: "0 auto", 
-              color: "#444444"
-            }}>
-               {t("reviewsSubtitle")}
+            <p
+              style={{
+                fontSize: "1.2rem",
+                maxWidth: "800px",
+                margin: "0 auto",
+                color: "#444444",
+              }}
+            >
+              {t("reviewsSubtitle")}
             </p>
           </motion.div>
-          
+
           <TestimonialsCarousel testimonials={testimonialData} />
         </Section>
 

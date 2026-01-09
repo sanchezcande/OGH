@@ -86,7 +86,10 @@ export const HighlightText = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 
-  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease; /* Se agregó box-shadow */
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease; /* Se agregó box-shadow */
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -94,7 +97,6 @@ export const HighlightText = styled.div`
 
   &:hover {
     transform: scale(1.01);
-
   }
 
   ${fadeInUp}
@@ -118,7 +120,6 @@ export const Divider = styled.hr`
   &.hidden {
     width: 0;
   }
-
 `;
 
 export const NumberedList = styled.ol`

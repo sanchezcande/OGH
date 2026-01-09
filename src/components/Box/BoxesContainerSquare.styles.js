@@ -1,19 +1,19 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const ContainerSquare = styled.div`
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-grid-template-rows: repeat(2, 1fr);
-gap: 40px; 
-padding: 20px;
-margin: 0 auto;
-max-width: 1200px;
-justify-content: center;
-align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 40px;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+  justify-content: center;
+  align-items: center;
 
-@media (max-width: 1110px) {
-    grid-template-columns: 1fr; 
+  @media (max-width: 1110px) {
+    grid-template-columns: 1fr;
     grid-gap: 20px;
     padding: 0 20px;
   }
-    `;
+`;

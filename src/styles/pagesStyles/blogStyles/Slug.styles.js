@@ -78,12 +78,10 @@ export const Highlight = styled.span`
   font-weight: bold;
 `;
 
-
 export const ErrorMessage = styled.div`
-  padding: 100px 20px; 
-  text-align: center; 
-  font-size: 2.5rem; 
+  padding: 100px 20px;
+  text-align: center;
+  font-size: 2.5rem;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.primary};
 `;
-

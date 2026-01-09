@@ -8,17 +8,17 @@ import {
   Description,
 } from "../../src/styles/pagesStyles/servicesStyles/AI.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
-import { 
-  FaCheckCircle, 
-  FaCogs, 
-  FaSyncAlt, 
-  FaRocket, 
-  FaCloud, 
-  FaUsers, 
+import {
+  FaCheckCircle,
+  FaCogs,
+  FaSyncAlt,
+  FaRocket,
+  FaCloud,
+  FaUsers,
   FaProjectDiagram,
   FaShieldAlt,
   FaLightbulb,
-  FaChartLine
+  FaChartLine,
 } from "react-icons/fa";
 
 // Componentes visuales mejorados
@@ -46,14 +46,13 @@ const HeroSection = ({ children, style }) => (
         left: 0,
         right: 0,
         bottom: 0,
-        background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"circles\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"2\" fill=\"rgba(255,255,255,0.1)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23circles)\"/></svg>')",
+        background:
+          'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circles" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23circles)"/></svg>\')',
         opacity: 0.4,
         zIndex: 1,
       }}
     />
-    <div style={{ position: "relative", zIndex: 2 }}>
-      {children}
-    </div>
+    <div style={{ position: "relative", zIndex: 2 }}>{children}</div>
     <div
       style={{
         position: "absolute",
@@ -69,7 +68,12 @@ const HeroSection = ({ children, style }) => (
   </div>
 );
 
-const ProfessionalCard = ({ children, style, className, hasPattern = false }) => (
+const ProfessionalCard = ({
+  children,
+  style,
+  className,
+  hasPattern = false,
+}) => (
   <div
     className={className}
     style={{
@@ -105,19 +109,19 @@ const ProfessionalCard = ({ children, style, className, hasPattern = false }) =>
         }}
       />
     )}
-    <div style={{ position: "relative", zIndex: 2 }}>
-      {children}
-    </div>
+    <div style={{ position: "relative", zIndex: 2 }}>{children}</div>
   </div>
 );
 
 const FeatureGrid = ({ children }) => (
-  <div style={{ 
-    display: "grid", 
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "1.5rem",
-    marginBottom: "2rem"
-  }}>
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      gap: "1.5rem",
+      marginBottom: "2rem",
+    }}
+  >
     {children}
   </div>
 );
@@ -138,29 +142,35 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => (
       animationDelay: `${delay * 0.1}s`,
     }}
   >
-    <div style={{ 
-      fontSize: "2.5rem", 
-      color: "#F97B72", 
-      marginBottom: "1rem",
-      textAlign: "center"
-    }}>
+    <div
+      style={{
+        fontSize: "2.5rem",
+        color: "#F97B72",
+        marginBottom: "1rem",
+        textAlign: "center",
+      }}
+    >
       {icon}
     </div>
-    <h4 style={{ 
-      fontSize: "1.2rem", 
-      fontWeight: "600", 
-      marginBottom: "0.5rem",
-      color: "#2B2B2B",
-      textAlign: "center"
-    }}>
+    <h4
+      style={{
+        fontSize: "1.2rem",
+        fontWeight: "600",
+        marginBottom: "0.5rem",
+        color: "#2B2B2B",
+        textAlign: "center",
+      }}
+    >
       {title}
     </h4>
-    <p style={{ 
-      fontSize: "0.95rem", 
-      lineHeight: "1.6",
-      color: "#6B7280",
-      textAlign: "center"
-    }}>
+    <p
+      style={{
+        fontSize: "0.95rem",
+        lineHeight: "1.6",
+        color: "#6B7280",
+        textAlign: "center",
+      }}
+    >
       {description}
     </p>
     <style>{`
@@ -173,29 +183,33 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => (
 );
 
 const SectionTitle = ({ children, style }) => (
-  <h2 style={{
-    fontSize: "2rem",
-    fontWeight: "700",
-    marginBottom: "1.5rem",
-    color: "#2B2B2B",
-    textAlign: "center",
-    ...style,
-  }}>
+  <h2
+    style={{
+      fontSize: "2rem",
+      fontWeight: "700",
+      marginBottom: "1.5rem",
+      color: "#2B2B2B",
+      textAlign: "center",
+      ...style,
+    }}
+  >
     {children}
   </h2>
 );
 
 const Subtitle = ({ children, style }) => (
-  <p style={{
-    fontSize: "1.1rem",
-    lineHeight: "1.6",
-    color: "#6B7280",
-    textAlign: "center",
-    marginBottom: "2rem",
-    maxWidth: "600px",
-    margin: "0 auto 2rem auto",
-    ...style,
-  }}>
+  <p
+    style={{
+      fontSize: "1.1rem",
+      lineHeight: "1.6",
+      color: "#6B7280",
+      textAlign: "center",
+      marginBottom: "2rem",
+      maxWidth: "600px",
+      margin: "0 auto 2rem auto",
+      ...style,
+    }}
+  >
     {children}
   </p>
 );
@@ -227,7 +241,7 @@ const N8nAutomation = () => {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const items = document.querySelectorAll(".animate");
@@ -240,7 +254,10 @@ const N8nAutomation = () => {
     <>
       <Head>
         <title>n8n Automation - OpenGateHub</title>
-        <meta name="description" content={t("homeServicesSection.cards.n8nAutomation.description")}/>
+        <meta
+          name="description"
+          content={t("homeServicesSection.cards.n8nAutomation.description")}
+        />
         <meta
           name="keywords"
           content="n8n, Automation, Workflow, Integrations, No-code, Business Efficiency"
@@ -249,16 +266,18 @@ const N8nAutomation = () => {
       </Head>
 
       {/* Hero Section - Full Width */}
-      <section style={{ 
-        background: "linear-gradient(135deg, #6a7c8d 0%, #4d5a6a 100%)",
-        padding: "3rem 2rem",
-        marginTop: "1rem",
-        marginBottom: "2rem",
-        textAlign: "center",
-        color: "white",
-        position: "relative",
-        overflow: "hidden"
-      }}>
+      <section
+        style={{
+          background: "linear-gradient(135deg, #6a7c8d 0%, #4d5a6a 100%)",
+          padding: "3rem 2rem",
+          marginTop: "1rem",
+          marginBottom: "2rem",
+          textAlign: "center",
+          color: "white",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         {/* Patrón de fondo tecnológico */}
         <div
           style={{
@@ -267,22 +286,34 @@ const N8nAutomation = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"hex\" width=\"40\" height=\"35\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0l20 11.5v23L20 46 0 34.5v-23L20 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><path d=\"M40 0l20 11.5v23L40 46 20 34.5v-23L40 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><circle cx=\"20\" cy=\"23\" r=\"1.5\" fill=\"rgba(255,255,255,0.08)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23hex)\"/></svg>')",
+            background:
+              'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="hex" width="40" height="35" patternUnits="userSpaceOnUse"><path d="M20 0l20 11.5v23L20 46 0 34.5v-23L20 0z" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/><path d="M40 0l20 11.5v23L40 46 20 34.5v-23L40 0z" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/><circle cx="20" cy="23" r="1.5" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23hex)"/></svg>\')',
             opacity: 0.7,
           }}
         />
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
-          <div className="animate" style={{ 
-            fontSize: "4rem", 
-            marginBottom: "1rem",
-            animation: "float 3s ease-in-out infinite, fadeInUp 0.6s forwards",
-            display: "inline-block",
-            color: "#F97B72",
-            textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
-            opacity: 0,
-            transform: "translateY(20px)",
-            animationDelay: "0s, 0s"
-          }}>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            maxWidth: 1200,
+            margin: "0 auto",
+          }}
+        >
+          <div
+            className="animate"
+            style={{
+              fontSize: "4rem",
+              marginBottom: "1rem",
+              animation:
+                "float 3s ease-in-out infinite, fadeInUp 0.6s forwards",
+              display: "inline-block",
+              color: "#F97B72",
+              textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
+              opacity: 0,
+              transform: "translateY(20px)",
+              animationDelay: "0s, 0s",
+            }}
+          >
             <FaProjectDiagram />
           </div>
           <style>{`
@@ -305,32 +336,37 @@ const N8nAutomation = () => {
               }
             }
           `}</style>
-          <h1 className="animate" style={{ 
-            fontSize: "2.5rem", 
-            fontWeight: "700", 
-            marginBottom: "1rem",
-            color: "white",
-            animationDelay: "0.1s",
-            opacity: 0,
-            transform: "translateY(20px)",
-            animation: "fadeInUp 0.6s forwards",
-            animationDelay: "0.1s"
-          }}>
+          <h1
+            className="animate"
+            style={{
+              fontSize: "2.5rem",
+              fontWeight: "700",
+              marginBottom: "1rem",
+              color: "white",
+              animationDelay: "0.1s",
+              opacity: 0,
+              transform: "translateY(20px)",
+              animation: "fadeInUp 0.6s forwards",
+              animationDelay: "0.1s",
+            }}
+          >
             n8n Automation
           </h1>
-          <p className="animate" style={{ 
-            fontSize: "1.2rem", 
-            opacity: 0,
-            maxWidth: "600px",
-            margin: "0 auto",
-            transform: "translateY(20px)",
-            animation: "fadeInUp 0.6s forwards",
-            animationDelay: "0.2s"
-          }}>
-            {lang === "es" 
+          <p
+            className="animate"
+            style={{
+              fontSize: "1.2rem",
+              opacity: 0,
+              maxWidth: "600px",
+              margin: "0 auto",
+              transform: "translateY(20px)",
+              animation: "fadeInUp 0.6s forwards",
+              animationDelay: "0.2s",
+            }}
+          >
+            {lang === "es"
               ? "Conectá tus herramientas y automatizá flujos de trabajo sin código"
-              : "Connect your tools and automate workflows without code"
-            }
+              : "Connect your tools and automate workflows without code"}
           </p>
         </div>
       </section>
@@ -338,77 +374,117 @@ const N8nAutomation = () => {
       {/* Main Content - Full Width */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2rem" }}>
         {/* Main Description */}
-        <div className="animate" style={{ 
-          position: "relative",
-          padding: "2rem",
-          marginBottom: "2rem",
-          borderRadius: "12px",
-          overflow: "hidden",
-          background: "#f8f9fa",
-          animationDelay: "0.3s"
-        }}>
+        <div
+          className="animate"
+          style={{
+            position: "relative",
+            padding: "2rem",
+            marginBottom: "2rem",
+            borderRadius: "12px",
+            overflow: "hidden",
+            background: "#f8f9fa",
+            animationDelay: "0.3s",
+          }}
+        >
           <div>
-            <SectionTitle><span className="animate" style={{animationDelay: "0.35s"}}>{lang === "es" ? "¿Qué es n8n?" : "What is n8n?"}</span></SectionTitle>
-            <Subtitle><span className="animate" style={{animationDelay: "0.4s"}}>{lang === "es"
-                ? "n8n es una plataforma visual de automatización de flujos de trabajo de código abierto. Permite conectar aplicaciones, automatizar procesos y crear integraciones personalizadas sin necesidad de programar."
-                : "n8n is an open-source, visual workflow automation platform. It empowers businesses and teams to connect apps, automate processes, and build custom integrations—no coding required."
-              }</span></Subtitle>
+            <SectionTitle>
+              <span className="animate" style={{ animationDelay: "0.35s" }}>
+                {lang === "es" ? "¿Qué es n8n?" : "What is n8n?"}
+              </span>
+            </SectionTitle>
+            <Subtitle>
+              <span className="animate" style={{ animationDelay: "0.4s" }}>
+                {lang === "es"
+                  ? "n8n es una plataforma visual de automatización de flujos de trabajo de código abierto. Permite conectar aplicaciones, automatizar procesos y crear integraciones personalizadas sin necesidad de programar."
+                  : "n8n is an open-source, visual workflow automation platform. It empowers businesses and teams to connect apps, automate processes, and build custom integrations—no coding required."}
+              </span>
+            </Subtitle>
           </div>
         </div>
 
         {/* Key Benefits */}
-        <SectionTitle><span className="animate" style={{animationDelay: "0.45s"}}>{lang === "es" ? "¿Por qué elegir n8n?" : "Why choose n8n?"}</span></SectionTitle>
+        <SectionTitle>
+          <span className="animate" style={{ animationDelay: "0.45s" }}>
+            {lang === "es" ? "¿Por qué elegir n8n?" : "Why choose n8n?"}
+          </span>
+        </SectionTitle>
         <FeatureGrid>
           {/* FeatureCards ya tienen la clase animate */}
           <FeatureCard
             icon={<FaCogs />}
             title={lang === "es" ? "Open Source" : "Open Source"}
-            description={lang === "es" ? "Código abierto y económico, sin costos ocultos" : "Open-source and cost-effective, no hidden costs"}
+            description={
+              lang === "es"
+                ? "Código abierto y económico, sin costos ocultos"
+                : "Open-source and cost-effective, no hidden costs"
+            }
             delay={1}
           />
           <FeatureCard
             icon={<FaSyncAlt />}
             title={lang === "es" ? "Sin Código" : "No Code"}
-            description={lang === "es" ? "Interfaz visual intuitiva, sin programación requerida" : "Intuitive visual interface, no programming required"}
+            description={
+              lang === "es"
+                ? "Interfaz visual intuitiva, sin programación requerida"
+                : "Intuitive visual interface, no programming required"
+            }
             delay={2}
           />
           <FeatureCard
             icon={<FaCloud />}
             title={lang === "es" ? "200+ Integraciones" : "200+ Integrations"}
-            description={lang === "es" ? "Conecta con todas tus herramientas favoritas" : "Connect with all your favorite tools"}
+            description={
+              lang === "es"
+                ? "Conecta con todas tus herramientas favoritas"
+                : "Connect with all your favorite tools"
+            }
             delay={3}
           />
           <FeatureCard
             icon={<FaShieldAlt />}
             title={lang === "es" ? "Flexible" : "Flexible"}
-            description={lang === "es" ? "Cloud o self-hosted, según tus necesidades" : "Cloud or self-hosted, based on your needs"}
+            description={
+              lang === "es"
+                ? "Cloud o self-hosted, según tus necesidades"
+                : "Cloud or self-hosted, based on your needs"
+            }
             delay={4}
           />
           <FeatureCard
             icon={<FaChartLine />}
             title={lang === "es" ? "Productividad" : "Productivity"}
-            description={lang === "es" ? "Aumenta la eficiencia y reduce errores" : "Increase efficiency and reduce errors"}
+            description={
+              lang === "es"
+                ? "Aumenta la eficiencia y reduce errores"
+                : "Increase efficiency and reduce errors"
+            }
             delay={5}
           />
           <FeatureCard
             icon={<FaLightbulb />}
             title={lang === "es" ? "Escalable" : "Scalable"}
-            description={lang === "es" ? "Crece con tu negocio, desde startups hasta enterprise" : "Grows with your business, from startups to enterprise"}
+            description={
+              lang === "es"
+                ? "Crece con tu negocio, desde startups hasta enterprise"
+                : "Grows with your business, from startups to enterprise"
+            }
             delay={6}
           />
         </FeatureGrid>
       </div>
 
       {/* Use Cases - Full Width Section */}
-      <section style={{ 
-        background: "linear-gradient(135deg, #6a7c8d 0%, #4d5a6a 100%)",
-        padding: "3rem 2rem",
-        marginBottom: "2rem",
-        textAlign: "center",
-        color: "white",
-        position: "relative",
-        overflow: "hidden"
-      }}>
+      <section
+        style={{
+          background: "linear-gradient(135deg, #6a7c8d 0%, #4d5a6a 100%)",
+          padding: "3rem 2rem",
+          marginBottom: "2rem",
+          textAlign: "center",
+          color: "white",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         {/* Patrón de fondo tecnológico */}
         <div
           style={{
@@ -417,99 +493,194 @@ const N8nAutomation = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"hex2\" width=\"40\" height=\"35\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0l20 11.5v23L20 46 0 34.5v-23L20 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><path d=\"M40 0l20 11.5v23L40 46 20 34.5v-23L40 0z\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"0.5\"/><circle cx=\"20\" cy=\"23\" r=\"1.5\" fill=\"rgba(255,255,255,0.08)\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23hex2)\"/></svg>')",
+            background:
+              'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="hex2" width="40" height="35" patternUnits="userSpaceOnUse"><path d="M20 0l20 11.5v23L20 46 0 34.5v-23L20 0z" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/><path d="M40 0l20 11.5v23L40 46 20 34.5v-23L40 0z" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/><circle cx="20" cy="23" r="1.5" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23hex2)"/></svg>\')',
             opacity: 0.7,
           }}
         />
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
-          <h2 className="animate" style={{ 
-            fontSize: "2rem", 
-            fontWeight: "700", 
-            marginBottom: "1.5rem",
-            color: "white",
-            animationDelay: "0.55s"
-          }}>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            maxWidth: 1200,
+            margin: "0 auto",
+          }}
+        >
+          <h2
+            className="animate"
+            style={{
+              fontSize: "2rem",
+              fontWeight: "700",
+              marginBottom: "1.5rem",
+              color: "white",
+              animationDelay: "0.55s",
+            }}
+          >
             {lang === "es" ? "Casos de uso comunes" : "Common use cases"}
           </h2>
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "1.5rem"
-          }}>
-          <div 
-            className="use-case-card animate"
-            style={{ 
-              padding: "1.5rem", 
-              background: "white", 
-              borderRadius: "8px", 
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              border: "1px solid rgba(0,0,0,0.05)",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              transform: "translateY(0)",
-              animationDelay: "0.6s"
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "1.5rem",
             }}
           >
-            <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
-              <FaUsers />
+            <div
+              className="use-case-card animate"
+              style={{
+                padding: "1.5rem",
+                background: "white",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "1px solid rgba(0,0,0,0.05)",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                transform: "translateY(0)",
+                animationDelay: "0.6s",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "1.5rem",
+                  color: "#F97B72",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <FaUsers />
+              </div>
+              <h4
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  color: "#2B2B2B",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {lang === "es"
+                  ? "Sincronización de datos"
+                  : "Data synchronization"}
+              </h4>
+              <p
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#6B7280",
+                  textAlign: "center",
+                  lineHeight: "1.5",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {lang === "es"
+                  ? "Sincroniza información entre CRM, email marketing y sistemas de soporte"
+                  : "Sync information between CRM, email marketing and support systems"}
+              </p>
             </div>
-            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>
-              {lang === "es" ? "Sincronización de datos" : "Data synchronization"}
-            </h4>
-            <p style={{ fontSize: "0.9rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>
-              {lang === "es" ? "Sincroniza información entre CRM, email marketing y sistemas de soporte" : "Sync information between CRM, email marketing and support systems"}
-            </p>
-          </div>
-          <div 
-            className="use-case-card animate"
-            style={{ 
-              padding: "1.5rem", 
-              background: "white", 
-              borderRadius: "8px", 
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              border: "1px solid rgba(0,0,0,0.05)",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              transform: "translateY(0)",
-              animationDelay: "0.7s"
-            }}
-          >
-            <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
-              <FaRocket />
+            <div
+              className="use-case-card animate"
+              style={{
+                padding: "1.5rem",
+                background: "white",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "1px solid rgba(0,0,0,0.05)",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                transform: "translateY(0)",
+                animationDelay: "0.7s",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "1.5rem",
+                  color: "#F97B72",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <FaRocket />
+              </div>
+              <h4
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  color: "#2B2B2B",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {lang === "es" ? "Gestión de leads" : "Lead management"}
+              </h4>
+              <p
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#6B7280",
+                  textAlign: "center",
+                  lineHeight: "1.5",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {lang === "es"
+                  ? "Captura leads y automatiza el seguimiento y notificaciones"
+                  : "Capture leads and automate follow-up and notifications"}
+              </p>
             </div>
-            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>
-              {lang === "es" ? "Gestión de leads" : "Lead management"}
-            </h4>
-            <p style={{ fontSize: "0.9rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>
-              {lang === "es" ? "Captura leads y automatiza el seguimiento y notificaciones" : "Capture leads and automate follow-up and notifications"}
-            </p>
-          </div>
-          <div 
-            className="use-case-card animate"
-            style={{ 
-              padding: "1.5rem", 
-              background: "white", 
-              borderRadius: "8px", 
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              border: "1px solid rgba(0,0,0,0.05)",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              transform: "translateY(0)",
-              animationDelay: "0.8s"
-            }}
-          >
-            <div style={{ fontSize: "1.5rem", color: "#F97B72", marginBottom: "0.5rem", textAlign: "center", transition: "all 0.3s ease" }}>
-              <FaCogs />
+            <div
+              className="use-case-card animate"
+              style={{
+                padding: "1.5rem",
+                background: "white",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "1px solid rgba(0,0,0,0.05)",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                transform: "translateY(0)",
+                animationDelay: "0.8s",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "1.5rem",
+                  color: "#F97B72",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <FaCogs />
+              </div>
+              <h4
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                  color: "#2B2B2B",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {lang === "es"
+                  ? "Procesamiento de pedidos"
+                  : "Order processing"}
+              </h4>
+              <p
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#6B7280",
+                  textAlign: "center",
+                  lineHeight: "1.5",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {lang === "es"
+                  ? "Automatiza el cumplimiento de pedidos y gestión de inventario"
+                  : "Automate order fulfillment and inventory management"}
+              </p>
             </div>
-            <h4 style={{ fontWeight: "600", marginBottom: "0.5rem", textAlign: "center", color: "#2B2B2B", transition: "all 0.3s ease" }}>
-              {lang === "es" ? "Procesamiento de pedidos" : "Order processing"}
-            </h4>
-            <p style={{ fontSize: "0.9rem", color: "#6B7280", textAlign: "center", lineHeight: "1.5", transition: "all 0.3s ease" }}>
-              {lang === "es" ? "Automatiza el cumplimiento de pedidos y gestión de inventario" : "Automate order fulfillment and inventory management"}
-            </p>
           </div>
-        </div>
-        <style>{`
+          <style>{`
           .use-case-card:hover {
             transform: translateY(-8px) !important;
             box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
@@ -523,37 +694,43 @@ const N8nAutomation = () => {
             color: #F97B72 !important;
           }
         `}</style>
-      </div>
-    </section>
+        </div>
+      </section>
 
       <ServiceContainer>
         {/* Call to Action */}
-        <ProfessionalCard style={{ 
-          background: "#f8f9fa",
-          textAlign: "center"
-        }}>
-          <h3 className="animate" style={{ 
-            fontSize: "1.5rem", 
-            fontWeight: "600", 
-            marginBottom: "1rem",
-            color: "#2B2B2B",
-            animationDelay: "0.9s"
-          }}>
-            {lang === "es" 
-              ? "¿Listo para automatizar tu negocio?" 
-              : "Ready to automate your business?"
-            }
+        <ProfessionalCard
+          style={{
+            background: "#f8f9fa",
+            textAlign: "center",
+          }}
+        >
+          <h3
+            className="animate"
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              marginBottom: "1rem",
+              color: "#2B2B2B",
+              animationDelay: "0.9s",
+            }}
+          >
+            {lang === "es"
+              ? "¿Listo para automatizar tu negocio?"
+              : "Ready to automate your business?"}
           </h3>
-          <p className="animate" style={{ 
-            fontSize: "1.1rem", 
-            color: "#6B7280",
-            marginBottom: "2rem",
-            animationDelay: "1.0s"
-          }}>
+          <p
+            className="animate"
+            style={{
+              fontSize: "1.1rem",
+              color: "#6B7280",
+              marginBottom: "2rem",
+              animationDelay: "1.0s",
+            }}
+          >
             {lang === "es"
               ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
-              : "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes."
-            }
+              : "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes."}
           </p>
         </ProfessionalCard>
 
@@ -563,4 +740,4 @@ const N8nAutomation = () => {
   );
 };
 
-export default N8nAutomation; 
+export default N8nAutomation;

@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import companyHistory from "../../../assets/images/companyHistory.png";
 import missionAndCoreValues from "../../../assets/images/coreValues.png";
 import technologies from "../../../assets/images/team.jpg";

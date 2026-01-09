@@ -14,27 +14,27 @@ import {
   HowWeMeasureLink,
   Tooltip,
 } from "../../styles/pagesStyles/Metrics.styles";
-import { 
-  FaRocket, 
-  FaClock, 
-  FaStar, 
-  FaCodeBranch, 
+import {
+  FaRocket,
+  FaClock,
+  FaStar,
+  FaCodeBranch,
   FaChartLine,
   FaPlay,
   FaCheckDouble,
   FaChartBar,
-  FaTachometerAlt
+  FaTachometerAlt,
 } from "react-icons/fa";
-import { 
-  BiTrendingUp, 
-  BiTimeFive, 
-  BiCheckCircle, 
-  BiGitBranch, 
+import {
+  BiTrendingUp,
+  BiTimeFive,
+  BiCheckCircle,
+  BiGitBranch,
   BiBarChart,
   BiTimer,
   BiTargetLock,
   BiPieChartAlt2,
-  BiSpeedometer
+  BiSpeedometer,
 } from "react-icons/bi";
 
 const MetricsSection = () => {
@@ -79,14 +79,16 @@ const MetricsSection = () => {
 
         <MetricsGrid>
           {metrics.map((metric) => {
-            const metricData = t(`metricsSection.metrics.${metric.key}`, { returnObjects: true });
-            const measurementDetail = t(`metricsSection.measurementDetails.${metric.key}`);
-            
+            const metricData = t(`metricsSection.metrics.${metric.key}`, {
+              returnObjects: true,
+            });
+            const measurementDetail = t(
+              `metricsSection.measurementDetails.${metric.key}`,
+            );
+
             return (
-              <MetricCard key={metric.key} delay={metric.delay}>
-                <MetricIcon>
-                  {metric.icon}
-                </MetricIcon>
+              <MetricCard key={metric.key} $delay={metric.delay}>
+                <MetricIcon>{metric.icon}</MetricIcon>
                 <MetricValue>
                   {metricData.value}
                   <MetricUnit>{metricData.unit}</MetricUnit>
@@ -99,9 +101,7 @@ const MetricsSection = () => {
                 >
                   {t("metricsSection.howWeMeasure")}
                   {hoveredMetric === metric.key && (
-                    <Tooltip>
-                      {measurementDetail}
-                    </Tooltip>
+                    <Tooltip>{measurementDetail}</Tooltip>
                   )}
                 </HowWeMeasureLink>
               </MetricCard>

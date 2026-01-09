@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 // Keep existing animations if any, or define new ones if needed
 const fadeInUp = keyframes`
@@ -27,10 +27,10 @@ export const HighlightedText = styled.span`
   border-radius: 4px;
   white-space: nowrap;
   position: relative; // For positioning the pseudo-element
-  
+
   // The text itself should be visible from the start
   // But we need a pseudo-element for the background
-  
+
   // This creates the pink background that will be animated
   &::before {
     content: "";
@@ -39,7 +39,7 @@ export const HighlightedText = styled.span`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: ${({ theme }) => theme.colors.accent || '#FF6B6B'}; 
+    background-color: ${({ theme }) => theme.colors.accent || "#FF6B6B"};
     border-radius: 4px;
     transform: scaleX(0); // Initially scaled to 0 width
     transform-origin: left; // Will grow from left
@@ -53,7 +53,7 @@ export const Title = styled.h1`
   color: ${({ theme }) => theme.colors.text};
   line-height: 1.2;
   margin-bottom: 0.5rem; // Small margin below title
-  position: relative; 
+  position: relative;
 
   &.form-title {
     text-align: left; // Align form title to left as in image
@@ -64,17 +64,17 @@ export const Title = styled.h1`
   @media (max-width: 768px) {
     font-size: 2.2rem;
     &.form-title {
-        text-align: center;
-        font-size: 1.8rem; // Further reduce on mobile if needed
+      text-align: center;
+      font-size: 1.8rem; // Further reduce on mobile if needed
     }
   }
-  
+
   // When Title becomes visible, we'll handle the animation in parent containers
 `;
 
 export const SubTitle = styled.p`
   font-size: 1rem;
-  color: ${({ theme }) => theme.colors.textMuted || '#555'};
+  color: ${({ theme }) => theme.colors.textMuted || "#555"};
   line-height: 1.6;
   margin-bottom: 1rem;
 `;
@@ -91,13 +91,13 @@ export const ContactItem = styled.div`
     flex-direction: column;
   }
 
-  span { 
+  span {
     font-size: 0.9rem;
-    color: ${({ theme }) => theme.colors.textMuted || '#666'};
+    color: ${({ theme }) => theme.colors.textMuted || "#666"};
     margin-bottom: 0.25rem;
   }
 
-  p { 
+  p {
     font-size: 1.1rem;
     font-weight: 500;
     color: ${({ theme }) => theme.colors.text};
@@ -113,32 +113,42 @@ export const ContactInfo = styled.div`
   ${ContactItem} {
     animation: ${fadeInUp} 0.5s ease-out forwards;
   }
-  ${ContactItem}:nth-child(1) { animation-delay: 0.2s; }
-  ${ContactItem}:nth-child(2) { animation-delay: 0.4s; }
+  ${ContactItem}:nth-child(1) {
+    animation-delay: 0.2s;
+  }
+  ${ContactItem}:nth-child(2) {
+    animation-delay: 0.4s;
+  }
   // ${ContactItem}:nth-child(3) { animation-delay: 0.6s; } // For Map Street if it existed
 `;
 
 // Now define LeftColumn and RightColumn that use the above components
 export const LeftColumn = styled.div`
   flex: 1;
-  background-color: #FFF0F0; // Light pink background from image
+  background-color: #fff0f0; // Light pink background from image
   padding: 2.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius || '12px'};
+  border-radius: ${({ theme }) => theme.borderRadius || "12px"};
   display: flex;
   flex-direction: column;
   gap: 1.5rem; // Spacing between elements in left column
 
   ${Title}, ${SubTitle}, ${ContactInfo} {
-      opacity: 0;
-      animation: ${fadeInUp} 0.6s ease-out forwards;
+    opacity: 0;
+    animation: ${fadeInUp} 0.6s ease-out forwards;
   }
-  ${Title} { animation-delay: 0.3s; }
-  ${SubTitle} { animation-delay: 0.5s; }
-  ${ContactInfo} { animation-delay: 0.7s; }
+  ${Title} {
+    animation-delay: 0.3s;
+  }
+  ${SubTitle} {
+    animation-delay: 0.5s;
+  }
+  ${ContactInfo} {
+    animation-delay: 0.7s;
+  }
 
   // Single animation for highlighted text background
   &.visible ${HighlightedText}::before {
-      animation: ${drawLine} 0.7s ease-out 0.8s forwards;
+    animation: ${drawLine} 0.7s ease-out 0.8s forwards;
   }
 
   @media (max-width: 992px) {
@@ -146,7 +156,7 @@ export const LeftColumn = styled.div`
     max-width: 600px; // Limit width on smaller screens when stacked
     padding: 2rem;
   }
-    @media (max-width: 768px) {
+  @media (max-width: 768px) {
     padding: 1.5rem;
   }
 `;
@@ -157,56 +167,59 @@ export const RightColumn = styled.div`
   flex-direction: column;
   padding: 1rem; // Some padding for the right column
 
-   // Targeting the form directly to adjust its styles as requested
+  // Targeting the form directly to adjust its styles as requested
   .contact-form {
-      background-color: transparent !important; // Ensure form background is transparent
-      padding: 0 !important; // Remove padding if any from form itself
-      box-shadow: none !important; // Remove shadow if any
-      border: none !important; // Ensure no border
-      max-width: 100%; // Allow form to take full width of column
+    background-color: transparent !important; // Ensure form background is transparent
+    padding: 0 !important; // Remove padding if any from form itself
+    box-shadow: none !important; // Remove shadow if any
+    border: none !important; // Ensure no border
+    max-width: 100%; // Allow form to take full width of column
 
-      input,
-      textarea {
-          background-color: ${({ theme }) => theme.colors.greyLight || '#f0f0f0'} !important; // Grey background for inputs
-          border: none !important; // No border for inputs
-          color: ${({ theme }) => theme.colors.text} !important;
-          &::placeholder {
-              color: ${({ theme }) => theme.colors.textMuted || '#888'} !important;
-          }
+    input,
+    textarea {
+      background-color: ${({ theme }) =>
+        theme.colors.greyLight ||
+        "#f0f0f0"} !important; // Grey background for inputs
+      border: none !important; // No border for inputs
+      color: ${({ theme }) => theme.colors.text} !important;
+      &::placeholder {
+        color: ${({ theme }) => theme.colors.textMuted || "#888"} !important;
       }
-      
-      // Style for the send button to match captcha width
-      button[type="submit"] {
-   // Half width as requested
-          background-color: ${({ theme }) => theme.colors.accent || '#FF6B6B'} !important; // Use accent color (pink)
-          color: white !important;
-          margin-top: 15px;
-          font-weight: bold;
-          transition: all 0.3s ease;
-          
-          &:hover {
-              opacity: 0.9;
-              transform: translateY(-2px);
-          }
+    }
+
+    // Style for the send button to match captcha width
+    button[type="submit"] {
+      // Half width as requested
+      background-color: ${({ theme }) =>
+        theme.colors.accent || "#FF6B6B"} !important; // Use accent color (pink)
+      color: white !important;
+      margin-top: 15px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
       }
+    }
   }
 
   // Add cascade animation to children of RightColumn
-  ${Title}.form-title { 
+  ${Title}.form-title {
     opacity: 0;
     animation: ${fadeInUp} 0.6s ease-out forwards;
-    animation-delay: 0.3s; 
+    animation-delay: 0.3s;
   }
 
   // Single animation for highlighted text in form title
   &.visible ${Title}.form-title ${HighlightedText}::before {
-     animation: ${drawLine} 0.7s ease-out 1s forwards;
+    animation: ${drawLine} 0.7s ease-out 1s forwards;
   }
 
   @media (max-width: 992px) {
     width: 100%;
     max-width: 600px; // Limit width on smaller screens when stacked
-     padding: 1rem 0; 
+    padding: 1rem 0;
   }
 `;
 
@@ -219,7 +232,8 @@ export const MainWrapper = styled.div`
   // animation: ${fadeInUp} 0.7s ease-out; // Let children handle their own main animation
 
   // Add initial hidden states for children if we want to cascade them
-  & > * { // Target direct children (LeftColumn, RightColumn)
+  & > * {
+    // Target direct children (LeftColumn, RightColumn)
     opacity: 0; // Start hidden if not already handled by fadeInUp on MainWrapper
     animation: ${fadeInUp} 0.7s ease-out forwards;
   }
@@ -232,7 +246,8 @@ export const MainWrapper = styled.div`
     animation-delay: 0.4s;
   }
 
-  @media (max-width: 992px) { // Breakpoint for stacking columns
+  @media (max-width: 992px) {
+    // Breakpoint for stacking columns
     flex-direction: column;
     align-items: center;
   }
@@ -251,7 +266,7 @@ export const Container = styled.div`
 `;
 
 export const IconWrapper = styled.div`
-  background-color: ${({ theme }) => theme.colors.accent || '#FF6B6B'}; 
+  background-color: ${({ theme }) => theme.colors.accent || "#FF6B6B"};
   color: white;
   padding: 0.8rem;
   border-radius: 50%;

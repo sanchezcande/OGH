@@ -17,12 +17,15 @@ export const ReviewsContainer = styled.section`
   margin: 6rem auto;
   padding: 3rem 0;
   position: relative;
-  background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}22, ${theme.colors.background})`};
+  background: ${({ theme }) =>
+    `linear-gradient(145deg, ${theme.colors.backgroundAlt}22, ${theme.colors.background})`};
   border-top: 1px solid ${({ theme }) => theme.colors.accent}22;
   border-bottom: 1px solid ${({ theme }) => theme.colors.accent}22;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 
   &.visible {
     opacity: 1;
@@ -30,7 +33,7 @@ export const ReviewsContainer = styled.section`
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -50px;
     left: 50%;
@@ -170,4 +173,4 @@ export const CarouselButton = styled.button`
   &.next {
     right: 20px;
   }
-`; 
+`;

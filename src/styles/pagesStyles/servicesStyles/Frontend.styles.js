@@ -83,13 +83,14 @@ export const HighlightText = styled.div`
   background: ${({ theme }) => theme.colors.backgroundAlt};
   text-align: center;
   span {
-    display: inline-block; 
-    transition: transform 0.3s ease, color 0.3s ease;
+    display: inline-block;
+    transition:
+      transform 0.3s ease,
+      color 0.3s ease;
   }
 
   span:hover {
     transform: scale(1.03);
-
   }
 `;
 
@@ -136,11 +137,13 @@ export const NumberedList = styled.ol`
       border-radius: 8%;
       margin-right: 1rem;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+      transition:
+        transform 0.3s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
       width: 2rem;
       height: 2rem;
       min-width: 2rem;
-
     }
   }
 `;

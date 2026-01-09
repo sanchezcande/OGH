@@ -23,12 +23,13 @@ const pulse = keyframes`
 export const MetricsSection = styled.section`
   width: 100%;
   padding: 4rem 2rem;
-  margin-bottom: 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);  position: relative;
+  margin-bottom: 0 !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -61,7 +62,7 @@ export const MetricsHeader = styled.div`
     font-weight: 700;
     color: #1e293b;
     margin: 0 0 1rem 0;
-    background: linear-gradient(135deg, #F97B72 0%, #E35A52 100%);
+    background: linear-gradient(135deg, #f97b72 0%, #e35a52 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -103,18 +104,18 @@ export const MetricCard = styled.div`
   border-radius: 20px;
   padding: 2rem;
   text-align: center;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.05),
     0 10px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(30px);
   animation: ${fadeInUp} 0.8s ease-out forwards;
-  animation-delay: ${props => props.delay || '0s'};
+  animation-delay: ${(props) => props.$delay || "0s"};
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 
+    box-shadow:
       0 20px 25px rgba(0, 0, 0, 0.1),
       0 10px 10px rgba(0, 0, 0, 0.04);
   }
@@ -127,7 +128,7 @@ export const MetricCard = styled.div`
 export const MetricValue = styled.div`
   font-size: 3rem;
   font-weight: 800;
-  color: #F97B72;
+  color: #f97b72;
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -176,7 +177,7 @@ export const MetricDescription = styled.p`
 export const MetricIcon = styled.div`
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #F97B72 0%, #E35A52 100%);
+  background: linear-gradient(135deg, #f97b72 0%, #e35a52 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -212,11 +213,28 @@ export const HowWeMeasureLink = styled.div`
     background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
     border-color: #94a3b8;
     color: #334155;
+
+    ${Tooltip} {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
   }
 
   @media (max-width: 768px) {
     font-size: 0.8rem;
     padding: 0.4rem 0.8rem;
+  }
+`;
+
+const fadeInTooltip = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 `;
 
@@ -232,14 +250,16 @@ export const Tooltip = styled.div`
   border-radius: 8px;
   font-size: 0.8rem;
   line-height: 1.4;
-  max-width: 280px;
+  max-width: 380px;
+  min-width: 300px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   white-space: normal;
   text-align: left;
+  animation: ${fadeInTooltip} 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 100%;
     left: 50%;
@@ -249,7 +269,8 @@ export const Tooltip = styled.div`
   }
 
   @media (max-width: 768px) {
-    max-width: 240px;
+    max-width: 320px;
+    min-width: 260px;
     font-size: 0.75rem;
     padding: 0.8rem;
   }

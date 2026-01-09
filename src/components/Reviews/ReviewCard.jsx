@@ -16,4 +16,4 @@ export const ReviewCard = ({ review, company, role }) => {
       </ReviewAuthor>
     </StyledReviewCard>
   );
-}; 
+};

@@ -6,27 +6,27 @@ import GraphicDesign from "../../../assets/images/placeholder-graphicdesign.png"
 const DataSquare = (t) => [
   {
     id: 1,
-    title: t('frontendTitle'),
+    title: t("frontendTitle"),
     image: Security,
-    description: t('frontendDescription'),
+    description: t("frontendDescription"),
   },
   {
     id: 2,
-    title: t('backendTitle'),
+    title: t("backendTitle"),
     image: UXUI,
-    description: t('backendDescription'),
+    description: t("backendDescription"),
   },
   {
     id: 3,
-    title: t('uxuiTitle'),
+    title: t("uxuiTitle"),
     image: UXUI1,
-    description: t('uxuiDescription'),
+    description: t("uxuiDescription"),
   },
   {
     id: 4,
-    title: t('graphicDesignTitle'),
+    title: t("graphicDesignTitle"),
     image: GraphicDesign,
-    description: t('graphicDesignDescription'),
+    description: t("graphicDesignDescription"),
   },
 ];
 

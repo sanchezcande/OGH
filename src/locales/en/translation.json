@@ -83,11 +83,11 @@
     "description": "Book a free strategy session to discuss your project needs.",
     "buttonText": "Book Free Strategy Call"
   },
-"aboutUsCallToAction": {
-  "title": "Let's Build Something That Feels Right",
-  "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
-  "buttonText": "Book a Free Call"
-},
+  "aboutUsCallToAction": {
+    "title": "Let's Build Something That Feels Right",
+    "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
+    "buttonText": "Book a Free Call"
+  },
 
   "contactUsCallToAction": {
     "title": "Ready to Talk Solutions?",
@@ -106,20 +106,21 @@
     "email": "info@opengatehub.com",
     "comeAnd": "Come and",
     "joinUs": "Join Us"
-  },"companyHistoryTitle": "Our Journey",
-"companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
+  },
+  "companyHistoryTitle": "Our Journey",
+  "companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
 
-"missionAndCoreValuesTitle_part1": "Our Mission & ",
-"missionAndCoreValuesTitle_highlight": "Values",
-"missionAndCoreValuesDescription": "We believe in doing meaningful work — with people who care. Our mission is to support founders and teams who want to create value with integrity, for their users, their investors, and the world they're part of.",
+  "missionAndCoreValuesTitle_part1": "Our Mission & ",
+  "missionAndCoreValuesTitle_highlight": "Values",
+  "missionAndCoreValuesDescription": "We believe in doing meaningful work — with people who care. Our mission is to support founders and teams who want to create value with integrity, for their users, their investors, and the world they're part of.",
 
-"technologiesTitle_part1": "Our ",
-"technologiesTitle_highlight": "People",
-"technologiesDescription": "The strength of what we build comes from who we build it with. Our team isn't just talented — they're thoughtful, reliable, and genuinely committed to creating products with purpose.",
+  "technologiesTitle_part1": "Our ",
+  "technologiesTitle_highlight": "People",
+  "technologiesDescription": "The strength of what we build comes from who we build it with. Our team isn't just talented — they're thoughtful, reliable, and genuinely committed to creating products with purpose.",
 
-"commitmentToInnovationTitle_part1": "Innovation with ",
-"commitmentToInnovationTitle_highlight": "Purpose",
-"commitmentToInnovationDescription": "We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.",
+  "commitmentToInnovationTitle_part1": "Innovation with ",
+  "commitmentToInnovationTitle_highlight": "Purpose",
+  "commitmentToInnovationDescription": "We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.",
 
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
@@ -468,7 +469,11 @@
     "smartersCity": {
       "title": "Smarters City",
       "description": "Urban Asset-Management SaaS for real-time mapping & maintenance of streetlights, traffic lights and more.",
-      "metrics": ["35% faster load", "0 critical bugs", "1st municipal contract"]
+      "metrics": [
+        "35% faster load",
+        "0 critical bugs",
+        "1st municipal contract"
+      ]
     },
     "estudioSab": {
       "title": "Estudio Sab",
@@ -529,31 +534,31 @@
     "title": "The Faces Behind the Code",
     "subtitle": "Meet the people who turn challenges into solutions and ideas into reality.",
     "members": {
-                     "javier": {
-                 "name": "Javier",
-                 "role": "Senior Frontend Engineer",
-                 "description": "Javier has been building web apps long enough to know what works and what doesn't. He's our go-to guy for React, Vue, and cloud-based architectures, and he has a knack for solving tough problems without overcomplicating things. Experienced, reliable, and easy to work with — that's why we trust him with the big stuff."
-               },
-                     "giuliano": {
-                 "name": "Giuliano",
-                 "role": "Full Stack Engineer",
-                 "description": "Giuliano can jump from backend to frontend without missing a beat. Skilled in Node.js, PHP, .NET, React, and modern UI frameworks, he's always exploring new tech to make our projects better. Fast learner, team player, and problem-solver — he's the one who keeps things moving smoothly from idea to delivery."
-               },
-                     "laura": {
-                 "name": "Laura",
-                 "role": "Web Designer & SEO Specialist",
-                 "description": "Laura knows how to make a website look great and show up where it matters. She's worked on over 50 projects for clients in Argentina, Spain, and the U.S., combining WordPress, Elementor, and SEO to create sites people actually enjoy using. With a background in visual arts and a passion for painting, she brings a unique creative touch to every project — making sure our work not only looks good, but gets found."
-               },
-                     "gustavo": {
-                 "name": "Gustavo",
-                 "role": "CTO",
-                 "description": "Gustavo is a seasoned tech leader with a mastery of an impressive range of technologies — from PHP, Java, and Python to modern frameworks like Angular, Node.js, Express, and Laravel. Over the years, he's built and led the development of large-scale, high-performance systems, always with an eye for scalability and quality. He sees the big picture, solves complex problems without breaking a sweat, and knows how to guide a team to deliver their best work."
-               },
-                     "alejandria": {
-                 "name": "Alejandría",
-                 "role": "QA Analyst",
-                 "description": "Alejandría makes sure what we ship actually works. She plans and runs functional, regression, and integration tests across web and mobile, keeps coverage organized in Xray/Jira, and validates APIs with Postman. With SQL skills, she checks data at the source and catches edge cases early. Her UX/UI background helps her think like a user, write clear bug reports, and push for reliable, easy‑to‑use releases. Reliable and detail-oriented, she's the one who makes sure nothing slips through the cracks before launch."
-               }
+      "javier": {
+        "name": "Javier",
+        "role": "Senior Frontend Engineer",
+        "description": "Javier has been building web apps long enough to know what works and what doesn't. He's our go-to guy for React, Vue, and cloud-based architectures, and he has a knack for solving tough problems without overcomplicating things. Experienced, reliable, and easy to work with — that's why we trust him with the big stuff."
+      },
+      "giuliano": {
+        "name": "Giuliano",
+        "role": "Full Stack Engineer",
+        "description": "Giuliano can jump from backend to frontend without missing a beat. Skilled in Node.js, PHP, .NET, React, and modern UI frameworks, he's always exploring new tech to make our projects better. Fast learner, team player, and problem-solver — he's the one who keeps things moving smoothly from idea to delivery."
+      },
+      "laura": {
+        "name": "Laura",
+        "role": "Web Designer & SEO Specialist",
+        "description": "Laura knows how to make a website look great and show up where it matters. She's worked on over 50 projects for clients in Argentina, Spain, and the U.S., combining WordPress, Elementor, and SEO to create sites people actually enjoy using. With a background in visual arts and a passion for painting, she brings a unique creative touch to every project — making sure our work not only looks good, but gets found."
+      },
+      "gustavo": {
+        "name": "Gustavo",
+        "role": "CTO",
+        "description": "Gustavo is a seasoned tech leader with a mastery of an impressive range of technologies — from PHP, Java, and Python to modern frameworks like Angular, Node.js, Express, and Laravel. Over the years, he's built and led the development of large-scale, high-performance systems, always with an eye for scalability and quality. He sees the big picture, solves complex problems without breaking a sweat, and knows how to guide a team to deliver their best work."
+      },
+      "alejandria": {
+        "name": "Alejandría",
+        "role": "QA Analyst",
+        "description": "Alejandría makes sure what we ship actually works. She plans and runs functional, regression, and integration tests across web and mobile, keeps coverage organized in Xray/Jira, and validates APIs with Postman. With SQL skills, she checks data at the source and catches edge cases early. Her UX/UI background helps her think like a user, write clear bug reports, and push for reliable, easy‑to‑use releases. Reliable and detail-oriented, she's the one who makes sure nothing slips through the cracks before launch."
+      }
     }
   }
 }

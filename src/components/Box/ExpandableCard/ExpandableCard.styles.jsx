@@ -60,7 +60,7 @@ export const CloseButton = styled.button`
   position: absolute;
   right: -8px;
   z-index: 9999;
-  background: ${({ theme }) => theme.colors.primary};;
+  background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.secondary};
   border-radius: 20%;
   width: 38px;
@@ -69,9 +69,11 @@ export const CloseButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
   font-size: 26px;
 
   &:hover {

@@ -32,4 +32,4 @@ plugins:
   - sortAttrs: true
   - removeDimensions: true
   - removeAttrs:
-      attrs: '(stroke|fill)'
+      attrs: "(stroke|fill)"
