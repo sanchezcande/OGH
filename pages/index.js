@@ -74,9 +74,22 @@ const ProjectTabs = ({ activeTab, onTabChange }) => {
 const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverContent, delay = 0, badges = ["35% faster", "0 bugs", "Live product"], category }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showHover, setShowHover] = useState(false);
+  const [hoverPosition, setHoverPosition] = useState(null);
+  const cardRef = React.useRef(null);
   
   const handleMouseEnter = (event) => {
     if (!isMobile) {
+      // Calcular posición ANTES de mostrar el hover
+      if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        // Usar el centro exacto del div interno (donde está el logo) - width: 320px
+        // El hover también tiene width: 320px, así que deben alinearse perfectamente
+        const centerX = rect.left + (rect.width / 2);
+        setHoverPosition({
+          top: rect.bottom + 5,
+          left: centerX
+        });
+      }
       setShowHover(true);
       // Aumentar z-index cuando se hace hover
       event.currentTarget.style.zIndex = "99999999999";
@@ -90,6 +103,35 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
       event.currentTarget.style.zIndex = "999999";
     }
   };
+  
+  // Actualizar posición cuando se hace scroll o resize
+  useEffect(() => {
+    if (showHover && cardRef.current) {
+      const updatePosition = () => {
+        if (cardRef.current) {
+          const rect = cardRef.current.getBoundingClientRect();
+          // Usar el centro del div interno (donde está el logo) - width: 320px
+          const centerX = rect.left + (rect.width / 2);
+          setHoverPosition({
+            top: rect.bottom + 5,
+            left: centerX
+          });
+        }
+      };
+      
+      // Pequeño delay para asegurar que el DOM esté actualizado
+      const timeoutId = setTimeout(updatePosition, 10);
+      
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
+      };
+    }
+  }, [showHover]);
 
   const handleTouchStart = (event) => {
     if (isMobile) {
@@ -103,10 +145,9 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         style={{
           position: "relative",
           display: "flex",
@@ -115,7 +156,7 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
           padding: "2rem",
           cursor: "pointer",
           transition: "all 0.3s ease",
-          zIndex: showHover ? "99999999999" : "999999"
+          zIndex: showHover ? "999999999999" : "999999"
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -125,12 +166,15 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
           }
         }}
       >
-        <div style={{
-          position: "relative",
-          width: "320px",
-          textAlign: "center",
-          zIndex: showHover ? "99999999999" : "999999"
-        }}>
+        <div 
+          ref={cardRef}
+          style={{
+            position: "relative",
+            width: "320px",
+            textAlign: "center",
+            zIndex: showHover ? "999999999999" : "999999"
+          }}
+        >
           <div style={{
             display: "flex",
             flexDirection: "column",
@@ -209,26 +253,28 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
             )}
           </div>
           
-          {/* Hover Card */}
-          {showHover && (
+          {/* Hover Card - Renderizado con portal para evitar overflow */}
+          {showHover && typeof window !== 'undefined' && hoverPosition && hoverPosition.top > 0 && createPortal(
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
               style={{
-                position: "absolute",
-                top: "100%",
-                left: "0",
+                position: "fixed",
+                top: `${hoverPosition.top}px`,
+                left: `${hoverPosition.left - 160}px`, // Restar la mitad del ancho (320px / 2 = 160px) para centrar
                 background: "white",
                 borderRadius: "12px",
                 padding: "1rem",
                 boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
                 border: "1px solid #e5e7eb",
-                width: "100%",
-                zIndex: 99999999999,
+                width: "320px",
+                maxWidth: "320px",
+                minWidth: "320px",
+                boxSizing: "border-box",
+                zIndex: 999999999999,
                 pointerEvents: "none",
-                marginTop: "10px",
                 textAlign: "center"
               }}
             >
@@ -274,7 +320,8 @@ const FeaturedWorkCard = ({ image, title, description, metrics, link, hoverConte
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </motion.div>,
+            document.body
           )}
         </div>
       </motion.div>
@@ -724,6 +771,31 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
 export default function HomePage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('all');
+  const [carouselPaused, setCarouselPaused] = useState(false);
+  const carouselTrackRef = React.useRef(null);
+
+  // Inyectar estilos del carrusel
+  useEffect(() => {
+    const styleId = 'infinite-carousel-styles';
+    let styleElement = document.getElementById(styleId);
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      @keyframes infiniteScrollCarousel {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+    `;
+  }, []);
 
   const parseHighlightedText = (text) => {
     if (!text) return [];
@@ -932,14 +1004,17 @@ export default function HomePage() {
         <MetricsSection />
         
         {/* Featured Work Section */}
-        <Section className="full-width" style={{
-          padding: "2rem 1rem",
-          margin: "2rem 0",
-          borderTop: "1px solid #e5e7eb",
-          borderBottom: "1px solid #e5e7eb",
-          position: "relative",
-          zIndex: 999999
-        }}>
+        <div style={{ background: "white", marginTop: "-1px" }}>
+          <Section className="full-width" style={{
+            padding: "2rem 1rem",
+            margin: "0",
+            borderTop: "none",
+            borderBottom: "1px solid #e5e7eb",
+            position: "relative",
+            zIndex: 999999,
+            overflow: "visible",
+            background: "white"
+          }}>
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -1040,34 +1115,81 @@ export default function HomePage() {
               activeTab === 'all' || project.category === activeTab
             );
 
+            // Duplicar proyectos para efecto infinito
+            // Si hay pocas tarjetas, duplicar más veces para que el carrusel se vea mejor
+            const minDuplications = filteredProjects.length <= 3 ? 4 : 2;
+            const duplicatedProjects = Array(minDuplications).fill(filteredProjects).flat();
+            
             return (
-              <div style={{ 
-                display: "grid", 
-                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                gap: "1.5rem",
-                maxWidth: "1400px",
-                margin: "0 auto",
-                position: "relative",
-                zIndex: 999999
-              }}>
-                {filteredProjects.map((project, index) => (
-                  <FeaturedWorkCard
-                    key={project.title}
-                    image={project.image}
-                    title={project.title}
-                    description={project.description}
-                    metrics={project.metrics}
-                    link={project.link}
-                    hoverContent={project.hoverContent}
-                    badges={project.badges}
-                    category={project.category}
-                    delay={project.delay}
-                  />
-                ))}
-              </div>
+              <>
+                <style dangerouslySetInnerHTML={{__html: `
+                  @keyframes infiniteScrollCarousel {
+                    0% {
+                      transform: translateX(0);
+                    }
+                    100% {
+                      transform: translateX(-50%);
+                    }
+                  }
+                `}} />
+                <div 
+                  style={{
+                    width: "100%",
+                    maxWidth: "1400px",
+                    margin: "0 auto",
+                    position: "relative",
+                    zIndex: 999999,
+                    overflow: "hidden",
+                    padding: "1rem 0",
+                    display: "flex",
+                    alignItems: "center",
+                    minHeight: "280px",
+                    height: "280px"
+                  }}
+                  onMouseEnter={() => setCarouselPaused(true)}
+                  onMouseLeave={() => setCarouselPaused(false)}
+                >
+                  <div 
+                    ref={carouselTrackRef}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                      animation: "infiniteScrollCarousel 40s linear infinite",
+                      width: "fit-content",
+                      willChange: "transform",
+                      animationPlayState: carouselPaused ? "paused" : "running"
+                    }}
+                  >
+                    {duplicatedProjects.map((project, index) => (
+                      <div 
+                        key={`${project.title}-${index}`} 
+                        style={{
+                          flexShrink: 0,
+                          flexGrow: 0
+                        }}
+                      >
+                        <FeaturedWorkCard
+                          image={project.image}
+                          title={project.title}
+                          description={project.description}
+                          metrics={project.metrics}
+                          link={project.link}
+                          hoverContent={project.hoverContent}
+                          badges={project.badges}
+                          category={project.category}
+                          delay={0}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             );
           })()}
-        </Section>
+          </Section>
+        </div>
         
         {/* Original Plan Section */}
         <PlanSection>
