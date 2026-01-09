@@ -7,7 +7,8 @@ export const FAQContainer = styled.section`
   margin: 2rem auto;
   max-width: 1200px;
   border-radius: 12px;
-  box-shadow: ${({ theme }) => theme.boxShadow}; // Ej: 0 4px 12px rgba(0,0,0,0.05)
+  box-shadow: ${({ theme }) =>
+    theme.boxShadow}; // Ej: 0 4px 12px rgba(0,0,0,0.05)
 `;
 
 export const FAQTitle = styled.h1`
@@ -39,7 +40,9 @@ export const FAQList = styled.ul`
     opacity: 0;
     transform: translateY(20px);
     will-change: opacity, transform;
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
 
     &.visible {
       opacity: 1;
@@ -47,7 +50,7 @@ export const FAQList = styled.ul`
     }
 
     &::before {
-      content: '➤';
+      content: "➤";
       position: absolute;
       left: 0;
       top: 0;

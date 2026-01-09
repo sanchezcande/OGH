@@ -42,7 +42,7 @@ const Card = ({
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (currentDomTarget) {
@@ -66,7 +66,7 @@ const Card = ({
       x: 0,
       y: 0,
       config: { mass: 5, tension: 350, friction: 40 },
-    })
+    }),
   );
 
   useGesture(
@@ -82,7 +82,7 @@ const Card = ({
       onHover: ({ hovering }) =>
         !hovering && api({ rotateX: 0, rotateY: 0, scale: 1 }),
     },
-    { domTarget, eventOptions: { passive: false } }
+    { domTarget, eventOptions: { passive: false } },
   );
 
   return (
@@ -105,7 +105,12 @@ const Card = ({
       <div className={styles.textContainer}>
         {!imageBottom && (
           <div className={styles.image}>
-            <Image src={Imagen} alt={title || 'Service Icon'} width={84} height={64} />
+            <Image
+              src={Imagen}
+              alt={title || "Service Icon"}
+              width={84}
+              height={64}
+            />
           </div>
         )}
         <h1>{title}</h1>
@@ -115,7 +120,16 @@ const Card = ({
             className={styles.image}
             style={{ width: "64px", height: "64px", justifySelf: "center" }}
           >
-            {typeof Imagen === 'function' ? <Imagen /> : <Image src={Imagen} alt={title || 'Service Icon'} width={64} height={64} />}
+            {typeof Imagen === "function" ? (
+              <Imagen />
+            ) : (
+              <Image
+                src={Imagen}
+                alt={title || "Service Icon"}
+                width={64}
+                height={64}
+              />
+            )}
           </div>
         )}
         {buttonText && (
@@ -163,7 +177,9 @@ const Box = ({
         imageBottom={imageBottom}
         animationDelay={animationDelay}
       />
-      {isOpen && <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />}
+      {isOpen && (
+        <ExpandableCard closeCard={() => handleBoxClick(null)} id={id} />
+      )}
     </div>
   );
 };

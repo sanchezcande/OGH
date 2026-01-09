@@ -84,7 +84,7 @@ export const Container = styled.div`
     ${({ theme }) => theme.colors.background} 70%
   );
   overflow: hidden;
-  padding: 40px 20px;
+  padding: 40px 0px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -92,12 +92,12 @@ export const Container = styled.div`
   animation: ${fadeIn} 0.8s ease;
   overflow: hidden;
   z-index: 0;
-  
+
   /* Adding more whitespace between sections */
   & > * {
     margin-bottom: 1rem;
   }
-  
+
   & .full-width {
     width: 100%;
     max-width: 1400px;
@@ -120,7 +120,7 @@ export const Hero = styled.div`
   background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
   color: white;
   position: relative;
-  
+
   &::before {
     content: "";
     position: absolute;
@@ -132,12 +132,12 @@ export const Hero = styled.div`
     opacity: 0.3;
     z-index: 1;
   }
-  
+
   & > * {
     position: relative;
     z-index: 2;
   }
-  
+
   @media (max-width: 768px) {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -145,7 +145,7 @@ export const Hero = styled.div`
     padding: 80px 15px;
     margin-bottom: 3rem;
   }
-  
+
   @media (max-width: 480px) {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -161,7 +161,11 @@ export const GradientOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, ${({ theme }) => theme.colors.backgroundAlt}, transparent);
+  background: linear-gradient(
+    145deg,
+    ${({ theme }) => theme.colors.backgroundAlt},
+    transparent
+  );
   z-index: -2;
 `;
 
@@ -176,7 +180,7 @@ export const Glow = styled.div`
   z-index: -1;
   filter: blur(120px);
   animation: ${glow} 6s ease-in-out infinite;
-  
+
   &::after {
     content: "";
     position: absolute;
@@ -197,7 +201,11 @@ export const FloatingBlob = styled.div`
   left: 50%;
   width: 1000px;
   height: 1000px;
-  background: radial-gradient(circle, ${({ theme }) => theme.colors.accent}, transparent 70%);
+  background: radial-gradient(
+    circle,
+    ${({ theme }) => theme.colors.accent},
+    transparent 70%
+  );
   opacity: 0.35;
   filter: blur(200px);
   border-radius: 50%;
@@ -222,7 +230,9 @@ export const Title = styled.h1`
     white-space: nowrap;
     overflow: hidden;
     border-right: 2px solid ${({ theme }) => theme.colors.accent};
-    animation: typing 3s steps(30, end) forwards, blink-caret 0.7s step-end infinite;
+    animation:
+      typing 3s steps(30, end) forwards,
+      blink-caret 0.7s step-end infinite;
   }
 
   .highlighted-word {
@@ -230,7 +240,7 @@ export const Title = styled.h1`
     font-weight: 700;
     position: relative;
     display: inline-block;
-    
+
     &::after {
       content: "";
       position: absolute;
@@ -244,27 +254,36 @@ export const Title = styled.h1`
       transform-origin: left;
       transition: transform 0.6s ease;
     }
-    
+
     &:hover::after {
       transform: scaleX(1);
     }
   }
 
   @keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
   }
 
   @keyframes blink-caret {
-    0%, 100% { border-color: transparent; }
-    50% { border-color: ${({ theme }) => theme.colors.accent}; }
+    0%,
+    100% {
+      border-color: transparent;
+    }
+    50% {
+      border-color: ${({ theme }) => theme.colors.accent};
+    }
   }
 
   /* Desktop and mobile visibility classes */
   .desktop-only {
     display: inline-block;
   }
-  
+
   .mobile-only {
     display: none;
   }
@@ -275,25 +294,25 @@ export const Title = styled.h1`
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
-    
+
     .desktop-only {
       display: none;
     }
-    
+
     .mobile-only {
       display: inline-block;
     }
-    
+
     .animated {
       white-space: normal;
       border-right: none;
     }
-    
+
     .highlighted-word {
       display: inline;
     }
   }
-  
+
   @media (max-width: 610px) {
     font-size: 2rem;
   }
@@ -313,7 +332,7 @@ export const Subtitle = styled.h2`
   padding: 20px;
   cursor: default;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  
+
   @media (max-width: 768px) {
     font-size: 1.3rem;
     padding: 10px;
@@ -327,9 +346,10 @@ export const Section = styled.div`
   padding: 2rem;
   position: relative;
   z-index: 1;
-  
+
   &.full-width {
-    max-width: none;
+    max-width: 100%;
+    width: 100%;
     padding: 4rem 2rem;
     background: ${({ theme }) => `${theme.colors.backgroundAlt}11`};
   }
@@ -342,10 +362,9 @@ export const Section = styled.div`
     padding: 2.5rem 2rem 2rem 2rem;
     box-shadow: none;
   }
-  
+
   @media (max-width: 768px) {
-    padding: 1rem;
-    &.full-width {
+    padding: 0 &.full-width {
       padding: 0;
     }
     &.serious-block {
@@ -370,7 +389,7 @@ export const SectionTitle = styled.h3`
   transition: transform 0.3s ease;
 
   &::before {
-    content: '';
+    content: "";
     width: 0;
     height: 3px;
     background: ${({ theme }) => theme.colors.accent};
@@ -391,7 +410,7 @@ export const SectionTitle = styled.h3`
     font-weight: 800;
     position: relative;
     display: inline-block;
-    
+
     &::after {
       content: "";
       position: absolute;
@@ -405,16 +424,16 @@ export const SectionTitle = styled.h3`
       transform-origin: left;
       transition: transform 0.6s ease;
     }
-    
+
     &:hover::after {
       transform: scaleX(1);
     }
   }
-  
+
   @media (max-width: 768px) {
     font-size: 1.8rem;
     flex-wrap: wrap;
-    
+
     .highlighted-word {
       display: inline;
     }
@@ -439,7 +458,7 @@ export const SectionText = styled.p`
     font-style: normal;
     font-weight: 500;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 1.1rem;
   }
@@ -462,7 +481,7 @@ export const CTAButton = styled.a`
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(249, 123, 114, 0.3);
-  
+
   &::before {
     content: "";
     position: absolute;
@@ -479,7 +498,7 @@ export const CTAButton = styled.a`
     z-index: 1;
     transition: left 0.5s ease;
   }
-  
+
   &::after {
     content: "";
     position: absolute;
@@ -492,47 +511,47 @@ export const CTAButton = styled.a`
     transform-origin: right;
     transition: transform 0.3s ease;
   }
-  
+
   &:hover {
     transform: translateY(-2px);
     color: white;
     box-shadow: 0 6px 20px rgba(249, 123, 114, 0.4);
     background: #d88a82;
-    
+
     &::before {
       left: 100%;
     }
-    
+
     &::after {
       transform: scaleX(1);
       transform-origin: left;
     }
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   &.primary-cta {
     padding: 18px 36px;
     font-weight: 700;
     font-size: 1.2rem;
     background: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 6px 16px rgba(249, 123, 114, 0.4);
-    
+
     &:hover {
       background: ${({ theme }) => theme.colors.accentDark};
       box-shadow: 0 8px 24px rgba(249, 123, 114, 0.5);
     }
   }
-  
+
   &.secondary-cta {
     background: transparent;
     color: ${({ theme }) => theme.colors.accent};
     border: 2px solid ${({ theme }) => theme.colors.accent};
     box-shadow: none;
     position: relative;
-    
+
     &::before {
       background: linear-gradient(
         90deg,
@@ -541,7 +560,7 @@ export const CTAButton = styled.a`
         transparent 100%
       );
     }
-    
+
     &::after {
       content: "";
       position: absolute;
@@ -554,23 +573,23 @@ export const CTAButton = styled.a`
       transform-origin: right;
       transition: transform 0.3s ease;
     }
-    
+
     &:hover {
       background-color: ${({ theme }) => theme.colors.accent}11;
       color: ${({ theme }) => theme.colors.accent};
       box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
-      
+
       &::after {
         transform: scaleX(1);
         transform-origin: left;
       }
     }
   }
-  
+
   @media (max-width: 768px) {
     padding: 14px 28px;
     font-size: 1rem;
-    
+
     &.primary-cta {
       padding: 16px 32px;
       font-size: 1.1rem;
@@ -588,7 +607,7 @@ export const PlanSteps = styled.ul`
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  
+
   li {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
@@ -604,22 +623,22 @@ export const PlanSteps = styled.ul`
     transform: translateY(20px);
     animation: fadeInUp 0.6s ease forwards;
     animation-delay: calc(0.2s * var(--i, 0));
-    
+
     &:hover {
       transform: translateY(-8px);
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.3);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
     }
 
     strong {
       display: block;
       font-size: 2rem;
       font-weight: 800;
-      color: #F97B72;
+      color: #f97b72;
       margin-bottom: 1rem;
     }
-    
+
     /* Flecha entre tarjetas */
     &:not(:last-child)::after {
       content: "→";
@@ -628,7 +647,7 @@ export const PlanSteps = styled.ul`
       top: 50%;
       transform: translateY(-50%);
       font-size: 1.5rem;
-      color: #F97B72;
+      color: #f97b72;
       font-weight: bold;
       z-index: 3;
     }
@@ -640,20 +659,20 @@ export const PlanSteps = styled.ul`
       transform: translateY(20px);
     }
     to {
-    opacity: 1;
+      opacity: 1;
       transform: translateY(0);
     }
   }
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-    
+
     li {
       min-width: 280px;
       max-width: 320px;
-      
+
       &:not(:last-child)::after {
         content: "↓";
         right: 50%;
@@ -674,9 +693,9 @@ export const PlanSection = styled.section`
   padding: 60px 20px;
   background: linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%);
   color: white;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  
+
   &::before {
     content: "";
     position: absolute;
@@ -688,14 +707,14 @@ export const PlanSection = styled.section`
     opacity: 0.3;
     z-index: 1;
   }
-  
+
   & > * {
     position: relative;
     z-index: 2;
   }
-  
+
   .highlighted-word {
-    color: #F97B72;
+    color: #f97b72;
     font-weight: 800;
   }
 
@@ -703,9 +722,9 @@ export const PlanSection = styled.section`
     mix-blend-mode: normal;
     color: white;
     margin-bottom: 3rem;
-    
+
     &::before {
-      background: #F97B72;
+      background: #f97b72;
     }
   }
 
@@ -713,7 +732,7 @@ export const PlanSection = styled.section`
     mix-blend-mode: normal;
     color: rgba(255, 255, 255, 0.9);
   }
-  
+
   @media (max-width: 768px) {
     padding: 40px 15px;
   }
@@ -730,9 +749,9 @@ export const ImageContainer = styled.div`
 export const Highlight = styled.span`
   color: ${({ theme }) => theme.colors.accent};
   position: relative;
-  
+
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: 0;
@@ -744,7 +763,7 @@ export const Highlight = styled.span`
     transform-origin: left;
     transition: transform 0.6s ease;
   }
-  
+
   &:hover::after {
     transform: scaleX(1);
   }

@@ -24,7 +24,6 @@ export const LogoIcon = styled.div`
   align-items: center;
   flex-direction: row;
   margin: 0 1rem;
-
 `;
 
 export const NavBarContainer = styled.nav`
@@ -64,8 +63,6 @@ export const LangMenuItem = styled.li`
     transform: scale(1.02);
     font-weight: 600;
   }
-
-
 `;
 
 export const BurgerMenu = styled.div`
@@ -99,14 +96,11 @@ export const MenuItem = styled.li`
   color: ${({ theme }) => theme.colors.text};
   border-radius: ${({ theme }) => theme.borderRadius};
   transition: all 0.2s ease;
- 
 
   &:active {
     transform: scale(1.02);
     font-weight: 600;
   }
-
-
 `;
 
 export const ArrowIcon = styled(FaAngleDown)`

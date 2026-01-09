@@ -20,7 +20,6 @@ import Link from "next/link";
 const LogoImg = () => (
   <LogoImgContainer>
     <Image src={Logo} alt="software development company" width={130} />
-
   </LogoImgContainer>
 );
 
@@ -69,7 +68,6 @@ const Footer = () => {
               {t("privacyPolicy")}
             </Link>{" "}
           </FooterText>
-
         </div>
         <div>
           <h4>{t("connectWithUs")}</h4>
@@ -85,12 +83,13 @@ const Footer = () => {
             </a> */}
           </TelMailContainer>
           <TelMailContainer>
-            <Mail /> <FooterText>    <a href="mailto:info@opengatehub.com">info@opengatehub.com</a>
+            <Mail />{" "}
+            <FooterText>
+              {" "}
+              <a href="mailto:info@opengatehub.com">info@opengatehub.com</a>
             </FooterText>
           </TelMailContainer>
           <LogoImg />
-          
-
         </div>
       </FooterContent>
     </FooterContainer>

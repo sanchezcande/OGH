@@ -12,63 +12,63 @@ import { useState, useEffect } from "react";
 // import { FaWhatsapp  } from "react-icons/fa";
 
 const Layout = styled.div`
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 `;
 
 const Main = styled.main`
-    flex: 1;
+  flex: 1;
 `;
 
 const Loader = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background-color: ${({ theme }) => theme.colors.accent};;
-    animation: loader-animation 1s infinite;
-    z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: ${({ theme }) => theme.colors.accent};
+  animation: loader-animation 1s infinite;
+  z-index: 9999;
 
-    @keyframes loader-animation {
-        0% {
-            width: 0;
-        }
-        50% {
-            width: 50%;
-        }
-        100% {
-            width: 100%;
-        }
+  @keyframes loader-animation {
+    0% {
+      width: 0;
     }
+    50% {
+      width: 50%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
 `;
 
 const FloatingWhatsAppButton = styled.a`
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background-color: #25d366;
-    border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    cursor: pointer;
-    color: white;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer;
+  color: white;
 
-    &:hover {
-        transform: scale(1.1);
-        transition: transform 0.2s ease-in-out;
-    }
+  &:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease-in-out;
+  }
 
-    svg {
-        width: 30px;
-        height: 30px;
-    }
+  svg {
+    width: 30px;
+    height: 30px;
+  }
 `;
 
 export default function MyApp({ Component, pageProps }) {
@@ -77,13 +77,13 @@ export default function MyApp({ Component, pageProps }) {
 
   // --- LÓGICA SEO AGREGADA ---
   // 1. Definimos el dominio base
-  const siteUrl = 'https://opengatehub.com';
+  const siteUrl = "https://opengatehub.com";
 
   // 2. Obtenemos la ruta limpia
-  const path = router.asPath.split('?')[0];
+  const path = router.asPath.split("?")[0];
 
   // 3. Construimos la URL final correcta
-  const canonicalUrl = path === '/' ? siteUrl : `${siteUrl}${path}`;
+  const canonicalUrl = path === "/" ? siteUrl : `${siteUrl}${path}`;
   // ---------------------------
 
   useEffect(() => {
@@ -127,7 +127,10 @@ export default function MyApp({ Component, pageProps }) {
           property="og:description"
           content="OpenGateHub specializes in innovative software development for businesses worldwide."
         />
-        <meta property="og:image" content="https://opengatehub.com/circular-bgw.png" />
+        <meta
+          property="og:image"
+          content="https://opengatehub.com/circular-bgw.png"
+        />
 
         <meta property="og:url" content={canonicalUrl} />
 

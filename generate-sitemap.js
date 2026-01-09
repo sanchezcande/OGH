@@ -3,11 +3,7 @@ const path = require("path");
 
 const DOMAIN = "https://opengatehub.com"; // Cambia por tu dominio.
 
-const paths = [
-  "/", 
-  "/about", 
-  "/contact", 
-];
+const paths = ["/", "/about", "/contact"];
 
 const generateSitemap = () => {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -25,7 +21,11 @@ const generateSitemap = () => {
         .join("\n")}
     </urlset>`;
 
-  fs.writeFileSync(path.join(__dirname, "public", "sitemap.xml"), sitemap, "utf8");
+  fs.writeFileSync(
+    path.join(__dirname, "public", "sitemap.xml"),
+    sitemap,
+    "utf8",
+  );
 };
 
 generateSitemap();

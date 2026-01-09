@@ -1,7 +1,7 @@
 import React from "react";
 import Box from "./Box";
 import { ContainerSquare } from "./BoxesContainerSquare.styles";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import DataSquare from "./data/dataSquare";
 
 export default function BoxesContainer() {

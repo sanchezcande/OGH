@@ -6,7 +6,7 @@ import {
   ReviewsCarousel,
   ReviewsTrack,
   CarouselButton,
-  ReviewsWrapper
+  ReviewsWrapper,
 } from "../../styles/components/Reviews.styles";
 import { SectionTitle } from "../../styles/pagesStyles/HomePages.styles";
 import { InView } from "../InView/InView";
@@ -17,23 +17,27 @@ export const ReviewsSection = () => {
   const reviews = ["skylar", "techvision", "greenleaf", "innovatelab"];
 
   const handlePrevSlide = () => {
-    setCurrentSlide(current => (current === 0 ? reviews.length - 1 : current - 1));
+    setCurrentSlide((current) =>
+      current === 0 ? reviews.length - 1 : current - 1,
+    );
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide(current => (current === reviews.length - 1 ? 0 : current + 1));
+    setCurrentSlide((current) =>
+      current === reviews.length - 1 ? 0 : current + 1,
+    );
   };
 
   return (
     <InView>
       {(isInView) => (
-        <ReviewsContainer className={isInView ? 'visible' : ''}>
-          <SectionTitle style={{ "--i": 3 }}>
-            {t("reviewsTitle")}
-          </SectionTitle>
+        <ReviewsContainer className={isInView ? "visible" : ""}>
+          <SectionTitle style={{ "--i": 3 }}>{t("reviewsTitle")}</SectionTitle>
           <ReviewsCarousel>
             <ReviewsWrapper>
-              <ReviewsTrack style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+              <ReviewsTrack
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
                 {reviews.map((reviewKey) => (
                   <ReviewCard
                     key={reviewKey}
@@ -63,4 +67,4 @@ export const ReviewsSection = () => {
       )}
     </InView>
   );
-}; 
+};

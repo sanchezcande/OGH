@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import { useTranslation } from 'react-i18next';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ContainerRow } from "./BoxesContainerRow.styles";
 import Box from "./Box";
 import { HighlightedWord } from "../../styles/pagesStyles/AboutUs.styles";
@@ -89,7 +89,7 @@ export default function BoxesContainerRows() {
           title={item.title}
           description={item.description}
           imagen={item.image}
-          buttonText={t('learnMoreButtonText')}
+          buttonText={t("learnMoreButtonText")}
           height={380}
           width={260}
           marginLeftParagraph=""

@@ -42,12 +42,12 @@ export const CallToActionTitle = styled.h2`
   position: relative;
   z-index: 2;
   line-height: 1.2;
-  
+
   span {
-    color: #F97B72;
+    color: #f97b72;
     font-weight: 800;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 2rem;
   }
@@ -63,7 +63,7 @@ export const CallToActionDescription = styled.p`
   position: relative;
   z-index: 2;
   line-height: 1.6;
-  
+
   @media (max-width: 768px) {
     font-size: 1rem;
     margin-bottom: 2rem;
@@ -71,7 +71,7 @@ export const CallToActionDescription = styled.p`
 `;
 
 export const CallToActionButton = styled.a`
-  background: #F97B72;
+  background: #f97b72;
   color: white;
   padding: 16px 32px;
   font-weight: 600;
@@ -84,10 +84,10 @@ export const CallToActionButton = styled.a`
   position: relative;
   overflow: hidden;
   z-index: 2;
-  border: 2px solid #F97B72;
+  border: 2px solid #f97b72;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
-  
+
   &::before {
     content: "";
     position: absolute;
@@ -101,10 +101,10 @@ export const CallToActionButton = styled.a`
       rgba(255, 255, 255, 0.1) 50%,
       transparent 100%
     );
-  z-index: 1;
+    z-index: 1;
     transition: left 0.5s ease;
   }
-  
+
   &::after {
     content: "";
     position: absolute;
@@ -124,21 +124,21 @@ export const CallToActionButton = styled.a`
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(249, 123, 114, 0.3);
     border-color: #e06a5f;
-    
+
     &::before {
       left: 100%;
     }
-    
+
     &::after {
       transform: scaleX(1);
       transform-origin: left;
     }
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   @media (max-width: 768px) {
     padding: 14px 28px;
     font-size: 1rem;

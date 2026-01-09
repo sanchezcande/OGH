@@ -1,14 +1,20 @@
 import styled from "styled-components";
-import { FaInstagram, FaLinkedin, FaGithub, FaEnvelope, FaWhatsapp } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaLinkedin,
+  FaGithub,
+  FaEnvelope,
+  FaWhatsapp,
+} from "react-icons/fa";
 
 export const FooterContainer = styled.footer`
-background-color: #FFF5F5;
+  background-color: #fff5f5;
   color: ${({ theme }) => theme.colors.text};
   padding: 20px;
   text-align: center;
-  width: 100%; 
-  min-width: 100vw; 
-  position: relative; 
+  width: 100%;
+  min-width: 100vw;
+  position: relative;
 
   h4 {
     margin-bottom: 10px;
@@ -101,7 +107,7 @@ export const Github = styled(FaGithub)`
   width: 22px;
   height: 22px;
   fill: ${({ theme }) => theme.colors.primaryDark};
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
   display: block;
   &:hover {
     transform: scale(1.1);
@@ -155,7 +161,7 @@ export const Title = styled.h3`
   margin-left: 10px;
 
   span {
-  margin-top: 2px;
+    margin-top: 2px;
     font-weight: 400;
     color: ${({ theme }) => theme.colors.primary};
   }
@@ -164,5 +170,5 @@ export const Title = styled.h3`
 export const LogoImgContainer = styled.div`
   display: flex;
   gap: 5px;
-  margin-left:-6px;
+  margin-left: -6px;
 `;

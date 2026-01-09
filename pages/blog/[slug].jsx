@@ -8,7 +8,7 @@ import {
   Title,
   ImageContainer,
   Content,
-  ErrorMessage
+  ErrorMessage,
 } from "../../src/styles/pagesStyles/blogStyles/Slug.styles";
 
 export default function ArticlePage() {
@@ -20,15 +20,12 @@ export default function ArticlePage() {
   const article = articles.find((article) => article.slug === slug);
 
   if (!article) {
-    return (
-      <ErrorMessage>
-        {t("articleNotFound")}
-      </ErrorMessage>
-    );
+    return <ErrorMessage>{t("articleNotFound")}</ErrorMessage>;
   }
 
   // Obtenemos el extracto para la descripción (usando los primeros 150 caracteres)
-  const descriptionExcerpt = article.content.split("\n\n")[0].substring(0, 150) + '...';
+  const descriptionExcerpt =
+    article.content.split("\n\n")[0].substring(0, 150) + "...";
 
   return (
     <motion.div
@@ -42,10 +39,7 @@ export default function ArticlePage() {
         <title>{article.title} | OpenGateHub</title>
 
         {/* Descripción dinámica */}
-        <meta
-          name="description"
-          content={descriptionExcerpt}
-        />
+        <meta name="description" content={descriptionExcerpt} />
 
         <meta property="og:title" content={article.title} />
       </Head>

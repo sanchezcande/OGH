@@ -12,7 +12,6 @@ const SpinnerWrapper = styled.div`
 const SpinnerElement = styled.img`
   width: 100px;
   height: 100px;
-
 `;
 
 const Spinner = () => (

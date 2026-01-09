@@ -9,20 +9,21 @@ import {
 } from "../../src/styles/pagesStyles/servicesStyles/AI.styles";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import {
-  FaBrain,
-  FaCogs,
-  FaChartLine,
-  FaRobot,
-  FaLightbulb,
-  FaShieldAlt,
-  FaRocket,
   FaUsers,
+  FaRocket,
+  FaHandshake,
+  FaCode,
+  FaClock,
+  FaChartLine,
+  FaShieldAlt,
   FaSyncAlt,
-  FaProjectDiagram,
+  FaUserTie,
+  FaUsersCog,
+  FaCheckCircle,
 } from "react-icons/fa";
 import React from "react";
 
-// Componentes visuales mejorados (mismo estilo que n8n)
+// Componentes visuales mejorados (mismo estilo que otras páginas)
 const HeroSection = ({ children, style }) => (
   <div
     style={{
@@ -61,7 +62,7 @@ const HeroSection = ({ children, style }) => (
         right: "-20%",
         width: "200px",
         height: "200px",
-        background: "rgba(249, 123, 114, 0.2)",
+        background: "rgba(255, 255, 255, 0.2)",
         borderRadius: "50%",
         zIndex: 1,
       }}
@@ -229,13 +230,7 @@ export const ServicesCallToAction = () => {
   );
 };
 
-const fadeInUpStyle = {
-  opacity: 0,
-  transform: "translateY(20px)",
-  animation: "fadeInUp 0.7s forwards",
-};
-
-const aiSolutions = () => {
+const staffAugmentation = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
@@ -258,11 +253,18 @@ const aiSolutions = () => {
   return (
     <>
       <Head>
-        <title>AI Solutions - OpenGateHub</title>
-        <meta name="description" content={t("aiSolutions.description")} />
+        <title>Staff Augmentation - OpenGateHub</title>
+        <meta
+          name="description"
+          content={
+            lang === "es"
+              ? "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar."
+              : "We scale your team prioritizing cultural fit and human quality. We select developers who align with your values and way of working."
+          }
+        />
         <meta
           name="keywords"
-          content="AI, Artificial Intelligence, Machine Learning, Automation, Business Intelligence, Data Analytics"
+          content="Staff Augmentation, Remote Developers, Software Development Team, IT Consulting, Development Services"
         />
         <meta name="author" content="OpenGateHub" />
       </Head>
@@ -274,6 +276,16 @@ const aiSolutions = () => {
         }
         .animate { opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s; }
         .visible { opacity: 1 !important; transform: translateY(0) !important; }
+        @keyframes usersPulse {
+          0%, 100% { 
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% { 
+            transform: scale(1.05);
+            opacity: 0.9;
+          }
+        }
       `}</style>
 
       {/* Hero Section - Full Width */}
@@ -318,23 +330,11 @@ const aiSolutions = () => {
               animationDelay: "0.05s",
               color: "#F97B72",
               textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
-              animation: "brainPulse 3s ease-in-out infinite",
+              animation: "usersPulse 3s ease-in-out infinite",
             }}
           >
-            <FaBrain />
+            <FaUsers />
           </div>
-          <style>{`
-            @keyframes brainPulse {
-              0%, 100% { 
-                transform: scale(1);
-                opacity: 1;
-              }
-              50% { 
-                transform: scale(1.05);
-                opacity: 0.9;
-              }
-            }
-          `}</style>
           <h1
             className="animate"
             style={{
@@ -344,21 +344,21 @@ const aiSolutions = () => {
               animationDelay: "0.1s",
             }}
           >
-            AI Solutions
+            Staff Augmentation
           </h1>
           <p
             className="animate"
             style={{
               fontSize: "1.2rem",
-              opacity: 0.9,
+              opacity: 0.95,
               maxWidth: "600px",
               margin: "0 auto",
               animationDelay: "0.15s",
             }}
           >
             {lang === "es"
-              ? "Potenciá tu negocio con inteligencia artificial"
-              : "Power your business with artificial intelligence"}
+              ? "Ampliamos tu equipo priorizando el match cultural y la calidad humana"
+              : "We scale your team prioritizing cultural fit and human quality"}
           </p>
         </div>
       </section>
@@ -398,9 +398,15 @@ const aiSolutions = () => {
           />
           <div style={{ position: "relative", zIndex: 2 }}>
             <SectionTitle>
-              {lang === "es" ? "¿Qué es la IA?" : "What is AI?"}
+              {lang === "es"
+                ? "¿Qué es Staff Augmentation?"
+                : "What is Staff Augmentation?"}
             </SectionTitle>
-            <Subtitle>{t("aiSolutions.description")}</Subtitle>
+            <Subtitle>
+              {lang === "es"
+                ? "Staff Augmentation es nuestro servicio estrella. Nosotros priorizamos el match cultural y la calidad humana por encima de todo. No solo buscamos desarrolladores expertos, sino personas que se alineen con tus valores, tu forma de trabajar y tu visión. Trabajamos como parte de tu equipo para entregar resultados de calidad y acelerar tu roadmap sin la complejidad de contrataciones tradicionales."
+                : "Staff Augmentation is our flagship service. We prioritize cultural fit and human quality above all else. We don't just find expert developers—we find people who align with your values, your way of working, and your vision. We work as part of your team to deliver quality results and accelerate your roadmap without the complexity of traditional hiring."}
+            </Subtitle>
           </div>
         </div>
 
@@ -411,8 +417,8 @@ const aiSolutions = () => {
         >
           <SectionTitle>
             {lang === "es"
-              ? "¿Te identificás con estos desafíos?"
-              : "Do you face these challenges?"}
+              ? "¿Por qué elegir Staff Augmentation?"
+              : "Why choose Staff Augmentation?"}
           </SectionTitle>
           <div
             style={{
@@ -423,101 +429,15 @@ const aiSolutions = () => {
               marginBottom: "1rem",
             }}
           >
-            {/* Cada card de desafío */}
+            {/* Cada card de beneficio */}
             <div
               className="animate"
               style={{
                 padding: "1.5rem",
-                background: "#FEF2F2",
+                background: "#F0F9FF",
                 borderRadius: "8px",
-                border: "1px solid #FECACA",
+                border: "1px solid #BAE6FD",
                 animationDelay: "0.3s",
-                minWidth: "240px",
-                maxWidth: "280px",
-                flex: "1 1 240px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "2rem",
-                  color: "#F97B72",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <FaCogs />
-              </div>
-              <h4
-                style={{
-                  fontWeight: "600",
-                  marginBottom: "0.5rem",
-                  color: "#2B2B2B",
-                }}
-              >
-                {lang === "es" ? "Procesos manuales" : "Manual processes"}
-              </h4>
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "#6B7280",
-                  lineHeight: "1.5",
-                }}
-              >
-                {lang === "es"
-                  ? "¿Te cuesta automatizar procesos y analizar datos de manera efectiva?"
-                  : "Do you find it challenging to automate processes and analyze data effectively?"}
-              </p>
-            </div>
-            <div
-              className="animate"
-              style={{
-                padding: "1.5rem",
-                background: "#FEF2F2",
-                borderRadius: "8px",
-                border: "1px solid #FECACA",
-                animationDelay: "0.35s",
-                minWidth: "240px",
-                maxWidth: "280px",
-                flex: "1 1 240px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "2rem",
-                  color: "#F97B72",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <FaBrain />
-              </div>
-              <h4
-                style={{
-                  fontWeight: "600",
-                  marginBottom: "0.5rem",
-                  color: "#2B2B2B",
-                }}
-              >
-                {lang === "es" ? "Falta de expertise" : "Lack of expertise"}
-              </h4>
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "#6B7280",
-                  lineHeight: "1.5",
-                }}
-              >
-                {lang === "es"
-                  ? "¿No tenés el conocimiento interno para implementar IA en tu negocio?"
-                  : "Do you lack the internal expertise to implement AI in your business?"}
-              </p>
-            </div>
-            <div
-              className="animate"
-              style={{
-                padding: "1.5rem",
-                background: "#FEF2F2",
-                borderRadius: "8px",
-                border: "1px solid #FECACA",
-                animationDelay: "0.4s",
                 minWidth: "240px",
                 maxWidth: "280px",
                 flex: "1 1 240px",
@@ -539,7 +459,9 @@ const aiSolutions = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es" ? "Ventaja competitiva" : "Competitive edge"}
+                {lang === "es"
+                  ? "Acelerá tu roadmap"
+                  : "Accelerate your roadmap"}
               </h4>
               <p
                 style={{
@@ -549,8 +471,94 @@ const aiSolutions = () => {
                 }}
               >
                 {lang === "es"
-                  ? "¿Tu negocio se está perdiendo la ventaja competitiva que puede brindar la IA?"
-                  : "Is your business missing out on the competitive edge AI can provide?"}
+                  ? "Agregá talento experto rápidamente sin los tiempos de contratación tradicionales."
+                  : "Add expert talent quickly without traditional hiring timelines."}
+              </p>
+            </div>
+            <div
+              className="animate"
+              style={{
+                padding: "1.5rem",
+                background: "#F0F9FF",
+                borderRadius: "8px",
+                border: "1px solid #BAE6FD",
+                animationDelay: "0.35s",
+                minWidth: "240px",
+                maxWidth: "280px",
+                flex: "1 1 240px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "2rem",
+                  color: "#F97B72",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                <FaHandshake />
+              </div>
+              <h4
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  color: "#2B2B2B",
+                }}
+              >
+                {lang === "es" ? "Integración perfecta" : "Perfect integration"}
+              </h4>
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  color: "#6B7280",
+                  lineHeight: "1.5",
+                }}
+              >
+                {lang === "es"
+                  ? "Nuestros desarrolladores se integran como parte de tu equipo, alineados con tu cultura."
+                  : "Our developers integrate as part of your team, aligned with your culture."}
+              </p>
+            </div>
+            <div
+              className="animate"
+              style={{
+                padding: "1.5rem",
+                background: "#F0F9FF",
+                borderRadius: "8px",
+                border: "1px solid #BAE6FD",
+                animationDelay: "0.4s",
+                minWidth: "240px",
+                maxWidth: "280px",
+                flex: "1 1 240px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "2rem",
+                  color: "#F97B72",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                <FaCode />
+              </div>
+              <h4
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  color: "#2B2B2B",
+                }}
+              >
+                {lang === "es" ? "Expertos en tecnología" : "Tech experts"}
+              </h4>
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  color: "#6B7280",
+                  lineHeight: "1.5",
+                }}
+              >
+                {lang === "es"
+                  ? "Accedé a desarrolladores senior con experiencia en las tecnologías que necesitás."
+                  : "Access senior developers with experience in the technologies you need."}
               </p>
             </div>
           </div>
@@ -558,9 +566,9 @@ const aiSolutions = () => {
             className="animate"
             style={{
               padding: "1.5rem",
-              background: "#F0F9FF",
+              background: "#FFF5F5",
               borderRadius: "8px",
-              border: "1px solid #BAE6FD",
+              border: "1px solid #FECACA",
               marginTop: "1rem",
               animationDelay: "0.45s",
             }}
@@ -575,82 +583,80 @@ const aiSolutions = () => {
               }}
             >
               {lang === "es"
-                ? "Como líder innovador, tenés el poder de superar estos desafíos y llevar tu negocio al futuro."
-                : "As an innovative leader, you have the power to overcome these challenges and lead your business into the future."}
+                ? "Para nosotros, el match cultural y la calidad humana son la prioridad. Trabajamos como parte de tu equipo, no como un proveedor externo. Nuestro compromiso es con tu éxito."
+                : "For us, cultural fit and human quality are the priority. We work as part of your team, not as an external vendor. Our commitment is to your success."}
             </p>
           </div>
         </ProfessionalCard>
 
         {/* Key Benefits */}
         <SectionTitle className="animate" style={{ animationDelay: "0.5s" }}>
-          {lang === "es" ? "¿Por qué elegir IA?" : "Why choose AI?"}
+          {lang === "es" ? "Beneficios clave" : "Key Benefits"}
         </SectionTitle>
         <FeatureGrid>
           <FeatureCard
             className="animate"
-            icon={<FaRobot />}
-            title={
-              lang === "es" ? "Automatización Inteligente" : "Smart Automation"
-            }
+            icon={<FaUsersCog />}
+            title={lang === "es" ? "Equipo Extendido" : "Extended Team"}
             description={
               lang === "es"
-                ? "Automatiza procesos complejos con IA que aprende y mejora"
-                : "Automate complex processes with AI that learns and improves"
+                ? "Desarrolladores que trabajan como parte de tu equipo, no como contratistas externos"
+                : "Developers who work as part of your team, not as external contractors"
             }
             delay={1}
           />
           <FeatureCard
             className="animate"
-            icon={<FaChartLine />}
-            title={lang === "es" ? "Análisis Avanzado" : "Advanced Analytics"}
+            icon={<FaClock />}
+            title={lang === "es" ? "Tiempo de Respuesta" : "Quick Start"}
             description={
               lang === "es"
-                ? "Extrae insights valiosos de tus datos con machine learning"
-                : "Extract valuable insights from your data with machine learning"
+                ? "Integración rápida, sin procesos largos de contratación"
+                : "Quick integration, without long hiring processes"
             }
             delay={2}
           />
           <FeatureCard
             className="animate"
-            icon={<FaBrain />}
-            title={lang === "es" ? "IA Personalizada" : "Custom AI"}
+            icon={<FaChartLine />}
+            title={lang === "es" ? "Escalabilidad" : "Scalability"}
             description={
               lang === "es"
-                ? "Soluciones de IA adaptadas a tus necesidades específicas"
-                : "AI solutions tailored to your specific needs"
+                ? "Ajustá el tamaño de tu equipo según tus necesidades del proyecto"
+                : "Adjust your team size based on your project needs"
             }
             delay={3}
           />
           <FeatureCard
             className="animate"
-            icon={<FaLightbulb />}
-            title={lang === "es" ? "Innovación" : "Innovation"}
+            icon={<FaShieldAlt />}
+            title={lang === "es" ? "Calidad Garantizada" : "Guaranteed Quality"}
             description={
               lang === "es"
-                ? "Mantente a la vanguardia con las últimas tecnologías de IA"
-                : "Stay ahead with the latest AI technologies"
+                ? "Desarrolladores senior con experiencia comprobada en proyectos complejos"
+                : "Senior developers with proven experience in complex projects"
             }
             delay={4}
           />
           <FeatureCard
             className="animate"
-            icon={<FaShieldAlt />}
-            title={lang === "es" ? "Seguridad" : "Security"}
+            icon={<FaSyncAlt />}
+            title={lang === "es" ? "Flexibilidad" : "Flexibility"}
             description={
               lang === "es"
-                ? "IA segura y confiable para proteger tus datos"
-                : "Secure and reliable AI to protect your data"
+                ? "Adaptación rápida a cambios en requerimientos y prioridades"
+                : "Quick adaptation to changes in requirements and priorities"
             }
             delay={5}
           />
           <FeatureCard
             className="animate"
-            icon={<FaRocket />}
-            title={lang === "es" ? "Escalabilidad" : "Scalability"}
+            icon={<FaUserTie />}
+            title={lang === "es" ? "Alineación Cultural" : "Cultural Fit"}
             description={
               lang === "es"
-                ? "Soluciones que crecen con tu negocio"
-                : "Solutions that grow with your business"
+                ? "Desarrolladores que comparten tus valores y forma de trabajar"
+                : "Developers who share your values and way of working"
             }
             delay={6}
           />
@@ -736,15 +742,15 @@ const aiSolutions = () => {
                     }}
                   >
                     {lang === "es"
-                      ? "Entendemos tus necesidades"
-                      : "Understand your needs"}
+                      ? "Entendemos tu cultura"
+                      : "Understand your culture"}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
                     {lang === "es"
-                      ? "Evaluamos tus objetivos de negocio e identificamos oportunidades de IA."
-                      : "We assess your business goals and identify AI opportunities."}
+                      ? "Priorizamos entender tus valores, tu forma de trabajar y tu visión. El match cultural es nuestra prioridad número uno."
+                      : "We prioritize understanding your values, your way of working, and your vision. Cultural fit is our number one priority."}
                   </div>
                 </div>
               </li>
@@ -779,15 +785,15 @@ const aiSolutions = () => {
                     }}
                   >
                     {lang === "es"
-                      ? "Diseñamos soluciones"
-                      : "Design solutions"}
+                      ? "Seleccionamos por match cultural"
+                      : "Select for cultural fit"}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
                     {lang === "es"
-                      ? "Creamos estrategias y modelos de IA adaptados a tus requerimientos."
-                      : "We create AI strategies and models tailored to your requirements."}
+                      ? "Nosotros evaluamos y seleccionamos desarrolladores priorizando el match cultural y la calidad humana, no solo las habilidades técnicas."
+                      : "We evaluate and select developers prioritizing cultural fit and human quality, not just technical skills."}
                   </div>
                 </div>
               </li>
@@ -821,16 +827,14 @@ const aiSolutions = () => {
                       fontSize: "1.08rem",
                     }}
                   >
-                    {lang === "es"
-                      ? "Colaboramos de cerca"
-                      : "Collaborate closely"}
+                    {lang === "es" ? "Integración rápida" : "Quick integration"}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
                     {lang === "es"
-                      ? "Refinamos soluciones basándonos en tu feedback y aseguramos integración perfecta."
-                      : "We refine solutions based on your feedback and ensure seamless integration."}
+                      ? "Nuestros desarrolladores se integran a tu equipo y procesos desde el día uno."
+                      : "Our developers integrate into your team and processes from day one."}
                   </div>
                 </div>
               </li>
@@ -863,16 +867,14 @@ const aiSolutions = () => {
                       fontSize: "1.08rem",
                     }}
                   >
-                    {lang === "es"
-                      ? "Potenciamos tu negocio"
-                      : "Empower your business"}
+                    {lang === "es" ? "Trabajamos juntos" : "Work together"}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
                     {lang === "es"
-                      ? "Entregamos herramientas impulsadas por IA que transforman tus operaciones."
-                      : "We deliver AI-driven tools that transform your operations."}
+                      ? "Colaboramos de cerca, entregamos resultados y aceleramos tu roadmap."
+                      : "We collaborate closely, deliver results and accelerate your roadmap."}
                   </div>
                 </div>
               </li>
@@ -924,7 +926,7 @@ const aiSolutions = () => {
               color: "white",
             }}
           >
-            {lang === "es" ? "Casos de uso de IA" : "AI use cases"}
+            {lang === "es" ? "Casos de uso ideales" : "Ideal use cases"}
           </h2>
           <div
             style={{
@@ -934,7 +936,7 @@ const aiSolutions = () => {
             }}
           >
             <div
-              className="ai-use-case-card animate"
+              className="animate"
               style={{
                 padding: "1.5rem",
                 background: "white",
@@ -949,19 +951,11 @@ const aiSolutions = () => {
                 e.currentTarget.style.transform = "translateY(-8px)";
                 e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
                 e.currentTarget.style.borderColor = "rgba(249, 123, 114, 0.3)";
-                e.currentTarget.querySelector("div").style.transform =
-                  "scale(1.1)";
-                e.currentTarget.querySelector("div").style.color = "#ff6b6b";
-                e.currentTarget.querySelector("h4").style.color = "#F97B72";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
                 e.currentTarget.style.borderColor = "#E5E7EB";
-                e.currentTarget.querySelector("div").style.transform =
-                  "scale(1)";
-                e.currentTarget.querySelector("div").style.color = "#F97B72";
-                e.currentTarget.querySelector("h4").style.color = "#2B2B2B";
               }}
             >
               <div
@@ -970,10 +964,9 @@ const aiSolutions = () => {
                   color: "#F97B72",
                   marginBottom: "1rem",
                   textAlign: "center",
-                  transition: "all 0.3s ease",
                 }}
               >
-                <FaUsers />
+                <FaRocket />
               </div>
               <h4
                 style={{
@@ -981,10 +974,9 @@ const aiSolutions = () => {
                   marginBottom: "0.5rem",
                   textAlign: "center",
                   color: "#2B2B2B",
-                  transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es" ? "Chatbots inteligentes" : "Smart chatbots"}
+                {lang === "es" ? "Startups en crecimiento" : "Growing startups"}
               </h4>
               <p
                 style={{
@@ -992,16 +984,15 @@ const aiSolutions = () => {
                   color: "#6B7280",
                   textAlign: "center",
                   lineHeight: "1.5",
-                  transition: "all 0.3s ease",
                 }}
               >
                 {lang === "es"
-                  ? "Atención al cliente 24/7 con respuestas inteligentes y personalizadas"
-                  : "24/7 customer service with intelligent and personalized responses"}
+                  ? "Escalá tu equipo rápidamente para cumplir con deadlines y objetivos ambiciosos"
+                  : "Scale your team quickly to meet deadlines and ambitious goals"}
               </p>
             </div>
             <div
-              className="ai-use-case-card animate"
+              className="animate"
               style={{
                 padding: "1.5rem",
                 background: "white",
@@ -1016,19 +1007,11 @@ const aiSolutions = () => {
                 e.currentTarget.style.transform = "translateY(-8px)";
                 e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
                 e.currentTarget.style.borderColor = "rgba(249, 123, 114, 0.3)";
-                e.currentTarget.querySelector("div").style.transform =
-                  "scale(1.1)";
-                e.currentTarget.querySelector("div").style.color = "#ff6b6b";
-                e.currentTarget.querySelector("h4").style.color = "#F97B72";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
                 e.currentTarget.style.borderColor = "#E5E7EB";
-                e.currentTarget.querySelector("div").style.transform =
-                  "scale(1)";
-                e.currentTarget.querySelector("div").style.color = "#F97B72";
-                e.currentTarget.querySelector("h4").style.color = "#2B2B2B";
               }}
             >
               <div
@@ -1037,10 +1020,9 @@ const aiSolutions = () => {
                   color: "#F97B72",
                   marginBottom: "1rem",
                   textAlign: "center",
-                  transition: "all 0.3s ease",
                 }}
               >
-                <FaChartLine />
+                <FaCode />
               </div>
               <h4
                 style={{
@@ -1048,12 +1030,9 @@ const aiSolutions = () => {
                   marginBottom: "0.5rem",
                   textAlign: "center",
                   color: "#2B2B2B",
-                  transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Predicción de tendencias"
-                  : "Trend prediction"}
+                {lang === "es" ? "Proyectos específicos" : "Specific projects"}
               </h4>
               <p
                 style={{
@@ -1061,16 +1040,15 @@ const aiSolutions = () => {
                   color: "#6B7280",
                   textAlign: "center",
                   lineHeight: "1.5",
-                  transition: "all 0.3s ease",
                 }}
               >
                 {lang === "es"
-                  ? "Anticipa el comportamiento del mercado y las necesidades de los clientes"
-                  : "Anticipate market behavior and customer needs"}
+                  ? "Agregá expertise en tecnologías específicas para proyectos puntuales"
+                  : "Add expertise in specific technologies for targeted projects"}
               </p>
             </div>
             <div
-              className="ai-use-case-card animate"
+              className="animate"
               style={{
                 padding: "1.5rem",
                 background: "white",
@@ -1085,19 +1063,11 @@ const aiSolutions = () => {
                 e.currentTarget.style.transform = "translateY(-8px)";
                 e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
                 e.currentTarget.style.borderColor = "rgba(249, 123, 114, 0.3)";
-                e.currentTarget.querySelector("div").style.transform =
-                  "scale(1.1)";
-                e.currentTarget.querySelector("div").style.color = "#ff6b6b";
-                e.currentTarget.querySelector("h4").style.color = "#F97B72";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
                 e.currentTarget.style.borderColor = "#E5E7EB";
-                e.currentTarget.querySelector("div").style.transform =
-                  "scale(1)";
-                e.currentTarget.querySelector("div").style.color = "#F97B72";
-                e.currentTarget.querySelector("h4").style.color = "#2B2B2B";
               }}
             >
               <div
@@ -1106,10 +1076,9 @@ const aiSolutions = () => {
                   color: "#F97B72",
                   marginBottom: "1rem",
                   textAlign: "center",
-                  transition: "all 0.3s ease",
                 }}
               >
-                <FaCogs />
+                <FaUsers />
               </div>
               <h4
                 style={{
@@ -1117,12 +1086,9 @@ const aiSolutions = () => {
                   marginBottom: "0.5rem",
                   textAlign: "center",
                   color: "#2B2B2B",
-                  transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Optimización de procesos"
-                  : "Process optimization"}
+                {lang === "es" ? "Equipos distribuidos" : "Distributed teams"}
               </h4>
               <p
                 style={{
@@ -1130,12 +1096,11 @@ const aiSolutions = () => {
                   color: "#6B7280",
                   textAlign: "center",
                   lineHeight: "1.5",
-                  transition: "all 0.3s ease",
                 }}
               >
                 {lang === "es"
-                  ? "Mejora la eficiencia operativa con IA que optimiza automáticamente"
-                  : "Improve operational efficiency with AI that automatically optimizes"}
+                  ? "Ampliá tu equipo remoto con desarrolladores que trabajan en tu timezone"
+                  : "Expand your remote team with developers who work in your timezone"}
               </p>
             </div>
           </div>
@@ -1144,43 +1109,21 @@ const aiSolutions = () => {
 
       <ServiceContainer>
         {/* Call to Action */}
-        <ProfessionalCard
-          className="animate"
-          style={{
-            background: "#FFF5F5",
-            textAlign: "center",
-            animationDelay: "1s",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: "600",
-              marginBottom: "1rem",
-              color: "#2B2B2B",
-            }}
-          >
-            {lang === "es"
-              ? "¿Listo para el futuro con IA?"
-              : "Ready for the AI future?"}
-          </h3>
-          <p
-            style={{
-              fontSize: "1.1rem",
-              color: "#6B7280",
-              marginBottom: "2rem",
-            }}
-          >
-            {t("aiSolutions.vision")}
-          </p>
-        </ProfessionalCard>
-
-        <div className="animate" style={{ animationDelay: "1.05s" }}>
-          <ServicesCallToAction />
+        <div className="animate" style={{ animationDelay: "1s" }}>
+          <CallToActionBlock
+            title={
+              lang === "es"
+                ? "¿Listo para ampliar tu equipo?"
+                : "Ready to scale your team?"
+            }
+            description={t("servicesCallToAction.description")}
+            buttonText={t("servicesCallToAction.buttonText")}
+            highlightWord="Ready"
+          />
         </div>
       </ServiceContainer>
     </>
   );
 };
 
-export default aiSolutions;
+export default staffAugmentation;

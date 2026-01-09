@@ -71,7 +71,7 @@ const ContactForm = () => {
           "service_jk13omy",
           "template_k5rhtkf",
           e.target,
-          "DMk76Fu8oF26N7Yse"
+          "DMk76Fu8oF26N7Yse",
         )
         .then(
           (result) => {
@@ -83,7 +83,7 @@ const ContactForm = () => {
             setFormStatus(t("errorSendingMessage"));
             setIsModalOpen(true);
             console.error(error.text);
-          }
+          },
         );
     }
   }
@@ -104,7 +104,9 @@ const ContactForm = () => {
           onChange={handleInputChange}
           className={errors.from_name ? "error touched" : "valid touched"}
         />
-        {errors.from_name && <Error className="visible">{errors.from_name}</Error>}
+        {errors.from_name && (
+          <Error className="visible">{errors.from_name}</Error>
+        )}
 
         <Input
           type="email"
@@ -114,7 +116,9 @@ const ContactForm = () => {
           onChange={handleInputChange}
           className={errors.from_email ? "error touched" : "valid touched"}
         />
-        {errors.from_email && <Error className="visible">{errors.from_email}</Error>}
+        {errors.from_email && (
+          <Error className="visible">{errors.from_email}</Error>
+        )}
 
         <Input
           type="number"

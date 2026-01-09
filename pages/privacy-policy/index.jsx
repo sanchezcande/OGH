@@ -5,7 +5,7 @@ import {
   PrivacyPolicySection,
   SectionTitle,
   SectionContent,
-  List
+  List,
 } from "../../src/styles/pagesStyles/PrivacyPolicy.styles";
 import { useTranslation } from "react-i18next";
 

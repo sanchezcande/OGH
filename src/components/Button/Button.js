@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 // Definición del keyframe para el pulso del botón
 const pulse = keyframes`
@@ -13,14 +13,16 @@ export const LightButton = styled.button`
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
   font-size: 1em;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
-    background-color: #0034EE;
+    background-color: #0034ee;
     transform: translateY(-2px);
   }
 `;
@@ -65,7 +67,7 @@ export const DarkButton = styled.button`
     color: ${({ theme }) => theme.colors.background};
     transform: scale(1.05); /* Escala en lugar de trasladarse */
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    
+
     &::before {
       left: 100%; /* El brillo se desplaza al hacer hover */
     }

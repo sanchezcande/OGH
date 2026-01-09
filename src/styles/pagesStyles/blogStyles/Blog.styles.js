@@ -5,7 +5,11 @@ export const BlogContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   padding: 30px;
-  background: linear-gradient(145deg, ${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.backgroundAlt});
+  background: linear-gradient(
+    145deg,
+    ${({ theme }) => theme.colors.background},
+    ${({ theme }) => theme.colors.backgroundAlt}
+  );
   color: ${({ theme }) => theme.colors.text};
   min-height: 100vh;
 `;
@@ -81,7 +85,8 @@ export const ScrollToTopButton = styled.button`
 `;
 
 export const ArticleCard = styled.div`
-  background: ${({ theme }) => `linear-gradient(145deg, ${theme.colors.backgroundAlt}, ${theme.colors.background})`};
+  background: ${({ theme }) =>
+    `linear-gradient(145deg, ${theme.colors.backgroundAlt}, ${theme.colors.background})`};
   border: 2px solid ${({ theme }) => theme.colors.primaryDark};
   border-radius: 16px;
   padding: 20px;
@@ -90,7 +95,9 @@ export const ArticleCard = styled.div`
   width: 100%;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 
   &.visible {
     opacity: 1;

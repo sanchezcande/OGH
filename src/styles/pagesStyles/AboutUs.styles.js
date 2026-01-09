@@ -40,13 +40,13 @@ export const Container = styled.div`
   }
 
   /* H1 styles are now within ImageText for better specificity regarding animation */
-  
+
   /* Smooth scrolling for better animation experience */
   scroll-behavior: smooth;
 `;
 
 export const ImageText = styled.div`
-margin-top: 1rem;
+  margin-top: 1rem;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -64,7 +64,9 @@ margin-top: 1rem;
     margin-top: 1rem;
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    transition:
+      opacity 0.8s ease-out,
+      transform 0.8s ease-out;
 
     &.visible {
       opacity: 1;
@@ -75,16 +77,16 @@ margin-top: 1rem;
       width: 100%;
       height: auto;
       border-radius: 50%;
-      box-shadow: 
+      box-shadow:
         0 10px 20px rgba(0, 0, 0, 0.1),
         0 6px 6px rgba(0, 0, 0, 0.1),
         0 0 0 1px rgba(0, 0, 0, 0.05);
       background-color: #ffffff;
       transition: all 0.3s ease;
-      
+
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 
+        box-shadow:
           0 15px 30px rgba(0, 0, 0, 0.12),
           0 8px 8px rgba(0, 0, 0, 0.12),
           0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -100,13 +102,15 @@ margin-top: 1rem;
       text-align: center;
       opacity: 0;
       transform: translateY(20px);
-      transition: opacity 0.6s ease-out 0.3s, transform 0.6s ease-out 0.3s;
+      transition:
+        opacity 0.6s ease-out 0.3s,
+        transform 0.6s ease-out 0.3s;
 
       .image-container.visible & {
         opacity: 1;
         transform: translateY(0);
       }
-      
+
       .founder-name {
         font-size: 1.2rem;
         font-weight: 600;
@@ -115,7 +119,7 @@ margin-top: 1rem;
         text-align: center;
         display: block;
       }
-      
+
       .founder-role {
         font-size: 0.9rem;
         font-weight: 400;
@@ -136,7 +140,9 @@ margin-top: 1rem;
     align-items: flex-start;
     opacity: 0;
     transform: translateY(-30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
     transition-delay: 0.2s;
 
     &.visible {
@@ -178,22 +184,22 @@ const highlightAnimation = keyframes`
 
 // Styled component for the highlighted word (remains the same)
 export const HighlightedWord = styled.span.attrs(() => ({
-  className: 'highlighted-class-placeholder' 
+  className: "highlighted-class-placeholder",
 }))`
   display: inline-block;
   position: relative;
   color: white;
-  padding: 0.05em 0.15em; 
+  padding: 0.05em 0.15em;
   border-radius: 3px;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: ${({ theme }) => theme.colors.accent}; 
+    background-color: ${({ theme }) => theme.colors.accent};
     transform-origin: left;
     z-index: -1;
     border-radius: inherit;
@@ -212,7 +218,9 @@ export const TeamSection = styled.section`
   padding: 2rem 0;
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
 
   &.visible {
     opacity: 1;
@@ -256,13 +264,15 @@ export const TeamMemberCard = styled.div`
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.05),
     0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
 
   &.visible {
     opacity: 1;
@@ -271,7 +281,7 @@ export const TeamMemberCard = styled.div`
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 
+    box-shadow:
       0 8px 25px rgba(0, 0, 0, 0.1),
       0 4px 10px rgba(0, 0, 0, 0.05);
   }
@@ -329,7 +339,9 @@ export const CompanyDescription = styled.div`
   text-align: center;
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
 
   &.visible {
     opacity: 1;
@@ -347,7 +359,7 @@ export const CompanyDescription = styled.div`
       animation: ${slideInFromTopText} 0.6s ease-out 0.4s forwards;
     }
   }
-  
+
   h1 {
     font-size: 2.5rem;
     color: ${({ theme }) => theme.colors.primaryDark};
@@ -406,15 +418,15 @@ export const CompanyDescription = styled.div`
   @media (max-width: 768px) {
     margin: 0 1rem 2rem 1rem;
     padding: 1rem;
-    
+
     h1 {
       font-size: 2rem;
     }
-    
+
     h2.subtitle {
       font-size: 1.3rem;
     }
-    
+
     p {
       font-size: 1rem;
       line-height: 1.5;

@@ -8,7 +8,12 @@ import {
 } from "./CallToAction.styles";
 import { motion } from "framer-motion";
 
-const CallToActionBlock = ({ title, description, buttonText, highlightWord }) => {
+const CallToActionBlock = ({
+  title,
+  description,
+  buttonText,
+  highlightWord,
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
 
@@ -18,11 +23,11 @@ const CallToActionBlock = ({ title, description, buttonText, highlightWord }) =>
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-            observer.disconnect(); 
+            observer.disconnect();
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (ref.current) {
@@ -39,25 +44,27 @@ const CallToActionBlock = ({ title, description, buttonText, highlightWord }) =>
   // Function to format title with optional word highlighting
   const formatTitle = (title, highlightWord) => {
     if (!title) return "";
-    
+
     // If no highlightWord is provided, highlight the first word (default behavior)
     if (!highlightWord) {
-    const words = title.split(" ");
-    if (words.length <= 1) return title;
-    
-    return (
-      <>
-        <span>{words[0]}</span> {words.slice(1).join(" ")}
+      const words = title.split(" ");
+      if (words.length <= 1) return title;
+
+      return (
+        <>
+          <span>{words[0]}</span> {words.slice(1).join(" ")}
         </>
       );
     }
-    
+
     // If highlightWord is provided, find and highlight that specific word
     const words = title.split(" ");
-    const highlightIndex = words.findIndex(word => 
-      word.toLowerCase().replace(/[^a-z0-9]/g, '') === highlightWord.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const highlightIndex = words.findIndex(
+      (word) =>
+        word.toLowerCase().replace(/[^a-z0-9]/g, "") ===
+        highlightWord.toLowerCase().replace(/[^a-z0-9]/g, ""),
     );
-    
+
     if (highlightIndex === -1) {
       // If word not found, fall back to highlighting first word
       return (
@@ -66,7 +73,7 @@ const CallToActionBlock = ({ title, description, buttonText, highlightWord }) =>
         </>
       );
     }
-    
+
     return (
       <>
         {words.slice(0, highlightIndex).join(" ")}
@@ -85,9 +92,15 @@ const CallToActionBlock = ({ title, description, buttonText, highlightWord }) =>
         animate={isVisible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6 }}
       >
-        <CallToActionTitle>{formatTitle(title, highlightWord)}</CallToActionTitle>
+        <CallToActionTitle>
+          {formatTitle(title, highlightWord)}
+        </CallToActionTitle>
         <CallToActionDescription>{description}</CallToActionDescription>
-        <CallToActionButton href="https://calendly.com/sanchezgcandelaria" target="_blank" rel="noopener noreferrer">
+        <CallToActionButton
+          href="https://calendly.com/sanchezgcandelaria"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {buttonText}
         </CallToActionButton>
       </motion.div>

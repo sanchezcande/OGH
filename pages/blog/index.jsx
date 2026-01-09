@@ -20,7 +20,7 @@ export default function Blog() {
   const filteredArticles = articles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.summary.toLowerCase().includes(searchTerm.toLowerCase())
+      article.summary.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function Blog() {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const cards = document.querySelectorAll(".article-card");
@@ -59,7 +59,7 @@ export default function Blog() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const handleImageLoad = () => {
-    setIsImageLoaded(true); 
+    setIsImageLoaded(true);
   };
 
   return (
@@ -75,8 +75,8 @@ export default function Blog() {
       <Gallery>
         {filteredArticles.map((article) => (
           <ArticleCard key={article.slug} className="article-card">
-            <img 
-              src={article.image} 
+            <img
+              src={article.image}
               alt={article.title}
               loading="lazy"
               onLoad={handleImageLoad}

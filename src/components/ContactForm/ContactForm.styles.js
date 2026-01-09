@@ -102,7 +102,7 @@ export const TextArea = styled.textarea`
 `;
 
 export const Error = styled.div`
-  color:   ${({ theme }) => theme.colors.accentDark};;
+  color: ${({ theme }) => theme.colors.accentDark};
   margin-bottom: 10px;
   font-size: 10px;
   margin-left: 10px;
@@ -125,17 +125,14 @@ export const Error = styled.div`
 `;
 
 export const StyledButton = styled(DarkButton)`
-margin-top: 10px;
+  margin-top: 10px;
   display: inline-block;
 
-    &.error {
-      animation: none;
-
+  &.error {
+    animation: none;
   }
 
   &.valid {
     animation: none;
-
   }
-
 `;

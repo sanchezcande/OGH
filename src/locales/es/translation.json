@@ -29,17 +29,17 @@
   "articleNotFound": "Artículo no encontrado. Por favor, visita el índice de nuestro blog para ver las publicaciones recientes.",
   "seoDescription": "Ayudamos a fundadores y VCs visionarios a escalar startups con desarrolladores alineados culturalmente que valoran el impacto.",
   "heroAnimatedText": {
-    "part1": "Tu socio ",
-    "highlight1": "tech",
-    "part2": "con",
-    "highlight2": "alma"
+    "part1": "Alianzas tech ",
+    "highlight1": "humanas",
+    "part2": " primero",
+    "highlight2": ""
   },
-  "heroSubtitle": "Haciendo tu vida más fácil — con humanos reales que se preocupan.",
+  "heroSubtitle": "Encontramos desarrolladores que encajan con tu equipo, no solo con tus requerimientos.",
   "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
-  "problemTitle": "Estás <highlight>contra</highlight> reloj.",
-  "problemText": "Construir un producto es difícil. Querés avanzar rápido, mantener la calidad y rodearte de gente confiable. Pero contratar lleva tiempo y tercerizar suele implicar perder control o cultura.",
-  "weGetYouTitle": "Te <highlight>vemos</highlight>.",
-  "weGetYouText": "Te entendemos. Por eso creamos OpenGateHub: para hacer tu trabajo más liviano, con un equipo que cuida la calidad y se adapta a tu forma de trabajar. No tenés que hacerlo solo.",
+  "problemTitle": "Contratar desarrolladores es <highlight>difícil</highlight>.",
+  "problemText": "Necesitás escalar tu equipo, pero encontrar desarrolladores que encajen con tu cultura y entreguen trabajo de calidad lleva tiempo. La contratación tradicional es lenta, y la mayoría de las agencias priorizan habilidades sobre el match cultural.",
+  "weGetYouTitle": "Nosotros <highlight>priorizamos el fit</highlight>.",
+  "weGetYouText": "Por eso nos enfocamos en Staff Augmentation: te conectamos con desarrolladores que se alinean con tus valores y forma de trabajar. El match cultural y la calidad humana van primero—sin olvidar las habilidades técnicas sólidas.",
   "servicesTitle": "Nuestros Servicios",
   "servicesText": "Trabajamos con personas que se preocupan por el cómo, no solo por el qué. Soluciones personalizadas para fundadores que quieren escalar con fluidez, confianza y cultura.",
   "planTitle": "Así trabajamos:",
@@ -49,12 +49,13 @@
     "step3": "Ponete en marcha: integrá, iterá y escalá con confianza."
   },
   "connectWithUs": "Conectate con Nosotros",
-  "aboutUsTitle_part1": "Construimos tecnología que hace tu vida ",
-  "aboutUsTitle_highlight": "más fácil",
-  "aboutUsSubtitle": "— y tu producto más fuerte",
-  "aboutUsText": "No somos solo otra agencia de desarrollo. Somos un equipo de desarrolladores que sabe lo que se necesita para construir, escalar y mantener productos que importan.\nEn OpenGateHub, creemos que la tecnología debería sentirse como un apoyo — no como estrés.\nNos importa cómo se construyen las cosas — con propósito, claridad y alma.",
-  "aboutUsLastLine": " Nuestro trabajo es simple: ",
-  "aboutUsTextBold": "hacer que el trabajo duro se sienta más liviano.",
+  "aboutUsTitle_part1": "Construimos tecnología poniendo a las ",
+  "aboutUsTitle_highlight": "personas",
+  "aboutUsTitle_part2": " primero",
+  "aboutUsSubtitle": "— porque los productos fuertes empiezan con equipos fuertes.",
+  "aboutUsText": "No somos otra agencia de desarrollo. Formamos alianzas a largo plazo con equipos que valoran el match cultural tanto como la excelencia técnica.\nEn OpenGateHub, ser human-first significa reducir fricción, no agregar procesos. Construimos con claridad, intención y cuidado — para que el trabajo complejo se sienta más liviano y el progreso se mantenga sostenible.",
+  "aboutUsLastLine": "",
+  "aboutUsTextBold": "",
   "aboutUsFounder": "Candelaria Sanchez",
   "aboutUsFounderRole": "Co-fundadora y CTO, OpenGateHub",
   "aboutUsFounderBio": "Candelaria Sanchez es ingeniera de software y co-fundadora de OpenGateHub, un socio tecnológico para equipos estadounidenses impulsados por el impacto. No comenzó en salas de juntas, comenzó detrás del volante de un Uber, donde una conversación casual la llevó a su primer rol en tecnología. Esa experiencia moldeó el propósito de OpenGateHub: abrir puertas para otros mientras ayuda a empresas éticas y orientadas a la misión a moverse más rápido.\n\nSu equipo integra escuadras senior alineadas con la misión, en zonas horarias cercanas desde América Latina, directamente en los rituales de ingeniería estadounidenses - standups, revisiones de sprint, puertas de QA, reduciendo el tiempo del ciclo sin agregar sobrecarga de gestión. Candelaria lidera con una mentalidad centrada en las personas, pruebas sobre promesas: sprints claros, ajuste cultural, resultados medibles. El objetivo no es solo enviar funciones, es usar la tecnología de manera responsable para hacer los negocios y el mundo un mejor lugar para todos.",
@@ -444,6 +445,10 @@
     "subtitle": "Ofrecemos soluciones personalizadas que ayudan a fundadores y VCs visionarios a escalar con impacto",
     "startJourneyButton": "Comienza tu viaje",
     "cards": {
+      "staffAugmentation": {
+        "title": "Staff Augmentation",
+        "description": "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar, no solo habilidades técnicas."
+      },
       "softwareDevelopment": {
         "title": "Desarrollo de Software",
         "description": "Soluciones personalizadas que escalan con tu negocio, desde aplicaciones web hasta sistemas empresariales."
@@ -452,17 +457,13 @@
         "title": "Diseño UX/UI",
         "description": "Interfaces atractivas que conectan con los usuarios y aumentan las conversiones mediante diseño basado en investigación."
       },
-      "aiSolutions": {
-        "title": "Soluciones de IA",
-        "description": "Aprovecha el poder de la inteligencia artificial para automatizar procesos y obtener valiosos insights."
+      "aiAndAutomation": {
+        "title": "IA y Automatización",
+        "description": "Aprovecha el poder de la inteligencia artificial y automatiza flujos de trabajo sin código. Conectamos tus herramientas y construimos integraciones poderosas que hacen que tu negocio funcione más suavemente."
       },
       "dataAnalytics": {
         "title": "Analítica de Datos",
         "description": "Convierte tus datos en inteligencia accionable con análisis avanzados y visualizaciones."
-      },
-      "n8nAutomation": {
-        "title": "Automatización n8n",
-        "description": "Conecta tus herramientas y automatiza flujos de trabajo sin código. Construimos integraciones poderosas que hacen que tu negocio funcione más suavemente."
       },
       "mobileDevelopment": {
         "title": "Desarrollo Móvil",
@@ -476,7 +477,11 @@
     "smartersCity": {
       "title": "Smarters City",
       "description": "SaaS de gestión de activos urbanos para mapeo y mantenimiento en tiempo real de semáforos, luces de tráfico y más.",
-      "metrics": ["35% carga más rápida", "0 bugs críticos", "1er contrato municipal"]
+      "metrics": [
+        "35% carga más rápida",
+        "0 bugs críticos",
+        "1er contrato municipal"
+      ]
     },
     "estudioSab": {
       "title": "Estudio Sab",
@@ -537,31 +542,31 @@
     "title": "Los Rostros Detrás del Código",
     "subtitle": "Conoce a las personas que convierten desafíos en soluciones e ideas en realidad.",
     "members": {
-                     "javier": {
-                 "name": "Javier",
-                 "role": "Ingeniero Frontend Senior",
-                 "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
-               },
-                     "giuliano": {
-                 "name": "Giuliano",
-                 "role": "Ingeniero Full Stack",
-                 "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
-               },
-                     "laura": {
-                 "name": "Laura",
-                 "role": "Desarrolladora Frontend",
-                 "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
-               },
-                     "gustavo": {
-                 "name": "Gustavo",
-                 "role": "Arquitecto de Software",
-                 "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
-               },
-                     "alejandria": {
-                 "name": "Alejandría",
-                 "role": "Analista QA",
-                 "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
-               }
+      "javier": {
+        "name": "Javier",
+        "role": "Ingeniero Frontend Senior",
+        "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
+      },
+      "giuliano": {
+        "name": "Giuliano",
+        "role": "Ingeniero Full Stack",
+        "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
+      },
+      "laura": {
+        "name": "Laura",
+        "role": "Desarrolladora Frontend",
+        "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
+      },
+      "gustavo": {
+        "name": "Gustavo",
+        "role": "CTO",
+        "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
+      },
+      "alejandria": {
+        "name": "Alejandría",
+        "role": "Analista QA",
+        "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
+      }
     }
   }
 }

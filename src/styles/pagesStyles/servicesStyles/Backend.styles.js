@@ -39,7 +39,11 @@ const pulseBorder = `
 `;
 
 export const ServiceContainer = styled.section`
-  background: linear-gradient(145deg, ${({ theme }) => theme.colors.secondary}, ${({ theme }) => theme.colors.muted});
+  background: linear-gradient(
+    145deg,
+    ${({ theme }) => theme.colors.secondary},
+    ${({ theme }) => theme.colors.muted}
+  );
   color: ${({ theme }) => theme.colors.text};
   padding: 3rem 2rem;
   margin: 2rem auto;
@@ -49,7 +53,7 @@ export const ServiceContainer = styled.section`
   transition: box-shadow 0.3s ease;
 
   &:hover {
-   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   }
 `;
 
