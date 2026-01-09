@@ -4,6 +4,10 @@ const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     const mediaQuery = window.matchMedia(query);
     const handleChange = () => setMatches(mediaQuery.matches);
 
