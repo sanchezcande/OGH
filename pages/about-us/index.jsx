@@ -88,6 +88,7 @@ const AboutUs = React.forwardRef((props, ref) => {
           <HighlightedWord className="animate">
             {t("aboutUsTitle_highlight")}
           </HighlightedWord>
+          {t("aboutUsTitle_part2")}
         </h1>
         <h2 className="subtitle">{t("aboutUsSubtitle")}</h2>
         <p>
