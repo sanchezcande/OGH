@@ -23,25 +23,26 @@
 .navLinks {
   display: flex;
   list-style: none;
-  border-radius: 4px;
-  background-color: rgba(249, 123, 114, 0.08); /* coral suave */
-  padding: 15px 30px;
-  border: 2px solid #2b2b2b;
+  border-radius: 8px;
+  background-color: #ffffff;
+  padding: 12px 24px;
+  border: 1px solid #e5e7eb;
   position: relative;
   justify-content: center;
   gap: 50px;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .navLink {
   position: relative;
-  padding: 10px 20px;
-  color: #4b5563;
+  padding: 8px 16px;
+  color: #374151;
   cursor: pointer;
   text-decoration: none;
-  font-size: 16px;
-  transition: color 0.3s ease;
+  font-size: 15px;
+  transition: color 0.2s ease;
+  font-weight: 500;
 }
 
 .navLink:hover {
@@ -51,9 +52,9 @@
 .highlightBar {
   position: absolute;
   bottom: 0;
-  height: 100%;
-  background-color: rgba(249, 123, 114, 0.2);
-  border-radius: 4px;
+  height: 2px;
+  background-color: #f97b72;
+  border-radius: 2px;
   transition:
     left 0.3s ease,
     width 0.3s ease;
@@ -128,18 +129,18 @@
   transform: translateX(-50%) scaleY(0);
   transform-origin: top;
   list-style: none;
-  border: 2px solid #2b2b2b;
-  border-radius: 4px;
-  background-color: #fff5f5;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #ffffff;
   z-index: 10000;
   margin: 0;
   padding: 0;
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 0.3s ease-in-out,
-    transform 0.3s ease-in-out;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   visibility: hidden;
 }
 
@@ -166,31 +167,32 @@
 }
 
 .servicesMenuItem {
-  padding: 10px 16px;
+  padding: 12px 20px;
   cursor: pointer;
-  color: #1f2937;
-  font-weight: 300;
+  color: #374151;
+  font-weight: 400;
   font-size: 15px;
   min-width: 220px;
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    font-size 0.3s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color 0.2s ease,
+    color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .servicesMenuItem:first-child {
   margin-top: 0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .servicesMenuItem:last-child {
   border-bottom: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .servicesMenuItem:hover {
-  background-color: rgba(249, 123, 114, 0.2);
-  font-size: 16px;
-  font-weight: 400;
+  background-color: #f9fafb;
   color: #f97b72;
 }
 

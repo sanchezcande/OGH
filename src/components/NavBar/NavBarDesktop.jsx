@@ -142,25 +142,15 @@ const NavBarDesktop = () => {
                       style={
                         service.featured
                           ? {
-                            background:
-                              "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
+                            background: "#f9fafb",
                             fontWeight: "500",
+                            borderLeft: "2px solid #f97b72",
                           }
                           : {}
                       }
                     >
                       <Link href={service.href}>
                         {service.text}
-                        {service.featured && (
-                          <span
-                            style={{
-                              marginLeft: "8px",
-                              fontSize: "0.75rem",
-                            }}
-                          >
-                            ⭐
-                          </span>
-                        )}
                       </Link>
                     </li>
                   ))}

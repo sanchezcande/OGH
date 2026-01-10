@@ -5,11 +5,7 @@ export const BlogContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   padding: 30px;
-  background: linear-gradient(
-    145deg,
-    ${({ theme }) => theme.colors.background},
-    ${({ theme }) => theme.colors.backgroundAlt}
-  );
+  background: #ffffff;
   color: ${({ theme }) => theme.colors.text};
   min-height: 100vh;
 `;
@@ -23,34 +19,33 @@ export const SearchBarContainer = styled.div`
 export const SearchInput = styled.input`
   width: 280px;
   padding: 10px 15px;
-  border: none;
-  border-bottom: 2px solid ${({ theme }) => theme.colors.primaryDark};
-  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
   font-size: 1rem;
   color: ${({ theme }) => theme.colors.text};
   outline: none;
   margin-left: 10px;
   margin-bottom: 20px;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s ease;
 
   &::placeholder {
-    color: ${({ theme }) => theme.colors.text};
-    opacity: 0.7;
+    color: #9ca3af;
   }
 
   &:focus {
-    border-bottom-color: ${({ theme }) => theme.colors.accent};
+    border-color: #6b7280;
   }
 `;
 
 export const Gallery = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 28px;
   width: 100%;
   justify-content: start;
   justify-items: stretch;
-  align-items: start;
+  align-items: stretch;
 
   @media (min-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
@@ -85,19 +80,23 @@ export const ScrollToTopButton = styled.button`
 `;
 
 export const ArticleCard = styled.div`
-  background: ${({ theme }) =>
-    `linear-gradient(145deg, ${theme.colors.backgroundAlt}, ${theme.colors.background})`};
-  border: 2px solid ${({ theme }) => theme.colors.primaryDark};
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   opacity: 0;
   transform: translateY(20px);
   transition:
     opacity 0.6s ease,
-    transform 0.6s ease;
+    transform 0.6s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 
   &.visible {
     opacity: 1;
@@ -108,41 +107,57 @@ export const ArticleCard = styled.div`
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
   }
 
   &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 12px 24px ${({ theme }) => theme.colors.primaryDark}CC;
-    border-color: ${({ theme }) => theme.colors.primaryDark};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #d1d5db;
   }
 
   h2 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+    font-weight: 600;
     margin-bottom: 12px;
-    color: ${({ theme }) => theme.colors.text};
+    color: #1f2937;
+    line-height: 1.3;
+    flex-shrink: 0;
 
     @media (max-width: 768px) {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
     }
   }
 
   p {
-    font-size: 1rem;
-    color: ${({ theme }) => theme.colors.text};
-    line-height: 1.5;
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    flex-grow: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
   }
 
   a {
     display: inline-block;
-    margin-top: 15px;
-    color: ${({ theme }) => theme.colors.accent};
-    font-weight: bold;
+    margin-top: auto;
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 0.9rem;
     text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+    width: fit-content;
+    align-self: flex-start;
 
     &:hover {
-      color: ${({ theme }) => theme.colors.accentDark};
+      color: #374151;
+      border-bottom-color: #374151;
     }
   }
 `;
