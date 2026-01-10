@@ -135,7 +135,6 @@ const NavBarMobile = () => {
                         ? {
                             background:
                               "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
-                            borderLeft: "3px solid #F97B72",
                             fontWeight: "500",
                           }
                         : {}

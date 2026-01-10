@@ -109,14 +109,12 @@ const NavBarDesktop = () => {
         <div
           className={styles.highlightBar}
           style={{
-            left: `${
-              (tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
+            left: `${(tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
                 0) - 30
-            }px`,
-            width: `${
-              (tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
+              }px`,
+            width: `${(tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
                 0) + 60
-            }px`,
+              }px`,
           }}
         />
         {pillTabs.map((tab, i) => (
@@ -134,9 +132,8 @@ const NavBarDesktop = () => {
               <>
                 <span className={`${styles.navLink} nav-link`}>{tab.text}</span>
                 <ul
-                  className={`${styles.servicesMenu} ${
-                    showServicesMenu ? styles.visible : ""
-                  }`}
+                  className={`${styles.servicesMenu} ${showServicesMenu ? styles.visible : ""
+                    }`}
                 >
                   {servicesList.map((service, index) => (
                     <li
@@ -145,11 +142,10 @@ const NavBarDesktop = () => {
                       style={
                         service.featured
                           ? {
-                              background:
-                                "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
-                              borderLeft: "3px solid #F97B72",
-                              fontWeight: "500",
-                            }
+                            background:
+                              "linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%)",
+                            fontWeight: "500",
+                          }
                           : {}
                       }
                     >

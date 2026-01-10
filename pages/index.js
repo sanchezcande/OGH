@@ -195,7 +195,7 @@ const FeaturedWorkCard = ({
           ref={cardRef}
           style={{
             position: "relative",
-            width: "320px",
+            width: isMobile ? "250px" : "320px",
             textAlign: "center",
             zIndex: showHover ? "999999999999" : "999999",
           }}
@@ -208,26 +208,36 @@ const FeaturedWorkCard = ({
               width: "100%",
             }}
           >
-            <img
-              src={image}
-              alt={title}
+            <div
               style={{
-                width: "auto",
-                maxWidth: "200px",
-                height: "auto",
-                maxHeight: "120px",
-                objectFit: "contain",
-                transition: "transform 0.3s ease-out",
-                filter: "grayscale(20%)",
-                cursor: isMobile ? "default" : "pointer",
+                height: "120px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                marginBottom: "0.25rem",
               }}
-              onMouseEnter={(e) =>
-                !isMobile && (e.target.style.transform = "scale(1.02)")
-              }
-              onMouseLeave={(e) =>
-                !isMobile && (e.target.style.transform = "scale(1)")
-              }
-            />
+            >
+              <img
+                src={image}
+                alt={title}
+                style={{
+                  width: "auto",
+                  maxWidth: "200px",
+                  maxHeight: "120px",
+                  objectFit: "contain",
+                  transition: "transform 0.3s ease-out",
+                  filter: "grayscale(20%)",
+                  cursor: isMobile ? "default" : "pointer",
+                }}
+                onMouseEnter={(e) =>
+                  !isMobile && (e.target.style.transform = "scale(1.02)")
+                }
+                onMouseLeave={(e) =>
+                  !isMobile && (e.target.style.transform = "scale(1)")
+                }
+              />
+            </div>
             <div
               style={{
                 marginTop: "0.25rem",
@@ -241,23 +251,28 @@ const FeaturedWorkCard = ({
             {isMobile && (
               <div
                 style={{
-                  marginTop: "0.5rem",
+                  marginTop: "0.75rem",
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection: "row",
                   gap: "0.5rem",
                   alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <div
+                <button
                   style={{
-                    fontSize: "0.7rem",
-                    color: "#F97B72",
-                    fontWeight: "500",
-                    opacity: 0.8,
-                    padding: "0.3rem 0.8rem",
-                    border: "1px solid #F97B72",
-                    borderRadius: "12px",
+                    fontSize: "0.75rem",
+                    color: "#6B7280",
+                    fontWeight: "600",
+                    background: "transparent",
+                    border: "none",
+                    padding: "0.4rem 1rem",
+                    borderRadius: "6px",
                     cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    textDecoration: "underline",
+                    textUnderlineOffset: "3px",
+                    textDecorationThickness: "1.5px",
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -271,27 +286,43 @@ const FeaturedWorkCard = ({
                     }
                     setShowHover(!showHover);
                   }}
+                  onMouseEnter={(e) => {
+                    e.target.style.opacity = "0.7";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.opacity = "1";
+                  }}
                 >
-                  {showHover ? "Hide details" : "See details"}
-                </div>
-                <div
+                  {showHover ? "Hide" : "Details"}
+                </button>
+                <button
                   style={{
-                    fontSize: "0.7rem",
+                    fontSize: "0.75rem",
                     color: "#6B7280",
-                    fontWeight: "500",
-                    opacity: 0.8,
-                    padding: "0.3rem 0.8rem",
-                    border: "1px solid #6B7280",
-                    borderRadius: "12px",
+                    fontWeight: "600",
+                    background: "transparent",
+                    border: "none",
+                    padding: "0.4rem 1rem",
+                    borderRadius: "6px",
                     cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    textDecoration: "underline",
+                    textUnderlineOffset: "3px",
+                    textDecorationThickness: "1.5px",
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(link, "_blank", "noopener,noreferrer");
                   }}
+                  onMouseEnter={(e) => {
+                    e.target.style.opacity = "0.7";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.opacity = "1";
+                  }}
                 >
-                  Visit website
-                </div>
+                  Website
+                </button>
               </div>
             )}
           </div>
@@ -308,49 +339,48 @@ const FeaturedWorkCard = ({
                 return null;
               return createPortal(
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
                   style={{
                     position: "fixed",
                     top: `${hoverPosition.top}px`,
-                    left: `${hoverPosition.left - 160}px`, // Restar la mitad del ancho (320px / 2 = 160px) para centrar
+                    left: `${hoverPosition.left - (isMobile ? 100 : 160)}px`,
                     background: "white",
-                    borderRadius: "12px",
-                    padding: "1rem",
-                    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                    border: "1px solid #e5e7eb",
-                    width: "320px",
-                    maxWidth: "320px",
-                    minWidth: "320px",
+                    borderRadius: "8px",
+                    padding: "1.25rem 1rem",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                    border: "1px solid #f3f4f6",
+                    width: isMobile ? "200px" : "320px",
+                    maxWidth: isMobile ? "200px" : "320px",
+                    minWidth: isMobile ? "200px" : "320px",
                     boxSizing: "border-box",
                     zIndex: 999999999999,
                     pointerEvents: "none",
-                    textAlign: "center",
                   }}
                 >
                   <div
                     style={{
                       position: "absolute",
-                      top: "-8px",
+                      top: "-6px",
                       left: "50%",
                       transform: "translateX(-50%)",
                       width: "0",
                       height: "0",
-                      borderLeft: "8px solid transparent",
-                      borderRight: "8px solid transparent",
-                      borderBottom: "8px solid white",
+                      borderLeft: "6px solid transparent",
+                      borderRight: "6px solid transparent",
+                      borderBottom: "6px solid white",
                     }}
                   />
 
                   <div
                     style={{
-                      fontSize: "0.9rem",
-                      lineHeight: "1.4",
-                      color: "#6B7280",
-                      marginBottom: "1rem",
-                      textAlign: "center",
+                      fontSize: "0.85rem",
+                      lineHeight: "1.5",
+                      color: "#374151",
+                      marginBottom: "0.75rem",
+                      textAlign: "left",
                     }}
                   >
                     {hoverContent}
@@ -359,22 +389,24 @@ const FeaturedWorkCard = ({
                   <div
                     style={{
                       display: "flex",
-                      gap: "0.75rem",
+                      gap: "0.5rem",
                       flexWrap: "wrap",
-                      justifyContent: "center",
+                      paddingTop: "0.75rem",
+                      borderTop: "1px solid #f3f4f6",
                     }}
                   >
                     {badges.map((badge, index) => (
                       <span
                         key={index}
                         style={{
-                          background: "#F97B72",
-                          color: "white",
-                          padding: "0.3rem 0.8rem",
-                          borderRadius: "16px",
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
+                          background: "#f3f4f6",
+                          color: "#374151",
+                          padding: "0.25rem 0.6rem",
+                          borderRadius: "4px",
+                          fontSize: "0.7rem",
+                          fontWeight: "500",
                           whiteSpace: "nowrap",
+                          border: "1px solid #d1d5db",
                         }}
                       >
                         {badge}
@@ -1335,7 +1367,7 @@ export default function HomePage() {
                       Modern and Powerful <strong>RPA platform</strong>{" "}
                     </>
                   ),
-                  badges: ["RPA", "Automation", "Always on"],
+                  badges: ["RPA Platform", "Web & Desktop", "3,200+ Bots"],
                   category: "saas",
                   delay: 0.6,
                 },
@@ -1390,7 +1422,7 @@ export default function HomePage() {
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
-                        gap: isMobile ? "-2rem" : "0.75rem",
+                        gap: isMobile ? "15px" : "0.75rem",
                         animation: "infiniteScrollCarousel 40s linear infinite",
                         width: "fit-content",
                         willChange: "transform",

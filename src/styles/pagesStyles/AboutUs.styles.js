@@ -292,12 +292,10 @@ export const TeamMemberCard = styled.div`
     border-radius: 50%;
     margin: 0 auto 1rem;
     overflow: hidden;
-    border: 3px solid ${({ theme }) => theme.colors.accent};
     transition: all 0.3s ease;
 
     &:hover {
       transform: scale(1.05);
-      border-color: ${({ theme }) => theme.colors.primaryDark};
     }
 
     img {
