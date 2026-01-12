@@ -3,12 +3,9 @@ import {
   BlogContainer,
   Gallery,
   ArticleCard,
-  ScrollToTopButton,
   SearchInput,
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
 export default function Blog() {
@@ -40,10 +37,6 @@ export default function Blog() {
 
     return () => observer.disconnect();
   }, [filteredArticles]);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -87,10 +80,6 @@ export default function Blog() {
           </ArticleCard>
         ))}
       </Gallery>
-
-      <ScrollToTopButton onClick={scrollToTop}>
-        <FontAwesomeIcon icon={faArrowUp} size="lg" />
-      </ScrollToTopButton>
     </BlogContainer>
   );
 }

@@ -501,30 +501,15 @@ const BackEnd = () => {
       </section>
 
       {/* CTA FINAL */}
-      <section
+      <div
         className="animate"
         style={{
-          background: "#fff",
-          color: "#232946",
-          borderRadius: 18,
           maxWidth: 900,
           margin: "0 auto 2.5rem auto",
-          padding: "2.2rem 2rem 1.7rem 2rem",
           textAlign: "center",
-          boxShadow: "0 2px 16px #23294608",
           animationDelay: "0.9s",
         }}
       >
-        <h2 style={{ fontWeight: 800, fontSize: "1.5rem", marginBottom: 10 }}>
-          {lang === "es"
-            ? "¿Listo para escalar tu negocio?"
-            : "Ready to scale your business?"}
-        </h2>
-        <p style={{ fontSize: "1.05rem", marginBottom: 20 }}>
-          {lang === "es"
-            ? "Hablemos de tu backend y la nube."
-            : "Let's talk about your backend and the cloud."}
-        </p>
         <CallToActionBlock
           title={lang === "es" ? "¡Contáctanos hoy!" : "Contact us today!"}
           description={
@@ -537,7 +522,7 @@ const BackEnd = () => {
           }
           highlightWord="today"
         />
-      </section>
+      </div>
     </>
   );
 };

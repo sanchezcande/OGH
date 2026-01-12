@@ -92,12 +92,12 @@ export const Container = styled.div`
   animation: ${fadeIn} 0.8s ease;
   overflow: hidden;
   z-index: 0;
-
+  
   /* Adding more whitespace between sections */
   & > * {
     margin-bottom: 1rem;
   }
-
+  
   & .full-width {
     width: 100%;
     max-width: 1400px;
@@ -120,7 +120,7 @@ export const Hero = styled.div`
   background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
   color: white;
   position: relative;
-
+  
   &::before {
     content: "";
     position: absolute;
@@ -132,12 +132,12 @@ export const Hero = styled.div`
     opacity: 0.3;
     z-index: 1;
   }
-
+  
   & > * {
     position: relative;
     z-index: 2;
   }
-
+  
   @media (max-width: 768px) {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -145,7 +145,7 @@ export const Hero = styled.div`
     padding: 50px 15px;
     margin-bottom: 3rem;
   }
-
+  
   @media (max-width: 480px) {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -180,7 +180,7 @@ export const Glow = styled.div`
   z-index: -1;
   filter: blur(120px);
   animation: ${glow} 6s ease-in-out infinite;
-
+  
   &::after {
     content: "";
     position: absolute;
@@ -240,7 +240,7 @@ export const Title = styled.h1`
     font-weight: 700;
     position: relative;
     display: inline-block;
-
+    
     &::after {
       content: "";
       position: absolute;
@@ -254,7 +254,7 @@ export const Title = styled.h1`
       transform-origin: left;
       transition: transform 0.6s ease;
     }
-
+    
     &:hover::after {
       transform: scaleX(1);
     }
@@ -283,7 +283,7 @@ export const Title = styled.h1`
   .desktop-only {
     display: inline-block;
   }
-
+  
   .mobile-only {
     display: none;
   }
@@ -294,25 +294,25 @@ export const Title = styled.h1`
 
   @media (max-width: 768px) {
     font-size: ${({ theme }) => theme.fontSizes.heroTitle.mobile};
-
+    
     .desktop-only {
       display: none;
     }
-
+    
     .mobile-only {
       display: inline-block;
     }
-
+    
     .animated {
       white-space: normal;
       border-right: none;
     }
-
+    
     .highlighted-word {
       display: inline;
     }
   }
-
+  
   @media (max-width: 610px) {
     font-size: ${({ theme }) => theme.fontSizes.heroTitle.mobile};
   }
@@ -332,7 +332,7 @@ export const Subtitle = styled.h2`
   padding: 20px;
   cursor: default;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-
+  
   @media (max-width: 768px) {
     font-size: ${({ theme }) => theme.fontSizes.heroSubtitle.mobile};
     padding: 10px;
@@ -347,7 +347,7 @@ export const Section = styled.div`
   padding: 2rem;
   position: relative;
   z-index: 1;
-
+  
   &.full-width {
     max-width: 100%;
     width: 100%;
@@ -363,7 +363,7 @@ export const Section = styled.div`
     padding: 2.5rem 2rem 2rem 2rem;
     box-shadow: none;
   }
-
+  
   @media (max-width: 768px) {
     padding: 0 &.full-width {
       padding: 0;
@@ -415,7 +415,7 @@ export const SectionTitle = styled.h3`
     font-weight: 800;
     position: relative;
     display: inline-block;
-
+    
     &::after {
       content: "";
       position: absolute;
@@ -429,17 +429,17 @@ export const SectionTitle = styled.h3`
       transform-origin: left;
       transition: transform 0.6s ease;
     }
-
+    
     &:hover::after {
       transform: scaleX(1);
     }
   }
-
+  
   @media (max-width: 768px) {
     font-size: 1.5rem;
     flex-wrap: wrap;
     margin-bottom: 1rem;
-
+    
     .highlighted-word {
       display: inline;
     }
@@ -468,7 +468,7 @@ export const SectionText = styled.p`
     font-style: normal;
     font-weight: 500;
   }
-
+  
   @media (max-width: 768px) {
     font-size: 1rem;
     line-height: 1.5;
@@ -492,7 +492,7 @@ export const CTAButton = styled.a`
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(249, 123, 114, 0.3);
-
+  
   &::before {
     content: "";
     position: absolute;
@@ -509,7 +509,7 @@ export const CTAButton = styled.a`
     z-index: 1;
     transition: left 0.5s ease;
   }
-
+  
   &::after {
     content: "";
     position: absolute;
@@ -522,47 +522,47 @@ export const CTAButton = styled.a`
     transform-origin: right;
     transition: transform 0.3s ease;
   }
-
+  
   &:hover {
     transform: translateY(-2px);
     color: white;
     box-shadow: 0 6px 20px rgba(249, 123, 114, 0.4);
     background: #d88a82;
-
+    
     &::before {
       left: 100%;
     }
-
+    
     &::after {
       transform: scaleX(1);
       transform-origin: left;
     }
   }
-
+  
   &:active {
     transform: translateY(0);
   }
-
+  
   &.primary-cta {
     padding: 14px 28px;
     font-weight: 600;
     font-size: 1rem;
     background: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 6px 16px rgba(249, 123, 114, 0.4);
-
+    
     &:hover {
       background: ${({ theme }) => theme.colors.accentDark};
       box-shadow: 0 8px 24px rgba(249, 123, 114, 0.5);
     }
   }
-
+  
   &.secondary-cta {
     background: transparent;
     color: ${({ theme }) => theme.colors.accent};
     border: 2px solid ${({ theme }) => theme.colors.accent};
     box-shadow: none;
     position: relative;
-
+    
     &::before {
       background: linear-gradient(
         90deg,
@@ -571,7 +571,7 @@ export const CTAButton = styled.a`
         transparent 100%
       );
     }
-
+    
     &::after {
       content: "";
       position: absolute;
@@ -584,26 +584,26 @@ export const CTAButton = styled.a`
       transform-origin: right;
       transition: transform 0.3s ease;
     }
-
+    
     &:hover {
       background-color: ${({ theme }) => theme.colors.accent}11;
       color: ${({ theme }) => theme.colors.accent};
       box-shadow: 0 4px 12px rgba(249, 123, 114, 0.2);
-
+      
       &::after {
         transform: scaleX(1);
         transform-origin: left;
       }
     }
   }
-
+  
   @media (max-width: 768px) {
     padding: 12px 24px;
     font-size: 0.95rem;
 
     &.primary-cta {
-      padding: 14px 28px;
-      font-size: 1rem;
+    padding: 14px 28px;
+    font-size: 1rem;
     }
   }
 `;
@@ -618,7 +618,7 @@ export const PlanSteps = styled.ul`
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-
+  
   li {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
@@ -634,7 +634,7 @@ export const PlanSteps = styled.ul`
     transform: translateY(20px);
     animation: fadeInUp 0.6s ease forwards;
     animation-delay: calc(0.2s * var(--i, 0));
-
+    
     &:hover {
       transform: translateY(-8px);
       background: rgba(255, 255, 255, 0.15);
@@ -649,7 +649,7 @@ export const PlanSteps = styled.ul`
       color: #f97b72;
       margin-bottom: 1rem;
     }
-
+    
     /* Flecha entre tarjetas */
     &:not(:last-child)::after {
       content: "→";
@@ -670,20 +670,20 @@ export const PlanSteps = styled.ul`
       transform: translateY(20px);
     }
     to {
-      opacity: 1;
+    opacity: 1;
       transform: translateY(0);
     }
   }
-
+  
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-
+    
     li {
       min-width: 280px;
       max-width: 320px;
-
+      
       &:not(:last-child)::after {
         content: "↓";
         right: 50%;
@@ -707,7 +707,7 @@ export const PlanSection = styled.section`
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   border-radius: 20px 20px 0 0;
-
+  
   &::before {
     content: "";
     position: absolute;
@@ -719,12 +719,12 @@ export const PlanSection = styled.section`
     opacity: 0.3;
     z-index: 1;
   }
-
+  
   & > * {
     position: relative;
     z-index: 2;
   }
-
+  
   .highlighted-word {
     color: #f97b72;
     font-weight: 800;
@@ -734,7 +734,7 @@ export const PlanSection = styled.section`
     mix-blend-mode: normal;
     color: white;
     margin-bottom: 3rem;
-
+    
     &::before {
       background: #f97b72;
     }
@@ -744,7 +744,7 @@ export const PlanSection = styled.section`
     mix-blend-mode: normal;
     color: rgba(255, 255, 255, 0.9);
   }
-
+  
   @media (max-width: 768px) {
     padding: 40px 15px;
   }
@@ -761,7 +761,7 @@ export const ImageContainer = styled.div`
 export const Highlight = styled.span`
   color: ${({ theme }) => theme.colors.accent};
   position: relative;
-
+  
   &::after {
     content: "";
     position: absolute;
@@ -775,7 +775,7 @@ export const Highlight = styled.span`
     transform-origin: left;
     transition: transform 0.6s ease;
   }
-
+  
   &:hover::after {
     transform: scaleX(1);
   }

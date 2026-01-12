@@ -667,71 +667,8 @@ const GraphicDesign = () => {
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div
             className="animate"
-            style={{
-              textAlign: "center",
-              marginBottom: "2rem",
-              animationDelay: "0.6s",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "2rem",
-                marginBottom: "16px",
-                color: "#F97B72",
-              }}
-            >
-              <FaStar />
-            </div>
-            <p
-              style={{
-                fontSize: "1.1rem",
-                fontStyle: "italic",
-                marginBottom: "16px",
-                lineHeight: 1.6,
-                color: "#1e293b",
-              }}
-            >
-              {lang === "es"
-                ? "Trabajé con OGH en el rediseño de mi marca y quedé impresionada. No solo entendieron mi visión, sino que la superaron. El logo y la paleta de colores que crearon son exactamente lo que necesitaba para destacar en mi industria."
-                : "I worked with OGH on my brand redesign and was blown away. They not only understood my vision but exceeded it. The logo and color palette they created are exactly what I needed to stand out in my industry."}
-            </p>
-            <div
-              style={{ fontWeight: 600, fontSize: "1rem", color: "#F97B72" }}
-            >
-              {lang === "es"
-                ? "— Laura Martínez, CEO de TechFlow"
-                : "— Jennifer Rodriguez, CEO of TechFlow"}
-            </div>
-          </div>
-
-          <div
-            className="animate"
             style={{ textAlign: "center", animationDelay: "0.7s" }}
           >
-            <h2
-              style={{
-                fontSize: "2rem",
-                fontWeight: 700,
-                marginBottom: "16px",
-                color: "#232946",
-              }}
-            >
-              {lang === "es"
-                ? "¿Listo para crear algo increíble?"
-                : "Ready to create something amazing?"}
-            </h2>
-            <p
-              style={{
-                fontSize: "1.1rem",
-                color: "#64748b",
-                marginBottom: "1.5rem",
-                lineHeight: 1.6,
-              }}
-            >
-              {lang === "es"
-                ? "Hablemos de tu proyecto de diseño y creemos juntos algo que destaque."
-                : "Let's talk about your design project and create something that stands out together."}
-            </p>
             <CallToActionBlock
               title={
                 lang === "es"

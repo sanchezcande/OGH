@@ -544,31 +544,31 @@
     "title": "Los Rostros Detrás del Código",
     "subtitle": "Conoce a las personas que convierten desafíos en soluciones e ideas en realidad.",
     "members": {
-      "javier": {
-        "name": "Javier",
-        "role": "Ingeniero Frontend Senior",
-        "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
-      },
-      "giuliano": {
-        "name": "Giuliano",
-        "role": "Ingeniero Full Stack",
-        "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
-      },
-      "laura": {
-        "name": "Laura",
-        "role": "Desarrolladora Frontend",
-        "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
-      },
-      "gustavo": {
-        "name": "Gustavo",
+                     "javier": {
+                 "name": "Javier",
+                 "role": "Ingeniero Frontend Senior",
+                 "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
+               },
+                     "giuliano": {
+                 "name": "Giuliano",
+                 "role": "Ingeniero Full Stack",
+                 "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
+               },
+                     "laura": {
+                 "name": "Laura",
+                 "role": "Desarrolladora Frontend",
+                 "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
+               },
+                     "gustavo": {
+                 "name": "Gustavo",
         "role": "CTO",
-        "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
-      },
-      "alejandria": {
-        "name": "Alejandría",
-        "role": "Analista QA",
-        "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
-      }
+                 "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
+               },
+                     "alejandria": {
+                 "name": "Alejandría",
+                 "role": "Analista QA",
+                 "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
+               }
     }
   }
 }

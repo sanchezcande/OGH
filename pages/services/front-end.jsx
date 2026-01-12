@@ -671,43 +671,19 @@ const FrontEnd = () => {
         }}
       >
         <div className="animate" style={{ maxWidth: 800, margin: "0 auto" }}>
-          <h2
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: 700,
-              marginBottom: "20px",
-              color: "#232946",
-            }}
-          >
-            {lang === "es"
-              ? "¿Listo para crear algo increíble?"
-              : "Ready to create something amazing?"}
-          </h2>
-          <p
-            style={{
-              fontSize: "1.2rem",
-              color: "#64748b",
-              marginBottom: "2rem",
-              lineHeight: 1.6,
-            }}
-          >
-            {lang === "es"
-              ? "Hablemos de tu proyecto frontend y construyamos juntos la experiencia digital que tu negocio merece."
-              : "Let's talk about your frontend project and build together the digital experience your business deserves."}
-          </p>
           <CallToActionBlock
             title={
-              lang === "es" ? "¡Iniciá tu proyecto!" : "Start your project!"
-            }
+              lang === "es"
+                ? "¿Listo para convertir visitantes en clientes?"
+                : "Ready to turn visitors into customers?"}
             description={
               lang === "es"
-                ? "Descubrí cómo podemos transformar tu idea en una experiencia digital."
-                : "Discover how we can transform your idea into a digital experience."
-            }
+                ? "Hablemos de tu proyecto frontend y construyamos juntos la experiencia digital que tu negocio merece."
+                : "Let's talk about your frontend project and build together the digital experience your business deserves."}
             buttonText={
               lang === "es" ? "Quiero saber más" : "I want to know more"
             }
-            highlightWord="your"
+            highlightWord={lang === "es" ? "clientes" : "customers"}
           />
         </div>
       </section>

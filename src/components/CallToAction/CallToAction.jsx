@@ -74,11 +74,17 @@ const CallToActionBlock = ({
       );
     }
 
+    // Separate the word from trailing punctuation
+    const wordWithPunctuation = words[highlightIndex];
+    const punctuationMatch = wordWithPunctuation.match(/^(.+?)([.,;:!?]+)$/);
+    const wordOnly = punctuationMatch ? punctuationMatch[1] : wordWithPunctuation;
+    const punctuation = punctuationMatch ? punctuationMatch[2] : "";
+
     return (
       <>
         {words.slice(0, highlightIndex).join(" ")}
         {highlightIndex > 0 && " "}
-        <span>{words[highlightIndex]}</span>
+        <span>{wordOnly}</span>{punctuation}
         {highlightIndex < words.length - 1 && " "}
         {words.slice(highlightIndex + 1).join(" ")}
       </>

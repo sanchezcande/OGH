@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import Head from "next/head";
 import {
-  ServiceContainer,
   ServiceTitle,
   Divider,
   Description,
@@ -1107,21 +1106,19 @@ const staffAugmentation = () => {
         </div>
       </section>
 
-      <ServiceContainer>
-        {/* Call to Action */}
-        <div className="animate" style={{ animationDelay: "1s" }}>
-          <CallToActionBlock
-            title={
-              lang === "es"
-                ? "¿Listo para ampliar tu equipo?"
-                : "Ready to scale your team?"
-            }
-            description={t("servicesCallToAction.description")}
-            buttonText={t("servicesCallToAction.buttonText")}
-            highlightWord="Ready"
-          />
-        </div>
-      </ServiceContainer>
+      {/* Call to Action */}
+      <div className="animate" style={{ animationDelay: "1s" }}>
+        <CallToActionBlock
+          title={
+            lang === "es"
+              ? "¿Listo para ampliar tu equipo?"
+              : "Ready to scale your team?"
+          }
+          description={t("servicesCallToAction.description")}
+          buttonText={t("servicesCallToAction.buttonText")}
+          highlightWord="Ready"
+        />
+      </div>
     </>
   );
 };

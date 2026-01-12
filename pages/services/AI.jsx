@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import Head from "next/head";
 import {
-  ServiceContainer,
   ServiceTitle,
   Divider,
   Description,
@@ -1142,43 +1141,10 @@ const aiSolutions = () => {
         </div>
       </section>
 
-      <ServiceContainer>
-        {/* Call to Action */}
-        <ProfessionalCard
-          className="animate"
-          style={{
-            background: "#FFF5F5",
-            textAlign: "center",
-            animationDelay: "1s",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: "600",
-              marginBottom: "1rem",
-              color: "#2B2B2B",
-            }}
-          >
-            {lang === "es"
-              ? "¿Listo para el futuro con IA?"
-              : "Ready for the AI future?"}
-          </h3>
-          <p
-            style={{
-              fontSize: "1.1rem",
-              color: "#6B7280",
-              marginBottom: "2rem",
-            }}
-          >
-            {t("aiSolutions.vision")}
-          </p>
-        </ProfessionalCard>
-
-        <div className="animate" style={{ animationDelay: "1.05s" }}>
-          <ServicesCallToAction />
-        </div>
-      </ServiceContainer>
+      {/* Call to Action */}
+      <div className="animate" style={{ animationDelay: "1s" }}>
+        <ServicesCallToAction />
+      </div>
     </>
   );
 };

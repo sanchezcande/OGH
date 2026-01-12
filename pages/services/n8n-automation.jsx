@@ -700,12 +700,12 @@ const N8nAutomation = () => {
       <CallToActionBlock
         title={
           lang === "es"
-            ? "¿Listo para automatizar tu negocio?"
+              ? "¿Listo para automatizar tu negocio?"
             : "Ready to automate your business?"
         }
         description={
           lang === "es"
-            ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
+              ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
             : "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes."
         }
         buttonText={t("servicesCallToAction.buttonText")}

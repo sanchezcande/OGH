@@ -64,25 +64,6 @@ export const Gallery = styled.div`
   }
 `;
 
-export const ScrollToTopButton = styled.button`
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: ${({ theme }) => theme.colors.accent};
-  border: none;
-  color: #ffffff;
-  padding: 12px 16px;
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  transition: background 0.3s;
-  z-index: 1000;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.accentDark};
-  }
-`;
-
 export const ArticleCard = styled.div`
   background: #ffffff;
   border: 1px solid #e5e7eb;
