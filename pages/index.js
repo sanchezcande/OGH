@@ -28,6 +28,7 @@ import { createPortal } from "react-dom";
 import { FaProjectDiagram, FaExternalLinkAlt, FaUsers } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import useMediaQuery from "../src/Hooks/useMediaQuery";
 
 // Tabs Component
@@ -735,6 +736,18 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
   const [isHovered, setIsHovered] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const boxRef = React.useRef(null);
+  const router = useRouter();
+
+  // Prefetch las páginas cuando se hace hover sobre la caja
+  useEffect(() => {
+    if (menuItems.length > 0) {
+      menuItems.forEach((item) => {
+        router.prefetch(item.href);
+      });
+    } else if (link) {
+      router.prefetch(link);
+    }
+  }, [menuItems, link, router]);
 
   // Cerrar el menú al hacer click fuera
   useEffect(() => {
@@ -746,11 +759,11 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
       }
     };
 
-    // Agregar un pequeño delay para evitar que se cierre inmediatamente
+    // Reducir el delay para mejor rendimiento
     const timeoutId = setTimeout(() => {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("touchstart", handleClickOutside);
-    }, 100);
+    }, 50);
 
     return () => {
       clearTimeout(timeoutId);
@@ -793,7 +806,7 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -802,16 +815,20 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
           }}
         >
           {menuItems.map((item, index) => (
-            <Link
+            <div
               key={index}
-              href={item.href}
               style={{ textDecoration: "none" }}
-              onClick={() => setShowMenu(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                setShowMenu(false);
+                // Navegación inmediata sin esperar animaciones
+                router.push(item.href);
+              }}
             >
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
+                transition={{ duration: 0.15, delay: index * 0.02, ease: "easeOut" }}
                 style={{
                   padding: "12px 16px",
                   cursor: "pointer",
@@ -836,7 +853,7 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
               >
                 {item.text}
               </motion.div>
-            </Link>
+            </div>
           ))}
         </motion.div>
       ) : (
@@ -844,7 +861,7 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
             fontSize: "1rem",
             lineHeight: "1.6",

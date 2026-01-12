@@ -4,8 +4,8 @@ import { FaAngleDown, FaGlobe } from "react-icons/fa";
 export const MenuIcon = styled.div`
   cursor: pointer;
   font-size: 1.5rem;
-  transition: transform 0.3s ease;
-  color: ${({ theme }) => theme.colors.text};
+  transition: transform 0.2s ease;
+  color: #374151;
   transform: ${({ open }) => (open ? "rotate(-90deg)" : "rotate(0)")};
 `;
 
@@ -14,6 +14,11 @@ export const LanguageMenu = styled.ul`
   position: relative;
   width: 100%;
   background-color: transparent;
+  border: none;
+  border-radius: 0;
+  margin-top: 4px;
+  padding: 0;
+  box-shadow: none;
   display: ${({ open }) => (open ? "flex" : "none")};
   flex-direction: column;
 `;
@@ -29,17 +34,17 @@ export const LogoIcon = styled.div`
 export const NavBarContainer = styled.nav`
   margin: 10px 1rem 0 1rem;
   padding: 0.5rem 1rem;
-  background-color: ${({ theme }) => theme.colors.backgroundAlt};
-  border: 2px solid ${({ theme }) => theme.colors.primary};
-  box-shadow: ${({ theme }) => theme.boxShadow};
-  border-radius: ${({ theme }) => theme.borderRadius};
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
   position: relative;
 `;
 
 export const Logo = styled.div`
   font-weight: 700;
   font-size: 24px;
-  color: ${({ theme }) => theme.colors.primary};
+  color: #374151;
   width: 60%;
   margin-top: 0.6rem;
 `;
@@ -50,18 +55,28 @@ export const Span = styled.span`
 
 export const LangMenuItem = styled.li`
   display: block;
-  padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius};
-  color: ${({ theme }) => theme.colors.text};
+  padding: 10px 16px;
+  border-radius: 0;
+  color: #374151;
   transition: all 0.2s ease;
   cursor: pointer;
   min-height: 44px;
   display: flex;
   align-items: center;
+  font-size: 14px;
+  font-weight: 400;
+  border-bottom: none;
+  padding-left: 24px;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:active {
-    transform: scale(1.02);
-    font-weight: 600;
+    background-color: transparent;
+    color: #f97b72;
+    border-left: none;
+    padding-left: 24px;
   }
 `;
 
@@ -83,8 +98,8 @@ export const Menu = styled.ul`
   list-style: none;
   margin: 1rem 0;
   padding: 0.75rem;
-  background-color: ${({ theme }) => theme.colors.backgroundAlt};
-  border-radius: ${({ theme }) => theme.borderRadius};
+  background-color: #ffffff;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -92,20 +107,22 @@ export const Menu = styled.ul`
 
 export const MenuItem = styled.li`
   display: block;
-  padding: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-  border-radius: ${({ theme }) => theme.borderRadius};
+  padding: 0.75rem 1rem;
+  color: #374151;
+  border-radius: 8px;
   transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 400;
 
   &:active {
-    transform: scale(1.02);
-    font-weight: 600;
+    background-color: #f9fafb;
+    color: #f97b72;
   }
 `;
 
 export const ArrowIcon = styled(FaAngleDown)`
-  transition: transform 0.3s ease-in-out;
-  color: ${({ theme }) => theme.colors.text};
+  transition: transform 0.2s ease-in-out;
+  color: #374151;
 
   ${({ open }) =>
     open &&
@@ -118,7 +135,7 @@ export const WorldIcon = styled(FaGlobe)`
   width: 24px;
   height: 24px;
   margin-right: 10px;
-  color: ${({ theme }) => theme.colors.text};
+  color: #374151;
 `;
 
 export const LangMenuContainer = styled.span`
