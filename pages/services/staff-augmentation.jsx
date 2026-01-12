@@ -1106,19 +1106,19 @@ const staffAugmentation = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <div className="animate" style={{ animationDelay: "1s" }}>
-        <CallToActionBlock
-          title={
-            lang === "es"
-              ? "¿Listo para ampliar tu equipo?"
-              : "Ready to scale your team?"
-          }
-          description={t("servicesCallToAction.description")}
-          buttonText={t("servicesCallToAction.buttonText")}
-          highlightWord="Ready"
-        />
-      </div>
+        {/* Call to Action */}
+        <div className="animate" style={{ animationDelay: "1s" }}>
+          <CallToActionBlock
+            title={
+              lang === "es"
+                ? "¿Listo para ampliar tu equipo?"
+                : "Ready to scale your team?"
+            }
+            description={t("servicesCallToAction.description")}
+            buttonText={t("servicesCallToAction.buttonText")}
+            highlightWord="Ready"
+          />
+        </div>
     </>
   );
 };

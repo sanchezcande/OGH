@@ -434,6 +434,15 @@ export const SectionTitle = styled.h3`
       transform: scaleX(1);
     }
   }
+
+  .highlighted-word-with-punctuation {
+    display: inline-block;
+    
+    .highlighted-punctuation {
+      color: ${({ theme }) => theme.colors.primary};
+      font-weight: ${({ theme }) => theme.fontWeights.bold};
+    }
+  }
   
   @media (max-width: 768px) {
     font-size: 1.5rem;
@@ -442,6 +451,11 @@ export const SectionTitle = styled.h3`
     
     .highlighted-word {
       display: inline;
+    }
+
+    .highlighted-word-with-punctuation {
+      white-space: nowrap;
+      display: inline-block;
     }
   }
 `;

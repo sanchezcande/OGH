@@ -1099,16 +1099,39 @@ export default function HomePage() {
   const parseHighlightedText = (text) => {
     if (!text) return [];
     const parts = text.split(/<highlight>|<\/highlight>/);
-    return parts.map((part, index) => {
-      if (index % 2 === 1) {
-        return (
-          <span key={index} className="highlighted-word">
-            {part}
-          </span>
-        );
+    const result = [];
+    
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 1) {
+        // This is a highlighted word
+        const highlightedWord = parts[i];
+        const nextPart = parts[i + 1] || "";
+        const isPunctuationOnly = /^[.,;:!?]+$/.test(nextPart.trim());
+        
+        if (isPunctuationOnly) {
+          result.push(
+            <span key={i} className="highlighted-word-with-punctuation">
+              <span className="highlighted-word">{highlightedWord}</span>
+              <span className="highlighted-punctuation">{nextPart}</span>
+            </span>
+          );
+          i++; // Skip the next part since we already included it
+        } else {
+          result.push(
+            <span key={i} className="highlighted-word">
+              {highlightedWord}
+            </span>
+          );
+        }
+      } else {
+        // This is regular text
+        if (parts[i]) {
+          result.push(<React.Fragment key={i}>{parts[i]}</React.Fragment>);
+        }
       }
-      return <React.Fragment key={index}>{part}</React.Fragment>;
-    });
+    }
+    
+    return result;
   };
 
   const testimonialData = [
