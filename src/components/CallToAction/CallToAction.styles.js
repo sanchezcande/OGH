@@ -7,8 +7,8 @@ const fadeIn = keyframes`
 
 export const CallToActionContainer = styled.div`
   text-align: center;
-  margin: 6rem auto;
-  padding: 4rem 3rem;
+  margin: 4rem auto;
+  padding: 2.5rem 2rem;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   color: #1e293b;
   border-radius: 12px;
@@ -29,53 +29,53 @@ export const CallToActionContainer = styled.div`
   }
 
   @media (max-width: 768px) {
-    margin: 4rem 1rem;
-    padding: 3rem 2rem;
+    margin: 3rem 1rem;
+    padding: 2rem 1.5rem;
   }
 `;
 
 export const CallToActionTitle = styled.h2`
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #1e293b;
   position: relative;
   z-index: 2;
-  line-height: 1.2;
+  line-height: 1.3;
 
   span {
     color: #f97b72;
-    font-weight: 800;
+    font-weight: 700;
   }
 
   @media (max-width: 768px) {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 `;
 
 export const CallToActionDescription = styled.p`
-  font-size: 1.1rem;
-  margin-bottom: 2.5rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
   color: #475569;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   position: relative;
   z-index: 2;
-  line-height: 1.6;
+  line-height: 1.5;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
-    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
   }
 `;
 
 export const CallToActionButton = styled.a`
   background: #f97b72;
   color: white;
-  padding: 16px 32px;
+  padding: 12px 24px;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
   border-radius: 8px;
   text-decoration: none;
   margin-top: 0;
@@ -140,7 +140,7 @@ export const CallToActionButton = styled.a`
   }
 
   @media (max-width: 768px) {
-    padding: 14px 28px;
-    font-size: 1rem;
+    padding: 12px 24px;
+    font-size: 0.95rem;
   }
 `;

@@ -11,8 +11,8 @@
 
 .logo {
   font-weight: 800;
-  font-size: 28px;
-  margin-top: 15px;
+  font-size: 26px;
+  margin-top: 12px;
 }
 
 .span {
@@ -25,7 +25,7 @@
   list-style: none;
   border-radius: 8px;
   background-color: #ffffff;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: 1px solid #e5e7eb;
   position: relative;
   justify-content: center;
@@ -36,11 +36,11 @@
 
 .navLink {
   position: relative;
-  padding: 8px 16px;
+  padding: 6px 14px;
   color: #374151;
   cursor: pointer;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
   transition: color 0.2s ease;
   font-weight: 500;
 }
@@ -167,11 +167,11 @@
 }
 
 .servicesMenuItem {
-  padding: 12px 20px;
+  padding: 10px 16px;
   cursor: pointer;
   color: #374151;
   font-weight: 400;
-  font-size: 15px;
+  font-size: 14px;
   min-width: 220px;
   transition:
     background-color 0.2s ease,

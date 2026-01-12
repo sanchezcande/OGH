@@ -58,7 +58,7 @@ export const MetricsHeader = styled.div`
   animation: ${fadeInUp} 0.8s ease-out forwards;
 
   h2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: #1e293b;
     margin: 0 0 1rem 0;
@@ -68,12 +68,12 @@ export const MetricsHeader = styled.div`
     background-clip: text;
 
     @media (max-width: 768px) {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
   }
 
   p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #64748b;
     margin: 0;
     max-width: 600px;
@@ -82,7 +82,7 @@ export const MetricsHeader = styled.div`
     line-height: 1.6;
 
     @media (max-width: 768px) {
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
   }
 `;
@@ -101,8 +101,8 @@ export const MetricsGrid = styled.div`
 
 export const MetricCard = styled.div`
   background: #ffffff;
-  border-radius: 20px;
-  padding: 2rem;
+  border-radius: 12px;
+  padding: 1.25rem;
   text-align: center;
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.05),
@@ -121,13 +121,13 @@ export const MetricCard = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 `;
 
 export const MetricValue = styled.div`
-  font-size: 3rem;
-  font-weight: 800;
+  font-size: 2.25rem;
+  font-weight: 700;
   color: #f97b72;
   margin-bottom: 0.5rem;
   display: flex;
@@ -136,22 +136,22 @@ export const MetricValue = styled.div`
   gap: 0.5rem;
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
   }
 `;
 
 export const MetricUnit = styled.span`
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: #64748b;
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 0.95rem;
   }
 `;
 
 export const MetricLabel = styled.h3`
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 0.5rem 0;
@@ -159,7 +159,7 @@ export const MetricLabel = styled.h3`
   letter-spacing: 0.5px;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -175,22 +175,22 @@ export const MetricDescription = styled.p`
 `;
 
 export const MetricIcon = styled.div`
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   background: linear-gradient(135deg, #f97b72 0%, #e35a52 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1rem;
+  margin: 0 auto 0.5rem;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   animation: ${pulse} 2s ease-in-out infinite;
 
   @media (max-width: 768px) {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
 `;
 

@@ -110,7 +110,7 @@ export const Hero = styled.div`
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
-  padding: 100px 20px;
+  padding: 60px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,7 +142,7 @@ export const Hero = styled.div`
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
-    padding: 80px 15px;
+    padding: 50px 15px;
     margin-bottom: 3rem;
   }
 
@@ -150,7 +150,7 @@ export const Hero = styled.div`
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
-    padding: 60px 10px;
+    padding: 40px 10px;
     margin-bottom: 2rem;
   }
 `;
@@ -219,7 +219,7 @@ export const Title = styled.h1`
   mix-blend-mode: normal;
   z-index: 1;
   position: relative;
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2.5rem, 5vw, 3rem);
   font-weight: 700;
   margin: 20px 0 10px 0;
   text-align: center;
@@ -323,7 +323,7 @@ export const Subtitle = styled.h2`
   mix-blend-mode: normal;
   z-index: 1;
   position: relative;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 400;
   margin-bottom: 30px;
   max-width: 800px;
@@ -375,9 +375,9 @@ export const Section = styled.div`
 `;
 
 export const SectionTitle = styled.h3`
-  font-size: 2.2rem;
-  font-weight: 800;
-  margin-bottom: 25px;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
   position: relative;
   z-index: 1;
   color: ${({ theme }) => theme.colors.primary};
@@ -443,12 +443,12 @@ export const SectionTitle = styled.h3`
 `;
 
 export const SectionText = styled.p`
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   line-height: 1.6;
   color: ${({ theme }) => theme.colors.textMuted};
   position: relative;
   z-index: 1;
-  font-weight: 500;
+  font-weight: 400;
 
   strong {
     color: ${({ theme }) => theme.colors.accent};
@@ -470,9 +470,9 @@ export const SectionText = styled.p`
 export const CTAButton = styled.a`
   background: #d85a4f;
   color: white;
-  padding: 16px 32px;
+  padding: 12px 24px;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
   border-radius: 8px;
   text-decoration: none;
   margin-top: 30px;
@@ -536,9 +536,9 @@ export const CTAButton = styled.a`
   }
 
   &.primary-cta {
-    padding: 18px 36px;
-    font-weight: 700;
-    font-size: 1.2rem;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 1rem;
     background: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 6px 16px rgba(249, 123, 114, 0.4);
 
@@ -590,12 +590,12 @@ export const CTAButton = styled.a`
   }
 
   @media (max-width: 768px) {
-    padding: 14px 28px;
-    font-size: 1rem;
+    padding: 12px 24px;
+    font-size: 0.95rem;
 
     &.primary-cta {
-      padding: 16px 32px;
-      font-size: 1.1rem;
+      padding: 14px 28px;
+      font-size: 1rem;
     }
   }
 `;

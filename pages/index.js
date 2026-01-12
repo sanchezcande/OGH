@@ -646,8 +646,8 @@ const TestimonialsCarousel = ({ testimonials }) => {
               {/* Content */}
               <p
                 style={{
-                  fontSize: isMobile ? "1rem" : "1.3rem",
-                  lineHeight: isMobile ? "1.6" : "1.8",
+                  fontSize: isMobile ? "0.95rem" : "1.1rem",
+                  lineHeight: isMobile ? "1.5" : "1.6",
                   color: "#333",
                   marginBottom: isMobile ? "1.5rem" : "2rem",
                   fontStyle: "italic",
@@ -673,25 +673,19 @@ const TestimonialsCarousel = ({ testimonials }) => {
               >
                 <p
                   style={{
-                    fontWeight: "700",
-                    fontSize: "1.2rem",
+                    fontWeight: "600",
+                    fontSize: isMobile ? "0.95rem" : "1rem",
                     color: "#F97B72",
                     margin: 0,
-                    "@media (max-width: 768px)": {
-                      fontSize: "1.1rem",
-                    },
                   }}
                 >
                   {testimonial.company}
                 </p>
                 <p
                   style={{
-                    fontSize: "1rem",
+                    fontSize: isMobile ? "0.85rem" : "0.9rem",
                     color: "#666",
                     margin: 0,
-                    "@media (max-width: 768px)": {
-                      fontSize: "0.9rem",
-                    },
                   }}
                 >
                   {testimonial.role}
@@ -779,9 +773,9 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
         animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
         transition={{ duration: 0.1 }}
         style={{
-          fontSize: "3rem",
+          fontSize: "2.25rem",
           color: "var(--color-accent, #FF6B6B)",
-          marginBottom: "1rem",
+          marginBottom: "0.5rem",
           display: "inline-block",
         }}
       >
@@ -790,9 +784,9 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
 
       <h3
         style={{
-          fontSize: "1.5rem",
-          fontWeight: "700",
-          marginBottom: "1rem",
+          fontSize: "1.15rem",
+          fontWeight: "600",
+          marginBottom: "0.5rem",
           color: "var(--color-text, #333)",
           transition: "color 0.2s ease",
           ...(isHovered ? { color: "#E35A52" } : {}),
@@ -830,14 +824,14 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.15, delay: index * 0.02, ease: "easeOut" }}
                 style={{
-                  padding: "12px 16px",
+                  padding: "10px 14px",
                   cursor: "pointer",
                   color: "#1f2937",
-                  fontSize: "0.95rem",
+                  fontSize: "0.9rem",
                   fontWeight: "500",
                   backgroundColor: "#f9fafb",
                   border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
+                  borderRadius: "6px",
                   transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
@@ -863,8 +857,8 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           style={{
-            fontSize: "1rem",
-            lineHeight: "1.6",
+            fontSize: "0.9rem",
+            lineHeight: "1.5",
             color: "#444444",
           }}
         >
@@ -896,8 +890,8 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
 
   const boxStyle = {
     background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
-    borderRadius: "16px",
-    padding: "2rem",
+    borderRadius: "12px",
+    padding: "1.25rem",
     height: "100%",
     cursor: menuItems.length > 0 || link ? "pointer" : "default",
     position: "relative",
@@ -1257,8 +1251,8 @@ export default function HomePage() {
           >
             <h2
               style={{
-                fontSize: isMobile ? "1.8rem" : "2.8rem",
-                fontWeight: "800",
+                fontSize: isMobile ? "1.8rem" : "2rem",
+                fontWeight: "700",
                 marginBottom: "1rem",
               }}
             >
@@ -1268,7 +1262,7 @@ export default function HomePage() {
             </h2>
             <p
               style={{
-                fontSize: isMobile ? "1rem" : "1.2rem",
+                fontSize: isMobile ? "1rem" : "1.1rem",
                 maxWidth: "800px",
                 margin: "0 auto",
                 color: "var(--color-text-muted, #666)",
@@ -1669,8 +1663,8 @@ export default function HomePage() {
           >
             <h2
               style={{
-                fontSize: isMobile ? "1.8rem" : "2.8rem",
-                fontWeight: "800",
+                fontSize: isMobile ? "1.8rem" : "2rem",
+                fontWeight: "700",
                 marginBottom: "1rem",
               }}
             >
@@ -1678,7 +1672,7 @@ export default function HomePage() {
             </h2>
             <p
               style={{
-                fontSize: isMobile ? "1rem" : "1.2rem",
+                fontSize: isMobile ? "1rem" : "1.1rem",
                 maxWidth: "800px",
                 margin: "0 auto",
                 color: "#444444",
