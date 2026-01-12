@@ -334,8 +334,9 @@ export const Subtitle = styled.h2`
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 
   @media (max-width: 768px) {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     padding: 10px;
+    line-height: 1.5;
   }
 `;
 
@@ -431,8 +432,9 @@ export const SectionTitle = styled.h3`
   }
 
   @media (max-width: 768px) {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     flex-wrap: wrap;
+    margin-bottom: 1rem;
 
     .highlighted-word {
       display: inline;
@@ -460,7 +462,8 @@ export const SectionText = styled.p`
   }
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    line-height: 1.5;
   }
 `;
 
@@ -687,7 +690,7 @@ export const PlanSteps = styled.ul`
 export const PlanSection = styled.section`
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  margin: 60px 0;
+  margin: 60px 0 0 0;
   text-align: center;
   position: relative;
   padding: 60px 20px;
@@ -695,6 +698,7 @@ export const PlanSection = styled.section`
   color: white;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  border-radius: 20px 20px 0 0;
 
   &::before {
     content: "";

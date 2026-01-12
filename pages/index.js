@@ -656,7 +656,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
                   overflowWrap: "break-word",
                   hyphens: "auto",
                   textAlign: "left",
-                  padding: isMobile ? "0 12px" : 0,
+                  padding: isMobile ? "0 50px" : 0,
                 }}
               >
                 "{testimonial.content}"
@@ -1257,7 +1257,7 @@ export default function HomePage() {
           >
             <h2
               style={{
-                fontSize: "2.8rem",
+                fontSize: isMobile ? "1.8rem" : "2.8rem",
                 fontWeight: "800",
                 marginBottom: "1rem",
               }}
@@ -1268,7 +1268,7 @@ export default function HomePage() {
             </h2>
             <p
               style={{
-                fontSize: "1.2rem",
+                fontSize: isMobile ? "1rem" : "1.2rem",
                 maxWidth: "800px",
                 margin: "0 auto",
                 color: "var(--color-text-muted, #666)",
@@ -1656,7 +1656,8 @@ export default function HomePage() {
           style={{
             background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
             padding: "4rem 1rem",
-            margin: "4rem 0",
+            margin: "0",
+            marginTop: "0",
           }}
         >
           <motion.div
@@ -1668,7 +1669,7 @@ export default function HomePage() {
           >
             <h2
               style={{
-                fontSize: "2.8rem",
+                fontSize: isMobile ? "1.8rem" : "2.8rem",
                 fontWeight: "800",
                 marginBottom: "1rem",
               }}
@@ -1677,7 +1678,7 @@ export default function HomePage() {
             </h2>
             <p
               style={{
-                fontSize: "1.2rem",
+                fontSize: isMobile ? "1rem" : "1.2rem",
                 maxWidth: "800px",
                 margin: "0 auto",
                 color: "#444444",
