@@ -48,24 +48,24 @@ export const HighlightedText = styled.span`
 `;
 
 export const Title = styled.h1`
-  font-size: 2.8rem; // Adjust as per image
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.text};
-  line-height: 1.2;
+  line-height: ${({ theme }) => theme.lineHeights.tight};
   margin-bottom: 0.5rem; // Small margin below title
   position: relative;
 
   &.form-title {
     text-align: left; // Align form title to left as in image
     margin-bottom: 1.5rem; // Space above form
-    font-size: 2.2rem; // Reduced font size for "Come and Join Us"
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
   }
 
   @media (max-width: 768px) {
-    font-size: 2.2rem;
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
     &.form-title {
       text-align: center;
-      font-size: 1.8rem; // Further reduce on mobile if needed
+      font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
     }
   }
 
@@ -73,10 +73,14 @@ export const Title = styled.h1`
 `;
 
 export const SubTitle = styled.p`
-  font-size: 1rem;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
   color: ${({ theme }) => theme.colors.textMuted || "#555"};
-  line-height: 1.6;
+  line-height: ${({ theme }) => theme.lineHeights.normal};
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+  }
 `;
 
 export const ContactItem = styled.div`
@@ -92,16 +96,24 @@ export const ContactItem = styled.div`
   }
 
   span {
-    font-size: 0.9rem;
+    font-size: ${({ theme }) => theme.fontSizes.small.desktop};
     color: ${({ theme }) => theme.colors.textMuted || "#666"};
     margin-bottom: 0.25rem;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.small.mobile};
+    }
   }
 
   p {
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
     color: ${({ theme }) => theme.colors.text};
     margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+    }
   }
 `;
 

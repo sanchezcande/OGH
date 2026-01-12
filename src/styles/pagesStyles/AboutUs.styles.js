@@ -112,22 +112,30 @@ export const ImageText = styled.div`
       }
 
       .founder-name {
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: ${({ theme }) => theme.fontSizes.cardTitle.desktop};
+        font-weight: ${({ theme }) => theme.fontWeights.semibold};
         color: #333333;
         margin: 0 0 3px 0;
         text-align: center;
         display: block;
+
+        @media (max-width: 768px) {
+          font-size: ${({ theme }) => theme.fontSizes.cardTitle.mobile};
+        }
       }
 
       .founder-role {
-        font-size: 0.9rem;
-        font-weight: 400;
+        font-size: ${({ theme }) => theme.fontSizes.small.desktop};
+        font-weight: ${({ theme }) => theme.fontWeights.regular};
         color: #555555;
         text-align: center;
         display: block;
         font-style: italic;
         margin: 0;
+
+        @media (max-width: 768px) {
+          font-size: ${({ theme }) => theme.fontSizes.small.mobile};
+        }
       }
     }
   }
@@ -154,10 +162,14 @@ export const ImageText = styled.div`
       white-space: pre-line;
       text-align: left;
       color: ${({ theme }) => theme.colors.textMuted};
-      line-height: 1.6;
+      line-height: ${({ theme }) => theme.lineHeights.normal};
       margin: 0;
-      font-size: 1rem;
-      font-weight: 400;
+      font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+      font-weight: ${({ theme }) => theme.fontWeights.regular};
+
+      @media (max-width: 768px) {
+        font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+      }
     }
   }
 
@@ -229,21 +241,29 @@ export const TeamSection = styled.section`
 
   .team-title {
     text-align: center;
-    font-size: 2.5rem;
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
     color: ${({ theme }) => theme.colors.primaryDark};
     margin-bottom: 1rem;
-    font-weight: 700;
+    font-weight: ${({ theme }) => theme.fontWeights.bold};
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+    }
   }
 
   .team-subtitle {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
     color: ${({ theme }) => theme.colors.textMuted};
     margin-bottom: 3rem;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-    line-height: 1.6;
+    line-height: ${({ theme }) => theme.lineHeights.normal};
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+    }
   }
 
   .team-grid {
@@ -306,26 +326,38 @@ export const TeamMemberCard = styled.div`
   }
 
   .member-name {
-    font-size: 1.3rem;
-    font-weight: 600;
+    font-size: ${({ theme }) => theme.fontSizes.cardTitle.desktop};
+    font-weight: ${({ theme }) => theme.fontWeights.semibold};
     color: ${({ theme }) => theme.colors.primaryDark};
     margin: 0 0 0.5rem 0;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.cardTitle.mobile};
+    }
   }
 
   .member-role {
-    font-size: 1rem;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
     color: ${({ theme }) => theme.colors.accent};
-    font-weight: 500;
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
     margin: 0 0 1rem 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
   }
 
   .member-description {
-    font-size: 0.9rem;
+    font-size: ${({ theme }) => theme.fontSizes.cardText.desktop};
     color: ${({ theme }) => theme.colors.textMuted};
-    line-height: 1.6;
+    line-height: ${({ theme }) => theme.lineHeights.normal};
     margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.cardText.mobile};
+    }
   }
 `;
 
@@ -359,23 +391,31 @@ export const CompanyDescription = styled.div`
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
     color: ${({ theme }) => theme.colors.primaryDark};
     text-align: center;
     margin: 0;
-    font-weight: 700;
-    line-height: 1.2;
+    font-weight: ${({ theme }) => theme.fontWeights.bold};
+    line-height: ${({ theme }) => theme.lineHeights.tight};
 
     span:not(.highlighted-class-placeholder) {
-      font-size: 1rem;
+      font-size: ${({ theme }) => theme.fontSizes.body.desktop};
       display: block;
       margin-top: 10px;
       color: ${({ theme }) => theme.colors.textAlt};
-      font-weight: 400;
+      font-weight: ${({ theme }) => theme.fontWeights.regular};
       max-width: 900px;
       margin-left: auto;
       margin-right: auto;
-      line-height: 1.6;
+      line-height: ${({ theme }) => theme.lineHeights.normal};
+    }
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+
+      span:not(.highlighted-class-placeholder) {
+        font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+      }
     }
   }
 
@@ -384,12 +424,16 @@ export const CompanyDescription = styled.div`
   }
 
   h2.subtitle {
-    font-size: 1.5rem;
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
     color: ${({ theme }) => theme.colors.primaryDark};
     text-align: center;
     margin: 0;
-    font-weight: 400;
-    line-height: 1.2;
+    font-weight: ${({ theme }) => theme.fontWeights.regular};
+    line-height: ${({ theme }) => theme.lineHeights.tight};
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+    }
   }
 
   h2.subtitle + p {
@@ -398,14 +442,18 @@ export const CompanyDescription = styled.div`
 
   p {
     white-space: pre-line;
-    text-align: center;
+    text-align: justify;
     color: ${({ theme }) => theme.colors.textMuted};
-    line-height: 1.6;
+    line-height: ${({ theme }) => theme.lineHeights.normal};
     margin: 0;
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
-    font-size: 1.1rem;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
   }
 
   .bold-text {
@@ -418,16 +466,16 @@ export const CompanyDescription = styled.div`
     padding: 1rem;
 
     h1 {
-      font-size: 2rem;
+      font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
     }
 
     h2.subtitle {
-      font-size: 1.3rem;
+      font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
     }
 
     p {
-      font-size: 1rem;
-      line-height: 1.5;
+      font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+      line-height: ${({ theme }) => theme.lineHeights.normal};
     }
   }
 `;
