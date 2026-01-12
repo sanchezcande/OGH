@@ -129,10 +129,16 @@ export default function MyApp({ Component, pageProps }) {
         />
         <meta
           property="og:image"
-          content="https://opengatehub.com/circular-bgw.png"
+          content="https://opengatehub.com/Reducido4oscuro.png"
         />
 
         <meta property="og:url" content={canonicalUrl} />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:image"
+          content="https://opengatehub.com/Reducido4oscuro.png"
+        />
 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
