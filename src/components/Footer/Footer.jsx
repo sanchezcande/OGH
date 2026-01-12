@@ -11,6 +11,7 @@ import {
   TelMailContainer,
   Title,
   LogoImgContainer,
+  ServicesGrid,
 } from "./Footer.styles";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
@@ -25,6 +26,16 @@ const LogoImg = () => (
 
 const Footer = () => {
   const { t } = useTranslation();
+  const servicesList = [
+    { text: "Staff Augmentation", href: "/services/staff-augmentation" },
+    { text: "n8n Automation", href: "/services/n8n-automation" },
+    { text: t("aiTitle"), href: "/services/AI" },
+    { text: t("frontendTitle"), href: "/services/front-end" },
+    { text: t("backendTitle"), href: "/services/back-end" },
+    { text: t("uxuiTitle"), href: "/services/ux-ui" },
+    { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
+  ];
+
   return (
     <FooterContainer>
       <FooterContent>
@@ -57,7 +68,29 @@ const Footer = () => {
           <LogoImg />
         </div>
         <div>
+          <h4>{t("services")}</h4>
+          <ServicesGrid>
+            {servicesList.map((service, index) => (
+              <FooterText key={index}>
+                <Link href={service.href} className="footer-link">
+                  {service.text}
+                </Link>
+              </FooterText>
+            ))}
+          </ServicesGrid>
+        </div>
+        <div>
           <h4>{t("aboutUs")}</h4>
+          <FooterText>
+            <Link href="/blog" className="footer-link">
+              {t("Blog")}
+            </Link>
+          </FooterText>
+          <FooterText>
+            <Link href="/about-us" className="footer-link">
+              {t("aboutUs")}
+            </Link>
+          </FooterText>
           <FooterText>
             <Link href="/faqs" className="footer-link">
               {t("faq")}
