@@ -27,6 +27,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { FaProjectDiagram, FaExternalLinkAlt, FaUsers } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
+import Link from "next/link";
 import useMediaQuery from "../src/Hooks/useMediaQuery";
 
 // Tabs Component
@@ -730,34 +731,36 @@ const TestimonialsCarousel = ({ testimonials }) => {
   );
 };
 
-const ServiceBox = ({ icon, title, description, delay = 0 }) => {
+const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const boxRef = React.useRef(null);
 
-  return (
-    <motion.div
-      className="service-box"
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.15, delay: delay * 0.1 }}
-      whileHover={{
-        scale: 1.02,
-        transition: { duration: 0.1 },
-      }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      style={{
-        background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
-        borderRadius: "16px",
-        padding: "2rem",
-        height: "100%",
-        cursor: "pointer",
-        position: "relative",
-        overflow: "hidden",
-        border: "1px solid rgba(249, 123, 114, 0.2)",
-        transition: "all 0.15s ease",
-      }}
-    >
+  // Cerrar el menú al hacer click fuera
+  useEffect(() => {
+    if (!showMenu) return;
+
+    const handleClickOutside = (event) => {
+      if (boxRef.current && !boxRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    // Agregar un pequeño delay para evitar que se cierre inmediatamente
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [showMenu]);
+
+  const boxContent = (
+    <>
       <motion.div
         initial={{ scale: 1 }}
         animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
@@ -785,15 +788,72 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
         {title}
       </h3>
 
-      <p
-        style={{
-          fontSize: "1rem",
-          lineHeight: "1.6",
-          color: "#444444",
-        }}
-      >
-        {description}
-      </p>
+      {menuItems.length > 0 && showMenu ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+            marginTop: "0.5rem",
+          }}
+        >
+          {menuItems.map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+              style={{ textDecoration: "none" }}
+              onClick={() => setShowMenu(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
+                style={{
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  color: "#1f2937",
+                  fontSize: "0.95rem",
+                  fontWeight: "500",
+                  backgroundColor: "#f9fafb",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#f97b72";
+                  e.target.style.color = "#ffffff";
+                  e.target.style.borderColor = "#f97b72";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#f9fafb";
+                  e.target.style.color = "#1f2937";
+                  e.target.style.borderColor = "#e5e7eb";
+                }}
+              >
+                {item.text}
+              </motion.div>
+            </Link>
+          ))}
+        </motion.div>
+      ) : (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          style={{
+            fontSize: "1rem",
+            lineHeight: "1.6",
+            color: "#444444",
+          }}
+        >
+          {description}
+        </motion.p>
+      )}
 
       <motion.div
         className="service-bg-circle"
@@ -813,7 +873,71 @@ const ServiceBox = ({ icon, title, description, delay = 0 }) => {
           zIndex: "-1",
         }}
       />
-    </motion.div>
+
+    </>
+  );
+
+  const boxStyle = {
+    background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
+    borderRadius: "16px",
+    padding: "2rem",
+    height: "100%",
+    cursor: menuItems.length > 0 || link ? "pointer" : "default",
+    position: "relative",
+    overflow: "hidden",
+    border: "1px solid rgba(249, 123, 114, 0.2)",
+    transition: "all 0.15s ease",
+  };
+
+  if (link && menuItems.length === 0) {
+    return (
+      <Link href={link} style={{ textDecoration: "none", color: "inherit" }}>
+        <motion.div
+          className="service-box"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.15, delay: delay * 0.1 }}
+          whileHover={{
+            scale: 1.02,
+            transition: { duration: 0.1 },
+          }}
+          onHoverStart={() => setIsHovered(true)}
+          onHoverEnd={() => setIsHovered(false)}
+          style={boxStyle}
+        >
+          {boxContent}
+        </motion.div>
+      </Link>
+    );
+  }
+
+  return (
+    <>
+      <motion.div
+        ref={boxRef}
+        className="service-box"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.15, delay: delay * 0.1 }}
+        whileHover={{
+          scale: 1.02,
+          transition: { duration: 0.1 },
+        }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (menuItems.length > 0) {
+            setShowMenu(!showMenu);
+          }
+        }}
+        style={boxStyle}
+      >
+        {boxContent}
+      </motion.div>
+    </>
   );
 };
 
@@ -1154,6 +1278,7 @@ export default function HomePage() {
                 "homeServicesSection.cards.staffAugmentation.description",
               )}
               delay={0.05}
+              link="/services/staff-augmentation"
             />
             <ServiceBox
               icon="💻"
@@ -1162,6 +1287,10 @@ export default function HomePage() {
                 "homeServicesSection.cards.softwareDevelopment.description",
               )}
               delay={0.1}
+              menuItems={[
+                { text: t("frontendTitle"), href: "/services/front-end" },
+                { text: t("backendTitle"), href: "/services/back-end" },
+              ]}
             />
             <ServiceBox
               icon="🎨"
@@ -1170,6 +1299,10 @@ export default function HomePage() {
                 "homeServicesSection.cards.uxUiDesign.description",
               )}
               delay={0.15}
+              menuItems={[
+                { text: t("uxuiTitle"), href: "/services/ux-ui" },
+                { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
+              ]}
             />
             <ServiceBox
               icon="🤖"
@@ -1178,6 +1311,10 @@ export default function HomePage() {
                 "homeServicesSection.cards.aiAndAutomation.description",
               )}
               delay={0.2}
+              menuItems={[
+                { text: "n8n Automation", href: "/services/n8n-automation" },
+                { text: t("aiTitle"), href: "/services/AI" },
+              ]}
             />
             <ServiceBox
               icon="📊"
@@ -1186,6 +1323,7 @@ export default function HomePage() {
                 "homeServicesSection.cards.dataAnalytics.description",
               )}
               delay={0.25}
+              link="/services/back-end"
             />
             <ServiceBox
               icon="📱"
@@ -1194,6 +1332,10 @@ export default function HomePage() {
                 "homeServicesSection.cards.mobileDevelopment.description",
               )}
               delay={0.3}
+              menuItems={[
+                { text: t("frontendTitle"), href: "/services/front-end" },
+                { text: t("backendTitle"), href: "/services/back-end" },
+              ]}
             />
           </div>
         </Section>

@@ -44,6 +44,11 @@ const NavBarDesktop = () => {
     };
   }, [updateHighlight]);
 
+  // Actualizar highlight cuando cambia el hover o activeIndex
+  useEffect(() => {
+    updateHighlight();
+  }, [hoveredIndex, activeIndex, updateHighlight]);
+
   const toggleLangMenu = () => {
     setShowLangMenu((prev) => !prev);
   };
@@ -106,17 +111,24 @@ const NavBarDesktop = () => {
         <Image src={Logo4} alt="OpenGateHub Logo" height={30} />
       </Link>
       <ul className={styles.navLinks}>
-        <div
-          className={styles.highlightBar}
-          style={{
-            left: `${(tabOffsets[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
-                0) - 30
-              }px`,
-            width: `${(tabWidths[hoveredIndex !== -1 ? hoveredIndex : activeIndex] ||
-                0) + 60
-              }px`,
-          }}
-        />
+        {(() => {
+          const currentIndex = hoveredIndex !== -1 ? hoveredIndex : activeIndex;
+          const offset = tabOffsets[currentIndex] || 0;
+          const width = tabWidths[currentIndex] || 0;
+          const calculatedLeft = offset - 30;
+          const actualLeft = calculatedLeft < 0 ? 0 : calculatedLeft;
+          const leftAdjustment = actualLeft - calculatedLeft;
+          
+          return (
+            <div
+              className={styles.highlightBar}
+              style={{
+                left: `${actualLeft}px`,
+                width: `${width + 60 - leftAdjustment}px`,
+              }}
+            />
+          );
+        })()}
         {pillTabs.map((tab, i) => (
           <li
             key={tab.text}
