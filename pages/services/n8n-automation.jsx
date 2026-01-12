@@ -697,45 +697,20 @@ const N8nAutomation = () => {
         </div>
       </section>
 
-      <ServiceContainer>
-        {/* Call to Action */}
-        <ProfessionalCard
-          style={{
-            background: "#f8f9fa",
-            textAlign: "center",
-          }}
-        >
-          <h3
-            className="animate"
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: "600",
-              marginBottom: "1rem",
-              color: "#2B2B2B",
-              animationDelay: "0.9s",
-            }}
-          >
-            {lang === "es"
-              ? "¿Listo para automatizar tu negocio?"
-              : "Ready to automate your business?"}
-          </h3>
-          <p
-            className="animate"
-            style={{
-              fontSize: "1.1rem",
-              color: "#6B7280",
-              marginBottom: "2rem",
-              animationDelay: "1.0s",
-            }}
-          >
-            {lang === "es"
-              ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
-              : "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes."}
-          </p>
-        </ProfessionalCard>
-
-        <ServicesCallToAction />
-      </ServiceContainer>
+      <CallToActionBlock
+        title={
+          lang === "es"
+            ? "¿Listo para automatizar tu negocio?"
+            : "Ready to automate your business?"
+        }
+        description={
+          lang === "es"
+            ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
+            : "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes."
+        }
+        buttonText={t("servicesCallToAction.buttonText")}
+        highlightWord="automate"
+      />
     </>
   );
 };

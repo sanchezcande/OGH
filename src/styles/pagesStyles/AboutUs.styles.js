@@ -160,7 +160,7 @@ export const ImageText = styled.div`
 
     .bio-text {
       white-space: pre-line;
-      text-align: left;
+      text-align: justify;
       color: ${({ theme }) => theme.colors.textMuted};
       line-height: ${({ theme }) => theme.lineHeights.normal};
       margin: 0;
@@ -169,6 +169,7 @@ export const ImageText = styled.div`
 
       @media (max-width: 768px) {
         font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+        text-align: justify;
       }
     }
   }

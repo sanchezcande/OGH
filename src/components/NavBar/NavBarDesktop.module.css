@@ -13,6 +13,8 @@
   font-weight: 800;
   font-size: 26px;
   margin-top: 12px;
+  display: flex;
+  align-items: center;
 }
 
 .span {
@@ -63,9 +65,9 @@
 .langMenuContainer {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   position: relative;
-  margin-right: 25px;
+  margin-right: 20px;
 }
 
 .langMenu {
@@ -96,10 +98,10 @@
 }
 
 .langMenuItem {
-  padding: 10px 16px;
+  padding: 8px 14px;
   cursor: pointer;
   color: #1f2937;
-  font-size: 1rem;
+  font-size: 14px;
   transition: transform 0.2s ease;
 }
 
@@ -108,14 +110,15 @@
 }
 
 .worldIcon {
-  width: 32px;
-  height: 32px;
-  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
 }
 
 .styledLangText {
   font-weight: 500;
   color: #1f2937;
+  font-size: 14px;
 }
 
 .arrowIcon {

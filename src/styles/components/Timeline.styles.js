@@ -270,8 +270,11 @@ export const TimelineItem = styled.div`
 
 export const TimelineContent = styled.div`
   // No specific width needed here anymore, handled by parent flex item
+  background-color: #ffffff;
   padding: 15px 20px; // Adjusted padding
   border-radius: 8px;
+  position: relative;
+  z-index: 4;
 
   h3 {
     margin-top: 0;
@@ -279,6 +282,7 @@ export const TimelineContent = styled.div`
     color: ${({ theme }) => theme.colors.text}; // Ensure main text color
     font-size: 1.3rem; // Slightly smaller title
     position: relative;
+    z-index: 5;
     padding-bottom: 6px; // Adjusted space
 
     // Ensure ALL text within the h3 has the same color

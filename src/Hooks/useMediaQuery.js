@@ -24,7 +24,7 @@ const useMediaQuery = (query) => {
 
     // Agregar listener
     if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", handleChange);
+    mediaQuery.addEventListener("change", handleChange);
     } else {
       // Fallback para navegadores antiguos
       mediaQuery.addListener(handleChange);
