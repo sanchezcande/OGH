@@ -58,14 +58,18 @@ export const ServiceContainer = styled.section`
 `;
 
 export const ServiceTitle = styled.h2`
-  font-size: 2.8rem;
-  font-weight: 800;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: 1.5rem;
   text-align: left;
   color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -79,12 +83,16 @@ export const ServiceList = styled.ul`
   padding: 0;
 
   li {
-    font-size: 1.1rem;
-    line-height: 1.6;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.normal};
     margin-bottom: 1rem;
     padding: 1rem;
     padding-left: 1.5rem;
     color: ${({ theme }) => theme.colors.text};
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
     background: ${({ theme }) => theme.colors.backgroundAlt};
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -135,11 +143,15 @@ export const ServiceList = styled.ul`
 `;
 
 export const Description = styled.p`
-  font-size: 1.2rem;
-  line-height: 1.8;
+  font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
+  line-height: ${({ theme }) => theme.lineHeights.relaxed};
   margin-bottom: 2rem;
   text-align: justify;
   color: ${({ theme }) => theme.colors.text};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+  }
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -149,9 +161,13 @@ export const Description = styled.p`
 export const HighlightText = styled.div`
   text-align: center;
   margin: 3rem 0;
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
   border: 2px dashed ${({ theme }) => theme.colors.primary};
   padding: 1rem;
   border-radius: 8px;
@@ -193,12 +209,16 @@ export const NumberedList = styled.ol`
 
   li {
     counter-increment: list-counter;
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
 
     &.visible {
       animation: fadeInUp 0.5s ease forwards;

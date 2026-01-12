@@ -12,20 +12,28 @@ export const FAQContainer = styled.section`
 `;
 
 export const FAQTitle = styled.h1`
-  font-size: 2.2rem;
-  font-weight: 500;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
   margin-bottom: 2rem;
   text-align: left;
   color: ${({ theme }) => theme.colors.primaryDark};
   margin-left: 2.6rem;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 `;
 
 export const FAQTitle1 = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: 2rem;
   text-align: center;
   color: ${({ theme }) => theme.colors.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 `;
 
 export const FAQList = styled.ul`
@@ -67,20 +75,28 @@ export const FAQList = styled.ul`
 `;
 
 export const Question = styled.h2`
-  font-size: 1.4rem;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.fontSizes.cardTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
   margin-bottom: 0.5rem;
   color: ${({ theme }) => theme.colors.text};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.cardTitle.mobile};
+  }
 `;
 
 export const Answer = styled.p`
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+  line-height: ${({ theme }) => theme.lineHeights.normal};
   color: ${({ theme }) => theme.colors.text};
   background: ${({ theme }) => theme.colors.backgroundAlt}; // Ej: #f1f1f1
   padding: 1rem;
   border-radius: 8px;
   transition: box-shadow 0.3s ease;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+  }
 
   &:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);

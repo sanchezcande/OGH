@@ -219,8 +219,8 @@ export const Title = styled.h1`
   mix-blend-mode: normal;
   z-index: 1;
   position: relative;
-  font-size: clamp(2.5rem, 5vw, 3rem);
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.heroTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin: 20px 0 10px 0;
   text-align: center;
   overflow: hidden;
@@ -289,11 +289,11 @@ export const Title = styled.h1`
   }
 
   @media (max-width: 900px) {
-    font-size: 3rem;
+    font-size: ${({ theme }) => theme.fontSizes.heroTitle.desktop};
   }
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: ${({ theme }) => theme.fontSizes.heroTitle.mobile};
 
     .desktop-only {
       display: none;
@@ -314,7 +314,7 @@ export const Title = styled.h1`
   }
 
   @media (max-width: 610px) {
-    font-size: 2rem;
+    font-size: ${({ theme }) => theme.fontSizes.heroTitle.mobile};
   }
 `;
 
@@ -323,20 +323,20 @@ export const Subtitle = styled.h2`
   mix-blend-mode: normal;
   z-index: 1;
   position: relative;
-  font-size: 1.2rem;
-  font-weight: 400;
+  font-size: ${({ theme }) => theme.fontSizes.heroSubtitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
   margin-bottom: 30px;
   max-width: 800px;
-  line-height: 1.6;
+  line-height: ${({ theme }) => theme.lineHeights.relaxed};
   display: inline-block;
   padding: 20px;
   cursor: default;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: ${({ theme }) => theme.fontSizes.heroSubtitle.mobile};
     padding: 10px;
-    line-height: 1.5;
+    line-height: ${({ theme }) => theme.lineHeights.normal};
   }
 `;
 
@@ -375,8 +375,8 @@ export const Section = styled.div`
 `;
 
 export const SectionTitle = styled.h3`
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: 20px;
   position: relative;
   z-index: 1;
@@ -388,6 +388,10 @@ export const SectionTitle = styled.h3`
   animation-delay: calc(0.2s * var(--i, 0));
   opacity: 0;
   transition: transform 0.3s ease;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 
   &::before {
     content: "";
@@ -443,12 +447,16 @@ export const SectionTitle = styled.h3`
 `;
 
 export const SectionText = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
+  line-height: ${({ theme }) => theme.lineHeights.normal};
   color: ${({ theme }) => theme.colors.textMuted};
   position: relative;
   z-index: 1;
-  font-weight: 400;
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+  }
 
   strong {
     color: ${({ theme }) => theme.colors.accent};

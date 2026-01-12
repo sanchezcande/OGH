@@ -22,12 +22,16 @@ export const SearchInput = styled.input`
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: #ffffff;
-  font-size: 1rem;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
   color: ${({ theme }) => theme.colors.text};
   outline: none;
   margin-left: 10px;
   margin-bottom: 20px;
   transition: border-color 0.2s ease;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+  }
 
   &::placeholder {
     color: #9ca3af;
@@ -118,42 +122,50 @@ export const ArticleCard = styled.div`
   }
 
   h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: ${({ theme }) => theme.fontSizes.cardTitle.desktop};
+    font-weight: ${({ theme }) => theme.fontWeights.semibold};
     margin-bottom: 12px;
     color: #1f2937;
-    line-height: 1.3;
+    line-height: ${({ theme }) => theme.lineHeights.tight};
     flex-shrink: 0;
 
     @media (max-width: 768px) {
-      font-size: 1.3rem;
+      font-size: ${({ theme }) => theme.fontSizes.cardTitle.mobile};
     }
   }
 
   p {
-    font-size: 0.95rem;
+    font-size: ${({ theme }) => theme.fontSizes.cardText.desktop};
     color: #6b7280;
-    line-height: 1.6;
+    line-height: ${({ theme }) => theme.lineHeights.normal};
     margin-bottom: 16px;
     flex-grow: 1;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.cardText.mobile};
+    }
   }
 
   a {
     display: inline-block;
     margin-top: auto;
     color: #6b7280;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
+    font-size: ${({ theme }) => theme.fontSizes.small.desktop};
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: border-color 0.2s ease, color 0.2s ease;
     flex-shrink: 0;
     width: fit-content;
     align-self: flex-start;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.small.mobile};
+    }
 
     &:hover {
       color: #374151;

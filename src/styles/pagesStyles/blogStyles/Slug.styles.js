@@ -15,24 +15,30 @@ export const ArticleContainer = styled.div`
   padding: 30px 40px;
   background-color: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
-  line-height: 1.8;
-  font-size: 1.1rem;
+  line-height: ${({ theme }) => theme.lineHeights.relaxed};
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
   max-width: 1200px;
   margin: 0 auto 20px auto;
   border-radius: ${({ theme }) => theme.borderRadius};
   animation: ${fadeIn} 0.6s ease-out;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+  }
 `;
 
 export const Title = styled.h1`
-  font-size: 2rem;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
   font-family: ${({ theme }) => theme.fonts.main};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.accent};
   text-align: left;
   margin-bottom: 20px;
+  line-height: ${({ theme }) => theme.lineHeights.tight};
 
   @media (max-width: 768px) {
-    font-size: 1.3rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: -10px;
   }
 `;
@@ -57,10 +63,15 @@ export const Content = styled.div`
   gap: 16px;
   font-family: ${({ theme }) => theme.fonts.main};
   text-align: justify;
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+  line-height: ${({ theme }) => theme.lineHeights.normal};
 
   p {
     margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.body.mobile};
   }
 
   ul {
@@ -81,7 +92,11 @@ export const Highlight = styled.span`
 export const ErrorMessage = styled.div`
   padding: 100px 20px;
   text-align: center;
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 `;

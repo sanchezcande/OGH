@@ -42,11 +42,15 @@ export const ServiceContainer = styled.section`
 `;
 
 export const ServiceTitle = styled.h2`
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: 1.5rem;
   color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -61,13 +65,17 @@ export const ServiceList = styled.ul`
   padding-left: 0;
 
   li {
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     position: relative;
     padding-left: 1.5rem;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
 
 
     &.visible {
@@ -117,11 +125,15 @@ export const ServiceList = styled.ul`
 `;
 
 export const HighlightText = styled.p`
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
   text-align: center;
   margin-top: 2rem;
   color: ${({ theme }) => theme.colors.accent};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+  }
   transition:
     -webkit-text-stroke 0.3s ease,
     color 0.3s ease;
@@ -153,9 +165,13 @@ export const Divider = styled.hr`
 `;
 
 export const Description = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+  line-height: ${({ theme }) => theme.lineHeights.relaxed};
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+  }
 
   &.visible {
     animation: fadeInUp 0.5s ease forwards;
@@ -172,11 +188,15 @@ export const NumberedList = styled.ol`
 
   li {
     counter-increment: list-counter;
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
 
     &.visible {
       animation: fadeInUp 0.5s ease forwards;

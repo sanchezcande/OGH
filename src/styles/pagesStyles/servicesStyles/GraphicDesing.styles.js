@@ -31,14 +31,18 @@ export const ServiceContainer = styled.section`
 `;
 
 export const ServiceTitle = styled.h2`
-  font-size: 2.8rem;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sectionTitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: 2rem;
   text-align: left;
   color: ${({ theme }) => theme.colors.primary};
   text-transform: uppercase;
   border-bottom: 2px solid ${({ theme }) => theme.colors.accent};
   padding-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionTitle.mobile};
+  }
 `;
 
 export const ServiceList = styled.ul`
@@ -46,11 +50,15 @@ export const ServiceList = styled.ul`
   padding-left: 0;
 
   li {
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: 1.2rem;
     padding-left: 1.8rem;
     position: relative;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
 
     &::before {
       content: "•";
@@ -72,9 +80,13 @@ export const Divider = styled.hr`
 `;
 
 export const HighlightText = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+  }
   border-left: 4px solid ${({ theme }) => theme.colors.accent};
   padding: 1rem 1.5rem;
   background: ${({ theme }) => theme.colors.backgroundAlt};
@@ -83,10 +95,14 @@ export const HighlightText = styled.div`
 `;
 
 export const Description = styled.p`
-  font-size: 1.15rem;
-  line-height: 1.9;
+  font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.desktop};
+  line-height: ${({ theme }) => theme.lineHeights.relaxed};
   margin-bottom: 2rem;
   color: ${({ theme }) => theme.colors.text};
+
+  @media (max-width: 768px) {
+    font-size: ${({ theme }) => theme.fontSizes.sectionSubtitle.mobile};
+  }
 `;
 
 export const NumberedList = styled.ol`
@@ -96,11 +112,15 @@ export const NumberedList = styled.ol`
 
   li {
     counter-increment: list-counter;
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: 1.2rem;
     display: flex;
     align-items: flex-start;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
 
     &::before {
       content: counter(list-counter);
@@ -124,11 +144,15 @@ export const ServiceListCross = styled.ul`
   padding-left: 0;
 
   li {
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+    line-height: ${({ theme }) => theme.lineHeights.relaxed};
     margin-bottom: 1rem;
     padding-left: 1.8rem;
     position: relative;
+
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    }
 
     &::before {
       content: "x";

@@ -28,6 +28,64 @@ const theme = {
     bold: 700,
     black: 900,
   },
+  fontSizes: {
+    // Hero & Main Titles
+    heroTitle: {
+      desktop: "clamp(2.5rem, 5vw, 3rem)",
+      mobile: "2rem",
+    },
+    // Section Titles
+    sectionTitle: {
+      desktop: "2rem",
+      mobile: "1.8rem",
+    },
+    // Hero Subtitle
+    heroSubtitle: {
+      desktop: "1.2rem",
+      mobile: "1.2rem",
+    },
+    // Section Subtitles
+    sectionSubtitle: {
+      desktop: "1.1rem",
+      mobile: "1rem",
+    },
+    // Body Text
+    body: {
+      desktop: "1rem",
+      mobile: "0.95rem",
+    },
+    // Small Text
+    small: {
+      desktop: "0.9rem",
+      mobile: "0.85rem",
+    },
+    // Button Text
+    button: {
+      desktop: "1rem",
+      mobile: "0.95rem",
+    },
+    // Primary CTA Button
+    ctaButton: {
+      desktop: "1rem",
+      mobile: "1rem",
+    },
+    // Card Title
+    cardTitle: {
+      desktop: "1.15rem",
+      mobile: "1rem",
+    },
+    // Card Text
+    cardText: {
+      desktop: "0.9rem",
+      mobile: "0.85rem",
+    },
+  },
+  lineHeights: {
+    tight: "1.2",
+    normal: "1.5",
+    relaxed: "1.6",
+    loose: "1.8",
+  },
   spacing: {
     xs: "4px",
     small: "8px",
