@@ -10,7 +10,6 @@ import {
   FaCheckCircle,
   FaRocket,
   FaUsers,
-  FaStar,
   FaPaintBrush,
   FaImage,
   FaPenNib,
