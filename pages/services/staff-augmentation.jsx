@@ -255,11 +255,7 @@ const staffAugmentation = () => {
         <title>Staff Augmentation - OpenGateHub</title>
         <meta
           name="description"
-          content={
-            lang === "es"
-              ? "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar."
-              : "We scale your team prioritizing cultural fit and human quality. We select developers who align with your values and way of working."
-          }
+          content={t("staffAugmentation.metaDescription")}
         />
         <meta
           name="keywords"
@@ -355,9 +351,7 @@ const staffAugmentation = () => {
               animationDelay: "0.15s",
             }}
           >
-            {lang === "es"
-              ? "Ampliamos tu equipo priorizando el match cultural y la calidad humana"
-              : "We scale your team prioritizing cultural fit and human quality"}
+            {t("staffAugmentation.heroSubtitle")}
           </p>
         </div>
       </section>
@@ -397,14 +391,10 @@ const staffAugmentation = () => {
           />
           <div style={{ position: "relative", zIndex: 2 }}>
             <SectionTitle>
-              {lang === "es"
-                ? "¿Qué es Staff Augmentation?"
-                : "What is Staff Augmentation?"}
+              {t("staffAugmentation.whatIsTitle")}
             </SectionTitle>
             <Subtitle>
-              {lang === "es"
-                ? "Staff Augmentation es nuestro servicio estrella. Nosotros priorizamos el match cultural y la calidad humana por encima de todo. No solo buscamos desarrolladores expertos, sino personas que se alineen con tus valores, tu forma de trabajar y tu visión. Trabajamos como parte de tu equipo para entregar resultados de calidad y acelerar tu roadmap sin la complejidad de contrataciones tradicionales."
-                : "Staff Augmentation is our flagship service. We prioritize cultural fit and human quality above all else. We don't just find expert developers—we find people who align with your values, your way of working, and your vision. We work as part of your team to deliver quality results and accelerate your roadmap without the complexity of traditional hiring."}
+              {t("staffAugmentation.whatIsDescription")}
             </Subtitle>
           </div>
         </div>
@@ -415,9 +405,7 @@ const staffAugmentation = () => {
           style={{ animationDelay: "0.25s" }}
         >
           <SectionTitle>
-            {lang === "es"
-              ? "¿Por qué elegir Staff Augmentation?"
-              : "Why choose Staff Augmentation?"}
+            {t("staffAugmentation.whyChooseTitle")}
           </SectionTitle>
           <div
             style={{
@@ -458,9 +446,7 @@ const staffAugmentation = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es"
-                  ? "Acelerá tu roadmap"
-                  : "Accelerate your roadmap"}
+                {t("staffAugmentation.benefits.accelerateTitle")}
               </h4>
               <p
                 style={{
@@ -469,9 +455,7 @@ const staffAugmentation = () => {
                   lineHeight: "1.5",
                 }}
               >
-                {lang === "es"
-                  ? "Agregá talento experto rápidamente sin los tiempos de contratación tradicionales."
-                  : "Add expert talent quickly without traditional hiring timelines."}
+                {t("staffAugmentation.benefits.accelerateDescription")}
               </p>
             </div>
             <div
@@ -503,7 +487,7 @@ const staffAugmentation = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es" ? "Integración perfecta" : "Perfect integration"}
+                {t("staffAugmentation.benefits.integrationTitle")}
               </h4>
               <p
                 style={{
@@ -512,9 +496,7 @@ const staffAugmentation = () => {
                   lineHeight: "1.5",
                 }}
               >
-                {lang === "es"
-                  ? "Nuestros desarrolladores se integran como parte de tu equipo, alineados con tu cultura."
-                  : "Our developers integrate as part of your team, aligned with your culture."}
+                {t("staffAugmentation.benefits.integrationDescription")}
               </p>
             </div>
             <div
@@ -546,7 +528,7 @@ const staffAugmentation = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es" ? "Expertos en tecnología" : "Tech experts"}
+                {t("staffAugmentation.benefits.techExpertsTitle")}
               </h4>
               <p
                 style={{
@@ -555,9 +537,7 @@ const staffAugmentation = () => {
                   lineHeight: "1.5",
                 }}
               >
-                {lang === "es"
-                  ? "Accedé a desarrolladores senior con experiencia en las tecnologías que necesitás."
-                  : "Access senior developers with experience in the technologies you need."}
+                {t("staffAugmentation.benefits.techExpertsDescription")}
               </p>
             </div>
           </div>
@@ -581,82 +561,56 @@ const staffAugmentation = () => {
                 fontWeight: "500",
               }}
             >
-              {lang === "es"
-                ? "Para nosotros, el match cultural y la calidad humana son la prioridad. Trabajamos como parte de tu equipo, no como un proveedor externo. Nuestro compromiso es con tu éxito."
-                : "For us, cultural fit and human quality are the priority. We work as part of your team, not as an external vendor. Our commitment is to your success."}
+              {t("staffAugmentation.benefits.commitment")}
             </p>
           </div>
         </ProfessionalCard>
 
         {/* Key Benefits */}
         <SectionTitle className="animate" style={{ animationDelay: "0.5s" }}>
-          {lang === "es" ? "Beneficios clave" : "Key Benefits"}
+          {t("staffAugmentation.keyBenefitsTitle")}
         </SectionTitle>
         <FeatureGrid>
           <FeatureCard
             className="animate"
             icon={<FaUsersCog />}
-            title={lang === "es" ? "Equipo Extendido" : "Extended Team"}
-            description={
-              lang === "es"
-                ? "Desarrolladores que trabajan como parte de tu equipo, no como contratistas externos"
-                : "Developers who work as part of your team, not as external contractors"
-            }
+            title={t("staffAugmentation.keyBenefits.extendedTeamTitle")}
+            description={t("staffAugmentation.keyBenefits.extendedTeamDescription")}
             delay={1}
           />
           <FeatureCard
             className="animate"
             icon={<FaClock />}
-            title={lang === "es" ? "Tiempo de Respuesta" : "Quick Start"}
-            description={
-              lang === "es"
-                ? "Integración rápida, sin procesos largos de contratación"
-                : "Quick integration, without long hiring processes"
-            }
+            title={t("staffAugmentation.keyBenefits.quickStartTitle")}
+            description={t("staffAugmentation.keyBenefits.quickStartDescription")}
             delay={2}
           />
           <FeatureCard
             className="animate"
             icon={<FaChartLine />}
-            title={lang === "es" ? "Escalabilidad" : "Scalability"}
-            description={
-              lang === "es"
-                ? "Ajustá el tamaño de tu equipo según tus necesidades del proyecto"
-                : "Adjust your team size based on your project needs"
-            }
+            title={t("staffAugmentation.keyBenefits.scalabilityTitle")}
+            description={t("staffAugmentation.keyBenefits.scalabilityDescription")}
             delay={3}
           />
           <FeatureCard
             className="animate"
             icon={<FaShieldAlt />}
-            title={lang === "es" ? "Calidad Garantizada" : "Guaranteed Quality"}
-            description={
-              lang === "es"
-                ? "Desarrolladores senior con experiencia comprobada en proyectos complejos"
-                : "Senior developers with proven experience in complex projects"
-            }
+            title={t("staffAugmentation.keyBenefits.guaranteedQualityTitle")}
+            description={t("staffAugmentation.keyBenefits.guaranteedQualityDescription")}
             delay={4}
           />
           <FeatureCard
             className="animate"
             icon={<FaSyncAlt />}
-            title={lang === "es" ? "Flexibilidad" : "Flexibility"}
-            description={
-              lang === "es"
-                ? "Adaptación rápida a cambios en requerimientos y prioridades"
-                : "Quick adaptation to changes in requirements and priorities"
-            }
+            title={t("staffAugmentation.keyBenefits.flexibilityTitle")}
+            description={t("staffAugmentation.keyBenefits.flexibilityDescription")}
             delay={5}
           />
           <FeatureCard
             className="animate"
             icon={<FaUserTie />}
-            title={lang === "es" ? "Alineación Cultural" : "Cultural Fit"}
-            description={
-              lang === "es"
-                ? "Desarrolladores que comparten tus valores y forma de trabajar"
-                : "Developers who share your values and way of working"
-            }
+            title={t("staffAugmentation.keyBenefits.culturalFitTitle")}
+            description={t("staffAugmentation.keyBenefits.culturalFitDescription")}
             delay={6}
           />
         </FeatureGrid>
@@ -671,9 +625,7 @@ const staffAugmentation = () => {
           }}
         >
           <SectionTitle>
-            {lang === "es"
-              ? "¿Cómo trabajamos con vos?"
-              : "How do we work with you?"}
+            {t("staffAugmentation.howWeWorkTitle")}
           </SectionTitle>
           <div
             style={{
@@ -740,16 +692,12 @@ const staffAugmentation = () => {
                       fontSize: "1.08rem",
                     }}
                   >
-                    {lang === "es"
-                      ? "Entendemos tu cultura"
-                      : "Understand your culture"}
+                    {t("staffAugmentation.howWeWork.step1Title")}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
-                    {lang === "es"
-                      ? "Priorizamos entender tus valores, tu forma de trabajar y tu visión. El match cultural es nuestra prioridad número uno."
-                      : "We prioritize understanding your values, your way of working, and your vision. Cultural fit is our number one priority."}
+                    {t("staffAugmentation.howWeWork.step1Description")}
                   </div>
                 </div>
               </li>
@@ -783,16 +731,12 @@ const staffAugmentation = () => {
                       fontSize: "1.08rem",
                     }}
                   >
-                    {lang === "es"
-                      ? "Seleccionamos por match cultural"
-                      : "Select for cultural fit"}
+                    {t("staffAugmentation.howWeWork.step2Title")}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
-                    {lang === "es"
-                      ? "Nosotros evaluamos y seleccionamos desarrolladores priorizando el match cultural y la calidad humana, no solo las habilidades técnicas."
-                      : "We evaluate and select developers prioritizing cultural fit and human quality, not just technical skills."}
+                    {t("staffAugmentation.howWeWork.step2Description")}
                   </div>
                 </div>
               </li>
@@ -826,14 +770,12 @@ const staffAugmentation = () => {
                       fontSize: "1.08rem",
                     }}
                   >
-                    {lang === "es" ? "Integración rápida" : "Quick integration"}
+                    {t("staffAugmentation.howWeWork.step3Title")}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
-                    {lang === "es"
-                      ? "Nuestros desarrolladores se integran a tu equipo y procesos desde el día uno."
-                      : "Our developers integrate into your team and processes from day one."}
+                    {t("staffAugmentation.howWeWork.step3Description")}
                   </div>
                 </div>
               </li>
@@ -866,14 +808,12 @@ const staffAugmentation = () => {
                       fontSize: "1.08rem",
                     }}
                   >
-                    {lang === "es" ? "Trabajamos juntos" : "Work together"}
+                    {t("staffAugmentation.howWeWork.step4Title")}
                   </span>
                   <div
                     style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
                   >
-                    {lang === "es"
-                      ? "Colaboramos de cerca, entregamos resultados y aceleramos tu roadmap."
-                      : "We collaborate closely, deliver results and accelerate your roadmap."}
+                    {t("staffAugmentation.howWeWork.step4Description")}
                   </div>
                 </div>
               </li>
@@ -925,7 +865,7 @@ const staffAugmentation = () => {
               color: "white",
             }}
           >
-            {lang === "es" ? "Casos de uso ideales" : "Ideal use cases"}
+            {t("staffAugmentation.useCasesTitle")}
           </h2>
           <div
             style={{
@@ -975,7 +915,7 @@ const staffAugmentation = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es" ? "Startups en crecimiento" : "Growing startups"}
+                {t("staffAugmentation.useCases.growingStartupsTitle")}
               </h4>
               <p
                 style={{
@@ -985,9 +925,7 @@ const staffAugmentation = () => {
                   lineHeight: "1.5",
                 }}
               >
-                {lang === "es"
-                  ? "Escalá tu equipo rápidamente para cumplir con deadlines y objetivos ambiciosos"
-                  : "Scale your team quickly to meet deadlines and ambitious goals"}
+                {t("staffAugmentation.useCases.growingStartupsDescription")}
               </p>
             </div>
             <div
@@ -1031,7 +969,7 @@ const staffAugmentation = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es" ? "Proyectos específicos" : "Specific projects"}
+                {t("staffAugmentation.useCases.specificProjectsTitle")}
               </h4>
               <p
                 style={{
@@ -1041,9 +979,7 @@ const staffAugmentation = () => {
                   lineHeight: "1.5",
                 }}
               >
-                {lang === "es"
-                  ? "Agregá expertise en tecnologías específicas para proyectos puntuales"
-                  : "Add expertise in specific technologies for targeted projects"}
+                {t("staffAugmentation.useCases.specificProjectsDescription")}
               </p>
             </div>
             <div
@@ -1087,7 +1023,7 @@ const staffAugmentation = () => {
                   color: "#2B2B2B",
                 }}
               >
-                {lang === "es" ? "Equipos distribuidos" : "Distributed teams"}
+                {t("staffAugmentation.useCases.distributedTeamsTitle")}
               </h4>
               <p
                 style={{
@@ -1097,9 +1033,7 @@ const staffAugmentation = () => {
                   lineHeight: "1.5",
                 }}
               >
-                {lang === "es"
-                  ? "Ampliá tu equipo remoto con desarrolladores que trabajan en tu timezone"
-                  : "Expand your remote team with developers who work in your timezone"}
+                {t("staffAugmentation.useCases.distributedTeamsDescription")}
               </p>
             </div>
           </div>
@@ -1109,14 +1043,10 @@ const staffAugmentation = () => {
         {/* Call to Action */}
         <div className="animate" style={{ animationDelay: "1s" }}>
           <CallToActionBlock
-            title={
-              lang === "es"
-                ? "¿Listo para ampliar tu equipo?"
-                : "Ready to scale your team?"
-            }
+            title={t("staffAugmentation.ctaTitle")}
             description={t("servicesCallToAction.description")}
             buttonText={t("servicesCallToAction.buttonText")}
-            highlightWord="Ready"
+            highlightWord={t("staffAugmentation.ctaHighlightWord")}
           />
         </div>
     </>

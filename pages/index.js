@@ -224,9 +224,10 @@ const FeaturedWorkCard = ({
                 src={image}
                 alt={title}
                 style={{
-                  width: "auto",
+                  width: category === "web-performance" ? "auto" : "auto",
                   maxWidth: "200px",
-                  maxHeight: "120px",
+                  height: category === "web-performance" ? "70px" : "auto",
+                  maxHeight: category === "web-performance" ? "70px" : "120px",
                   objectFit: "contain",
                   transition: "transform 0.3s ease-out",
                   filter: "grayscale(20%)",
@@ -1478,7 +1479,7 @@ export default function HomePage() {
                       shipped.
                     </>
                   ),
-                  badges: ["Fast pages", "SEO ready", "Always on"],
+                  badges: ["Fast pages", "SEO ready", "Modern stack"],
                   category: "web-performance",
                   delay: 0.2,
                 },
@@ -1512,23 +1513,39 @@ export default function HomePage() {
                       optimized performance.
                     </>
                   ),
-                  badges: ["Dynamic transitions", "SEO ready", "Always on"],
+                  badges: ["Dynamic transitions", "SEO ready", "Fast load"],
                   category: "web-performance",
                   delay: 0.4,
+                },
+                {
+                  image: "/kdabogados.png",
+                  title: "KD Abogados",
+                  description: "Sitio web profesional y responsive",
+                  metrics: ["Rápido y seguro", "99.9% uptime", "SEO optimizado"],
+                  link: "https://kdabogados.com.ar/",
+                  hoverContent: (
+                    <>
+                      <strong>Web Development</strong> — professional website,
+                      responsive design.
+                    </>
+                  ),
+                  badges: ["Responsive", "SEO ready", "Fast load"],
+                  category: "web-performance",
+                  delay: 0.45,
                 },
                 {
                   image: "/valthor-logo.e3b5a398.png",
                   title: "Valthor CRM",
                   description: "Plataforma CRM moderna y optimizada con IA",
                   metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
-                  link: "#",
+                  link: "https://www.valthorcrm.com/",
                   hoverContent: (
                     <>
                       <strong>Modern CRM platform</strong> — powered with{" "}
                       <strong>AI</strong>.
                     </>
                   ),
-                  badges: ["CRM", "AI", "Always on"],
+                  badges: ["CRM", "AI", "24/7"],
                   category: "saas",
                   delay: 0.5,
                 },

@@ -85,6 +85,59 @@
     "description": "Reservá una sesión estratégica gratuita para discutir tus necesidades.",
     "buttonText": "Reservar Sesión Gratis"
   },
+  "staffAugmentation": {
+    "metaDescription": "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar.",
+    "heroSubtitle": "Ampliamos tu equipo priorizando el match cultural y la calidad humana",
+    "whatIsTitle": "¿Qué es Staff Augmentation?",
+    "whatIsDescription": "Staff Augmentation es nuestro servicio estrella. Nosotros priorizamos el match cultural y la calidad humana por encima de todo. No solo buscamos desarrolladores expertos, sino personas que se alineen con tus valores, tu forma de trabajar y tu visión. Trabajamos como parte de tu equipo para entregar resultados de calidad y acelerar tu roadmap sin la complejidad de contrataciones tradicionales.",
+    "whyChooseTitle": "¿Por qué elegir Staff Augmentation?",
+    "benefits": {
+      "accelerateTitle": "Acelerá tu roadmap",
+      "accelerateDescription": "Agregá talento experto rápidamente sin los tiempos de contratación tradicionales.",
+      "integrationTitle": "Integración perfecta",
+      "integrationDescription": "Nuestros desarrolladores se integran como parte de tu equipo, alineados con tu cultura.",
+      "techExpertsTitle": "Expertos en tecnología",
+      "techExpertsDescription": "Accedé a desarrolladores senior con experiencia en las tecnologías que necesitás.",
+      "commitment": "Para nosotros, el match cultural y la calidad humana son la prioridad. Trabajamos como parte de tu equipo, no como un proveedor externo. Nuestro compromiso es con tu éxito."
+    },
+    "keyBenefitsTitle": "Beneficios clave",
+    "keyBenefits": {
+      "extendedTeamTitle": "Equipo Extendido",
+      "extendedTeamDescription": "Desarrolladores que trabajan como parte de tu equipo, no como contratistas externos",
+      "quickStartTitle": "Tiempo de Respuesta",
+      "quickStartDescription": "Integración rápida, sin procesos largos de contratación",
+      "scalabilityTitle": "Escalabilidad",
+      "scalabilityDescription": "Ajustá el tamaño de tu equipo según tus necesidades del proyecto",
+      "guaranteedQualityTitle": "Calidad Garantizada",
+      "guaranteedQualityDescription": "Desarrolladores senior con experiencia comprobada en proyectos complejos",
+      "flexibilityTitle": "Flexibilidad",
+      "flexibilityDescription": "Adaptación rápida a cambios en requerimientos y prioridades",
+      "culturalFitTitle": "Alineación Cultural",
+      "culturalFitDescription": "Desarrolladores que comparten tus valores y forma de trabajar"
+    },
+    "howWeWorkTitle": "¿Cómo trabajamos con vos?",
+    "howWeWork": {
+      "step1Title": "Entendemos tu cultura",
+      "step1Description": "Priorizamos entender tus valores, tu forma de trabajar y tu visión. El match cultural es nuestra prioridad número uno.",
+      "step2Title": "Seleccionamos por match cultural",
+      "step2Description": "Nosotros evaluamos y seleccionamos desarrolladores priorizando el match cultural y la calidad humana, no solo las habilidades técnicas.",
+      "step3Title": "Integración rápida",
+      "step3Description": "Nuestros desarrolladores se integran a tu equipo y procesos desde el día uno.",
+      "step4Title": "Trabajamos juntos",
+      "step4Description": "Colaboramos de cerca, entregamos resultados y aceleramos tu roadmap."
+    },
+    "useCasesTitle": "Casos de uso ideales",
+    "useCases": {
+      "growingStartupsTitle": "Startups en crecimiento",
+      "growingStartupsDescription": "Escalá tu equipo rápidamente para cumplir con deadlines y objetivos ambiciosos",
+      "specificProjectsTitle": "Proyectos específicos",
+      "specificProjectsDescription": "Agregá expertise en tecnologías específicas para proyectos puntuales",
+      "distributedTeamsTitle": "Equipos distribuidos",
+      "distributedTeamsDescription": "Ampliá tu equipo remoto con desarrolladores que trabajan en tu timezone"
+    },
+    "ctaTitle": "¿Listo para ampliar tu equipo?",
+    "ctaHighlightWord": "ampliar"
+  },
   "aboutUsCallToAction": {
     "title": "Creemos algo increíble juntos",
     "description": "Programa una consulta gratuita e inicia tu transformación digital.",
@@ -453,7 +506,7 @@
       },
       "softwareDevelopment": {
         "title": "Desarrollo de Software",
-        "description": "Soluciones personalizadas que escalan con tu negocio, desde aplicaciones web hasta sistemas empresariales."
+        "description": "Aplicaciones web, plataformas y sistemas que escalan. Construimos la base sobre la que corre tu negocio — código limpio, arquitectura sólida y entrega confiable."
       },
       "uxUiDesign": {
         "title": "Diseño UX/UI",
@@ -465,7 +518,7 @@
       },
       "dataAnalytics": {
         "title": "Analítica de Datos",
-        "description": "Convierte tus datos en inteligencia accionable con análisis avanzados y visualizaciones."
+        "description": "Dashboards, reportes y pipelines de datos que tienen sentido. Te ayudamos a entender qué pasa en tu negocio — y qué hacer al respecto."
       },
       "mobileDevelopment": {
         "title": "Desarrollo Móvil",
@@ -505,31 +558,31 @@
         "value": "7.3",
         "unit": "días",
         "label": "Tiempo Promedio de Inicio",
-        "description": "Desde firma de SOW hasta primer PR mergeado (n=6 proyectos, actualizado: ago 2025)"
+        "description": "Desde firma de SOW hasta primer PR mergeado (n=6 proyectos, actualizado: ene 2026)"
       },
       "onTimeDelivery": {
         "value": "87",
         "unit": "%",
         "label": "Entrega a Tiempo",
-        "description": "Hitos/sprints entregados en fecha (n=9 meses, actualizado: ago 2025)"
+        "description": "Hitos/sprints entregados en fecha (n=9 meses, actualizado: ene 2026)"
       },
       "npsScore": {
         "value": "9.7",
         "unit": "/10",
         "label": "Puntuación CSAT",
-        "description": "Customer Satisfaction Score del feedback de clientes (n=4 encuestas, actualizado: ago 2025)"
+        "description": "Customer Satisfaction Score del feedback de clientes (n=66 encuestas, actualizado: ene 2026)"
       },
       "sprintsShipped": {
         "value": "50+",
         "unit": "",
         "label": "Sprints Entregados",
-        "description": "Entregas exitosas de sprints en múltiples proyectos de clientes (n=6 proyectos, actualizado: ago 2025)"
+        "description": "Entregas exitosas de sprints en múltiples proyectos de clientes (n=6 proyectos, actualizado: ene 2026)"
       },
       "cycleTimeReduction": {
         "value": "28",
         "unit": "%",
         "label": "Reducción del Tiempo del Ciclo",
-        "description": "vs. baseline inicial del cliente (n=2 proyectos, promedio 18-28%, actualizado: ago 2025)"
+        "description": "vs. baseline inicial del cliente (n=4 proyectos, promedio 18-28%, actualizado: ene 2026)"
       }
     },
     "measurementDetails": {

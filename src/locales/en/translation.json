@@ -85,6 +85,59 @@
     "description": "Book a free strategy session to discuss your project needs.",
     "buttonText": "Book Free Strategy Call"
   },
+  "staffAugmentation": {
+    "metaDescription": "We scale your team prioritizing cultural fit and human quality. We select developers who align with your values and way of working.",
+    "heroSubtitle": "We scale your team prioritizing cultural fit and human quality",
+    "whatIsTitle": "What is Staff Augmentation?",
+    "whatIsDescription": "Staff Augmentation is our flagship service. We prioritize cultural fit and human quality above all else. We don't just find expert developers—we find people who align with your values, your way of working, and your vision. We work as part of your team to deliver quality results and accelerate your roadmap without the complexity of traditional hiring.",
+    "whyChooseTitle": "Why choose Staff Augmentation?",
+    "benefits": {
+      "accelerateTitle": "Accelerate your roadmap",
+      "accelerateDescription": "Add expert talent quickly without traditional hiring timelines.",
+      "integrationTitle": "Perfect integration",
+      "integrationDescription": "Our developers integrate as part of your team, aligned with your culture.",
+      "techExpertsTitle": "Tech experts",
+      "techExpertsDescription": "Access senior developers with experience in the technologies you need.",
+      "commitment": "For us, cultural fit and human quality are the priority. We work as part of your team, not as an external vendor. Our commitment is to your success."
+    },
+    "keyBenefitsTitle": "Key Benefits",
+    "keyBenefits": {
+      "extendedTeamTitle": "Extended Team",
+      "extendedTeamDescription": "Developers who work as part of your team, not as external contractors",
+      "quickStartTitle": "Quick Start",
+      "quickStartDescription": "Quick integration, without long hiring processes",
+      "scalabilityTitle": "Scalability",
+      "scalabilityDescription": "Adjust your team size based on your project needs",
+      "guaranteedQualityTitle": "Guaranteed Quality",
+      "guaranteedQualityDescription": "Senior developers with proven experience in complex projects",
+      "flexibilityTitle": "Flexibility",
+      "flexibilityDescription": "Quick adaptation to changes in requirements and priorities",
+      "culturalFitTitle": "Cultural Fit",
+      "culturalFitDescription": "Developers who share your values and way of working"
+    },
+    "howWeWorkTitle": "How do we work with you?",
+    "howWeWork": {
+      "step1Title": "Understand your culture",
+      "step1Description": "We prioritize understanding your values, your way of working, and your vision. Cultural fit is our number one priority.",
+      "step2Title": "Select for cultural fit",
+      "step2Description": "We evaluate and select developers prioritizing cultural fit and human quality, not just technical skills.",
+      "step3Title": "Quick integration",
+      "step3Description": "Our developers integrate into your team and processes from day one.",
+      "step4Title": "Work together",
+      "step4Description": "We collaborate closely, deliver results and accelerate your roadmap."
+    },
+    "useCasesTitle": "Ideal use cases",
+    "useCases": {
+      "growingStartupsTitle": "Growing startups",
+      "growingStartupsDescription": "Scale your team quickly to meet deadlines and ambitious goals",
+      "specificProjectsTitle": "Specific projects",
+      "specificProjectsDescription": "Add expertise in specific technologies for targeted projects",
+      "distributedTeamsTitle": "Distributed teams",
+      "distributedTeamsDescription": "Expand your remote team with developers who work in your timezone"
+    },
+    "ctaTitle": "Ready to scale your team?",
+    "ctaHighlightWord": "scale"
+  },
   "aboutUsCallToAction": {
     "title": "Let's Build Something That Feels Right",
     "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
@@ -445,7 +498,7 @@
       },
       "softwareDevelopment": {
         "title": "Software Development",
-        "description": "Custom software that feels tailored to you. We co-create what you need — from MVPs to powerful systems — with clarity, care, and flow."
+        "description": "Web apps, platforms, and systems that scale. We build the foundation your business runs on — clean code, solid architecture, and reliable delivery."
       },
       "uxUiDesign": {
         "title": "UX/UI Design",
@@ -457,7 +510,7 @@
       },
       "dataAnalytics": {
         "title": "Data Analytics",
-        "description": "Your data has a story to tell. We turn it into insights you can actually use — no fluff, just clarity."
+        "description": "Dashboards, reports, and data pipelines that make sense. We help you understand what's happening in your business — and what to do about it."
       },
       "mobileDevelopment": {
         "title": "Mobile Development",
@@ -497,31 +550,31 @@
         "value": "7.3",
         "unit": "days",
         "label": "Average Kickoff Time",
-        "description": "From signed SOW to first merged PR (n=6 projects, updated: Aug 2025)"
+        "description": "From signed SOW to first merged PR (n=6 projects, updated: Jan 2026)"
       },
       "onTimeDelivery": {
         "value": "87",
         "unit": "%",
         "label": "On-Time Delivery",
-        "description": "Milestones/sprints delivered on time (n=9 months, updated: Aug 2025)"
+        "description": "Milestones/sprints delivered on time (n=9 months, updated: Jan 2026)"
       },
       "npsScore": {
         "value": "9.7",
         "unit": "/10",
         "label": "CSAT Score",
-        "description": "Customer Satisfaction Score from client feedback (n=4 surveys, updated: Aug 2025)"
+        "description": "Customer Satisfaction Score from client feedback (n=66 surveys, updated: Jan 2026)"
       },
       "sprintsShipped": {
         "value": "50+",
         "unit": "",
         "label": "Sprints Shipped",
-        "description": "Successful sprint deliveries across multiple client projects (n=6 projects, updated: Aug 2025)"
+        "description": "Successful sprint deliveries across multiple client projects (n=6 projects, updated: Jan 2026)"
       },
       "cycleTimeReduction": {
         "value": "28",
         "unit": "%",
         "label": "Cycle Time Reduction",
-        "description": "vs. client's initial baseline (n=2 projects, average 18-28%, updated: Aug 2025)"
+        "description": "vs. client's initial baseline (n=4 projects, average 18-28%, updated: Jan 2026)"
       }
     },
     "measurementDetails": {
