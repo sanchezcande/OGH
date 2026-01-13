@@ -45,12 +45,12 @@ export default function ArticlePage() {
       </Head>
 
       <ArticleContainer>
+        {/* Aseguramos que el título principal sea un H1 para SEO */}
+        <Title as="h1">{article.title}</Title>
+
         <ImageContainer>
           <img src={article.image} alt={article.title} />
         </ImageContainer>
-
-        {/* Aseguramos que el título principal sea un H1 para SEO */}
-        <Title as="h1">{article.title}</Title>
 
         <Content>
           {article.content.split("\n\n").map((paragraph, index) => (

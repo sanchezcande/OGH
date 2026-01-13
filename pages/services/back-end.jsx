@@ -96,17 +96,6 @@ const timelineData = (lang) => [
   },
 ];
 
-const quote = {
-  es: {
-    text: "No ves el backend ni la nube, pero sentís la diferencia cuando todo funciona.",
-    author: "Equipo OGH",
-  },
-  en: {
-    text: "You don’t see the backend or the cloud, but you feel the difference when everything just works.",
-    author: "OGH Team",
-  },
-};
-
 const BackEnd = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -459,44 +448,6 @@ const BackEnd = () => {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* TESTIMONIO / QUOTE */}
-      <section
-        style={{
-          maxWidth: 900,
-          margin: "0 auto",
-          marginBottom: "2.5rem",
-          padding: "0 1rem",
-        }}
-      >
-        <div
-          className="animate"
-          style={{
-            background: "#fff",
-            color: "#232946",
-            borderRadius: 18,
-            padding: "2.2rem 2rem 1.7rem 2rem",
-            textAlign: "center",
-            fontSize: "1.13rem",
-            fontStyle: "italic",
-            boxShadow: "0 2px 16px #23294608",
-            animationDelay: "0.8s",
-          }}
-        >
-          “{quote[lang]?.text}”
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: "1.05rem",
-              marginTop: 14,
-              fontStyle: "normal",
-              color: "#F97B72",
-            }}
-          >
-            — {quote[lang]?.author}
-          </div>
         </div>
       </section>
 
