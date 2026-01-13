@@ -350,7 +350,7 @@ const N8nAutomation = () => {
               animationDelay: "0.1s",
             }}
           >
-            n8n Automation
+            {t("n8nAutomation.heroTitle")}
           </h1>
           <p
             className="animate"
@@ -364,9 +364,7 @@ const N8nAutomation = () => {
               animationDelay: "0.2s",
             }}
           >
-            {lang === "es"
-              ? "Conectá tus herramientas y automatizá flujos de trabajo sin código"
-              : "Connect your tools and automate workflows without code"}
+            {t("n8nAutomation.heroSubtitle")}
           </p>
         </div>
       </section>
@@ -389,85 +387,89 @@ const N8nAutomation = () => {
           <div>
             <SectionTitle>
               <span className="animate" style={{ animationDelay: "0.35s" }}>
-                {lang === "es" ? "¿Qué es n8n?" : "What is n8n?"}
+                {t("n8nAutomation.whatIsTitle")}
               </span>
             </SectionTitle>
             <Subtitle>
               <span className="animate" style={{ animationDelay: "0.4s" }}>
-                {lang === "es"
-                  ? "n8n es una plataforma visual de automatización de flujos de trabajo de código abierto. Permite conectar aplicaciones, automatizar procesos y crear integraciones personalizadas sin necesidad de programar."
-                  : "n8n is an open-source, visual workflow automation platform. It empowers businesses and teams to connect apps, automate processes, and build custom integrations—no coding required."}
+                {t("n8nAutomation.whatIsDescription")}
               </span>
             </Subtitle>
+            <div
+              className="animate"
+              style={{
+                marginTop: "1.5rem",
+                textAlign: "center",
+                animationDelay: "0.45s",
+              }}
+            >
+              <a
+                href="/blog/n8n-automation-business-efficiency"
+                style={{
+                  color: "#2B2B2B",
+                  textDecoration: "none",
+                  fontWeight: "500",
+                  fontSize: "0.9rem",
+                  borderBottom: "2px solid #F97B72",
+                  paddingBottom: "2px",
+                  transition: "all 0.3s ease",
+                  display: "inline-block",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = "#F97B72";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = "#2B2B2B";
+                }}
+              >
+                {t("n8nAutomation.articleLink")}
+              </a>
+            </div>
           </div>
         </div>
 
         {/* Key Benefits */}
         <SectionTitle>
           <span className="animate" style={{ animationDelay: "0.45s" }}>
-            {lang === "es" ? "¿Por qué elegir n8n?" : "Why choose n8n?"}
+            {t("n8nAutomation.whyChooseTitle")}
           </span>
         </SectionTitle>
         <FeatureGrid>
           {/* FeatureCards ya tienen la clase animate */}
           <FeatureCard
             icon={<FaCogs />}
-            title={lang === "es" ? "Open Source" : "Open Source"}
-            description={
-              lang === "es"
-                ? "Código abierto y económico, sin costos ocultos"
-                : "Open-source and cost-effective, no hidden costs"
-            }
+            title={t("n8nAutomation.benefits.openSourceTitle")}
+            description={t("n8nAutomation.benefits.openSourceDescription")}
             delay={1}
           />
           <FeatureCard
             icon={<FaSyncAlt />}
-            title={lang === "es" ? "Sin Código" : "No Code"}
-            description={
-              lang === "es"
-                ? "Interfaz visual intuitiva, sin programación requerida"
-                : "Intuitive visual interface, no programming required"
-            }
+            title={t("n8nAutomation.benefits.noCodeTitle")}
+            description={t("n8nAutomation.benefits.noCodeDescription")}
             delay={2}
           />
           <FeatureCard
             icon={<FaCloud />}
-            title={lang === "es" ? "200+ Integraciones" : "200+ Integrations"}
-            description={
-              lang === "es"
-                ? "Conecta con todas tus herramientas favoritas"
-                : "Connect with all your favorite tools"
-            }
+            title={t("n8nAutomation.benefits.integrationsTitle")}
+            description={t("n8nAutomation.benefits.integrationsDescription")}
             delay={3}
           />
           <FeatureCard
             icon={<FaShieldAlt />}
-            title={lang === "es" ? "Flexible" : "Flexible"}
-            description={
-              lang === "es"
-                ? "Cloud o self-hosted, según tus necesidades"
-                : "Cloud or self-hosted, based on your needs"
-            }
+            title={t("n8nAutomation.benefits.flexibleTitle")}
+            description={t("n8nAutomation.benefits.flexibleDescription")}
             delay={4}
           />
           <FeatureCard
             icon={<FaChartLine />}
-            title={lang === "es" ? "Productividad" : "Productivity"}
-            description={
-              lang === "es"
-                ? "Aumenta la eficiencia y reduce errores"
-                : "Increase efficiency and reduce errors"
-            }
+            title={t("n8nAutomation.benefits.productivityTitle")}
+            description={t("n8nAutomation.benefits.productivityDescription")}
             delay={5}
           />
           <FeatureCard
             icon={<FaLightbulb />}
-            title={lang === "es" ? "Escalable" : "Scalable"}
-            description={
-              lang === "es"
-                ? "Crece con tu negocio, desde startups hasta enterprise"
-                : "Grows with your business, from startups to enterprise"
-            }
+            title={t("n8nAutomation.benefits.scalableTitle")}
+            description={t("n8nAutomation.benefits.scalableDescription")}
             delay={6}
           />
         </FeatureGrid>
@@ -516,7 +518,7 @@ const N8nAutomation = () => {
               animationDelay: "0.55s",
             }}
           >
-            {lang === "es" ? "Casos de uso comunes" : "Common use cases"}
+            {t("n8nAutomation.useCasesTitle")}
           </h2>
           <div
             style={{
@@ -559,9 +561,7 @@ const N8nAutomation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Sincronización de datos"
-                  : "Data synchronization"}
+                {t("n8nAutomation.useCases.dataSyncTitle")}
               </h4>
               <p
                 style={{
@@ -572,9 +572,7 @@ const N8nAutomation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Sincroniza información entre CRM, email marketing y sistemas de soporte"
-                  : "Sync information between CRM, email marketing and support systems"}
+                {t("n8nAutomation.useCases.dataSyncDescription")}
               </p>
             </div>
             <div
@@ -611,7 +609,7 @@ const N8nAutomation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es" ? "Gestión de leads" : "Lead management"}
+                {t("n8nAutomation.useCases.leadManagementTitle")}
               </h4>
               <p
                 style={{
@@ -622,9 +620,7 @@ const N8nAutomation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Captura leads y automatiza el seguimiento y notificaciones"
-                  : "Capture leads and automate follow-up and notifications"}
+                {t("n8nAutomation.useCases.leadManagementDescription")}
               </p>
             </div>
             <div
@@ -661,9 +657,7 @@ const N8nAutomation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Procesamiento de pedidos"
-                  : "Order processing"}
+                {t("n8nAutomation.useCases.orderProcessingTitle")}
               </h4>
               <p
                 style={{
@@ -674,9 +668,7 @@ const N8nAutomation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                {lang === "es"
-                  ? "Automatiza el cumplimiento de pedidos y gestión de inventario"
-                  : "Automate order fulfillment and inventory management"}
+                {t("n8nAutomation.useCases.orderProcessingDescription")}
               </p>
             </div>
           </div>
@@ -698,18 +690,10 @@ const N8nAutomation = () => {
       </section>
 
       <CallToActionBlock
-        title={
-          lang === "es"
-              ? "¿Listo para automatizar tu negocio?"
-            : "Ready to automate your business?"
-        }
-        description={
-          lang === "es"
-              ? "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables."
-            : "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes."
-        }
+        title={t("n8nAutomation.ctaTitle")}
+        description={t("n8nAutomation.ctaDescription")}
         buttonText={t("servicesCallToAction.buttonText")}
-        highlightWord="automate"
+        highlightWord={t("n8nAutomation.ctaHighlightWord")}
       />
     </>
   );
