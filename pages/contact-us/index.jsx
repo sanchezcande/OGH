@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import Head from "next/head";
+import Script from "next/script";
 import { motion } from "framer-motion";
 import useMediaQuery from "../../src/Hooks/useMediaQuery";
 import EstimateForm from "../../src/components/ContactForm/EstimateForm";
@@ -9,6 +10,16 @@ const ContactUs = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min?hide_event_type_details=1&text_color=1e293b&primary_color=f97b72";
+  const calendlyWidgetRef = useRef(null);
+  const [scriptLoaded, setScriptLoaded] = React.useState(false);
+
+  useEffect(() => {
+    // Solo inicializar Calendly si el script está cargado y no estamos en mobile
+    if (scriptLoaded && !isMobile && typeof window !== "undefined" && window.Calendly) {
+      // El script automáticamente inicializará los widgets con la clase calendly-inline-widget
+      // No necesitamos llamar manualmente a initInlineWidget
+    }
+  }, [scriptLoaded, isMobile]);
 
   return (
     <>
@@ -22,6 +33,15 @@ const ContactUs = () => {
           )}
         />
       </Head>
+
+      {/* Calendly Widget Script - Solo cargar en desktop */}
+      {!isMobile && (
+        <Script
+          src="https://assets.calendly.com/assets/external/widget.js"
+          strategy="lazyOnload"
+          onLoad={() => setScriptLoaded(true)}
+        />
+      )}
 
       <div
         style={{
@@ -106,58 +126,73 @@ const ContactUs = () => {
                 "For teams ready to scale with senior engineers."}
             </p>
 
-            <a
-              href={calendlyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-block",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "10px 20px",
-                backgroundColor: "#f97b72",
-                color: "white",
-                borderRadius: "8px",
-                textDecoration: "none",
-                fontWeight: "600",
-                fontSize: "0.9rem",
-                transition: "all 0.3s ease",
-                width: "100%",
-                textAlign: "center",
-                border: "2px solid #f97b72",
-                cursor: "pointer",
-                boxShadow: "none",
-                position: "relative",
-                overflow: "hidden",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#e06a5f";
-                e.currentTarget.style.borderColor = "#e06a5f";
-                // Crear la línea inferior
-                if (!e.currentTarget.querySelector(".bottom-line")) {
-                  const line = document.createElement("div");
-                  line.className = "bottom-line";
-                  line.style.cssText = "position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: white; transform: scaleX(0); transform-origin: right; transition: transform 0.3s ease;";
-                  e.currentTarget.appendChild(line);
-                  setTimeout(() => {
-                    line.style.transform = "scaleX(1)";
-                    line.style.transformOrigin = "left";
-                  }, 10);
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#f97b72";
-                e.currentTarget.style.borderColor = "#f97b72";
-                const line = e.currentTarget.querySelector(".bottom-line");
-                if (line) {
-                  line.style.transform = "scaleX(0)";
-                  line.style.transformOrigin = "right";
-                  setTimeout(() => line.remove(), 300);
-                }
-              }}
-            >
-              {t("contactPage.bookCallButton") || "Book a 15-min strategy call"}
-            </a>
+            {isMobile ? (
+              // Mobile: Botón que redirige a Calendly
+              <a
+                href={calendlyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-block",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 20px",
+                  backgroundColor: "#f97b72",
+                  color: "white",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  fontWeight: "600",
+                  fontSize: "0.9rem",
+                  transition: "all 0.3s ease",
+                  width: "100%",
+                  textAlign: "center",
+                  border: "2px solid #f97b72",
+                  cursor: "pointer",
+                  boxShadow: "none",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#e06a5f";
+                  e.currentTarget.style.borderColor = "#e06a5f";
+                  // Crear la línea inferior
+                  if (!e.currentTarget.querySelector(".bottom-line")) {
+                    const line = document.createElement("div");
+                    line.className = "bottom-line";
+                    line.style.cssText = "position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: white; transform: scaleX(0); transform-origin: right; transition: transform 0.3s ease;";
+                    e.currentTarget.appendChild(line);
+                    setTimeout(() => {
+                      line.style.transform = "scaleX(1)";
+                      line.style.transformOrigin = "left";
+                    }, 10);
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f97b72";
+                  e.currentTarget.style.borderColor = "#f97b72";
+                  const line = e.currentTarget.querySelector(".bottom-line");
+                  if (line) {
+                    line.style.transform = "scaleX(0)";
+                    line.style.transformOrigin = "right";
+                    setTimeout(() => line.remove(), 300);
+                  }
+                }}
+              >
+                {t("contactPage.bookCallButton") || "Book a 15-min strategy call"}
+              </a>
+            ) : (
+              // Desktop: Embed de Calendly
+              <div
+                ref={calendlyWidgetRef}
+                className="calendly-inline-widget"
+                data-url={calendlyUrl}
+                style={{
+                  minWidth: "320px",
+                  height: "700px",
+                  width: "100%",
+                }}
+              />
+            )}
             <p
               style={{
                 fontSize: "0.8rem",

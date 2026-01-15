@@ -619,26 +619,18 @@ const TestimonialsCarousel = ({ testimonials }) => {
                 alignItems: "center",
                 textAlign: "center",
                 position: "relative",
-                "@media (max-width: 768px)": {
-                  padding: "1.5rem 0",
-                  minHeight: "350px",
-                },
+                minHeight: isMobile ? "350px" : "auto",
               }}
             >
               {/* Quote Icon */}
               <div
                 style={{
                   position: "absolute",
-                  top: "2rem",
-                  left: "2rem",
-                  fontSize: "3rem",
+                  top: isMobile ? "1rem" : "2rem",
+                  left: isMobile ? "1rem" : "2rem",
+                  fontSize: isMobile ? "2rem" : "3rem",
                   color: "#F97B72",
                   opacity: 0.1,
-                  "@media (max-width: 768px)": {
-                    top: "1rem",
-                    left: "1rem",
-                    fontSize: "2rem",
-                  },
                 }}
               >
                 <FaQuoteLeft />
@@ -929,27 +921,26 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories =
     );
   }
 
-  // Si hay subcategorías, hacer la caja clickeable hacia la primera subcategoría
-  if (subcategories.length > 0 && subcategories[0]?.href) {
+  // Si hay subcategorías, NO envolver en Link (evitar <a> anidados)
+  // Los Links individuales dentro de boxContent manejan la navegación
+  if (subcategories.length > 0) {
     return (
-      <Link href={subcategories[0].href} style={{ textDecoration: "none", color: "inherit" }}>
-        <motion.div
-          className="service-box"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.15, delay: delay * 0.1 }}
-          whileHover={{
-            scale: 1.02,
-            transition: { duration: 0.1 },
-          }}
-          onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => setIsHovered(false)}
-          style={{ ...boxStyle, cursor: "pointer" }}
-        >
-          {boxContent}
-        </motion.div>
-      </Link>
+      <motion.div
+        className="service-box"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.15, delay: delay * 0.1 }}
+        whileHover={{
+          scale: 1.02,
+          transition: { duration: 0.1 },
+        }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        style={boxStyle}
+      >
+        {boxContent}
+      </motion.div>
     );
   }
 
@@ -1232,9 +1223,9 @@ export default function HomePage() {
           </Title>
           <Subtitle>{t("heroSubtitle")}</Subtitle>
           <CTAButton
-            href="https://calendly.com/sanchezgcandelaria"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
+            target={isMobile ? "_blank" : "_self"}
+            rel={isMobile ? "noopener noreferrer" : undefined}
             className="primary-cta"
           >
             {t("ctaButton")}
@@ -1666,9 +1657,9 @@ export default function HomePage() {
           {/* New CTA button below plan section */}
           <div style={{ textAlign: "center", marginTop: "3rem" }}>
             <CTAButton
-              href="https://calendly.com/sanchezgcandelaria"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
+              target={isMobile ? "_blank" : "_self"}
+              rel={isMobile ? "noopener noreferrer" : undefined}
               className="secondary-cta"
             >
               {t("homeServicesSection.startJourneyButton")}
