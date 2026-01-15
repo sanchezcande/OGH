@@ -25,27 +25,20 @@ const NavBarMobile = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
-  const [showServicesMenu, setShowServicesMenu] = useState(false);
 
   const closeAllMenus = useCallback(() => {
     setMenuOpen(false);
     setShowLangMenu(false);
-    setShowServicesMenu(false);
   }, []);
 
   const toggleMenu = useCallback(() => {
     setMenuOpen(!menuOpen);
     setShowLangMenu(false);
-    setShowServicesMenu(false);
   }, [menuOpen]);
 
   const toggleLangMenu = useCallback(() => {
     setShowLangMenu(!showLangMenu);
   }, [showLangMenu]);
-
-  const toggleServicesMenu = useCallback(() => {
-    setShowServicesMenu(!showServicesMenu);
-  }, [showServicesMenu]);
 
   const handleLangChange = useCallback(
     (lang) => {
@@ -86,15 +79,6 @@ const NavBarMobile = () => {
     };
   }, [menuOpen, closeAllMenus]);
 
-  const servicesList = [
-    { text: "Staff Augmentation", href: "/services/staff-augmentation" },
-    { text: "n8n Automation", href: "/services/n8n-automation" },
-    { text: t("aiTitle"), href: "/services/AI" },
-    { text: t("frontendTitle"), href: "/services/front-end" },
-    { text: t("backendTitle"), href: "/services/back-end" },
-    { text: t("uxuiTitle"), href: "/services/ux-ui" },
-    { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
-  ];
 
   return (
     <NavBarContainer ref={menuRef}>
@@ -111,34 +95,18 @@ const NavBarMobile = () => {
       </LogoIcon>
       {menuOpen && (
         <Menu open={menuOpen}>
-          <MenuItem onClick={() => handleNavigation("/")}>{t("home")}</MenuItem>
-          <MenuItem>
-            <LangMenuContainer
-              style={{ marginBottom: "10px" }}
-              onClick={toggleServicesMenu}
-            >
-              {t("services")}
-              <ArrowIcon open={showServicesMenu} />
-            </LangMenuContainer>
-            {showServicesMenu && (
-              <LanguageMenu open={showServicesMenu}>
-                {servicesList.map((service, index) => (
-                  <LangMenuItem
-                    key={index}
-                    onClick={() => handleNavigation(service.href)}
-                  >
-                    {service.text}
-                  </LangMenuItem>
-                ))}
-              </LanguageMenu>
-            )}
+          <MenuItem onClick={() => handleNavigation("/services/staff-augmentation")}>
+            Staff Augmentation
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation("/services/software-factory")}>
+            Software Factory
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation("/blog")}>
+            {t("Blog")}
           </MenuItem>
           <MenuItem onClick={() => handleNavigation("/about-us")}>
             {t("aboutUs")}
           </MenuItem>
-
-          <MenuItem onClick={() => handleNavigation("/blog")}>Blog</MenuItem>
-          <MenuItem onClick={() => handleNavigation("/faqs")}>FAQs</MenuItem>
           <MenuItem onClick={() => handleNavigation("/contact-us")}>
             {t("contactUs")}
           </MenuItem>

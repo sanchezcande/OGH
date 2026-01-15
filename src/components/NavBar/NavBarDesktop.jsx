@@ -14,7 +14,6 @@ const NavBarDesktop = () => {
   const [selectedLang, setSelectedLang] = useState("en");
   const [tabWidths, setTabWidths] = useState([]);
   const [tabOffsets, setTabOffsets] = useState([]);
-  const [showServicesMenu, setShowServicesMenu] = useState(false);
 
   const updateHighlight = useCallback(() => {
     const navLinks = document.querySelectorAll(".nav-link");
@@ -59,51 +58,17 @@ const NavBarDesktop = () => {
     setShowLangMenu(false);
   };
 
-  const pillTabs = [
-    { text: t("home"), href: "/" },
-    { text: t("services"), href: "/services" },
-    { text: t("aboutUs"), href: "/about-us" },
-    { text: t("Blog"), href: "/blog" },
-    { text: t("FAQs"), href: "/faqs" },
-    { text: t("contactUs"), href: "/contact-us" },
-  ];
-
-  const servicesList = [
-    {
-      text: "Staff Augmentation",
-      href: "/services/staff-augmentation",
-      featured: true,
-    },
-    { text: "n8n Automation", href: "/services/n8n-automation" },
-    { text: t("aiTitle"), href: "/services/AI" },
-    { text: t("frontendTitle"), href: "/services/front-end" },
-    { text: t("backendTitle"), href: "/services/back-end" },
-    { text: t("uxuiTitle"), href: "/services/ux-ui" },
-    { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
-  ];
-
-  const handleMouseEnterServices = () => {
-    setShowServicesMenu(true);
-  };
-
-  const handleMouseLeaveServices = (e) => {
-    const submenu = document.querySelector(`.${styles.servicesMenu}`);
-    const relatedTarget = e.relatedTarget;
-    if (
-      !submenu ||
-      !(relatedTarget instanceof Node) || // FIX aplicado
-      !submenu.contains(relatedTarget)
-    ) {
-      setShowServicesMenu(false);
-    }
-  };
-
   const handleTabClick = (index) => {
     setActiveIndex(index);
-    if (pillTabs[index].text !== t("services")) {
-      setShowServicesMenu(false);
-    }
   };
+
+  const pillTabs = [
+    { text: "Staff Augmentation", href: "/services/staff-augmentation" },
+    { text: "Software Factory", href: "/services/software-factory" },
+    { text: t("Blog"), href: "/blog" },
+    { text: t("aboutUs"), href: "/about-us" },
+    { text: t("contactUs"), href: "/contact-us" },
+  ];
 
   return (
     <nav className={styles.navBarContainer}>
@@ -130,55 +95,16 @@ const NavBarDesktop = () => {
           );
         })()}
         {pillTabs.map((tab, i) => (
-          <li
-            key={tab.text}
-            className={tab.text === t("services") ? styles.navLinkWrapper : ""}
-            onMouseEnter={
-              tab.text === t("services") ? handleMouseEnterServices : null
-            }
-            onMouseLeave={
-              tab.text === t("services") ? handleMouseLeaveServices : null
-            }
-          >
-            {tab.text === t("services") ? (
-              <>
-                <span className={`${styles.navLink} nav-link`}>{tab.text}</span>
-                <ul
-                  className={`${styles.servicesMenu} ${showServicesMenu ? styles.visible : ""
-                    }`}
-                >
-                  {servicesList.map((service, index) => (
-                    <li
-                      key={index}
-                      className={styles.servicesMenuItem}
-                      style={
-                        service.featured
-                          ? {
-                            background: "#f9fafb",
-                            fontWeight: "500",
-                            borderLeft: "2px solid #f97b72",
-                          }
-                          : {}
-                      }
-                    >
-                      <Link href={service.href}>
-                        {service.text}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <Link
-                href={tab.href}
-                className={`${styles.navLink} nav-link`}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(-1)}
-                onClick={() => handleTabClick(i)}
-              >
-                {tab.text}
-              </Link>
-            )}
+          <li key={tab.text}>
+            <Link
+              href={tab.href}
+              className={`${styles.navLink} nav-link`}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseLeave={() => setHoveredIndex(-1)}
+              onClick={() => handleTabClick(i)}
+            >
+              {tab.text}
+            </Link>
           </li>
         ))}
       </ul>

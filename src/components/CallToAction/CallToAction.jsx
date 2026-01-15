@@ -7,6 +7,7 @@ import {
   CallToActionButton,
 } from "./CallToAction.styles";
 import { motion } from "framer-motion";
+import useMediaQuery from "../../Hooks/useMediaQuery";
 
 const CallToActionBlock = ({
   title,
@@ -16,6 +17,13 @@ const CallToActionBlock = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  
+  // En desktop: redirigir a /contact-us donde está el embed
+  // En mobile: redirigir directamente a Calendly
+  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min";
+  const ctaHref = isMobile ? calendlyUrl : "/contact-us";
+  const ctaTarget = isMobile ? "_blank" : "_self";
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -103,9 +111,9 @@ const CallToActionBlock = ({
         </CallToActionTitle>
         <CallToActionDescription>{description}</CallToActionDescription>
         <CallToActionButton
-          href="https://calendly.com/sanchezgcandelaria"
-          target="_blank"
-          rel="noopener noreferrer"
+          href={ctaHref}
+          target={ctaTarget}
+          rel={isMobile ? "noopener noreferrer" : undefined}
         >
           {buttonText}
         </CallToActionButton>

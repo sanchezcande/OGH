@@ -138,6 +138,49 @@
     "ctaTitle": "Ready to scale your team?",
     "ctaHighlightWord": "scale"
   },
+  "softwareFactory": {
+    "metaDescription": "End-to-end software development from concept to production. We deliver complete solutions that scale with your business.",
+    "heroSubtitle": "End-to-end software development from concept to production",
+    "whatIsTitle": "What is Software Factory?",
+    "whatIsDescription": "Software Factory is our end-to-end development model where we take full ownership of your project from concept to production. We manage the entire development lifecycle, from planning and design to deployment and maintenance, delivering a complete, production-ready solution.",
+    "whenToUseTitle": "When to use Software Factory?",
+    "whenToUse": {
+      "newProductTitle": "New Product Development",
+      "newProductDescription": "When you're building a product from scratch and need a dedicated team to bring it to market",
+      "completeSolutionTitle": "Complete Solutions",
+      "completeSolutionDescription": "When you need end-to-end development including design, development, testing, and deployment",
+      "tightDeadlineTitle": "Tight Deadlines",
+      "tightDeadlineDescription": "When you have a clear deadline and need a focused team to deliver on time"
+    },
+    "processTitle": "Our Process",
+    "process": {
+      "step1Title": "Discovery & Planning",
+      "step1Description": "We understand your vision, define requirements, and create a detailed roadmap",
+      "step2Title": "Design & Architecture",
+      "step2Description": "We design the user experience, create prototypes, and architect scalable solutions",
+      "step3Title": "Development & Testing",
+      "step3Description": "We build your product with clean code, rigorous testing, and continuous integration",
+      "step4Title": "Deployment & Launch",
+      "step4Description": "We deploy to production, monitor performance, and ensure smooth launch",
+      "step5Title": "Support & Maintenance",
+      "step5Description": "We provide ongoing support, updates, and improvements to keep your product running smoothly"
+    },
+    "outcomesTitle": "What You Get",
+    "outcomes": {
+      "fullyFunctionalTitle": "Fully Functional Product",
+      "fullyFunctionalDescription": "A complete, working solution ready for your users",
+      "productionReadyTitle": "Production Ready",
+      "productionReadyDescription": "Deployed, tested, and optimized for real-world use",
+      "scalableArchitectureTitle": "Scalable Architecture",
+      "scalableArchitectureDescription": "Built to grow with your business needs",
+      "completeDocumentationTitle": "Complete Documentation",
+      "completeDocumentationDescription": "Technical documentation and user guides included"
+    },
+    "ctaTitle": "Ready to build your product?",
+    "ctaDescription": "Get a detailed project estimate tailored to your needs.",
+    "ctaButtonText": "Get a Project Estimate",
+    "ctaHighlightWord": "build"
+  },
   "n8nAutomation": {
     "heroTitle": "n8n Automation",
     "heroSubtitle": "Connect your tools and automate workflows without code",
@@ -194,7 +237,34 @@
     "phone": "+54 9 11 2348-5638",
     "email": "info@opengatehub.com",
     "comeAnd": "Come and",
-    "joinUs": "Join Us"
+    "joinUs": "Join Us",
+    "heroTitle": "Let's talk about your project",
+    "heroSubtitle": "Choose the fastest way to move forward — book a call or request an estimate.",
+    "bookCallTitle": "Book a strategy call",
+    "bookCallDescription": "For teams ready to scale with senior engineers.",
+    "bookCallButton": "Book a 15-min strategy call",
+    "getEstimateTitle": "Request a project estimate",
+    "getEstimateDescription": "Tell us a bit about your needs and we'll suggest the best engagement model.",
+    "whatHappensNext": "What happens next",
+    "step1Title": "We review your request within 24 hours",
+    "step2Title": "We recommend the best engagement model",
+    "step3Title": "You get a clear next step — call or proposal.",
+    "bookCallDisclaimer": "No commitment. We'll assess fit and next steps.",
+    "footerCTAText": "Prefer to talk first?",
+    "footerCTALink": "Book a call"
+  },
+  "contactForm": {
+    "company": "Company",
+    "engagementType": "Engagement type",
+    "budget": "Estimated budget",
+    "timeline": "Timeline / urgency",
+    "pleaseEnterCompany": "Please enter your company name",
+    "pleaseSelectEngagement": "Please select an engagement type",
+    "pleaseSelectBudget": "Please select a budget range",
+    "pleaseSelectTimeline": "Please select a timeline",
+    "requestEstimate": "Request estimate",
+    "submitting": "Submitting...",
+    "estimateRequestSent": "Estimate request sent successfully. We'll review it within 24 hours and get back to you."
   },
   "companyHistoryTitle": "Our Journey",
   "companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
@@ -213,6 +283,7 @@
 
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
+  "howWeBuildIntro": "This capability is delivered through our Staff Augmentation and Software Factory engagement models.",
   "backendTitle": "Backend & Cloud",
   "backendDescription": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
   "uxuiTitle": "UX/UI Design",
@@ -549,6 +620,25 @@
       "mobileDevelopment": {
         "title": "Mobile Development",
         "description": "From your idea to their pocket. We create native apps that feel intuitive, responsive and on brand — every time."
+      }
+    }
+  },
+  "homeCapabilitiesSection": {
+    "title": "How we build",
+    "subtitle": "These capabilities are delivered through our Staff Augmentation and Software Factory engagement models.",
+    "ctaText": "Explore how we build",
+    "cards": {
+      "softwareDevelopment": {
+        "title": "Software Development",
+        "description": "Build scalable web applications, robust backend systems, and cloud architectures that power your business growth."
+      },
+      "mobileDevelopment": {
+        "title": "Mobile Development",
+        "description": "Create native iOS and Android apps, cross-platform solutions, and mobile-first products that engage users wherever they are."
+      },
+      "dataAutomation": {
+        "title": "Data & Automation",
+        "description": "Transform data into insights with analytics dashboards, AI-powered workflows, and seamless integrations that automate operations."
       }
     }
   },
