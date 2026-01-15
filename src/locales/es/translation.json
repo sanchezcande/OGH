@@ -138,6 +138,49 @@
     "ctaTitle": "¿Listo para ampliar tu equipo?",
     "ctaHighlightWord": "ampliar"
   },
+  "softwareFactory": {
+    "metaDescription": "Desarrollo de software end-to-end desde el concepto hasta producción. Entregamos soluciones completas que escalan con tu negocio.",
+    "heroSubtitle": "Desarrollo de software end-to-end desde el concepto hasta producción",
+    "whatIsTitle": "¿Qué es Software Factory?",
+    "whatIsDescription": "Software Factory es nuestro modelo de desarrollo end-to-end donde asumimos la propiedad completa de tu proyecto desde el concepto hasta producción. Gestionamos todo el ciclo de vida del desarrollo, desde planificación y diseño hasta despliegue y mantenimiento, entregando una solución completa lista para producción.",
+    "whenToUseTitle": "¿Cuándo usar Software Factory?",
+    "whenToUse": {
+      "newProductTitle": "Desarrollo de Nuevo Producto",
+      "newProductDescription": "Cuando estás construyendo un producto desde cero y necesitas un equipo dedicado para llevarlo al mercado",
+      "completeSolutionTitle": "Soluciones Completas",
+      "completeSolutionDescription": "Cuando necesitas desarrollo end-to-end incluyendo diseño, desarrollo, testing y despliegue",
+      "tightDeadlineTitle": "Deadlines Ajustados",
+      "tightDeadlineDescription": "Cuando tienes una fecha límite clara y necesitas un equipo enfocado para entregar a tiempo"
+    },
+    "processTitle": "Nuestro Proceso",
+    "process": {
+      "step1Title": "Descubrimiento y Planificación",
+      "step1Description": "Entendemos tu visión, definimos requisitos y creamos un roadmap detallado",
+      "step2Title": "Diseño y Arquitectura",
+      "step2Description": "Diseñamos la experiencia de usuario, creamos prototipos y arquitectamos soluciones escalables",
+      "step3Title": "Desarrollo y Testing",
+      "step3Description": "Construimos tu producto con código limpio, testing riguroso e integración continua",
+      "step4Title": "Despliegue y Lanzamiento",
+      "step4Description": "Desplegamos a producción, monitoreamos performance y aseguramos un lanzamiento sin problemas",
+      "step5Title": "Soporte y Mantenimiento",
+      "step5Description": "Proporcionamos soporte continuo, actualizaciones y mejoras para mantener tu producto funcionando sin problemas"
+    },
+    "outcomesTitle": "Qué Recibes",
+    "outcomes": {
+      "fullyFunctionalTitle": "Producto Completamente Funcional",
+      "fullyFunctionalDescription": "Una solución completa y funcionando lista para tus usuarios",
+      "productionReadyTitle": "Listo para Producción",
+      "productionReadyDescription": "Desplegado, testeado y optimizado para uso en el mundo real",
+      "scalableArchitectureTitle": "Arquitectura Escalable",
+      "scalableArchitectureDescription": "Construido para crecer con las necesidades de tu negocio",
+      "completeDocumentationTitle": "Documentación Completa",
+      "completeDocumentationDescription": "Documentación técnica y guías de usuario incluidas"
+    },
+    "ctaTitle": "¿Listo para construir tu producto?",
+    "ctaDescription": "Obtén un estimado detallado del proyecto adaptado a tus necesidades.",
+    "ctaButtonText": "Obtener Estimado del Proyecto",
+    "ctaHighlightWord": "construir"
+  },
   "n8nAutomation": {
     "heroTitle": "n8n Automation",
     "heroSubtitle": "Conectá tus herramientas y automatizá flujos de trabajo sin código",
@@ -193,7 +236,34 @@
     "phone": "+54 9 11 2348-5638",
     "email": "info@opengatehub.com",
     "comeAnd": "Ven y",
-    "joinUs": "Únete a Nosotros"
+    "joinUs": "Únete a Nosotros",
+    "heroTitle": "Hablemos de tu proyecto",
+    "heroSubtitle": "Elige la forma más rápida de avanzar — reserva una llamada o solicita un estimado.",
+    "bookCallTitle": "Reserva una llamada estratégica",
+    "bookCallDescription": "Para equipos listos para escalar con ingenieros senior.",
+    "bookCallButton": "Reservar llamada de 15 min",
+    "getEstimateTitle": "Solicita un estimado de proyecto",
+    "getEstimateDescription": "Cuéntanos un poco sobre tus necesidades y te sugeriremos el mejor modelo de engagement.",
+    "whatHappensNext": "Qué sucede después",
+    "step1Title": "Revisamos tu solicitud en 24 horas",
+    "step2Title": "Te recomendamos el mejor modelo de engagement",
+    "step3Title": "Recibes un próximo paso claro — llamada o propuesta.",
+    "bookCallDisclaimer": "Sin compromiso. Evaluaremos el fit y los próximos pasos.",
+    "footerCTAText": "¿Prefieres hablar primero?",
+    "footerCTALink": "Reservar llamada"
+  },
+  "contactForm": {
+    "company": "Empresa",
+    "engagementType": "Tipo de engagement",
+    "budget": "Presupuesto estimado",
+    "timeline": "Plazo / urgencia",
+    "pleaseEnterCompany": "Por favor ingresa el nombre de tu empresa",
+    "pleaseSelectEngagement": "Por favor selecciona un tipo de engagement",
+    "pleaseSelectBudget": "Por favor selecciona un rango de presupuesto",
+    "pleaseSelectTimeline": "Por favor selecciona un plazo",
+    "requestEstimate": "Solicitar estimado",
+    "submitting": "Enviando...",
+    "estimateRequestSent": "Solicitud de estimado enviada exitosamente. La revisaremos en 24 horas y te contactaremos."
   },
   "companyHistoryTitle": "Nuestro Camino",
   "companyHistoryDescription": "Nuestra historia comenzó con una simple creencia: que la tecnología debe servir a un propósito superior. Desde nuestras raíces en Argentina hasta nuestro alcance global actual, hemos tenido el privilegio de trabajar con líderes que se atreven a pensar diferente sobre el éxito.",
@@ -224,6 +294,7 @@
   "commitmentToInnovationExpandableDescription4": "Nuestro objetivo es ayudarte a construir soluciones que no solo resuelvan los problemas de hoy sino que ayuden a crear un mejor mañana.",
   "frontendTitle": "Front-end",
   "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
+  "howWeBuildIntro": "Esta capacidad se entrega a través de nuestros modelos de engagement Staff Augmentation y Software Factory.",
   "backendTitle": "Backend & Cloud",
   "backendDescription": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
   "uxuiTitle": "Diseño UX/UI",
@@ -557,6 +628,25 @@
       "mobileDevelopment": {
         "title": "Desarrollo Móvil",
         "description": "Crea experiencias nativas potentes para iOS y Android que capten a tus usuarios en cualquier dispositivo."
+      }
+    }
+  },
+  "homeCapabilitiesSection": {
+    "title": "Cómo construimos",
+    "subtitle": "Estas capacidades se entregan a través de nuestros modelos de engagement Staff Augmentation y Software Factory.",
+    "ctaText": "Explorar cómo construimos",
+    "cards": {
+      "softwareDevelopment": {
+        "title": "Desarrollo de Software",
+        "description": "Construye aplicaciones web escalables, sistemas backend robustos y arquitecturas cloud que impulsan el crecimiento de tu negocio."
+      },
+      "mobileDevelopment": {
+        "title": "Desarrollo Móvil",
+        "description": "Crea apps nativas iOS y Android, soluciones cross-platform y productos mobile-first que conectan con usuarios donde estén."
+      },
+      "dataAutomation": {
+        "title": "Datos y Automatización",
+        "description": "Transforma datos en insights con dashboards analíticos, workflows potenciados por IA e integraciones que automatizan operaciones."
       }
     }
   },

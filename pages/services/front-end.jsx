@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import Head from "next/head";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   FaCode,
   FaMobileAlt,
@@ -184,21 +186,32 @@ const FrontEnd = () => {
               }}
             >
               {lang === "es"
-                ? "Construimos experiencias digitales que cautivan"
-                : "We build digital experiences that captivate"}
+                ? "Cómo construimos software escalable"
+                : "How we build scalable software"}
             </h1>
 
             <p
               style={{
                 fontSize: "1.2rem",
                 opacity: 0.9,
-                marginBottom: "24px",
+                marginBottom: "12px",
                 lineHeight: 1.6,
               }}
             >
               {lang === "es"
                 ? "Desarrollamos interfaces modernas, responsivas y accesibles que convierten visitantes en clientes."
                 : "We develop modern, responsive, and accessible interfaces that turn visitors into customers."}
+            </p>
+            <p
+              style={{
+                fontSize: "1rem",
+                opacity: 0.85,
+                marginBottom: "24px",
+                lineHeight: 1.6,
+                fontStyle: "italic",
+              }}
+            >
+              {t("howWeBuildIntro")}
             </p>
 
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
@@ -657,6 +670,77 @@ const FrontEnd = () => {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Engagement Models CTA */}
+      <section
+        style={{
+          padding: "3rem 2rem",
+          background: "#f8fafc",
+          textAlign: "center",
+        }}
+      >
+        <div className="animate" style={{ maxWidth: 800, margin: "0 auto" }}>
+          <h3
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: 600,
+              marginBottom: "1rem",
+              color: "#1e293b",
+            }}
+          >
+            {lang === "es"
+              ? "¿Cómo quieres trabajar con nosotros?"
+              : "How do you want to work with us?"}
+          </h3>
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              marginTop: "2rem",
+            }}
+          >
+            <Link href="/services/staff-augmentation">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  padding: "1rem 2rem",
+                  background: "#F97B72",
+                  color: "white",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {lang === "es" ? "Staff Augmentation" : "Staff Augmentation"}
+              </motion.div>
+            </Link>
+            <Link href="/services/software-factory">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  padding: "1rem 2rem",
+                  background: "white",
+                  color: "#F97B72",
+                  border: "2px solid #F97B72",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {lang === "es" ? "Software Factory" : "Software Factory"}
+              </motion.div>
+            </Link>
           </div>
         </div>
       </section>

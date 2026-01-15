@@ -727,48 +727,23 @@ const TestimonialsCarousel = ({ testimonials }) => {
   );
 };
 
-const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] }) => {
+const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories = [], ctaText }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  const boxRef = React.useRef(null);
   const router = useRouter();
 
   // Prefetch las páginas cuando se hace hover sobre la caja
   useEffect(() => {
-    if (menuItems.length > 0) {
-      menuItems.forEach((item) => {
+    if (subcategories.length > 0) {
+      subcategories.forEach((item) => {
         router.prefetch(item.href);
       });
     } else if (link) {
       router.prefetch(link);
     }
-  }, [menuItems, link, router]);
-
-  // Cerrar el menú al hacer click fuera
-  useEffect(() => {
-    if (!showMenu) return;
-
-    const handleClickOutside = (event) => {
-      if (boxRef.current && !boxRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-    };
-
-    // Reducir el delay para mejor rendimiento
-    const timeoutId = setTimeout(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
-    }, 50);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [showMenu]);
+  }, [subcategories, link, router]);
 
   const boxContent = (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <motion.div
         initial={{ scale: 1 }}
         animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
@@ -796,75 +771,103 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
         {title}
       </h3>
 
-      {menuItems.length > 0 && showMenu ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            marginTop: "0.5rem",
-          }}
-        >
-          {menuItems.map((item, index) => (
-            <div
-              key={index}
-              style={{ textDecoration: "none" }}
-              onClick={(e) => {
-                e.preventDefault();
-                setShowMenu(false);
-                // Navegación inmediata sin esperar animaciones
-                router.push(item.href);
-              }}
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.15, delay: index * 0.02, ease: "easeOut" }}
-                style={{
-                  padding: "10px 14px",
-                  cursor: "pointer",
-                  color: "#1f2937",
-                  fontSize: "0.9rem",
-                  fontWeight: "500",
-                  backgroundColor: "#f9fafb",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "6px",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f97b72";
-                  e.target.style.color = "#ffffff";
-                  e.target.style.borderColor = "#f97b72";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "#f9fafb";
-                  e.target.style.color = "#1f2937";
-                  e.target.style.borderColor = "#e5e7eb";
-                }}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        style={{
+          fontSize: "0.9rem",
+          lineHeight: "1.5",
+          color: "#444444",
+          marginBottom: subcategories.length > 0 ? "1rem" : "0",
+          flex: subcategories.length > 0 ? "0 0 auto" : 1,
+        }}
+      >
+        {description}
+      </motion.p>
+
+      {subcategories.length > 0 && (
+        <div style={{ marginTop: "auto", paddingTop: "1rem" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0.75rem",
+              marginBottom: "0.5rem",
+              alignItems: "center",
+            }}
+          >
+            {subcategories.map((item, index) => (
+              <Link 
+                key={index}
+                href={item.href} 
+                style={{ textDecoration: "none" }}
+                onClick={(e) => e.stopPropagation()}
               >
-                {item.text}
-              </motion.div>
-            </div>
-          ))}
-        </motion.div>
-      ) : (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          style={{
-            fontSize: "0.9rem",
-            lineHeight: "1.5",
-            color: "#444444",
-          }}
-        >
-          {description}
-        </motion.p>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#6B7280",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    borderBottom: "1px solid transparent",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#F97B72";
+                    e.currentTarget.style.borderBottomColor = "#F97B72";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "#6B7280";
+                    e.currentTarget.style.borderBottomColor = "transparent";
+                  }}
+                >
+                  {item.text}
+                </motion.span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!subcategories.length && ctaText && link && (
+        <Link href={link} style={{ textDecoration: "none", marginTop: "auto" }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              color: "#F97B72",
+              fontSize: "0.95rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              paddingTop: "1rem",
+              borderTop: "1px solid rgba(249, 123, 114, 0.2)",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "0.8";
+              e.currentTarget.style.color = "#E35A52";
+              e.currentTarget.style.borderTopColor = "rgba(249, 123, 114, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+              e.currentTarget.style.color = "#F97B72";
+              e.currentTarget.style.borderTopColor = "rgba(249, 123, 114, 0.2)";
+            }}
+          >
+            {ctaText}
+            <span style={{ fontSize: "0.9rem", transition: "transform 0.2s ease" }}>
+              →
+            </span>
+          </motion.div>
+        </Link>
       )}
 
       <motion.div
@@ -885,8 +888,7 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
           zIndex: "-1",
         }}
       />
-
-    </>
+    </div>
   );
 
   const boxStyle = {
@@ -894,14 +896,17 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
     borderRadius: "12px",
     padding: "1.25rem",
     height: "100%",
-    cursor: menuItems.length > 0 || link ? "pointer" : "default",
+    cursor: subcategories.length > 0 ? "default" : (link ? "pointer" : "default"),
     position: "relative",
     overflow: "hidden",
     border: "1px solid rgba(249, 123, 114, 0.2)",
     transition: "all 0.15s ease",
+    display: "flex",
+    flexDirection: "column",
   };
 
-  if (link && menuItems.length === 0) {
+  // Si no hay subcategorías pero hay un link directo, hacer toda la caja clickeable
+  if (!subcategories.length && link) {
     return (
       <Link href={link} style={{ textDecoration: "none", color: "inherit" }}>
         <motion.div
@@ -924,32 +929,44 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, menuItems = [] 
     );
   }
 
+  // Si hay subcategorías, hacer la caja clickeable hacia la primera subcategoría
+  if (subcategories.length > 0 && subcategories[0]?.href) {
+    return (
+      <Link href={subcategories[0].href} style={{ textDecoration: "none", color: "inherit" }}>
+        <motion.div
+          className="service-box"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.15, delay: delay * 0.1 }}
+          whileHover={{
+            scale: 1.02,
+            transition: { duration: 0.1 },
+          }}
+          onHoverStart={() => setIsHovered(true)}
+          onHoverEnd={() => setIsHovered(false)}
+          style={{ ...boxStyle, cursor: "pointer" }}
+        >
+          {boxContent}
+        </motion.div>
+      </Link>
+    );
+  }
+
+  // Si no hay subcategorías ni link, solo mostrar la caja
   return (
-    <>
-      <motion.div
-        ref={boxRef}
-        className="service-box"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.15, delay: delay * 0.1 }}
-        whileHover={{
-          scale: 1.02,
-          transition: { duration: 0.1 },
-        }}
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (menuItems.length > 0) {
-            setShowMenu(!showMenu);
-          }
-        }}
-        style={boxStyle}
-      >
-        {boxContent}
-      </motion.div>
-    </>
+    <motion.div
+      className="service-box"
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.15, delay: delay * 0.1 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      style={boxStyle}
+    >
+      {boxContent}
+    </motion.div>
   );
 };
 
@@ -1264,7 +1281,7 @@ export default function HomePage() {
           </motion.div>
         </Section>
 
-        {/* Services Section with Interactive Boxes */}
+        {/* Capabilities Section - How we build */}
         <Section className="full-width">
           <motion.div
             initial={{ opacity: 0 }}
@@ -1281,7 +1298,7 @@ export default function HomePage() {
               }}
             >
               <span style={{ color: "var(--color-accent, #FF6B6B)" }}>
-                {t("homeServicesSection.title")}
+                {t("homeCapabilitiesSection.title")}
               </span>
             </h2>
             <p
@@ -1292,84 +1309,59 @@ export default function HomePage() {
                 color: "var(--color-text-muted, #666)",
               }}
             >
-              {t("homeServicesSection.subtitle")}
+              {t("homeCapabilitiesSection.subtitle")}
             </p>
           </motion.div>
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: "2rem",
               maxWidth: "1200px",
               margin: "0 auto",
               padding: "0 1rem",
             }}
           >
-            <ServiceBox
-              icon={<FaUsers style={{ color: "#E35A52", fontSize: "3rem" }} />}
-              title={t("homeServicesSection.cards.staffAugmentation.title")}
-              description={t(
-                "homeServicesSection.cards.staffAugmentation.description",
-              )}
-              delay={0.05}
-              link="/services/staff-augmentation"
-            />
+            {/* Software Development */}
             <ServiceBox
               icon="💻"
-              title={t("homeServicesSection.cards.softwareDevelopment.title")}
+              title={t("homeCapabilitiesSection.cards.softwareDevelopment.title")}
               description={t(
-                "homeServicesSection.cards.softwareDevelopment.description",
+                "homeCapabilitiesSection.cards.softwareDevelopment.description",
               )}
               delay={0.1}
-              menuItems={[
+              subcategories={[
                 { text: t("frontendTitle"), href: "/services/front-end" },
                 { text: t("backendTitle"), href: "/services/back-end" },
               ]}
             />
-            <ServiceBox
-              icon="🎨"
-              title={t("homeServicesSection.cards.uxUiDesign.title")}
-              description={t(
-                "homeServicesSection.cards.uxUiDesign.description",
-              )}
-              delay={0.15}
-              menuItems={[
-                { text: t("uxuiTitle"), href: "/services/ux-ui" },
-                { text: t("graphicDesignTitle"), href: "/services/graphic-design" },
-              ]}
-            />
-            <ServiceBox
-              icon="🤖"
-              title={t("homeServicesSection.cards.aiAndAutomation.title")}
-              description={t(
-                "homeServicesSection.cards.aiAndAutomation.description",
-              )}
-              delay={0.2}
-              menuItems={[
-                { text: "n8n Automation", href: "/services/n8n-automation" },
-                { text: t("aiTitle"), href: "/services/AI" },
-              ]}
-            />
-            <ServiceBox
-              icon="📊"
-              title={t("homeServicesSection.cards.dataAnalytics.title")}
-              description={t(
-                "homeServicesSection.cards.dataAnalytics.description",
-              )}
-              delay={0.25}
-              link="/services/back-end"
-            />
+            
+            {/* Mobile Development */}
             <ServiceBox
               icon="📱"
-              title={t("homeServicesSection.cards.mobileDevelopment.title")}
+              title={t("homeCapabilitiesSection.cards.mobileDevelopment.title")}
               description={t(
-                "homeServicesSection.cards.mobileDevelopment.description",
+                "homeCapabilitiesSection.cards.mobileDevelopment.description",
               )}
-              delay={0.3}
-              menuItems={[
+              delay={0.2}
+              subcategories={[
                 { text: t("frontendTitle"), href: "/services/front-end" },
                 { text: t("backendTitle"), href: "/services/back-end" },
+              ]}
+            />
+            
+            {/* Data & Automation */}
+            <ServiceBox
+              icon="📊"
+              title={t("homeCapabilitiesSection.cards.dataAutomation.title")}
+              description={t(
+                "homeCapabilitiesSection.cards.dataAutomation.description",
+              )}
+              delay={0.3}
+              subcategories={[
+                { text: t("aiTitle"), href: "/services/AI" },
+                { text: "n8n Automation", href: "/services/n8n-automation" },
               ]}
             />
           </div>
