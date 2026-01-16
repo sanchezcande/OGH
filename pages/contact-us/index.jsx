@@ -197,7 +197,7 @@ const ContactUs = () => {
               style={{
                 fontSize: "0.8rem",
                 color: "#94a3b8",
-                textAlign: "center",
+                textAlign: isMobile ? "left" : "center",
                 marginTop: "0.75rem",
                 marginBottom: "0",
                 lineHeight: "1.4",

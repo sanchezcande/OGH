@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import emailjs from "emailjs-com";
+import ReCAPTCHA from "react-google-recaptcha";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import {
   FormContainer,
@@ -23,6 +24,7 @@ const EstimateForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formStatus, setFormStatus] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const validateForm = () => {
     const newErrors = {};
@@ -63,8 +65,19 @@ const EstimateForm = () => {
     }
   };
 
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!captchaToken) {
+      setFormStatus(t("pleaseCompleteCaptcha") || "Please complete the captcha");
+      setIsModalOpen(true);
+      return;
+    }
+    
     if (!validateForm()) {
       return;
     }
@@ -101,6 +114,7 @@ const EstimateForm = () => {
         budget: "",
         timeline: "",
       });
+      setCaptchaToken(null);
     } catch (error) {
       console.error("Error sending estimate request:", error);
       setFormStatus(t("errorSendingMessage"));
@@ -312,6 +326,13 @@ const EstimateForm = () => {
             {errors.timeline}
           </Error>
         )}
+
+        <div style={{ marginBottom: "1rem", display: "flex", justifyContent: "flex-start" }}>
+          <ReCAPTCHA
+            sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-"
+            onChange={handleCaptchaChange}
+          />
+        </div>
 
         <StyledButton
           type="submit"
