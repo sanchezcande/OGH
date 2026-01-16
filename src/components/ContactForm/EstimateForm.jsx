@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import emailjs from "emailjs-com";
 import ReCAPTCHA from "react-google-recaptcha";
 import SuccessModal from "./SuccessModal/SuccessModal";
+import useMediaQuery from "../../Hooks/useMediaQuery";
 import {
   FormContainer,
   Input,
-  Error,
+  Error as ErrorMessage,
   StyledButton,
 } from "./ContactForm.styles";
 
 const EstimateForm = () => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -72,7 +73,11 @@ const EstimateForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!captchaToken) {
+    // Solo validar captcha en producción (no en localhost)
+    const isDevelopment = typeof window !== "undefined" && 
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+    
+    if (!isDevelopment && !captchaToken) {
       setFormStatus(t("pleaseCompleteCaptcha") || "Please complete the captcha");
       setIsModalOpen(true);
       return;
@@ -85,24 +90,34 @@ const EstimateForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Prepare email template data
-      const templateParams = {
-        from_name: formData.name,
-        from_email: formData.email,
-        company: formData.company,
-        engagement_type: formData.engagement_type,
-        budget: formData.budget,
-        timeline: formData.timeline,
-        subject: `Project Estimate Request - ${formData.engagement_type}`,
-        message: `Company: ${formData.company}\nEngagement Type: ${formData.engagement_type}\nBudget: ${formData.budget}\nTimeline: ${formData.timeline}`,
-      };
+      // Enviar datos a la API route
+      const response = await fetch("/api/send-estimate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          engagement_type: formData.engagement_type,
+          budget: formData.budget,
+          timeline: formData.timeline,
+        }),
+      });
 
-      await emailjs.send(
-        "service_jk13omy",
-        "template_k5rhtkf",
-        templateParams,
-        "DMk76Fu8oF26N7Yse"
-      );
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        // Si la respuesta no es JSON, probablemente es un error de servidor
+        const text = await response.text();
+        throw new Error(`Server error: ${response.status} - ${text.substring(0, 100)}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || "Failed to send estimate request");
+      }
 
       setFormStatus(t("contactForm.estimateRequestSent") || "Estimate request sent successfully");
       setIsModalOpen(true);
@@ -117,7 +132,7 @@ const EstimateForm = () => {
       setCaptchaToken(null);
     } catch (error) {
       console.error("Error sending estimate request:", error);
-      setFormStatus(t("errorSendingMessage"));
+      setFormStatus(t("errorSendingMessage") || "Error sending message. Please try again.");
       setIsModalOpen(true);
     } finally {
       setIsSubmitting(false);
@@ -135,7 +150,7 @@ const EstimateForm = () => {
     padding: "0.6rem 0.75rem",
     border: "1px solid #e5e7eb",
     borderRadius: "6px",
-    fontSize: "0.875rem",
+    fontSize: isMobile ? "0.8rem" : "0.875rem", // Más pequeño en mobile
     backgroundColor: "#ffffff",
     color: "#1f2937",
     width: "100%",
@@ -149,6 +164,7 @@ const EstimateForm = () => {
   const selectStyle = {
     ...baseInputStyle,
     paddingRight: "2.25rem",
+    fontSize: isMobile ? "0.8rem" : "0.875rem", // Más pequeño en mobile
     appearance: "none",
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
     backgroundRepeat: "no-repeat",
@@ -180,9 +196,9 @@ const EstimateForm = () => {
           }}
         />
         {errors.name && (
-          <Error style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
+          <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
             {errors.name}
-          </Error>
+          </ErrorMessage>
         )}
 
         <Input
@@ -206,9 +222,9 @@ const EstimateForm = () => {
           }}
         />
         {errors.company && (
-          <Error style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
+          <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
             {errors.company}
-          </Error>
+          </ErrorMessage>
         )}
 
         <Input
@@ -232,9 +248,9 @@ const EstimateForm = () => {
           }}
         />
         {errors.email && (
-          <Error style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
+          <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
             {errors.email}
-          </Error>
+          </ErrorMessage>
         )}
 
         <select
@@ -247,6 +263,8 @@ const EstimateForm = () => {
             marginBottom: errors.engagement_type ? "0.25rem" : "0.75rem",
             border: errors.engagement_type ? "1px solid #F97B72" : selectStyle.border,
             color: formData.engagement_type ? "#1f2937" : "#9CA3AF",
+            fontSize: isMobile ? "0.8rem" : "0.875rem", // Forzar tamaño en mobile
+            WebkitTextSizeAdjust: "100%", // Prevenir zoom automático en iOS
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "none";
@@ -261,9 +279,9 @@ const EstimateForm = () => {
           <option value="Software Factory">Software Factory</option>
         </select>
         {errors.engagement_type && (
-          <Error style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
+          <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
             {errors.engagement_type}
-          </Error>
+          </ErrorMessage>
         )}
 
         <select
@@ -276,6 +294,8 @@ const EstimateForm = () => {
             marginBottom: errors.budget ? "0.25rem" : "0.75rem",
             border: errors.budget ? "1px solid #F97B72" : selectStyle.border,
             color: formData.budget ? "#1f2937" : "#9CA3AF",
+            fontSize: isMobile ? "0.8rem" : "0.875rem", // Forzar tamaño en mobile
+            WebkitTextSizeAdjust: "100%", // Prevenir zoom automático en iOS
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "none";
@@ -286,15 +306,15 @@ const EstimateForm = () => {
           }}
         >
           <option value="">{t("contactForm.budget") || "Estimated budget"}</option>
-          <option value="Under $10k">Under $10k</option>
+          <option value="< $10k">&lt; $10k</option>
           <option value="$10k–$25k">$10k–$25k</option>
           <option value="$25k–$50k">$25k–$50k</option>
           <option value="$50k+">$50k+</option>
         </select>
         {errors.budget && (
-          <Error style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
+          <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
             {errors.budget}
-          </Error>
+          </ErrorMessage>
         )}
 
         <select
@@ -307,6 +327,8 @@ const EstimateForm = () => {
             marginBottom: errors.timeline ? "0.25rem" : "0.75rem",
             border: errors.timeline ? "1px solid #F97B72" : selectStyle.border,
             color: formData.timeline ? "#1f2937" : "#9CA3AF",
+            fontSize: isMobile ? "0.8rem" : "0.875rem", // Forzar tamaño en mobile
+            WebkitTextSizeAdjust: "100%", // Prevenir zoom automático en iOS
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "none";
@@ -322,17 +344,22 @@ const EstimateForm = () => {
           <option value="Just exploring">Just exploring</option>
         </select>
         {errors.timeline && (
-          <Error style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
+          <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
             {errors.timeline}
-          </Error>
+          </ErrorMessage>
         )}
 
-        <div style={{ marginBottom: "1rem", display: "flex", justifyContent: "flex-start" }}>
-          <ReCAPTCHA
-            sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-"
-            onChange={handleCaptchaChange}
-          />
-        </div>
+        {/* Solo mostrar captcha en producción (no en localhost) */}
+        {typeof window !== "undefined" && 
+         window.location.hostname !== "localhost" && 
+         window.location.hostname !== "127.0.0.1" && (
+          <div style={{ marginBottom: "1rem", display: "flex", justifyContent: "flex-start" }}>
+            <ReCAPTCHA
+              sitekey="6Lcdg6cqAAAAANwnQdyMzXcCUUTe3GzdeexkbU_-"
+              onChange={handleCaptchaChange}
+            />
+          </div>
+        )}
 
         <StyledButton
           type="submit"
