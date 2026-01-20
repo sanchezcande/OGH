@@ -52,7 +52,7 @@ const Footer = () => {
               <Github />
             </a>{" "}
             <a
-              href="https://www.instagram.com/opengatehub"
+              href="https://www.instagram.com/candelariasanchez.ogh/"
               target="_blank"
               rel="noreferrer"
             >
