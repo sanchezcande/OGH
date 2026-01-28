@@ -1197,7 +1197,7 @@ export default function HomePage() {
           <Title>
             {/* Desktop version with animation */}
             <span className="animated desktop-only">
-              {t("heroAnimatedText.part1")}{" "}
+              {t("heroAnimatedText.part1")}
               <span className="highlighted-word">
                 {t("heroAnimatedText.highlight1")}
               </span>{" "}
@@ -1210,7 +1210,7 @@ export default function HomePage() {
 
             {/* Mobile version without animation */}
             <span className="mobile-only">
-              {t("heroAnimatedText.part1")}{" "}
+              {t("heroAnimatedText.part1")}
               <span className="highlighted-word">
                 {t("heroAnimatedText.highlight1")}
               </span>{" "}

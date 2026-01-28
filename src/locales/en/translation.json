@@ -737,6 +737,16 @@
         "name": "Alejandría",
         "role": "QA Analyst",
         "description": "Alejandría makes sure what we ship actually works. She plans and runs functional, regression, and integration tests across web and mobile, keeps coverage organized in Xray/Jira, and validates APIs with Postman. With SQL skills, she checks data at the source and catches edge cases early. Her UX/UI background helps her think like a user, write clear bug reports, and push for reliable, easy‑to‑use releases. Reliable and detail-oriented, she's the one who makes sure nothing slips through the cracks before launch."
+      },
+      "vadym": {
+        "name": "Vadym",
+        "role": "Full Stack Developer",
+        "description": "Full Stack Developer with a strong eye for detail and a passion for building high-quality digital products. Specialized in modern frontend development and advanced 3D and interactive experiences with Three.js, combined with solid backend expertise in Node.js and Python. With a background in automation testing and cloud-based systems, Vadym brings reliability, precision and scalability to every project he works on."
+      },
+      "ilia": {
+        "name": "Ilia",
+        "role": "Senior QA Automation Engineer",
+        "description": "Senior QA Automation Engineer with a strong focus on building reliable, scalable testing systems. Specialized in Python-based automation frameworks, end-to-end testing and CI/CD integration, ensuring high-quality releases across complex platforms. With experience leading automation initiatives and mentoring teams, Ilia brings structure, efficiency and confidence to every development process."
       }
     }
   }
