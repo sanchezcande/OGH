@@ -11,6 +11,52 @@ import {
   ErrorMessage,
 } from "../../src/styles/pagesStyles/blogStyles/Slug.styles";
 
+function renderArticleBlock(block, key) {
+  const trimmed = block.trim();
+  if (!trimmed) return null;
+
+  // Headings (markdown-ish)
+  if (trimmed.startsWith("### ")) {
+    return (
+      <h3 key={key} style={{ fontWeight: 800, marginTop: "1.25rem" }}>
+        {trimmed.replace(/^###\s+/, "")}
+      </h3>
+    );
+  }
+  if (trimmed.startsWith("## ")) {
+    return (
+      <h2 key={key} style={{ fontWeight: 800, marginTop: "1.5rem" }}>
+        {trimmed.replace(/^##\s+/, "")}
+      </h2>
+    );
+  }
+
+  // Bullet lists (all lines start with "- ")
+  const lines = trimmed.split("\n");
+  const isBulletList = lines.length > 1 && lines.every((l) => l.trim().startsWith("- "));
+  if (isBulletList) {
+    return (
+      <ul key={key} style={{ paddingLeft: "1.25rem", marginTop: "0.75rem" }}>
+        {lines.map((l, idx) => (
+          <li key={idx}>{l.trim().replace(/^-+\s+/, "")}</li>
+        ))}
+      </ul>
+    );
+  }
+
+  // Paragraph (preserve single newlines)
+  return (
+    <p key={key}>
+      {lines.map((line, idx) => (
+        <React.Fragment key={idx}>
+          {line}
+          {idx < lines.length - 1 ? <br /> : null}
+        </React.Fragment>
+      ))}
+    </p>
+  );
+}
+
 export default function ArticlePage() {
   const { query } = useRouter();
   const { slug } = query;
@@ -53,9 +99,9 @@ export default function ArticlePage() {
         </ImageContainer>
 
         <Content>
-          {article.content.split("\n\n").map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+          {article.content
+            .split("\n\n")
+            .map((block, index) => renderArticleBlock(block, index))}
         </Content>
       </ArticleContainer>
     </motion.div>
