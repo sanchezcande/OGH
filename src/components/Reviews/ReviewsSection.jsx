@@ -14,7 +14,7 @@ import { InView } from "../InView/InView";
 export const ReviewsSection = () => {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const reviews = ["skylar", "techvision", "greenleaf", "innovatelab"];
+  const reviews = ["farzad", "skylar", "techvision", "greenleaf", "innovatelab"];
 
   const handlePrevSlide = () => {
     setCurrentSlide((current) =>

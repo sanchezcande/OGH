@@ -586,6 +586,11 @@
   ],
   "reviewsTitle": "Lo que dicen nuestros clientes",
   "reviews": {
+    "farzad": {
+      "text": "Trabajamos con OpenGateHub en dos proyectos distintos: un sitio de e-commerce y un producto de IA en etapa temprana.\n\nLo que más valoré fue lo sencillo que se sintió todo el proceso. Hicieron las preguntas correctas desde el inicio, mantuvieron la comunicación clara y cumplieron sin idas y vueltas innecesarias. El sitio de e-commerce se entregó listo para lanzar, exactamente como lo necesitábamos.\n\nEn el producto de IA, también nos ayudaron a pensar la dirección desde el principio — no solo construyendo features, sino enfocándose en qué tenía sentido construir primero.\n\nSi buscan un equipo confiable, proactivo y con el que sea genuinamente fácil trabajar, recomiendo OpenGateHub sin dudar.",
+      "company": "Farzad Khosravi",
+      "role": "Founder — Hot Date Kitchen · Chief Product Officer — Cicero (early-stage)"
+    },
     "skylar": {
       "text": "Estamos realmente muy contentos con el trabajo que hizo OpenGateHub para nuestro emprendimiento. Supieron captar desde el primer momento lo que queríamos transmitir y lo plasmaron en una página web moderna, intuitiva y visualmente impecable. Además, su atención fue excelente: siempre disponibles, rápidos para responder y con mucha predisposición para resolver cada duda o necesidad que surgía. Se nota que trabajan con compromiso, profesionalismo y experiencia. Los recomendamos sin dudar.",
       "company": "Skylar",
@@ -678,6 +683,16 @@
       "title": "Skylar",
       "description": "Plataforma de e-commerce para una marca líder de útiles escolares en Argentina.",
       "metrics": ["≤2s TTI", "+28% conversiones", "Catálogo en vivo"]
+    },
+    "hotDateKitchen": {
+      "title": "Hot Date Kitchen",
+      "description": "Landing y e-commerce para una marca premium de snacks veganos. Dátiles artesanales, tienda Shopify y narrativa enfocada en sustentabilidad.",
+      "metrics": ["Landing + E-commerce", "Shopify", "Marca carbono neutral"]
+    },
+    "cicero": {
+      "title": "Cicero",
+      "description": "Bibliotecario personal con IA (etapa temprana).",
+      "metrics": ["Dirección de producto", "Desarrollo temprano", "Ver en LinkedIn"]
     }
   },
   "metricsSection": {

@@ -87,6 +87,7 @@ const FeaturedWorkCard = ({
   delay = 0,
   badges = ["35% faster", "0 bugs", "Live product"],
   category,
+  imageScale = 1,
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [showHover, setShowHover] = useState(false);
@@ -232,12 +233,15 @@ const FeaturedWorkCard = ({
                   transition: "transform 0.3s ease-out",
                   filter: "grayscale(20%)",
                   cursor: isMobile ? "default" : "pointer",
+                  transform: `scale(${imageScale})`,
                 }}
                 onMouseEnter={(e) =>
-                  !isMobile && (e.target.style.transform = "scale(1.02)")
+                  !isMobile &&
+                  (e.target.style.transform = `scale(${1.02 * imageScale})`)
                 }
                 onMouseLeave={(e) =>
-                  !isMobile && (e.target.style.transform = "scale(1)")
+                  !isMobile &&
+                  (e.target.style.transform = `scale(${imageScale})`)
                 }
               />
             </div>
@@ -1145,6 +1149,11 @@ export default function HomePage() {
 
   const testimonialData = [
     {
+      content: t("reviews.farzad.text"),
+      company: t("reviews.farzad.company"),
+      role: t("reviews.farzad.role"),
+    },
+    {
       content: t("reviews.skylar.text"),
       company: t("reviews.skylar.company"),
       role: t("reviews.skylar.role"),
@@ -1485,6 +1494,31 @@ export default function HomePage() {
                   delay: 0.3,
                 },
                 {
+                  image: "/HotDate.png",
+                  title: t("featuredWorkSection.hotDateKitchen.title"),
+                  description: t(
+                    "featuredWorkSection.hotDateKitchen.description",
+                  ),
+                  metrics: t("featuredWorkSection.hotDateKitchen.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://hotdatekitchen.com/",
+                  hoverContent: (
+                    <>
+                      <strong>Landing + E-commerce</strong> — premium snack
+                      brand, Shopify store, 99% recommend
+                    </>
+                  ),
+                  badges: [
+                    "Landing page",
+                    "E-commerce",
+                    "Carbon neutral brand",
+                  ],
+                  category: "commerce",
+                  delay: 0.35,
+                  imageScale: 0.9,
+                },
+                {
                   image: "/GBS.png",
                   title: "GBS Abogados",
                   description: "Plataforma web moderna y optimizada",
@@ -1531,6 +1565,25 @@ export default function HomePage() {
                   badges: ["CRM", "AI", "24/7"],
                   category: "saas",
                   delay: 0.5,
+                },
+                {
+                  image: "/Cicero.png",
+                  title: t("featuredWorkSection.cicero.title"),
+                  description: t("featuredWorkSection.cicero.description"),
+                  metrics: t("featuredWorkSection.cicero.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://www.linkedin.com/company/cicerolearn/",
+                  hoverContent: (
+                    <>
+                      <strong>Product direction + early development</strong> —
+                      AI-powered personal librarian. View on LinkedIn.
+                    </>
+                  ),
+                  badges: ["AI", "Early-stage", "View on LinkedIn"],
+                  category: "saas",
+                  delay: 0.52,
+                  imageScale: 0.7,
                 },
                 {
                   image: "/vivabots_azul.png",
@@ -1625,6 +1678,7 @@ export default function HomePage() {
                             badges={project.badges}
                             category={project.category}
                             delay={0}
+                            imageScale={project.imageScale}
                           />
                         </div>
                       ))}
