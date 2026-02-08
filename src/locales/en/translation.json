@@ -576,7 +576,7 @@
   "reviewsSubtitle": "Real stories from founders and leaders who've trusted us to grow with them.",
   "reviews": {
     "farzad": {
-      "text": "We worked with OpenGateHub on two different projects: an e-commerce website and an early-stage AI product.\n\nWhat I appreciated most was how easy the whole process felt. They asked the right questions early on, kept communication clear, and followed through without unnecessary back-and-forth. The e-commerce site was delivered ready to launch, exactly as we needed.\n\nOn the AI product, they also helped us think through the direction early — not just building features, but focusing on what actually made sense to build first.\n\nIf you're looking for a team that's reliable, proactive, and genuinely easy to work with, I'd definitely recommend OpenGateHub.",
+      "text": "We worked with OpenGateHub on two different projects: an e-commerce site and an early-stage AI product.\n\nWhat I valued most was how straightforward the whole process felt. They asked the right questions from the start, kept communication clear, and delivered without unnecessary back and forth. The e-commerce site was delivered ready to launch, exactly as we needed it.\n\nOn the AI product, they also helped us think through the direction from the beginning — not just building features, but focusing on what made sense to build first.\n\nIf you're looking for a reliable, proactive team that's genuinely easy to work with, I recommend OpenGateHub without hesitation.",
       "company": "Farzad Khosravi",
       "role": "Founder — Hot Date Kitchen · Chief Product Officer — Cicero (early-stage)"
     },
@@ -584,6 +584,11 @@
       "text": "We are truly delighted with the work OpenGateHub did for our venture. They understood from the very beginning what we wanted to convey and translated it into a modern, intuitive, and visually flawless website. Moreover, their service was excellent: always available, quick to respond, and very willing to resolve any doubts or needs that arose. It's evident that they work with commitment, professionalism, and experience. We recommend them without hesitation.",
       "company": "Skylar",
       "role": "Founder"
+    },
+    "vantage": {
+      "text": "Through OpenGateHub we were able to hire excellent developers and QA engineers who significantly strengthened our project. The team is highly organized, proactive, and great at keeping complex workflows running efficiently. We would happily work with them again and highly recommend OpenGateHub!",
+      "company": "Vantage",
+      "role": "Veronika, Producer"
     },
     "techvision": {
       "text": "OpenGateHub quickly adapted to the project dynamics, identified bottlenecks and proposed solutions that accelerated delivery. Their work was key to exceeding our client's expectations and strengthening our relationship with them.",
@@ -675,16 +680,6 @@
       "title": "Skylar",
       "description": "E-commerce platform for a leading school supplies brand in Argentina.",
       "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
-    },
-    "hotDateKitchen": {
-      "title": "Hot Date Kitchen",
-      "description": "Landing page and e-commerce for a premium vegan snack brand. Handmade dates, Shopify store, and sustainability-focused storytelling.",
-      "metrics": ["Landing + E-commerce", "Shopify", "Carbon neutral brand"]
-    },
-    "cicero": {
-      "title": "Cicero",
-      "description": "AI-powered personal librarian (early-stage).",
-      "metrics": ["Product direction", "Early development", "View on LinkedIn"]
     }
   },
   "metricsSection": {

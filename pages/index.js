@@ -1154,6 +1154,11 @@ export default function HomePage() {
       role: t("reviews.farzad.role"),
     },
     {
+      content: t("reviews.vantage.text"),
+      company: t("reviews.vantage.company"),
+      role: t("reviews.vantage.role"),
+    },
+    {
       content: t("reviews.skylar.text"),
       company: t("reviews.skylar.company"),
       role: t("reviews.skylar.role"),
@@ -1438,6 +1443,7 @@ export default function HomePage() {
 
             {(() => {
               const projects = [
+                // SaaS first
                 {
                   image: "/smarters-card.png",
                   title: t("featuredWorkSection.smartersCity.title"),
@@ -1458,6 +1464,57 @@ export default function HomePage() {
                   delay: 0.1,
                 },
                 {
+                  image: "/valthor-logo.e3b5a398.png",
+                  title: "Valthor CRM",
+                  description: "Plataforma CRM moderna y optimizada con IA",
+                  metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
+                  link: "https://www.valthorcrm.com/",
+                  hoverContent: (
+                    <>
+                      <strong>Modern CRM platform</strong> — powered with{" "}
+                      <strong>AI</strong>.
+                    </>
+                  ),
+                  badges: ["CRM", "AI", "24/7"],
+                  category: "saas",
+                  delay: 0.2,
+                },
+                {
+                  image: "/Cicero.png",
+                  title: t("featuredWorkSection.cicero.title"),
+                  description: t("featuredWorkSection.cicero.description"),
+                  metrics: t("featuredWorkSection.cicero.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://www.linkedin.com/company/cicerolearn/",
+                  hoverContent: (
+                    <>
+                      <strong>Product direction + early development</strong> —
+                      AI-powered personal librarian. View on LinkedIn.
+                    </>
+                  ),
+                  badges: ["AI", "Early-stage", "View on LinkedIn"],
+                  category: "saas",
+                  delay: 0.3,
+                  imageScale: 0.7,
+                },
+                {
+                  image: "/vivabots_azul.png",
+                  title: "Vivabots RPA",
+                  description: "Plataforma RPA moderna y optimizada",
+                  metrics: ["99.9% uptime", "99.9% efficienty"],
+                  link: "https://vivabots.com/",
+                  hoverContent: (
+                    <>
+                      Modern and Powerful <strong>RPA platform</strong>{" "}
+                    </>
+                  ),
+                  badges: ["RPA Platform", "Web & Desktop", "3,200+ Bots"],
+                  category: "saas",
+                  delay: 0.4,
+                },
+                // Then the rest
+                {
                   image: "/estudio-sab.png",
                   title: t("featuredWorkSection.estudioSab.title"),
                   description: t("featuredWorkSection.estudioSab.description"),
@@ -1473,7 +1530,7 @@ export default function HomePage() {
                   ),
                   badges: ["Fast pages", "SEO ready", "Modern stack"],
                   category: "web-performance",
-                  delay: 0.2,
+                  delay: 0.5,
                 },
                 {
                   image: "/Skylar.png",
@@ -1491,7 +1548,7 @@ export default function HomePage() {
                   ),
                   badges: ["≤2s TTI", "+28% conversions", "Live catalog"],
                   category: "commerce",
-                  delay: 0.3,
+                  delay: 0.55,
                 },
                 {
                   image: "/HotDate.png",
@@ -1515,7 +1572,7 @@ export default function HomePage() {
                     "Carbon neutral brand",
                   ],
                   category: "commerce",
-                  delay: 0.35,
+                  delay: 0.6,
                   imageScale: 0.9,
                 },
                 {
@@ -1532,7 +1589,7 @@ export default function HomePage() {
                   ),
                   badges: ["Dynamic transitions", "SEO ready", "Fast load"],
                   category: "web-performance",
-                  delay: 0.4,
+                  delay: 0.65,
                 },
                 {
                   image: "/kdabogados.png",
@@ -1548,57 +1605,7 @@ export default function HomePage() {
                   ),
                   badges: ["Responsive", "SEO ready", "Fast load"],
                   category: "web-performance",
-                  delay: 0.45,
-                },
-                {
-                  image: "/valthor-logo.e3b5a398.png",
-                  title: "Valthor CRM",
-                  description: "Plataforma CRM moderna y optimizada con IA",
-                  metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
-                  link: "https://www.valthorcrm.com/",
-                  hoverContent: (
-                    <>
-                      <strong>Modern CRM platform</strong> — powered with{" "}
-                      <strong>AI</strong>.
-                    </>
-                  ),
-                  badges: ["CRM", "AI", "24/7"],
-                  category: "saas",
-                  delay: 0.5,
-                },
-                {
-                  image: "/Cicero.png",
-                  title: t("featuredWorkSection.cicero.title"),
-                  description: t("featuredWorkSection.cicero.description"),
-                  metrics: t("featuredWorkSection.cicero.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://www.linkedin.com/company/cicerolearn/",
-                  hoverContent: (
-                    <>
-                      <strong>Product direction + early development</strong> —
-                      AI-powered personal librarian. View on LinkedIn.
-                    </>
-                  ),
-                  badges: ["AI", "Early-stage", "View on LinkedIn"],
-                  category: "saas",
-                  delay: 0.52,
-                  imageScale: 0.7,
-                },
-                {
-                  image: "/vivabots_azul.png",
-                  title: "Vivabots RPA",
-                  description: "Plataforma RPA moderna y optimizada",
-                  metrics: ["99.9% uptime", "99.9% efficienty"],
-                  link: "https://vivabots.com/",
-                  hoverContent: (
-                    <>
-                      Modern and Powerful <strong>RPA platform</strong>{" "}
-                    </>
-                  ),
-                  badges: ["RPA Platform", "Web & Desktop", "3,200+ Bots"],
-                  category: "saas",
-                  delay: 0.6,
+                  delay: 0.7,
                 },
               ];
 
