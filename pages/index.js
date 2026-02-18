@@ -1499,6 +1499,25 @@ export default function HomePage() {
                   imageScale: 0.7,
                 },
                 {
+                  image: "/vantage.svg",
+                  title: t("featuredWorkSection.vantage.title"),
+                  description: t("featuredWorkSection.vantage.description"),
+                  metrics: t("featuredWorkSection.vantage.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://vantageinc.ai/",
+                  hoverContent: (
+                    <>
+                      <strong>Staff Augmentation</strong> — embedded engineers &
+                      QA, accelerating their roadmap and product velocity.
+                    </>
+                  ),
+                  badges: ["Staff Aug", "Engineers + QA", "Faster roadmap"],
+                  category: "saas",
+                  delay: 0.35,
+                  imageScale: 0.75,
+                },
+                {
                   image: "/vivabots_azul.png",
                   title: "Vivabots RPA",
                   description: "Plataforma RPA moderna y optimizada",

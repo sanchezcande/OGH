@@ -702,6 +702,11 @@
       "description": "Plataforma de e-commerce para una marca líder de útiles escolares en Argentina.",
       "metrics": ["≤2s TTI", "+28% conversiones", "Catálogo en vivo"]
     },
+    "vantage": {
+      "title": "Vantage",
+      "description": "Staff augmentation — ingenieros y QA embebidos en su equipo, acelerando la entrega del roadmap y mejorando la velocidad de desarrollo.",
+      "metrics": ["Staff Augmentation", "Roadmap acelerado", "QA embebido"]
+    },
     "hotDateKitchen": {
       "title": "Hot Date Kitchen",
       "description": "Landing y e-commerce para una marca premium de snacks veganos. Dátiles artesanales, tienda Shopify y narrativa enfocada en sustentabilidad.",

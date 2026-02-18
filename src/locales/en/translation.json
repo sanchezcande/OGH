@@ -693,6 +693,21 @@
       "title": "Skylar",
       "description": "E-commerce platform for a leading school supplies brand in Argentina.",
       "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
+    },
+    "vantage": {
+      "title": "Vantage",
+      "description": "Staff augmentation — embedded engineers and QA into their team, accelerating roadmap delivery and boosting development velocity.",
+      "metrics": ["Staff Augmentation", "Faster roadmap", "QA embedded"]
+    },
+    "hotDateKitchen": {
+      "title": "Hot Date Kitchen",
+      "description": "Landing page and e-commerce for a premium vegan snack brand.",
+      "metrics": ["Landing + E-commerce", "Shopify", "Carbon neutral brand"]
+    },
+    "cicero": {
+      "title": "Cicero",
+      "description": "AI-powered personal librarian (early-stage).",
+      "metrics": ["Product direction", "Early development", "View on LinkedIn"]
     }
   },
   "metricsSection": {
