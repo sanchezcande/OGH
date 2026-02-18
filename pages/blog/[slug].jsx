@@ -2,7 +2,8 @@ import React from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import Head from "next/head"; // <-- NUEVA IMPORTACIÓN
+import Head from "next/head";
+import Image from "next/image";
 import {
   ArticleContainer,
   Title,
@@ -95,7 +96,14 @@ export default function ArticlePage() {
         <Title as="h1">{article.title}</Title>
 
         <ImageContainer>
-          <img src={article.image} alt={article.title} />
+          <Image
+            src={article.image}
+            alt={article.title}
+            width={900}
+            height={506}
+            sizes="(max-width: 768px) 100vw, 900px"
+            style={{ maxWidth: "100%", height: "auto", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}
+          />
         </ImageContainer>
 
         <Content>

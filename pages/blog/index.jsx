@@ -6,6 +6,7 @@ import {
   SearchInput,
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslation } from "react-i18next";
 
 export default function Blog() {
@@ -68,9 +69,13 @@ export default function Blog() {
       <Gallery>
         {filteredArticles.map((article) => (
           <ArticleCard key={article.slug} className="article-card">
-            <img
-              src={article.image}
+            <Image
+              src={article.thumbnail || article.image}
               alt={article.title}
+              width={600}
+              height={300}
+              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw"
+              style={{ width: "100%", height: "200px", objectFit: "cover" }}
               loading="lazy"
               onLoad={handleImageLoad}
             />
