@@ -35,6 +35,15 @@ const ModalContent = styled.div`
     margin-bottom: 1.5rem;
     line-height: 1.5;
   }
+
+  .quick-action-link {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    color: #0ea5e9;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
 `;
 
 const CloseButton = styled.button`

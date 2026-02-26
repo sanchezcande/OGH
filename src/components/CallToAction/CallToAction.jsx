@@ -14,6 +14,9 @@ const CallToActionBlock = ({
   description,
   buttonText,
   highlightWord,
+  ctaHref,
+  ctaTarget,
+  ctaRel,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
@@ -22,8 +25,11 @@ const CallToActionBlock = ({
   // En desktop: redirigir a /contact-us donde está el embed
   // En mobile: redirigir directamente a Calendly
   const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min";
-  const ctaHref = isMobile ? calendlyUrl : "/contact-us";
-  const ctaTarget = isMobile ? "_blank" : "_self";
+  const defaultHref = isMobile ? calendlyUrl : "/contact-us";
+  const defaultTarget = isMobile ? "_blank" : "_self";
+  const finalHref = ctaHref || defaultHref;
+  const finalTarget = ctaTarget || defaultTarget;
+  const finalRel = ctaRel || (finalTarget === "_blank" ? "noopener noreferrer" : undefined);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -111,9 +117,9 @@ const CallToActionBlock = ({
         </CallToActionTitle>
         <CallToActionDescription>{description}</CallToActionDescription>
         <CallToActionButton
-          href={ctaHref}
-          target={ctaTarget}
-          rel={isMobile ? "noopener noreferrer" : undefined}
+          href={finalHref}
+          target={finalTarget}
+          rel={finalRel}
         >
           {buttonText}
         </CallToActionButton>
@@ -127,6 +133,9 @@ CallToActionBlock.propTypes = {
   description: PropTypes.string.isRequired,
   buttonText: PropTypes.string.isRequired,
   highlightWord: PropTypes.string, // Optional prop for highlighting specific words
+  ctaHref: PropTypes.string,
+  ctaTarget: PropTypes.string,
+  ctaRel: PropTypes.string,
 };
 
 export default CallToActionBlock;

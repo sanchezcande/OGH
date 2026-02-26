@@ -25,8 +25,18 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import React from "react";
 import { createPortal } from "react-dom";
-import { FaProjectDiagram, FaExternalLinkAlt, FaUsers } from "react-icons/fa";
-import { FaChevronLeft, FaChevronRight, FaQuoteLeft } from "react-icons/fa";
+import {
+  FaProjectDiagram,
+  FaExternalLinkAlt,
+  FaUsers,
+  FaChevronLeft,
+  FaChevronRight,
+  FaQuoteLeft,
+  FaClock,
+  FaBolt,
+  FaDollarSign,
+  FaTasks,
+} from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useMediaQuery from "../src/Hooks/useMediaQuery";
@@ -93,6 +103,7 @@ const FeaturedWorkCard = ({
   const [showHover, setShowHover] = useState(false);
   const [hoverPosition, setHoverPosition] = useState(null);
   const cardRef = React.useRef(null);
+  const hasValidLink = Boolean(link && link !== "#");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -182,14 +193,14 @@ const FeaturedWorkCard = ({
           alignItems: "center",
           justifyContent: "center",
           padding: isMobile ? "0.5rem" : "2rem",
-          cursor: "pointer",
+          cursor: hasValidLink ? "pointer" : "default",
           transition: "all 0.3s ease",
           zIndex: showHover ? "999999999999" : "999999",
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={() => {
-          if (!isMobile) {
+          if (!isMobile && hasValidLink) {
             window.open(link, "_blank", "noopener,noreferrer");
           }
         }}
@@ -232,7 +243,7 @@ const FeaturedWorkCard = ({
                   objectFit: "contain",
                   transition: "transform 0.3s ease-out",
                   filter: "grayscale(20%)",
-                  cursor: isMobile ? "default" : "pointer",
+                  cursor: !isMobile && hasValidLink ? "pointer" : "default",
                   transform: `scale(${imageScale})`,
                 }}
                 onMouseEnter={(e) =>
@@ -302,34 +313,36 @@ const FeaturedWorkCard = ({
                 >
                   {showHover ? "Hide" : "Details"}
                 </button>
-                <button
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#6B7280",
-                    fontWeight: "600",
-                    background: "transparent",
-                    border: "none",
-                    padding: "0.4rem 1rem",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    textDecoration: "underline",
-                    textUnderlineOffset: "3px",
-                    textDecorationThickness: "1.5px",
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(link, "_blank", "noopener,noreferrer");
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.opacity = "0.7";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.opacity = "1";
-                  }}
-                >
-                  Website
-                </button>
+                {hasValidLink && (
+                  <button
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#6B7280",
+                      fontWeight: "600",
+                      background: "transparent",
+                      border: "none",
+                      padding: "0.4rem 1rem",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "3px",
+                      textDecorationThickness: "1.5px",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(link, "_blank", "noopener,noreferrer");
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.opacity = "0.7";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.opacity = "1";
+                    }}
+                  >
+                    Website
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -443,7 +456,7 @@ export const HomeCallToAction = () => {
       title={callToAction.title}
       description={callToAction.description}
       buttonText={callToAction.buttonText}
-      highlightWord="aligned"
+      highlightWord="friction"
     />
   );
 };
@@ -1065,7 +1078,7 @@ const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
 };
 
 export default function HomePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState("all");
   const [carouselPaused, setCarouselPaused] = useState(false);
   const carouselTrackRef = React.useRef(null);
@@ -1180,6 +1193,105 @@ export default function HomePage() {
     },
   ];
 
+  const lang = i18n.language?.startsWith("es") ? "es" : "en";
+  const benchmarkCards = [
+    {
+      icon: <FaTasks />,
+      value: "58%",
+      title:
+        lang === "es"
+          ? "del tiempo en coordinación"
+          : "of time spent on coordination",
+      description:
+        lang === "es"
+          ? "Trabajo operativo y coordinación ('work about work') en equipos de conocimiento."
+          : "Operational coordination ('work about work') in knowledge teams.",
+      sourceLabel: "Asana Anatomy of Work (2023)",
+      sourceUrl:
+        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+    },
+    {
+      icon: <FaClock />,
+      value: "4.9h",
+      title:
+        lang === "es"
+          ? "ahorrables por persona/semana"
+          : "recoverable per person/week",
+      description:
+        lang === "es"
+          ? "Horas que los trabajadores estiman recuperar con mejores procesos."
+          : "Hours workers estimate they could recover with better processes.",
+      sourceLabel: "Asana Anatomy of Work (2023)",
+      sourceUrl:
+        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+    },
+    {
+      icon: <FaBolt />,
+      value: "2 min",
+      title:
+        lang === "es"
+          ? "entre interrupciones promedio"
+          : "between average interruptions",
+      description:
+        lang === "es"
+          ? "Meetings, emails y chats interrumpen el foco de trabajo."
+          : "Meetings, emails, and chats interrupt focused work.",
+      sourceLabel: "Microsoft Work Trend Index (2025)",
+      sourceUrl:
+        "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
+    },
+    {
+      icon: <FaDollarSign />,
+      value: "32%",
+      title:
+        lang === "es"
+          ? "reducción promedio de costos"
+          : "average cost reduction",
+      description:
+        lang === "es"
+          ? "Organizaciones maduras en automatización reportan reducción de costos."
+          : "Mature automation organizations report cost reduction.",
+      sourceLabel: "Deloitte Intelligent Automation Survey (2022)",
+      sourceUrl:
+        "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
+    },
+  ];
+
+  const benchmarkBars = [
+    {
+      label:
+        lang === "es"
+          ? "Tiempo en coordinación manual"
+          : "Time spent on manual coordination",
+      value: 58,
+      color: "#F97B72",
+    },
+    {
+      label:
+        lang === "es"
+          ? "Trabajo percibido como caótico"
+          : "Work perceived as chaotic",
+      value: 48,
+      color: "#FB7185",
+    },
+    {
+      label:
+        lang === "es"
+          ? "Reducción de costos (automatización madura)"
+          : "Cost reduction (mature automation)",
+      value: 32,
+      color: "#38BDF8",
+    },
+    {
+      label:
+        lang === "es"
+          ? "Roles con actividades técnicamente automatizables"
+          : "Roles with technically automatable activities",
+      value: 60,
+      color: "#818CF8",
+    },
+  ];
+
   return (
     <>
       <Head>
@@ -1188,7 +1300,7 @@ export default function HomePage() {
         <meta property="og:title" content={t("OpenGateHub")} />
         <meta
           name="keywords"
-          content="OpenGateHub, Open Gate Hub, Open GateHub, software develop, web develop, páginas web"
+          content="OpenGateHub, process automation, workflow automation, business automation, ai automation, digital operations"
         />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
@@ -1286,6 +1398,227 @@ export default function HomePage() {
           </motion.div>
         </Section>
 
+        <Section className="full-width" style={{ background: "#f8fafc" }}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.2 }}
+            style={{ textAlign: "center", marginBottom: "2rem" }}
+          >
+            <h2
+              style={{
+                fontSize: isMobile ? "1.8rem" : "2rem",
+                fontWeight: "700",
+                marginBottom: "0.75rem",
+                color: "#1F2937",
+              }}
+            >
+              {lang === "es"
+                ? "Automatizar impacta negocio, no solo tecnología"
+                : "Automation impacts business, not just tech"}
+            </h2>
+            <p
+              style={{
+                maxWidth: "840px",
+                margin: "0 auto",
+                color: "#4B5563",
+                fontSize: isMobile ? "1rem" : "1.08rem",
+                lineHeight: 1.6,
+              }}
+            >
+              {lang === "es"
+                ? "Benchmarks globales muestran cuánto tiempo, foco y costo se pierde sin workflows conectados. Estos números explican por qué la automatización libera capacidad real del equipo."
+                : "Global benchmarks show how much time, focus, and budget is lost without connected workflows. These numbers explain why automation unlocks real team capacity."}
+            </p>
+          </motion.div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: "1rem",
+              maxWidth: "1200px",
+              margin: "0 auto 2rem auto",
+              padding: "0 1rem",
+            }}
+          >
+            {benchmarkCards.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.15, delay: index * 0.05 }}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "12px",
+                  padding: "1rem",
+                  boxShadow: "0 4px 16px rgba(15, 23, 42, 0.05)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "10px",
+                      background: "rgba(249, 123, 114, 0.12)",
+                      color: "#F97B72",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {item.icon}
+                  </div>
+                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#111827" }}>
+                    {item.value}
+                  </div>
+                </div>
+                <div style={{ fontWeight: 600, color: "#1F2937", marginBottom: "0.35rem" }}>
+                  {item.title}
+                </div>
+                <p style={{ color: "#4B5563", fontSize: "0.92rem", lineHeight: 1.5, marginBottom: "0.65rem" }}>
+                  {item.description}
+                </p>
+                <a
+                  href={item.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "#0EA5E9",
+                    fontSize: "0.82rem",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  {lang === "es" ? "Fuente:" : "Source:"} {item.sourceLabel}
+                </a>
+              </motion.div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              maxWidth: "1200px",
+              margin: "0 auto",
+              padding: "0 1rem",
+            }}
+          >
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #E5E7EB",
+                borderRadius: "14px",
+                padding: isMobile ? "1rem" : "1.25rem",
+                boxShadow: "0 6px 24px rgba(15, 23, 42, 0.06)",
+              }}
+            >
+              <h3 style={{ marginBottom: "1rem", color: "#111827", fontSize: "1.1rem" }}>
+                {lang === "es"
+                  ? "Benchmarks visuales de fricción operativa"
+                  : "Visual benchmarks of operational friction"}
+              </h3>
+              {benchmarkBars.map((bar, idx) => (
+                <div key={idx} style={{ marginBottom: idx === benchmarkBars.length - 1 ? 0 : "0.95rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: "1rem",
+                      marginBottom: "0.35rem",
+                      fontSize: "0.9rem",
+                      color: "#374151",
+                    }}
+                  >
+                    <span>{bar.label}</span>
+                    <strong>{bar.value}%</strong>
+                  </div>
+                  <div
+                    style={{
+                      height: "10px",
+                      width: "100%",
+                      background: "#F1F5F9",
+                      borderRadius: "999px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${bar.value}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: idx * 0.07 }}
+                      style={{
+                        height: "100%",
+                        borderRadius: "999px",
+                        background: bar.color,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+              <div
+                style={{
+                  marginTop: "1rem",
+                  color: "#6B7280",
+                  fontSize: "0.82rem",
+                  lineHeight: 1.5,
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "0.8rem 1rem",
+                }}
+              >
+                {[
+                  {
+                    label: "Asana 2023",
+                    url: "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+                  },
+                  {
+                    label: "Microsoft 2025",
+                    url: "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
+                  },
+                  {
+                    label: "Deloitte 2022",
+                    url: "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
+                  },
+                  {
+                    label: "McKinsey 2017",
+                    url: "https://www.mckinsey.com/featured-insights/employment-and-growth/jobs-lost-jobs-gained-what-the-future-of-work-will-mean-for-jobs-skills-and-wages",
+                  },
+                ].map((source, idx) => (
+                  <a
+                    key={idx}
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "#0EA5E9",
+                      textDecoration: "none",
+                      fontWeight: 600,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                    }}
+                  >
+                    {lang === "es" ? "Fuente" : "Source"}: {source.label}
+                    <FaExternalLinkAlt style={{ fontSize: "0.65rem" }} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Section>
+
         {/* Capabilities Section - How we build */}
         <Section className="full-width">
           <motion.div
@@ -1328,37 +1661,49 @@ export default function HomePage() {
               padding: "0 1rem",
             }}
           >
-            {/* Software Development */}
+            {/* Staff Augmentation */}
             <ServiceBox
-              icon="💻"
+              icon="🤝"
               title={t("homeCapabilitiesSection.cards.softwareDevelopment.title")}
               description={t(
                 "homeCapabilitiesSection.cards.softwareDevelopment.description",
               )}
               delay={0.1}
               subcategories={[
-                { text: t("frontendTitle"), href: "/services/front-end" },
-                { text: t("backendTitle"), href: "/services/back-end" },
+                {
+                  text: lang === "es" ? "Staff Augmentation" : "Staff Augmentation",
+                  href: "/services/staff-augmentation",
+                },
+                {
+                  text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation",
+                  href: "/services/workflow-automation",
+                },
               ]}
             />
             
-            {/* Mobile Development */}
+            {/* Workflow Automation */}
             <ServiceBox
-              icon="📱"
+              icon="⚙️"
               title={t("homeCapabilitiesSection.cards.mobileDevelopment.title")}
               description={t(
                 "homeCapabilitiesSection.cards.mobileDevelopment.description",
               )}
               delay={0.2}
               subcategories={[
-                { text: t("frontendTitle"), href: "/services/front-end" },
-                { text: t("backendTitle"), href: "/services/back-end" },
+                {
+                  text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation",
+                  href: "/services/workflow-automation",
+                },
+                {
+                  text: lang === "es" ? "Automatización n8n" : "n8n Automation",
+                  href: "/services/n8n-automation",
+                },
               ]}
             />
             
-            {/* Data & Automation */}
+            {/* AI + Automation Ops */}
             <ServiceBox
-              icon="📊"
+              icon="📈"
               title={t("homeCapabilitiesSection.cards.dataAutomation.title")}
               description={t(
                 "homeCapabilitiesSection.cards.dataAutomation.description",
@@ -1366,7 +1711,10 @@ export default function HomePage() {
               delay={0.3}
               subcategories={[
                 { text: t("aiTitle"), href: "/services/AI" },
-                { text: "n8n Automation", href: "/services/n8n-automation" },
+                {
+                  text: lang === "es" ? "Automatización n8n" : "n8n Automation",
+                  href: "/services/n8n-automation",
+                },
               ]}
             />
           </div>
@@ -1466,8 +1814,14 @@ export default function HomePage() {
                 {
                   image: "/valthor-logo.e3b5a398.png",
                   title: "Valthor CRM",
-                  description: "Plataforma CRM moderna y optimizada con IA",
-                  metrics: ["Omnicanal", "99.9% uptime", "SEO optimizado"],
+                  description:
+                    lang === "es"
+                      ? "Plataforma CRM moderna optimizada con IA"
+                      : "Modern CRM platform optimized with AI",
+                  metrics:
+                    lang === "es"
+                      ? ["Omnichannel", "99.9% uptime", "SEO optimized"]
+                      : ["Omnichannel", "99.9% uptime", "SEO optimized"],
                   link: "https://www.valthorcrm.com/",
                   hoverContent: (
                     <>
@@ -1520,8 +1874,11 @@ export default function HomePage() {
                 {
                   image: "/vivabots_azul.png",
                   title: "Vivabots RPA",
-                  description: "Plataforma RPA moderna y optimizada",
-                  metrics: ["99.9% uptime", "99.9% efficienty"],
+                  description:
+                    lang === "es"
+                      ? "Plataforma RPA moderna y optimizada"
+                      : "Modern and optimized RPA platform",
+                  metrics: ["99.9% uptime", "99.9% efficiency"],
                   link: "https://vivabots.com/",
                   hoverContent: (
                     <>
@@ -1597,8 +1954,14 @@ export default function HomePage() {
                 {
                   image: "/GBS.png",
                   title: "GBS Abogados",
-                  description: "Plataforma web moderna y optimizada",
-                  metrics: ["+40% velocidad", "99.9% uptime", "SEO optimizado"],
+                  description:
+                    lang === "es"
+                      ? "Plataforma web moderna y optimizada"
+                      : "Modern and optimized web platform",
+                  metrics:
+                    lang === "es"
+                      ? ["+40% speed", "99.9% uptime", "SEO optimized"]
+                      : ["+40% speed", "99.9% uptime", "SEO optimized"],
                   link: "#",
                   hoverContent: (
                     <>
@@ -1613,8 +1976,14 @@ export default function HomePage() {
                 {
                   image: "/kdabogados.png",
                   title: "KD Abogados",
-                  description: "Sitio web profesional y responsive",
-                  metrics: ["Rápido y seguro", "99.9% uptime", "SEO optimizado"],
+                  description:
+                    lang === "es"
+                      ? "Sitio web profesional y responsive"
+                      : "Professional and responsive website",
+                  metrics:
+                    lang === "es"
+                      ? ["Fast and secure", "99.9% uptime", "SEO optimized"]
+                      : ["Fast and secure", "99.9% uptime", "SEO optimized"],
                   link: "https://kdabogados.com.ar/",
                   hoverContent: (
                     <>

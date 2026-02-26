@@ -1,10 +1,10 @@
 {
-  "OpenGateHub": "OpenGateHub - IT Consulting and Software Development Services",
-  "pageDescription": "OpenGateHub offers IT consulting and custom software development solutions. We help businesses build scalable web and mobile applications to drive innovation and digital transformation.",
+  "OpenGateHub": "OpenGateHub - Process & Workflow Automation for Companies",
+  "pageDescription": "OpenGateHub helps companies automate business processes and workflows through AI, integrations, and scalable digital solutions.",
   "home": "Home",
   "services": "Services",
   "aboutUs": "About Us",
-  "ctaButton": "Book a Free Consulting Call",
+  "ctaButton": "Book a Workflow Automation Audit",
   "contactUs": "Contact",
   "english": "English",
   "spanish": "Spanish",
@@ -48,32 +48,32 @@
   "innovativeSolution": "our team works to make your vision a reality while supporting your",
   "seoTitle": "Build with People Who Get It | OpenGateHub",
   "articleNotFound": "We couldn't find this article. Please visit our blog's homepage to browse our latest posts.",
-  "seoDescription": "We help visionary founders and VCs scale startups with culturally aligned developers that care about impact.",
+  "seoDescription": "We help companies scale operations through workflow automation and staff augmentation with measurable business impact.",
   "heroAnimatedText": {
-    "part1": "Human-",
-    "highlight1": "first",
-    "part2": " tech ",
-    "highlight2": "partnerships"
+    "part1": "Automate your company's ",
+    "highlight1": "workflows",
+    "part2": " and ",
+    "highlight2": "operations"
   },
-  "heroSubtitle": "We find developers who fit your team, not just your requirements.",
+  "heroSubtitle": "Reduce manual work, lower operating costs, and free your team for higher-impact work.",
   "heroAlt": "Tech team illustration - OpenGateHub",
-  "problemTitle": "Hiring developers is <highlight>hard</highlight>.",
-  "problemText": "You need to scale your team, but finding developers who fit your culture and deliver quality work takes time. Traditional hiring is slow, and most agencies prioritize skills over cultural fit.",
-  "weGetYouTitle": "We <highlight>prioritize fit</highlight>.",
-  "weGetYouText": "That's why we focus on Staff Augmentation: we match you with developers who align with your values and way of working. Cultural fit and human quality come first—without overlooking solid technical skills.",
+  "problemTitle": "Manual operations are <highlight>expensive</highlight>.",
+  "problemText": "When teams depend on spreadsheets, repetitive tasks, and disconnected tools, execution slows down, errors increase, and leadership loses visibility over critical workflows.",
+  "weGetYouTitle": "We <highlight>automate what matters</highlight>.",
+  "weGetYouText": "We design and implement workflow automations that connect your systems, remove bottlenecks, and create predictable operations. Human-first execution remains our edge: clear communication, ownership, and reliable delivery.",
   "servicesTitle": "Our Services",
   "servicesText": "We work with people who care about the how, not just the what. Custom solutions for founders who want to scale with flow, trust, and culture.",
-  "planTitle": "Here's how we do it:",
+  "planTitle": "How we engage:",
   "planSteps": {
-    "step1": "Discovery Call: We listen. Tell us where you are, what you need, and what matters most to you.",
-    "step2": "Custom Plan: We put together a clear plan and match you with developers aligned with your goals and culture.",
-    "step3": "Build & Grow: We integrate smoothly, communicate openly, and scale with intention and care."
+    "step1": "Operational Discovery: We map your current process, bottlenecks, and priorities.",
+    "step2": "Execution Plan: We define the right model (Workflow Automation, Staff Augmentation, or both).",
+    "step3": "Launch & Optimize: We implement, measure impact, and improve continuously."
   },
   "forBusiness": "business growth.",
   "homeCallToAction": {
-    "title": "Ready to build something that feels aligned?",
-    "description": "Let's talk about your vision and what kind of support would actually feel good.",
-    "buttonText": "Book a Free Consulting Call"
+    "title": "Ready to cut operational friction?",
+    "description": "Book a short call to identify your highest-impact automation and staffing opportunities.",
+    "buttonText": "Book a Workflow Automation Audit"
   },
   "faqsCallToAction": {
     "title": "Still Have Questions?",
@@ -139,47 +139,47 @@
     "ctaHighlightWord": "scale"
   },
   "softwareFactory": {
-    "metaDescription": "End-to-end software development from concept to production. We deliver complete solutions that scale with your business.",
-    "heroSubtitle": "End-to-end software development from concept to production",
-    "whatIsTitle": "What is Software Factory?",
-    "whatIsDescription": "Software Factory is our end-to-end development model where we take full ownership of your project from concept to production. We manage the entire development lifecycle, from planning and design to deployment and maintenance, delivering a complete, production-ready solution.",
-    "whenToUseTitle": "When to use Software Factory?",
+    "metaDescription": "Automate your company's core workflows and operations with end-to-end process automation built for scale.",
+    "heroSubtitle": "Automate repetitive operations and connect your tools with reliable workflows",
+    "whatIsTitle": "What is Workflow Automation?",
+    "whatIsDescription": "Our workflow automation model helps your company remove manual work, connect systems, and standardize operations. We design, build, and deploy automations that reduce errors, accelerate execution, and free your team for higher-value work.",
+    "whenToUseTitle": "When to use Workflow Automation?",
     "whenToUse": {
-      "newProductTitle": "New Product Development",
-      "newProductDescription": "When you're building a product from scratch and need a dedicated team to bring it to market",
-      "completeSolutionTitle": "Complete Solutions",
-      "completeSolutionDescription": "When you need end-to-end development including design, development, testing, and deployment",
-      "tightDeadlineTitle": "Tight Deadlines",
-      "tightDeadlineDescription": "When you have a clear deadline and need a focused team to deliver on time"
+      "newProductTitle": "Manual Process Bottlenecks",
+      "newProductDescription": "When teams waste time on repetitive tasks, follow-ups, and disconnected handoffs",
+      "completeSolutionTitle": "Disconnected Tools & Data",
+      "completeSolutionDescription": "When your CRM, ERP, finance, support, or marketing tools don't sync reliably",
+      "tightDeadlineTitle": "Need Faster Operations",
+      "tightDeadlineDescription": "When you need to improve speed, consistency, and reporting without increasing headcount"
     },
     "processTitle": "Our Process",
     "process": {
-      "step1Title": "Discovery & Planning",
-      "step1Description": "We understand your vision, define requirements, and create a detailed roadmap",
-      "step2Title": "Design & Architecture",
-      "step2Description": "We design the user experience, create prototypes, and architect scalable solutions",
-      "step3Title": "Development & Testing",
-      "step3Description": "We build your product with clean code, rigorous testing, and continuous integration",
-      "step4Title": "Deployment & Launch",
-      "step4Description": "We deploy to production, monitor performance, and ensure smooth launch",
-      "step5Title": "Support & Maintenance",
-      "step5Description": "We provide ongoing support, updates, and improvements to keep your product running smoothly"
+      "step1Title": "Workflow Audit",
+      "step1Description": "We map your current processes, identify bottlenecks, and prioritize high-ROI automations",
+      "step2Title": "Automation Blueprint",
+      "step2Description": "We design the workflow logic, integration architecture, data rules, and exception handling",
+      "step3Title": "Build & Integrate",
+      "step3Description": "We implement automations, connect your tools, and validate each scenario end to end",
+      "step4Title": "Deploy & Enable",
+      "step4Description": "We launch safely, train your team, and define operating playbooks and ownership",
+      "step5Title": "Optimize & Scale",
+      "step5Description": "We monitor results, improve workflows, and expand automation to new business areas"
     },
     "outcomesTitle": "What You Get",
     "outcomes": {
-      "fullyFunctionalTitle": "Fully Functional Product",
-      "fullyFunctionalDescription": "A complete, working solution ready for your users",
-      "productionReadyTitle": "Production Ready",
-      "productionReadyDescription": "Deployed, tested, and optimized for real-world use",
-      "scalableArchitectureTitle": "Scalable Architecture",
-      "scalableArchitectureDescription": "Built to grow with your business needs",
-      "completeDocumentationTitle": "Complete Documentation",
-      "completeDocumentationDescription": "Technical documentation and user guides included"
+      "fullyFunctionalTitle": "Automated Workflows",
+      "fullyFunctionalDescription": "Business-critical processes running automatically with clear logic and controls",
+      "productionReadyTitle": "Reliable Operations",
+      "productionReadyDescription": "Fewer manual errors, faster cycle times, and consistent execution across teams",
+      "scalableArchitectureTitle": "Connected Systems",
+      "scalableArchitectureDescription": "Integrated tools and data flows that scale as your company grows",
+      "completeDocumentationTitle": "Operational Visibility",
+      "completeDocumentationDescription": "Dashboards, alerts, and documentation so your team can manage confidently"
     },
-    "ctaTitle": "Ready to build your product?",
-    "ctaDescription": "Get a detailed project estimate tailored to your needs.",
-    "ctaButtonText": "Get a Project Estimate",
-    "ctaHighlightWord": "build"
+    "ctaTitle": "Ready to automate your operations?",
+    "ctaDescription": "Get a custom automation plan for your workflows, systems, and business goals.",
+    "ctaButtonText": "Get an Automation Estimate",
+    "ctaHighlightWord": "automate"
   },
   "n8nAutomation": {
     "heroTitle": "n8n Automation",
@@ -227,7 +227,7 @@
     "buttonText": "Book Free Call Now"
   },
   "contactUsMetaTitle": "Contact Us - OpenGateHub",
-  "contactUsMetaDescription": "Get in touch with OpenGateHub. We are here to help you with your digital transformation needs.",
+  "contactUsMetaDescription": "Choose the fastest path to better operations: automation audit or execution estimate.",
   "contactPage": {
     "getIn": "Get in",
     "touch": "Touch",
@@ -238,33 +238,40 @@
     "email": "info@opengatehub.com",
     "comeAnd": "Come and",
     "joinUs": "Join Us",
-    "heroTitle": "Let's talk about your project",
-    "heroSubtitle": "Choose the fastest way to move forward — book a call or request an estimate.",
-    "bookCallTitle": "Book a strategy call",
-    "bookCallDescription": "For teams ready to scale with senior engineers.",
-    "bookCallButton": "Book a 15-min strategy call",
-    "getEstimateTitle": "Request a project estimate",
-    "getEstimateDescription": "Tell us a bit about your needs and we'll suggest the best engagement model.",
+    "heroTitle": "Let's optimize your operations",
+    "heroSubtitle": "Choose the fastest path forward: book an automation audit or request an execution estimate.",
+    "bookCallTitle": "Book an automation audit",
+    "bookCallDescription": "For teams that want to reduce manual work and improve operational speed.",
+    "bookCallButton": "Book a 15-min automation audit",
+    "getEstimateTitle": "Request an execution estimate",
+    "getEstimateDescription": "Share your needs and we'll recommend the best model: Workflow Automation, Staff Augmentation, or both.",
     "whatHappensNext": "What happens next",
     "step1Title": "We review your request within 24 hours",
     "step2Title": "We recommend the best engagement model",
     "step3Title": "You get a clear next step — call or proposal.",
-    "bookCallDisclaimer": "No commitment. We'll assess fit and next steps.",
+    "bookCallDisclaimer": "No commitment. You'll leave with a clear next step and priority actions.",
     "footerCTAText": "Prefer to talk first?",
     "footerCTALink": "Book a call"
   },
   "contactForm": {
     "company": "Company",
-    "engagementType": "Engagement type",
+    "engagementType": "Primary engagement need",
+    "optionWorkflow": "Workflow Automation",
+    "optionStaff": "Staff Augmentation",
+    "optionBoth": "Both: Workflow Automation + Staff Augmentation",
     "budget": "Estimated budget",
     "timeline": "Timeline / urgency",
+    "bottleneck": "Biggest operational bottleneck (optional)",
+    "notSureYet": "Not sure yet",
     "pleaseEnterCompany": "Please enter your company name",
     "pleaseSelectEngagement": "Please select an engagement type",
     "pleaseSelectBudget": "Please select a budget range",
     "pleaseSelectTimeline": "Please select a timeline",
-    "requestEstimate": "Request estimate",
+    "requestEstimate": "Get my execution plan",
     "submitting": "Submitting...",
-    "estimateRequestSent": "Estimate request sent successfully. We'll review it within 24 hours and get back to you."
+    "estimateRequestSent": "Request received successfully. We'll review it within 24 hours and send you next steps.",
+    "successNextStep": "Next step: you'll receive a recommendation for Workflow Automation, Staff Augmentation, or both.",
+    "successQuickAction": "Urgent? Book a 15-min automation audit"
   },
   "companyHistoryTitle": "Our Journey",
   "companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
@@ -283,7 +290,7 @@
 
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
-  "howWeBuildIntro": "This capability is delivered through our Staff Augmentation and Software Factory engagement models.",
+  "howWeBuildIntro": "This capability is delivered through our Staff Augmentation and Workflow Automation engagement models.",
   "backendTitle": "Backend & Cloud",
   "backendDescription": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
   "uxuiTitle": "UX/UI Design",
@@ -401,7 +408,7 @@
   "faqsTitle": "Frequently Asked Questions",
   "faqs": {
     "softwareFactory": {
-      "title": "Software Factory FAQs",
+      "title": "Workflow Automation FAQs",
       "questions": [
         {
           "question": "What services does OpenGateHub offer?",
@@ -537,6 +544,14 @@
   "readMore": "Read more",
   "articles": [
     {
+      "title": "January 2026 automation news: agentic operations go enterprise-grade",
+      "slug": "january-2026-agentic-automation-enterprise-news",
+      "summary": "On January 20, 2026, Automation Anywhere announced AI-native agentic solutions with OpenAI. Here is what this changes for enterprise operations, risk, and rollout strategy.",
+      "image": "/images/article7.png",
+      "thumbnail": "/images/article7.png",
+      "content": "On January 20, 2026, Automation Anywhere announced a new generation of AI-native agentic solutions developed in collaboration with OpenAI. This matters because it reflects a broader shift in enterprise automation: companies are moving from isolated task automation to governed, end-to-end operational execution.\n\nFor years, most organizations adopted automation in disconnected layers: RPA bots for repetitive steps, scripts for integrations, and AI assistants for narrow interactions. The new wave of agentic solutions is trying to connect those layers into one controlled system where reasoning and execution happen together, but with enterprise governance built in.\n\nThe technical idea behind the announcement is straightforward. OpenAI reasoning models handle interpretation and decision context, while Automation Anywhere's Process Reasoning Engine coordinates what action should happen next and executes securely across systems. In business terms, that means fewer handoffs between tools, faster cycle times, and better operational consistency.\n\n## Why this is a meaningful update for operators\n\nThe key value is not \"more AI\" by itself. The value is reliable execution under real constraints: policy, security, approvals, and auditability.\n\nA practical finance example looks like this:\n- An invoice exception is detected.\n- The agentic layer evaluates context (vendor history, amount, payment policy, prior approvals).\n- The platform executes a governed flow (route for approval, update ERP status, notify the owner, and store trace evidence).\n\nCompared with ad-hoc automation, this model is easier to monitor and safer to scale. Teams gain speed without losing control.\n\n## The strategic takeaway: autonomy must be governed\n\nA common market mistake is to frame agentic automation as \"fully autonomous AI\" on day one. In enterprise operations, that usually creates unnecessary risk.\n\nWhat works better is progressive autonomy:\n- Assisted mode: the system recommends, humans approve.\n- Supervised mode: the system executes defined flows with monitoring.\n- Semi-autonomous mode: the system acts in bounded scenarios with strict escalation rules.\n\nThis model helps organizations protect customer trust, compliance posture, and financial accuracy while still capturing productivity gains.\n\n## What leaders should do next\n\nStart with process economics, not tools. The right first question is: where do we have the highest coordination cost and repetitive operational friction?\n\nChoose one workflow with:\n- High volume and clear rules.\n- Frequent manual handoffs.\n- Measurable impact on cost, speed, or service quality.\n\nThen move in this order: map current-state process, define control points and success metrics, run a contained pilot, and scale only after evidence.\n\nThis approach avoids the most expensive failure pattern in automation programs: launching broad pilots that look impressive in demos but never become production operating capability.\n\nThe January 20, 2026 announcement is a signal of where the market is going. Automation is no longer a side initiative owned only by technical teams. It is becoming a core operating capability tied directly to execution quality, margin efficiency, and organizational speed.\n\nIn 2026 and beyond, winning companies will not be the ones with the most \"AI features.\" They will be the ones that translate AI plus automation into dependable daily operations.\n\n## Source\n\nOfficial release dated January 20, 2026: \"Automation Anywhere Advances AI-Native Agentic Solutions for the Enterprise with OpenAI\" (PR Newswire and Automation Anywhere press room)."
+    },
+    {
       "title": "Why Most Dev Agencies Get It Wrong (And What We Do Instead)",
       "slug": "why-most-dev-agencies-get-it-wrong",
       "summary": "It's not a skills problem. It's a fit problem. Why cultural alignment beats technical checkboxes—and what we do differently at OpenGateHub.",
@@ -654,21 +669,21 @@
     }
   },
   "homeCapabilitiesSection": {
-    "title": "How we build",
-    "subtitle": "These capabilities are delivered through our Staff Augmentation and Software Factory engagement models.",
-    "ctaText": "Explore how we build",
+    "title": "How we scale your operations",
+    "subtitle": "We combine Staff Augmentation and Workflow Automation to increase execution speed, consistency, and operational visibility.",
+    "ctaText": "Explore how we scale",
     "cards": {
       "softwareDevelopment": {
-        "title": "Software Development",
-        "description": "Build scalable web applications, robust backend systems, and cloud architectures that power your business growth."
+        "title": "Staff Augmentation",
+        "description": "Embed senior engineers and QA into your team to increase delivery capacity without increasing management overhead."
       },
       "mobileDevelopment": {
-        "title": "Mobile Development",
-        "description": "Create native iOS and Android apps, cross-platform solutions, and mobile-first products that engage users wherever they are."
+        "title": "Workflow Automation",
+        "description": "Automate repetitive workflows, approvals, and cross-team handoffs to reduce cycle time and manual errors."
       },
       "dataAutomation": {
-        "title": "Data & Automation",
-        "description": "Transform data into insights with analytics dashboards, AI-powered workflows, and seamless integrations that automate operations."
+        "title": "AI & Automation Ops",
+        "description": "Connect systems, orchestrate AI-powered processes, and gain real-time operational visibility with dashboards and alerts."
       }
     }
   },
