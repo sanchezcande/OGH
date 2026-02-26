@@ -20,15 +20,15 @@ import Link from "next/link";
 
 const LogoImg = () => (
   <LogoImgContainer>
-    <Image src={Logo} alt="software development company" width={130} />
+    <Image src={Logo} alt="business process automation company" width={130} />
   </LogoImgContainer>
 );
 
 const Footer = () => {
   const { t } = useTranslation();
   const servicesList = [
+    { text: "Workflow Automation", href: "/services/workflow-automation" },
     { text: "Staff Augmentation", href: "/services/staff-augmentation" },
-    { text: "Software Factory", href: "/services/software-factory" },
     { text: "n8n Automation", href: "/services/n8n-automation" },
     { text: t("aiTitle"), href: "/services/AI" },
     { text: t("frontendTitle"), href: "/services/front-end" },

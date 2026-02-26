@@ -11,6 +11,10 @@ import {
   FaTasks,
   FaCog,
   FaTruck,
+  FaClock,
+  FaBolt,
+  FaDollarSign,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import React from "react";
 
@@ -210,6 +214,65 @@ const Subtitle = ({ children, style }) => (
 const SoftwareFactory = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const isSpanish = lang?.startsWith("es");
+  const impactBenchmarks = [
+    {
+      value: "58%",
+      title: isSpanish
+        ? "del tiempo en coordinación"
+        : "of time spent on coordination",
+      description: isSpanish
+        ? "Asana reporta carga operativa alta en equipos de conocimiento."
+        : "Asana reports high operational overhead in knowledge teams.",
+      sourceLabel: "Asana Anatomy of Work (2023)",
+      sourceUrl:
+        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+      icon: <FaTasks />,
+      color: "#F97B72",
+    },
+    {
+      value: "4.9h",
+      title: isSpanish
+        ? "recuperables por semana"
+        : "recoverable per week",
+      description: isSpanish
+        ? "Horas que equipos estiman liberar con mejores procesos."
+        : "Hours teams estimate they can free up with better processes.",
+      sourceLabel: "Asana Anatomy of Work (2023)",
+      sourceUrl:
+        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+      icon: <FaClock />,
+      color: "#FB7185",
+    },
+    {
+      value: "2 min",
+      title: isSpanish
+        ? "entre interrupciones"
+        : "between interruptions",
+      description: isSpanish
+        ? "Microsoft señala interrupciones constantes que afectan foco."
+        : "Microsoft highlights constant interruptions that affect focus.",
+      sourceLabel: "Microsoft Work Trend Index (2025)",
+      sourceUrl:
+        "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
+      icon: <FaBolt />,
+      color: "#38BDF8",
+    },
+    {
+      value: "32%",
+      title: isSpanish
+        ? "reducción promedio de costos"
+        : "average cost reduction",
+      description: isSpanish
+        ? "Deloitte muestra impacto económico en automatización madura."
+        : "Deloitte shows economic impact in mature automation programs.",
+      sourceLabel: "Deloitte Intelligent Automation Survey (2022)",
+      sourceUrl:
+        "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
+      icon: <FaDollarSign />,
+      color: "#818CF8",
+    },
+  ];
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -234,14 +297,14 @@ const SoftwareFactory = () => {
   return (
     <>
       <Head>
-        <title>Software Factory - OpenGateHub</title>
+        <title>Workflow Automation - OpenGateHub</title>
         <meta
           name="description"
           content={t("softwareFactory.metaDescription")}
         />
         <meta
           name="keywords"
-          content="Software Factory, Custom Software Development, End-to-End Development, Project Delivery, Software Solutions"
+          content="Workflow Automation, Business Process Automation, AI Automation, n8n Workflows, Process Optimization"
         />
         <meta name="author" content="OpenGateHub" />
       </Head>
@@ -253,7 +316,7 @@ const SoftwareFactory = () => {
         }
         .animate { opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s; }
         .visible { opacity: 1 !important; transform: translateY(0) !important; }
-        @keyframes factoryPulse {
+        @keyframes automationPulse {
           0%, 100% { 
             transform: scale(1);
             opacity: 1;
@@ -306,7 +369,7 @@ const SoftwareFactory = () => {
               animationDelay: "0.05s",
               color: "#F97B72",
               textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
-              animation: "factoryPulse 3s ease-in-out infinite",
+              animation: "automationPulse 3s ease-in-out infinite",
             }}
           >
             <FaProjectDiagram />
@@ -320,7 +383,7 @@ const SoftwareFactory = () => {
               animationDelay: "0.1s",
             }}
           >
-            Software Factory
+            Workflow Automation
           </h1>
           <p
             className="animate"
@@ -378,6 +441,146 @@ const SoftwareFactory = () => {
             </Subtitle>
           </div>
         </div>
+
+        <ProfessionalCard
+          className="animate"
+          style={{ animationDelay: "0.22s", marginTop: "-0.25rem" }}
+        >
+          <SectionTitle style={{ marginBottom: "0.8rem" }}>
+            {isSpanish
+              ? "Impacto medible de automatizar workflows"
+              : "Measurable impact of workflow automation"}
+          </SectionTitle>
+          <Subtitle style={{ marginBottom: "1.5rem" }}>
+            {isSpanish
+              ? "Cuando reducís fricción operativa, ganás velocidad, foco y margen. Estos benchmarks respaldan por qué automatizar procesos es una decisión de negocio."
+              : "When you reduce operational friction, you gain speed, focus, and margin. These benchmarks show why process automation is a business decision."}
+          </Subtitle>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+              gap: "1rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            {impactBenchmarks.map((item, index) => (
+              <div
+                key={index}
+                className="animate"
+                style={{
+                  background: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "12px",
+                  padding: "1rem",
+                  animationDelay: `${0.24 + index * 0.05}s`,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.65rem",
+                    marginBottom: "0.55rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: `${item.color}22`,
+                      color: item.color,
+                    }}
+                  >
+                    {item.icon}
+                  </div>
+                  <strong style={{ fontSize: "1.35rem", color: "#0F172A" }}>
+                    {item.value}
+                  </strong>
+                </div>
+                <div style={{ fontWeight: 600, color: "#1E293B", marginBottom: "0.35rem" }}>
+                  {item.title}
+                </div>
+                <p style={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.45, marginBottom: "0.55rem" }}>
+                  {item.description}
+                </p>
+                <a
+                  href={item.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "#0EA5E9",
+                    textDecoration: "none",
+                    fontSize: "0.82rem",
+                    fontWeight: 600,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                  }}
+                >
+                  {isSpanish ? "Fuente" : "Source"} <FaExternalLinkAlt style={{ fontSize: "0.7rem" }} />
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: "12px",
+              padding: "1rem",
+            }}
+          >
+            <h4 style={{ marginBottom: "0.9rem", color: "#0F172A", fontSize: "1rem" }}>
+              {isSpanish
+                ? "Dónde se genera la mejora operativa"
+                : "Where operational improvement happens"}
+            </h4>
+            {impactBenchmarks.map((item, idx) => {
+              const numericValue = parseInt(item.value, 10);
+              const width = Number.isNaN(numericValue) ? 49 : numericValue;
+              return (
+                <div key={idx} style={{ marginBottom: idx === impactBenchmarks.length - 1 ? 0 : "0.85rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: "0.88rem",
+                      color: "#334155",
+                      marginBottom: "0.32rem",
+                    }}
+                  >
+                    <span>{item.title}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                  <div
+                    style={{
+                      height: "10px",
+                      background: "#E2E8F0",
+                      borderRadius: "999px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${width}%`,
+                        height: "100%",
+                        borderRadius: "999px",
+                        background: item.color,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </ProfessionalCard>
 
         {/* When to Use Section */}
         <ProfessionalCard

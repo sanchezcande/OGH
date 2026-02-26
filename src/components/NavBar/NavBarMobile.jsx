@@ -95,11 +95,11 @@ const NavBarMobile = () => {
       </LogoIcon>
       {menuOpen && (
         <Menu open={menuOpen}>
+          <MenuItem onClick={() => handleNavigation("/services/workflow-automation")}>
+            Workflow Automation
+          </MenuItem>
           <MenuItem onClick={() => handleNavigation("/services/staff-augmentation")}>
             Staff Augmentation
-          </MenuItem>
-          <MenuItem onClick={() => handleNavigation("/services/software-factory")}>
-            Software Factory
           </MenuItem>
           <MenuItem onClick={() => handleNavigation("/blog")}>
             {t("Blog")}

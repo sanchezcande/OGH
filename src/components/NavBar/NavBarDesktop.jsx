@@ -63,8 +63,8 @@ const NavBarDesktop = () => {
   };
 
   const pillTabs = [
+    { text: "Workflow Automation", href: "/services/workflow-automation" },
     { text: "Staff Augmentation", href: "/services/staff-augmentation" },
-    { text: "Software Factory", href: "/services/software-factory" },
     { text: t("Blog"), href: "/blog" },
     { text: t("aboutUs"), href: "/about-us" },
     { text: t("contactUs"), href: "/contact-us" },

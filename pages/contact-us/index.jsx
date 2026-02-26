@@ -68,7 +68,7 @@ const ContactUs = () => {
               color: "#1e293b",
             }}
           >
-            {t("contactPage.heroTitle") || "Let's talk about your project"}
+            {t("contactPage.heroTitle") || "Let's optimize your operations"}
           </h1>
           <p
             style={{
@@ -79,7 +79,7 @@ const ContactUs = () => {
             }}
           >
             {t("contactPage.heroSubtitle") || 
-              "Choose the fastest way to move forward — book a call or request an estimate."}
+              "Choose the fastest path forward: book an automation audit or request an execution estimate."}
           </p>
         </motion.div>
 
@@ -113,7 +113,7 @@ const ContactUs = () => {
                 color: "#1e293b",
               }}
             >
-              {t("contactPage.bookCallTitle") || "Book a strategy call"}
+              {t("contactPage.bookCallTitle") || "Book an automation audit"}
             </h2>
             <p
               style={{
@@ -123,7 +123,7 @@ const ContactUs = () => {
               }}
             >
               {t("contactPage.bookCallDescription") || 
-                "For teams ready to scale with senior engineers."}
+                "For teams that want to reduce manual work and improve operational speed."}
             </p>
 
             {isMobile ? (
@@ -178,7 +178,7 @@ const ContactUs = () => {
                   }
                 }}
               >
-                {t("contactPage.bookCallButton") || "Book a 15-min strategy call"}
+                {t("contactPage.bookCallButton") || "Book a 15-min automation audit"}
               </a>
             ) : (
               // Desktop: Embed de Calendly
@@ -203,7 +203,7 @@ const ContactUs = () => {
                 lineHeight: "1.4",
               }}
             >
-              {t("contactPage.bookCallDisclaimer") || "No commitment. We'll assess fit and next steps."}
+              {t("contactPage.bookCallDisclaimer") || "No commitment. You'll leave with a clear next step and priority actions."}
             </p>
           </motion.div>
 
@@ -228,7 +228,7 @@ const ContactUs = () => {
                 color: "#1e293b",
               }}
             >
-              {t("contactPage.getEstimateTitle") || "Request a project estimate"}
+              {t("contactPage.getEstimateTitle") || "Request an execution estimate"}
             </h2>
             <p
               style={{
@@ -238,7 +238,7 @@ const ContactUs = () => {
               }}
             >
               {t("contactPage.getEstimateDescription") || 
-                "Tell us a bit about your needs and we'll suggest the best engagement model."}
+                "Share your needs and we'll recommend the best model: Workflow Automation, Staff Augmentation, or both."}
             </p>
 
             <EstimateForm />

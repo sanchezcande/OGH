@@ -108,11 +108,11 @@ export default function MyApp({ Component, pageProps }) {
         <title>OpenGateHub</title>
         <meta
           name="description"
-          content="OpenGateHub specializes in innovative software development for businesses worldwide. Transform your ideas into powerful digital solutions."
+          content="OpenGateHub helps companies automate processes and workflows with AI, integrations, and tailored digital operations solutions."
         />
         <meta
           name="keywords"
-          content="software development, web design, mobile apps, nextjs, react, argentina, colombia, outsourcing, software agency, tech partner, custom development, IA, ai, LLM"
+          content="process automation, workflow automation, business automation, ai automation, n8n, system integrations, digital operations, staff augmentation"
         />
         <link rel="icon" href="/browser-link-logo.png" type="image/png" />
 
@@ -125,7 +125,7 @@ export default function MyApp({ Component, pageProps }) {
         />
         <meta
           property="og:description"
-          content="OpenGateHub specializes in innovative software development for businesses worldwide."
+          content="We automate business workflows and processes with AI, integrations, and scalable digital operations."
         />
         <meta
           property="og:image"

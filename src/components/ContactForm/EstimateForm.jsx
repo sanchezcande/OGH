@@ -20,12 +20,15 @@ const EstimateForm = () => {
     engagement_type: "",
     budget: "",
     timeline: "",
+    bottleneck: "",
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formStatus, setFormStatus] = useState("");
+  const [modalKind, setModalKind] = useState("info");
   const [captchaToken, setCaptchaToken] = useState(null);
+  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min";
 
   const validateForm = () => {
     const newErrors = {};
@@ -40,12 +43,6 @@ const EstimateForm = () => {
     }
     if (!formData.engagement_type) {
       newErrors.engagement_type = t("contactForm.pleaseSelectEngagement") || "Please select an engagement type";
-    }
-    if (!formData.budget) {
-      newErrors.budget = t("contactForm.pleaseSelectBudget") || "Please select a budget range";
-    }
-    if (!formData.timeline) {
-      newErrors.timeline = t("contactForm.pleaseSelectTimeline") || "Please select a timeline";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -79,6 +76,7 @@ const EstimateForm = () => {
     
     if (!isDevelopment && !captchaToken) {
       setFormStatus(t("pleaseCompleteCaptcha") || "Please complete the captcha");
+      setModalKind("error");
       setIsModalOpen(true);
       return;
     }
@@ -103,6 +101,7 @@ const EstimateForm = () => {
           engagement_type: formData.engagement_type,
           budget: formData.budget,
           timeline: formData.timeline,
+          bottleneck: formData.bottleneck,
         }),
       });
 
@@ -119,7 +118,12 @@ const EstimateForm = () => {
         throw new Error(data.error || data.details || "Failed to send estimate request");
       }
 
-      setFormStatus(t("contactForm.estimateRequestSent") || "Estimate request sent successfully");
+      setFormStatus(
+        `${t("contactForm.estimateRequestSent") || "Estimate request sent successfully"} ${
+          t("contactForm.successNextStep") || "Next step: we will contact you with a clear plan and recommendation."
+        }`,
+      );
+      setModalKind("success");
       setIsModalOpen(true);
       setFormData({
         name: "",
@@ -128,11 +132,13 @@ const EstimateForm = () => {
         engagement_type: "",
         budget: "",
         timeline: "",
+        bottleneck: "",
       });
       setCaptchaToken(null);
     } catch (error) {
       console.error("Error sending estimate request:", error);
       setFormStatus(t("errorSendingMessage") || "Error sending message. Please try again.");
+      setModalKind("error");
       setIsModalOpen(true);
     } finally {
       setIsSubmitting(false);
@@ -142,6 +148,7 @@ const EstimateForm = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setFormStatus("");
+    setModalKind("info");
   };
 
   // Estilo base unificado para todos los inputs
@@ -275,8 +282,15 @@ const EstimateForm = () => {
           }}
         >
           <option value="">{t("contactForm.engagementType") || "Engagement type"}</option>
-          <option value="Staff Augmentation">Staff Augmentation</option>
-          <option value="Software Factory">Software Factory</option>
+          <option value="Process & Workflow Automation">
+            {t("contactForm.optionWorkflow") || "Workflow Automation"}
+          </option>
+          <option value="Staff Augmentation">
+            {t("contactForm.optionStaff") || "Staff Augmentation"}
+          </option>
+          <option value="Workflow Automation + Staff Augmentation">
+            {t("contactForm.optionBoth") || "Both: Workflow Automation + Staff Augmentation"}
+          </option>
         </select>
         {errors.engagement_type && (
           <ErrorMessage style={{ marginBottom: "0.5rem", marginTop: "-0.75rem" }}>
@@ -288,7 +302,6 @@ const EstimateForm = () => {
           name="budget"
           value={formData.budget}
           onChange={handleChange}
-          required
           style={{
             ...selectStyle,
             marginBottom: errors.budget ? "0.25rem" : "0.75rem",
@@ -306,6 +319,7 @@ const EstimateForm = () => {
           }}
         >
           <option value="">{t("contactForm.budget") || "Estimated budget"}</option>
+          <option value="Not sure yet">{t("contactForm.notSureYet") || "Not sure yet"}</option>
           <option value="< $10k">&lt; $10k</option>
           <option value="$10k–$25k">$10k–$25k</option>
           <option value="$25k–$50k">$25k–$50k</option>
@@ -321,7 +335,6 @@ const EstimateForm = () => {
           name="timeline"
           value={formData.timeline}
           onChange={handleChange}
-          required
           style={{
             ...selectStyle,
             marginBottom: errors.timeline ? "0.25rem" : "0.75rem",
@@ -339,6 +352,7 @@ const EstimateForm = () => {
           }}
         >
           <option value="">{t("contactForm.timeline") || "Timeline / urgency"}</option>
+          <option value="Not sure yet">{t("contactForm.notSureYet") || "Not sure yet"}</option>
           <option value="ASAP">ASAP</option>
           <option value="1–3 months">1–3 months</option>
           <option value="Just exploring">Just exploring</option>
@@ -348,6 +362,27 @@ const EstimateForm = () => {
             {errors.timeline}
           </ErrorMessage>
         )}
+
+        <textarea
+          name="bottleneck"
+          placeholder={t("contactForm.bottleneck") || "Biggest operational bottleneck (optional)"}
+          value={formData.bottleneck}
+          onChange={handleChange}
+          rows={3}
+          style={{
+            ...baseInputStyle,
+            resize: "vertical",
+            minHeight: "88px",
+            marginBottom: "0.75rem",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "none";
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.boxShadow = "none";
+            e.currentTarget.style.outline = "none";
+          }}
+        />
 
         {/* Solo mostrar captcha en producción (no en localhost) */}
         {typeof window !== "undefined" && 
@@ -412,13 +447,21 @@ const EstimateForm = () => {
         >
           {isSubmitting 
             ? (t("contactForm.submitting") || "Submitting...") 
-            : (t("contactForm.requestEstimate") || "Request estimate")
+            : (t("contactForm.requestEstimate") || "Get my execution plan")
           }
         </StyledButton>
       </FormContainer>
 
       {isModalOpen && (
-        <SuccessModal message={formStatus} onClose={closeModal} />
+        <SuccessModal
+          message={formStatus}
+          onClose={closeModal}
+          showQuickAction={modalKind === "success"}
+          quickActionText={
+            t("contactForm.successQuickAction") || "Urgent? Book a 15-min automation audit"
+          }
+          quickActionHref={calendlyUrl}
+        />
       )}
     </>
   );

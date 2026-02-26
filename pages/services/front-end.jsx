@@ -722,7 +722,7 @@ const FrontEnd = () => {
                 {lang === "es" ? "Staff Augmentation" : "Staff Augmentation"}
               </motion.div>
             </Link>
-            <Link href="/services/software-factory">
+            <Link href="/services/workflow-automation">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -738,7 +738,7 @@ const FrontEnd = () => {
                   transition: "all 0.2s ease",
                 }}
               >
-                {lang === "es" ? "Software Factory" : "Software Factory"}
+                {lang === "es" ? "Automatización de Flujos" : "Workflow Automation"}
               </motion.div>
             </Link>
           </div>

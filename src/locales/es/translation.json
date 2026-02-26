@@ -1,6 +1,6 @@
 {
-  "OpenGateHub": "OpenGateHub - Consultoría IT y Desarrollo de Software",
-  "pageDescription": "OpenGateHub ofrece consultoría IT y soluciones de desarrollo de software a medida. Ayudamos a las empresas a crear aplicaciones web y móviles escalables para impulsar la innovación y la transformación digital.",
+  "OpenGateHub": "OpenGateHub - Automatización de Procesos y Flujos para Empresas",
+  "pageDescription": "OpenGateHub ayuda a empresas a automatizar procesos y flujos de trabajo con IA, integraciones y soluciones digitales escalables.",
   "home": "Inicio",
   "services": "Servicios",
   "aboutUs": "Nosotros",
@@ -8,7 +8,7 @@
   "english": "Inglés",
   "spanish": "Español",
   "name": "Nombre",
-  "ctaButton": "Reservá tu consulta gratis",
+  "ctaButton": "Reservá tu auditoría de automatización",
   "email": "Correo electrónico",
   "phoneNumber": "Número de teléfono (opcional)",
   "subject": "Asunto (opcional)",
@@ -29,26 +29,26 @@
   "Blog": "Blog",
   "seoTitle": "Constru\u00ed con personas que lo entienden | OpenGateHub",
   "articleNotFound": "Artículo no encontrado. Por favor, visita el índice de nuestro blog para ver las publicaciones recientes.",
-  "seoDescription": "Ayudamos a fundadores y VCs visionarios a escalar startups con desarrolladores alineados culturalmente que valoran el impacto.",
+  "seoDescription": "Ayudamos a empresas a escalar su operación con automatización de flujos y staff augmentation con impacto medible en negocio.",
   "heroAnimatedText": {
-    "part1": "Alianzas tecnológicas centradas en las ",
-    "highlight1": "personas",
-    "part2": "",
-    "highlight2": ""
+    "part1": "Automatizá los ",
+    "highlight1": "flujos",
+    "part2": " y procesos de tu ",
+    "highlight2": "empresa"
   },
-  "heroSubtitle": "Encontramos desarrolladores que encajan con tu equipo, no solo con tus requerimientos.",
+  "heroSubtitle": "Reducí trabajo manual, bajá costos operativos y liberá a tu equipo para tareas de mayor impacto.",
   "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
-  "problemTitle": "Contratar desarrolladores es <highlight>difícil</highlight>.",
-  "problemText": "Necesitás escalar tu equipo, pero encontrar desarrolladores que encajen con tu cultura y entreguen trabajo de calidad lleva tiempo. La contratación tradicional es lenta, y la mayoría de las agencias priorizan habilidades sobre el match cultural.",
-  "weGetYouTitle": "Nosotros <highlight>priorizamos el fit</highlight>.",
-  "weGetYouText": "Por eso nos enfocamos en Staff Augmentation: te conectamos con desarrolladores que se alinean con tus valores y forma de trabajar. El match cultural y la calidad humana van primero—sin olvidar las habilidades técnicas sólidas.",
+  "problemTitle": "Las operaciones manuales son <highlight>costosas</highlight>.",
+  "problemText": "Cuando los equipos dependen de planillas, tareas repetitivas y herramientas desconectadas, la ejecución se vuelve lenta, aumentan los errores y se pierde visibilidad sobre procesos críticos.",
+  "weGetYouTitle": "Nosotros <highlight>automatizamos lo que importa</highlight>.",
+  "weGetYouText": "Diseñamos e implementamos automatizaciones de workflows que conectan tus sistemas, eliminan cuellos de botella y hacen tu operación más predecible. Nuestro diferencial sigue siendo human-first: comunicación clara, ownership y entrega confiable.",
   "servicesTitle": "Nuestros Servicios",
   "servicesText": "Trabajamos con personas que se preocupan por el cómo, no solo por el qué. Soluciones personalizadas para fundadores que quieren escalar con fluidez, confianza y cultura.",
-  "planTitle": "Así trabajamos:",
+  "planTitle": "Cómo trabajamos:",
   "planSteps": {
-    "step1": "Llamada inicial: contanos qué necesitás.",
-    "step2": "Plan personalizado: te conectamos con desarrolladores alineados.",
-    "step3": "Ponete en marcha: integrá, iterá y escalá con confianza."
+    "step1": "Discovery operativo: mapeamos tu proceso actual, cuellos de botella y prioridades.",
+    "step2": "Plan de ejecución: definimos el modelo ideal (Automatización, Staff Augmentation o ambos).",
+    "step3": "Implementar y optimizar: ejecutamos, medimos impacto y mejoramos de forma continua."
   },
   "connectWithUs": "Conectate con Nosotros",
   "aboutUsTitle_part1": "Construimos tecnología poniendo a las ",
@@ -71,9 +71,9 @@
   "innovativeSolution": "nuestro equipo trabaja para hacer realidad tu visión mientras apoya el",
   "forBusiness": "crecimiento de tu negocio.",
   "homeCallToAction": {
-    "title": "¿Listo para transformar tu negocio?",
-    "description": "Reservá tu consultoría gratuita de 30 minutos hoy",
-    "buttonText": "Reservar Consulta Gratis"
+    "title": "¿Listo para reducir fricción operativa?",
+    "description": "Reservá una llamada corta para detectar oportunidades de mayor impacto en automatización y staffing.",
+    "buttonText": "Reservá tu auditoría de automatización"
   },
   "faqsCallToAction": {
     "title": "¿Todavía tenés preguntas?",
@@ -139,47 +139,47 @@
     "ctaHighlightWord": "ampliar"
   },
   "softwareFactory": {
-    "metaDescription": "Desarrollo de software end-to-end desde el concepto hasta producción. Entregamos soluciones completas que escalan con tu negocio.",
-    "heroSubtitle": "Desarrollo de software end-to-end desde el concepto hasta producción",
-    "whatIsTitle": "¿Qué es Software Factory?",
-    "whatIsDescription": "Software Factory es nuestro modelo de desarrollo end-to-end donde asumimos la propiedad completa de tu proyecto desde el concepto hasta producción. Gestionamos todo el ciclo de vida del desarrollo, desde planificación y diseño hasta despliegue y mantenimiento, entregando una solución completa lista para producción.",
-    "whenToUseTitle": "¿Cuándo usar Software Factory?",
+    "metaDescription": "Automatiza los procesos y flujos clave de tu empresa con una solución end-to-end pensada para escalar.",
+    "heroSubtitle": "Automatizá operaciones repetitivas y conectá tus herramientas con flujos confiables",
+    "whatIsTitle": "¿Qué es la Automatización de Flujos?",
+    "whatIsDescription": "Nuestro modelo de automatización de flujos ayuda a tu empresa a eliminar tareas manuales, conectar sistemas y estandarizar operaciones. Diseñamos, implementamos y desplegamos automatizaciones que reducen errores, aceleran la ejecución y liberan tiempo de tu equipo para trabajo de mayor valor.",
+    "whenToUseTitle": "¿Cuándo usar Automatización de Flujos?",
     "whenToUse": {
-      "newProductTitle": "Desarrollo de Nuevo Producto",
-      "newProductDescription": "Cuando estás construyendo un producto desde cero y necesitas un equipo dedicado para llevarlo al mercado",
-      "completeSolutionTitle": "Soluciones Completas",
-      "completeSolutionDescription": "Cuando necesitas desarrollo end-to-end incluyendo diseño, desarrollo, testing y despliegue",
-      "tightDeadlineTitle": "Deadlines Ajustados",
-      "tightDeadlineDescription": "Cuando tienes una fecha límite clara y necesitas un equipo enfocado para entregar a tiempo"
+      "newProductTitle": "Cuellos de Botella Manuales",
+      "newProductDescription": "Cuando tus equipos pierden tiempo en tareas repetitivas, seguimientos y traspasos desconectados",
+      "completeSolutionTitle": "Herramientas y Datos Desconectados",
+      "completeSolutionDescription": "Cuando tu CRM, ERP, finanzas, soporte o marketing no se sincronizan de forma confiable",
+      "tightDeadlineTitle": "Necesidad de Operar Más Rápido",
+      "tightDeadlineDescription": "Cuando necesitás mejorar velocidad, consistencia y reporting sin aumentar headcount"
     },
     "processTitle": "Nuestro Proceso",
     "process": {
-      "step1Title": "Descubrimiento y Planificación",
-      "step1Description": "Entendemos tu visión, definimos requisitos y creamos un roadmap detallado",
-      "step2Title": "Diseño y Arquitectura",
-      "step2Description": "Diseñamos la experiencia de usuario, creamos prototipos y arquitectamos soluciones escalables",
-      "step3Title": "Desarrollo y Testing",
-      "step3Description": "Construimos tu producto con código limpio, testing riguroso e integración continua",
-      "step4Title": "Despliegue y Lanzamiento",
-      "step4Description": "Desplegamos a producción, monitoreamos performance y aseguramos un lanzamiento sin problemas",
-      "step5Title": "Soporte y Mantenimiento",
-      "step5Description": "Proporcionamos soporte continuo, actualizaciones y mejoras para mantener tu producto funcionando sin problemas"
+      "step1Title": "Auditoría de Procesos",
+      "step1Description": "Mapeamos tus procesos actuales, detectamos cuellos de botella y priorizamos automatizaciones de alto ROI",
+      "step2Title": "Blueprint de Automatización",
+      "step2Description": "Diseñamos la lógica de flujos, arquitectura de integración, reglas de datos y manejo de excepciones",
+      "step3Title": "Implementación e Integración",
+      "step3Description": "Construimos automatizaciones, conectamos tus herramientas y validamos escenarios de punta a punta",
+      "step4Title": "Despliegue y Adopción",
+      "step4Description": "Lanzamos de forma segura, capacitamos a tu equipo y definimos playbooks operativos",
+      "step5Title": "Optimización y Escalado",
+      "step5Description": "Monitoreamos resultados, mejoramos flujos y expandimos la automatización a nuevas áreas"
     },
     "outcomesTitle": "Qué Recibes",
     "outcomes": {
-      "fullyFunctionalTitle": "Producto Completamente Funcional",
-      "fullyFunctionalDescription": "Una solución completa y funcionando lista para tus usuarios",
-      "productionReadyTitle": "Listo para Producción",
-      "productionReadyDescription": "Desplegado, testeado y optimizado para uso en el mundo real",
-      "scalableArchitectureTitle": "Arquitectura Escalable",
-      "scalableArchitectureDescription": "Construido para crecer con las necesidades de tu negocio",
-      "completeDocumentationTitle": "Documentación Completa",
-      "completeDocumentationDescription": "Documentación técnica y guías de usuario incluidas"
+      "fullyFunctionalTitle": "Flujos Automatizados",
+      "fullyFunctionalDescription": "Procesos críticos corriendo automáticamente con lógica clara y controles definidos",
+      "productionReadyTitle": "Operación Confiable",
+      "productionReadyDescription": "Menos errores manuales, tiempos de ciclo más rápidos y ejecución consistente",
+      "scalableArchitectureTitle": "Sistemas Conectados",
+      "scalableArchitectureDescription": "Herramientas e información integradas para crecer con tu empresa",
+      "completeDocumentationTitle": "Visibilidad Operativa",
+      "completeDocumentationDescription": "Dashboards, alertas y documentación para gestionar con confianza"
     },
-    "ctaTitle": "¿Listo para construir tu producto?",
-    "ctaDescription": "Obtén un estimado detallado del proyecto adaptado a tus necesidades.",
-    "ctaButtonText": "Obtener Estimado del Proyecto",
-    "ctaHighlightWord": "construir"
+    "ctaTitle": "¿Listo para automatizar tu operación?",
+    "ctaDescription": "Recibí un plan de automatización personalizado para tus flujos, sistemas y objetivos de negocio.",
+    "ctaButtonText": "Obtener Estimado de Automatización",
+    "ctaHighlightWord": "automatizar"
   },
   "n8nAutomation": {
     "heroTitle": "n8n Automation",
@@ -226,7 +226,7 @@
     "buttonText": "Reservar Llamada Ahora"
   },
   "contactUsMetaTitle": "Contacto - OpenGateHub",
-  "contactUsMetaDescription": "Ponte en contacto con OpenGateHub. Estamos aquí para ayudarte con tus necesidades de transformación digital.",
+  "contactUsMetaDescription": "Elegí el camino más rápido para mejorar tu operación: auditoría de automatización o estimado de ejecución.",
   "contactPage": {
     "getIn": "Ponte en",
     "touch": "Contacto",
@@ -237,33 +237,40 @@
     "email": "info@opengatehub.com",
     "comeAnd": "Ven y",
     "joinUs": "Únete a Nosotros",
-    "heroTitle": "Hablemos de tu proyecto",
-    "heroSubtitle": "Elige la forma más rápida de avanzar — reserva una llamada o solicita un estimado.",
-    "bookCallTitle": "Reserva una llamada estratégica",
-    "bookCallDescription": "Para equipos listos para escalar con ingenieros senior.",
-    "bookCallButton": "Reservar llamada de 15 min",
-    "getEstimateTitle": "Solicita un estimado de proyecto",
-    "getEstimateDescription": "Cuéntanos un poco sobre tus necesidades y te sugeriremos el mejor modelo de engagement.",
+    "heroTitle": "Optimicemos tu operación",
+    "heroSubtitle": "Elegí el camino más rápido: auditoría de automatización o estimado de ejecución.",
+    "bookCallTitle": "Reservá una auditoría de automatización",
+    "bookCallDescription": "Para equipos que quieren reducir trabajo manual y acelerar la operación.",
+    "bookCallButton": "Reservar auditoría de 15 min",
+    "getEstimateTitle": "Solicitá un estimado de ejecución",
+    "getEstimateDescription": "Contanos tus necesidades y te recomendamos el modelo ideal: Automatización, Staff Augmentation o ambos.",
     "whatHappensNext": "Qué sucede después",
     "step1Title": "Revisamos tu solicitud en 24 horas",
     "step2Title": "Te recomendamos el mejor modelo de engagement",
     "step3Title": "Recibes un próximo paso claro — llamada o propuesta.",
-    "bookCallDisclaimer": "Sin compromiso. Evaluaremos el fit y los próximos pasos.",
+    "bookCallDisclaimer": "Sin compromiso. Te llevás próximos pasos claros y acciones priorizadas.",
     "footerCTAText": "¿Prefieres hablar primero?",
     "footerCTALink": "Reservar llamada"
   },
   "contactForm": {
     "company": "Empresa",
-    "engagementType": "Tipo de engagement",
+    "engagementType": "Necesidad principal de engagement",
+    "optionWorkflow": "Automatización de Flujos",
+    "optionStaff": "Staff Augmentation",
+    "optionBoth": "Ambos: Automatización + Staff Augmentation",
     "budget": "Presupuesto estimado",
     "timeline": "Plazo / urgencia",
+    "bottleneck": "Principal cuello de botella operativo (opcional)",
+    "notSureYet": "Todavía no lo sé",
     "pleaseEnterCompany": "Por favor ingresa el nombre de tu empresa",
     "pleaseSelectEngagement": "Por favor selecciona un tipo de engagement",
     "pleaseSelectBudget": "Por favor selecciona un rango de presupuesto",
     "pleaseSelectTimeline": "Por favor selecciona un plazo",
-    "requestEstimate": "Solicitar estimado",
+    "requestEstimate": "Quiero mi plan de ejecución",
     "submitting": "Enviando...",
-    "estimateRequestSent": "Solicitud de estimado enviada exitosamente. La revisaremos en 24 horas y te contactaremos."
+    "estimateRequestSent": "Solicitud recibida con éxito. La revisaremos en menos de 24 horas y te enviaremos próximos pasos.",
+    "successNextStep": "Próximo paso: recibirás recomendación de Automatización, Staff Augmentation o ambos.",
+    "successQuickAction": "¿Urgente? Reservá una auditoría de 15 min"
   },
   "companyHistoryTitle": "Nuestro Camino",
   "companyHistoryDescription": "Nuestra historia comenzó con una simple creencia: que la tecnología debe servir a un propósito superior. Desde nuestras raíces en Argentina hasta nuestro alcance global actual, hemos tenido el privilegio de trabajar con líderes que se atreven a pensar diferente sobre el éxito.",
@@ -294,7 +301,7 @@
   "commitmentToInnovationExpandableDescription4": "Nuestro objetivo es ayudarte a construir soluciones que no solo resuelvan los problemas de hoy sino que ayuden a crear un mejor mañana.",
   "frontendTitle": "Front-end",
   "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
-  "howWeBuildIntro": "Esta capacidad se entrega a través de nuestros modelos de engagement Staff Augmentation y Software Factory.",
+  "howWeBuildIntro": "Esta capacidad se entrega a través de nuestros modelos de engagement Staff Augmentation y Automatización de Flujos.",
   "backendTitle": "Backend & Cloud",
   "backendDescription": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
   "uxuiTitle": "Diseño UX/UI",
@@ -413,7 +420,7 @@
   "faqsTitle": "Preguntas Frecuentes",
   "faqs": {
     "softwareFactory": {
-      "title": "Software Factory",
+      "title": "Automatización de Flujos",
       "questions": [
         {
           "question": "¿Qué servicios ofrece OpenGateHub?",
@@ -549,6 +556,14 @@
   "readMore": "Leer más",
   "articles": [
     {
+      "title": "Noticia de enero 2026: la automatización agentic entra en fase empresarial",
+      "slug": "noticia-enero-2026-automatizacion-agentic-empresarial",
+      "summary": "El 20 de enero de 2026, Automation Anywhere anunció soluciones agentic junto a OpenAI. Qué cambia en operaciones, riesgos y despliegue para empresas.",
+      "image": "/images/article7.png",
+      "thumbnail": "/images/article7.png",
+      "content": "El 20 de enero de 2026, Automation Anywhere anunció una nueva generación de soluciones agentic desarrolladas junto a OpenAI para uso empresarial. Esta noticia importa porque confirma un cambio de etapa en automatización: pasar de automatizar tareas sueltas a ejecutar procesos de negocio completos con control, trazabilidad y gobierno.\n\nDurante años, muchas organizaciones avanzaron con capas separadas: RPA para tareas repetitivas, scripts para integraciones y asistentes de IA para consultas puntuales. El enfoque agentic intenta unir esas capas en un sistema operativo continuo: entender contexto, decidir con reglas y ejecutar acciones en herramientas reales de la empresa.\n\nEn la práctica, la propuesta combina capacidad de razonamiento de modelos de IA con un motor de ejecución de procesos. Es decir, no solo \"piensa\" qué hacer, también lo lleva a producción con pasos definidos, permisos y registro de evidencia. Para operaciones, eso es crucial: sin controles, la IA no escala; con controles, la IA se convierte en capacidad operativa.\n\n## Qué cambia para equipos de negocio y operaciones\n\nLa mejora principal no es estética, es económica: menos fricción de coordinación, menor tiempo de ciclo y menos errores manuales.\n\nEjemplo en finanzas:\n- Se detecta una excepción en una factura.\n- El sistema interpreta contexto (proveedor, monto, políticas, historial).\n- Ejecuta un flujo gobernado (solicita aprobación, actualiza ERP, notifica al responsable y deja evidencia de auditoría).\n\nFrente a automatizaciones aisladas, este modelo mejora la consistencia y reduce dependencia de intervención manual permanente. El equipo gana velocidad sin perder control.\n\n## El punto clave: autonomía gobernada, no autonomía total\n\nUno de los errores más comunes hoy es vender \"autonomía total\" como objetivo inmediato. En entornos empresariales, eso suele aumentar riesgo operativo y regulatorio.\n\nLa estrategia efectiva en 2026 es autonomía progresiva:\n- Modo asistido: el sistema recomienda y una persona confirma.\n- Modo supervisado: el sistema ejecuta con reglas y monitoreo.\n- Modo semiautónomo: el sistema actúa en escenarios acotados con escalamiento automático.\n\nEste enfoque permite capturar beneficios de productividad sin sacrificar compliance, precisión financiera ni calidad de servicio.\n\n## Qué debería hacer una empresa ahora\n\nEmpezar por procesos, no por herramientas. La pregunta útil no es \"qué modelo usamos\", sino \"dónde tenemos más costo de coordinación y más trabajo repetitivo\".\n\nUn buen primer caso tiene:\n- Volumen alto y reglas claras.\n- Handoffs manuales frecuentes.\n- Impacto medible en costo, tiempo o experiencia.\n\nDespués, ejecutar en orden: mapear proceso actual, definir métricas y controles, correr piloto acotado, escalar solo con evidencia. Así se evita el error clásico de programas de automatización que lucen bien en demo pero no se sostienen en operación real.\n\nLa noticia del 20 de enero de 2026 marca dirección de mercado. La automatización ya no es un proyecto técnico aislado: es una capacidad estratégica de operaciones. Las empresas que ganen no serán las que acumulen más features de IA, sino las que conviertan IA + automatización en ejecución confiable del día a día.\n\n## Fuente\n\nComunicado oficial del 20 de enero de 2026: \"Automation Anywhere Advances AI-Native Agentic Solutions for the Enterprise with OpenAI\" (PR Newswire y sala de prensa de Automation Anywhere)."
+    },
+    {
       "title": "Por qué la mayoría de las agencias de desarrollo se equivocan (y qué hacemos nosotros distinto)",
       "slug": "why-most-dev-agencies-get-it-wrong",
       "summary": "No es un problema de habilidades. Es un problema de encaje. Por qué la alineación cultural gana a los checkboxes técnicos — y qué hacemos distinto en OpenGateHub.",
@@ -662,21 +677,21 @@
     }
   },
   "homeCapabilitiesSection": {
-    "title": "Cómo construimos",
-    "subtitle": "Estas capacidades se entregan a través de nuestros modelos de engagement Staff Augmentation y Software Factory.",
-    "ctaText": "Explorar cómo construimos",
+    "title": "Cómo escalamos tu operación",
+    "subtitle": "Combinamos Staff Augmentation y Automatización de Flujos para aumentar velocidad de ejecución, consistencia y visibilidad operativa.",
+    "ctaText": "Explorar cómo escalamos",
     "cards": {
       "softwareDevelopment": {
-        "title": "Desarrollo de Software",
-        "description": "Construye aplicaciones web escalables, sistemas backend robustos y arquitecturas cloud que impulsan el crecimiento de tu negocio."
+        "title": "Staff Augmentation",
+        "description": "Sumá ingenieros senior y QA a tu equipo para aumentar capacidad de entrega sin incrementar la carga de management."
       },
       "mobileDevelopment": {
-        "title": "Desarrollo Móvil",
-        "description": "Crea apps nativas iOS y Android, soluciones cross-platform y productos mobile-first que conectan con usuarios donde estén."
+        "title": "Automatización de Flujos",
+        "description": "Automatizá tareas repetitivas, aprobaciones y handoffs entre equipos para reducir tiempos de ciclo y errores manuales."
       },
       "dataAutomation": {
-        "title": "Datos y Automatización",
-        "description": "Transforma datos en insights con dashboards analíticos, workflows potenciados por IA e integraciones que automatizan operaciones."
+        "title": "IA + Operaciones Automatizadas",
+        "description": "Conectá sistemas, orquestá procesos con IA y ganá visibilidad operativa en tiempo real con dashboards y alertas."
       }
     }
   },
