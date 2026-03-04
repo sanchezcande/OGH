@@ -98,6 +98,11 @@ const Footer = () => {
             </Link>
           </FooterText>
           <FooterText>
+            <Link href="/calculator" className="footer-link">
+              {t("calculator.footerLink")}
+            </Link>
+          </FooterText>
+          <FooterText>
             <Link href="/privacy-policy" className="footer-link">
               {t("privacyPolicy")}
             </Link>{" "}

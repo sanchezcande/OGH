@@ -1723,6 +1723,326 @@ export default function HomePage() {
         {/* Metrics Section */}
         <MetricsSection />
 
+        {/* Calculator Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          style={{
+            background: "#fafafa",
+            borderTop: "1px solid #f0f0f0",
+            borderBottom: "1px solid #f0f0f0",
+            padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ maxWidth: "660px", margin: "0 auto" }}>
+            {/* Badge */}
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                background: "#fff5f5",
+                border: "1.5px solid #fecaca",
+                borderRadius: "100px",
+                padding: "0.3rem 0.9rem",
+                fontSize: "0.73rem",
+                fontWeight: 700,
+                color: "#f97b72",
+                marginBottom: "1.5rem",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+              }}
+            >
+              {t("calculator.bannerEyebrow")}
+            </div>
+
+            {/* Headline */}
+            <h2
+              style={{
+                fontSize: isMobile ? "1.85rem" : "2.7rem",
+                fontWeight: 800,
+                color: "#111827",
+                lineHeight: 1.2,
+                marginBottom: "1rem",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {t("calculator.bannerTitle")}
+            </h2>
+
+            {/* Subtitle */}
+            <p
+              style={{
+                fontSize: "1.05rem",
+                color: "#6b7280",
+                lineHeight: 1.7,
+                maxWidth: "460px",
+                margin: "0 auto 2.75rem",
+              }}
+            >
+              {t("calculator.bannerSub")}
+            </p>
+
+            {/* Stat cards */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+                gap: "1rem",
+                maxWidth: "560px",
+                margin: "0 auto 2.5rem",
+              }}
+            >
+              {[
+                { value: "8h",    labelKey: "calculator.bannerStat1Label" },
+                { value: "60%",   labelKey: "calculator.bannerStat2Label" },
+                { value: "2 min", labelKey: "calculator.bannerStat3Label" },
+              ].map((stat) => (
+                <div
+                  key={stat.value}
+                  style={{
+                    background: "white",
+                    border: "1.5px solid #e5e7eb",
+                    borderRadius: "12px",
+                    padding: "1.5rem 1rem",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0, left: 0, right: 0,
+                      height: "3px",
+                      background: "linear-gradient(90deg, #f97b72, #e35a52)",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "2rem",
+                      fontWeight: 900,
+                      color: "#f97b72",
+                      lineHeight: 1,
+                      marginBottom: "0.4rem",
+                    }}
+                  >
+                    {stat.value}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#6b7280",
+                      fontWeight: 500,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {t(stat.labelKey)}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA button */}
+            <Link href="/calculator">
+              <button
+                style={{
+                  background: "linear-gradient(135deg, #f97b72 0%, #e35a52 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  padding: "1rem 2.5rem",
+                  fontSize: "1.05rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  boxShadow: "0 4px 20px rgba(249,123,114,0.38)",
+                  transition: "all 0.22s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 28px rgba(249,123,114,0.48)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,123,114,0.38)";
+                }}
+              >
+                {t("calculator.bannerCTA")}
+              </button>
+            </Link>
+            <p style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "0.875rem" }}>
+              {t("calculator.trustLine")}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Case Studies Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          style={{
+            background: "white",
+            borderTop: "1px solid #f0f0f0",
+            padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+          }}
+        >
+          <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+            {/* Header */}
+            <div style={{ textAlign: "center", marginBottom: isMobile ? "2.5rem" : "3.5rem" }}>
+              <div
+                style={{
+                  display: "inline-flex",
+                  background: "#fff5f5",
+                  border: "1.5px solid #fecaca",
+                  borderRadius: "100px",
+                  padding: "0.3rem 0.9rem",
+                  fontSize: "0.73rem",
+                  fontWeight: 700,
+                  color: "#f97b72",
+                  marginBottom: "1rem",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {t("caseStudiesSection.eyebrow")}
+              </div>
+              <h2
+                style={{
+                  fontSize: isMobile ? "1.85rem" : "2.5rem",
+                  fontWeight: 800,
+                  color: "#111827",
+                  lineHeight: 1.2,
+                  marginBottom: "0.75rem",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {t("caseStudiesSection.title")}
+              </h2>
+              <p style={{ fontSize: "1rem", color: "#6b7280", lineHeight: 1.6 }}>
+                {t("caseStudiesSection.subtitle")}
+              </p>
+            </div>
+
+            {/* Cards grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+                gap: "1.5rem",
+              }}
+            >
+              {[
+                {
+                  img: "/case-studies/valthor.jpeg",
+                  categoryKey: "caseStudiesSection.valthorCategory",
+                  titleKey: "caseStudiesSection.valthorTitle",
+                  descKey: "caseStudiesSection.valthorDesc",
+                  stat: { value: "40%", labelKey: "caseStudiesSection.valthorStat" },
+                },
+                {
+                  img: "/case-studies/hot-date-kitchen.jpeg",
+                  categoryKey: "caseStudiesSection.hotdateCategory",
+                  titleKey: "caseStudiesSection.hotdateTitle",
+                  descKey: "caseStudiesSection.hotdateDesc",
+                  stat: null,
+                },
+                {
+                  img: "/case-studies/smarters-city.jpeg",
+                  categoryKey: "caseStudiesSection.smartersCategory",
+                  titleKey: "caseStudiesSection.smartersTitle",
+                  descKey: "caseStudiesSection.smartersDesc",
+                  stat: null,
+                },
+                {
+                  img: "/case-studies/vantage.jpeg",
+                  categoryKey: "caseStudiesSection.vantageCategory",
+                  titleKey: "caseStudiesSection.vantageTitle",
+                  descKey: "caseStudiesSection.vantageDesc",
+                  stat: null,
+                },
+              ].map((cs) => (
+                <div
+                  key={cs.titleKey}
+                  style={{
+                    background: "#fafafa",
+                    border: "1.5px solid #e5e7eb",
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    transition: "box-shadow 0.2s ease, transform 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.09)";
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "none";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  <div style={{ height: "200px", overflow: "hidden" }}>
+                    <img
+                      src={cs.img}
+                      alt={t(cs.titleKey)}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div style={{ padding: "1.5rem" }}>
+                    <span
+                      style={{
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        color: "#f97b72",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                      }}
+                    >
+                      {t(cs.categoryKey)}
+                    </span>
+                    <h3
+                      style={{
+                        fontSize: "1.15rem",
+                        fontWeight: 700,
+                        color: "#111827",
+                        margin: "0.4rem 0 0.5rem",
+                      }}
+                    >
+                      {t(cs.titleKey)}
+                    </h3>
+                    <p style={{ fontSize: "0.9rem", color: "#6b7280", lineHeight: 1.6, marginBottom: cs.stat ? "1rem" : 0 }}>
+                      {t(cs.descKey)}
+                    </p>
+                    {cs.stat && (
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "baseline",
+                          gap: "0.4rem",
+                          background: "#fff5f5",
+                          border: "1px solid #ffe3e1",
+                          borderRadius: "8px",
+                          padding: "0.5rem 0.875rem",
+                        }}
+                      >
+                        <span style={{ fontSize: "1.4rem", fontWeight: 900, color: "#f97b72", lineHeight: 1 }}>
+                          {cs.stat.value}
+                        </span>
+                        <span style={{ fontSize: "0.8rem", color: "#6b7280", fontWeight: 500 }}>
+                          {t(cs.stat.labelKey)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
         {/* Featured Work Section */}
         <div
           style={{
