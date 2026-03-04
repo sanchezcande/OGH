@@ -860,7 +860,7 @@
     "tasksSelectedOne": "1 task selected",
     "tasksSelectedMany": "{{count}} tasks selected",
     "step4Title": "What industry does your company operate in?",
-    "step4Sub": "To personalize recommendations.",
+    "step4Sub": "To benchmark against similar companies in your industry.",
     "industryEcommerce": "E-commerce",
     "industrySaaS": "SaaS / Tech",
     "industryProfessional": "Professional services",
@@ -874,7 +874,7 @@
     "hoursLost": "Hours lost / month",
     "hoursRecovered": "Hours back for work that matters",
     "monthlyCost": "Monthly cost of manual work",
-    "savingsHeadline": "Your company could save",
+    "savingsHeadline": "Your team could reclaim every month",
     "perMonth": "/month",
     "annualSavings": "{{amount}} per year in potential savings",
     "benchmarkNote": "Based on average RPA ROI data showing 60% cost reduction through automation (Flobotics 2024, McKinsey, Deloitte). Actual results may vary.",
@@ -883,7 +883,7 @@
     "socialProofStat1": "fewer manual tasks",
     "socialProofStat2": "faster follow-up",
     "leadTitle": "Get your automation plan",
-    "leadSub": "We'll send you a personalized analysis and next steps for your team — free, no commitment.",
+    "leadSub": "You've already done the hard part. Let us turn your numbers into a concrete plan — free, no commitment.",
     "namePlaceholder": "Your name",
     "emailPlaceholder": "Your work email",
     "submitBtn": "See my automation plan →",
@@ -901,7 +901,7 @@
     "bannerSub": "Answer 4 quick questions. We'll calculate your monthly loss and your savings potential with automation.",
     "bannerStat1Label": "wasted per person / week",
     "bannerStat2Label": "avg savings with automation",
-    "bannerStat3Label": "to get your result",
-    "bannerCTA": "Calculate my savings →"
+    "bannerStat3Label": "between average interruptions at work",
+    "bannerCTA": "See what it's costing you →"
   }
 }

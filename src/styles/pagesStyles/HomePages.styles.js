@@ -78,11 +78,7 @@ const buttonHover = keyframes`
 
 export const Container = styled.div`
   position: relative;
-  background: radial-gradient(
-    circle at 50% 50%,
-    ${({ theme }) => theme.colors.backgroundAlt}22,
-    ${({ theme }) => theme.colors.background} 70%
-  );
+  background: ${({ theme }) => theme.colors.background};
   overflow: hidden;
   padding: 40px 0px;
   text-align: center;

@@ -1730,9 +1730,10 @@ export default function HomePage() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           style={{
-            background: "#fafafa",
-            borderTop: "1px solid #f0f0f0",
-            borderBottom: "1px solid #f0f0f0",
+            width: "100%",
+            background: "white",
+            borderTop: "1px solid #e5e7eb",
+            borderBottom: "1px solid #e5e7eb",
             padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
             textAlign: "center",
           }}
@@ -1797,9 +1798,9 @@ export default function HomePage() {
               }}
             >
               {[
-                { value: "8h",    labelKey: "calculator.bannerStat1Label" },
-                { value: "60%",   labelKey: "calculator.bannerStat2Label" },
-                { value: "2 min", labelKey: "calculator.bannerStat3Label" },
+                { value: "8h",    labelKey: "calculator.bannerStat1Label", source: "Zapier, 2021" },
+                { value: "60%",   labelKey: "calculator.bannerStat2Label", source: "Flobotics, 2024" },
+                { value: "2 min", labelKey: "calculator.bannerStat3Label", source: "Microsoft WTI, 2025" },
               ].map((stat) => (
                 <div
                   key={stat.value}
@@ -1840,6 +1841,9 @@ export default function HomePage() {
                     }}
                   >
                     {t(stat.labelKey)}
+                  </p>
+                  <p style={{ fontSize: "0.65rem", color: "#d1d5db", marginTop: "0.4rem", fontWeight: 400 }}>
+                    {stat.source}
                   </p>
                 </div>
               ))}
@@ -1886,6 +1890,7 @@ export default function HomePage() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           style={{
+            width: "100%",
             background: "white",
             borderTop: "1px solid #f0f0f0",
             padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
@@ -1984,11 +1989,11 @@ export default function HomePage() {
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
-                  <div style={{ height: "200px", overflow: "hidden" }}>
+                  <div style={{ height: "220px", overflow: "hidden", borderRadius: "14px 14px 0 0" }}>
                     <img
                       src={cs.img}
                       alt={t(cs.titleKey)}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }}
                     />
                   </div>
                   <div style={{ padding: "1.5rem" }}>

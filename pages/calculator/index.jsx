@@ -547,6 +547,28 @@ export default function Calculator() {
                 fontWeight: 500,
               }}
             >
+              {t("calculator.monthlyCost")}
+            </p>
+            <p
+              style={{
+                fontSize: isMobile ? "1.6rem" : "1.8rem",
+                fontWeight: 700,
+                color: "#2b2b2b",
+                lineHeight: 1,
+              }}
+            >
+              {fmt(monthlyCost)}
+            </p>
+          </MetricCard>
+          <MetricCard>
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "#6b7280",
+                marginBottom: "0.4rem",
+                fontWeight: 500,
+              }}
+            >
               {t("calculator.hoursRecovered")}
             </p>
             <p
@@ -561,28 +583,6 @@ export default function Calculator() {
               <span style={{ fontSize: "1rem", fontWeight: 500, color: "#6b7280" }}>
                 {" "}h
               </span>
-            </p>
-          </MetricCard>
-          <MetricCard>
-            <p
-              style={{
-                fontSize: "0.75rem",
-                color: "#6b7280",
-                marginBottom: "0.4rem",
-                fontWeight: 500,
-              }}
-            >
-              {t("calculator.monthlyCost")}
-            </p>
-            <p
-              style={{
-                fontSize: isMobile ? "1.6rem" : "1.8rem",
-                fontWeight: 700,
-                color: "#2b2b2b",
-                lineHeight: 1,
-              }}
-            >
-              {fmt(monthlyCost)}
             </p>
           </MetricCard>
         </div>

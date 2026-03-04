@@ -868,7 +868,7 @@
     "tasksSelectedOne": "1 tarea seleccionada",
     "tasksSelectedMany": "{{count}} tareas seleccionadas",
     "step4Title": "¿En qué industria opera tu empresa?",
-    "step4Sub": "Para personalizar las recomendaciones.",
+    "step4Sub": "Para comparar con empresas similares de tu industria.",
     "industryEcommerce": "E-commerce",
     "industrySaaS": "SaaS / Tech",
     "industryProfessional": "Servicios profesionales",
@@ -882,7 +882,7 @@
     "hoursLost": "Horas perdidas / mes",
     "hoursRecovered": "Horas de vuelta para trabajo que importa",
     "monthlyCost": "Costo mensual del trabajo manual",
-    "savingsHeadline": "Tu empresa podría ahorrar",
+    "savingsHeadline": "Tu equipo podría recuperar cada mes",
     "perMonth": "/mes",
     "annualSavings": "{{amount}} por año en ahorros potenciales",
     "benchmarkNote": "Basado en datos de ROI promedio de RPA que muestran 60% de reducción de costos con automatización (Flobotics 2024, McKinsey, Deloitte). Los resultados reales pueden variar.",
@@ -891,7 +891,7 @@
     "socialProofStat1": "menos tareas manuales",
     "socialProofStat2": "más velocidad de follow-up",
     "leadTitle": "Recibí tu plan de automatización",
-    "leadSub": "Te enviamos un análisis personalizado y los próximos pasos para tu equipo — gratis, sin compromiso.",
+    "leadSub": "Ya hiciste la parte difícil. Nosotros convertimos tus números en un plan concreto — gratis, sin compromiso.",
     "namePlaceholder": "Tu nombre",
     "emailPlaceholder": "Tu email de trabajo",
     "submitBtn": "Ver mi plan de automatización →",
@@ -909,7 +909,7 @@
     "bannerSub": "Respondé 4 preguntas rápidas. Calculamos tu pérdida mensual y tu potencial de ahorro con automatización.",
     "bannerStat1Label": "perdidas por persona / semana",
     "bannerStat2Label": "ahorro promedio con automatización",
-    "bannerStat3Label": "para obtener tu resultado",
-    "bannerCTA": "Calcular mis ahorros →"
+    "bannerStat3Label": "entre interrupciones promedio en el trabajo",
+    "bannerCTA": "Ver cuánto te está costando →"
   }
 }
