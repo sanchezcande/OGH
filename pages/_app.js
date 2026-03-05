@@ -105,36 +105,43 @@ export default function MyApp({ Component, pageProps }) {
     <ThemeProvider theme={theme}>
       <GlobalStyles />
       <Head>
-        <title>OpenGateHub</title>
+        <title>Workflow & Process Automation for Companies | OpenGateHub</title>
         <meta
           name="description"
-          content="OpenGateHub helps companies automate processes and workflows with AI, integrations, and tailored digital operations solutions."
+          content="OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and embedded engineering teams. Kickoff in 7.3 days. Measurable results from sprint one."
         />
         <meta
           name="keywords"
-          content="process automation, workflow automation, business automation, ai automation, n8n, system integrations, digital operations, staff augmentation"
+          content="workflow automation, process automation, business automation, n8n automation, staff augmentation, AI automation, system integrations, operational efficiency"
         />
         <link rel="icon" href="/browser-link-logo.png" type="image/png" />
-
-        {/* --- SEO CORREGIDO --- */}
         <link rel="canonical" href={canonicalUrl} />
 
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="OpenGateHub" />
         <meta
           property="og:title"
-          content="OpenGateHub - Your Trusted Development Partner"
+          content="Workflow & Process Automation for Companies | OpenGateHub"
         />
         <meta
           property="og:description"
-          content="We automate business workflows and processes with AI, integrations, and scalable digital operations."
+          content="Stop losing 8+ hours per person each week to manual work. We automate your workflows, connect your systems, and embed senior engineers — results from day one."
         />
         <meta
           property="og:image"
           content="https://opengatehub.com/Reducido4oscuro.png"
         />
-
         <meta property="og:url" content={canonicalUrl} />
 
         <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Workflow & Process Automation for Companies | OpenGateHub"
+        />
+        <meta
+          name="twitter:description"
+          content="Stop losing 8+ hours per person each week to manual work. We automate your workflows, connect your systems, and embed senior engineers."
+        />
         <meta
           name="twitter:image"
           content="https://opengatehub.com/Reducido4oscuro.png"

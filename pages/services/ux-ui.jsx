@@ -114,20 +114,20 @@ const UxUi = () => {
   return (
     <>
       <Head>
-        <title>UX/UI - OpenGateHub</title>
+        <title>UX/UI Design for SaaS & Digital Products | OpenGateHub</title>
         <meta
           name="description"
-          content={
-            lang === "es"
-              ? "Transformamos la manera en que tus clientes ven, usan y aman tu negocio."
-              : "We transform how your clients see, use and love your business."
-          }
+          content="We design interfaces your users actually want to use — wireframes, prototypes, full visual systems, and engineering-ready handoffs. Human-first UX with measurable impact."
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="UX/UI Design for SaaS & Digital Products | OpenGateHub" />
+        <meta property="og:description" content="From wireframes to production — UX/UI design that reduces friction, improves conversion, and makes your product feel effortless to use." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="UX Design, UI Design, User Experience, Wireframes, Prototypes, Intuitive Interfaces"
+          content="UX design, UI design, product design, SaaS design, user experience, wireframes, prototypes, design system"
         />
-        <meta name="author" content="OpenGateHub" />
+        <meta name="robots" content="index, follow" />
       </Head>
       <style>{`
         @keyframes fadeInUp {

@@ -55,12 +55,16 @@
     "part2": " and ",
     "highlight2": "operations"
   },
-  "heroSubtitle": "Reduce manual work, lower operating costs, and free your team for higher-impact work.",
+  "heroSubtitle": "The average team loses 8+ hours per person each week to tasks automation handles in minutes. We help you take that time back — and turn it into output that actually moves your business.",
+  "heroSecondaryCTA": "See what it's costing you →",
+  "heroTrustChip1": "9.7/10 CSAT",
+  "heroTrustChip2": "7.3-day kickoff",
+  "heroTrustChip3": "50+ sprints shipped",
   "heroAlt": "Tech team illustration - OpenGateHub",
   "problemTitle": "Manual operations are <highlight>expensive</highlight>.",
   "problemText": "When teams depend on spreadsheets, repetitive tasks, and disconnected tools, execution slows down, errors increase, and leadership loses visibility over critical workflows.",
-  "weGetYouTitle": "We <highlight>automate what matters</highlight>.",
-  "weGetYouText": "We design and implement workflow automations that connect your systems, remove bottlenecks, and create predictable operations. Human-first execution remains our edge: clear communication, ownership, and reliable delivery.",
+  "weGetYouTitle": "Your team <highlight>shouldn't be doing this</highlight>.",
+  "weGetYouText": "Every hour spent copying data between tools, chasing approvals, or generating reports manually is an hour that could go toward real work. We permanently eliminate those tasks — and give your team the capacity to actually move faster.",
   "servicesTitle": "Our Services",
   "servicesText": "We work with people who care about the how, not just the what. Custom solutions for founders who want to scale with flow, trust, and culture.",
   "planTitle": "How we engage:",
@@ -70,10 +74,37 @@
     "step3": "Launch & Optimize: We implement, measure impact, and improve continuously."
   },
   "forBusiness": "business growth.",
+  "contactPage": {
+    "heroTitle": "Let's talk about your operations",
+    "heroSubtitle": "Book a free audit call, or just send us a message and we'll figure out the best next step together.",
+    "bookCallTitle": "Book a free audit call",
+    "bookCallDescription": "15 minutes. We'll map your biggest operational bottleneck and tell you honestly whether we can help.",
+    "bookCallButton": "Book a 15-min call",
+    "bookCallDisclaimer": "No commitment. You'll leave with a clear next step.",
+    "getEstimateTitle": "Or send us a message",
+    "getEstimateDescription": "Not ready for a call? Tell us what's going on and we'll come back with a specific recommendation — usually within 24 hours.",
+    "whatHappensNext": "What happens after you reach out",
+    "step1Title": "We read your message carefully",
+    "step2Title": "We send you a specific recommendation",
+    "step3Title": "You decide what to do next — no pressure",
+    "footerCTAText": "Prefer to talk first?",
+    "footerCTALink": "Book a 15-min call"
+  },
+  "contactForm": {
+    "companyOptional": "Company (optional)",
+    "messagePlaceholder": "What's going on? Tell us what you're dealing with — the more context, the better.",
+    "pleaseDescribeProblem": "Tell us a bit more (at least 10 characters)",
+    "sendBtn": "Send →",
+    "submitting": "Sending...",
+    "trustNote": "We reply within 24h — no pitch, just a clear next step.",
+    "successMessage": "We got your message and will reply within 24 hours.",
+    "successQuickAction": "Urgent? Book a 15-min call"
+  },
   "homeCallToAction": {
-    "title": "Ready to cut operational friction?",
-    "description": "Book a short call to identify your highest-impact automation and staffing opportunities.",
-    "buttonText": "Book a Workflow Automation Audit"
+    "title": "Every week you wait, it costs you.",
+    "description": "Book a free 30-minute call. We'll identify your top 3 automation opportunities and give you an honest savings estimate — no pitch, just value.",
+    "buttonText": "Book a Free Audit Call",
+    "noCommitment": "Free call · No commitment · No pitch"
   },
   "faqsCallToAction": {
     "title": "Still Have Questions?",
@@ -600,8 +631,8 @@
       "content": "In a world where technology is advancing at an unprecedented pace, artificial intelligence (AI) and automation are revolutionizing the way businesses operate and grow. From streamlining internal processes to enhancing customer experiences, these technologies are the key to staying competitive in today's market.\n\nWhy invest in AI and automation? Companies that embrace these tools not only reduce costs and operational times but also free up resources to focus on innovation and strategic development. According to Gartner, 70% of organizations will be using AI technologies in at least one key function by 2025.\n\nPractical Applications in Businesses\n\nProcess Optimization: Automating repetitive tasks such as inventory management, order tracking, or customer service through chatbots.\nPredictive Analysis: AI enables the analysis of large volumes of data to anticipate trends, identify risks, and make informed decisions.\nCustomer Personalization: Advanced algorithms make it possible to deliver unique and relevant experiences that enhance customer loyalty.\nAdvanced Cybersecurity: AI-based systems detect threats in real time, protecting sensitive data from cyberattacks.\n\nThe Impact on Business Growth\n\nAI and automation not only enhance efficiency but also pave the way for new business opportunities. Companies that have adopted these technologies report significant increases in productivity and customer satisfaction, leading to sustainable growth.\n\nOpenGateHub: Your Partner in AI and Automation\n\nAt OpenGateHub, we understand that every business faces unique challenges. That's why we deliver customized AI and automation solutions tailored to your needs, ensuring real and tangible results.\n\nThe future is now, and with AI and automation, success is within your business's reach."
     }
   ],
-  "reviewsTitle": "From those we've partnered with",
-  "reviewsSubtitle": "Real stories from founders and leaders who've trusted us to grow with them.",
+  "reviewsTitle": "What our partners say",
+  "reviewsSubtitle": "9.7/10 satisfaction score across 66 client surveys. Here's what they say.",
   "reviews": {
     "farzad": {
       "text": "We worked with OpenGateHub on two different projects: an e-commerce site and an early-stage AI product.\n\nWhat I valued most was how straightforward the whole process felt. They asked the right questions from the start, kept communication clear, and delivered without unnecessary back and forth. The e-commerce site was delivered ready to launch, exactly as we needed it.\n\nOn the AI product, they also helped us think through the direction from the beginning — not just building features, but focusing on what made sense to build first.\n\nIf you're looking for a reliable, proactive team that's genuinely easy to work with, I recommend OpenGateHub without hesitation.",
@@ -669,9 +700,10 @@
     }
   },
   "homeCapabilitiesSection": {
-    "title": "How we scale your operations",
-    "subtitle": "We combine Staff Augmentation and Workflow Automation to increase execution speed, consistency, and operational visibility.",
-    "ctaText": "Explore how we scale",
+    "title": "Where we create the most impact",
+    "subtitle": "From eliminating manual tasks to scaling your engineering team — here's how companies like yours stop losing time and start shipping faster.",
+    "ctaText": "See how we work",
+    "mostPopular": "Most Popular",
     "cards": {
       "softwareDevelopment": {
         "title": "Staff Augmentation",
@@ -690,7 +722,8 @@
   "caseStudiesSection": {
     "eyebrow": "Case Studies",
     "title": "Real results, real companies",
-    "subtitle": "A look at some of the work we're proud of.",
+    "subtitle": "Measurable outcomes across automation, AI, and engineering delivery.",
+    "benchmarksCTA": "Calculate your team's potential savings →",
     "valthorCategory": "AI · CRM",
     "valthorTitle": "Valthor CRM",
     "valthorDesc": "We embedded a senior squad to build their AI-powered CRM. Conversational automation, real-time dashboards, and seamless integration into their engineering rituals.",
@@ -698,12 +731,15 @@
     "hotdateCategory": "E-commerce",
     "hotdateTitle": "Hot Date Kitchen",
     "hotdateDesc": "Gourmet brand e-commerce with custom visual identity, integrated cart and payment gateway, mobile optimization, and technical SEO.",
+    "hotdateStat": "conversion-optimized launch",
     "smartersCategory": "Smart Cities",
     "smartersTitle": "Smarters City",
     "smartersDesc": "Urban management platform centralizing data on mobility, infrastructure, and municipal services — real-time analysis with interactive dashboards for city managers.",
+    "smartersStat": "faster page load",
     "vantageCategory": "AI · Generative",
     "vantageTitle": "Vantage Inc.",
-    "vantageDesc": "Embedded AI engineering team to build a generative image platform with natural language editing and an integration-ready API for any creative workflow."
+    "vantageDesc": "Embedded AI engineering team to build a generative image platform with natural language editing and an integration-ready API for any creative workflow.",
+    "vantageStat": "roadmap acceleration"
   },
   "featuredWorkSection": {
     "title": "Featured Work",

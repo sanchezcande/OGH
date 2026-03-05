@@ -40,10 +40,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, company, engagement_type, budget, timeline } = req.body;
+    const { name, email, company, message } = req.body;
 
     // Validación básica
-    if (!name || !email || !company || !engagement_type || !budget || !timeline) {
+    if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -53,56 +53,37 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid email address" });
     }
 
-    // Log de los datos recibidos
-    console.log("=== SENDING EMAIL ===");
-    console.log("To:", process.env.CONTACT_EMAIL || "info@opengatehub.com");
-    console.log("From: OpenGateHub <onboarding@resend.dev>");
-    console.log("Subject:", `Project Estimate Request - ${engagement_type}`);
-    console.log("Form data:", { name, email, company, engagement_type, budget, timeline });
+    console.log("=== SENDING CONTACT EMAIL ===");
+    console.log("Form data:", { name, email, company, message: message.substring(0, 50) });
 
     // Enviar email con Resend
     const { data, error } = await resend.emails.send({
-      from: "OpenGateHub <onboarding@resend.dev>", // Cambiar esto cuando configures tu dominio
-      to: "candelaria@opengatehub.com", // Email donde recibirás los mensajes (temporalmente tu email para testing)
-      subject: `Project Estimate Request - ${engagement_type}`,
+      from: "OpenGateHub <onboarding@resend.dev>",
+      to: "candelaria@opengatehub.com",
+      subject: `New contact from ${name}${company ? ` — ${company}` : ""}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #1e293b; border-bottom: 2px solid #f97b72; padding-bottom: 10px;">
-            New Project Estimate Request
+            New Contact Message
           </h2>
-          
+
           <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1e293b; margin-top: 0;">Contact Information</h3>
             <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Company:</strong> ${company}</p>
+            <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+            ${company ? `<p><strong>Company:</strong> ${company}</p>` : ""}
           </div>
 
           <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #1e293b; margin-top: 0;">Project Details</h3>
-            <p><strong>Engagement Type:</strong> ${engagement_type}</p>
-            <p><strong>Budget:</strong> ${budget}</p>
-            <p><strong>Timeline:</strong> ${timeline}</p>
+            <h3 style="color: #1e293b; margin-top: 0;">What they're dealing with</h3>
+            <p style="white-space: pre-wrap; line-height: 1.6;">${message}</p>
           </div>
 
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #64748b; font-size: 12px;">
-            <p>This email was sent from the OpenGateHub contact form.</p>
+            <p>Sent from opengatehub.com/contact-us</p>
           </div>
         </div>
       `,
-      text: `
-New Project Estimate Request
-
-Contact Information:
-- Name: ${name}
-- Email: ${email}
-- Company: ${company}
-
-Project Details:
-- Engagement Type: ${engagement_type}
-- Budget: ${budget}
-- Timeline: ${timeline}
-      `,
+      text: `New Contact Message\n\nName: ${name}\nEmail: ${email}${company ? `\nCompany: ${company}` : ""}\n\nMessage:\n${message}`,
     });
 
     if (error) {

@@ -257,13 +257,20 @@ const aiSolutions = () => {
   return (
     <>
       <Head>
-        <title>AI Solutions - OpenGateHub</title>
-        <meta name="description" content={t("aiSolutions.description")} />
+        <title>AI Automation Solutions for Business | OpenGateHub</title>
+        <meta
+          name="description"
+          content="We embed AI into your business operations — conversational automation, generative tools, intelligent pipelines, and real-time dashboards. Practical AI that actually ships."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="AI Automation Solutions for Business | OpenGateHub" />
+        <meta property="og:description" content="From AI-powered CRMs to generative image platforms — we build practical AI solutions that connect to your existing workflows and deliver measurable results." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="AI, Artificial Intelligence, Machine Learning, Automation, Business Intelligence, Data Analytics"
+          content="AI automation, AI for business, AI workflow automation, generative AI, business intelligence, AI integration, machine learning solutions"
         />
-        <meta name="author" content="OpenGateHub" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <style>{`

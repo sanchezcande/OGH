@@ -252,16 +252,20 @@ const staffAugmentation = () => {
   return (
     <>
       <Head>
-        <title>Staff Augmentation - OpenGateHub</title>
+        <title>Staff Augmentation — Embed Senior Engineers in Your Team | OpenGateHub</title>
         <meta
           name="description"
-          content={t("staffAugmentation.metaDescription")}
+          content="Scale your engineering team in 7.3 days. We embed senior developers and QA engineers who join your standups, ship in your sprints, and match your culture — 87% on-time delivery."
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Staff Augmentation — Embed Senior Engineers in Your Team | OpenGateHub" />
+        <meta property="og:description" content="Senior engineers embedded in your team in under 2 weeks. Nearshore, culturally aligned, and ready to ship — no management overhead." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="Staff Augmentation, Remote Developers, Software Development Team, IT Consulting, Development Services"
+          content="staff augmentation, remote developers, embedded engineering team, nearshore development, senior developers for hire, QA engineers"
         />
-        <meta name="author" content="OpenGateHub" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <style>{`

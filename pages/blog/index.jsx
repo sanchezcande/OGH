@@ -7,6 +7,7 @@ import {
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
 import Image from "next/image";
+import Head from "next/head";
 import { useTranslation } from "react-i18next";
 
 export default function Blog() {
@@ -57,6 +58,16 @@ export default function Blog() {
   };
 
   return (
+    <>
+    <Head>
+      <title>Automation & Process Improvement Blog | OpenGateHub</title>
+      <meta name="description" content="Practical guides on workflow automation, n8n, AI tools, and operational efficiency. Written by the team that's automated 300+ processes across 50+ companies." />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Automation & Process Improvement Blog | OpenGateHub" />
+      <meta property="og:description" content="Practical guides on workflow automation, n8n, AI tools, and operational efficiency." />
+      <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
+      <meta name="robots" content="index, follow" />
+    </Head>
     <BlogContainer>
       <SearchInput
         type="text"
@@ -86,5 +97,6 @@ export default function Blog() {
         ))}
       </Gallery>
     </BlogContainer>
+    </>
   );
 }

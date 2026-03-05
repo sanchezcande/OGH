@@ -452,282 +452,194 @@ export const HomeCallToAction = () => {
   const callToAction = t("homeCallToAction", { returnObjects: true });
 
   return (
-    <CallToActionBlock
-      title={callToAction.title}
-      description={callToAction.description}
-      buttonText={callToAction.buttonText}
-      highlightWord="friction"
-    />
+    <div style={{ position: "relative" }}>
+      <CallToActionBlock
+        title={callToAction.title}
+        description={callToAction.description}
+        buttonText={callToAction.buttonText}
+        highlightWord="costs"
+      />
+      <div style={{
+        textAlign: "center",
+        marginTop: "-1.5rem",
+        paddingBottom: "2rem",
+        color: "rgba(255,255,255,0.65)",
+        fontSize: "0.82rem",
+        letterSpacing: "0.03em",
+      }}>
+        {t("homeCallToAction.noCommitment", "Free call · No commitment · No pitch")}
+      </div>
+    </div>
   );
 };
 
 const TestimonialsCarousel = ({ testimonials }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const PER_PAGE = 3;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth <= 768);
-      };
+      const checkMobile = () => setIsMobile(window.innerWidth <= 768);
       checkMobile();
       window.addEventListener("resize", checkMobile);
       return () => window.removeEventListener("resize", checkMobile);
     }
   }, []);
 
-  const nextSlide = () => {
-    if (!isAnimating) {
-      setIsAnimating(true);
-      setCurrentSlide((prev) => (prev + 1) % testimonials.length);
-      setTimeout(() => setIsAnimating(false), 300);
-    }
-  };
+  const totalPages = isMobile ? testimonials.length : Math.ceil(testimonials.length / PER_PAGE);
+  const visibleTestimonials = isMobile
+    ? [testimonials[currentPage]]
+    : testimonials.slice(currentPage * PER_PAGE, currentPage * PER_PAGE + PER_PAGE);
 
-  const prevSlide = () => {
-    if (!isAnimating) {
-      setIsAnimating(true);
-      setCurrentSlide(
-        (prev) => (prev - 1 + testimonials.length) % testimonials.length,
-      );
-      setTimeout(() => setIsAnimating(false), 300);
-    }
-  };
-
-  const goToSlide = (index) => {
-    if (!isAnimating && index !== currentSlide) {
-      setIsAnimating(true);
-      setCurrentSlide(index);
-      setTimeout(() => setIsAnimating(false), 300);
-    }
-  };
+  const nextSlide = () => setCurrentPage((prev) => (prev + 1) % totalPages);
+  const prevSlide = () => setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  const goToSlide = (index) => setCurrentPage(index);
 
   // Auto-play
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
+    const interval = setInterval(nextSlide, 6000);
     return () => clearInterval(interval);
-  }, [currentSlide, isAnimating]);
+  }, [currentPage, isMobile]);
+
+  const ChevronLeft = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  );
+  const ChevronRight = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
 
   return (
-    <div
-      style={{
-        maxWidth: isMobile ? "100%" : "1000px",
-        margin: isMobile ? 0 : "0 auto",
-        position: "relative",
-        padding: isMobile ? 0 : "0 2rem",
-      }}
-    >
-      {/* Main Carousel */}
-      <div
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          borderRadius: isMobile ? 0 : "20px",
-          background: "white",
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
-          minHeight: isMobile ? "350px" : "400px",
-          margin: 0,
-          padding: isMobile ? 0 : undefined,
-        }}
-      >
-        {/* Navigation Buttons */}
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: isMobile ? "0 1rem" : "0 2rem" }}>
+      {/* Cards grid with side arrows */}
+      <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "0.5rem" : "1.25rem" }}>
+        {/* Prev arrow */}
         <button
           onClick={prevSlide}
-          disabled={isAnimating}
+          aria-label="Previous reviews"
           style={{
-            position: "absolute",
-            left: isMobile ? 6 : "20px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: isMobile ? "none" : "rgba(255, 255, 255, 0.9)",
+            background: "white",
             border: "none",
             borderRadius: "50%",
-            width: isMobile ? 28 : 50,
-            height: isMobile ? 28 : 50,
+            width: "44px",
+            height: "44px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
-            zIndex: 10,
-            boxShadow: isMobile ? "none" : "0 4px 20px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            opacity: isMobile ? 0.4 : isAnimating ? 0.5 : 1,
+            flexShrink: 0,
+            color: "#F97B72",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)",
+            transition: "box-shadow 0.2s, transform 0.15s, background 0.2s",
           }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = "translateY(-50%) scale(1.1)";
-            e.target.style.background = "rgba(255, 255, 255, 1)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = "translateY(-50%) scale(1)";
-            e.target.style.background = "rgba(255, 255, 255, 0.9)";
-          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,123,114,0.25), 0 0 0 1.5px rgba(249,123,114,0.35)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)"; }}
         >
-          <FaChevronLeft
-            style={{
-              color: isMobile ? "#F97B72" : "#F97B72",
-              fontSize: isMobile ? "1rem" : "1.2rem",
-              opacity: isMobile ? 1 : 1,
-            }}
-          />
+          <ChevronLeft />
         </button>
 
-        <button
-          onClick={nextSlide}
-          disabled={isAnimating}
-          style={{
-            position: "absolute",
-            right: isMobile ? 6 : "20px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: isMobile ? "none" : "rgba(255, 255, 255, 0.9)",
-            border: "none",
-            borderRadius: "50%",
-            width: isMobile ? 28 : 50,
-            height: isMobile ? 32 : 50,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            zIndex: 10,
-            boxShadow: isMobile ? "none" : "0 4px 20px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            opacity: isMobile ? 0.4 : isAnimating ? 0.5 : 1,
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = "translateY(-50%) scale(1.1)";
-            e.target.style.background = "rgba(255, 255, 255, 1)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = "translateY(-50%) scale(1)";
-            e.target.style.background = "rgba(255, 255, 255, 0.9)";
-          }}
-        >
-          <FaChevronRight
-            style={{
-              color: isMobile ? "#F97B72" : "#F97B72",
-              fontSize: isMobile ? "1rem" : "1.2rem",
-              opacity: isMobile ? 1 : 1,
-              paddingTop: isMobile ? 2 : 0,
-            }}
-          />
-        </button>
-
-        {/* Slides Container */}
-        <div
-          style={{
-            display: "flex",
-            transition: "transform 0.3s ease",
-            transform: `translateX(-${currentSlide * 100}%)`,
-            height: "100%",
-          }}
-        >
-          {testimonials.map((testimonial, index) => (
+        {/* Cards grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+          gap: "1.25rem",
+          alignItems: "stretch",
+          flex: 1,
+        }}>
+          {visibleTestimonials.map((testimonial, index) => (
             <div
-              key={index}
+              key={`${currentPage}-${index}`}
               style={{
-                minWidth: "100%",
-                padding: isMobile ? "1.5rem 0" : "3rem 4rem",
+                background: "white",
+                borderRadius: "16px",
+                padding: "1.75rem",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
+                border: "1.5px solid #f0f0f0",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                textAlign: "center",
+                gap: "1rem",
                 position: "relative",
-                minHeight: isMobile ? "350px" : "auto",
               }}
             >
-              {/* Quote Icon */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: isMobile ? "1rem" : "2rem",
-                  left: isMobile ? "1rem" : "2rem",
-                  fontSize: isMobile ? "2rem" : "3rem",
-                  color: "#F97B72",
-                  opacity: 0.1,
-                }}
-              >
-                <FaQuoteLeft />
+              {/* Stars */}
+              <div style={{ display: "flex", gap: "2px" }}>
+                {[1,2,3,4,5].map((s) => (
+                  <span key={s} style={{ color: "#f97b72", fontSize: "0.95rem" }}>★</span>
+                ))}
               </div>
 
-              {/* Content */}
-              <p
-                style={{
-                  fontSize: isMobile ? "0.95rem" : "1.1rem",
-                  lineHeight: isMobile ? "1.5" : "1.6",
-                  color: "#333",
-                  marginBottom: isMobile ? "1.5rem" : "2rem",
-                  fontStyle: "italic",
-                  maxWidth: "600px",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                  hyphens: "auto",
-                  textAlign: "left",
-                  padding: isMobile ? "0 50px" : 0,
-                }}
-              >
-                "{testimonial.content}"
+              {/* Quote */}
+              <p style={{
+                fontSize: "0.93rem",
+                lineHeight: 1.65,
+                color: "#374151",
+                fontStyle: "italic",
+                margin: 0,
+                flex: 1,
+              }}>
+                &ldquo;{testimonial.content}&rdquo;
               </p>
 
-              {/* Author Info */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                <p
-                  style={{
-                    fontWeight: "600",
-                    fontSize: isMobile ? "0.95rem" : "1rem",
-                    color: "#F97B72",
-                    margin: 0,
-                  }}
-                >
+              {/* Author */}
+              <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "0.75rem" }}>
+                <div style={{ fontWeight: 700, color: "#111827", fontSize: "0.93rem" }}>
                   {testimonial.company}
-                </p>
-                <p
-                  style={{
-                    fontSize: isMobile ? "0.85rem" : "0.9rem",
-                    color: "#666",
-                    margin: 0,
-                  }}
-                >
-                  {testimonial.role}
-                </p>
+                </div>
+                {testimonial.role && (
+                  <div style={{ color: "#f97b72", fontSize: "0.8rem", marginTop: "2px" }}>
+                    {testimonial.role}
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
+
+        {/* Next arrow */}
+        <button
+          onClick={nextSlide}
+          aria-label="Next reviews"
+          style={{
+            background: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: "44px",
+            height: "44px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            flexShrink: 0,
+            color: "#F97B72",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)",
+            transition: "box-shadow 0.2s, transform 0.15s, background 0.2s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,123,114,0.25), 0 0 0 1.5px rgba(249,123,114,0.35)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)"; }}
+        >
+          <ChevronRight />
+        </button>
       </div>
 
       {/* Dots Indicator */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "0.5rem",
-          marginTop: "2rem",
-        }}
-      >
-        {testimonials.map((_, index) => (
+      <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "2rem" }}>
+        {Array.from({ length: totalPages }).map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             style={{
-              width: index === currentSlide ? "30px" : "12px",
-              height: "12px",
-              borderRadius: "6px",
+              width: index === currentPage ? "28px" : "8px",
+              height: "8px",
+              borderRadius: "100px",
               border: "none",
-              background: index === currentSlide ? "#F97B72" : "#ddd",
+              background: index === currentPage ? "#F97B72" : "#d1d5db",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              opacity: isAnimating ? 0.5 : 1,
+              padding: 0,
             }}
           />
         ))}
@@ -736,7 +648,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
   );
 };
 
-const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories = [], ctaText }) => {
+const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories = [], ctaText, badge }) => {
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
 
@@ -752,7 +664,24 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories =
   }, [subcategories, link, router]);
 
   const boxContent = (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative" }}>
+      {badge && (
+        <div style={{
+          position: "absolute",
+          top: "-1rem",
+          right: "-1rem",
+          background: "#f97b72",
+          color: "white",
+          fontSize: "0.68rem",
+          fontWeight: 700,
+          padding: "0.2rem 0.65rem",
+          borderRadius: "100px",
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
+        }}>
+          {badge}
+        </div>
+      )}
       <motion.div
         initial={{ scale: 1 }}
         animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
@@ -1295,13 +1224,27 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>OpenGateHub</title>
-        <meta name="description" content="OpenGateHub" />
-        <meta property="og:title" content={t("OpenGateHub")} />
+        <title>Workflow & Process Automation for Companies | OpenGateHub</title>
+        <meta
+          name="description"
+          content="Your team is losing 8+ hours per person each week to tasks automation handles in minutes. OpenGateHub automates your workflows, embeds senior engineers, and delivers results in 7.3 days."
+        />
         <meta
           name="keywords"
-          content="OpenGateHub, process automation, workflow automation, business automation, ai automation, digital operations"
+          content="workflow automation, process automation, staff augmentation, n8n automation, AI automation, operational efficiency, reduce manual work, business automation"
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Workflow & Process Automation for Companies | OpenGateHub" />
+        <meta
+          property="og:description"
+          content="Stop losing hours to manual work. We automate your workflows, connect your tools, and embed senior engineers — 9.7/10 CSAT, 7.3-day kickoff, 50+ sprints shipped."
+        />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
+        <meta property="og:url" content="https://opengatehub.com" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Workflow & Process Automation for Companies | OpenGateHub" />
+        <meta name="twitter:description" content="Stop losing hours to manual work. We automate workflows, connect tools, and embed senior engineers." />
+        <meta name="twitter:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
       </Head>
@@ -1348,14 +1291,53 @@ export default function HomePage() {
             </span>
           </Title>
           <Subtitle>{t("heroSubtitle")}</Subtitle>
-          <CTAButton
-            href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
-            target={isMobile ? "_blank" : "_self"}
-            rel={isMobile ? "noopener noreferrer" : undefined}
-            className="primary-cta"
-          >
-            {t("ctaButton")}
-          </CTAButton>
+          {/* Primary + Secondary CTAs */}
+          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center", alignItems: "center", marginTop: "1.75rem" }}>
+            <CTAButton
+              href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
+              target={isMobile ? "_blank" : "_self"}
+              rel={isMobile ? "noopener noreferrer" : undefined}
+              className="primary-cta"
+              style={{ marginTop: 0 }}
+            >
+              {t("ctaButton")}
+            </CTAButton>
+            <CTAButton
+              href="/calculator"
+              className="secondary-cta"
+              style={{ marginTop: 0 }}
+            >
+              {t("heroSecondaryCTA", "See what it's costing you →")}
+            </CTAButton>
+          </div>
+
+          {/* Trust chips */}
+          <div style={{
+            display: "flex",
+            gap: "0.75rem",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginTop: "1.5rem",
+          }}>
+            {[
+              t("heroTrustChip1", "9.7/10 CSAT"),
+              t("heroTrustChip2", "7.3-day kickoff"),
+              t("heroTrustChip3", "50+ sprints shipped"),
+            ].map((chip) => (
+              <span key={chip} style={{
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                borderRadius: "100px",
+                padding: "0.3rem 0.9rem",
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.9)",
+                backdropFilter: "blur(4px)",
+              }}>
+                ✓ {chip}
+              </span>
+            ))}
+          </div>
         </Hero>
 
         <Section
@@ -1619,6 +1601,24 @@ export default function HomePage() {
           </div>
         </Section>
 
+        {/* Benchmarks CTA nudge */}
+        <div style={{ textAlign: "center", padding: "0.5rem 1rem 2.5rem", width: "100%" }}>
+          <Link href="/calculator" style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            color: "#f97b72",
+            fontWeight: 700,
+            fontSize: "0.97rem",
+            textDecoration: "none",
+            borderBottom: "2px solid #f97b72",
+            paddingBottom: "2px",
+            transition: "opacity 0.2s",
+          }}>
+            {t("caseStudiesSection.benchmarksCTA", "Calculate your team's potential savings →")}
+          </Link>
+        </div>
+
         {/* Capabilities Section - How we build */}
         <Section className="full-width">
           <motion.div
@@ -1688,6 +1688,7 @@ export default function HomePage() {
               description={t(
                 "homeCapabilitiesSection.cards.mobileDevelopment.description",
               )}
+              badge={t("homeCapabilitiesSection.mostPopular", "Most Popular")}
               delay={0.2}
               subcategories={[
                 {

@@ -59,13 +59,20 @@ const FrontEnd = () => {
   return (
     <>
       <Head>
-        <title>Frontend - OpenGateHub</title>
-        <meta name="description" content={t("frontend.description")} />
+        <title>Frontend Development — React & Next.js for SaaS & Web Apps | OpenGateHub</title>
+        <meta
+          name="description"
+          content="We build fast, modern frontends with React and Next.js — from SaaS dashboards to e-commerce. Clean architecture, ≤2s load times, and design that actually converts."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Frontend Development — React & Next.js | OpenGateHub" />
+        <meta property="og:description" content="Fast, modern frontends built with React and Next.js. SaaS dashboards, e-commerce, landing pages — built to perform and convert." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="Frontend, Responsive Design, React, Modern Frameworks, Web Development"
+          content="frontend development, React development, Next.js, web development, SaaS frontend, web performance, responsive design"
         />
-        <meta name="author" content="OpenGateHub" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <style>{`

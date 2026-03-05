@@ -24,14 +24,13 @@ const ContactUs = () => {
   return (
     <>
       <Head>
-        <title>{t("contactUsMetaTitle", "Contact Us - OpenGateHub")}</title>
-        <meta
-          name="description"
-          content={t(
-            "contactUsMetaDescription",
-            "Choose the fastest way to move forward — book a call or request an estimate.",
-          )}
-        />
+        <title>Book a Free Automation Audit | OpenGateHub</title>
+        <meta name="description" content="Book a free 15-minute automation audit or send us a message. We'll identify your top operational bottlenecks and reply within 24 hours — no pitch, just a clear next step." />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Book a Free Automation Audit | OpenGateHub" />
+        <meta property="og:description" content="15 minutes. We'll map your biggest operational bottleneck and tell you honestly whether we can help." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       {/* Calendly Widget Script - Solo cargar en desktop */}

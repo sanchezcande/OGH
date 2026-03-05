@@ -297,16 +297,20 @@ const SoftwareFactory = () => {
   return (
     <>
       <Head>
-        <title>Workflow Automation - OpenGateHub</title>
+        <title>Workflow Automation Services for Companies | OpenGateHub</title>
         <meta
           name="description"
-          content={t("softwareFactory.metaDescription")}
+          content="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Powered by n8n, AI, and custom integrations."
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Workflow Automation Services for Companies | OpenGateHub" />
+        <meta property="og:description" content="Eliminate manual tasks permanently. We build automations that connect your systems, remove bottlenecks, and give your team back the hours that matter." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="Workflow Automation, Business Process Automation, AI Automation, n8n Workflows, Process Optimization"
+          content="workflow automation services, business process automation, n8n automation, AI workflows, process optimization, reduce manual work"
         />
-        <meta name="author" content="OpenGateHub" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <style>{`

@@ -63,23 +63,21 @@ const AboutUs = React.forwardRef((props, ref) => {
   return (
     <Container ref={ref}>
       <Head>
-        <title>About Us - OpenGateHub</title>
+        <title>About OpenGateHub — Workflow Automation & Engineering Team | OpenGateHub</title>
         <meta
           name="description"
-          content="Learn about OpenGateHub, our mission, values, and the passionate team driving innovation in digital solutions. Together, we create meaningful change."
+          content="We're a human-first automation and engineering company from Latin America. Near-timezone, senior teams that embed into your workflow — 9.7/10 CSAT, 87% on-time delivery."
         />
-        <meta property="og:title" content="About Us - OpenGateHub" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="About OpenGateHub — Workflow Automation & Engineering Team" />
         <meta
           property="og:description"
-          content="Discover how OpenGateHub builds bridges to help your ideas lead the digital future. Our team is committed to delivering tailored solutions."
+          content="Human-first execution, measurable outcomes. We embed senior engineers and automate workflows for impact-driven companies — 9.7/10 CSAT, 7.3-day kickoff."
         />
-        <meta
-          property="og:image"
-          content="https://opengatehub.com/images/og-about-us.png"
-        />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="OpenGateHub, About Us, Mission, Values, Digital Transformation, Technology Solutions, Innovation"
+          content="OpenGateHub, workflow automation company, staff augmentation, engineering team, process automation, near-shore development"
         />
         <meta name="robots" content="index, follow" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

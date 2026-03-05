@@ -50,8 +50,16 @@ const FAQs = () => {
   return (
     <>
       <Head>
-        <title>FAQs - OpenGateHub</title>
-        <meta name="description" content={t("faqs.description")} />
+        <title>Workflow Automation FAQ — Common Questions Answered | OpenGateHub</title>
+        <meta
+          name="description"
+          content="Questions about workflow automation, staff augmentation, and AI for business? We answer the most common ones from companies like yours — honest, practical, no jargon."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Workflow Automation FAQ | OpenGateHub" />
+        <meta property="og:description" content="Common questions about workflow automation, staff augmentation, and AI for business — answered honestly." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <FAQContainer>

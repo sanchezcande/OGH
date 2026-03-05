@@ -36,12 +36,16 @@
     "part2": " y procesos de tu ",
     "highlight2": "empresa"
   },
-  "heroSubtitle": "Reducí trabajo manual, bajá costos operativos y liberá a tu equipo para tareas de mayor impacto.",
+  "heroSubtitle": "El equipo promedio pierde 8+ horas por persona cada semana en tareas que la automatización resuelve en minutos. Te ayudamos a recuperar ese tiempo — y convertirlo en resultados que realmente mueven el negocio.",
+  "heroSecondaryCTA": "Calculá cuánto te está costando →",
+  "heroTrustChip1": "9.7/10 CSAT",
+  "heroTrustChip2": "Kickoff en 7.3 días",
+  "heroTrustChip3": "50+ sprints entregados",
   "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
   "problemTitle": "Las operaciones manuales son <highlight>costosas</highlight>.",
   "problemText": "Cuando los equipos dependen de planillas, tareas repetitivas y herramientas desconectadas, la ejecución se vuelve lenta, aumentan los errores y se pierde visibilidad sobre procesos críticos.",
-  "weGetYouTitle": "Nosotros <highlight>automatizamos lo que importa</highlight>.",
-  "weGetYouText": "Diseñamos e implementamos automatizaciones de workflows que conectan tus sistemas, eliminan cuellos de botella y hacen tu operación más predecible. Nuestro diferencial sigue siendo human-first: comunicación clara, ownership y entrega confiable.",
+  "weGetYouTitle": "Tu equipo <highlight>no debería estar haciendo esto</highlight>.",
+  "weGetYouText": "Cada hora que tu equipo pasa copiando datos entre herramientas, persiguiendo aprobaciones o generando reportes a mano es una hora que no va a trabajo real. Eliminamos esas tareas de forma permanente — y le devolvemos a tu equipo la capacidad de moverse más rápido.",
   "servicesTitle": "Nuestros Servicios",
   "servicesText": "Trabajamos con personas que se preocupan por el cómo, no solo por el qué. Soluciones personalizadas para fundadores que quieren escalar con fluidez, confianza y cultura.",
   "planTitle": "Cómo trabajamos:",
@@ -70,10 +74,37 @@
   "crafting": " con soluciones digitales a medida. Desde sitios web intuitivos hasta aplicaciones móviles innovadoras, ",
   "innovativeSolution": "nuestro equipo trabaja para hacer realidad tu visión mientras apoya el",
   "forBusiness": "crecimiento de tu negocio.",
+  "contactPage": {
+    "heroTitle": "Hablemos de tu operación",
+    "heroSubtitle": "Reservá una llamada gratuita, o mandanos un mensaje y juntos encontramos el mejor próximo paso.",
+    "bookCallTitle": "Reservá una llamada gratuita",
+    "bookCallDescription": "15 minutos. Mapeamos tu mayor cuello de botella operativo y te decimos honestamente si podemos ayudar.",
+    "bookCallButton": "Reservar una llamada de 15 min",
+    "bookCallDisclaimer": "Sin compromiso. Te vas con un próximo paso concreto.",
+    "getEstimateTitle": "O mandanos un mensaje",
+    "getEstimateDescription": "¿No estás listo para una llamada? Contanos qué está pasando y te respondemos con una recomendación específica — generalmente en menos de 24 horas.",
+    "whatHappensNext": "Qué pasa después de que nos escribís",
+    "step1Title": "Leemos tu mensaje con atención",
+    "step2Title": "Te enviamos una recomendación específica",
+    "step3Title": "Vos decidís qué hacer después — sin presión",
+    "footerCTAText": "¿Preferís hablar primero?",
+    "footerCTALink": "Reservar una llamada de 15 min"
+  },
+  "contactForm": {
+    "companyOptional": "Empresa (opcional)",
+    "messagePlaceholder": "¿Qué está pasando? Contanos con qué estás lidiando — cuanto más contexto, mejor.",
+    "pleaseDescribeProblem": "Contanos un poco más (mínimo 10 caracteres)",
+    "sendBtn": "Enviar →",
+    "submitting": "Enviando...",
+    "trustNote": "Respondemos en menos de 24h — sin pitch, solo un próximo paso concreto.",
+    "successMessage": "Recibimos tu mensaje y respondemos dentro de las 24 horas.",
+    "successQuickAction": "¿Urgente? Reservá una llamada de 15 min"
+  },
   "homeCallToAction": {
-    "title": "¿Listo para reducir fricción operativa?",
-    "description": "Reservá una llamada corta para detectar oportunidades de mayor impacto en automatización y staffing.",
-    "buttonText": "Reservá tu auditoría de automatización"
+    "title": "Cada semana que esperás, te cuesta.",
+    "description": "Reservá una llamada gratuita de 30 minutos. Identificamos tus 3 principales oportunidades de automatización y te damos una estimación honesta del ahorro — sin pitch, solo valor.",
+    "buttonText": "Reservá una llamada gratis",
+    "noCommitment": "Llamada gratuita · Sin compromiso · Sin pitch"
   },
   "faqsCallToAction": {
     "title": "¿Todavía tenés preguntas?",
@@ -612,7 +643,8 @@
       "content": "En un mundo donde la tecnología avanza a un ritmo sin precedentes, la inteligencia artificial (IA) y la automatización están revolucionando la forma en que las empresas operan y crecen. Desde la optimización de procesos internos hasta la mejora de las experiencias de los clientes, estas tecnologías son la clave para mantener la competitividad en el mercado actual.\n\n¿Por qué invertir en IA y automatización? Las empresas que adoptan estas herramientas no solo reducen costos y tiempos operativos, sino que también liberan recursos para enfocarse en la innovación y el desarrollo estratégico. Según Gartner, el 70% de las organizaciones utilizarán tecnologías de IA en al menos una función clave para 2025.\n\nAplicaciones Prácticas en las Empresas\n\nOptimización de Procesos: Automatización de tareas repetitivas como la gestión de inventario, seguimiento de pedidos o servicio al cliente a través de chatbots.\nAnálisis Predictivo: La IA permite analizar grandes volúmenes de datos para anticipar tendencias, identificar riesgos y tomar decisiones informadas.\nPersonalización del Cliente: Los algoritmos avanzados hacen posible ofrecer experiencias únicas y relevantes que mejoran la fidelidad del cliente.\nCiberseguridad Avanzada: Los sistemas basados en IA detectan amenazas en tiempo real, protegiendo los datos sensibles de ciberataques.\n\nEl Impacto en el Crecimiento Empresarial\n\nLa IA y la automatización no solo mejoran la eficiencia, sino que también abren el camino a nuevas oportunidades de negocio. Las empresas que han adoptado estas tecnologías reportan aumentos significativos en la productividad y la satisfacción del cliente, lo que conduce a un crecimiento sostenible.\n\nOpenGateHub: Tu Socio en IA y Automatización\n\nEn OpenGateHub, entendemos que cada empresa enfrenta desafíos únicos. Por eso, entregamos soluciones personalizadas de IA y automatización adaptadas a tus necesidades, asegurando resultados reales y tangibles.\n\nEl futuro es ahora, y con la IA y la automatización, el éxito está al alcance de tu empresa."
     }
   ],
-  "reviewsTitle": "Lo que dicen nuestros clientes",
+  "reviewsTitle": "Lo que dicen nuestros socios",
+  "reviewsSubtitle": "9.7/10 en satisfacción en 66 encuestas de clientes. Esto es lo que dicen.",
   "reviews": {
     "farzad": {
       "text": "Trabajamos con OpenGateHub en dos proyectos distintos: un sitio de e-commerce y un producto de IA en etapa temprana.\n\nLo que más valoré fue lo sencillo que se sintió todo el proceso. Hicieron las preguntas correctas desde el inicio, mantuvieron la comunicación clara y cumplieron sin idas y vueltas innecesarias. El sitio de e-commerce se entregó listo para lanzar, exactamente como lo necesitábamos.\n\nEn el producto de IA, también nos ayudaron a pensar la dirección desde el principio — no solo construyendo features, sino enfocándose en qué tenía sentido construir primero.\n\nSi buscan un equipo confiable, proactivo y con el que sea genuinamente fácil trabajar, recomiendo OpenGateHub sin dudar.",
@@ -677,9 +709,10 @@
     }
   },
   "homeCapabilitiesSection": {
-    "title": "Cómo escalamos tu operación",
-    "subtitle": "Combinamos Staff Augmentation y Automatización de Flujos para aumentar velocidad de ejecución, consistencia y visibilidad operativa.",
-    "ctaText": "Explorar cómo escalamos",
+    "title": "Dónde generamos más impacto",
+    "subtitle": "Desde eliminar tareas manuales hasta escalar tu equipo de ingeniería — así es como empresas como la tuya dejan de perder tiempo y empiezan a moverse más rápido.",
+    "ctaText": "Ver cómo trabajamos",
+    "mostPopular": "Más Popular",
     "cards": {
       "softwareDevelopment": {
         "title": "Staff Augmentation",
@@ -698,7 +731,8 @@
   "caseStudiesSection": {
     "eyebrow": "Casos de Estudio",
     "title": "Resultados reales, empresas reales",
-    "subtitle": "Una muestra del trabajo del que estamos orgullosos.",
+    "subtitle": "Resultados medibles en automatización, IA y entrega de ingeniería.",
+    "benchmarksCTA": "Calculá el ahorro potencial de tu equipo →",
     "valthorCategory": "IA · CRM",
     "valthorTitle": "Valthor CRM",
     "valthorDesc": "Embebimos un squad senior para construir su CRM con IA. Automatización conversacional, dashboards en tiempo real e integración directa en sus rituales de ingeniería.",
@@ -706,12 +740,15 @@
     "hotdateCategory": "E-commerce",
     "hotdateTitle": "Hot Date Kitchen",
     "hotdateDesc": "E-commerce de marca gourmet con identidad visual personalizada, carrito y pasarela de pago integrados, optimización mobile y SEO técnico.",
+    "hotdateStat": "lanzamiento optimizado para conversión",
     "smartersCategory": "Smart Cities",
     "smartersTitle": "Smarters City",
     "smartersDesc": "Plataforma de gestión urbana que centraliza datos de movilidad, infraestructura y servicios municipales — análisis en tiempo real con dashboards interactivos.",
+    "smartersStat": "mejora en velocidad de carga",
     "vantageCategory": "IA · Generativa",
     "vantageTitle": "Vantage Inc.",
-    "vantageDesc": "Equipo de IA embebido para construir una plataforma de imágenes generativas con edición por lenguaje natural y una API lista para integrarse en cualquier flujo creativo."
+    "vantageDesc": "Equipo de IA embebido para construir una plataforma de imágenes generativas con edición por lenguaje natural y una API lista para integrarse en cualquier flujo creativo.",
+    "vantageStat": "aceleración del roadmap"
   },
   "featuredWorkSection": {
     "title": "Trabajos Destacados",

@@ -253,16 +253,20 @@ const N8nAutomation = () => {
   return (
     <>
       <Head>
-        <title>n8n Automation - OpenGateHub</title>
+        <title>n8n Automation Agency — Custom Workflow Automation | OpenGateHub</title>
         <meta
           name="description"
-          content={t("homeServicesSection.cards.n8nAutomation.description")}
+          content="We build and deploy custom n8n workflows that connect your apps, automate repetitive processes, and give you real-time visibility over your operations — without writing code."
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="n8n Automation Agency — Custom Workflow Automation | OpenGateHub" />
+        <meta property="og:description" content="n8n workflow automation built by experts. We connect your tools, automate your operations, and give your team back the hours that matter." />
+        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
         <meta
           name="keywords"
-          content="n8n, Automation, Workflow, Integrations, No-code, Business Efficiency"
+          content="n8n automation, n8n agency, n8n workflow, n8n integrations, workflow automation, no-code automation, business process automation"
         />
-        <meta name="author" content="OpenGateHub" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       {/* Hero Section - Full Width */}
