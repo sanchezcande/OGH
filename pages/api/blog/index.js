@@ -5,13 +5,18 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    const { lang = 'es', search = '', sort = 'newest' } = req.query;
+    const { lang = 'es', search = '', sort = 'newest', page = '1', limit = '6' } = req.query;
+
+    const pageInt = parseInt(page);
+    const limitInt = parseInt(limit);
+    const skip = (pageInt - 1) * limitInt;
 
     let orderBy = { createdAt: 'desc' };
     if (sort === 'oldest') orderBy = { createdAt: 'asc' };
     if (sort === 'alphabetical') orderBy = { title: 'asc' };
 
     try {
+        // Fetch articles with pagination
         const articles = await prisma.article.findMany({
             where: {
                 lang: lang,
@@ -21,9 +26,17 @@ export default async function handler(req, res) {
                 ],
             },
             orderBy,
+            skip,
+            take: limitInt + 1, // Fetch one extra to see if there's more
         });
 
-        return res.status(200).json(articles);
+        const hasMore = articles.length > limitInt;
+        const results = hasMore ? articles.slice(0, limitInt) : articles;
+
+        return res.status(200).json({
+            articles: results,
+            hasMore
+        });
     } catch (error) {
         console.error('API Blog Index Error:', error);
         return res.status(500).json({ message: 'Internal server error' });
