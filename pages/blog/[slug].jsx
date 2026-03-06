@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import SEO from "../../src/components/SEO/SEO";
@@ -57,8 +58,20 @@ function renderArticleBlock(block, key) {
   );
 }
 
+
 export default function ArticlePage({ article, error }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
+
+  // Escuchar cambios de idioma y actualizar la página para reflejar la traducción correcta
+  React.useEffect(() => {
+    if (article && i18n.language !== article.lang) {
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, lang: i18n.language },
+      }, undefined, { shallow: false });
+    }
+  }, [i18n.language, article, router]);
 
   if (error || !article) {
     return <ErrorMessage>{t("articleNotFound") || "Artículo no encontrado."}</ErrorMessage>;

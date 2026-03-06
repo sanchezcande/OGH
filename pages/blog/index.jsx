@@ -113,7 +113,7 @@ export default function Blog() {
                   />
                   <h2>{article.title}</h2>
                   <p>{article.summary}</p>
-                  <Link href={`/blog/${article.slug}`}>{t("readMore")}</Link>
+                  <Link href={`/blog/${article.slug}?lang=${i18n.language || "es"}`}>{t("readMore")}</Link>
                 </ArticleCard>
               ))
             ) : (
