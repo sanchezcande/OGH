@@ -8,6 +8,8 @@ import {
   SearchAndSort,
   SortSelect,
   LoadMoreButton,
+  CardActions,
+  EditLink,
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
 import Image from "next/image";
@@ -172,7 +174,14 @@ export default function Blog() {
                     />
                     <h2>{article.title}</h2>
                     <p>{article.summary}</p>
-                    <Link href={`/blog/${article.slug}?lang=${i18n.language || "es"}`}>{t("readMore")}</Link>
+                    <CardActions>
+                      <Link href={`/blog/${article.slug}?lang=${i18n.language || "es"}`}>{t("readMore")}</Link>
+                      {isAuthenticated && (
+                        <EditLink href={`/admin/new-post?edit=${article.slug}&lang=${article.lang}`}>
+                          {t("edit") || "Editar"}
+                        </EditLink>
+                      )}
+                    </CardActions>
                   </ArticleCard>
                 ))
               ) : (

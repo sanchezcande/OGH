@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Link from "next/link";
 
 export const BlogContainer = styled.div`
   display: flex;
@@ -184,6 +185,24 @@ export const ArticleCard = styled.div`
       color: #374151;
       border-bottom-color: #374151;
     }
+  }
+`;
+
+export const CardActions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  width: 100%;
+`;
+
+export const EditLink = styled(Link)`
+  color: #0070f3;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
