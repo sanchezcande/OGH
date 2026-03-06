@@ -16,6 +16,20 @@ export default function Blog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/admin/check-auth");
+        const data = await res.json();
+        setIsAuthenticated(data.authenticated);
+      } catch (error) {
+        console.error("Auth check failed", error);
+      }
+    };
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -91,6 +105,21 @@ export default function Blog() {
           onChange={handleSearch}
           onBlur={handleSearchBlur}
         />
+
+        {isAuthenticated && (
+          <div style={{ marginBottom: "2rem", textAlign: "right" }}>
+            <Link href="/admin/new-post" style={{
+              background: "#0070f3",
+              color: "white",
+              padding: "0.8rem 1.5rem",
+              borderRadius: "5px",
+              textDecoration: "none",
+              fontWeight: "bold"
+            }}>
+              + Nuevo Artículo
+            </Link>
+          </div>
+        )}
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "2rem", color: "white" }}>
