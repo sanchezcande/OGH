@@ -58,21 +58,27 @@ function renderArticleBlock(block, key) {
   );
 }
 
-export default function ArticlePage() {
-  const { query } = useRouter();
-  const { slug } = query;
-  const { t } = useTranslation();
-  const articles = t("articles", { returnObjects: true }) || [];
 
-  const article = articles.find((article) => article.slug === slug);
+export default function ArticlePage({ article, error }) {
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
 
-  if (!article) {
-    return <ErrorMessage>{t("articleNotFound")}</ErrorMessage>;
+  // Escuchar cambios de idioma y actualizar la página para reflejar la traducción correcta
+  React.useEffect(() => {
+    if (article && i18n.language !== article.lang) {
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, lang: i18n.language },
+      }, undefined, { shallow: false });
+    }
+  }, [i18n.language, article, router]);
+
+  if (error || !article) {
+    return <ErrorMessage>{t("articleNotFound") || "Artículo no encontrado."}</ErrorMessage>;
   }
 
   // Obtenemos el extracto para la descripción (usando los primeros 150 caracteres)
-  const descriptionExcerpt =
-    article.content.split("\n\n")[0].substring(0, 150) + "...";
+  const descriptionExcerpt = article.summary || (article.content.split("\n\n")[0].substring(0, 150) + "...");
 
   return (
     <motion.div
@@ -94,10 +100,11 @@ export default function ArticlePage() {
 
         <ImageContainer>
           <Image
-            src={article.image}
+            src={article.image || "/images/placeholder.png"}
             alt={article.title}
             width={900}
             height={506}
+            priority
             sizes="(max-width: 768px) 100vw, 900px"
             style={{ maxWidth: "100%", height: "auto", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}
           />
@@ -112,3 +119,28 @@ export default function ArticlePage() {
     </motion.div>
   );
 }
+
+export async function getServerSideProps(context) {
+  const { slug } = context.params;
+  const { lang = 'es' } = context.query;
+
+  try {
+    // Determine base URL for internal API call
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const host = context.req.headers.host;
+    const baseUrl = `${protocol}://${host}`;
+
+    const res = await fetch(`${baseUrl}/api/blog/${slug}?lang=${lang}`);
+
+    if (!res.ok) {
+      return { props: { article: null, error: true } };
+    }
+
+    const article = await res.json();
+    return { props: { article } };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return { props: { article: null, error: true } };
+  }
+}
+

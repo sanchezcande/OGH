@@ -584,7 +584,12 @@
     ]
   },
   "searchPlaceholder": "Buscar artículos...",
+  "newest": "Más recientes",
+  "oldest": "Más antiguos",
+  "alphabetical": "Alfabético",
+  "loadMore": "Cargar más",
   "readMore": "Leer más",
+  "edit": "Editar",
   "articles": [
     {
       "title": "Noticia de enero 2026: la automatización agentic entra en fase empresarial",
@@ -765,27 +770,47 @@
     "estudioSab": {
       "title": "Estudio Sab",
       "description": "Desarrollo web full-stack para un estudio de diseño creativo.",
-      "metrics": ["Desarrollo completo", "Diseño moderno", "Sitio web en vivo"]
+      "metrics": [
+        "Desarrollo completo",
+        "Diseño moderno",
+        "Sitio web en vivo"
+      ]
     },
     "skylar": {
       "title": "Skylar",
       "description": "Plataforma de e-commerce para una marca líder de útiles escolares en Argentina.",
-      "metrics": ["≤2s TTI", "+28% conversiones", "Catálogo en vivo"]
+      "metrics": [
+        "≤2s TTI",
+        "+28% conversiones",
+        "Catálogo en vivo"
+      ]
     },
     "vantage": {
       "title": "Vantage",
       "description": "Staff augmentation — ingenieros y QA embebidos en su equipo, acelerando la entrega del roadmap y mejorando la velocidad de desarrollo.",
-      "metrics": ["Staff Augmentation", "Roadmap acelerado", "QA embebido"]
+      "metrics": [
+        "Staff Augmentation",
+        "Roadmap acelerado",
+        "QA embebido"
+      ]
     },
     "hotDateKitchen": {
       "title": "Hot Date Kitchen",
       "description": "Landing y e-commerce para una marca premium de snacks veganos. Dátiles artesanales, tienda Shopify y narrativa enfocada en sustentabilidad.",
-      "metrics": ["Landing + E-commerce", "Shopify", "Marca carbono neutral"]
+      "metrics": [
+        "Landing + E-commerce",
+        "Shopify",
+        "Marca carbono neutral"
+      ]
     },
     "cicero": {
       "title": "Cicero",
       "description": "Bibliotecario personal con IA (etapa temprana).",
-      "metrics": ["Dirección de producto", "Desarrollo temprano", "Ver en LinkedIn"]
+      "metrics": [
+        "Dirección de producto",
+        "Desarrollo temprano",
+        "Ver en LinkedIn"
+      ]
     }
   },
   "metricsSection": {
@@ -836,41 +861,41 @@
     "title": "Los Rostros Detrás del Código",
     "subtitle": "Conoce a las personas que convierten desafíos en soluciones e ideas en realidad.",
     "members": {
-                     "javier": {
-                 "name": "Javier",
-                 "role": "Ingeniero Frontend Senior",
-                 "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
-               },
-                     "giuliano": {
-                 "name": "Giuliano",
-                 "role": "Ingeniero Full Stack",
-                 "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
-               },
-                     "laura": {
-                 "name": "Laura",
-                 "role": "Desarrolladora Frontend",
-                 "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
-               },
-                     "gustavo": {
-                 "name": "Gustavo",
+      "javier": {
+        "name": "Javier",
+        "role": "Ingeniero Frontend Senior",
+        "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
+      },
+      "giuliano": {
+        "name": "Giuliano",
+        "role": "Ingeniero Full Stack",
+        "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
+      },
+      "laura": {
+        "name": "Laura",
+        "role": "Desarrolladora Frontend",
+        "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
+      },
+      "gustavo": {
+        "name": "Gustavo",
         "role": "CTO",
-                 "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
-               },
-                     "alejandria": {
-                 "name": "Alejandría",
-                 "role": "Analista QA",
-                 "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
-              },
-                     "vadym": {
-                 "name": "Vadym",
-                 "role": "Desarrollador Full Stack",
-                 "description": "Desarrollador Full Stack con gran atención al detalle y pasión por construir productos digitales de alta calidad. Especializado en desarrollo frontend moderno y experiencias 3D e interactivas avanzadas con Three.js, combinado con sólida experiencia backend en Node.js y Python. Con experiencia en testing de automatización y sistemas cloud, Vadym aporta confiabilidad, precisión y escalabilidad a cada proyecto en el que trabaja."
-               },
-                     "ilia": {
-                 "name": "Ilia",
-                 "role": "Ingeniero Senior de Automatización QA",
-                 "description": "Ingeniero Senior de Automatización QA con un fuerte enfoque en construir sistemas de testing confiables y escalables. Especializado en frameworks de automatización basados en Python, testing end-to-end e integración CI/CD, asegurando releases de alta calidad en plataformas complejas. Con experiencia liderando iniciativas de automatización y mentoreando equipos, Ilia aporta estructura, eficiencia y confianza a cada proceso de desarrollo."
-               }
+        "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
+      },
+      "alejandria": {
+        "name": "Alejandría",
+        "role": "Analista QA",
+        "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
+      },
+      "vadym": {
+        "name": "Vadym",
+        "role": "Desarrollador Full Stack",
+        "description": "Desarrollador Full Stack con gran atención al detalle y pasión por construir productos digitales de alta calidad. Especializado en desarrollo frontend moderno y experiencias 3D e interactivas avanzadas con Three.js, combinado con sólida experiencia backend en Node.js y Python. Con experiencia en testing de automatización y sistemas cloud, Vadym aporta confiabilidad, precisión y escalabilidad a cada proyecto en el que trabaja."
+      },
+      "ilia": {
+        "name": "Ilia",
+        "role": "Ingeniero Senior de Automatización QA",
+        "description": "Ingeniero Senior de Automatización QA con un fuerte enfoque en construir sistemas de testing confiables y escalables. Especializado en frameworks de automatización basados en Python, testing end-to-end e integración CI/CD, asegurando releases de alta calidad en plataformas complejas. Con experiencia liderando iniciativas de automatización y mentoreando equipos, Ilia aporta estructura, eficiencia y confianza a cada proceso de desarrollo."
+      }
     }
   },
   "calculator": {

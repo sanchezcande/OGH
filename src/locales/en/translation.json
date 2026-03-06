@@ -251,7 +251,6 @@
     "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
     "buttonText": "Book a Free Call"
   },
-
   "contactUsCallToAction": {
     "title": "Ready to Talk Solutions?",
     "description": "Schedule a free call with our team to discuss your project.",
@@ -306,19 +305,15 @@
   },
   "companyHistoryTitle": "Our Journey",
   "companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
-
   "missionAndCoreValuesTitle_part1": "Our Mission & ",
   "missionAndCoreValuesTitle_highlight": "Values",
   "missionAndCoreValuesDescription": "We believe in doing meaningful work — with people who care. Our mission is to support founders and teams who want to create value with integrity, for their users, their investors, and the world they're part of.",
-
   "technologiesTitle_part1": "Our ",
   "technologiesTitle_highlight": "People",
   "technologiesDescription": "The strength of what we build comes from who we build it with. Our team isn't just talented — they're thoughtful, reliable, and genuinely committed to creating products with purpose.",
-
   "commitmentToInnovationTitle_part1": "Innovation with ",
   "commitmentToInnovationTitle_highlight": "Purpose",
   "commitmentToInnovationDescription": "We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.",
-
   "frontendTitle": "Front-end",
   "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
   "howWeBuildIntro": "This capability is delivered through our Staff Augmentation and Workflow Automation engagement models.",
@@ -572,7 +567,12 @@
     ]
   },
   "searchPlaceholder": "Search articles...",
+  "newest": "Newest",
+  "oldest": "Oldest",
+  "alphabetical": "Alphabetical",
+  "loadMore": "Load more",
   "readMore": "Read more",
+  "edit": "Edit",
   "articles": [
     {
       "title": "January 2026 automation news: agentic operations go enterprise-grade",
@@ -756,27 +756,47 @@
     "estudioSab": {
       "title": "Estudio Sab",
       "description": "Full-stack web development for a creative design studio.",
-      "metrics": ["Full development", "Modern design", "Live website"]
+      "metrics": [
+        "Full development",
+        "Modern design",
+        "Live website"
+      ]
     },
     "skylar": {
       "title": "Skylar",
       "description": "E-commerce platform for a leading school supplies brand in Argentina.",
-      "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
+      "metrics": [
+        "≤2s TTI",
+        "+28% conversions",
+        "Live catalog"
+      ]
     },
     "vantage": {
       "title": "Vantage",
       "description": "Staff augmentation — embedded engineers and QA into their team, accelerating roadmap delivery and boosting development velocity.",
-      "metrics": ["Staff Augmentation", "Faster roadmap", "QA embedded"]
+      "metrics": [
+        "Staff Augmentation",
+        "Faster roadmap",
+        "QA embedded"
+      ]
     },
     "hotDateKitchen": {
       "title": "Hot Date Kitchen",
       "description": "Landing page and e-commerce for a premium vegan snack brand.",
-      "metrics": ["Landing + E-commerce", "Shopify", "Carbon neutral brand"]
+      "metrics": [
+        "Landing + E-commerce",
+        "Shopify",
+        "Carbon neutral brand"
+      ]
     },
     "cicero": {
       "title": "Cicero",
       "description": "AI-powered personal librarian (early-stage).",
-      "metrics": ["Product direction", "Early development", "View on LinkedIn"]
+      "metrics": [
+        "Product direction",
+        "Early development",
+        "View on LinkedIn"
+      ]
     }
   },
   "metricsSection": {

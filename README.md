@@ -1,73 +1,42 @@
-# Getting Started with Create React App
+# Automation & Process Improvement Blog | OpenGateHub
 
-## to use webpack:
+Este proyecto es una plataforma de blog moderna con un sistema de gestión de contenidos (CMS) integrado, optimizada para SEO y diseñada para un rendimiento máximo con Next.js, Prisma y MySQL.
 
-npx webpack --config webpack.config.js  
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 🛠️ Comandos de Base de Datos
 
-## Available Scripts
+Para facilitar el desarrollo local y el despliegue, se han incluido scripts específicos para la gestión de la base de datos:
 
-In the project directory, you can run:
+- `npm run db:setup`: **Comando recomendado para nuevas instalaciones.** Sincroniza el esquema de Prisma con tu base de datos y carga los artículos iniciales (seed) en español e inglés.
+- `npm run db:push`: Sincroniza los cambios en `schema.prisma` con la base de datos sin necesidad de migraciones manuales.
+- `npm run db:seed`: Carga o actualiza los artículos del blog desde los archivos JSON de traducciones.
+- `npm run db:studio`: Abre una interfaz web interactiva (`localhost:5555`) para explorar y editar los datos de la base de datos de forma visual.
 
-### `npm start`
+## 🚀 Guía de Despliegue en Vercel
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 1. Variables de Entorno
+Debes configurar las siguientes variables en el panel de Vercel (**Project Settings > Environment Variables**):
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| Variable | Descripción | Ejemplo / Observación |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | Conexión a la DB de producción | `mysql://user:pass@host:port/dbname` |
+| `ADMIN_PASSWORD` | Contraseña para acceder al CMS | Una clave segura de tu elección |
+| `JWT_SECRET` | Secreto para firmar sesiones | Una cadena larga y aleatoria |
+| `BLOB_READ_WRITE_TOKEN` | Token para gestión de imágenes | Se genera al crear el Storage en Vercel |
 
-### `npm test`
+### 2. Pasos para el Despliegue Inicial
+1. **Provisionar Base de Datos:** Crea tu base de datos MySQL/PostgreSQL.
+2. **Conectar Vercel Blob:** En la pestaña **Storage** de Vercel, crea un nuevo **Blob store**.
+3. **Sincronizar DB:** Antes del primer despliegue, ejecuta `npx prisma db push` apuntando a la URL de producción para crear las tablas.
+4. **Cargar Datos:** Ejecuta `node scripts/seed-blog.js` (asegurándote de que `DATABASE_URL` apunte a producción) para cargar los posts iniciales.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📁 Estructura del Blog
 
-### `npm run build`
+- `/blog`: Listado público con paginación y filtros.
+- `/admin/login`: Acceso seguro para administradores.
+- `/admin/new-post`: Formulario para crear o editar artículos con subida de imágenes.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 📖 Otros Comandos
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- `npm run dev`: Inicia el servidor de desarrollo en `localhost:3000`.
+- `npm run build`: Genera la versión de producción optimizada.
+- `npm run generate-sitemap`: Actualiza el sitemap para motores de búsqueda.

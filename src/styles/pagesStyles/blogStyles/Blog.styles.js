@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Link from "next/link";
 
 export const BlogContainer = styled.div`
   display: flex;
@@ -16,6 +17,23 @@ export const SearchBarContainer = styled.div`
   margin-bottom: 20px;
 `;
 
+export const ControlsRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+`;
+
+export const SearchAndSort = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+`;
+
 export const SearchInput = styled.input`
   width: 280px;
   padding: 10px 15px;
@@ -25,17 +43,32 @@ export const SearchInput = styled.input`
   font-size: ${({ theme }) => theme.fontSizes.body.desktop};
   color: ${({ theme }) => theme.colors.text};
   outline: none;
-  margin-left: 10px;
-  margin-bottom: 20px;
   transition: border-color 0.2s ease;
 
   @media (max-width: 768px) {
     font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    width: 100%;
   }
 
   &::placeholder {
     color: #9ca3af;
   }
+
+  &:focus {
+    border-color: #6b7280;
+  }
+`;
+
+export const SortSelect = styled.select`
+  padding: 10px 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+  color: ${({ theme }) => theme.colors.text};
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
 
   &:focus {
     border-color: #6b7280;
@@ -152,5 +185,48 @@ export const ArticleCard = styled.div`
       color: #374151;
       border-bottom-color: #374151;
     }
+  }
+`;
+
+export const CardActions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  width: 100%;
+`;
+
+export const EditLink = styled(Link)`
+  color: #0070f3;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+export const LoadMoreButton = styled.button`
+  margin: 40px auto;
+  padding: 12px 30px;
+  background: white;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: block;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
