@@ -7,21 +7,39 @@ import {
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
 import Image from "next/image";
-import Head from "next/head";
 import SEO from "../../src/components/SEO/SEO";
 import { useTranslation } from "react-i18next";
 
 export default function Blog() {
-  const { t } = useTranslation();
-  const articles = t("articles", { returnObjects: true }) || [];
+  const { t, i18n } = useTranslation();
+  const [articles, setArticles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const filteredArticles = articles.filter(
-    (article) =>
-      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.summary.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  useEffect(() => {
+    const fetchArticles = async () => {
+      setLoading(true);
+      try {
+        const lang = i18n.language || "es";
+        const response = await fetch(`/api/blog?lang=${lang}&search=${searchTerm}`);
+        if (response.ok) {
+          const data = await response.json();
+          setArticles(data);
+        }
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchArticles();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [i18n.language, searchTerm]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -39,7 +57,7 @@ export default function Blog() {
     cards.forEach((card) => observer.observe(card));
 
     return () => observer.disconnect();
-  }, [filteredArticles]);
+  }, [articles]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -74,26 +92,39 @@ export default function Blog() {
           onBlur={handleSearchBlur}
         />
 
-        <Gallery>
-          {filteredArticles.map((article) => (
-            <ArticleCard key={article.slug} className="article-card">
-              <Image
-                src={article.thumbnail || article.image}
-                alt={article.title}
-                width={600}
-                height={300}
-                sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw"
-                style={{ width: "100%", height: "200px", objectFit: "cover" }}
-                loading="lazy"
-                onLoad={handleImageLoad}
-              />
-              <h2>{article.title}</h2>
-              <p>{article.summary}</p>
-              <Link href={`/blog/${article.slug}`}>{t("readMore")}</Link>
-            </ArticleCard>
-          ))}
-        </Gallery>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "2rem", color: "white" }}>
+            {t("loading") || "Cargando..."}
+          </div>
+        ) : (
+          <Gallery>
+            {articles.length > 0 ? (
+              articles.map((article) => (
+                <ArticleCard key={article.slug} className="article-card">
+                  <Image
+                    src={article.thumbnail || article.image || "/images/placeholder.png"}
+                    alt={article.title}
+                    width={600}
+                    height={300}
+                    sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw"
+                    style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                    loading="lazy"
+                    onLoad={handleImageLoad}
+                  />
+                  <h2>{article.title}</h2>
+                  <p>{article.summary}</p>
+                  <Link href={`/blog/${article.slug}`}>{t("readMore")}</Link>
+                </ArticleCard>
+              ))
+            ) : (
+              <div style={{ textAlign: "center", gridColumn: "1 / -1", padding: "2rem", color: "white" }}>
+                {t("noArticlesFound") || "No se encontraron artículos."}
+              </div>
+            )}
+          </Gallery>
+        )}
       </BlogContainer>
     </>
   );
 }
+

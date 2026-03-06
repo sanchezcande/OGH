@@ -1,5 +1,4 @@
 import React from "react";
-import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import SEO from "../../src/components/SEO/SEO";
@@ -58,21 +57,15 @@ function renderArticleBlock(block, key) {
   );
 }
 
-export default function ArticlePage() {
-  const { query } = useRouter();
-  const { slug } = query;
+export default function ArticlePage({ article, error }) {
   const { t } = useTranslation();
-  const articles = t("articles", { returnObjects: true }) || [];
 
-  const article = articles.find((article) => article.slug === slug);
-
-  if (!article) {
-    return <ErrorMessage>{t("articleNotFound")}</ErrorMessage>;
+  if (error || !article) {
+    return <ErrorMessage>{t("articleNotFound") || "Artículo no encontrado."}</ErrorMessage>;
   }
 
   // Obtenemos el extracto para la descripción (usando los primeros 150 caracteres)
-  const descriptionExcerpt =
-    article.content.split("\n\n")[0].substring(0, 150) + "...";
+  const descriptionExcerpt = article.summary || (article.content.split("\n\n")[0].substring(0, 150) + "...");
 
   return (
     <motion.div
@@ -94,10 +87,11 @@ export default function ArticlePage() {
 
         <ImageContainer>
           <Image
-            src={article.image}
+            src={article.image || "/images/placeholder.png"}
             alt={article.title}
             width={900}
             height={506}
+            priority
             sizes="(max-width: 768px) 100vw, 900px"
             style={{ maxWidth: "100%", height: "auto", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}
           />
@@ -112,3 +106,28 @@ export default function ArticlePage() {
     </motion.div>
   );
 }
+
+export async function getServerSideProps(context) {
+  const { slug } = context.params;
+  const { lang = 'es' } = context.query;
+
+  try {
+    // Determine base URL for internal API call
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const host = context.req.headers.host;
+    const baseUrl = `${protocol}://${host}`;
+
+    const res = await fetch(`${baseUrl}/api/blog/${slug}?lang=${lang}`);
+
+    if (!res.ok) {
+      return { props: { article: null, error: true } };
+    }
+
+    const article = await res.json();
+    return { props: { article } };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return { props: { article: null, error: true } };
+  }
+}
+
