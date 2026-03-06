@@ -5,7 +5,11 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    const { lang = 'es', search = '' } = req.query;
+    const { lang = 'es', search = '', sort = 'newest' } = req.query;
+
+    let orderBy = { createdAt: 'desc' };
+    if (sort === 'oldest') orderBy = { createdAt: 'asc' };
+    if (sort === 'alphabetical') orderBy = { title: 'asc' };
 
     try {
         const articles = await prisma.article.findMany({
@@ -16,9 +20,7 @@ export default async function handler(req, res) {
                     { summary: { contains: search } },
                 ],
             },
-            orderBy: {
-                createdAt: 'desc',
-            },
+            orderBy,
         });
 
         return res.status(200).json(articles);

@@ -4,6 +4,9 @@ import {
   Gallery,
   ArticleCard,
   SearchInput,
+  ControlsRow,
+  SearchAndSort,
+  SortSelect,
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +17,7 @@ export default function Blog() {
   const { t, i18n } = useTranslation();
   const [articles, setArticles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -36,7 +40,7 @@ export default function Blog() {
       setLoading(true);
       try {
         const lang = i18n.language || "es";
-        const response = await fetch(`/api/blog?lang=${lang}&search=${searchTerm}`);
+        const response = await fetch(`/api/blog?lang=${lang}&search=${searchTerm}&sort=${sortOrder}`);
         if (response.ok) {
           const data = await response.json();
           setArticles(data);
@@ -53,7 +57,7 @@ export default function Blog() {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [i18n.language, searchTerm]);
+  }, [i18n.language, searchTerm, sortOrder]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -98,16 +102,23 @@ export default function Blog() {
         keywords="workflow automation blog, process improvement, n8n tutorials, AI business guides, operational efficiency"
       />
       <BlogContainer>
-        <SearchInput
-          type="text"
-          placeholder={t("searchPlaceholder") || "Buscar artículos..."}
-          value={searchTerm}
-          onChange={handleSearch}
-          onBlur={handleSearchBlur}
-        />
+        <ControlsRow>
+          <SearchAndSort>
+            <SearchInput
+              type="text"
+              placeholder={t("searchPlaceholder") || "Buscar artículos..."}
+              value={searchTerm}
+              onChange={handleSearch}
+              onBlur={handleSearchBlur}
+            />
+            <SortSelect value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+              <option value="newest">{t("newest") || "Más recientes"}</option>
+              <option value="oldest">{t("oldest") || "Más antiguos"}</option>
+              <option value="alphabetical">{t("alphabetical") || "Alfabético"}</option>
+            </SortSelect>
+          </SearchAndSort>
 
-        {isAuthenticated && (
-          <div style={{ marginBottom: "2rem", textAlign: "right" }}>
+          {isAuthenticated && (
             <Link href="/admin/new-post" style={{
               background: "#0070f3",
               color: "white",
@@ -118,8 +129,8 @@ export default function Blog() {
             }}>
               + Nuevo Artículo
             </Link>
-          </div>
-        )}
+          )}
+        </ControlsRow>
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "2rem", color: "white" }}>

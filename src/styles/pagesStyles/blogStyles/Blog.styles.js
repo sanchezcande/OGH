@@ -16,6 +16,23 @@ export const SearchBarContainer = styled.div`
   margin-bottom: 20px;
 `;
 
+export const ControlsRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+`;
+
+export const SearchAndSort = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+`;
+
 export const SearchInput = styled.input`
   width: 280px;
   padding: 10px 15px;
@@ -25,17 +42,32 @@ export const SearchInput = styled.input`
   font-size: ${({ theme }) => theme.fontSizes.body.desktop};
   color: ${({ theme }) => theme.colors.text};
   outline: none;
-  margin-left: 10px;
-  margin-bottom: 20px;
   transition: border-color 0.2s ease;
 
   @media (max-width: 768px) {
     font-size: ${({ theme }) => theme.fontSizes.body.mobile};
+    width: 100%;
   }
 
   &::placeholder {
     color: #9ca3af;
   }
+
+  &:focus {
+    border-color: #6b7280;
+  }
+`;
+
+export const SortSelect = styled.select`
+  padding: 10px 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: ${({ theme }) => theme.fontSizes.body.desktop};
+  color: ${({ theme }) => theme.colors.text};
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
 
   &:focus {
     border-color: #6b7280;
