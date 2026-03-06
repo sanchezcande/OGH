@@ -46,7 +46,12 @@
     "start": "next start",
     "lint": "next lint",
     "analyze": "cross-env ANALYZE=true next build",
-    "generate-sitemap": "node generate-sitemap.js"
+    "generate-sitemap": "node generate-sitemap.js",
+    "db:push": "prisma db push",
+    "db:seed": "node scripts/seed-blog.js",
+    "db:setup": "prisma db push && node scripts/seed-blog.js",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
   },
   "eslintConfig": {
     "extends": [
