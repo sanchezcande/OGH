@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   ServiceContainer,
   ServiceTitle,
@@ -252,22 +252,11 @@ const N8nAutomation = () => {
 
   return (
     <>
-      <Head>
-        <title>n8n Automation Agency — Custom Workflow Automation | OpenGateHub</title>
-        <meta
-          name="description"
-          content="We build and deploy custom n8n workflows that connect your apps, automate repetitive processes, and give you real-time visibility over your operations — without writing code."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="n8n Automation Agency — Custom Workflow Automation | OpenGateHub" />
-        <meta property="og:description" content="n8n workflow automation built by experts. We connect your tools, automate your operations, and give your team back the hours that matter." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="n8n automation, n8n agency, n8n workflow, n8n integrations, workflow automation, no-code automation, business process automation"
-        />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="n8n Automation Agency — Custom Workflow Automation | OpenGateHub"
+        description="We build and deploy custom n8n workflows that connect your apps, automate repetitive processes, and give you real-time visibility over your operations — without writing code."
+        keywords="n8n automation, n8n agency, n8n workflow, n8n integrations, workflow automation, no-code automation, business process automation"
+      />
 
       {/* Hero Section - Full Width */}
       <section
@@ -320,7 +309,8 @@ const N8nAutomation = () => {
           >
             <FaProjectDiagram />
           </div>
-          <style>{`
+          <style dangerouslySetInnerHTML={{
+            __html: `
             @keyframes float {
               0%, 100% { 
                 transform: translateY(0px) rotate(0deg); 
@@ -339,7 +329,7 @@ const N8nAutomation = () => {
                 transform: translateY(0); 
               }
             }
-          `}</style>
+          ` }} />
           <h1
             className="animate"
             style={{
@@ -676,7 +666,8 @@ const N8nAutomation = () => {
               </p>
             </div>
           </div>
-          <style>{`
+          <style dangerouslySetInnerHTML={{
+            __html: `
           .use-case-card:hover {
             transform: translateY(-8px) !important;
             box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
@@ -689,7 +680,7 @@ const N8nAutomation = () => {
           .use-case-card:hover h4 {
             color: #F97B72 !important;
           }
-        `}</style>
+        ` }} />
         </div>
       </section>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   FaPalette,
   FaEye,
@@ -122,15 +122,11 @@ const GraphicDesign = () => {
 
   return (
     <>
-      <Head>
-        <title>Graphic Design - OpenGateHub</title>
-        <meta name="description" content={t("graphicDesign.description")} />
-        <meta
-          name="keywords"
-          content="Graphic Design, Branding, Visual Identity, Professional Graphics, Digital Campaigns"
-        />
-        <meta name="author" content="OpenGateHub" />
-      </Head>
+      <SEO
+        title="Professional Graphic Design & Branding | OpenGateHub"
+        description="We create consistent, high-impact visual identities. From logo design and complete branding to digital graphics and print materials — professional design that tells your story."
+        keywords="graphic design, branding agency, visual identity, logo design, professional graphics, digital design, print material design"
+      />
 
       <style>{`
         @keyframes fadeInUp {

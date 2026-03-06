@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   FaUserCheck,
   FaMobileAlt,
@@ -113,22 +113,11 @@ const UxUi = () => {
 
   return (
     <>
-      <Head>
-        <title>UX/UI Design for SaaS & Digital Products | OpenGateHub</title>
-        <meta
-          name="description"
-          content="We design interfaces your users actually want to use — wireframes, prototypes, full visual systems, and engineering-ready handoffs. Human-first UX with measurable impact."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="UX/UI Design for SaaS & Digital Products | OpenGateHub" />
-        <meta property="og:description" content="From wireframes to production — UX/UI design that reduces friction, improves conversion, and makes your product feel effortless to use." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="UX design, UI design, product design, SaaS design, user experience, wireframes, prototypes, design system"
-        />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="UX/UI Design for SaaS & Digital Products | OpenGateHub"
+        description="We design interfaces your users actually want to use — wireframes, prototypes, full visual systems, and engineering-ready handoffs. Human-first UX with measurable impact."
+        keywords="UX design agency, UI design service, product design, SaaS UX, user experience design, wireframing, prototyping, design systems, conversion rate optimization"
+      />
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }

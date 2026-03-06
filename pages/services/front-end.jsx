@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -58,22 +58,11 @@ const FrontEnd = () => {
 
   return (
     <>
-      <Head>
-        <title>Frontend Development — React & Next.js for SaaS & Web Apps | OpenGateHub</title>
-        <meta
-          name="description"
-          content="We build fast, modern frontends with React and Next.js — from SaaS dashboards to e-commerce. Clean architecture, ≤2s load times, and design that actually converts."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Frontend Development — React & Next.js | OpenGateHub" />
-        <meta property="og:description" content="Fast, modern frontends built with React and Next.js. SaaS dashboards, e-commerce, landing pages — built to perform and convert." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="frontend development, React development, Next.js, web development, SaaS frontend, web performance, responsive design"
-        />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="Frontend Development — React & Next.js for SaaS & Web Apps | OpenGateHub"
+        description="We build fast, modern frontends with React and Next.js — from SaaS dashboards to e-commerce. Clean architecture, ≤2s load times, and design that actually converts."
+        keywords="frontend development, React developer, Next.js architecture, SaaS frontend, web performance, responsive design, modern UI/UX, web development agency"
+      />
 
       <style>{`
         @keyframes fadeInUp {

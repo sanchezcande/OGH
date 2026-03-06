@@ -7,7 +7,7 @@ import {
 } from "../../src/styles/pagesStyles/AboutUs.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import Image from "next/image";
 import AboutTimeline from "../../src/components/Timeline/AboutTimeline";
 import TeamSection from "../../src/components/TeamSection/TeamSection";
@@ -62,26 +62,11 @@ const AboutUs = React.forwardRef((props, ref) => {
 
   return (
     <Container ref={ref}>
-      <Head>
-        <title>About OpenGateHub — Workflow Automation & Engineering Team | OpenGateHub</title>
-        <meta
-          name="description"
-          content="We're a human-first automation and engineering company from Latin America. Near-timezone, senior teams that embed into your workflow — 9.7/10 CSAT, 87% on-time delivery."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="About OpenGateHub — Workflow Automation & Engineering Team" />
-        <meta
-          property="og:description"
-          content="Human-first execution, measurable outcomes. We embed senior engineers and automate workflows for impact-driven companies — 9.7/10 CSAT, 7.3-day kickoff."
-        />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="OpenGateHub, workflow automation company, staff augmentation, engineering team, process automation, near-shore development"
-        />
-        <meta name="robots" content="index, follow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+      <SEO
+        title="About OpenGateHub — Workflow Automation & Engineering Team | OpenGateHub"
+        description="We're a human-first automation and engineering company from Latin America. Near-timezone, senior teams that embed into your workflow — 9.7/10 CSAT, 87% on-time delivery."
+        keywords="OpenGateHub, workflow automation company, staff augmentation, engineering team, process automation, near-shore development"
+      />
 
       <CompanyDescription ref={companyDescRef}>
         <h1>

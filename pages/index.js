@@ -17,7 +17,7 @@ import {
 } from "../src/styles/pagesStyles/HomePages.styles";
 import { useTranslation } from "react-i18next";
 import CallToActionBlock from "../src/components/CallToAction/CallToAction";
-import Head from "next/head";
+import SEO from "../src/components/SEO/SEO";
 import { InView } from "../src/components/InView/InView";
 import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
 import MetricsSection from "../src/components/Metrics/MetricsSection";
@@ -567,7 +567,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
             >
               {/* Stars */}
               <div style={{ display: "flex", gap: "2px" }}>
-                {[1,2,3,4,5].map((s) => (
+                {[1, 2, 3, 4, 5].map((s) => (
                   <span key={s} style={{ color: "#f97b72", fontSize: "0.95rem" }}>★</span>
                 ))}
               </div>
@@ -736,9 +736,9 @@ const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories =
             }}
           >
             {subcategories.map((item, index) => (
-              <Link 
+              <Link
                 key={index}
-                href={item.href} 
+                href={item.href}
                 style={{ textDecoration: "none" }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -1055,14 +1055,14 @@ export default function HomePage() {
     if (!text) return [];
     const parts = text.split(/<highlight>|<\/highlight>/);
     const result = [];
-    
+
     for (let i = 0; i < parts.length; i++) {
       if (i % 2 === 1) {
         // This is a highlighted word
         const highlightedWord = parts[i];
         const nextPart = parts[i + 1] || "";
         const isPunctuationOnly = /^[.,;:!?]+$/.test(nextPart.trim());
-        
+
         if (isPunctuationOnly) {
           result.push(
             <span key={i} className="highlighted-word-with-punctuation">
@@ -1085,7 +1085,7 @@ export default function HomePage() {
         }
       }
     }
-    
+
     return result;
   };
 
@@ -1221,33 +1221,49 @@ export default function HomePage() {
     },
   ];
 
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "OpenGateHub",
+    "url": "https://opengatehub.com",
+    "logo": "https://opengatehub.com/browser-link-logo.png",
+    "sameAs": [
+      "https://www.linkedin.com/company/opengatehub"
+    ],
+    "description": "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and embedded engineering teams."
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": "https://opengatehub.com",
+    "name": "OpenGateHub",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://opengatehub.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <>
-      <Head>
-        <title>Workflow & Process Automation for Companies | OpenGateHub</title>
-        <meta
-          name="description"
-          content="Your team is losing 8+ hours per person each week to tasks automation handles in minutes. OpenGateHub automates your workflows, embeds senior engineers, and delivers results in 7.3 days."
+      <SEO
+        title="Workflow & Process Automation for Companies | OpenGateHub"
+        description="Your team is losing 8+ hours per person each week to tasks automation handles in minutes. OpenGateHub automates your workflows, embeds senior engineers, and delivers results in 7.3 days."
+        keywords="workflow automation, process automation, staff augmentation, n8n automation, AI automation, operational efficiency, reduce manual work, business automation"
+      >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        <meta
-          name="keywords"
-          content="workflow automation, process automation, staff augmentation, n8n automation, AI automation, operational efficiency, reduce manual work, business automation"
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Workflow & Process Automation for Companies | OpenGateHub" />
-        <meta
-          property="og:description"
-          content="Stop losing hours to manual work. We automate your workflows, connect your tools, and embed senior engineers — 9.7/10 CSAT, 7.3-day kickoff, 50+ sprints shipped."
-        />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta property="og:url" content="https://opengatehub.com" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Workflow & Process Automation for Companies | OpenGateHub" />
-        <meta name="twitter:description" content="Stop losing hours to manual work. We automate workflows, connect tools, and embed senior engineers." />
-        <meta name="twitter:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
-      </Head>
+      </SEO>
 
       <Container>
         <FloatingBlob />
@@ -1264,21 +1280,7 @@ export default function HomePage() {
 
           <Glow />
           <Title>
-            {/* Desktop version with animation */}
-            <span className="animated desktop-only">
-              {t("heroAnimatedText.part1")}
-              <span className="highlighted-word">
-                {t("heroAnimatedText.highlight1")}
-              </span>{" "}
-              {t("heroAnimatedText.part2")}{" "}
-              <span className="highlighted-word">
-                {t("heroAnimatedText.highlight2")}
-              </span>
-              .
-            </span>
-
-            {/* Mobile version without animation */}
-            <span className="mobile-only">
+            <span className="animated">
               {t("heroAnimatedText.part1")}
               <span className="highlighted-word">
                 {t("heroAnimatedText.highlight1")}
@@ -1680,7 +1682,7 @@ export default function HomePage() {
                 },
               ]}
             />
-            
+
             {/* Workflow Automation */}
             <ServiceBox
               icon="⚙️"
@@ -1701,7 +1703,7 @@ export default function HomePage() {
                 },
               ]}
             />
-            
+
             {/* AI + Automation Ops */}
             <ServiceBox
               icon="📈"
@@ -1799,8 +1801,8 @@ export default function HomePage() {
               }}
             >
               {[
-                { value: "8h",    labelKey: "calculator.bannerStat1Label", source: "Zapier, 2021" },
-                { value: "60%",   labelKey: "calculator.bannerStat2Label", source: "Flobotics, 2024" },
+                { value: "8h", labelKey: "calculator.bannerStat1Label", source: "Zapier, 2021" },
+                { value: "60%", labelKey: "calculator.bannerStat2Label", source: "Flobotics, 2024" },
                 { value: "2 min", labelKey: "calculator.bannerStat3Label", source: "Microsoft WTI, 2025" },
               ].map((stat) => (
                 <div

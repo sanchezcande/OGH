@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import {
   FaProjectDiagram,
@@ -276,7 +276,7 @@ const SoftwareFactory = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -287,31 +287,20 @@ const SoftwareFactory = () => {
       },
       { threshold: 0.1 },
     );
-    
+
     const items = document.querySelectorAll(".animate");
     items.forEach((item) => observer.observe(item));
-    
+
     return () => observer.disconnect();
   }, []);
 
   return (
     <>
-      <Head>
-        <title>Workflow Automation Services for Companies | OpenGateHub</title>
-        <meta
-          name="description"
-          content="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Powered by n8n, AI, and custom integrations."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Workflow Automation Services for Companies | OpenGateHub" />
-        <meta property="og:description" content="Eliminate manual tasks permanently. We build automations that connect your systems, remove bottlenecks, and give your team back the hours that matter." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="workflow automation services, business process automation, n8n automation, AI workflows, process optimization, reduce manual work"
-        />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="Workflow Automation Services for Companies | OpenGateHub"
+        description="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Powered by n8n, AI, and custom integrations."
+        keywords="workflow automation services, business process automation, n8n automation, AI workflows, process optimization, reduce manual work"
+      />
 
       <style>{`
         @keyframes fadeInUp {

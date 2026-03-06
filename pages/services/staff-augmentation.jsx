@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   ServiceTitle,
   Divider,
@@ -251,22 +251,11 @@ const staffAugmentation = () => {
 
   return (
     <>
-      <Head>
-        <title>Staff Augmentation — Embed Senior Engineers in Your Team | OpenGateHub</title>
-        <meta
-          name="description"
-          content="Scale your engineering team in 7.3 days. We embed senior developers and QA engineers who join your standups, ship in your sprints, and match your culture — 87% on-time delivery."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Staff Augmentation — Embed Senior Engineers in Your Team | OpenGateHub" />
-        <meta property="og:description" content="Senior engineers embedded in your team in under 2 weeks. Nearshore, culturally aligned, and ready to ship — no management overhead." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="staff augmentation, remote developers, embedded engineering team, nearshore development, senior developers for hire, QA engineers"
-        />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="Staff Augmentation — Embed Senior Engineers in Your Team | OpenGateHub"
+        description="Scale your engineering team in 7.3 days. We embed senior developers and QA engineers who join your standups, ship in your sprints, and match your culture — 87% on-time delivery."
+        keywords="staff augmentation, remote developers, embedded engineering team, nearshore development, senior developers for hire, QA engineers"
+      />
 
       <style>{`
         @keyframes fadeInUp {
@@ -1044,15 +1033,15 @@ const staffAugmentation = () => {
         </div>
       </section>
 
-        {/* Call to Action */}
-        <div className="animate" style={{ animationDelay: "1s" }}>
-          <CallToActionBlock
-            title={t("staffAugmentation.ctaTitle")}
-            description={t("servicesCallToAction.description")}
-            buttonText={t("servicesCallToAction.buttonText")}
-            highlightWord={t("staffAugmentation.ctaHighlightWord")}
-          />
-        </div>
+      {/* Call to Action */}
+      <div className="animate" style={{ animationDelay: "1s" }}>
+        <CallToActionBlock
+          title={t("staffAugmentation.ctaTitle")}
+          description={t("servicesCallToAction.description")}
+          buttonText={t("servicesCallToAction.buttonText")}
+          highlightWord={t("staffAugmentation.ctaHighlightWord")}
+        />
+      </div>
     </>
   );
 };

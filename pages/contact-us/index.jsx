@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import Script from "next/script";
 import { motion } from "framer-motion";
 import useMediaQuery from "../../src/Hooks/useMediaQuery";
@@ -23,15 +23,11 @@ const ContactUs = () => {
 
   return (
     <>
-      <Head>
-        <title>Book a Free Automation Audit | OpenGateHub</title>
-        <meta name="description" content="Book a free 15-minute automation audit or send us a message. We'll identify your top operational bottlenecks and reply within 24 hours — no pitch, just a clear next step." />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Book a Free Automation Audit | OpenGateHub" />
-        <meta property="og:description" content="15 minutes. We'll map your biggest operational bottleneck and tell you honestly whether we can help." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="Book a Free Automation Audit | OpenGateHub"
+        description="Book a free 15-minute automation audit or send us a message. We'll identify your top operational bottlenecks and reply within 24 hours — no pitch, just a clear next step."
+        keywords="automation audit, contact OpenGateHub, workflow consulting, business automation experts, book a call"
+      />
 
       {/* Calendly Widget Script - Solo cargar en desktop */}
       {!isMobile && (
@@ -77,7 +73,7 @@ const ContactUs = () => {
               margin: "0 auto",
             }}
           >
-            {t("contactPage.heroSubtitle") || 
+            {t("contactPage.heroSubtitle") ||
               "Choose the fastest path forward: book an automation audit or request an execution estimate."}
           </p>
         </motion.div>
@@ -121,7 +117,7 @@ const ContactUs = () => {
                 marginBottom: "1.25rem",
               }}
             >
-              {t("contactPage.bookCallDescription") || 
+              {t("contactPage.bookCallDescription") ||
                 "For teams that want to reduce manual work and improve operational speed."}
             </p>
 
@@ -236,7 +232,7 @@ const ContactUs = () => {
                 marginBottom: "1.25rem",
               }}
             >
-              {t("contactPage.getEstimateDescription") || 
+              {t("contactPage.getEstimateDescription") ||
                 "Share your needs and we'll recommend the best model: Workflow Automation, Staff Augmentation, or both."}
             </p>
 
@@ -306,10 +302,10 @@ const ContactUs = () => {
                     color: "#1e293b",
                   }}
                 >
-                  {t(`contactPage.step${step}Title`) || 
+                  {t(`contactPage.step${step}Title`) ||
                     (step === 1 ? "We review your request within 24 hours" :
-                     step === 2 ? "We recommend the best engagement model" :
-                     "You get a clear next step — call or proposal.")}
+                      step === 2 ? "We recommend the best engagement model" :
+                        "You get a clear next step — call or proposal.")}
                 </h3>
               </div>
             ))}

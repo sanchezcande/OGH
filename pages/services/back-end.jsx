@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   FaServer,
   FaCloud,
@@ -118,22 +118,15 @@ const BackEnd = () => {
 
   return (
     <>
-      <Head>
-        <title>Backend & Cloud - OpenGateHub</title>
-        <meta
-          name="description"
-          content={
-            lang === "es"
-              ? "Infraestructura robusta, escalable y segura para que tu negocio nunca se detenga."
-              : "Robust, scalable and secure infrastructure so your business never stops."
-          }
-        />
-        <meta
-          name="keywords"
-          content="Backend, Cloud, Node.js, AWS, Google Cloud, Azure, Scalable Systems"
-        />
-        <meta name="author" content="OpenGateHub" />
-      </Head>
+      <SEO
+        title={lang === "es" ? "Arquitectura Backend y Soluciones Cloud | OpenGateHub" : "Backend Architecture & Cloud Solutions | OpenGateHub"}
+        description={
+          lang === "es"
+            ? "Infraestructura robusta, escalable y segura para que tu negocio nunca se detenga. Expertos en Node.js, AWS, Google Cloud y Azure."
+            : "Robust, scalable and secure infrastructure so your business never stops. Experts in Node.js, AWS, Google Cloud, and Azure."
+        }
+        keywords="Backend Development, Cloud Computing, Node.js, AWS, Google Cloud, Azure, Scalable Infrastructure, DevOps, API Development"
+      />
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   ServiceTitle,
   Divider,
@@ -256,22 +256,11 @@ const aiSolutions = () => {
 
   return (
     <>
-      <Head>
-        <title>AI Automation Solutions for Business | OpenGateHub</title>
-        <meta
-          name="description"
-          content="We embed AI into your business operations — conversational automation, generative tools, intelligent pipelines, and real-time dashboards. Practical AI that actually ships."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="AI Automation Solutions for Business | OpenGateHub" />
-        <meta property="og:description" content="From AI-powered CRMs to generative image platforms — we build practical AI solutions that connect to your existing workflows and deliver measurable results." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta
-          name="keywords"
-          content="AI automation, AI for business, AI workflow automation, generative AI, business intelligence, AI integration, machine learning solutions"
-        />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      <SEO
+        title="AI Automation Solutions for Business | OpenGateHub"
+        description="We embed AI into your business operations — conversational automation, generative tools, intelligent pipelines, and real-time dashboards. Practical AI that actually ships."
+        keywords="AI automation, AI for business, AI workflow automation, generative AI, business intelligence, AI integration, machine learning solutions"
+      />
 
       <style>{`
         @keyframes fadeInUp {
