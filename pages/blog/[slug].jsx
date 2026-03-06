@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import Image from "next/image";
 import {
   ArticleContainer,
@@ -81,15 +81,12 @@ export default function ArticlePage() {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.6 }}
     >
-      <Head>
-        {/* Título dinámico */}
-        <title>{article.title} | OpenGateHub</title>
-
-        {/* Descripción dinámica */}
-        <meta name="description" content={descriptionExcerpt} />
-
-        <meta property="og:title" content={article.title} />
-      </Head>
+      <SEO
+        title={`${article.title} | OpenGateHub`}
+        description={descriptionExcerpt}
+        image={article.image}
+        ogType="article"
+      />
 
       <ArticleContainer>
         {/* Aseguramos que el título principal sea un H1 para SEO */}

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import {
   FAQContainer,
   FAQTitle,
@@ -47,20 +47,33 @@ const FAQs = () => {
     return () => observer.disconnect();
   }, []);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": Object.keys(faqs).flatMap(category =>
+      faqs[category].questions.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    )
+  };
+
   return (
     <>
-      <Head>
-        <title>Workflow Automation FAQ — Common Questions Answered | OpenGateHub</title>
-        <meta
-          name="description"
-          content="Questions about workflow automation, staff augmentation, and AI for business? We answer the most common ones from companies like yours — honest, practical, no jargon."
+      <SEO
+        title="Workflow Automation FAQ — Common Questions Answered | OpenGateHub"
+        description="Questions about workflow automation, staff augmentation, and AI for business? We answer the most common ones from companies like yours — honest, practical, no jargon."
+        keywords="automation FAQ, workflow automation questions, AI for business FAQ, staff augmentation concerns"
+      >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Workflow Automation FAQ | OpenGateHub" />
-        <meta property="og:description" content="Common questions about workflow automation, staff augmentation, and AI for business — answered honestly." />
-        <meta property="og:image" content="https://opengatehub.com/Reducido4oscuro.png" />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      </SEO>
 
       <FAQContainer>
         <FAQTitle1>{t("faqsTitle")}</FAQTitle1>

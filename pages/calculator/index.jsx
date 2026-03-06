@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Head from "next/head";
+import SEO from "../../src/components/SEO/SEO";
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -8,35 +8,35 @@ import useMediaQuery from "../../src/Hooks/useMediaQuery";
 // ─── Calculation data (values/multipliers are language-independent) ────────────
 
 const TEAM_SIZE_VALUES = [
-  { labelKey: "calculator.team1to5",   value: "1-5",   multiplier: 3  },
-  { labelKey: "calculator.team6to15",  value: "6-15",  multiplier: 10 },
+  { labelKey: "calculator.team1to5", value: "1-5", multiplier: 3 },
+  { labelKey: "calculator.team6to15", value: "6-15", multiplier: 10 },
   { labelKey: "calculator.team16to50", value: "16-50", multiplier: 33 },
-  { labelKey: "calculator.team50plus", value: "50+",   multiplier: 60 },
+  { labelKey: "calculator.team50plus", value: "50+", multiplier: 60 },
 ];
 
 const SALARY_VALUES = [
-  { labelKey: "calculator.salaryUnder500",   value: "<$500",         amount: 350  },
-  { labelKey: "calculator.salary500to1500",  value: "$500-$1.500",   amount: 1000 },
+  { labelKey: "calculator.salaryUnder500", value: "<$500", amount: 350 },
+  { labelKey: "calculator.salary500to1500", value: "$500-$1.500", amount: 1000 },
   { labelKey: "calculator.salary1500to4000", value: "$1.500-$4.000", amount: 2750 },
-  { labelKey: "calculator.salaryOver4000",   value: ">$4.000",       amount: 5000 },
+  { labelKey: "calculator.salaryOver4000", value: ">$4.000", amount: 5000 },
 ];
 
 const TASK_VALUES = [
-  { id: "data-transfer",    labelKey: "calculator.taskDataTransfer"   },
+  { id: "data-transfer", labelKey: "calculator.taskDataTransfer" },
   { id: "follow-up-emails", labelKey: "calculator.taskFollowUpEmails" },
-  { id: "reports",          labelKey: "calculator.taskReports"        },
-  { id: "task-coordination",labelKey: "calculator.taskCoordination"   },
-  { id: "orders-invoices",  labelKey: "calculator.taskOrdersInvoices" },
-  { id: "crm-updates",      labelKey: "calculator.taskCRM"            },
-  { id: "client-onboarding",labelKey: "calculator.taskOnboarding"     },
+  { id: "reports", labelKey: "calculator.taskReports" },
+  { id: "task-coordination", labelKey: "calculator.taskCoordination" },
+  { id: "orders-invoices", labelKey: "calculator.taskOrdersInvoices" },
+  { id: "crm-updates", labelKey: "calculator.taskCRM" },
+  { id: "client-onboarding", labelKey: "calculator.taskOnboarding" },
 ];
 
 const INDUSTRY_VALUES = [
-  { labelKey: "calculator.industryEcommerce",    value: "ecommerce"             },
-  { labelKey: "calculator.industrySaaS",         value: "saas-tech"             },
+  { labelKey: "calculator.industryEcommerce", value: "ecommerce" },
+  { labelKey: "calculator.industrySaaS", value: "saas-tech" },
   { labelKey: "calculator.industryProfessional", value: "professional-services" },
-  { labelKey: "calculator.industryHealthEdu",    value: "health-education"      },
-  { labelKey: "calculator.industryOther",        value: "other"                 },
+  { labelKey: "calculator.industryHealthEdu", value: "health-education" },
+  { labelKey: "calculator.industryOther", value: "other" },
 ];
 
 const TOTAL_STEPS = 4;
@@ -380,8 +380,8 @@ export default function Calculator() {
                   stepNum === 1
                     ? answers.teamSize === opt.value
                     : stepNum === 2
-                    ? answers.salary === opt.value
-                    : answers.industry === opt.value
+                      ? answers.salary === opt.value
+                      : answers.industry === opt.value
                 }
                 onClick={() => {
                   const field =
@@ -706,7 +706,7 @@ export default function Calculator() {
             <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
               {[
                 { value: "40%", label: t("calculator.socialProofStat1") },
-                { value: "3x",  label: t("calculator.socialProofStat2") },
+                { value: "3x", label: t("calculator.socialProofStat2") },
               ].map((s) => (
                 <div key={s.value}>
                   <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#f97b72" }}>
@@ -844,13 +844,11 @@ export default function Calculator() {
 
   return (
     <>
-      <Head>
-        <title>{t("calculator.metaTitle")}</title>
-        <meta name="description" content={t("calculator.metaDescription")} />
-        <meta property="og:title" content={t("calculator.metaTitle")} />
-        <meta property="og:description" content={t("calculator.metaDescription")} />
-        <meta property="og:type" content="website" />
-      </Head>
+      <SEO
+        title={t("calculator.metaTitle")}
+        description={t("calculator.metaDescription")}
+        keywords="automation ROI calculator, business savings calculator, operational efficiency, cost of manual work, automation benefits"
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
