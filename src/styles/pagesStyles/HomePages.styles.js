@@ -302,6 +302,9 @@ export const Title = styled.h1`
     .animated {
       white-space: normal;
       border-right: none;
+      animation: none;
+      width: auto;
+      overflow: visible;
     }
     
     .highlighted-word {
