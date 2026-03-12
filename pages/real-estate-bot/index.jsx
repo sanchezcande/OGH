@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import Script from "next/script";
 import SEO from "../../src/components/SEO/SEO";
-import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import {
   FaWhatsapp,
   FaFacebookMessenger,
@@ -29,6 +29,10 @@ import {
   FaFilter,
 } from "react-icons/fa";
 import { SiGooglesheets } from "react-icons/si";
+import {
+  TbBuildingEstate,
+  TbMessageChatbot,
+} from "react-icons/tb";
 
 // ── Animaciones globales ──────────────────────────────────────────────────────
 const GLOBAL_CSS = `
@@ -69,7 +73,7 @@ const GLOBAL_CSS = `
   .feature-card:hover {
     transform: translateY(-6px) !important;
     box-shadow: 0 16px 40px rgba(0,0,0,0.13) !important;
-    border-color: rgba(249,123,114,0.4) !important;
+    border-color: rgba(217,119,6,0.4) !important;
   }
   .platform-pill:hover {
     transform: translateY(-4px) scale(1.04);
@@ -81,12 +85,15 @@ const GLOBAL_CSS = `
   }
   .price-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 50px rgba(249,123,114,0.25) !important;
+    box-shadow: 0 20px 50px rgba(217,119,6,0.25) !important;
   }
-  .faq-item:hover { border-color: rgba(249,123,114,0.5) !important; }
+  .faq-item:hover { border-color: rgba(217,119,6,0.5) !important; }
   .chat-bubble-in  { animation: slideIn 0.5s ease forwards; }
+  @media (max-width: 760px) {
+    .calendly-grid { grid-template-columns: 1fr !important; }
+  }
   .shimmer-text {
-    background: linear-gradient(90deg, #fff 0%, #F97B72 50%, #fff 100%);
+    background: linear-gradient(90deg, #fff 0%, #D97706 50%, #fff 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -126,7 +133,7 @@ const SectionSubtitle = ({ children, light = false, style = {} }) => (
   </p>
 );
 
-const Badge = ({ children, color = "#F97B72", bg = "#FFE3E1" }) => (
+const Badge = ({ children, color = "#D97706", bg = "#FEF3C7" }) => (
   <span
     style={{
       display: "inline-block",
@@ -221,14 +228,14 @@ const PropertyCard = ({ prop }) => (
       borderRadius: 12,
       padding: "1rem 1.1rem",
       boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
-      border: "1px solid rgba(249,123,114,0.2)",
+      border: "1px solid rgba(217,119,6,0.2)",
       maxWidth: 280,
       fontSize: "0.85rem",
     }}
   >
     <div
       style={{
-        background: "linear-gradient(135deg, #F97B72, #ff9a72)",
+        background: "linear-gradient(135deg, #D97706, #F59E0B)",
         height: 90,
         borderRadius: 8,
         marginBottom: "0.7rem",
@@ -248,7 +255,7 @@ const PropertyCard = ({ prop }) => (
     </div>
     <div
       style={{
-        color: "#F97B72",
+        color: "#D97706",
         fontWeight: 700,
         fontSize: "1rem",
         marginBottom: 6,
@@ -280,7 +287,7 @@ const PropertyCard = ({ prop }) => (
       ))}
     </div>
     <div style={{ color: "#6B7280", display: "flex", alignItems: "center", gap: 4 }}>
-      <FaMapMarkerAlt style={{ color: "#F97B72", flexShrink: 0 }} />
+      <FaMapMarkerAlt style={{ color: "#D97706", flexShrink: 0 }} />
       {prop.direccion}
     </div>
   </div>
@@ -425,7 +432,7 @@ const VideoDemoSection = () => {
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div className="anim-card" style={{ textAlign: "center" }}>
-          <Badge color="#F97B72" bg="#FFE3E1">Premium · Video IA</Badge>
+          <Badge color="#D97706" bg="#FEF3C7">Premium · Video IA</Badge>
         </div>
         <SectionTitle className="anim-card">
           De fotos de la planilla a video listo para redes
@@ -446,7 +453,7 @@ const VideoDemoSection = () => {
           {/* Panel izquierdo: flujo */}
           <div>
             {[
-              { step: "1", icon: "📸", title: "Fotos en la planilla", desc: "Las fotos ya están cargadas en la columna fotos_url de tu Google Sheet." },
+              { step: "1", icon: "📸", title: "Link de fotos en Drive", desc: "En la columna fotos_drive de la plantilla ponés el link de la carpeta de Drive con las fotos de esa propiedad." },
               { step: "2", icon: "🤖", title: "IA aplica Ken Burns + texto", desc: "Cada foto recibe zoom, paneo y texto descriptivo generado automáticamente: título, precio, barrio, características clave." },
               { step: "3", icon: "🎵", title: "Música de fondo automática", desc: "Selección de música ambiente según el tipo de propiedad: moderna para departamentos, cálida para casas de familia." },
               { step: "4", icon: "📲", title: "Video listo en minutos", desc: "Formato vertical (Reels/Stories) u horizontal (Feed). Listo para publicar directamente desde el bot." },
@@ -465,7 +472,7 @@ const VideoDemoSection = () => {
                     width: 36,
                     height: 36,
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, #F97B72, #ff9a72)",
+                    background: "linear-gradient(135deg, #D97706, #F59E0B)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -473,7 +480,7 @@ const VideoDemoSection = () => {
                     fontWeight: 800,
                     color: "white",
                     flexShrink: 0,
-                    boxShadow: "0 4px 12px rgba(249,123,114,0.35)",
+                    boxShadow: "0 4px 12px rgba(217,119,6,0.35)",
                   }}
                 >
                   {item.step}
@@ -495,7 +502,7 @@ const VideoDemoSection = () => {
                 background: "#F8FAFC",
                 borderRadius: 12,
                 padding: "1rem 1.2rem",
-                border: "1px solid rgba(249,123,114,0.2)",
+                border: "1px solid rgba(217,119,6,0.2)",
                 fontSize: "0.88rem",
                 color: "#4B5563",
                 lineHeight: 1.6,
@@ -613,7 +620,7 @@ const VideoDemoSection = () => {
                       {slide.detail}
                     </div>
                     {currentSlide === 0 && (
-                      <div style={{ marginTop: 8, fontSize: "1.1rem", fontWeight: 900, color: "#F97B72" }}>
+                      <div style={{ marginTop: 8, fontSize: "1.1rem", fontWeight: 900, color: "#D97706" }}>
                         Casa con pileta — USD 220.000
                       </div>
                     )}
@@ -641,7 +648,7 @@ const VideoDemoSection = () => {
                         onClick={stopVideo}
                         style={{
                           marginTop: 8,
-                          background: "#F97B72",
+                          background: "#D97706",
                           color: "white",
                           border: "none",
                           borderRadius: 999,
@@ -717,7 +724,7 @@ const VideoDemoSection = () => {
                   style={{
                     height: "100%",
                     width: `${progress}%`,
-                    background: "linear-gradient(90deg, #F97B72, #ff6b6b)",
+                    background: "linear-gradient(90deg, #D97706, #F59E0B)",
                     borderRadius: 999,
                     transition: "width 0.1s linear",
                   }}
@@ -730,7 +737,7 @@ const VideoDemoSection = () => {
               <button
                 onClick={startVideo}
                 style={{
-                  background: "linear-gradient(135deg, #F97B72, #ff6b6b)",
+                  background: "linear-gradient(135deg, #D97706, #F59E0B)",
                   color: "white",
                   border: "none",
                   borderRadius: 999,
@@ -738,7 +745,7 @@ const VideoDemoSection = () => {
                   fontSize: "0.95rem",
                   fontWeight: 700,
                   cursor: "pointer",
-                  boxShadow: "0 8px 25px rgba(249,123,114,0.4)",
+                  boxShadow: "0 8px 25px rgba(217,119,6,0.4)",
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
@@ -801,6 +808,17 @@ const RealEstateBot = () => {
     setChatStep(0);
   }, [activeTab]);
 
+  const [showSticky, setShowSticky] = useState(false);
+  const [calendlyLoaded, setCalendlyLoaded] = useState(false);
+  const calendlyRef = useRef(null);
+  const CALENDLY_URL =
+    "https://calendly.com/sanchezgcandelaria/15min?hide_event_type_details=1&hide_gdpr_banner=1&text_color=0f172a&primary_color=d97706";
+  useEffect(() => {
+    const onScroll = () => setShowSticky(window.scrollY > 700);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const conversations = {
     whatsapp: [
       { type: "user", text: "Hola! Busco un departamento en alquiler en el centro, 2 ambientes, con balcón." },
@@ -843,12 +861,12 @@ const RealEstateBot = () => {
     {
       icon: <SiGooglesheets />,
       color: "#0F9D58",
-      title: "Lee tu Google Sheet o Excel",
-      desc: "Conectá tu planilla existente con las columnas estándar (título, precio, barrio, ambientes, características) y el bot la interpreta automáticamente. Sin migrar datos.",
+      title: "Completás nuestra plantilla",
+      desc: "Te damos la plantilla de Google Sheets ya armada con todas las columnas. Solo la completás con tus propiedades y ponés el link de la carpeta de Drive con las fotos de cada una.",
     },
     {
       icon: <FaFilter />,
-      color: "#F97B72",
+      color: "#D97706",
       title: "Filtros inteligentes por consulta",
       desc: 'Si el cliente dice "busco depto 2 amb con balcón en alquiler en Palermo", el bot filtra tipo_operacion, tipo_propiedad, ambientes, balcon y barrio en tiempo real.',
     },
@@ -882,9 +900,9 @@ const RealEstateBot = () => {
     {
       num: "01",
       icon: <FaTable />,
-      title: "Compartís tu planilla",
-      desc: "Nos pasás tu Google Sheet o Excel con las propiedades en el formato estándar. Si no tenés uno todavía, te damos la plantilla lista.",
-      color: "#F97B72",
+      title: "Completás nuestra plantilla",
+      desc: "Te mandamos nuestra plantilla de Google Sheets ya armada. La completás con tus propiedades e incluís el link a la carpeta de Drive con las fotos de cada una.",
+      color: "#D97706",
     },
     {
       num: "02",
@@ -917,7 +935,7 @@ const RealEstateBot = () => {
     { col: "barrio", ejemplo: "Palermo / Centro", desc: "Zona de búsqueda del cliente" },
     { col: "ambientes / dormitorios / banos", ejemplo: "3 / 2 / 1", desc: "Filtros numéricos automáticos" },
     { col: "cochera / pileta / balcon…", ejemplo: "sí / no", desc: "+15 características reconocidas" },
-    { col: "fotos_url", ejemplo: "drive.google.com/…", desc: "Enviadas automáticamente al cliente" },
+    { col: "fotos_drive", ejemplo: "drive.google.com/carpeta/…", desc: "Link de carpeta de Drive con las fotos de esa propiedad. El bot las envía al cliente automáticamente." },
     { col: "horarios_visita", ejemplo: "Lunes 9-12, Sáb 10-13", desc: "Incluidos en la respuesta del bot" },
   ];
 
@@ -927,17 +945,17 @@ const RealEstateBot = () => {
       channel: "WhatsApp",
       channelColor: "#25D366",
       channelIcon: <FaWhatsapp />,
-      desc: "Para inmobiliarias que quieren automatizar su canal más activo sin complicarse.",
+      desc: "El bot, punto. Para inmobiliarias que quieren automatizar consultas sin complicarse.",
       features: [
         "Bot 24/7 por WhatsApp Business",
-        "Responde consultas y filtra leads",
+        "Responde consultas y filtra propiedades",
         "Agenda visitas automáticamente",
-        "Notificaciones al asesor en tiempo real",
-        "Lee tu Google Sheet o Excel",
-        "Setup completo incluido",
+        "Escala a humano con contexto completo",
+        "Plantilla de Google Sheets incluida",
+        "Setup completo en 48hs",
       ],
       cta: "Agenda una llamada",
-      ctaHref: "/contact-us?plan=starter",
+      ctaHref: "#contacto",
       highlight: false,
       badge: null,
     },
@@ -946,39 +964,39 @@ const RealEstateBot = () => {
       channel: "WhatsApp + Instagram + Facebook",
       channelColor: "#8B5CF6",
       channelIcon: <span style={{ display: "flex", gap: 4 }}><FaWhatsapp /><FaInstagram /><FaFacebookMessenger /></span>,
-      desc: "Un solo bot que cubre todos tus canales sociales simultáneamente.",
+      desc: "Los tres canales activos más el dashboard para entender qué está pasando con tus leads.",
       features: [
         "Todo lo del plan Starter",
         "Instagram Direct integrado",
         "Facebook Messenger integrado",
-        "Un solo bot, tres canales activos",
-        "Múltiples planillas / sucursales",
-        "Dashboard de métricas y leads",
-        "Soporte prioritario 24hs",
+        "Dashboard: consultas, propiedades más buscadas y horarios pico",
+        "Tasa de conversión consulta → visita",
+        "Múltiples sucursales / planillas",
+        "Soporte prioritario",
       ],
       cta: "Agenda una llamada",
-      ctaHref: "/contact-us?plan=pro",
+      ctaHref: "#contacto",
       highlight: true,
       badge: "Más elegido",
     },
     {
       name: "Premium",
-      channel: "Pro + Video IA de propiedades",
-      channelColor: "#F97B72",
+      channel: "Pro + Analytics + Video IA",
+      channelColor: "#D97706",
       channelIcon: <span>🎬</span>,
-      desc: "Generación automática de videos de cada propiedad para publicar en redes.",
+      desc: "Para inmobiliarias que quieren tomar decisiones con datos y contenido generado automáticamente.",
       features: [
         "Todo lo del plan Pro",
-        "4 videos de propiedades/mes con IA",
-        "Fotos + música + texto generados automáticamente",
-        "Listos para publicar en Instagram y Facebook",
-        "Videos extra disponibles",
-        "Ideal para desarrolladoras y grandes carteras",
+        "Analytics avanzadas: leads calificados, tiempo hasta cierre, comparativa por período",
+        "Exportación de reportes PDF / CSV",
+        "4 videos de propiedades/mes generados con IA",
+        "Fotos + música + texto automáticos listos para publicar",
+        "Ideal para desarrolladoras y carteras grandes",
       ],
       cta: "Agenda una llamada",
-      ctaHref: "/contact-us?plan=premium",
+      ctaHref: "#contacto",
       highlight: false,
-      badge: "Nuevo",
+      badge: "Completo",
     },
   ];
 
@@ -1009,8 +1027,8 @@ const RealEstateBot = () => {
       a: "Para nada. Vos manejás la planilla de Google Sheets como siempre. Nosotros nos encargamos de toda la parte técnica: conexión, configuración y mantenimiento del bot.",
     },
     {
-      q: "¿Funciona con mi planilla actual de Excel?",
-      a: "Sí. Podemos trabajar con Google Sheets o Excel subido a Drive. También te proveemos una plantilla optimizada con todas las columnas que el bot puede leer (incluidas las 30+ características de propiedades).",
+      q: "¿Cómo cargo mis propiedades?",
+      a: "Nosotros te damos la plantilla de Google Sheets ya armada con todas las columnas. Vos la completás con tus propiedades, ponés el link a la carpeta de Drive con las fotos de cada una, y listo. Sin adaptar nada ni migrar datos.",
     },
     {
       q: "¿Qué pasa si el cliente hace una pregunta muy específica que el bot no entiende?",
@@ -1034,15 +1052,93 @@ const RealEstateBot = () => {
     <>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <SEO
-        title="Real Estate Bot — Automatizá las consultas de tu inmobiliaria | OpenGateHub"
+        title="PropBot — Automatizá las consultas de tu inmobiliaria con IA"
         description="Bot inteligente que responde consultas de ventas y alquileres por WhatsApp, Facebook e Instagram leyendo tu Google Sheet o Excel. Activo 24/7, sin código."
         keywords="bot inmobiliaria, bot whatsapp propiedades, automatización inmobiliaria, chatbot real estate, responder consultas inmobiliaria, bot google sheets propiedades"
       />
+      <Script
+        src="https://assets.calendly.com/assets/external/widget.js"
+        strategy="lazyOnload"
+        onLoad={() => setCalendlyLoaded(true)}
+      />
+
+      {/* ── PROPBOT HEADER ──────────────────────────────────────────────────── */}
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          background: "rgba(11,26,62,0.96)",
+          backdropFilter: "blur(14px)",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          padding: "0.8rem 2rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                background: "linear-gradient(145deg, #92400E, #D97706)",
+                borderRadius: 13,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 18px rgba(217,119,6,0.5)",
+              }}
+            >
+              <TbBuildingEstate size={26} color="white" />
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                bottom: -5,
+                right: -5,
+                width: 22,
+                height: 22,
+                background: "white",
+                borderRadius: 7,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              }}
+            >
+              <TbMessageChatbot size={14} color="#D97706" />
+            </div>
+          </div>
+          <span style={{ fontWeight: 900, fontSize: "1.25rem", letterSpacing: "-0.02em" }}>
+            <span style={{ color: "white" }}>Prop</span><span style={{ color: "#FCD34D" }}>Bot</span>
+          </span>
+        </div>
+        <a
+          href="#contacto"
+          style={{
+            background: "linear-gradient(135deg, #D97706, #F59E0B)",
+            color: "white",
+            padding: "0.55rem 1.5rem",
+            borderRadius: 999,
+            fontWeight: 700,
+            fontSize: "0.9rem",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 7,
+            boxShadow: "0 4px 14px rgba(217,119,6,0.35)",
+          }}
+        >
+          <FaWhatsapp /> Consultar
+        </a>
+      </header>
 
       {/* ── HERO ────────────────────────────────────────────────────────────── */}
       <section
         style={{
-          background: "linear-gradient(135deg, #1a2a1a 0%, #0d1f0d 50%, #1a1a2e 100%)",
+          background: "linear-gradient(135deg, #0B1A3E 0%, #0D2252 50%, #0B1A3E 100%)",
           padding: "5rem 2rem 4rem",
           textAlign: "center",
           color: "white",
@@ -1056,13 +1152,13 @@ const RealEstateBot = () => {
             position: "absolute",
             inset: 0,
             background:
-              'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><defs><pattern id="g" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M0 40 L40 0 L80 40 L40 80 Z" fill="none" stroke="rgba(249,123,114,0.06)" stroke-width="1"/><circle cx="40" cy="40" r="2" fill="rgba(37,211,102,0.08)"/></pattern></defs><rect width="80" height="80" fill="url(%23g)"/></svg>\')',
+              'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><defs><pattern id="g" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M0 40 L40 0 L80 40 L40 80 Z" fill="none" stroke="rgba(217,119,6,0.06)" stroke-width="1"/><circle cx="40" cy="40" r="2" fill="rgba(37,211,102,0.08)"/></pattern></defs><rect width="80" height="80" fill="url(%23g)"/></svg>\')',
             opacity: 0.8,
           }}
         />
         {/* Orbs */}
-        <div style={{ position: "absolute", top: "10%", left: "5%", width: 300, height: 300, background: "radial-gradient(circle, rgba(37,211,102,0.12) 0%, transparent 70%)", borderRadius: "50%", filter: "blur(40px)" }} />
-        <div style={{ position: "absolute", bottom: "10%", right: "5%", width: 250, height: 250, background: "radial-gradient(circle, rgba(249,123,114,0.15) 0%, transparent 70%)", borderRadius: "50%", filter: "blur(40px)" }} />
+        <div style={{ position: "absolute", top: "10%", left: "5%", width: 300, height: 300, background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)", borderRadius: "50%", filter: "blur(40px)" }} />
+        <div style={{ position: "absolute", bottom: "10%", right: "5%", width: 250, height: 250, background: "radial-gradient(circle, rgba(217,119,6,0.18) 0%, transparent 70%)", borderRadius: "50%", filter: "blur(40px)" }} />
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: 900, margin: "0 auto" }}>
           {/* Plataformas badge */}
@@ -1103,23 +1199,23 @@ const RealEstateBot = () => {
               animation: "fadeInUp 0.7s ease forwards",
             }}
           >
-            Tu inmobiliaria{" "}
-            <span className="shimmer-text">atiende sola</span>{" "}
-            las consultas
+            Cada consulta sin responder es{" "}
+            <span className="shimmer-text">una venta que se pierde</span>
           </h1>
 
           <p
             style={{
-              fontSize: "clamp(1rem, 2vw, 1.25rem)",
+              fontSize: "clamp(1rem, 2vw, 1.2rem)",
               color: "rgba(255,255,255,0.78)",
-              maxWidth: 640,
+              maxWidth: 620,
               margin: "0 auto 2rem",
-              lineHeight: 1.7,
+              lineHeight: 1.75,
               animation: "fadeInUp 0.7s 0.15s ease forwards",
               opacity: 0,
             }}
           >
-            Un bot que lee tu Google Sheet o Excel con las propiedades y responde automáticamente por WhatsApp, Facebook e Instagram — ventas y alquileres, 24/7.
+            PropBot responde por WhatsApp, Instagram y Facebook en{" "}
+            <strong style={{ color: "#FCD34D" }}>menos de 5 segundos</strong> — ventas, alquileres, agendado de visitas — las 24 horas, sin que tu equipo mueva un dedo.
           </p>
 
           <div
@@ -1133,16 +1229,16 @@ const RealEstateBot = () => {
             }}
           >
             <a
-              href="/contact-us"
+              href="#contacto"
               style={{
-                background: "linear-gradient(135deg, #F97B72, #ff6b6b)",
+                background: "linear-gradient(135deg, #D97706, #F59E0B)",
                 color: "white",
                 padding: "0.9rem 2rem",
                 borderRadius: 999,
                 fontWeight: 700,
                 fontSize: "1rem",
                 textDecoration: "none",
-                boxShadow: "0 8px 25px rgba(249,123,114,0.4)",
+                boxShadow: "0 8px 25px rgba(217,119,6,0.4)",
                 transition: "all 0.3s ease",
                 display: "inline-flex",
                 alignItems: "center",
@@ -1151,7 +1247,7 @@ const RealEstateBot = () => {
               onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
               onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
             >
-              <FaBolt /> Quiero el bot para mi inmobiliaria
+              <FaBolt /> Quiero el bot — gratis los primeros 14 días
             </a>
             <a
               href="#como-funciona"
@@ -1186,16 +1282,169 @@ const RealEstateBot = () => {
             }}
           >
             {[
-              { num: "24/7", label: "Atención sin cortes" },
-              { num: "< 5s", label: "Tiempo de respuesta" },
-              { num: "+30", label: "Características de filtro" },
-              { num: "48hs", label: "Setup completo" },
+              { num: "< 5s", label: "Primera respuesta" },
+              { num: "24/7", label: "Todos los días del año" },
+              { num: "0", label: "Leads sin contestar" },
+              { num: "48hs", label: "Setup incluido" },
             ].map((m) => (
               <div key={m.label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "1.8rem", fontWeight: 800, color: "#F97B72" }}>{m.num}</div>
+                <div style={{ fontSize: "1.8rem", fontWeight: 800, color: "#D97706" }}>{m.num}</div>
                 <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.6)" }}>{m.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TRUST BAR ───────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          background: "#0B1A3E",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          padding: "0.9rem 2rem",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "2.5rem",
+          flexWrap: "wrap",
+        }}
+      >
+        {[
+          { icon: "✅", text: "Sin contratos" },
+          { icon: "🔄", text: "Cancelás cuando querés" },
+          { icon: "⚡", text: "Setup en 48hs" },
+          { icon: "🛡️", text: "Garantía 30 días" },
+          { icon: "🏢", text: "+127 inmobiliarias activas" },
+        ].map((item) => (
+          <div
+            key={item.text}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              fontSize: "0.85rem",
+              color: "rgba(255,255,255,0.72)",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span>{item.icon}</span> {item.text}
+          </div>
+        ))}
+      </div>
+
+      {/* ── EL COSTO DE NO RESPONDER ─────────────────────────────────────────── */}
+      <section style={{ background: "#FAFAFA", padding: "4.5rem 2rem", borderBottom: "2px solid #F3F4F6" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div className="anim-card" style={{ textAlign: "center" }}>
+            <Badge color="#EF4444" bg="rgba(239,68,68,0.1)">El costo de no responder</Badge>
+          </div>
+          <SectionTitle className="anim-card">
+            Cada hora de silencio le cuesta ventas a tu inmobiliaria
+          </SectionTitle>
+          <SectionSubtitle>
+            Los clientes no esperan. Si no respondés en minutos, ya están hablando con la competencia.
+          </SectionSubtitle>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "1.5rem",
+              marginTop: "1rem",
+            }}
+          >
+            {[
+              {
+                num: "78%",
+                title: "elige a quien responde primero",
+                desc: "De los compradores y locatarios que contactan por chat, casi 8 de 10 terminan eligiendo la inmobiliaria que respondió más rápido.",
+                color: "#EF4444",
+                icon: "⏱️",
+              },
+              {
+                num: "8 min",
+                title: "es lo que esperan antes de irse",
+                desc: "Después de 8 minutos sin respuesta, la mayoría abandona la conversación y busca otra opción. Para siempre.",
+                color: "#F59E0B",
+                icon: "💨",
+              },
+              {
+                num: "3hs",
+                title: "por día en respuestas repetidas",
+                desc: "Tu equipo pasa horas respondiendo 'tiene cochera', 'cuántos ambientes', 'cuál es el precio'. PropBot lo hace en 5 segundos.",
+                color: "#8B5CF6",
+                icon: "🔁",
+              },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="anim-card feature-card"
+                style={{
+                  background: "white",
+                  border: `1px solid ${stat.color}20`,
+                  borderTop: `4px solid ${stat.color}`,
+                  borderRadius: 16,
+                  padding: "1.8rem",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <div style={{ fontSize: "2.2rem", marginBottom: "0.6rem" }}>{stat.icon}</div>
+                <div style={{ fontSize: "2.8rem", fontWeight: 900, color: stat.color, lineHeight: 1, marginBottom: "0.4rem" }}>
+                  {stat.num}
+                </div>
+                <div style={{ fontSize: "1rem", fontWeight: 700, color: "#1F2937", marginBottom: "0.75rem" }}>
+                  {stat.title}
+                </div>
+                <div style={{ fontSize: "0.9rem", color: "#6B7280", lineHeight: 1.65 }}>
+                  {stat.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="anim-card"
+            style={{
+              marginTop: "2.5rem",
+              background: "linear-gradient(135deg, #0B1A3E, #0D2252)",
+              borderRadius: 16,
+              padding: "2rem 2.5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "2rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "white", marginBottom: "0.4rem" }}>
+                PropBot responde en menos de 5 segundos. Siempre.
+              </div>
+              <div style={{ fontSize: "0.92rem", color: "rgba(255,255,255,0.6)" }}>
+                A las 3 AM del domingo, en feriados, mientras tu equipo está en una visita.
+              </div>
+            </div>
+            <a
+              href="#contacto"
+              style={{
+                background: "linear-gradient(135deg, #D97706, #F59E0B)",
+                color: "white",
+                padding: "0.85rem 2rem",
+                borderRadius: 999,
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                boxShadow: "0 6px 20px rgba(217,119,6,0.4)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <FaBolt /> Quiero el bot ahora
+            </a>
           </div>
         </div>
       </section>
@@ -1449,10 +1698,10 @@ const RealEstateBot = () => {
             <Badge color="#0F9D58" bg="rgba(15,157,88,0.15)">Google Sheets / Excel</Badge>
           </div>
           <SectionTitle light className="anim-card">
-            El bot entiende tu planilla actual
+            Tu plantilla, lista para completar
           </SectionTitle>
           <SectionSubtitle light>
-            Compatible con el formato estándar de inmobiliarias. Si ya tenés tus propiedades en una hoja de cálculo, podés empezar hoy.
+            Te damos la plantilla con todas las columnas armadas. Solo la completás con tus propiedades y agregás el link de Drive con las fotos de cada una.
           </SectionSubtitle>
 
           {/* Tabla de columnas */}
@@ -1534,14 +1783,14 @@ const RealEstateBot = () => {
               fontSize: "0.88rem",
             }}
           >
-            ¿No tenés planilla todavía?{" "}
+            Pedí la plantilla gratis.{" "}
             <a
-              href="/contact-us"
-              style={{ color: "#4ade80", textDecoration: "underline", cursor: "pointer" }}
+              href="#contacto"
+              style={{ color: "#FCD34D", textDecoration: "underline", cursor: "pointer" }}
             >
-              Te mandamos la plantilla gratis
+              La recibís lista para completar
             </a>{" "}
-            con todas las columnas listas.
+            con todas las columnas, incluida la de fotos en Drive.
           </p>
         </div>
       </section>
@@ -1639,7 +1888,7 @@ const RealEstateBot = () => {
               {
                 consulta: '"3 dormitorios, suite, cochera, apto crédito"',
                 filtros: ["dormitorios: 3", "suite: sí", "cochera: sí", "apto_credito: sí"],
-                color: "#F97B72",
+                color: "#D97706",
               },
             ].map((item, i) => (
               <div
@@ -1710,7 +1959,7 @@ const RealEstateBot = () => {
       >
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div className="anim-card" style={{ textAlign: "center" }}>
-            <Badge color="#F97B72" bg="rgba(249,123,114,0.15)">Testimonios</Badge>
+            <Badge color="#D97706" bg="rgba(217,119,6,0.15)">Testimonios</Badge>
           </div>
           <SectionTitle light className="anim-card">
             Lo que dicen las inmobiliarias que ya lo usan
@@ -1737,7 +1986,7 @@ const RealEstateBot = () => {
                   transitionDelay: `${i * 0.12}s`,
                 }}
               >
-                <FaQuoteLeft style={{ color: "#F97B72", fontSize: "1.5rem", marginBottom: "1rem", opacity: 0.7 }} />
+                <FaQuoteLeft style={{ color: "#D97706", fontSize: "1.5rem", marginBottom: "1rem", opacity: 0.7 }} />
                 <p style={{ fontSize: "0.95rem", lineHeight: 1.7, color: "rgba(255,255,255,0.82)", marginBottom: "1.2rem" }}>
                   {t.text}
                 </p>
@@ -1754,6 +2003,79 @@ const RealEstateBot = () => {
         </div>
       </section>
 
+      {/* ── COMPARACIÓN ─────────────────────────────────────────────────────── */}
+      <section style={{ background: "white", padding: "4.5rem 2rem" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto" }}>
+          <div className="anim-card" style={{ textAlign: "center" }}>
+            <Badge color="#D97706" bg="#FEF3C7">PropBot vs. la alternativa</Badge>
+          </div>
+          <SectionTitle className="anim-card">
+            ¿Cuánto cuesta atender redes con una persona?
+          </SectionTitle>
+          <SectionSubtitle>
+            Antes de ver los precios, mirá la comparación real.
+          </SectionSubtitle>
+
+          <div
+            className="anim-card"
+            style={{
+              background: "white",
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+              border: "1px solid #E5E7EB",
+            }}
+          >
+            <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr" }}>
+              <div style={{ padding: "1.1rem 1.5rem", background: "#F9FAFB", borderBottom: "2px solid #E5E7EB" }}>
+                <span style={{ fontSize: "0.8rem", color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Característica</span>
+              </div>
+              <div style={{ padding: "1.1rem 1.5rem", background: "#FEF2F2", borderBottom: "2px solid #FECACA", textAlign: "center" }}>
+                <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "#DC2626" }}>❌ Sin bot</div>
+                <div style={{ fontSize: "0.72rem", color: "#9CA3AF" }}>Asesor de redes</div>
+              </div>
+              <div style={{ padding: "1.1rem 1.5rem", background: "linear-gradient(135deg, #D97706, #F59E0B)", borderBottom: "2px solid #D97706", textAlign: "center" }}>
+                <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "white" }}>✅ PropBot</div>
+                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.8)" }}>Automatizado</div>
+              </div>
+            </div>
+
+            {[
+              { feature: "Horario de atención", no: "8hs × 5 días", yes: "24 / 7 · 365 días" },
+              { feature: "Tiempo de 1ª respuesta", no: "15–60 minutos", yes: "< 5 segundos" },
+              { feature: "Canales cubiertos", no: "1 (difícil cubrir 3)", yes: "WhatsApp + IG + FB" },
+              { feature: "Tiempo libre del equipo", no: "0 — todos atentos al chat", yes: "3+ horas/día recuperadas" },
+              { feature: "Feriados y fines de semana", no: "Sin cobertura", yes: "Funciona igual" },
+              { feature: "Escala a humano", no: "Siempre manual", yes: "Automático con contexto" },
+              { feature: "Vacaciones / bajas", no: "Para todo", yes: "No aplica" },
+            ].map((row, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1.2fr 1fr 1fr",
+                  borderBottom: "1px solid #F3F4F6",
+                }}
+              >
+                <div style={{ padding: "0.9rem 1.5rem", fontSize: "0.88rem", fontWeight: 600, color: "#374151" }}>
+                  {row.feature}
+                </div>
+                <div style={{ padding: "0.9rem 1.5rem", fontSize: "0.85rem", color: "#DC2626", textAlign: "center", background: "rgba(254,242,242,0.4)" }}>
+                  {row.no}
+                </div>
+                <div style={{ padding: "0.9rem 1.5rem", fontSize: "0.85rem", color: "#065F46", fontWeight: 600, textAlign: "center", background: "rgba(236,253,245,0.4)" }}>
+                  {row.yes}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ textAlign: "center", marginTop: "1.2rem", fontSize: "0.82rem", color: "#9CA3AF" }}>
+            * Estimación para Argentina 2025. PropBot no tiene aportes, aguinaldo ni vacaciones.
+          </p>
+        </div>
+      </section>
+
       {/* ── PRECIOS ──────────────────────────────────────────────────────────── */}
       <section style={{ padding: "4rem 2rem", background: "#F8FAFC" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -1764,6 +2086,42 @@ const RealEstateBot = () => {
           <SectionSubtitle>
             Cada inmobiliaria es distinta. Agendá una llamada y te armamos la propuesta según tu volumen de consultas y canales.
           </SectionSubtitle>
+
+          <div
+            className="anim-card"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "2rem",
+              flexWrap: "wrap",
+              marginBottom: "2.5rem",
+            }}
+          >
+            {[
+              { icon: "🛡️", text: "Garantía 30 días o te devolvemos el dinero" },
+              { icon: "⚡", text: "14 días gratis para probar" },
+              { icon: "🔓", text: "Sin contratos, cancelás cuando querés" },
+            ].map((g) => (
+              <div
+                key={g.text}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "white",
+                  border: "1.5px solid #E5E7EB",
+                  borderRadius: 999,
+                  padding: "0.55rem 1.2rem",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                }}
+              >
+                <span>{g.icon}</span> {g.text}
+              </div>
+            ))}
+          </div>
 
           <div
             style={{
@@ -1805,7 +2163,7 @@ const RealEstateBot = () => {
                       transform: "translateX(-50%)",
                       background: plan.highlight
                         ? "linear-gradient(135deg, #8B5CF6, #6D28D9)"
-                        : "linear-gradient(135deg, #F97B72, #ff6b6b)",
+                        : "linear-gradient(135deg, #D97706, #F59E0B)",
                       color: "white",
                       fontSize: "0.75rem",
                       fontWeight: 700,
@@ -1814,7 +2172,7 @@ const RealEstateBot = () => {
                       whiteSpace: "nowrap",
                       boxShadow: plan.highlight
                         ? "0 4px 15px rgba(139,92,246,0.4)"
-                        : "0 4px 15px rgba(249,123,114,0.4)",
+                        : "0 4px 15px rgba(217,119,6,0.4)",
                     }}
                   >
                     {plan.badge === "Más elegido" ? "⭐ " : "✨ "}{plan.badge}
@@ -1938,7 +2296,7 @@ const RealEstateBot = () => {
             style={{
               marginTop: "2rem",
               background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
-              border: "1px solid rgba(249,123,114,0.25)",
+              border: "1px solid rgba(217,119,6,0.25)",
               borderRadius: 16,
               padding: "1.2rem 1.8rem",
               display: "flex",
@@ -1979,7 +2337,7 @@ const RealEstateBot = () => {
                 onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                 style={{
                   background: "#FAFAFA",
-                  border: `1px solid ${activeFaq === i ? "rgba(249,123,114,0.4)" : "rgba(0,0,0,0.07)"}`,
+                  border: `1px solid ${activeFaq === i ? "rgba(217,119,6,0.4)" : "rgba(0,0,0,0.07)"}`,
                   borderRadius: 12,
                   marginBottom: "0.75rem",
                   overflow: "hidden",
@@ -2003,7 +2361,7 @@ const RealEstateBot = () => {
                   <span
                     style={{
                       fontSize: "1.2rem",
-                      color: "#F97B72",
+                      color: "#D97706",
                       flexShrink: 0,
                       transition: "transform 0.3s ease",
                       transform: activeFaq === i ? "rotate(45deg)" : "rotate(0deg)",
@@ -2032,13 +2390,307 @@ const RealEstateBot = () => {
         </div>
       </section>
 
-      {/* ── CTA FINAL ───────────────────────────────────────────────────────── */}
-      <CallToActionBlock
-        title="¿Listo para automatizar tu inmobiliaria?"
-        description="Sumá el bot a tu operación y empezá a responder cada consulta en segundos, los 7 días de la semana."
-        buttonText="Quiero empezar ahora"
-        highlightWord="inmobiliaria"
-      />
+      {/* ── AGENDÁ UNA LLAMADA ───────────────────────────────────────────────── */}
+      <section
+        id="contacto"
+        style={{
+          background: "linear-gradient(160deg, #0B1A3E 0%, #0D2252 50%, #0B1A3E 100%)",
+          padding: "5rem 2rem",
+          color: "white",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Orb de fondo */}
+        <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", width: 700, height: 400, background: "radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 65%)", filter: "blur(60px)", pointerEvents: "none" }} />
+
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto" }}>
+          {/* Header de sección */}
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <Badge color="#D97706" bg="rgba(217,119,6,0.2)">Reservá tu lugar</Badge>
+            <h2 style={{ fontSize: "clamp(1.9rem, 4vw, 2.6rem)", fontWeight: 900, marginTop: "0.6rem", marginBottom: "0.8rem", lineHeight: 1.2 }}>
+              Agendá una llamada de 15 minutos
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.65)", maxWidth: 480, margin: "0 auto", lineHeight: 1.7, fontSize: "1rem" }}>
+              Te mostramos el bot en vivo con propiedades reales y te armamos la propuesta según tu volumen de consultas.
+            </p>
+          </div>
+
+          {/* Layout: bullets izq + widget der */}
+          <div
+            className="calendly-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0,1fr) minmax(0,2fr)",
+              gap: "3rem",
+              alignItems: "start",
+            }}
+          >
+            {/* Columna izquierda — qué pasa en la llamada */}
+            <div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", marginBottom: "1.2rem" }}>
+                En 15 minutos vas a ver
+              </div>
+              {[
+                { icon: "🤖", text: "El bot respondiendo consultas en vivo con propiedades reales" },
+                { icon: "📊", text: "Cómo se integra con tu Google Sheet o la plantilla que te damos" },
+                { icon: "⚡", text: "El proceso de setup de 48hs explicado paso a paso" },
+                { icon: "💰", text: "Precio final según tu cantidad de canales y propiedades" },
+                { icon: "🛡️", text: "Garantía 30 días — si no te convence, te devolvemos el dinero" },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    marginBottom: "1.1rem",
+                    padding: "0.9rem 1rem",
+                    background: "rgba(255,255,255,0.05)",
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                >
+                  <span style={{ fontSize: "1.2rem", flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                  <span style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.78)", lineHeight: 1.5 }}>{item.text}</span>
+                </div>
+              ))}
+
+              <div
+                style={{
+                  marginTop: "1.5rem",
+                  padding: "1rem",
+                  background: "rgba(217,119,6,0.12)",
+                  border: "1px solid rgba(217,119,6,0.3)",
+                  borderRadius: 10,
+                  fontSize: "0.85rem",
+                  color: "#FCD34D",
+                  lineHeight: 1.5,
+                }}
+              >
+                🔒 Sin compromiso. Si no es para vos, no hay problema.
+              </div>
+            </div>
+
+            {/* Columna derecha — Calendly widget */}
+            <div
+              style={{
+                background: "white",
+                borderRadius: 16,
+                overflow: "hidden",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                minHeight: 600,
+              }}
+            >
+              {calendlyLoaded ? (
+                <div
+                  ref={calendlyRef}
+                  className="calendly-inline-widget"
+                  data-url={CALENDLY_URL}
+                  style={{ minWidth: "100%", height: 630 }}
+                />
+              ) : (
+                <div style={{ height: 630, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}>
+                  <div style={{ width: 36, height: 36, border: "3px solid #E5E7EB", borderTopColor: "#D97706", borderRadius: "50%", animation: "rotateSlow 0.8s linear infinite" }} />
+                  <span style={{ color: "#9CA3AF", fontSize: "0.88rem" }}>Cargando calendario…</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile fallback */}
+          <div style={{ textAlign: "center", marginTop: "2rem" }}>
+            <a
+              href="https://calendly.com/sanchezgcandelaria/15min"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: "0.85rem",
+                color: "rgba(255,255,255,0.45)",
+                textDecoration: "underline",
+              }}
+            >
+              ¿No carga el calendario? Abrilo acá →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── STICKY CTA BAR ──────────────────────────────────────────────────── */}
+      {showSticky && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 999,
+            background: "rgba(11,26,62,0.97)",
+            borderTop: "2px solid rgba(217,119,6,0.5)",
+            padding: "0.85rem 2rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "2.5rem",
+            flexWrap: "wrap",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 -8px 30px rgba(0,0,0,0.3)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: "1.4rem" }}>⚡</span>
+            <div>
+              <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "white", lineHeight: 1.3 }}>
+                14 días gratis · Setup en 48hs · Garantía 30 días
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)" }}>
+                Respondé cada consulta en menos de 5 segundos
+              </div>
+            </div>
+          </div>
+          <a
+            href="#contacto"
+            style={{
+              background: "linear-gradient(135deg, #D97706, #F59E0B)",
+              color: "white",
+              padding: "0.7rem 2rem",
+              borderRadius: 999,
+              fontWeight: 700,
+              fontSize: "0.9rem",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              boxShadow: "0 4px 16px rgba(217,119,6,0.45)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+            }}
+          >
+            <FaBolt /> Empezar gratis
+          </a>
+        </div>
+      )}
+
+      {/* ── SCROLL TO TOP ───────────────────────────────────────────────────── */}
+      {showSticky && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          style={{
+            position: "fixed",
+            bottom: showSticky ? 88 : 92,
+            right: 90,
+            zIndex: 998,
+            width: 40,
+            height: 40,
+            background: "rgba(11,26,62,0.9)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            backdropFilter: "blur(8px)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
+            transition: "transform 0.2s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          aria-label="Volver arriba"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 15l-6-6-6 6" />
+          </svg>
+        </button>
+      )}
+
+      {/* ── WA FLOTANTE ─────────────────────────────────────────────────────── */}
+      <a
+        href="https://wa.me/5491123485638"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: showSticky ? 80 : 24,
+          right: 24,
+          zIndex: 998,
+          width: 56,
+          height: 56,
+          background: "#25D366",
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 4px 20px rgba(37,211,102,0.5)",
+          transition: "bottom 0.3s ease, transform 0.2s ease",
+          textDecoration: "none",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        aria-label="Escribinos por WhatsApp"
+      >
+        <FaWhatsapp style={{ color: "white", fontSize: "1.7rem" }} />
+      </a>
+
+      {/* ── PROPBOT FOOTER ──────────────────────────────────────────────────── */}
+      <footer
+        style={{
+          background: "#060F24",
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          padding: "2.2rem 2rem",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 9,
+            marginBottom: "0.65rem",
+          }}
+        >
+          <div style={{ position: "relative", width: 34, height: 34 }}>
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                background: "linear-gradient(145deg, #92400E, #D97706)",
+                borderRadius: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TbBuildingEstate size={20} color="white" />
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                bottom: -4,
+                right: -4,
+                width: 17,
+                height: 17,
+                background: "white",
+                borderRadius: 5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 1px 5px rgba(0,0,0,0.2)",
+              }}
+            >
+              <TbMessageChatbot size={11} color="#D97706" />
+            </div>
+          </div>
+          <span style={{ fontWeight: 900, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>
+            <span style={{ color: "white" }}>Prop</span><span style={{ color: "#FCD34D" }}>Bot</span>
+          </span>
+        </div>
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
+          © {new Date().getFullYear()} PropBot · Todos los derechos reservados.
+        </p>
+      </footer>
     </>
   );
 };
