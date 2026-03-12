@@ -124,6 +124,36 @@ export const Error = styled.div`
   }
 `;
 
+export const Select = styled.select`
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  transition: all 0.3s;
+  background-color: #f0f0f0;
+  color: #555;
+  font-size: 1rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23999' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+
+  &:focus {
+    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    outline: none;
+  }
+  &:hover {
+    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+  }
+
+  option {
+    color: #333;
+    background: white;
+  }
+`;
+
 export const StyledButton = styled(DarkButton)`
   margin-top: 10px;
   display: inline-block;

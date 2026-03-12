@@ -101,7 +101,7 @@ const NavBarMobile = () => {
           <MenuItem onClick={() => handleNavigation("/services/staff-augmentation")}>
             Staff Augmentation
           </MenuItem>
-          <MenuItem onClick={() => handleNavigation("/blog")}>
+<MenuItem onClick={() => handleNavigation("/blog")}>
             {t("Blog")}
           </MenuItem>
           <MenuItem onClick={() => handleNavigation("/about-us")}>

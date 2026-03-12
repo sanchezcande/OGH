@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { validateEmail, validateName, validateMessage } from "./validations";
 import {
   Input,
@@ -6,18 +7,27 @@ import {
   Error,
   FormContainer,
   StyledButton,
+  Select,
 } from "./ContactForm.styles";
 import SuccessModal from "./SuccessModal/SuccessModal";
 import emailjs from "emailjs-com";
 import { useTranslation } from "react-i18next";
 import ReCAPTCHA from "react-google-recaptcha";
 
+const PLAN_MAP = {
+  starter: "real-estate-bot-starter",
+  pro: "real-estate-bot-pro",
+  premium: "real-estate-bot-premium",
+};
+
 const ContactForm = () => {
   const { t } = useTranslation();
+  const router = useRouter();
   const initialFormData = {
     from_name: "",
     from_email: "",
     contact_number: "",
+    inquiry_type: "",
     subject: "",
     message: "",
   };
@@ -26,6 +36,13 @@ const ContactForm = () => {
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(initialFormData);
   const [captchaToken, setCaptchaToken] = useState(null);
+
+  useEffect(() => {
+    const planParam = router.query?.plan;
+    if (planParam && PLAN_MAP[planParam]) {
+      setFormData((prev) => ({ ...prev, inquiry_type: PLAN_MAP[planParam] }));
+    }
+  }, [router.query]);
 
   function validateForm(currentData = formData) {
     const newErrors = {};
@@ -127,6 +144,28 @@ const ContactForm = () => {
           value={formData.contact_number}
           onChange={handleInputChange}
         />
+
+        <Select
+          name="inquiry_type"
+          value={formData.inquiry_type}
+          onChange={handleInputChange}
+        >
+          <option value="" disabled>¿En qué podemos ayudarte?</option>
+          <optgroup label="🤖 Real Estate Bot">
+            <option value="real-estate-bot-starter">Real Estate Bot — Starter (WhatsApp)</option>
+            <option value="real-estate-bot-pro">Real Estate Bot — Pro (WhatsApp + Instagram + Facebook)</option>
+            <option value="real-estate-bot-premium">Real Estate Bot — Premium (Pro + Video IA)</option>
+          </optgroup>
+          <optgroup label="🛠 Otros servicios">
+            <option value="workflow-automation">Workflow Automation</option>
+            <option value="staff-augmentation">Staff Augmentation</option>
+            <option value="ai-services">Servicios de IA</option>
+            <option value="frontend">Desarrollo Frontend</option>
+            <option value="backend">Desarrollo Backend</option>
+            <option value="ux-ui">UX/UI Design</option>
+            <option value="other">Otro</option>
+          </optgroup>
+        </Select>
 
         <Input
           type="text"
