@@ -14,10 +14,11 @@ const ContactUs = () => {
   const [scriptLoaded, setScriptLoaded] = React.useState(false);
 
   useEffect(() => {
-    // Solo inicializar Calendly si el script está cargado y no estamos en mobile
-    if (scriptLoaded && !isMobile && typeof window !== "undefined" && window.Calendly) {
-      // El script automáticamente inicializará los widgets con la clase calendly-inline-widget
-      // No necesitamos llamar manualmente a initInlineWidget
+    if (scriptLoaded && !isMobile && calendlyWidgetRef.current && typeof window !== "undefined" && window.Calendly) {
+      window.Calendly.initInlineWidget({
+        url: calendlyUrl,
+        parentElement: calendlyWidgetRef.current,
+      });
     }
   }, [scriptLoaded, isMobile]);
 

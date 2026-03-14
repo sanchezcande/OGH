@@ -397,6 +397,7 @@ const VideoDemoSection = () => {
         padding: "4rem 2rem",
         borderTop: "1px solid rgba(0,0,0,0.06)",
       }}
+      className="video-demo-section"
     >
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -448,7 +449,7 @@ const VideoDemoSection = () => {
             gap: "2.5rem",
             alignItems: "center",
           }}
-          className="anim-card"
+          className="anim-card video-demo-grid"
         >
           {/* Panel izquierdo: flujo */}
           <div>
@@ -516,6 +517,7 @@ const VideoDemoSection = () => {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
             {/* Pantalla del video */}
             <div
+              className="video-demo-phone"
               style={{
                 width: "100%",
                 maxWidth: 340,
@@ -768,7 +770,9 @@ const VideoDemoSection = () => {
         <style dangerouslySetInnerHTML={{
           __html: `
             @media (max-width: 680px) {
-              .video-demo-grid { grid-template-columns: 1fr !important; }
+              .video-demo-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+              .video-demo-section { padding: 2.5rem 1rem !important; }
+              .video-demo-phone { max-width: 220px !important; }
             }
           `
         }} />
@@ -813,6 +817,16 @@ const RealEstateBot = () => {
   const calendlyRef = useRef(null);
   const CALENDLY_URL =
     "https://calendly.com/sanchezgcandelaria/15min?hide_event_type_details=1&hide_gdpr_banner=1&text_color=0f172a&primary_color=d97706";
+
+  useEffect(() => {
+    if (calendlyLoaded && calendlyRef.current && typeof window !== "undefined" && window.Calendly) {
+      window.Calendly.initInlineWidget({
+        url: CALENDLY_URL,
+        parentElement: calendlyRef.current,
+      });
+    }
+  }, [calendlyLoaded]);
+
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > 700);
     window.addEventListener("scroll", onScroll);
@@ -1116,7 +1130,9 @@ const RealEstateBot = () => {
           </span>
         </div>
         <a
-          href="#contacto"
+          href="https://wa.me/5491123485638"
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             background: "linear-gradient(135deg, #D97706, #F59E0B)",
             color: "white",
