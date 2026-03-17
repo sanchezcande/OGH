@@ -98,13 +98,13 @@ export default function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/browser-link-logo.png" type="image/png" />
       </Head>
       <Layout>
-        {router.pathname !== "/real-estate-bot" && <NavBar />}
+        <NavBar />
         {loading && <Loader />}
         <Main>
           <Component {...pageProps} />
         </Main>
-        {router.pathname !== "/real-estate-bot" && <Footer />}
-        {router.pathname !== "/real-estate-bot" && <ScrollToTopButton />}
+        <Footer />
+        <ScrollToTopButton />
         {/* <FloatingWhatsAppButton
           href="https://wa.me/+5491123485638"
           target="_blank"

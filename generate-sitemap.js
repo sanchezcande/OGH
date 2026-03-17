@@ -20,8 +20,7 @@ const staticPaths = [
   "/services/software-factory",
   "/services/staff-augmentation",
   "/services/ux-ui",
-  "/services/workflow-automation",
-  "/real-estate-bot"
+  "/services/workflow-automation"
 ];
 
 const generateSitemap = () => {

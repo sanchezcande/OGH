@@ -14,12 +14,6 @@ import emailjs from "emailjs-com";
 import { useTranslation } from "react-i18next";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const PLAN_MAP = {
-  starter: "real-estate-bot-starter",
-  pro: "real-estate-bot-pro",
-  premium: "real-estate-bot-premium",
-};
-
 const ContactForm = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -151,12 +145,7 @@ const ContactForm = () => {
           onChange={handleInputChange}
         >
           <option value="" disabled>¿En qué podemos ayudarte?</option>
-          <optgroup label="🤖 Real Estate Bot">
-            <option value="real-estate-bot-starter">Real Estate Bot — Starter (WhatsApp)</option>
-            <option value="real-estate-bot-pro">Real Estate Bot — Pro (WhatsApp + Instagram + Facebook)</option>
-            <option value="real-estate-bot-premium">Real Estate Bot — Premium (Pro + Video IA)</option>
-          </optgroup>
-          <optgroup label="🛠 Otros servicios">
+          <optgroup label="🛠 Servicios">
             <option value="workflow-automation">Workflow Automation</option>
             <option value="staff-augmentation">Staff Augmentation</option>
             <option value="ai-services">Servicios de IA</option>
