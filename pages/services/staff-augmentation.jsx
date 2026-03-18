@@ -252,10 +252,37 @@ const staffAugmentation = () => {
   return (
     <>
       <SEO
-        title="Staff Augmentation — Embed Senior Engineers in Your Team | OpenGateHub"
-        description="Scale your engineering team in 7.3 days. We embed senior developers and QA engineers who join your standups, ship in your sprints, and match your culture — 87% on-time delivery."
-        keywords="staff augmentation, remote developers, embedded engineering team, nearshore development, senior developers for hire, QA engineers"
-      />
+        title="Staff Augmentation in Latin America — Nearshore Senior Engineers | OpenGateHub"
+        description="Scale your engineering team in 7.3 days with nearshore developers from Latin America. We embed senior developers and QA engineers who join your standups, ship in your sprints, and match your culture — 9.7/10 CSAT, 87% on-time delivery."
+        keywords="staff augmentation LATAM, nearshore staff augmentation, staff augmentation Latin America, hire developers Latin America, nearshore development, embedded engineering team, remote developers LATAM, senior developers for hire, nearshore software development, QA engineers Latin America"
+      >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "Staff Augmentation in Latin America",
+              "description": "Scale your engineering team in 7.3 days with nearshore senior developers from Latin America. Cultural fit, timezone alignment, 87% on-time delivery.",
+              "provider": {
+                "@type": "Organization",
+                "name": "OpenGateHub",
+                "url": "https://opengatehub.com"
+              },
+              "areaServed": ["Latin America", "United States", "North America", "Europe"],
+              "serviceType": "Staff Augmentation",
+              "offers": {
+                "@type": "Offer",
+                "availability": "https://schema.org/InStock",
+                "priceSpecification": {
+                  "@type": "PriceSpecification",
+                  "priceCurrency": "USD"
+                }
+              }
+            }),
+          }}
+        />
+      </SEO>
 
       <style>{`
         @keyframes fadeInUp {

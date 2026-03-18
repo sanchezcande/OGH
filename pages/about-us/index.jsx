@@ -63,9 +63,9 @@ const AboutUs = React.forwardRef((props, ref) => {
   return (
     <Container ref={ref}>
       <SEO
-        title="About OpenGateHub — Workflow Automation & Engineering Team | OpenGateHub"
-        description="We're a human-first automation and engineering company from Latin America. Near-timezone, senior teams that embed into your workflow — 9.7/10 CSAT, 87% on-time delivery."
-        keywords="OpenGateHub, workflow automation company, staff augmentation, engineering team, process automation, near-shore development"
+        title="About OpenGateHub — Workflow Automation & Staff Augmentation LATAM"
+        description="We're a human-first automation and engineering company from Latin America. Nearshore senior teams that embed into your workflow — 9.7/10 CSAT, 87% on-time delivery. 300+ processes automated across 50+ companies."
+        keywords="OpenGateHub, workflow automation company LATAM, staff augmentation Latin America, nearshore engineering team, process automation, nearshore development company, about OpenGateHub, automation agency Latin America"
       />
 
       <CompanyDescription ref={companyDescRef}>

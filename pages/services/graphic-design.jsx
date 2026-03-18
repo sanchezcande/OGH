@@ -123,9 +123,9 @@ const GraphicDesign = () => {
   return (
     <>
       <SEO
-        title="Professional Graphic Design & Branding | OpenGateHub"
-        description="We create consistent, high-impact visual identities. From logo design and complete branding to digital graphics and print materials — professional design that tells your story."
-        keywords="graphic design, branding agency, visual identity, logo design, professional graphics, digital design, print material design"
+        title="Professional Graphic Design & Branding | LATAM Creative Agency | OpenGateHub"
+        description="We create consistent, high-impact visual identities from Latin America. Logo design, complete branding, digital graphics, and print materials — professional nearshore design that tells your story."
+        keywords="graphic design LATAM, branding agency Latin America, visual identity, logo design, professional graphics nearshore, digital design, creative agency LATAM, branding Latin America"
       />
 
       <style>{`

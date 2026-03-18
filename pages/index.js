@@ -1251,9 +1251,9 @@ export default function HomePage() {
   return (
     <>
       <SEO
-        title="Workflow & Process Automation for Companies | OpenGateHub"
-        description="Your team is losing 8+ hours per person each week to tasks automation handles in minutes. OpenGateHub automates your workflows, embeds senior engineers, and delivers results in 7.3 days."
-        keywords="workflow automation, process automation, staff augmentation, n8n automation, AI automation, operational efficiency, reduce manual work, business automation"
+        title="Workflow Automation & Staff Augmentation from Latin America | OpenGateHub"
+        description="Your team is losing 8+ hours per person each week to tasks automation handles in minutes. OpenGateHub automates workflows, embeds nearshore senior engineers from LATAM, and delivers results in 7.3 days. 9.7/10 CSAT."
+        keywords="workflow automation, process automation, staff augmentation LATAM, nearshore staff augmentation, n8n automation, AI automation, operational efficiency, nearshore software development, Latin America, business automation, hire developers Latin America"
       >
         <script
           type="application/ld+json"

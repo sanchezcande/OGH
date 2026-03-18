@@ -847,7 +847,7 @@ export default function Calculator() {
       <SEO
         title={t("calculator.metaTitle")}
         description={t("calculator.metaDescription")}
-        keywords="automation ROI calculator, business savings calculator, operational efficiency, cost of manual work, automation benefits"
+        keywords="automation ROI calculator, business savings calculator, operational efficiency, cost of manual work, automation benefits, workflow automation savings LATAM, staff augmentation cost calculator"
       />
 
       <motion.div

@@ -297,10 +297,29 @@ const SoftwareFactory = () => {
   return (
     <>
       <SEO
-        title="Workflow Automation Services for Companies | OpenGateHub"
-        description="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Powered by n8n, AI, and custom integrations."
-        keywords="workflow automation services, business process automation, n8n automation, AI workflows, process optimization, reduce manual work"
-      />
+        title="Workflow Automation Services for Companies | LATAM Automation Agency | OpenGateHub"
+        description="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Nearshore automation experts from Latin America. Powered by n8n, AI, and custom integrations."
+        keywords="workflow automation services, business process automation, workflow automation LATAM, process automation Latin America, n8n automation, AI workflows, process optimization, reduce manual work, automation agency nearshore, RPA LATAM"
+      >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "Workflow Automation Services",
+              "description": "We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Powered by n8n, AI, and custom integrations.",
+              "provider": {
+                "@type": "Organization",
+                "name": "OpenGateHub",
+                "url": "https://opengatehub.com"
+              },
+              "areaServed": ["Latin America", "United States", "North America", "Europe"],
+              "serviceType": "Workflow Automation"
+            }),
+          }}
+        />
+      </SEO>
 
       <style>{`
         @keyframes fadeInUp {

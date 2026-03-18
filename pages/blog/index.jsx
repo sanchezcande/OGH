@@ -61,9 +61,9 @@ export default function Blog() {
   return (
     <>
       <SEO
-        title="Automation & Process Improvement Blog | OpenGateHub"
-        description="Practical guides on workflow automation, n8n, AI tools, and operational efficiency. Written by the team that's automated 300+ processes across 50+ companies."
-        keywords="workflow automation blog, process improvement, n8n tutorials, AI business guides, operational efficiency"
+        title="Automation, Staff Augmentation & AI Blog | LATAM Insights | OpenGateHub"
+        description="Practical guides on workflow automation, n8n, AI tools, staff augmentation in Latin America, and nearshore development. Written by the team that's automated 300+ processes across 50+ companies."
+        keywords="workflow automation blog, staff augmentation LATAM blog, process improvement, n8n tutorials, AI business guides, operational efficiency, nearshore development insights, automation Latin America"
       />
       <BlogContainer>
         <SearchInput

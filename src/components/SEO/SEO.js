@@ -17,8 +17,8 @@ const SEO = ({
   const router = useRouter();
   const siteUrl = "https://opengatehub.com";
   const fullCanonical = canonical || `${siteUrl}${router.asPath.split("?")[0]}`;
-  const defaultTitle = "Workflow & Process Automation for Companies | OpenGateHub";
-  const defaultDescription = "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and embedded engineering teams. Kickoff in 7.3 days. Measurable results from sprint one.";
+  const defaultTitle = "Workflow Automation & Staff Augmentation in Latin America | OpenGateHub";
+  const defaultDescription = "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and nearshore engineering teams from Latin America. Kickoff in 7.3 days. 9.7/10 CSAT.";
   const defaultOgImage = "https://opengatehub.com/Reducido4oscuro.png";
 
   const displayTitle = title || defaultTitle;
@@ -37,6 +37,15 @@ const SEO = ({
       {/* Canonical */}
       <link rel="canonical" href={fullCanonical} />
 
+      {/* Hreflang - Bilingual support */}
+      <link rel="alternate" hrefLang="en" href={fullCanonical} />
+      <link rel="alternate" hrefLang="es" href={fullCanonical} />
+      <link rel="alternate" hrefLang="x-default" href={fullCanonical} />
+
+      {/* Geo targeting */}
+      <meta name="geo.region" content="LATAM" />
+      <meta name="geo.placename" content="Latin America" />
+
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={fullCanonical} />
@@ -44,6 +53,8 @@ const SEO = ({
       <meta property="og:description" content={ogDescription || displayDescription} />
       <meta property="og:image" content={ogImage || defaultOgImage} />
       <meta property="og:site_name" content="OpenGateHub" />
+      <meta property="og:locale" content="en_US" />
+      <meta property="og:locale:alternate" content="es_LA" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />

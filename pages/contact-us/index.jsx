@@ -25,9 +25,9 @@ const ContactUs = () => {
   return (
     <>
       <SEO
-        title="Book a Free Automation Audit | OpenGateHub"
-        description="Book a free 15-minute automation audit or send us a message. We'll identify your top operational bottlenecks and reply within 24 hours — no pitch, just a clear next step."
-        keywords="automation audit, contact OpenGateHub, workflow consulting, business automation experts, book a call"
+        title="Book a Free Automation Audit | LATAM Experts | OpenGateHub"
+        description="Book a free 15-minute automation audit with our LATAM experts. We'll identify your top operational bottlenecks and reply within 24 hours — no pitch, just a clear next step."
+        keywords="automation audit, contact OpenGateHub, workflow consulting LATAM, business automation experts Latin America, book a call, nearshore consulting, staff augmentation consultation"
       />
 
       {/* Calendly Widget Script - Solo cargar en desktop */}

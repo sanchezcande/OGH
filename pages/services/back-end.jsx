@@ -119,13 +119,13 @@ const BackEnd = () => {
   return (
     <>
       <SEO
-        title={lang === "es" ? "Arquitectura Backend y Soluciones Cloud | OpenGateHub" : "Backend Architecture & Cloud Solutions | OpenGateHub"}
+        title={lang === "es" ? "Arquitectura Backend y Soluciones Cloud | Nearshore | OpenGateHub" : "Backend Architecture & Cloud Solutions | Nearshore LATAM | OpenGateHub"}
         description={
           lang === "es"
-            ? "Infraestructura robusta, escalable y segura para que tu negocio nunca se detenga. Expertos en Node.js, AWS, Google Cloud y Azure."
-            : "Robust, scalable and secure infrastructure so your business never stops. Experts in Node.js, AWS, Google Cloud, and Azure."
+            ? "Infraestructura robusta, escalable y segura con equipos nearshore de Latinoamérica. Expertos en Node.js, Python, Go, AWS, Google Cloud y Azure. Kickoff en 7.3 días."
+            : "Robust, scalable and secure infrastructure with nearshore teams from Latin America. Experts in Node.js, Python, Go, AWS, Google Cloud, and Azure. Kickoff in 7.3 days."
         }
-        keywords="Backend Development, Cloud Computing, Node.js, AWS, Google Cloud, Azure, Scalable Infrastructure, DevOps, API Development"
+        keywords="backend development LATAM, cloud computing Latin America, Node.js developers nearshore, AWS infrastructure, Google Cloud, Azure, scalable infrastructure, DevOps LATAM, API development, nearshore backend developers, Python developers Latin America"
       />
       <style>{`
         @keyframes fadeInUp {

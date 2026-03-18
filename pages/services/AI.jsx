@@ -257,10 +257,29 @@ const aiSolutions = () => {
   return (
     <>
       <SEO
-        title="AI Automation Solutions for Business | OpenGateHub"
-        description="We embed AI into your business operations — conversational automation, generative tools, intelligent pipelines, and real-time dashboards. Practical AI that actually ships."
-        keywords="AI automation, AI for business, AI workflow automation, generative AI, business intelligence, AI integration, machine learning solutions"
-      />
+        title="AI Automation Services for Business | LATAM AI Agency | OpenGateHub"
+        description="We embed AI into your business operations — conversational automation, generative tools, intelligent pipelines, and real-time dashboards. Nearshore AI experts from Latin America. Practical AI that actually ships."
+        keywords="AI automation services, AI automation LATAM, AI for business, AI workflow automation, generative AI, business intelligence, AI integration Latin America, machine learning solutions, nearshore AI development, AI agency LATAM, artificial intelligence services"
+      >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "AI Automation Services",
+              "description": "AI automation services for business — conversational automation, generative tools, intelligent pipelines, and real-time dashboards from Latin America.",
+              "provider": {
+                "@type": "Organization",
+                "name": "OpenGateHub",
+                "url": "https://opengatehub.com"
+              },
+              "areaServed": ["Latin America", "United States", "North America", "Europe"],
+              "serviceType": "AI Automation"
+            }),
+          }}
+        />
+      </SEO>
 
       <style>{`
         @keyframes fadeInUp {

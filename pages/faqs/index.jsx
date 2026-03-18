@@ -65,9 +65,9 @@ const FAQs = () => {
   return (
     <>
       <SEO
-        title="Workflow Automation FAQ — Common Questions Answered | OpenGateHub"
-        description="Questions about workflow automation, staff augmentation, and AI for business? We answer the most common ones from companies like yours — honest, practical, no jargon."
-        keywords="automation FAQ, workflow automation questions, AI for business FAQ, staff augmentation concerns"
+        title="Workflow Automation & Staff Augmentation FAQ | LATAM | OpenGateHub"
+        description="Questions about workflow automation, staff augmentation in Latin America, nearshore development, and AI for business? Honest, practical answers — no jargon."
+        keywords="automation FAQ, workflow automation questions, staff augmentation FAQ LATAM, AI for business FAQ, nearshore development questions, staff augmentation Latin America FAQ"
       >
         <script
           type="application/ld+json"

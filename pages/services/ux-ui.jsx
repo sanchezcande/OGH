@@ -114,9 +114,9 @@ const UxUi = () => {
   return (
     <>
       <SEO
-        title="UX/UI Design for SaaS & Digital Products | OpenGateHub"
-        description="We design interfaces your users actually want to use — wireframes, prototypes, full visual systems, and engineering-ready handoffs. Human-first UX with measurable impact."
-        keywords="UX design agency, UI design service, product design, SaaS UX, user experience design, wireframing, prototyping, design systems, conversion rate optimization"
+        title="UX/UI Design for SaaS & Digital Products | LATAM Design Team | OpenGateHub"
+        description="We design interfaces your users actually want to use — wireframes, prototypes, full visual systems, and engineering-ready handoffs. Nearshore UX/UI designers from Latin America. Human-first design with measurable impact."
+        keywords="UX design agency LATAM, UI design service Latin America, product design, SaaS UX, user experience design nearshore, wireframing, prototyping, design systems, UX designers Latin America, nearshore design team"
       />
       <style>{`
         @keyframes fadeInUp {

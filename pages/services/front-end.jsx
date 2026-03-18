@@ -59,9 +59,9 @@ const FrontEnd = () => {
   return (
     <>
       <SEO
-        title="Frontend Development — React & Next.js for SaaS & Web Apps | OpenGateHub"
-        description="We build fast, modern frontends with React and Next.js — from SaaS dashboards to e-commerce. Clean architecture, ≤2s load times, and design that actually converts."
-        keywords="frontend development, React developer, Next.js architecture, SaaS frontend, web performance, responsive design, modern UI/UX, web development agency"
+        title="Frontend Development — React & Next.js | Nearshore Dev Team | OpenGateHub"
+        description="We build fast, modern frontends with React and Next.js — from SaaS dashboards to e-commerce. Nearshore frontend developers from Latin America. Clean architecture, ≤2s load times."
+        keywords="frontend development LATAM, React developer Latin America, Next.js development, SaaS frontend, nearshore frontend developers, web performance, responsive design, web development agency LATAM, hire React developers nearshore"
       />
 
       <style>{`

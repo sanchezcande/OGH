@@ -253,9 +253,9 @@ const N8nAutomation = () => {
   return (
     <>
       <SEO
-        title="n8n Automation Agency — Custom Workflow Automation | OpenGateHub"
-        description="We build and deploy custom n8n workflows that connect your apps, automate repetitive processes, and give you real-time visibility over your operations — without writing code."
-        keywords="n8n automation, n8n agency, n8n workflow, n8n integrations, workflow automation, no-code automation, business process automation"
+        title="n8n Automation Agency — Custom Workflow Automation | LATAM | OpenGateHub"
+        description="We build and deploy custom n8n workflows that connect your apps, automate repetitive processes, and give you real-time visibility — without writing code. Nearshore n8n experts from Latin America. 300+ processes automated."
+        keywords="n8n automation, n8n agency, n8n automation LATAM, n8n workflow, n8n integrations, workflow automation Latin America, no-code automation, business process automation, n8n consultant, automation agency nearshore"
       />
 
       {/* Hero Section - Full Width */}
