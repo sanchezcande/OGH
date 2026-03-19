@@ -1973,6 +1973,13 @@ export default function HomePage() {
                   descKey: "caseStudiesSection.vantageDesc",
                   stat: null,
                 },
+                {
+                  img: "/case-studies/propbot.png",
+                  categoryKey: "caseStudiesSection.propbotCategory",
+                  titleKey: "caseStudiesSection.propbotTitle",
+                  descKey: "caseStudiesSection.propbotDesc",
+                  stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" },
+                },
               ].map((cs) => (
                 <div
                   key={cs.titleKey}
@@ -2278,6 +2285,24 @@ export default function HomePage() {
                   category: "commerce",
                   delay: 0.6,
                   imageScale: 0.9,
+                },
+                {
+                  image: "/propbot-logo.svg",
+                  title: t("featuredWorkSection.propbot.title"),
+                  description: t("featuredWorkSection.propbot.description"),
+                  metrics: t("featuredWorkSection.propbot.metrics", {
+                    returnObjects: true,
+                  }),
+                  link: "https://propbot.cc",
+                  hoverContent: (
+                    <>
+                      <strong>AI Chatbot</strong> for real estate — instant
+                      responses, smart filtering, auto-scheduling.
+                    </>
+                  ),
+                  badges: ["AI", "WhatsApp", "24/7"],
+                  category: "saas",
+                  delay: 0.65,
                 },
                 {
                   image: "/GBS.png",

@@ -756,7 +756,11 @@
     "vantageCategory": "IA · Generativa",
     "vantageTitle": "Vantage Inc.",
     "vantageDesc": "Equipo de IA embebido para construir una plataforma de imágenes generativas con edición por lenguaje natural y una API lista para integrarse en cualquier flujo creativo.",
-    "vantageStat": "aceleración del roadmap"
+    "vantageStat": "aceleración del roadmap",
+    "propbotCategory": "IA · Automatización",
+    "propbotTitle": "PropBot",
+    "propbotDesc": "Chatbot con IA para inmobiliarias que responde consultas en 5 segundos, filtra propiedades por lenguaje natural y agenda visitas automáticamente — 24/7 en WhatsApp, Instagram y Facebook.",
+    "propbotStat": "consultas recuperadas"
   },
   "featuredWorkSection": {
     "title": "Trabajos Destacados",
@@ -794,6 +798,11 @@
       "title": "Cicero",
       "description": "Bibliotecario personal con IA (etapa temprana).",
       "metrics": ["Dirección de producto", "Desarrollo temprano", "Ver en LinkedIn"]
+    },
+    "propbot": {
+      "title": "PropBot",
+      "description": "Chatbot con IA para inmobiliarias que responde en 5 segundos, filtra propiedades y agenda visitas automáticamente en WhatsApp, Instagram y Facebook.",
+      "metrics": ["Respuesta <5s", "+23 visitas/mes", "24/7 multicanal"]
     }
   },
   "metricsSection": {

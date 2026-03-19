@@ -747,7 +747,11 @@
     "vantageCategory": "AI · Generative",
     "vantageTitle": "Vantage Inc.",
     "vantageDesc": "Embedded AI engineering team to build a generative image platform with natural language editing and an integration-ready API for any creative workflow.",
-    "vantageStat": "roadmap acceleration"
+    "vantageStat": "roadmap acceleration",
+    "propbotCategory": "AI · Automation",
+    "propbotTitle": "PropBot",
+    "propbotDesc": "AI-powered chatbot for real estate agencies that responds to inquiries in 5 seconds, filters properties via natural language, and auto-schedules viewings — 24/7 on WhatsApp, Instagram, and Facebook.",
+    "propbotStat": "recovered inquiries"
   },
   "featuredWorkSection": {
     "title": "Featured Work",
@@ -785,6 +789,11 @@
       "title": "Cicero",
       "description": "AI-powered personal librarian (early-stage).",
       "metrics": ["Product direction", "Early development", "View on LinkedIn"]
+    },
+    "propbot": {
+      "title": "PropBot",
+      "description": "AI-powered chatbot for real estate agencies — responds in 5 seconds, filters properties via natural language, and auto-schedules viewings on WhatsApp, Instagram, and Facebook.",
+      "metrics": ["<5s response", "+23 viewings/mo", "24/7 multi-channel"]
     }
   },
   "metricsSection": {
