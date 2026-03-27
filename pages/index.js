@@ -1951,6 +1951,7 @@ export default function HomePage() {
                   titleKey: "caseStudiesSection.valthorTitle",
                   descKey: "caseStudiesSection.valthorDesc",
                   stat: { value: "40%", labelKey: "caseStudiesSection.valthorStat" },
+                  link: "https://www.valthorcrm.com/",
                 },
                 {
                   img: "/case-studies/hot-date-kitchen.jpeg",
@@ -1958,6 +1959,7 @@ export default function HomePage() {
                   titleKey: "caseStudiesSection.hotdateTitle",
                   descKey: "caseStudiesSection.hotdateDesc",
                   stat: null,
+                  link: "https://hotdatekitchen.com/",
                 },
                 {
                   img: "/case-studies/smarters-city.jpeg",
@@ -1965,6 +1967,7 @@ export default function HomePage() {
                   titleKey: "caseStudiesSection.smartersTitle",
                   descKey: "caseStudiesSection.smartersDesc",
                   stat: null,
+                  link: "https://smarters.city/",
                 },
                 {
                   img: "/case-studies/vantage.jpeg",
@@ -1972,6 +1975,7 @@ export default function HomePage() {
                   titleKey: "caseStudiesSection.vantageTitle",
                   descKey: "caseStudiesSection.vantageDesc",
                   stat: null,
+                  link: "https://vantageinc.ai/",
                 },
                 {
                   img: "/case-studies/propbot.png",
@@ -1979,15 +1983,18 @@ export default function HomePage() {
                   titleKey: "caseStudiesSection.propbotTitle",
                   descKey: "caseStudiesSection.propbotDesc",
                   stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" },
+                  link: "https://propbot.cc",
                 },
               ].map((cs) => (
                 <div
                   key={cs.titleKey}
+                  onClick={() => window.open(cs.link, "_blank", "noopener,noreferrer")}
                   style={{
                     background: "#fafafa",
                     border: "1.5px solid #e5e7eb",
                     borderRadius: "16px",
                     overflow: "hidden",
+                    cursor: "pointer",
                     transition: "box-shadow 0.2s ease, transform 0.2s ease",
                   }}
                   onMouseEnter={(e) => {
