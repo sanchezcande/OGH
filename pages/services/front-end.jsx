@@ -104,6 +104,68 @@ const FrontEnd = () => {
           transform: translateY(-8px);
           box-shadow: 0 12px 40px rgba(35, 41, 70, 0.15);
         }
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+          align-items: center;
+        }
+        .hero-title {
+          font-size: 3rem;
+          font-weight: 800;
+          margin-bottom: 20px;
+          line-height: 1.1;
+          color: white;
+        }
+        .hero-visual-box {
+          width: 300px;
+          height: 200px;
+        }
+        .hero-section-heading h2,
+        .fe-section-heading {
+          font-size: 2.5rem;
+        }
+        @media (max-width: 768px) {
+          .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 2rem 1.25rem;
+          }
+          .hero-title {
+            font-size: 2rem;
+          }
+          .hero-visual-box {
+            width: 100%;
+            max-width: 280px;
+            height: 160px;
+            margin: 0 auto;
+          }
+          .hero-visual-wrapper {
+            display: flex;
+            justify-content: center;
+          }
+          .fe-section-heading {
+            font-size: 1.75rem !important;
+          }
+          .fe-process-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .hero-title {
+            font-size: 1.65rem;
+          }
+          .hero-visual-box {
+            max-width: 240px;
+            height: 140px;
+          }
+          .fe-section-heading {
+            font-size: 1.5rem !important;
+          }
+        }
       `}</style>
 
       {/* HERO SECTION - Split Layout */}
@@ -117,9 +179,6 @@ const FrontEnd = () => {
           position: "relative",
           overflow: "hidden",
           marginTop: "1rem",
-          "@media (max-width: 768px)": {
-            marginTop: "2rem",
-          },
         }}
       >
         <div
@@ -135,17 +194,7 @@ const FrontEnd = () => {
           }}
         />
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "4rem",
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "2rem",
-            alignItems: "center",
-          }}
-        >
+        <div className="hero-grid">
           {/* Left Side - Text */}
           <div className="animate" style={{ animationDelay: "0.1s" }}>
             <div
@@ -172,15 +221,7 @@ const FrontEnd = () => {
               </span>
             </div>
 
-            <h1
-              style={{
-                fontSize: "3rem",
-                fontWeight: 800,
-                marginBottom: "20px",
-                lineHeight: 1.1,
-                color: "white",
-              }}
-            >
+            <h1 className="hero-title">
               {lang === "es"
                 ? "Cómo construimos software escalable"
                 : "How we build scalable software"}
@@ -258,7 +299,7 @@ const FrontEnd = () => {
 
           {/* Right Side - Visual Elements */}
           <div
-            className="animate"
+            className="animate hero-visual-wrapper"
             style={{ animationDelay: "0.3s", textAlign: "center" }}
           >
             <div
@@ -269,9 +310,8 @@ const FrontEnd = () => {
             >
               {/* Main Device */}
               <div
+                className="hero-visual-box"
                 style={{
-                  width: 300,
-                  height: 200,
                   background: "rgba(255,255,255,0.1)",
                   borderRadius: "20px",
                   backdropFilter: "blur(10px)",
@@ -378,6 +418,7 @@ const FrontEnd = () => {
           style={{ maxWidth: 800, margin: "0 auto", marginBottom: "3rem" }}
         >
           <h2
+            className="fe-section-heading"
             style={{
               fontSize: "2.5rem",
               fontWeight: 700,
@@ -462,6 +503,7 @@ const FrontEnd = () => {
           style={{ maxWidth: 800, margin: "0 auto", marginBottom: "4rem" }}
         >
           <h2
+            className="fe-section-heading"
             style={{
               fontSize: "2.5rem",
               fontWeight: 700,
@@ -554,6 +596,7 @@ const FrontEnd = () => {
             style={{ textAlign: "center", marginBottom: "4rem" }}
           >
             <h2
+              className="fe-section-heading"
               style={{
                 fontSize: "2.5rem",
                 fontWeight: 700,
@@ -577,6 +620,7 @@ const FrontEnd = () => {
           </div>
 
           <div
+            className="fe-process-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
