@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <style>
+    text { fill: #111111; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #ffffff; }
+    }
+  </style>
+  <text x="32" y="48" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="38" letter-spacing="-2">OG</text>
+</svg>
