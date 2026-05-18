@@ -1,305 +1,699 @@
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import styled from "styled-components";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import SEO from "../../src/components/SEO/SEO";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
-import {
-  FaProjectDiagram,
-  FaRocket,
-  FaCode,
-  FaChartLine,
-  FaShieldAlt,
-  FaTasks,
-  FaCog,
-  FaTruck,
-  FaClock,
-  FaBolt,
-  FaDollarSign,
-  FaExternalLinkAlt,
-} from "react-icons/fa";
-import React from "react";
 
-// Componentes visuales mejorados (mismo estilo que otras páginas)
-const HeroSection = ({ children, style }) => (
-  <div
-    style={{
-      background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
-      borderRadius: "16px",
-      padding: "2.5rem 2rem",
-      marginTop: "1rem",
-      marginBottom: "2rem",
-      textAlign: "center",
-      color: "white",
-      position: "relative",
-      overflow: "hidden",
-      boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-      ...style,
-    }}
-  >
-    {/* Patrón de fondo sutil */}
-    <div
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background:
-          'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circles" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23circles)"/></svg>\')',
-        opacity: 0.4,
-        zIndex: 1,
-      }}
-    />
-    <div style={{ position: "relative", zIndex: 2 }}>{children}</div>
-    <div
-      style={{
-        position: "absolute",
-        top: "-50%",
-        right: "-20%",
-        width: "200px",
-        height: "200px",
-        background: "rgba(255, 255, 255, 0.2)",
-        borderRadius: "50%",
-        zIndex: 1,
-      }}
-    />
-  </div>
-);
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
-const ProfessionalCard = ({
-  children,
-  style,
-  className,
-  hasPattern = false,
-}) => (
-  <div
-    className={className}
-    style={{
-      background: "white",
-      borderRadius: "12px",
-      padding: "2rem",
-      marginBottom: "2rem",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-      border: "1px solid rgba(0,0,0,0.05)",
-      transition: "all 0.3s ease",
-      position: "relative",
-      overflow: "hidden",
-      ...style,
-    }}
-  >
-    {hasPattern && (
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
-            linear-gradient(45deg, rgba(249, 123, 114, 0.03) 25%, transparent 25%),
-            linear-gradient(-45deg, rgba(249, 123, 114, 0.03) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, rgba(249, 123, 114, 0.03) 75%),
-            linear-gradient(-45deg, transparent 75%, rgba(249, 123, 114, 0.03) 75%)
-          `,
-          backgroundSize: "20px 20px",
-          backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
-          zIndex: 1,
-        }}
-      />
-    )}
-    <div style={{ position: "relative", zIndex: 2 }}>{children}</div>
-  </div>
-);
+/* ===================================================================
+   STYLED COMPONENTS
+   =================================================================== */
 
-const FeatureGrid = ({ children }) => (
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-      gap: "1.5rem",
-      marginBottom: "2rem",
-    }}
-  >
-    {children}
-  </div>
-);
+const PageWrapper = styled.div`
+  overflow-x: hidden;
+  background: #fff;
+`;
 
-const FeatureCard = ({ icon, title, description, delay = 0 }) => (
-  <div
-    className="animate"
-    style={{
-      background: "white",
-      borderRadius: "12px",
-      padding: "1.5rem",
-      boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-      border: "1px solid rgba(0,0,0,0.04)",
-      transition: "all 0.3s ease",
-      opacity: 0,
-      transform: "translateY(20px)",
-      animation: "fadeInUp 0.6s forwards",
-      animationDelay: `${delay * 0.1}s`,
-    }}
-  >
-    <div
-      style={{
-        fontSize: "2.5rem",
-        color: "#F97B72",
-        marginBottom: "1rem",
-        textAlign: "center",
-      }}
-    >
-      {icon}
-    </div>
-    <h4
-      style={{
-        fontSize: "1.2rem",
-        fontWeight: "600",
-        marginBottom: "0.5rem",
-        color: "#2B2B2B",
-        textAlign: "center",
-      }}
-    >
-      {title}
-    </h4>
-    <p
-      style={{
-        fontSize: "0.95rem",
-        lineHeight: "1.6",
-        color: "#6B7280",
-        textAlign: "center",
-      }}
-    >
-      {description}
-    </p>
-    <style>{`
-      @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    `}</style>
-  </div>
-);
+/* ---------- HERO ---------- */
+const HeroSection = styled.section`
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  overflow: hidden;
+`;
 
-const SectionTitle = ({ children, style }) => (
-  <h2
-    style={{
-      fontSize: "2rem",
-      fontWeight: "700",
-      marginBottom: "1.5rem",
-      color: "#2B2B2B",
-      textAlign: "center",
-      ...style,
-    }}
-  >
-    {children}
-  </h2>
-);
+const HeroGrid = styled.div`
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+`;
 
-const Subtitle = ({ children, style }) => (
-  <p
-    style={{
-      fontSize: "1.1rem",
-      lineHeight: "1.6",
-      color: "#6B7280",
-      textAlign: "center",
-      marginBottom: "2rem",
-      maxWidth: "600px",
-      margin: "0 auto 2rem auto",
-      ...style,
-    }}
-  >
-    {children}
-  </p>
-);
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 2rem;
+  max-width: 900px;
+`;
 
+const HeroTitle = styled.h1`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 1.5rem;
+`;
+
+const HeroSubtitle = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+`;
+
+const HeroLine = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(204, 90, 80, 0.3), transparent);
+`;
+
+/* ---------- TEXT REVEAL ---------- */
+const TextRevealSection = styled.section`
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 0 2rem;
+`;
+
+const TextRevealInner = styled.div`
+  max-width: 900px;
+  width: 100%;
+`;
+
+const RevealText = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight: 500;
+  line-height: 1.65;
+  color: #111;
+  letter-spacing: -0.005em;
+`;
+
+const RevealWord = styled.span`
+  opacity: 0.12;
+  transition: opacity 0.1s;
+  display: inline-block;
+  margin-right: 0.3em;
+`;
+
+/* ---------- METRICS ---------- */
+const MetricsSection = styled.section`
+  position: relative;
+  padding: 8rem 2rem;
+  background: #fafafa;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+`;
+
+const SectionContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const SectionLabel = styled.span`
+  display: inline-block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #CC5A50;
+  margin-bottom: 1rem;
+`;
+
+const SectionHeading = styled.h2`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+`;
+
+const SectionSubtext = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.1rem;
+  color: #777;
+  line-height: 1.6;
+  max-width: 560px;
+  margin: 0 0 3.5rem;
+`;
+
+const MetricsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const MetricCard = styled.div`
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: border-color 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    border-color: #ccc;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+`;
+
+const MetricValue = styled.div`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.5rem;
+`;
+
+const MetricTitle = styled.div`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.4rem;
+`;
+
+const MetricDesc = styled.div`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.85rem;
+  color: #999;
+  line-height: 1.5;
+`;
+
+/* ---------- FEATURES / WHEN TO USE ---------- */
+const FeaturesSection = styled.section`
+  position: relative;
+  padding: 8rem 2rem;
+  background: #fff;
+`;
+
+const FeaturesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FeatureCard = styled.div`
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 2.5rem;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+
+  &:hover {
+    border-color: #ccc;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+  }
+`;
+
+const FeatureIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #CC5A50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  font-size: 1.2rem;
+`;
+
+const FeatureTitle = styled.h3`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 0.6rem;
+`;
+
+const FeatureDesc = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.95rem;
+  color: #888;
+  line-height: 1.6;
+  margin: 0;
+`;
+
+/* ---------- HORIZONTAL SCROLL (Process) ---------- */
+const HorizontalSection = styled.section`
+  position: relative;
+  background: #0a0a0a;
+  overflow: hidden;
+`;
+
+const HorizontalWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const HorizontalHeader = styled.div`
+  padding: 5rem 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const HorizontalHeaderTitle = styled.h2`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0;
+`;
+
+const HorizontalTrack = styled.div`
+  display: flex;
+  gap: 2rem;
+  padding: 0 4rem 5rem;
+  will-change: transform;
+
+  @media (max-width: 768px) {
+    padding: 0 2rem 4rem;
+    gap: 1.5rem;
+  }
+`;
+
+const StepCard = styled.div`
+  flex-shrink: 0;
+  width: min(75vw, 800px);
+  min-height: 240px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 3rem 3.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3rem;
+  transition: border-color 0.3s;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    width: 85vw;
+    min-height: 200px;
+    padding: 2rem;
+    gap: 1.5rem;
+  }
+`;
+
+const StepNumber = styled.span`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 6rem;
+  font-weight: 700;
+  color: rgba(204, 90, 80, 0.12);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 100px;
+  text-align: center;
+`;
+
+const StepTitle = styled.h3`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1rem;
+`;
+
+const StepDesc = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 480px;
+`;
+
+/* ---------- OUTCOMES ---------- */
+const OutcomesSection = styled.section`
+  position: relative;
+  padding: 8rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+`;
+
+const OutcomesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const OutcomeCard = styled.div`
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 2.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    border-color: #ccc;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+`;
+
+const OutcomeNumber = styled.span`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgba(204, 90, 80, 0.3);
+  flex-shrink: 0;
+  min-width: 40px;
+`;
+
+const OutcomeTitle = styled.h3`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 0.5rem;
+`;
+
+const OutcomeDesc = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.95rem;
+  color: #888;
+  line-height: 1.6;
+  margin: 0;
+`;
+
+/* ---------- COMMITMENT ---------- */
+const CommitmentSection = styled.section`
+  position: relative;
+  padding: 6rem 2rem;
+  background: #0a0a0a;
+  text-align: center;
+`;
+
+const CommitmentText = styled.p`
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto;
+`;
+
+const CTAWrapper = styled.div`
+  position: relative;
+`;
+
+/* ---------- MOBILE PROCESS ---------- */
+const MobileProcessSection = styled.section`
+  background: #0a0a0a;
+  padding: 4rem 1.5rem;
+`;
+
+const MobileProcessCard = styled.div`
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+`;
+
+/* ===================================================================
+   PAGE COMPONENT
+   =================================================================== */
 const SoftwareFactory = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const isSpanish = lang?.startsWith("es");
-  const impactBenchmarks = [
-    {
-      value: "58%",
-      title: isSpanish
-        ? "del tiempo en coordinación"
-        : "of time spent on coordination",
-      description: isSpanish
-        ? "Asana reporta carga operativa alta en equipos de conocimiento."
-        : "Asana reports high operational overhead in knowledge teams.",
-      sourceLabel: "Asana Anatomy of Work (2023)",
-      sourceUrl:
-        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
-      icon: <FaTasks />,
-      color: "#F97B72",
-    },
-    {
-      value: "4.9h",
-      title: isSpanish
-        ? "recuperables por semana"
-        : "recoverable per week",
-      description: isSpanish
-        ? "Horas que equipos estiman liberar con mejores procesos."
-        : "Hours teams estimate they can free up with better processes.",
-      sourceLabel: "Asana Anatomy of Work (2023)",
-      sourceUrl:
-        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
-      icon: <FaClock />,
-      color: "#FB7185",
-    },
-    {
-      value: "2 min",
-      title: isSpanish
-        ? "entre interrupciones"
-        : "between interruptions",
-      description: isSpanish
-        ? "Microsoft señala interrupciones constantes que afectan foco."
-        : "Microsoft highlights constant interruptions that affect focus.",
-      sourceLabel: "Microsoft Work Trend Index (2025)",
-      sourceUrl:
-        "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
-      icon: <FaBolt />,
-      color: "#38BDF8",
-    },
-    {
-      value: "32%",
-      title: isSpanish
-        ? "reducción promedio de costos"
-        : "average cost reduction",
-      description: isSpanish
-        ? "Deloitte muestra impacto económico en automatización madura."
-        : "Deloitte shows economic impact in mature automation programs.",
-      sourceLabel: "Deloitte Intelligent Automation Survey (2022)",
-      sourceUrl:
-        "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
-      icon: <FaDollarSign />,
-      color: "#818CF8",
-    },
-  ];
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Refs
+  const heroRef = useRef(null);
+  const heroTitleRef = useRef(null);
+  const heroSubRef = useRef(null);
+  const revealSectionRef = useRef(null);
+  const revealTextRef = useRef(null);
+  const metricsSectionRef = useRef(null);
+  const metricsCardsRef = useRef([]);
+  const featuresSectionRef = useRef(null);
+  const featuresCardsRef = useRef([]);
+  const horizontalWrapperRef = useRef(null);
+  const horizontalTrackRef = useRef(null);
+  const outcomesSectionRef = useRef(null);
+  const outcomesCardsRef = useRef([]);
+  const commitmentRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setIsMobile(window.innerWidth <= 768);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-          }
+    const ctx = gsap.context(() => {
+      /* ---------- 1. CINEMATIC HERO ---------- */
+      // Entrance (once)
+      gsap.fromTo(heroTitleRef.current,
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 1.2, ease: "power3.out", delay: 0.1 }
+      );
+      gsap.fromTo(heroSubRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1, ease: "power3.out", delay: 0.4 }
+      );
+
+      // Exit/return on scroll (scrub = bidirectional) — use .to, not .fromTo
+      const heroTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.5,
+        },
+      });
+      heroTl
+        .to(heroTitleRef.current, { scale: 0.85, opacity: 0, y: -40 })
+        .to(heroSubRef.current, { opacity: 0, y: -30 }, 0.1);
+
+      /* ---------- 2. SCROLL TEXT REVEAL (pinned) ---------- */
+      if (revealTextRef.current) {
+        const words = revealTextRef.current.querySelectorAll(".reveal-word");
+        if (words.length > 0) {
+          gsap.to(words, {
+            opacity: 1,
+            stagger: 0.05,
+            scrollTrigger: {
+              trigger: revealSectionRef.current,
+              start: "top top",
+              end: "+=150%",
+              pin: true,
+              scrub: 0.3,
+              anticipatePin: 1,
+            },
+          });
+        }
+      }
+
+      /* ---------- 3. METRICS STAGGER ---------- */
+      const metricCards = metricsCardsRef.current.filter(Boolean);
+      if (metricCards.length > 0) {
+        gsap.from(metricCards, {
+          opacity: 0,
+          y: 50,
+          scale: 0.95,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: metricsSectionRef.current,
+            start: "top 75%",
+            toggleActions: "play none none none",
+          },
         });
-      },
-      { threshold: 0.1 },
-    );
+      }
 
-    const items = document.querySelectorAll(".animate");
-    items.forEach((item) => observer.observe(item));
+      /* ---------- 4. FEATURES STAGGER ---------- */
+      const featureCards = featuresCardsRef.current.filter(Boolean);
+      if (featureCards.length > 0) {
+        gsap.from(featureCards, {
+          opacity: 0,
+          y: 60,
+          filter: "blur(6px)",
+          duration: 0.8,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: featuresSectionRef.current,
+            start: "top 75%",
+            toggleActions: "play none none none",
+          },
+        });
+      }
 
-    return () => observer.disconnect();
-  }, []);
+      /* ---------- 5. HORIZONTAL SCROLL TIMELINE ---------- */
+      if (
+        horizontalWrapperRef.current &&
+        horizontalTrackRef.current &&
+        !isMobile
+      ) {
+        const track = horizontalTrackRef.current;
+        if (track.children.length > 0) {
+          const getScrollAmount = () =>
+            track.scrollWidth - window.innerWidth + 100;
+
+          gsap.to(track, {
+            x: () => -getScrollAmount(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: horizontalWrapperRef.current,
+              start: "top top",
+              end: () => `+=${getScrollAmount()}`,
+              pin: true,
+              scrub: 0.5,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+      }
+
+      /* ---------- 6. OUTCOMES SCALE REVEAL ---------- */
+      const outcomeCards = outcomesCardsRef.current.filter(Boolean);
+      if (outcomeCards.length > 0) {
+        gsap.from(outcomeCards, {
+          scale: 0.9,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: outcomesSectionRef.current,
+            start: "top 75%",
+            toggleActions: "play none none none",
+          },
+        });
+      }
+
+      /* ---------- COMMITMENT FADE ---------- */
+      if (commitmentRef.current) {
+        gsap.from(commitmentRef.current, {
+          opacity: 0,
+          y: 40,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: commitmentRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        });
+      }
+    });
+
+    return () => ctx.revert();
+  }, [isMobile]);
+
+  /* ---------- Data ---------- */
+  const whatIsText = t("softwareFactory.whatIsDescription");
+  const revealWords = whatIsText ? whatIsText.split(" ") : [];
+
+  const metrics = [
+    { value: "58%", title: isSpanish ? "Tiempo en coordinación" : "Time on coordination", desc: "Asana Anatomy of Work (2023)" },
+    { value: "4.9h", title: isSpanish ? "Recuperables por semana" : "Recoverable per week", desc: "Asana Anatomy of Work (2023)" },
+    { value: "2 min", title: isSpanish ? "Entre interrupciones" : "Between interruptions", desc: "Microsoft Work Trend (2025)" },
+    { value: "32%", title: isSpanish ? "Reducción de costos" : "Cost reduction", desc: "Deloitte Automation (2022)" },
+  ];
+
+  const whenToUse = [
+    {
+      title: t("softwareFactory.whenToUse.newProductTitle"),
+      desc: t("softwareFactory.whenToUse.newProductDescription"),
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+          <polyline points="17 6 23 6 23 12" />
+        </svg>
+      ),
+    },
+    {
+      title: t("softwareFactory.whenToUse.completeSolutionTitle"),
+      desc: t("softwareFactory.whenToUse.completeSolutionDescription"),
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="9" y1="21" x2="9" y2="9" />
+        </svg>
+      ),
+    },
+    {
+      title: t("softwareFactory.whenToUse.tightDeadlineTitle"),
+      desc: t("softwareFactory.whenToUse.tightDeadlineDescription"),
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+    },
+  ];
+
+  const processSteps = [1, 2, 3, 4, 5];
+
+  const outcomes = [
+    { key: "fullyFunctional" },
+    { key: "productionReady" },
+    { key: "scalableArchitecture" },
+    { key: "completeDocumentation" },
+  ];
 
   return (
     <>
       <SEO
         title="Workflow Automation Services for Companies | LATAM Automation Agency | OpenGateHub"
-        description="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Nearshore automation experts from Latin America. Powered by n8n, AI, and custom integrations."
-        keywords="workflow automation services, business process automation, workflow automation LATAM, process automation Latin America, n8n automation, AI workflows, process optimization, reduce manual work, automation agency nearshore, RPA LATAM"
+        description="We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Nearshore automation experts from Latin America."
+        keywords="workflow automation services, business process automation, workflow automation LATAM, process automation Latin America, n8n automation, AI workflows, process optimization, reduce manual work, automation agency nearshore"
       >
         <script
           type="application/ld+json"
@@ -307,572 +701,195 @@ const SoftwareFactory = () => {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Service",
-              "name": "Workflow Automation Services",
-              "description": "We automate approvals, data transfers, reports, and cross-team handoffs. Reduce cycle time by 28% and cut manual work costs by 60%. Powered by n8n, AI, and custom integrations.",
-              "provider": {
-                "@type": "Organization",
-                "name": "OpenGateHub",
-                "url": "https://opengatehub.com"
-              },
-              "areaServed": ["Latin America", "United States", "North America", "Europe"],
-              "serviceType": "Workflow Automation"
+              name: "Workflow Automation Services",
+              description: "We automate approvals, data transfers, reports, and cross-team handoffs. Powered by n8n, AI, and custom integrations.",
+              provider: { "@type": "Organization", name: "OpenGateHub", url: "https://opengatehub.com" },
+              areaServed: ["Latin America", "United States", "North America", "Europe"],
+              serviceType: "Workflow Automation",
             }),
           }}
         />
       </SEO>
 
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate { opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s; }
-        .visible { opacity: 1 !important; transform: translateY(0) !important; }
-        @keyframes automationPulse {
-          0%, 100% { 
-            transform: scale(1);
-            opacity: 1;
-          }
-          50% { 
-            transform: scale(1.05);
-            opacity: 0.9;
-          }
-        }
-      `}</style>
-
-      {/* Hero Section - Full Width */}
-      <section
-        style={{
-          background: "linear-gradient(135deg, #5a6c7d 0%, #3d4a5a 100%)",
-          padding: "3rem 2rem",
-          marginTop: "1rem",
-          marginBottom: "2rem",
-          textAlign: "center",
-          color: "white",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background:
-              'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circles" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23circles)"/></svg>\')',
-            opacity: 0.4,
-          }}
-        />
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            maxWidth: 1200,
-            margin: "0 auto",
-          }}
-        >
-          <div
-            className="animate"
-            style={{
-              fontSize: "4rem",
-              marginBottom: "1rem",
-              animationDelay: "0.05s",
-              color: "#F97B72",
-              textShadow: "0 0 15px rgba(249, 123, 114, 0.4)",
-              animation: "automationPulse 3s ease-in-out infinite",
-            }}
-          >
-            <FaProjectDiagram />
-          </div>
-          <h1
-            className="animate"
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: "700",
-              marginBottom: "1rem",
-              animationDelay: "0.1s",
-            }}
-          >
-            Workflow Automation
-          </h1>
-          <p
-            className="animate"
-            style={{
-              fontSize: "1.2rem",
-              opacity: 0.95,
-              maxWidth: "600px",
-              margin: "0 auto",
-              animationDelay: "0.15s",
-            }}
-          >
-            {t("softwareFactory.heroSubtitle")}
-          </p>
-        </div>
-      </section>
-
-      {/* Main Content - Full Width */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2rem" }}>
-        {/* Main Description */}
-        <div
-          className="animate"
-          style={{
-            position: "relative",
-            padding: "2rem",
-            marginBottom: "2rem",
-            borderRadius: "12px",
-            overflow: "hidden",
-            animationDelay: "0.2s",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `
-                linear-gradient(45deg, rgba(249, 123, 114, 0.03) 25%, transparent 25%),
-                linear-gradient(-45deg, rgba(249, 123, 114, 0.03) 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, rgba(249, 123, 114, 0.03) 75%),
-                linear-gradient(-45deg, transparent 75%, rgba(249, 123, 114, 0.03) 75%)
-              `,
-              backgroundSize: "20px 20px",
-              backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
-              zIndex: 1,
-            }}
-          />
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <SectionTitle>
-              {t("softwareFactory.whatIsTitle")}
-            </SectionTitle>
-            <Subtitle>
-              {t("softwareFactory.whatIsDescription")}
-            </Subtitle>
-          </div>
-        </div>
-
-        <ProfessionalCard
-          className="animate"
-          style={{ animationDelay: "0.22s", marginTop: "-0.25rem" }}
-        >
-          <SectionTitle style={{ marginBottom: "0.8rem" }}>
-            {isSpanish
-              ? "Impacto medible de automatizar workflows"
-              : "Measurable impact of workflow automation"}
-          </SectionTitle>
-          <Subtitle style={{ marginBottom: "1.5rem" }}>
-            {isSpanish
-              ? "Cuando reducís fricción operativa, ganás velocidad, foco y margen. Estos benchmarks respaldan por qué automatizar procesos es una decisión de negocio."
-              : "When you reduce operational friction, you gain speed, focus, and margin. These benchmarks show why process automation is a business decision."}
-          </Subtitle>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-              gap: "1rem",
-              marginBottom: "1.5rem",
-            }}
-          >
-            {impactBenchmarks.map((item, index) => (
-              <div
-                key={index}
-                className="animate"
-                style={{
-                  background: "#F8FAFC",
-                  border: "1px solid #E2E8F0",
-                  borderRadius: "12px",
-                  padding: "1rem",
-                  animationDelay: `${0.24 + index * 0.05}s`,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.65rem",
-                    marginBottom: "0.55rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 10,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: `${item.color}22`,
-                      color: item.color,
-                    }}
-                  >
-                    {item.icon}
-                  </div>
-                  <strong style={{ fontSize: "1.35rem", color: "#0F172A" }}>
-                    {item.value}
-                  </strong>
-                </div>
-                <div style={{ fontWeight: 600, color: "#1E293B", marginBottom: "0.35rem" }}>
-                  {item.title}
-                </div>
-                <p style={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.45, marginBottom: "0.55rem" }}>
-                  {item.description}
-                </p>
-                <a
-                  href={item.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: "#0EA5E9",
-                    textDecoration: "none",
-                    fontSize: "0.82rem",
-                    fontWeight: 600,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.35rem",
-                  }}
-                >
-                  {isSpanish ? "Fuente" : "Source"} <FaExternalLinkAlt style={{ fontSize: "0.7rem" }} />
-                </a>
-              </div>
-            ))}
-          </div>
-
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "12px",
-              padding: "1rem",
-            }}
-          >
-            <h4 style={{ marginBottom: "0.9rem", color: "#0F172A", fontSize: "1rem" }}>
-              {isSpanish
-                ? "Dónde se genera la mejora operativa"
-                : "Where operational improvement happens"}
-            </h4>
-            {impactBenchmarks.map((item, idx) => {
-              const numericValue = parseInt(item.value, 10);
-              const width = Number.isNaN(numericValue) ? 49 : numericValue;
-              return (
-                <div key={idx} style={{ marginBottom: idx === impactBenchmarks.length - 1 ? 0 : "0.85rem" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "0.88rem",
-                      color: "#334155",
-                      marginBottom: "0.32rem",
-                    }}
-                  >
-                    <span>{item.title}</span>
-                    <strong>{item.value}</strong>
-                  </div>
-                  <div
-                    style={{
-                      height: "10px",
-                      background: "#E2E8F0",
-                      borderRadius: "999px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${width}%`,
-                        height: "100%",
-                        borderRadius: "999px",
-                        background: item.color,
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </ProfessionalCard>
-
-        {/* When to Use Section */}
-        <ProfessionalCard
-          className="animate"
-          style={{ animationDelay: "0.25s" }}
-        >
-          <SectionTitle>
-            {t("softwareFactory.whenToUseTitle")}
-          </SectionTitle>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: "1.5rem",
-              marginBottom: "1rem",
-            }}
-          >
-            <div
-              className="animate"
-              style={{
-                padding: "1.5rem",
-                background: "#F0F9FF",
-                borderRadius: "8px",
-                border: "1px solid #BAE6FD",
-                animationDelay: "0.3s",
-                minWidth: "240px",
-                maxWidth: "280px",
-                flex: "1 1 240px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "2rem",
-                  color: "#F97B72",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <FaRocket />
-              </div>
-              <h4
-                style={{
-                  fontWeight: "600",
-                  marginBottom: "0.5rem",
-                  color: "#2B2B2B",
-                }}
-              >
-                {t("softwareFactory.whenToUse.newProductTitle")}
-              </h4>
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "#6B7280",
-                  lineHeight: "1.5",
-                }}
-              >
-                {t("softwareFactory.whenToUse.newProductDescription")}
-              </p>
+      <PageWrapper>
+        {/* 1. CINEMATIC HERO */}
+        <HeroSection ref={heroRef}>
+          <HeroGrid />
+          <HeroContent>
+            <div ref={heroTitleRef}>
+              <HeroTitle>Workflow Automation</HeroTitle>
             </div>
-            <div
-              className="animate"
-              style={{
-                padding: "1.5rem",
-                background: "#F0F9FF",
-                borderRadius: "8px",
-                border: "1px solid #BAE6FD",
-                animationDelay: "0.35s",
-                minWidth: "240px",
-                maxWidth: "280px",
-                flex: "1 1 240px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "2rem",
-                  color: "#F97B72",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <FaCog />
-              </div>
-              <h4
-                style={{
-                  fontWeight: "600",
-                  marginBottom: "0.5rem",
-                  color: "#2B2B2B",
-                }}
-              >
-                {t("softwareFactory.whenToUse.completeSolutionTitle")}
-              </h4>
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "#6B7280",
-                  lineHeight: "1.5",
-                }}
-              >
-                {t("softwareFactory.whenToUse.completeSolutionDescription")}
-              </p>
+            <div ref={heroSubRef}>
+              <HeroSubtitle>{t("softwareFactory.heroSubtitle")}</HeroSubtitle>
             </div>
-            <div
-              className="animate"
-              style={{
-                padding: "1.5rem",
-                background: "#F0F9FF",
-                borderRadius: "8px",
-                border: "1px solid #BAE6FD",
-                animationDelay: "0.4s",
-                minWidth: "240px",
-                maxWidth: "280px",
-                flex: "1 1 240px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "2rem",
-                  color: "#F97B72",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <FaTruck />
-              </div>
-              <h4
-                style={{
-                  fontWeight: "600",
-                  marginBottom: "0.5rem",
-                  color: "#2B2B2B",
-                }}
-              >
-                {t("softwareFactory.whenToUse.tightDeadlineTitle")}
-              </h4>
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "#6B7280",
-                  lineHeight: "1.5",
-                }}
-              >
-                {t("softwareFactory.whenToUse.tightDeadlineDescription")}
-              </p>
-            </div>
-          </div>
-        </ProfessionalCard>
+          </HeroContent>
+          <HeroLine />
+        </HeroSection>
 
-        {/* Process Section */}
-        <SectionTitle className="animate" style={{ animationDelay: "0.5s" }}>
-          {t("softwareFactory.processTitle")}
-        </SectionTitle>
-        <ProfessionalCard
-          className="animate"
-          style={{
-            textAlign: "center",
-            padding: "2.5rem 1.5rem",
-            animationDelay: "0.55s",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "stretch",
-              width: "100%",
-              minHeight: 220,
-              margin: "0 auto",
-            }}
-          >
-            <div
-              style={{
-                width: 6,
-                minWidth: 6,
-                background: "#F97B72",
-                borderRadius: 3,
-                height: "calc(100% - 32px)",
-                marginTop: 16,
-                marginBottom: 16,
-                marginRight: 32,
-                boxShadow: "0 0 8px 0 #f97b7233",
-              }}
-            />
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                textAlign: "left",
-                width: "100%",
-                maxWidth: 480,
-              }}
-            >
-              {[1, 2, 3, 4, 5].map((step, index) => (
-                <li
-                  key={index}
-                  className="animate"
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    marginBottom: "1.5rem",
-                    animationDelay: `${0.6 + index * 0.05}s`,
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#F97B72",
-                      fontWeight: 700,
-                      fontSize: "1.3rem",
-                      minWidth: 28,
-                      display: "inline-block",
-                      textAlign: "center",
-                      marginRight: 18,
-                    }}
-                  >
-                    {step}.
-                  </span>
-                  <div>
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        color: "#222",
-                        fontSize: "1.08rem",
-                      }}
-                    >
-                      {t(`softwareFactory.process.step${step}Title`)}
-                    </span>
-                    <div
-                      style={{ color: "#6B7280", fontSize: "1rem", marginTop: 2 }}
-                    >
-                      {t(`softwareFactory.process.step${step}Description`)}
-                    </div>
-                  </div>
-                </li>
+        {/* 2. SCROLL TEXT REVEAL */}
+        <TextRevealSection ref={revealSectionRef}>
+          <TextRevealInner>
+            <SectionLabel>{t("softwareFactory.whatIsTitle")}</SectionLabel>
+            <RevealText ref={revealTextRef}>
+              {revealWords.map((word, i) => (
+                <RevealWord key={i} className="reveal-word">
+                  {word}
+                </RevealWord>
               ))}
-            </ul>
-          </div>
-        </ProfessionalCard>
+            </RevealText>
+          </TextRevealInner>
+        </TextRevealSection>
 
-        {/* Outcomes Section */}
-        <SectionTitle className="animate" style={{ animationDelay: "0.85s" }}>
-          {t("softwareFactory.outcomesTitle")}
-        </SectionTitle>
-        <FeatureGrid>
-          <FeatureCard
-            className="animate"
-            icon={<FaCode />}
-            title={t("softwareFactory.outcomes.fullyFunctionalTitle")}
-            description={t("softwareFactory.outcomes.fullyFunctionalDescription")}
-            delay={1}
-          />
-          <FeatureCard
-            className="animate"
-            icon={<FaShieldAlt />}
-            title={t("softwareFactory.outcomes.productionReadyTitle")}
-            description={t("softwareFactory.outcomes.productionReadyDescription")}
-            delay={2}
-          />
-          <FeatureCard
-            className="animate"
-            icon={<FaChartLine />}
-            title={t("softwareFactory.outcomes.scalableArchitectureTitle")}
-            description={t("softwareFactory.outcomes.scalableArchitectureDescription")}
-            delay={3}
-          />
-          <FeatureCard
-            className="animate"
-            icon={<FaTasks />}
-            title={t("softwareFactory.outcomes.completeDocumentationTitle")}
-            description={t("softwareFactory.outcomes.completeDocumentationDescription")}
-            delay={4}
-          />
-        </FeatureGrid>
+        {/* 3. IMPACT METRICS */}
+        <MetricsSection ref={metricsSectionRef}>
+          <SectionContainer>
+            <SectionLabel>
+              {isSpanish ? "Impacto" : "Impact"}
+            </SectionLabel>
+            <SectionHeading>
+              {isSpanish
+                ? "Impacto medible de automatizar workflows"
+                : "Measurable impact of workflow automation"}
+            </SectionHeading>
+            <SectionSubtext>
+              {isSpanish
+                ? "Estos benchmarks respaldan por qué automatizar procesos es una decisión de negocio."
+                : "These benchmarks show why process automation is a business decision."}
+            </SectionSubtext>
+            <MetricsGrid>
+              {metrics.map((m, i) => (
+                <MetricCard key={i} ref={(el) => (metricsCardsRef.current[i] = el)}>
+                  <MetricValue>{m.value}</MetricValue>
+                  <MetricTitle>{m.title}</MetricTitle>
+                  <MetricDesc>{m.desc}</MetricDesc>
+                </MetricCard>
+              ))}
+            </MetricsGrid>
+          </SectionContainer>
+        </MetricsSection>
 
-        {/* Call to Action */}
-        <div className="animate" style={{ animationDelay: "1s" }}>
+        {/* 4. WHEN TO USE */}
+        <FeaturesSection ref={featuresSectionRef}>
+          <SectionContainer>
+            <SectionLabel>
+              {isSpanish ? "Casos de uso" : "Use Cases"}
+            </SectionLabel>
+            <SectionHeading>
+              {t("softwareFactory.whenToUseTitle")}
+            </SectionHeading>
+            <SectionSubtext>
+              {isSpanish
+                ? "Situaciones donde la automatización genera el mayor retorno."
+                : "Situations where automation delivers the highest return."}
+            </SectionSubtext>
+            <FeaturesGrid>
+              {whenToUse.map((item, i) => (
+                <FeatureCard key={i} ref={(el) => (featuresCardsRef.current[i] = el)}>
+                  <FeatureIcon>{item.icon}</FeatureIcon>
+                  <FeatureTitle>{item.title}</FeatureTitle>
+                  <FeatureDesc>{item.desc}</FeatureDesc>
+                </FeatureCard>
+              ))}
+            </FeaturesGrid>
+          </SectionContainer>
+        </FeaturesSection>
+
+        {/* 5. HORIZONTAL SCROLL — PROCESS */}
+        {!isMobile ? (
+          <HorizontalSection>
+            <HorizontalWrapper ref={horizontalWrapperRef}>
+              <HorizontalHeader>
+                <SectionLabel style={{ color: "#666" }}>
+                  {isSpanish ? "Metodología" : "Methodology"}
+                </SectionLabel>
+                <HorizontalHeaderTitle>
+                  {t("softwareFactory.processTitle")}
+                </HorizontalHeaderTitle>
+              </HorizontalHeader>
+              <HorizontalTrack ref={horizontalTrackRef}>
+                {processSteps.map((step) => (
+                  <StepCard key={step}>
+                    <StepNumber>0{step}</StepNumber>
+                    <div>
+                      <StepTitle>{t(`softwareFactory.process.step${step}Title`)}</StepTitle>
+                      <StepDesc>{t(`softwareFactory.process.step${step}Description`)}</StepDesc>
+                    </div>
+                  </StepCard>
+                ))}
+              </HorizontalTrack>
+            </HorizontalWrapper>
+          </HorizontalSection>
+        ) : (
+          <MobileProcessSection>
+            <SectionContainer>
+              <SectionLabel style={{ color: "#666" }}>
+                {isSpanish ? "Metodología" : "Methodology"}
+              </SectionLabel>
+              <HorizontalHeaderTitle style={{ marginBottom: "2rem" }}>
+                {t("softwareFactory.processTitle")}
+              </HorizontalHeaderTitle>
+              {processSteps.map((step) => (
+                <MobileProcessCard key={step}>
+                  <StepNumber style={{ fontSize: "3rem", minWidth: "60px" }}>0{step}</StepNumber>
+                  <div>
+                    <StepTitle style={{ fontSize: "1.2rem" }}>{t(`softwareFactory.process.step${step}Title`)}</StepTitle>
+                    <StepDesc style={{ fontSize: "0.95rem" }}>{t(`softwareFactory.process.step${step}Description`)}</StepDesc>
+                  </div>
+                </MobileProcessCard>
+              ))}
+            </SectionContainer>
+          </MobileProcessSection>
+        )}
+
+        {/* 6. OUTCOMES */}
+        <OutcomesSection ref={outcomesSectionRef}>
+          <SectionContainer>
+            <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
+              <SectionLabel>
+                {isSpanish ? "Resultados" : "Outcomes"}
+              </SectionLabel>
+              <SectionHeading style={{ maxWidth: 600, margin: "0 auto" }}>
+                {t("softwareFactory.outcomesTitle")}
+              </SectionHeading>
+            </div>
+            <OutcomesGrid>
+              {outcomes.map((item, i) => (
+                <OutcomeCard key={item.key} ref={(el) => (outcomesCardsRef.current[i] = el)}>
+                  <OutcomeNumber>0{i + 1}</OutcomeNumber>
+                  <div>
+                    <OutcomeTitle>{t(`softwareFactory.outcomes.${item.key}Title`)}</OutcomeTitle>
+                    <OutcomeDesc>{t(`softwareFactory.outcomes.${item.key}Description`)}</OutcomeDesc>
+                  </div>
+                </OutcomeCard>
+              ))}
+            </OutcomesGrid>
+          </SectionContainer>
+        </OutcomesSection>
+
+        {/* COMMITMENT BANNER */}
+        <CommitmentSection ref={commitmentRef}>
+          <SectionContainer>
+            <SectionLabel style={{ color: "#666" }}>
+              {isSpanish ? "Compromiso" : "Our Commitment"}
+            </SectionLabel>
+            <CommitmentText>
+              {isSpanish
+                ? "Automatizamos tus procesos más críticos para que tu equipo se enfoque en lo que realmente importa. Sin fricciones, sin complejidad innecesaria."
+                : "We automate your most critical processes so your team can focus on what truly matters. No friction, no unnecessary complexity."}
+            </CommitmentText>
+          </SectionContainer>
+        </CommitmentSection>
+
+        {/* CTA */}
+        <CTAWrapper>
           <CallToActionBlock
             title={t("softwareFactory.ctaTitle")}
             description={t("softwareFactory.ctaDescription")}
             buttonText={t("softwareFactory.ctaButtonText")}
             highlightWord={t("softwareFactory.ctaHighlightWord")}
           />
-        </div>
-      </div>
+        </CTAWrapper>
+      </PageWrapper>
     </>
   );
 };
