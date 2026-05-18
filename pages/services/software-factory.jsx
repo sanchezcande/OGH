@@ -271,6 +271,10 @@ const HorizontalSection = styled.section`
   position: relative;
   background: #0a0a0a;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    overflow: visible;
+  }
 `;
 
 const HorizontalWrapper = styled.div`
@@ -300,7 +304,8 @@ const HorizontalTrack = styled.div`
   will-change: transform;
 
   @media (max-width: 768px) {
-    padding: 0 2rem 4rem;
+    flex-direction: column;
+    padding: 0 1.5rem 4rem;
     gap: 1.5rem;
   }
 `;
@@ -324,8 +329,9 @@ const StepCard = styled.div`
   }
 
   @media (max-width: 768px) {
-    width: 85vw;
-    min-height: 200px;
+    width: 100%;
+    flex-shrink: 1;
+    min-height: auto;
     padding: 2rem;
     gap: 1.5rem;
   }

@@ -87,9 +87,7 @@ const AboutUs = React.forwardRef((props, ref) => {
         const founder = founderRef.current;
         if (founder) {
           const accentLine = founder.querySelector(".founder-accent-line");
-          const eyebrow = founder.querySelector(".founder-eyebrow");
-          const columns = founder.querySelector(".founder-columns");
-          const credit = founder.querySelector(".founder-credit");
+          const mobile = window.innerWidth <= 768;
 
           gsap.set(accentLine, { height: 0 });
           gsap.set(founder, { clipPath: "inset(100% 0 0 0)" });
@@ -97,19 +95,21 @@ const AboutUs = React.forwardRef((props, ref) => {
           const fTl = gsap.timeline({
             scrollTrigger: {
               trigger: founder,
-              start: "top 85%",
-              end: "bottom 15%",
+              start: mobile ? "top 90%" : "top 85%",
+              end: mobile ? "top 30%" : "bottom 15%",
               scrub: 0.5,
             },
           });
 
-          // Wipe in from bottom (0→0.4)
+          // Wipe in from bottom
           fTl.to(founder, { clipPath: "inset(0% 0 0 0)", ease: "none" }, 0);
           // Accent line
           fTl.to(accentLine, { height: "100%" }, 0.2);
-          // Stay visible (0.4→0.6) — dead zone
-          // Wipe out to top (0.6→1)
-          fTl.to(founder, { clipPath: "inset(0 0 100% 0)", ease: "none" }, 0.6);
+
+          if (!mobile) {
+            // Wipe out to top — desktop only
+            fTl.to(founder, { clipPath: "inset(0 0 100% 0)", ease: "none" }, 0.6);
+          }
         }
 
         ScrollTrigger.refresh();

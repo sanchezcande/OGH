@@ -66,7 +66,6 @@ const gradientShift = keyframes`
 export const Container = styled.div`
   position: relative;
   background: #ffffff;
-  overflow-x: clip;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -341,31 +340,29 @@ export const MarqueeItem = styled.span`
 
 export const TextRevealSection = styled.section`
   width: 100%;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 120px 24px;
-  background: #fafafa;
+  padding: 140px 2rem;
+  background: #fff;
   position: relative;
 
   @media (max-width: 768px) {
     padding: 80px 20px;
-    min-height: auto;
   }
 `;
 
 export const TextRevealContent = styled.div`
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 900px;
+  width: 100%;
 `;
 
 export const RevealText = styled.p`
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
-  font-weight: 700;
-  line-height: 1.4;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight: 500;
+  line-height: 1.65;
   color: #111;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.005em;
 
   .reveal-word {
     display: inline-block;
@@ -379,7 +376,7 @@ export const RevealText = styled.p`
   }
 
   @media (max-width: 768px) {
-    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-size: clamp(1rem, 4vw, 1.3rem);
   }
 `;
 

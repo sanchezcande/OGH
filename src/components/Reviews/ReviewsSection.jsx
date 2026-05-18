@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ReviewsContainer } from "../../styles/components/Reviews.styles";
 import { SectionTitle } from "../../styles/pagesStyles/HomePages.styles";
 import { InView } from "../InView/InView";
@@ -47,7 +47,15 @@ const ReviewCardInline = ({ review, company, role, isMobile }) => (
 export const ReviewsSection = () => {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const reviewKeys = ["farzad", "vantage", "skylar", "techvision", "greenleaf", "innovatelab"];
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const PER_PAGE = 3;
   const totalPages = Math.ceil(reviewKeys.length / PER_PAGE);
@@ -70,46 +78,56 @@ export const ReviewsSection = () => {
             </p>
           )}
 
-          {/* Desktop: 3-column grid */}
-          <div className="reviews-desktop" style={{ display: "flex", gap: "1.25rem", alignItems: "stretch" }}>
-            {visibleKeys.map((key) => (
-              <ReviewCardInline
-                key={key}
-                review={t(`reviews.${key}.text`)}
-                company={t(`reviews.${key}.company`)}
-                role={t(`reviews.${key}.role`)}
-                isMobile={false}
-              />
-            ))}
-          </div>
+          {isMobile ? (
+            /* Mobile: all cards stacked, normal scroll */
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "0 1rem" }}>
+              {reviewKeys.map((key) => (
+                <ReviewCardInline
+                  key={key}
+                  review={t(`reviews.${key}.text`)}
+                  company={t(`reviews.${key}.company`)}
+                  role={t(`reviews.${key}.role`)}
+                  isMobile={false}
+                />
+              ))}
+            </div>
+          ) : (
+            /* Desktop: 3-column paginated grid */
+            <>
+              <div style={{ display: "flex", gap: "1.25rem", alignItems: "stretch" }}>
+                {visibleKeys.map((key) => (
+                  <ReviewCardInline
+                    key={key}
+                    review={t(`reviews.${key}.text`)}
+                    company={t(`reviews.${key}.company`)}
+                    role={t(`reviews.${key}.role`)}
+                    isMobile={false}
+                  />
+                ))}
+              </div>
 
-          {/* Dots navigation */}
-          <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "2rem" }}>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i)}
-                aria-label={`Go to page ${i + 1}`}
-                style={{
-                  width: i === currentPage ? "24px" : "8px",
-                  height: "8px",
-                  borderRadius: "100px",
-                  background: i === currentPage ? "#111111" : "#d1d5db",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 0,
-                  transition: "all 0.25s ease",
-                }}
-              />
-            ))}
-          </div>
-
-          <style>{`
-            @media (max-width: 768px) {
-              .reviews-desktop { flex-direction: column !important; }
-              .reviews-desktop > div { min-width: 100% !important; max-width: 100% !important; flex: 1 !important; }
-            }
-          `}</style>
+              {/* Dots navigation - desktop only */}
+              <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "2rem" }}>
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    aria-label={`Go to page ${i + 1}`}
+                    style={{
+                      width: i === currentPage ? "24px" : "8px",
+                      height: "8px",
+                      borderRadius: "100px",
+                      background: i === currentPage ? "#111111" : "#d1d5db",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      transition: "all 0.25s ease",
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </ReviewsContainer>
       )}
     </InView>

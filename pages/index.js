@@ -157,6 +157,7 @@ export default function HomePage() {
   const subtitleRef = useRef(null);
   const ctaGroupRef = useRef(null);
   const trustRef = useRef(null);
+  const revealSectionRef = useRef(null);
   const revealRef = useRef(null);
   const benchmarkRef = useRef(null);
   const caseStudyRef = useRef(null);
@@ -189,8 +190,10 @@ export default function HomePage() {
   /* ─── GSAP ANIMATIONS ─── */
   useEffect(() => {
     if (typeof window === "undefined") return;
+    let ctx;
 
-    const ctx = gsap.context(() => {
+    const timer = setTimeout(() => {
+      ctx = gsap.context(() => {
       // 1. HERO TEXT SPLIT REVEAL
       const words = titleRef.current?.querySelectorAll(".word-inner");
       if (words?.length) {
@@ -241,22 +244,21 @@ export default function HomePage() {
         });
       });
 
-      // 4. TEXT REVEAL ON SCROLL (pinned like service pages)
-      const revealWords = revealRef.current?.querySelectorAll(".reveal-word");
-      if (revealWords?.length) {
-        const revealSection = revealRef.current.closest("section");
-        gsap.to(revealWords, {
-          color: "#111",
-          stagger: 0.05,
-          scrollTrigger: {
-            trigger: revealSection || revealRef.current,
-            start: "top top",
-            end: "+=150%",
-            pin: true,
-            scrub: 0.3,
-            anticipatePin: 1,
-          },
-        });
+      // 4. TEXT REVEAL ON SCROLL
+      if (revealRef.current) {
+        const words = revealRef.current.querySelectorAll(".reveal-word");
+        if (words.length > 0) {
+          gsap.to(words, {
+            color: "#111",
+            stagger: 0.05,
+            scrollTrigger: {
+              trigger: revealSectionRef.current,
+              start: "top 75%",
+              end: "bottom 25%",
+              scrub: 0.3,
+            },
+          });
+        }
       }
 
       // 5. BENCHMARK CARDS stagger reveal
@@ -480,10 +482,14 @@ export default function HomePage() {
       // Refresh after layout settles (sticky metrics changes scroll height)
       ScrollTrigger.refresh();
       setTimeout(() => ScrollTrigger.refresh(), 300);
-      setTimeout(() => ScrollTrigger.refresh(), 1000);
-    });
+        ScrollTrigger.refresh();
+      });
+    }, 150);
 
-    return () => ctx.revert();
+    return () => {
+      clearTimeout(timer);
+      if (ctx) ctx.revert();
+    };
   }, [isMobile]);
 
   // Metric counter animation
@@ -747,7 +753,7 @@ export default function HomePage() {
               className="primary-cta"
             >
               {t("ctaButton")}
-              <span style={{ marginLeft: 4, transition: "transform 0.3s" }}>→</span>
+              <span style={{ marginLeft: 4, transition: "transform 0.3s", color: "#CC5A50" }}>→</span>
             </CTAButton>
             <CTAButton href="/calculator" className="secondary-cta">
               {t("heroSecondaryCTA", "See what it's costing you →")}
@@ -775,7 +781,7 @@ export default function HomePage() {
         </MarqueeBanner>
 
         {/* ═══════════ TEXT REVEAL SECTION ═══════════ */}
-        <TextRevealSection>
+        <TextRevealSection ref={revealSectionRef}>
           <TextRevealContent ref={revealRef}>
             <div className="gsap-fade-up" style={{ marginBottom: 32 }}>
               <SectionEyebrow>

@@ -32,7 +32,7 @@ export const LogoIcon = styled.div`
 `;
 
 export const NavBarContainer = styled.nav`
-  margin: 10px 1rem 0 1rem;
+  margin: 10px 1rem 10px 1rem;
   padding: 0.5rem 1rem;
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
@@ -46,7 +46,7 @@ export const Logo = styled.div`
   font-size: 24px;
   color: #374151;
   width: 60%;
-  margin-top: 0.6rem;
+  margin-top: 0;
 `;
 
 export const Span = styled.span`
