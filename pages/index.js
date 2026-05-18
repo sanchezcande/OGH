@@ -1,451 +1,110 @@
-import {
-  Container,
-  Hero,
-  Title,
-  Subtitle,
-  CTAButton,
-  GradientOverlay,
-  Highlight,
-  Section,
-  SectionTitle,
-  FloatingBlob,
-  PlanSteps,
-  SectionText,
-  ImageContainer,
-  Glow,
-  PlanSection,
-} from "../src/styles/pagesStyles/HomePages.styles";
-import { useTranslation } from "react-i18next";
-import CallToActionBlock from "../src/components/CallToAction/CallToAction";
-import SEO from "../src/components/SEO/SEO";
-import { InView } from "../src/components/InView/InView";
-import { ReviewsSection } from "../src/components/Reviews/ReviewsSection";
-import MetricsSection from "../src/components/Metrics/MetricsSection";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import React from "react";
-import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import SEO from "../src/components/SEO/SEO";
+import CallToActionBlock from "../src/components/CallToAction/CallToAction";
+// MetricsSection replaced by StickyMetrics inline
+import useMediaQuery from "../src/Hooks/useMediaQuery";
 import {
-  FaProjectDiagram,
-  FaExternalLinkAlt,
-  FaUsers,
-  FaChevronLeft,
-  FaChevronRight,
-  FaQuoteLeft,
+  FaTasks,
   FaClock,
   FaBolt,
   FaDollarSign,
-  FaTasks,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import useMediaQuery from "../src/Hooks/useMediaQuery";
+import {
+  Container,
+  Hero,
+  HeroOrb,
+  Title,
+  Subtitle,
+  HeroCTAGroup,
+  CTAButton,
+  TrustChips,
+  TrustChip,
+  MarqueeBanner,
+  MarqueeTrack,
+  MarqueeItem,
+  TextRevealSection,
+  TextRevealContent,
+  RevealText,
+  Section,
+  SectionInner,
+  SectionEyebrow,
+  SectionTitle,
+  SectionText,
+  ServiceCard,
+  ServiceIcon,
+  ServiceTitle,
+  ServiceDescription,
+  ServiceBadge,
+  ServiceLinks,
+  ServiceLink,
+  BenchmarkGrid,
+  BenchmarkCard,
+  BenchmarkValue,
+  BenchmarkBar,
+  CaseStudyGrid,
+  CaseStudyCard,
+  CarouselSection,
+  CarouselTrack,
+  CarouselCard,
+  PlanSection,
+  PlanSteps,
+  PlanStep,
+  TestimonialsSection,
+  ReviewsMarquee,
+  TestimonialCardStyled,
+  CalculatorBanner,
+  ScrollProgress,
+  ParallaxShowcase,
+  TiltCard,
+  ZoomRevealSection,
+  GridBackground,
+  StickyMetricsWrapper,
+  StickyMetricsViewport,
+  StickyMetricsProgress,
+  StickyMetricSlide,
+  StickyMetricDots,
+  StickyMetricDot,
+} from "../src/styles/pagesStyles/HomePages.styles";
 
-// Tabs Component
-const ProjectTabs = ({ activeTab, onTabChange, isMobile }) => {
-  const tabs = [
-    { id: "all", label: "All" },
-    { id: "saas", label: "SaaS" },
-    { id: "web-performance", label: "Web Performance" },
-    { id: "commerce", label: "Commerce" },
-  ];
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "0.5rem",
-        marginBottom: "2rem",
-        flexWrap: "wrap",
-        paddingLeft: isMobile ? "1.5rem" : "1rem",
-        paddingRight: isMobile ? "1.5rem" : "1rem",
-      }}
-    >
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "20px",
-            border: "none",
-            background: activeTab === tab.id ? "#F97B72" : "#f3f4f6",
-            color: activeTab === tab.id ? "white" : "#6B7280",
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
-};
-
-// Featured Work Card Component
-const FeaturedWorkCard = ({
-  image,
-  title,
-  description,
-  metrics,
-  link,
-  hoverContent,
-  delay = 0,
-  badges = ["35% faster", "0 bugs", "Live product"],
-  category,
-  imageScale = 1,
-}) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [showHover, setShowHover] = useState(false);
-  const [hoverPosition, setHoverPosition] = useState(null);
-  const cardRef = React.useRef(null);
-  const hasValidLink = Boolean(link && link !== "#");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth <= 768);
-      };
-      checkMobile();
-      window.addEventListener("resize", checkMobile);
-      return () => window.removeEventListener("resize", checkMobile);
-    }
-  }, []);
-
-  const handleMouseEnter = (event) => {
-    if (!isMobile) {
-      // Calcular posición ANTES de mostrar el hover
-      if (cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        // Usar el centro exacto del div interno (donde está el logo) - width: 320px
-        // El hover también tiene width: 320px, así que deben alinearse perfectamente
-        const centerX = rect.left + rect.width / 2;
-        setHoverPosition({
-          top: rect.bottom + 5,
-          left: centerX,
-        });
-      }
-      setShowHover(true);
-      // Aumentar z-index cuando se hace hover
-      event.currentTarget.style.zIndex = "99999999999";
-    }
-  };
-
-  const handleMouseLeave = (event) => {
-    if (!isMobile) {
-      setShowHover(false);
-      // Restaurar z-index cuando se quita el hover
-      event.currentTarget.style.zIndex = "999999";
-    }
-  };
-
-  // Actualizar posición cuando se hace scroll o resize
-  useEffect(() => {
-    if (showHover && cardRef.current) {
-      const updatePosition = () => {
-        if (cardRef.current) {
-          const rect = cardRef.current.getBoundingClientRect();
-          // Usar el centro del div interno (donde está el logo) - width: 320px
-          const centerX = rect.left + rect.width / 2;
-          setHoverPosition({
-            top: rect.bottom + 5,
-            left: centerX,
-          });
-        }
-      };
-
-      // Pequeño delay para asegurar que el DOM esté actualizado
-      const timeoutId = setTimeout(updatePosition, 10);
-
-      window.addEventListener("scroll", updatePosition, true);
-      window.addEventListener("resize", updatePosition);
-
-      return () => {
-        clearTimeout(timeoutId);
-        window.removeEventListener("scroll", updatePosition, true);
-        window.removeEventListener("resize", updatePosition);
-      };
-    }
-  }, [showHover]);
-
-  const handleTouchStart = (event) => {
-    if (isMobile) {
-      event.preventDefault();
-      setShowHover(!showHover);
-      // Aumentar z-index cuando se activa
-      event.currentTarget.style.zIndex = showHover ? "999999" : "9999999999";
-    }
-  };
-
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        style={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: isMobile ? "0.5rem" : "2rem",
-          cursor: hasValidLink ? "pointer" : "default",
-          transition: "all 0.3s ease",
-          zIndex: showHover ? "999999999999" : "999999",
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onClick={() => {
-          if (!isMobile && hasValidLink) {
-            window.open(link, "_blank", "noopener,noreferrer");
-          }
-        }}
-      >
-        <div
-          ref={cardRef}
-          style={{
-            position: "relative",
-            width: isMobile ? "250px" : "320px",
-            textAlign: "center",
-            zIndex: showHover ? "999999999999" : "999999",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            <div
-              style={{
-                height: "120px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                marginBottom: "0.25rem",
-              }}
-            >
-              <img
-                src={image}
-                alt={title}
-                style={{
-                  width: category === "web-performance" ? "auto" : "auto",
-                  maxWidth: "200px",
-                  height: category === "web-performance" ? "70px" : "auto",
-                  maxHeight: category === "web-performance" ? "70px" : "120px",
-                  objectFit: "contain",
-                  transition: "transform 0.3s ease-out",
-                  filter: "grayscale(20%)",
-                  cursor: !isMobile && hasValidLink ? "pointer" : "default",
-                  transform: `scale(${imageScale})`,
-                }}
-                onMouseEnter={(e) =>
-                  !isMobile &&
-                  (e.target.style.transform = `scale(${1.02 * imageScale})`)
-                }
-                onMouseLeave={(e) =>
-                  !isMobile &&
-                  (e.target.style.transform = `scale(${imageScale})`)
-                }
-              />
-            </div>
-            <div
-              style={{
-                marginTop: "0.25rem",
-                fontSize: "0.8rem",
-                color: "#6B7280",
-                fontWeight: "500",
-              }}
-            >
-              {title}
-            </div>
-            {isMobile && (
-              <div
-                style={{
-                  marginTop: "0.75rem",
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "0.5rem",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <button
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#6B7280",
-                    fontWeight: "600",
-                    background: "transparent",
-                    border: "none",
-                    padding: "0.4rem 1rem",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    textDecoration: "underline",
-                    textUnderlineOffset: "3px",
-                    textDecorationThickness: "1.5px",
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (cardRef.current) {
-                      const rect = cardRef.current.getBoundingClientRect();
-                      const centerX = rect.left + rect.width / 2;
-                      setHoverPosition({
-                        top: rect.bottom + 5,
-                        left: centerX,
-                      });
-                    }
-                    setShowHover(!showHover);
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.opacity = "0.7";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.opacity = "1";
-                  }}
-                >
-                  {showHover ? "Hide" : "Details"}
-                </button>
-                {hasValidLink && (
-                  <button
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "#6B7280",
-                      fontWeight: "600",
-                      background: "transparent",
-                      border: "none",
-                      padding: "0.4rem 1rem",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      textDecoration: "underline",
-                      textUnderlineOffset: "3px",
-                      textDecorationThickness: "1.5px",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(link, "_blank", "noopener,noreferrer");
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.opacity = "0.7";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.opacity = "1";
-                    }}
-                  >
-                    Website
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Hover Card - Renderizado con portal para evitar overflow */}
-          {showHover &&
-            typeof window !== "undefined" &&
-            hoverPosition &&
-            hoverPosition.top > 0 &&
-            hoverContent &&
-            Array.isArray(badges) &&
-            (() => {
-              if (typeof document === "undefined" || !document.body)
-                return null;
-              return createPortal(
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
-                  style={{
-                    position: "fixed",
-                    top: `${hoverPosition.top}px`,
-                    left: `${hoverPosition.left - (isMobile ? 100 : 160)}px`,
-                    background: "white",
-                    borderRadius: "8px",
-                    padding: "1.25rem 1rem",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-                    border: "1px solid #f3f4f6",
-                    width: isMobile ? "200px" : "320px",
-                    maxWidth: isMobile ? "200px" : "320px",
-                    minWidth: isMobile ? "200px" : "320px",
-                    boxSizing: "border-box",
-                    zIndex: 999999999999,
-                    pointerEvents: "none",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-6px",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: "0",
-                      height: "0",
-                      borderLeft: "6px solid transparent",
-                      borderRight: "6px solid transparent",
-                      borderBottom: "6px solid white",
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      fontSize: "0.85rem",
-                      lineHeight: "1.5",
-                      color: "#374151",
-                      marginBottom: "0.75rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    {hoverContent}
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "0.5rem",
-                      flexWrap: "wrap",
-                      paddingTop: "0.75rem",
-                      borderTop: "1px solid #f3f4f6",
-                    }}
-                  >
-                    {badges.map((badge, index) => (
-                      <span
-                        key={index}
-                        style={{
-                          background: "#f3f4f6",
-                          color: "#374151",
-                          padding: "0.25rem 0.6rem",
-                          borderRadius: "4px",
-                          fontSize: "0.7rem",
-                          fontWeight: "500",
-                          whiteSpace: "nowrap",
-                          border: "1px solid #d1d5db",
-                        }}
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>,
-                document.body,
-              );
-            })()}
-        </div>
-      </motion.div>
-    </>
-  );
-};
-
-export async function getServerSideProps() {
-  return { props: {} };
+// Register GSAP
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
 }
+
+/* ═══════════════════════════════════════════
+   HELPER COMPONENTS
+   ═══════════════════════════════════════════ */
+
+const ReviewsInfiniteMarquee = ({ testimonials }) => {
+  // Duplicate array for seamless infinite loop
+  const doubled = [...testimonials, ...testimonials];
+  return (
+    <ReviewsMarquee $duration="50s">
+      {doubled.map((t, i) => (
+        <TestimonialCardStyled key={i}>
+          <div className="stars">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <span key={s}>★</span>
+            ))}
+          </div>
+          <p className="quote">&ldquo;{t.content}&rdquo;</p>
+          <div className="author">
+            <div className="author-company">{t.company}</div>
+            {t.role && <div className="author-role">{t.role}</div>}
+          </div>
+        </TestimonialCardStyled>
+      ))}
+    </ReviewsMarquee>
+  );
+};
 
 export const HomeCallToAction = () => {
   const { t } = useTranslation();
@@ -459,1345 +118,944 @@ export const HomeCallToAction = () => {
         buttonText={callToAction.buttonText}
         highlightWord="costs"
       />
-      <div style={{
-        textAlign: "center",
-        marginTop: "-1.5rem",
-        paddingBottom: "2rem",
-        color: "rgba(255,255,255,0.65)",
-        fontSize: "0.82rem",
-        letterSpacing: "0.03em",
-      }}>
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "-1.5rem",
+          paddingBottom: "2rem",
+          color: "rgba(255,255,255,0.65)",
+          fontSize: "0.82rem",
+          letterSpacing: "0.03em",
+        }}
+      >
         {t("homeCallToAction.noCommitment", "Free call · No commitment · No pitch")}
       </div>
     </div>
   );
 };
 
-const TestimonialsCarousel = ({ testimonials }) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const PER_PAGE = 3;
+/* ═══════════════════════════════════════════
+   SERVER SIDE PROPS
+   ═══════════════════════════════════════════ */
+export async function getServerSideProps() {
+  return { props: {} };
+}
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-      checkMobile();
-      window.addEventListener("resize", checkMobile);
-      return () => window.removeEventListener("resize", checkMobile);
-    }
-  }, []);
-
-  const totalPages = isMobile ? testimonials.length : Math.ceil(testimonials.length / PER_PAGE);
-  const visibleTestimonials = isMobile
-    ? [testimonials[currentPage]]
-    : testimonials.slice(currentPage * PER_PAGE, currentPage * PER_PAGE + PER_PAGE);
-
-  const nextSlide = () => setCurrentPage((prev) => (prev + 1) % totalPages);
-  const prevSlide = () => setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
-  const goToSlide = (index) => setCurrentPage(index);
-
-  // Auto-play
-  useEffect(() => {
-    const interval = setInterval(nextSlide, 6000);
-    return () => clearInterval(interval);
-  }, [currentPage, isMobile]);
-
-  const ChevronLeft = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-  const ChevronRight = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="9 18 15 12 9 6" />
-    </svg>
-  );
-
-  return (
-    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: isMobile ? "0 1rem" : "0 2rem" }}>
-      {/* Cards grid with side arrows */}
-      <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "0.5rem" : "1.25rem" }}>
-        {/* Prev arrow */}
-        <button
-          onClick={prevSlide}
-          aria-label="Previous reviews"
-          style={{
-            background: "white",
-            border: "none",
-            borderRadius: "50%",
-            width: "44px",
-            height: "44px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            flexShrink: 0,
-            color: "#F97B72",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)",
-            transition: "box-shadow 0.2s, transform 0.15s, background 0.2s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,123,114,0.25), 0 0 0 1.5px rgba(249,123,114,0.35)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)"; }}
-        >
-          <ChevronLeft />
-        </button>
-
-        {/* Cards grid */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-          gap: "1.25rem",
-          alignItems: "stretch",
-          flex: 1,
-        }}>
-          {visibleTestimonials.map((testimonial, index) => (
-            <div
-              key={`${currentPage}-${index}`}
-              style={{
-                background: "white",
-                borderRadius: "16px",
-                padding: "1.75rem",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
-                border: "1.5px solid #f0f0f0",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
-                position: "relative",
-              }}
-            >
-              {/* Stars */}
-              <div style={{ display: "flex", gap: "2px" }}>
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <span key={s} style={{ color: "#f97b72", fontSize: "0.95rem" }}>★</span>
-                ))}
-              </div>
-
-              {/* Quote */}
-              <p style={{
-                fontSize: "0.93rem",
-                lineHeight: 1.65,
-                color: "#374151",
-                fontStyle: "italic",
-                margin: 0,
-                flex: 1,
-              }}>
-                &ldquo;{testimonial.content}&rdquo;
-              </p>
-
-              {/* Author */}
-              <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "0.75rem" }}>
-                <div style={{ fontWeight: 700, color: "#111827", fontSize: "0.93rem" }}>
-                  {testimonial.company}
-                </div>
-                {testimonial.role && (
-                  <div style={{ color: "#f97b72", fontSize: "0.8rem", marginTop: "2px" }}>
-                    {testimonial.role}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Next arrow */}
-        <button
-          onClick={nextSlide}
-          aria-label="Next reviews"
-          style={{
-            background: "white",
-            border: "none",
-            borderRadius: "50%",
-            width: "44px",
-            height: "44px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            flexShrink: 0,
-            color: "#F97B72",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)",
-            transition: "box-shadow 0.2s, transform 0.15s, background 0.2s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.transform = "scale(1.08)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,123,114,0.25), 0 0 0 1.5px rgba(249,123,114,0.35)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.10), 0 0 0 1.5px rgba(249,123,114,0.18)"; }}
-        >
-          <ChevronRight />
-        </button>
-      </div>
-
-      {/* Dots Indicator */}
-      <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "2rem" }}>
-        {Array.from({ length: totalPages }).map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            style={{
-              width: index === currentPage ? "28px" : "8px",
-              height: "8px",
-              borderRadius: "100px",
-              border: "none",
-              background: index === currentPage ? "#F97B72" : "#d1d5db",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              padding: 0,
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const ServiceBox = ({ icon, title, description, delay = 0, link, subcategories = [], ctaText, badge }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const router = useRouter();
-
-  // Prefetch las páginas cuando se hace hover sobre la caja
-  useEffect(() => {
-    if (subcategories.length > 0) {
-      subcategories.forEach((item) => {
-        router.prefetch(item.href);
-      });
-    } else if (link) {
-      router.prefetch(link);
-    }
-  }, [subcategories, link, router]);
-
-  const boxContent = (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative" }}>
-      {badge && (
-        <div style={{
-          position: "absolute",
-          top: "-1rem",
-          right: "-1rem",
-          background: "#f97b72",
-          color: "white",
-          fontSize: "0.68rem",
-          fontWeight: 700,
-          padding: "0.2rem 0.65rem",
-          borderRadius: "100px",
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-        }}>
-          {badge}
-        </div>
-      )}
-      <motion.div
-        initial={{ scale: 1 }}
-        animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
-        transition={{ duration: 0.1 }}
-        style={{
-          fontSize: "2.25rem",
-          color: "var(--color-accent, #FF6B6B)",
-          marginBottom: "0.5rem",
-          display: "inline-block",
-        }}
-      >
-        {icon}
-      </motion.div>
-
-      <h3
-        style={{
-          fontSize: "1.15rem",
-          fontWeight: "600",
-          marginBottom: "0.5rem",
-          color: "var(--color-text, #333)",
-          transition: "color 0.2s ease",
-          ...(isHovered ? { color: "#E35A52" } : {}),
-        }}
-      >
-        {title}
-      </h3>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-        style={{
-          fontSize: "0.9rem",
-          lineHeight: "1.5",
-          color: "#444444",
-          marginBottom: subcategories.length > 0 ? "1rem" : "0",
-          flex: subcategories.length > 0 ? "0 0 auto" : 1,
-        }}
-      >
-        {description}
-      </motion.p>
-
-      {subcategories.length > 0 && (
-        <div style={{ marginTop: "auto", paddingTop: "1rem" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.75rem",
-              marginBottom: "0.5rem",
-              alignItems: "center",
-            }}
-          >
-            {subcategories.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                style={{ textDecoration: "none" }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2, delay: index * 0.05 }}
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#6B7280",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                    borderBottom: "1px solid transparent",
-                    transition: "all 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "#F97B72";
-                    e.currentTarget.style.borderBottomColor = "#F97B72";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "#6B7280";
-                    e.currentTarget.style.borderBottomColor = "transparent";
-                  }}
-                >
-                  {item.text}
-                </motion.span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {!subcategories.length && ctaText && link && (
-        <Link href={link} style={{ textDecoration: "none", marginTop: "auto" }}>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              color: "#F97B72",
-              fontSize: "0.95rem",
-              fontWeight: "600",
-              cursor: "pointer",
-              paddingTop: "1rem",
-              borderTop: "1px solid rgba(249, 123, 114, 0.2)",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "0.8";
-              e.currentTarget.style.color = "#E35A52";
-              e.currentTarget.style.borderTopColor = "rgba(249, 123, 114, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.color = "#F97B72";
-              e.currentTarget.style.borderTopColor = "rgba(249, 123, 114, 0.2)";
-            }}
-          >
-            {ctaText}
-            <span style={{ fontSize: "0.9rem", transition: "transform 0.2s ease" }}>
-              →
-            </span>
-          </motion.div>
-        </Link>
-      )}
-
-      <motion.div
-        className="service-bg-circle"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={
-          isHovered ? { scale: 1, opacity: 0.1 } : { scale: 0, opacity: 0 }
-        }
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        style={{
-          position: "absolute",
-          width: "300px",
-          height: "300px",
-          borderRadius: "50%",
-          background: "var(--color-accent, #FF6B6B)",
-          right: "-150px",
-          bottom: "-150px",
-          zIndex: "-1",
-        }}
-      />
-    </div>
-  );
-
-  const boxStyle = {
-    background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
-    borderRadius: "12px",
-    padding: "1.25rem",
-    height: "100%",
-    cursor: subcategories.length > 0 ? "default" : (link ? "pointer" : "default"),
-    position: "relative",
-    overflow: "hidden",
-    border: "1px solid rgba(249, 123, 114, 0.2)",
-    transition: "all 0.15s ease",
-    display: "flex",
-    flexDirection: "column",
-  };
-
-  // Si no hay subcategorías pero hay un link directo, hacer toda la caja clickeable
-  if (!subcategories.length && link) {
-    return (
-      <Link href={link} style={{ textDecoration: "none", color: "inherit" }}>
-        <motion.div
-          className="service-box"
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.15, delay: delay * 0.1 }}
-          whileHover={{
-            scale: 1.02,
-            transition: { duration: 0.1 },
-          }}
-          onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => setIsHovered(false)}
-          style={boxStyle}
-        >
-          {boxContent}
-        </motion.div>
-      </Link>
-    );
-  }
-
-  // Si hay subcategorías, NO envolver en Link (evitar <a> anidados)
-  // Los Links individuales dentro de boxContent manejan la navegación
-  if (subcategories.length > 0) {
-    return (
-      <motion.div
-        className="service-box"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.15, delay: delay * 0.1 }}
-        whileHover={{
-          scale: 1.02,
-          transition: { duration: 0.1 },
-        }}
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        style={boxStyle}
-      >
-        {boxContent}
-      </motion.div>
-    );
-  }
-
-  // Si no hay subcategorías ni link, solo mostrar la caja
-  return (
-    <motion.div
-      className="service-box"
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.15, delay: delay * 0.1 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      style={boxStyle}
-    >
-      {boxContent}
-    </motion.div>
-  );
-};
-
-const TestimonialCard = ({ author, role, company, content, delay = 0 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      className="testimonial-card"
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.15, delay: delay * 0.1 }}
-      whileHover={{
-        y: -4,
-        transition: { duration: 0.1 },
-      }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      style={{
-        background: "#fff",
-        borderRadius: "16px",
-        padding: "2rem",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-        border: "1px solid rgba(249, 123, 114, 0.2)",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        transition: "all 0.15s ease",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {isHovered && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          transition={{ duration: 0.2 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "var(--color-accent, #FF6B6B)",
-            zIndex: 0,
-          }}
-        />
-      )}
-
-      <motion.div
-        style={{
-          fontSize: "2rem",
-          color: "var(--color-accent, #FF6B6B)",
-          marginBottom: "1rem",
-          position: "relative",
-          zIndex: 1,
-        }}
-        animate={isHovered ? { scale: 1.1 } : { scale: 1 }}
-        transition={{ duration: 0.1 }}
-      >
-        "
-      </motion.div>
-
-      <p
-        style={{
-          fontSize: "1rem",
-          lineHeight: "1.8",
-          flex: 1,
-          marginBottom: "1.5rem",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {content}
-      </p>
-
-      <div style={{ position: "relative", zIndex: 1 }}>
-        <p
-          style={{
-            fontWeight: "700",
-            fontSize: "1.1rem",
-            marginBottom: "0.2rem",
-            color: isHovered ? "#E35A52" : "var(--color-text, #333)",
-            transition: "color 0.2s ease",
-          }}
-        >
-          {company}
-        </p>
-        <p
-          style={{
-            fontSize: "0.9rem",
-            color: "var(--color-text-muted, #666)",
-          }}
-        >
-          {role}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
+/* ═══════════════════════════════════════════
+   MAIN HOMEPAGE
+   ═══════════════════════════════════════════ */
 export default function HomePage() {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState("all");
-  const [carouselPaused, setCarouselPaused] = useState(false);
-  const carouselTrackRef = React.useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const lang = i18n.language?.startsWith("es") ? "es" : "en";
+  const router = useRouter();
+
+  // Refs for GSAP
+  const heroRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const ctaGroupRef = useRef(null);
+  const trustRef = useRef(null);
+  const revealRef = useRef(null);
+  const benchmarkRef = useRef(null);
+  const caseStudyRef = useRef(null);
+  const planRef = useRef(null);
+  const servicesRef = useRef(null);
+  const parallaxShowcaseRef = useRef(null);
+  const zoomRevealRef = useRef(null);
+  const stickyMetricsRef = useRef(null);
+  const [activeMetric, setActiveMetric] = useState(0);
+  const [metricsProgress, setMetricsProgress] = useState(0);
+  const metricCounterRefs = useRef([]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth <= 768);
-      };
-      checkMobile();
-      window.addEventListener("resize", checkMobile);
-      return () => window.removeEventListener("resize", checkMobile);
-    }
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Inyectar estilos del carrusel
+  // Scroll progress
   useEffect(() => {
-    if (typeof document === "undefined") {
-      return;
-    }
+    const handleScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    const styleId = "infinite-carousel-styles";
-    let styleElement = document.getElementById(styleId);
+  /* ─── GSAP ANIMATIONS ─── */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-    if (!styleElement) {
-      styleElement = document.createElement("style");
-      styleElement.id = styleId;
-      document.head.appendChild(styleElement);
-    }
+    const ctx = gsap.context(() => {
+      // 1. HERO TEXT SPLIT REVEAL
+      const words = titleRef.current?.querySelectorAll(".word-inner");
+      if (words?.length) {
+        gsap.to(words, {
+          y: 0,
+          duration: 1,
+          stagger: 0.08,
+          ease: "power4.out",
+          delay: 0.3,
+        });
+      }
 
-    styleElement.textContent = `
-      @keyframes infiniteScrollCarousel {
-        0% {
-          transform: translateX(0);
+      // 2. HERO SUBTITLE + CTA fade in
+      gsap.to(subtitleRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 1.2,
+        ease: "power3.out",
+      });
+
+      gsap.to(ctaGroupRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 1.5,
+        ease: "power3.out",
+      });
+
+      gsap.to(trustRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 1.8,
+        ease: "power3.out",
+      });
+
+      // 3. HERO PARALLAX ORBS
+      gsap.utils.toArray(".hero-orb").forEach((orb) => {
+        gsap.to(orb, {
+          y: -150,
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
+      });
+
+      // 4. TEXT REVEAL ON SCROLL (pinned like service pages)
+      const revealWords = revealRef.current?.querySelectorAll(".reveal-word");
+      if (revealWords?.length) {
+        const revealSection = revealRef.current.closest("section");
+        gsap.to(revealWords, {
+          color: "#111",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: revealSection || revealRef.current,
+            start: "top top",
+            end: "+=150%",
+            pin: true,
+            scrub: 0.3,
+            anticipatePin: 1,
+          },
+        });
+      }
+
+      // 5. BENCHMARK CARDS stagger reveal
+      const benchCards = benchmarkRef.current?.querySelectorAll(".bench-card");
+      if (benchCards?.length) {
+        benchCards.forEach((card, i) => {
+          gsap.to(card, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 0.8,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: benchmarkRef.current,
+              start: "top 75%",
+              once: true,
+            },
+          });
+        });
+      }
+
+      // 6. BENCHMARK BARS animate width on scroll
+      const bars = benchmarkRef.current?.querySelectorAll(".bar-fill");
+      if (bars?.length) {
+        bars.forEach((bar, i) => {
+          gsap.to(bar, {
+            width: bar.dataset.width + "%",
+            duration: 1.4,
+            delay: i * 0.2,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: bar,
+              start: "top 90%",
+              once: true,
+            },
+          });
+        });
+      }
+
+      // 7. CASE STUDY CARDS scale reveal
+      const caseCards = caseStudyRef.current?.querySelectorAll(".case-card");
+      if (caseCards?.length) {
+        caseCards.forEach((card, i) => {
+          gsap.to(card, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            delay: i * 0.12,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              once: true,
+            },
+          });
+        });
+      }
+
+      // 8. PLAN STEPS stagger
+      const planSteps = planRef.current?.querySelectorAll(".plan-step");
+      if (planSteps?.length) {
+        planSteps.forEach((step, i) => {
+          gsap.to(step, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: step,
+              start: "top 85%",
+              once: true,
+            },
+          });
+        });
+      }
+
+      // 9. SERVICE CARDS stagger reveal
+      const svcCards = servicesRef.current?.querySelectorAll(".svc-card");
+      if (svcCards?.length) {
+        svcCards.forEach((card, i) => {
+          gsap.from(card, {
+            opacity: 0,
+            y: 60,
+            duration: 0.7,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              once: true,
+            },
+          });
+        });
+      }
+
+      // 10. PARALLAX SHOWCASE - background moves slower, number scales up
+      if (parallaxShowcaseRef.current) {
+        const bg = parallaxShowcaseRef.current.querySelector(".parallax-bg");
+        const num = parallaxShowcaseRef.current.querySelector(".parallax-number");
+
+        if (bg) {
+          gsap.to(bg, {
+            y: 100,
+            scrollTrigger: {
+              trigger: parallaxShowcaseRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          });
         }
-        100% {
-          transform: translateX(-50%);
+
+        if (num) {
+          ScrollTrigger.create({
+            trigger: parallaxShowcaseRef.current,
+            start: "top 60%",
+            once: true,
+            onEnter: () => num.classList.add("visible"),
+          });
         }
       }
-    `;
-  }, []);
 
-  const parseHighlightedText = (text) => {
+      // 11. ZOOM REVEAL - section scales from 1.15 to 1, border-radius reveals
+      if (zoomRevealRef.current) {
+        const inner = zoomRevealRef.current.querySelector(".zoom-inner");
+        if (inner) {
+          gsap.fromTo(
+            inner,
+            { scale: 1.15, borderRadius: "40px" },
+            {
+              scale: 1,
+              borderRadius: "0px",
+              ease: "none",
+              scrollTrigger: {
+                trigger: zoomRevealRef.current,
+                start: "top 80%",
+                end: "top 20%",
+                scrub: 1,
+              },
+            }
+          );
+        }
+
+        // Zoom cards stagger
+        const zCards = zoomRevealRef.current.querySelectorAll(".zoom-card");
+        if (zCards?.length) {
+          zCards.forEach((card, i) => {
+            gsap.from(card, {
+              opacity: 0,
+              y: 40,
+              duration: 0.6,
+              delay: i * 0.1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                once: true,
+              },
+            });
+          });
+        }
+      }
+
+      // 12. 3D TILT on hover
+      gsap.utils.toArray(".tilt-card").forEach((card) => {
+        const inner = card.querySelector(".tilt-inner");
+        if (!inner) return;
+
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -6;
+          const rotateY = ((x - centerX) / centerX) * 6;
+          inner.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+          inner.style.transform = "perspective(1000px) rotateX(0) rotateY(0) scale(1)";
+        });
+      });
+
+      // 13. STICKY METRICS scroll counter
+      if (stickyMetricsRef.current) {
+        const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
+        ScrollTrigger.create({
+          trigger: stickyMetricsRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0,
+          onUpdate: (self) => {
+            const p = self.progress;
+            setMetricsProgress(p);
+            const idx = Math.min(Math.floor(p * numSlides), numSlides - 1);
+            setActiveMetric(idx);
+          },
+        });
+      }
+
+      // 14. SECTION FADE INS
+      gsap.utils.toArray(".gsap-fade-up").forEach((el) => {
+        gsap.from(el, {
+          opacity: 0,
+          y: 50,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            once: true,
+          },
+        });
+      });
+
+      // Refresh after layout settles (sticky metrics changes scroll height)
+      ScrollTrigger.refresh();
+      setTimeout(() => ScrollTrigger.refresh(), 300);
+      setTimeout(() => ScrollTrigger.refresh(), 1000);
+    });
+
+    return () => ctx.revert();
+  }, [isMobile]);
+
+  // Metric counter animation
+  const prevMetricRef = useRef(-1);
+  useEffect(() => {
+    if (prevMetricRef.current === activeMetric) return;
+    prevMetricRef.current = activeMetric;
+    const el = metricCounterRefs.current[activeMetric];
+    if (!el) return;
+    const raw = el.dataset.value;
+    const isFloat = raw.includes(".");
+    const hasPlus = raw.includes("+");
+    const numVal = parseFloat(raw.replace("+", ""));
+    if (isNaN(numVal)) { el.textContent = raw; return; }
+    const dur = 800;
+    const start = performance.now();
+    const animate = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / dur, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = numVal * eased;
+      el.textContent = isFloat ? current.toFixed(1) : Math.round(current).toString();
+      if (hasPlus && progress >= 1) el.textContent += "+";
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    el.textContent = isFloat ? "0.0" : "0";
+    requestAnimationFrame(animate);
+  }, [activeMetric]);
+
+  /* ─── PARSE HIGHLIGHTED TEXT (from translations) ─── */
+  const parseHighlightedText = useCallback((text) => {
     if (!text) return [];
     const parts = text.split(/<highlight>|<\/highlight>/);
-    const result = [];
-
-    for (let i = 0; i < parts.length; i++) {
+    return parts.map((part, i) => {
       if (i % 2 === 1) {
-        // This is a highlighted word
-        const highlightedWord = parts[i];
-        const nextPart = parts[i + 1] || "";
-        const isPunctuationOnly = /^[.,;:!?]+$/.test(nextPart.trim());
-
-        if (isPunctuationOnly) {
-          result.push(
-            <span key={i} className="highlighted-word-with-punctuation">
-              <span className="highlighted-word">{highlightedWord}</span>
-              <span className="highlighted-punctuation">{nextPart}</span>
-            </span>
-          );
-          i++; // Skip the next part since we already included it
-        } else {
-          result.push(
-            <span key={i} className="highlighted-word">
-              {highlightedWord}
-            </span>
-          );
-        }
-      } else {
-        // This is regular text
-        if (parts[i]) {
-          result.push(<React.Fragment key={i}>{parts[i]}</React.Fragment>);
-        }
+        return (
+          <span key={i} className="highlighted-word">
+            {part}
+          </span>
+        );
       }
-    }
+      return part ? <React.Fragment key={i}>{part}</React.Fragment> : null;
+    });
+  }, []);
 
-    return result;
-  };
+  /* ─── SPLIT TEXT INTO WORDS FOR ANIMATION ─── */
+  const splitWords = useCallback((text, highlightWords = []) => {
+    if (!text) return null;
+    return text.split(" ").map((word, i) => {
+      const isHighlight = highlightWords.some(
+        (hw) => word.toLowerCase().replace(/[^a-z]/g, "") === hw.toLowerCase()
+      );
+      return (
+        <span className="word" key={i}>
+          <span className={`word-inner ${isHighlight ? "highlight" : ""}`}>
+            {word}&nbsp;
+          </span>
+        </span>
+      );
+    });
+  }, []);
 
+  /* ─── DATA ─── */
   const testimonialData = [
-    {
-      content: t("reviews.farzad.text"),
-      company: t("reviews.farzad.company"),
-      role: t("reviews.farzad.role"),
-    },
-    {
-      content: t("reviews.vantage.text"),
-      company: t("reviews.vantage.company"),
-      role: t("reviews.vantage.role"),
-    },
-    {
-      content: t("reviews.skylar.text"),
-      company: t("reviews.skylar.company"),
-      role: t("reviews.skylar.role"),
-    },
-    {
-      content: t("reviews.techvision.text"),
-      company: t("reviews.techvision.company"),
-      role: t("reviews.techvision.role"),
-    },
-    {
-      content: t("reviews.greenleaf.text"),
-      company: t("reviews.greenleaf.company"),
-      role: t("reviews.greenleaf.role"),
-    },
-    {
-      content: t("reviews.innovatelab.text"),
-      company: t("reviews.innovatelab.company"),
-      role: t("reviews.innovatelab.role"),
-    },
+    { content: t("reviews.farzad.text"), company: t("reviews.farzad.company"), role: t("reviews.farzad.role") },
+    { content: t("reviews.vantage.text"), company: t("reviews.vantage.company"), role: t("reviews.vantage.role") },
+    { content: t("reviews.skylar.text"), company: t("reviews.skylar.company"), role: t("reviews.skylar.role") },
+    { content: t("reviews.techvision.text"), company: t("reviews.techvision.company"), role: t("reviews.techvision.role") },
+    { content: t("reviews.greenleaf.text"), company: t("reviews.greenleaf.company"), role: t("reviews.greenleaf.role") },
+    { content: t("reviews.innovatelab.text"), company: t("reviews.innovatelab.company"), role: t("reviews.innovatelab.role") },
   ];
 
-  const lang = i18n.language?.startsWith("es") ? "es" : "en";
   const benchmarkCards = [
     {
       icon: <FaTasks />,
       value: "58%",
-      title:
-        lang === "es"
-          ? "del tiempo en coordinación"
-          : "of time spent on coordination",
-      description:
-        lang === "es"
-          ? "Trabajo operativo y coordinación ('work about work') en equipos de conocimiento."
-          : "Operational coordination ('work about work') in knowledge teams.",
+      title: lang === "es" ? "del tiempo en coordinación" : "of time spent on coordination",
+      description: lang === "es" ? "Trabajo operativo y coordinación en equipos de conocimiento." : "Operational coordination ('work about work') in knowledge teams.",
       sourceLabel: "Asana Anatomy of Work (2023)",
-      sourceUrl:
-        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+      sourceUrl: "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
     },
     {
       icon: <FaClock />,
       value: "4.9h",
-      title:
-        lang === "es"
-          ? "ahorrables por persona/semana"
-          : "recoverable per person/week",
-      description:
-        lang === "es"
-          ? "Horas que los trabajadores estiman recuperar con mejores procesos."
-          : "Hours workers estimate they could recover with better processes.",
+      title: lang === "es" ? "ahorrables por persona/semana" : "recoverable per person/week",
+      description: lang === "es" ? "Horas que los trabajadores estiman recuperar con mejores procesos." : "Hours workers estimate they could recover with better processes.",
       sourceLabel: "Asana Anatomy of Work (2023)",
-      sourceUrl:
-        "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
+      sourceUrl: "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
     },
     {
       icon: <FaBolt />,
       value: "2 min",
-      title:
-        lang === "es"
-          ? "entre interrupciones promedio"
-          : "between average interruptions",
-      description:
-        lang === "es"
-          ? "Meetings, emails y chats interrumpen el foco de trabajo."
-          : "Meetings, emails, and chats interrupt focused work.",
+      title: lang === "es" ? "entre interrupciones promedio" : "between average interruptions",
+      description: lang === "es" ? "Meetings, emails y chats interrumpen el foco de trabajo." : "Meetings, emails, and chats interrupt focused work.",
       sourceLabel: "Microsoft Work Trend Index (2025)",
-      sourceUrl:
-        "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
+      sourceUrl: "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
     },
     {
       icon: <FaDollarSign />,
       value: "32%",
-      title:
-        lang === "es"
-          ? "reducción promedio de costos"
-          : "average cost reduction",
-      description:
-        lang === "es"
-          ? "Organizaciones maduras en automatización reportan reducción de costos."
-          : "Mature automation organizations report cost reduction.",
+      title: lang === "es" ? "reducción promedio de costos" : "average cost reduction",
+      description: lang === "es" ? "Organizaciones maduras en automatización reportan reducción de costos." : "Mature automation organizations report cost reduction.",
       sourceLabel: "Deloitte Intelligent Automation Survey (2022)",
-      sourceUrl:
-        "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
+      sourceUrl: "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
     },
   ];
 
   const benchmarkBars = [
+    { label: lang === "es" ? "Tiempo en coordinación manual" : "Time spent on manual coordination", value: 58, color: "#CC5A50" },
+    { label: lang === "es" ? "Trabajo percibido como caótico" : "Work perceived as chaotic", value: 48, color: "#111111" },
+    { label: lang === "es" ? "Reducción de costos (automatización madura)" : "Cost reduction (mature automation)", value: 32, color: "#374151" },
+    { label: lang === "es" ? "Roles con actividades automatizables" : "Roles with technically automatable activities", value: 60, color: "#6B7280" },
+  ];
+
+  const caseStudies = [
+    { img: "/case-studies/valthor.jpeg", categoryKey: "caseStudiesSection.valthorCategory", titleKey: "caseStudiesSection.valthorTitle", descKey: "caseStudiesSection.valthorDesc", stat: { value: "40%", labelKey: "caseStudiesSection.valthorStat" }, link: "https://www.valthorcrm.com/" },
+    { img: "/case-studies/hot-date-kitchen.jpeg", categoryKey: "caseStudiesSection.hotdateCategory", titleKey: "caseStudiesSection.hotdateTitle", descKey: "caseStudiesSection.hotdateDesc", stat: null, link: "https://hotdatekitchen.com/" },
+    { img: "/case-studies/smarters-city.jpeg", categoryKey: "caseStudiesSection.smartersCategory", titleKey: "caseStudiesSection.smartersTitle", descKey: "caseStudiesSection.smartersDesc", stat: null, link: "https://smarters.city/" },
+    { img: "/case-studies/vantage.jpeg", categoryKey: "caseStudiesSection.vantageCategory", titleKey: "caseStudiesSection.vantageTitle", descKey: "caseStudiesSection.vantageDesc", stat: null, link: "https://vantageinc.ai/" },
+    { img: "/case-studies/propbot.png", categoryKey: "caseStudiesSection.propbotCategory", titleKey: "caseStudiesSection.propbotTitle", descKey: "caseStudiesSection.propbotDesc", stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" }, link: "https://propbot.cc" },
+  ];
+
+  const projects = [
+    { image: "/smarters-card.png", title: t("featuredWorkSection.smartersCity.title"), link: "https://smarters.city/", category: "saas" },
+    { image: "/valthor-logo.e3b5a398.png", title: "Valthor CRM", link: "https://www.valthorcrm.com/", category: "saas" },
+    { image: "/Cicero.png", title: t("featuredWorkSection.cicero.title"), link: "https://www.linkedin.com/company/cicerolearn/", category: "saas", imageScale: 0.7 },
+    { image: "/vantage.svg", title: t("featuredWorkSection.vantage.title"), link: "https://vantageinc.ai/", category: "saas", imageScale: 0.75 },
+    { image: "/vivabots_azul.png", title: "Vivabots RPA", link: "https://vivabots.com/", category: "saas" },
+    { image: "/estudio-sab.png", title: t("featuredWorkSection.estudioSab.title"), link: "https://estudiosab.com/", category: "web-performance" },
+    { image: "/Skylar.png", title: t("featuredWorkSection.skylar.title"), link: "https://skylar.ar/", category: "commerce" },
+    { image: "/HotDate.png", title: t("featuredWorkSection.hotDateKitchen.title"), link: "https://hotdatekitchen.com/", category: "commerce", imageScale: 0.9 },
+    { image: "/propbot-logo.svg", title: t("featuredWorkSection.propbot.title"), link: "https://propbot.cc", category: "saas" },
+    { image: "/GBS.png", title: "GBS Abogados", link: "#", category: "web-performance" },
+    { image: "/kdabogados.png", title: "KD Abogados", link: "https://kdabogados.com.ar/", category: "web-performance" },
+  ];
+
+  const duplicatedProjects = [...projects, ...projects];
+
+  const SvcIconPeople = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+  const SvcIconGear = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+  const SvcIconChart = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
+    </svg>
+  );
+
+  const services = [
     {
-      label:
-        lang === "es"
-          ? "Tiempo en coordinación manual"
-          : "Time spent on manual coordination",
-      value: 58,
-      color: "#F97B72",
+      icon: <SvcIconPeople />,
+      titleKey: "homeCapabilitiesSection.cards.softwareDevelopment.title",
+      descKey: "homeCapabilitiesSection.cards.softwareDevelopment.description",
+      links: [
+        { text: "Staff Augmentation", href: "/services/staff-augmentation" },
+        { text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation", href: "/services/workflow-automation" },
+      ],
     },
     {
-      label:
-        lang === "es"
-          ? "Trabajo percibido como caótico"
-          : "Work perceived as chaotic",
-      value: 48,
-      color: "#FB7185",
+      icon: <SvcIconGear />,
+      titleKey: "homeCapabilitiesSection.cards.mobileDevelopment.title",
+      descKey: "homeCapabilitiesSection.cards.mobileDevelopment.description",
+      badge: t("homeCapabilitiesSection.mostPopular", "Most Popular"),
+      links: [
+        { text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation", href: "/services/workflow-automation" },
+        { text: "Staff Augmentation", href: "/services/staff-augmentation" },
+      ],
     },
     {
-      label:
-        lang === "es"
-          ? "Reducción de costos (automatización madura)"
-          : "Cost reduction (mature automation)",
-      value: 32,
-      color: "#38BDF8",
+      icon: <SvcIconChart />,
+      titleKey: "homeCapabilitiesSection.cards.dataAutomation.title",
+      descKey: "homeCapabilitiesSection.cards.dataAutomation.description",
+      links: [
+        { text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation", href: "/services/workflow-automation" },
+        { text: "Staff Augmentation", href: "/services/staff-augmentation" },
+      ],
     },
-    {
-      label:
-        lang === "es"
-          ? "Roles con actividades técnicamente automatizables"
-          : "Roles with technically automatable activities",
-      value: 60,
-      color: "#818CF8",
-    },
+  ];
+
+  const marqueeItems = [
+    "WORKFLOW AUTOMATION",
+    "STAFF AUGMENTATION",
+    "NEARSHORE ENGINEERING",
+    "OPERATIONAL EFFICIENCY",
+    "PROCESS AUTOMATION",
+    "CULTURAL FIT",
   ];
 
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "OpenGateHub",
-    "url": "https://opengatehub.com",
-    "logo": "https://opengatehub.com/browser-link-logo.png",
-    "sameAs": [
-      "https://www.linkedin.com/company/opengatehub"
-    ],
-    "description": "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and embedded engineering teams."
+    name: "OpenGateHub",
+    url: "https://opengatehub.com",
+    logo: "https://opengatehub.com/browser-link-logo.png",
+    sameAs: ["https://www.linkedin.com/company/opengatehub"],
+    description: "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and embedded engineering teams.",
   };
 
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "url": "https://opengatehub.com",
-    "name": "OpenGateHub",
-    "potentialAction": {
+    url: "https://opengatehub.com",
+    name: "OpenGateHub",
+    potentialAction: {
       "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": "https://opengatehub.com/search?q={search_term_string}"
-      },
-      "query-input": "required name=search_term_string"
-    }
+      target: { "@type": "EntryPoint", urlTemplate: "https://opengatehub.com/search?q={search_term_string}" },
+      "query-input": "required name=search_term_string",
+    },
   };
+
+  /* ─── HERO TEXT ─── */
+  const heroText = `${t("heroAnimatedText.part1")} ${t("heroAnimatedText.highlight1")} ${t("heroAnimatedText.part2")} ${t("heroAnimatedText.highlight2")}.`;
+  const highlightWords = [
+    t("heroAnimatedText.highlight1"),
+    t("heroAnimatedText.highlight2"),
+  ];
+
+  /* ─── PROBLEM TEXT SPLIT FOR REVEAL ─── */
+  const problemText = t("problemText");
+  const weGetYouText = t("weGetYouText");
+  const revealFullText = `${problemText} ${weGetYouText}`;
 
   return (
     <>
       <SEO
         title="Workflow Automation & Staff Augmentation from Latin America | OpenGateHub"
         description="Your team is losing 8+ hours per person each week to tasks automation handles in minutes. OpenGateHub automates workflows, embeds nearshore senior engineers from LATAM, and delivers results in 7.3 days. 9.7/10 CSAT."
-        keywords="workflow automation, process automation, staff augmentation LATAM, nearshore staff augmentation, n8n automation, AI automation, operational efficiency, nearshore software development, Latin America, business automation, hire developers Latin America"
+        keywords="workflow automation, process automation, staff augmentation LATAM, nearshore staff augmentation, operational efficiency, nearshore software development, Latin America, business automation, hire developers Latin America"
       >
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       </SEO>
 
-      <Container>
-        <FloatingBlob />
-        <Hero>
-          <GradientOverlay />
-          {/* <ImageContainer>
-            <LottieAnimation
-              animationPath="/animations/home.json"
-              width="100%"
-              height="auto"
-            />
-          </ImageContainer> */}
-          {/* ⬅ este! */}
+      {/* Scroll progress bar */}
+      <ScrollProgress style={{ width: `${scrollProgress}%` }} />
 
-          <Glow />
-          <Title>
-            <span className="animated">
-              {t("heroAnimatedText.part1")}
-              <span className="highlighted-word">
-                {t("heroAnimatedText.highlight1")}
-              </span>{" "}
-              {t("heroAnimatedText.part2")}{" "}
-              <span className="highlighted-word">
-                {t("heroAnimatedText.highlight2")}
-              </span>
-              .
-            </span>
+      <Container>
+        {/* ═══════════ HERO ═══════════ */}
+        <Hero ref={heroRef}>
+          <HeroOrb className="hero-orb" $color="rgba(80, 80, 80, 0.2)" $size="700px" $top="-200px" $right="-200px" $blur="150px" $duration="25s" />
+          <HeroOrb className="hero-orb" $color="rgba(60, 60, 60, 0.15)" $size="500px" $bottom="-150px" $left="-100px" $blur="130px" $duration="30s" $delay="5s" />
+          <HeroOrb className="hero-orb" $color="rgba(100, 100, 100, 0.1)" $size="400px" $top="30%" $left="60%" $blur="100px" $duration="20s" $delay="2s" />
+
+          <Title ref={titleRef}>
+            {splitWords(heroText, highlightWords)}
           </Title>
-          <Subtitle>{t("heroSubtitle")}</Subtitle>
-          {/* Primary + Secondary CTAs */}
-          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center", alignItems: "center", marginTop: "1.75rem" }}>
+
+          <Subtitle ref={subtitleRef}>{t("heroSubtitle")}</Subtitle>
+
+          <HeroCTAGroup ref={ctaGroupRef}>
             <CTAButton
               href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
               target={isMobile ? "_blank" : "_self"}
               rel={isMobile ? "noopener noreferrer" : undefined}
               className="primary-cta"
-              style={{ marginTop: 0 }}
             >
               {t("ctaButton")}
+              <span style={{ marginLeft: 4, transition: "transform 0.3s" }}>→</span>
             </CTAButton>
-            <CTAButton
-              href="/calculator"
-              className="secondary-cta"
-              style={{ marginTop: 0 }}
-            >
+            <CTAButton href="/calculator" className="secondary-cta">
               {t("heroSecondaryCTA", "See what it's costing you →")}
             </CTAButton>
-          </div>
+          </HeroCTAGroup>
 
-          {/* Trust chips */}
-          <div style={{
-            display: "flex",
-            gap: "0.75rem",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            marginTop: "1.5rem",
-          }}>
+          <TrustChips ref={trustRef}>
             {[
               t("heroTrustChip1", "9.7/10 CSAT"),
               t("heroTrustChip2", "7.3-day kickoff"),
               t("heroTrustChip3", "50+ sprints shipped"),
             ].map((chip) => (
-              <span key={chip} style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "1px solid rgba(255,255,255,0.3)",
-                borderRadius: "100px",
-                padding: "0.3rem 0.9rem",
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.9)",
-                backdropFilter: "blur(4px)",
-              }}>
-                ✓ {chip}
-              </span>
+              <TrustChip key={chip}>{chip}</TrustChip>
             ))}
-          </div>
+          </TrustChips>
         </Hero>
 
-        <Section
-          className="serious-block"
-          style={{
-            paddingLeft: isMobile ? "20px" : undefined,
-            paddingRight: isMobile ? "20px" : undefined,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.15 }}
-          >
-            <SectionTitle style={{ "--i": 0 }}>
-              {parseHighlightedText(t("problemTitle"))}
-            </SectionTitle>
-            <SectionText>{t("problemText")}</SectionText>
-          </motion.div>
-        </Section>
-
-        <Section
-          className="serious-block"
-          style={{
-            paddingLeft: isMobile ? "20px" : undefined,
-            paddingRight: isMobile ? "20px" : undefined,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.15 }}
-          >
-            <SectionTitle style={{ "--i": 1 }}>
-              {parseHighlightedText(t("weGetYouTitle"))}
-            </SectionTitle>
-            <SectionText>{t("weGetYouText")}</SectionText>
-          </motion.div>
-        </Section>
-
-        <Section className="full-width" style={{ background: "#f8fafc" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.2 }}
-            style={{ textAlign: "center", marginBottom: "2rem" }}
-          >
-            <h2
-              style={{
-                fontSize: isMobile ? "1.8rem" : "2rem",
-                fontWeight: "700",
-                marginBottom: "0.75rem",
-                color: "#1F2937",
-              }}
-            >
-              {lang === "es"
-                ? "Automatizar impacta negocio, no solo tecnología"
-                : "Automation impacts business, not just tech"}
-            </h2>
-            <p
-              style={{
-                maxWidth: "840px",
-                margin: "0 auto",
-                color: "#4B5563",
-                fontSize: isMobile ? "1rem" : "1.08rem",
-                lineHeight: 1.6,
-              }}
-            >
-              {lang === "es"
-                ? "Benchmarks globales muestran cuánto tiempo, foco y costo se pierde sin workflows conectados. Estos números explican por qué la automatización libera capacidad real del equipo."
-                : "Global benchmarks show how much time, focus, and budget is lost without connected workflows. These numbers explain why automation unlocks real team capacity."}
-            </p>
-          </motion.div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "1rem",
-              maxWidth: "1200px",
-              margin: "0 auto 2rem auto",
-              padding: "0 1rem",
-            }}
-          >
-            {benchmarkCards.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.15, delay: index * 0.05 }}
-                style={{
-                  background: "#ffffff",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "12px",
-                  padding: "1rem",
-                  boxShadow: "0 4px 16px rgba(15, 23, 42, 0.05)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "10px",
-                      background: "rgba(249, 123, 114, 0.12)",
-                      color: "#F97B72",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    {item.icon}
-                  </div>
-                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#111827" }}>
-                    {item.value}
-                  </div>
-                </div>
-                <div style={{ fontWeight: 600, color: "#1F2937", marginBottom: "0.35rem" }}>
-                  {item.title}
-                </div>
-                <p style={{ color: "#4B5563", fontSize: "0.92rem", lineHeight: 1.5, marginBottom: "0.65rem" }}>
-                  {item.description}
-                </p>
-                <a
-                  href={item.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: "#0EA5E9",
-                    fontSize: "0.82rem",
-                    textDecoration: "none",
-                    fontWeight: 600,
-                  }}
-                >
-                  {lang === "es" ? "Fuente:" : "Source:"} {item.sourceLabel}
-                </a>
-              </motion.div>
+        {/* ═══════════ MARQUEE BANNER ═══════════ */}
+        <MarqueeBanner>
+          <MarqueeTrack>
+            {[...marqueeItems, ...marqueeItems].map((item, i) => (
+              <MarqueeItem key={i}>{item}</MarqueeItem>
             ))}
-          </div>
+          </MarqueeTrack>
+        </MarqueeBanner>
 
-          <div
-            style={{
-              maxWidth: "1200px",
-              margin: "0 auto",
-              padding: "0 1rem",
-            }}
-          >
+        {/* ═══════════ TEXT REVEAL SECTION ═══════════ */}
+        <TextRevealSection>
+          <TextRevealContent ref={revealRef}>
+            <div className="gsap-fade-up" style={{ marginBottom: 32 }}>
+              <SectionEyebrow>
+                {lang === "es" ? "El problema" : "The Problem"}
+              </SectionEyebrow>
+            </div>
+            <RevealText>
+              {revealFullText.split(" ").map((word, i) => (
+                <span className="reveal-word" key={i}>
+                  {word}{" "}
+                </span>
+              ))}
+            </RevealText>
+          </TextRevealContent>
+        </TextRevealSection>
+
+        {/* ═══════════ BENCHMARKS ═══════════ */}
+        <Section $bg="#f8fafc" $padding="100px 24px" $mobilePadding="60px 16px">
+          <SectionInner ref={benchmarkRef}>
+            <div className="gsap-fade-up" style={{ textAlign: "center", marginBottom: 48 }}>
+              <SectionTitle>
+                {lang === "es"
+                  ? "Automatizar impacta negocio, no solo tecnología"
+                  : "Automation impacts business, not just tech"}
+              </SectionTitle>
+              <SectionText style={{ maxWidth: 840, margin: "0 auto" }}>
+                {lang === "es"
+                  ? "Benchmarks globales muestran cuánto tiempo, foco y costo se pierde sin workflows conectados."
+                  : "Global benchmarks show how much time, focus, and budget is lost without connected workflows."}
+              </SectionText>
+            </div>
+
+            <BenchmarkGrid>
+              {benchmarkCards.map((item, i) => (
+                <BenchmarkCard key={i} className="bench-card" style={{ transitionDelay: `${i * 0.1}s` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 12,
+                        background: "rgba(0, 0, 0, 0.05)",
+                        color: "#111111",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {item.icon}
+                    </div>
+                    <BenchmarkValue>{item.value}</BenchmarkValue>
+                  </div>
+                  <div style={{ fontWeight: 600, color: "#1F2937", marginBottom: 6 }}>
+                    {item.title}
+                  </div>
+                  <p style={{ color: "#6B7280", fontSize: "0.92rem", lineHeight: 1.6, marginBottom: 10 }}>
+                    {item.description}
+                  </p>
+                  <a
+                    href={item.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#71717A", fontSize: "0.82rem", textDecoration: "none", fontWeight: 600 }}
+                  >
+                    {lang === "es" ? "Fuente:" : "Source:"} {item.sourceLabel}
+                  </a>
+                </BenchmarkCard>
+              ))}
+            </BenchmarkGrid>
+
+            {/* Visual bars */}
             <div
+              className="gsap-fade-up"
               style={{
-                background: "#ffffff",
+                background: "white",
                 border: "1px solid #E5E7EB",
-                borderRadius: "14px",
-                padding: isMobile ? "1rem" : "1.25rem",
-                boxShadow: "0 6px 24px rgba(15, 23, 42, 0.06)",
+                borderRadius: 16,
+                padding: isMobile ? 20 : 28,
+                boxShadow: "0 6px 24px rgba(15, 23, 42, 0.05)",
               }}
             >
-              <h3 style={{ marginBottom: "1rem", color: "#111827", fontSize: "1.1rem" }}>
-                {lang === "es"
-                  ? "Benchmarks visuales de fricción operativa"
-                  : "Visual benchmarks of operational friction"}
+              <h3 style={{ marginBottom: 20, color: "#111827", fontSize: "1.1rem", fontWeight: 700 }}>
+                {lang === "es" ? "Benchmarks visuales de fricción operativa" : "Visual benchmarks of operational friction"}
               </h3>
               {benchmarkBars.map((bar, idx) => (
-                <div key={idx} style={{ marginBottom: idx === benchmarkBars.length - 1 ? 0 : "0.95rem" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: "1rem",
-                      marginBottom: "0.35rem",
-                      fontSize: "0.9rem",
-                      color: "#374151",
-                    }}
-                  >
+                <div key={idx} style={{ marginBottom: idx === benchmarkBars.length - 1 ? 0 : 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.9rem", color: "#374151" }}>
                     <span>{bar.label}</span>
                     <strong>{bar.value}%</strong>
                   </div>
-                  <div
-                    style={{
-                      height: "10px",
-                      width: "100%",
-                      background: "#F1F5F9",
-                      borderRadius: "999px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${bar.value}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: idx * 0.07 }}
-                      style={{
-                        height: "100%",
-                        borderRadius: "999px",
-                        background: bar.color,
-                      }}
-                    />
-                  </div>
+                  <BenchmarkBar>
+                    <div className="bar-fill" data-width={bar.value} style={{ background: bar.color }} />
+                  </BenchmarkBar>
                 </div>
               ))}
-              <div
-                style={{
-                  marginTop: "1rem",
-                  color: "#6B7280",
-                  fontSize: "0.82rem",
-                  lineHeight: 1.5,
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "0.8rem 1rem",
-                }}
-              >
+              <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: "8px 16px" }}>
                 {[
-                  {
-                    label: "Asana 2023",
-                    url: "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/",
-                  },
-                  {
-                    label: "Microsoft 2025",
-                    url: "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/",
-                  },
-                  {
-                    label: "Deloitte 2022",
-                    url: "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html",
-                  },
-                  {
-                    label: "McKinsey 2017",
-                    url: "https://www.mckinsey.com/featured-insights/employment-and-growth/jobs-lost-jobs-gained-what-the-future-of-work-will-mean-for-jobs-skills-and-wages",
-                  },
+                  { label: "Asana 2023", url: "https://investors.asana.com/news-releases/news-release-details/asana-anatomy-work-global-index-2023-smart-collaboration-and/" },
+                  { label: "Microsoft 2025", url: "https://www.microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday/" },
+                  { label: "Deloitte 2022", url: "https://www.deloitte.com/us/en/insights/topics/talent/intelligent-automation-2022-survey-results.html" },
+                  { label: "McKinsey 2017", url: "https://www.mckinsey.com/featured-insights/employment-and-growth/jobs-lost-jobs-gained-what-the-future-of-work-will-mean-for-jobs-skills-and-wages" },
                 ].map((source, idx) => (
                   <a
                     key={idx}
                     href={source.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      color: "#0EA5E9",
-                      textDecoration: "none",
-                      fontWeight: 600,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                    }}
+                    style={{ color: "#71717A", textDecoration: "none", fontSize: "0.82rem", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}
                   >
-                    {lang === "es" ? "Fuente" : "Source"}: {source.label}
-                    <FaExternalLinkAlt style={{ fontSize: "0.65rem" }} />
+                    Source: {source.label} <FaExternalLinkAlt style={{ fontSize: "0.6rem" }} />
                   </a>
                 ))}
               </div>
             </div>
-          </div>
+
+            <div className="gsap-fade-up" style={{ textAlign: "center", padding: "32px 0 0" }}>
+              <Link
+                href="/calculator"
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#111111", fontWeight: 600, fontSize: "0.97rem", textDecoration: "none", borderBottom: "2px solid #111111", paddingBottom: 2 }}
+              >
+                {t("caseStudiesSection.benchmarksCTA", "Calculate your team's potential savings →")}
+              </Link>
+            </div>
+          </SectionInner>
         </Section>
 
-        {/* Benchmarks CTA nudge */}
-        <div style={{ textAlign: "center", padding: "0.5rem 1rem 2.5rem", width: "100%" }}>
-          <Link href="/calculator" style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.4rem",
-            color: "#f97b72",
-            fontWeight: 700,
-            fontSize: "0.97rem",
-            textDecoration: "none",
-            borderBottom: "2px solid #f97b72",
-            paddingBottom: "2px",
-            transition: "opacity 0.2s",
-          }}>
-            {t("caseStudiesSection.benchmarksCTA", "Calculate your team's potential savings →")}
-          </Link>
-        </div>
+        {/* ═══════════ PARALLAX SHOWCASE ═══════════ */}
+        <ParallaxShowcase ref={parallaxShowcaseRef}>
+          <div className="parallax-bg" />
+          <div className="parallax-content">
+            <div className="parallax-number">
+              {lang === "es" ? "8h+" : "8h+"}
+            </div>
+            <div className="parallax-stat-label">
+              {lang === "es"
+                ? "perdidas por persona, cada semana"
+                : "lost per person, every single week"}
+            </div>
+            <div className="parallax-stat-desc">
+              {lang === "es"
+                ? "Tareas repetitivas, coordinación manual, copy-paste entre herramientas. Tiempo que la automatización recupera en minutos."
+                : "Repetitive tasks, manual coordination, copy-pasting between tools. Time that automation recovers in minutes."}
+            </div>
+          </div>
+        </ParallaxShowcase>
 
-        {/* Capabilities Section - How we build */}
-        <Section className="full-width">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.2 }}
-            style={{ textAlign: "center", marginBottom: "3rem" }}
-          >
-            <h2
-              style={{
-                fontSize: isMobile ? "1.8rem" : "2rem",
-                fontWeight: "700",
-                marginBottom: "1rem",
-              }}
-            >
-              <span style={{ color: "var(--color-accent, #FF6B6B)" }}>
+        {/* ═══════════ SERVICES WITH 3D TILT ═══════════ */}
+        <Section ref={servicesRef} $bg="white" $padding="100px 24px" $mobilePadding="60px 16px" style={{ position: "relative" }}>
+          <GridBackground />
+          <SectionInner>
+            <div className="gsap-fade-up" style={{ textAlign: "center", marginBottom: 48 }}>
+              <SectionTitle>
                 {t("homeCapabilitiesSection.title")}
-              </span>
-            </h2>
-            <p
-              style={{
-                fontSize: isMobile ? "1rem" : "1.1rem",
-                maxWidth: "800px",
-                margin: "0 auto",
-                color: "var(--color-text-muted, #666)",
-              }}
-            >
-              {t("homeCapabilitiesSection.subtitle")}
-            </p>
-          </motion.div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "2rem",
-              maxWidth: "1200px",
-              margin: "0 auto",
-              padding: "0 1rem",
-            }}
-          >
-            {/* Staff Augmentation */}
-            <ServiceBox
-              icon="🤝"
-              title={t("homeCapabilitiesSection.cards.softwareDevelopment.title")}
-              description={t(
-                "homeCapabilitiesSection.cards.softwareDevelopment.description",
-              )}
-              delay={0.1}
-              subcategories={[
-                {
-                  text: lang === "es" ? "Staff Augmentation" : "Staff Augmentation",
-                  href: "/services/staff-augmentation",
-                },
-                {
-                  text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation",
-                  href: "/services/workflow-automation",
-                },
-              ]}
-            />
-
-            {/* Workflow Automation */}
-            <ServiceBox
-              icon="⚙️"
-              title={t("homeCapabilitiesSection.cards.mobileDevelopment.title")}
-              description={t(
-                "homeCapabilitiesSection.cards.mobileDevelopment.description",
-              )}
-              badge={t("homeCapabilitiesSection.mostPopular", "Most Popular")}
-              delay={0.2}
-              subcategories={[
-                {
-                  text: lang === "es" ? "Automatización de Flujos" : "Workflow Automation",
-                  href: "/services/workflow-automation",
-                },
-                {
-                  text: lang === "es" ? "Automatización n8n" : "n8n Automation",
-                  href: "/services/n8n-automation",
-                },
-              ]}
-            />
-
-            {/* AI + Automation Ops */}
-            <ServiceBox
-              icon="📈"
-              title={t("homeCapabilitiesSection.cards.dataAutomation.title")}
-              description={t(
-                "homeCapabilitiesSection.cards.dataAutomation.description",
-              )}
-              delay={0.3}
-              subcategories={[
-                { text: t("aiTitle"), href: "/services/AI" },
-                {
-                  text: lang === "es" ? "Automatización n8n" : "n8n Automation",
-                  href: "/services/n8n-automation",
-                },
-              ]}
-            />
-          </div>
-        </Section>
-
-        {/* Metrics Section */}
-        <MetricsSection />
-
-        {/* Calculator Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          style={{
-            width: "100%",
-            background: "white",
-            borderTop: "1px solid #e5e7eb",
-            borderBottom: "1px solid #e5e7eb",
-            padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ maxWidth: "660px", margin: "0 auto" }}>
-            {/* Badge */}
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                background: "#fff5f5",
-                border: "1.5px solid #fecaca",
-                borderRadius: "100px",
-                padding: "0.3rem 0.9rem",
-                fontSize: "0.73rem",
-                fontWeight: 700,
-                color: "#f97b72",
-                marginBottom: "1.5rem",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-              }}
-            >
-              {t("calculator.bannerEyebrow")}
+              </SectionTitle>
+              <SectionText style={{ margin: "0 auto" }}>
+                {t("homeCapabilitiesSection.subtitle")}
+              </SectionText>
             </div>
 
-            {/* Headline */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+              gap: 24,
+            }}>
+              {services.map((svc, i) => (
+                <div className="tilt-card" key={i}>
+                  <ServiceCard className="svc-card tilt-inner" style={{ width: "100%", minWidth: "auto" }}>
+                    {svc.badge && <ServiceBadge>{svc.badge}</ServiceBadge>}
+                    <ServiceIcon>{svc.icon}</ServiceIcon>
+                    <ServiceTitle>{t(svc.titleKey)}</ServiceTitle>
+                    <ServiceDescription>{t(svc.descKey)}</ServiceDescription>
+                    <ServiceLinks>
+                      {svc.links.map((link, j) => (
+                        <Link key={j} href={link.href} passHref legacyBehavior>
+                          <ServiceLink>{link.text}</ServiceLink>
+                        </Link>
+                      ))}
+                    </ServiceLinks>
+                  </ServiceCard>
+                </div>
+              ))}
+            </div>
+          </SectionInner>
+        </Section>
+
+        {/* ═══════════ ZOOM REVEAL SECTION ═══════════ */}
+        <ZoomRevealSection ref={zoomRevealRef}>
+          <div className="zoom-inner">
+            <div className="zoom-title">
+              {lang === "es" ? (
+                <>Resultados que <span>hablan solos</span></>
+              ) : (
+                <>Results that <span>speak for themselves</span></>
+              )}
+            </div>
+            <div className="zoom-subtitle">
+              {lang === "es"
+                ? "Métricas reales de equipos que dejaron de perder tiempo y empezaron a escalar."
+                : "Real metrics from teams that stopped losing time and started scaling."}
+            </div>
+            <div className="zoom-grid">
+              {[
+                { value: "9.7/10", label: "CSAT" },
+                { value: "7.3", label: lang === "es" ? "días avg kickoff" : "days avg kickoff" },
+                { value: "50+", label: lang === "es" ? "sprints entregados" : "sprints shipped" },
+                { value: "32%", label: lang === "es" ? "reducción de costos" : "cost reduction" },
+                { value: "4.9h", label: lang === "es" ? "recuperadas/semana" : "recovered/week" },
+                { value: "96%", label: lang === "es" ? "entregas a tiempo" : "on-time delivery" },
+              ].map((item, i) => (
+                <div className="zoom-card" key={i}>
+                  <div className="zoom-card-value">{item.value}</div>
+                  <div className="zoom-card-label">{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </ZoomRevealSection>
+
+        {/* ═══════════ STICKY METRICS ═══════════ */}
+        <StickyMetricsWrapper
+          ref={stickyMetricsRef}
+          style={{ height: "600vh" }}
+        >
+          <StickyMetricsViewport>
+            <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
+            <StickyMetricsProgress style={{ width: `${metricsProgress * 100}%` }} />
+            <StickyMetricDots>
+              {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
+                <StickyMetricDot key={i} $active={activeMetric === i} />
+              ))}
+            </StickyMetricDots>
+            {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
+              const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
+              return (
+                <StickyMetricSlide key={key} className={`metric-slide ${activeMetric === i ? "active" : ""}`}>
+                  <div className="metric-counter">
+                    <span
+                      ref={(el) => { metricCounterRefs.current[i] = el; }}
+                      data-value={d.value}
+                    >
+                      {d.value}
+                    </span>
+                    {d.unit && <span className="metric-unit">{d.unit}</span>}
+                  </div>
+                  <div className="metric-label">{d.label}</div>
+                  <div className="metric-desc">{d.description}</div>
+                </StickyMetricSlide>
+              );
+            })}
+          </StickyMetricsViewport>
+        </StickyMetricsWrapper>
+
+        {/* ═══════════ CALCULATOR BANNER ═══════════ */}
+        <CalculatorBanner $isMobile={isMobile} className="gsap-fade-up">
+          <div style={{ maxWidth: 660, margin: "0 auto", position: "relative", zIndex: 1 }}>
+            <SectionEyebrow>{t("calculator.bannerEyebrow")}</SectionEyebrow>
             <h2
               style={{
                 fontSize: isMobile ? "1.85rem" : "2.7rem",
                 fontWeight: 800,
                 color: "#111827",
                 lineHeight: 1.2,
-                marginBottom: "1rem",
+                marginBottom: 16,
                 letterSpacing: "-0.02em",
               }}
             >
               {t("calculator.bannerTitle")}
             </h2>
-
-            {/* Subtitle */}
-            <p
-              style={{
-                fontSize: "1.05rem",
-                color: "#6b7280",
-                lineHeight: 1.7,
-                maxWidth: "460px",
-                margin: "0 auto 2.75rem",
-              }}
-            >
+            <p style={{ fontSize: "1.05rem", color: "#6b7280", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
               {t("calculator.bannerSub")}
             </p>
 
-            {/* Stat cards */}
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-                gap: "1rem",
-                maxWidth: "560px",
-                margin: "0 auto 2.5rem",
+                gap: 16,
+                maxWidth: 560,
+                margin: "0 auto 40px",
               }}
             >
               {[
@@ -1810,714 +1068,180 @@ export default function HomePage() {
                   style={{
                     background: "white",
                     border: "1.5px solid #e5e7eb",
-                    borderRadius: "12px",
-                    padding: "1.5rem 1rem",
+                    borderRadius: 14,
+                    padding: "24px 16px",
                     position: "relative",
                     overflow: "hidden",
                   }}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0, left: 0, right: 0,
-                      height: "3px",
-                      background: "linear-gradient(90deg, #f97b72, #e35a52)",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontSize: "2rem",
-                      fontWeight: 900,
-                      color: "#f97b72",
-                      lineHeight: 1,
-                      marginBottom: "0.4rem",
-                    }}
-                  >
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "#111111" }} />
+                  <p style={{ fontSize: "2rem", fontWeight: 700, color: "#111111", lineHeight: 1, marginBottom: 6 }}>
                     {stat.value}
                   </p>
-                  <p
-                    style={{
-                      fontSize: "0.8rem",
-                      color: "#6b7280",
-                      fontWeight: 500,
-                      lineHeight: 1.4,
-                    }}
-                  >
+                  <p style={{ fontSize: "0.8rem", color: "#6b7280", fontWeight: 500, lineHeight: 1.4 }}>
                     {t(stat.labelKey)}
                   </p>
-                  <p style={{ fontSize: "0.65rem", color: "#d1d5db", marginTop: "0.4rem", fontWeight: 400 }}>
-                    {stat.source}
-                  </p>
+                  <p style={{ fontSize: "0.65rem", color: "#d1d5db", marginTop: 6 }}>{stat.source}</p>
                 </div>
               ))}
             </div>
 
-            {/* CTA button */}
             <Link href="/calculator">
               <button
                 style={{
-                  background: "linear-gradient(135deg, #f97b72 0%, #e35a52 100%)",
+                  background: "#111111",
                   color: "white",
                   border: "none",
-                  borderRadius: "10px",
-                  padding: "1rem 2.5rem",
+                  borderRadius: 60,
+                  padding: "16px 40px",
                   fontSize: "1.05rem",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: "pointer",
                   fontFamily: "inherit",
-                  boxShadow: "0 4px 20px rgba(249,123,114,0.38)",
-                  transition: "all 0.22s ease",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+                  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 28px rgba(249,123,114,0.48)";
+                  e.currentTarget.style.transform = "translateY(-3px) scale(1.02)";
+                  e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.25)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(249,123,114,0.38)";
+                  e.currentTarget.style.transform = "translateY(0) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.15)";
                 }}
               >
                 {t("calculator.bannerCTA")}
               </button>
             </Link>
-            <p style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "0.875rem" }}>
+            <p style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: 14 }}>
               {t("calculator.trustLine")}
             </p>
           </div>
-        </motion.div>
+        </CalculatorBanner>
 
-        {/* Case Studies Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          style={{
-            width: "100%",
-            background: "white",
-            borderTop: "1px solid #f0f0f0",
-            padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
-          }}
-        >
-          <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
-            {/* Header */}
-            <div style={{ textAlign: "center", marginBottom: isMobile ? "2.5rem" : "3.5rem" }}>
-              <div
-                style={{
-                  display: "inline-flex",
-                  background: "#fff5f5",
-                  border: "1.5px solid #fecaca",
-                  borderRadius: "100px",
-                  padding: "0.3rem 0.9rem",
-                  fontSize: "0.73rem",
-                  fontWeight: 700,
-                  color: "#f97b72",
-                  marginBottom: "1rem",
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {t("caseStudiesSection.eyebrow")}
-              </div>
-              <h2
-                style={{
-                  fontSize: isMobile ? "1.85rem" : "2.5rem",
-                  fontWeight: 800,
-                  color: "#111827",
-                  lineHeight: 1.2,
-                  marginBottom: "0.75rem",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {t("caseStudiesSection.title")}
-              </h2>
-              <p style={{ fontSize: "1rem", color: "#6b7280", lineHeight: 1.6 }}>
+        {/* ═══════════ CASE STUDIES ═══════════ */}
+        <Section $bg="white" $padding="100px 24px" $mobilePadding="60px 16px">
+          <SectionInner $maxWidth="1040px" ref={caseStudyRef}>
+            <div className="gsap-fade-up" style={{ textAlign: "center", marginBottom: isMobile ? 40 : 56 }}>
+              <SectionEyebrow>{t("caseStudiesSection.eyebrow")}</SectionEyebrow>
+              <SectionTitle>{t("caseStudiesSection.title")}</SectionTitle>
+              <SectionText style={{ margin: "0 auto" }}>
                 {t("caseStudiesSection.subtitle")}
-              </p>
+              </SectionText>
             </div>
 
-            {/* Cards grid */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
-                gap: "1.5rem",
-              }}
-            >
-              {[
-                {
-                  img: "/case-studies/valthor.jpeg",
-                  categoryKey: "caseStudiesSection.valthorCategory",
-                  titleKey: "caseStudiesSection.valthorTitle",
-                  descKey: "caseStudiesSection.valthorDesc",
-                  stat: { value: "40%", labelKey: "caseStudiesSection.valthorStat" },
-                  link: "https://www.valthorcrm.com/",
-                },
-                {
-                  img: "/case-studies/hot-date-kitchen.jpeg",
-                  categoryKey: "caseStudiesSection.hotdateCategory",
-                  titleKey: "caseStudiesSection.hotdateTitle",
-                  descKey: "caseStudiesSection.hotdateDesc",
-                  stat: null,
-                  link: "https://hotdatekitchen.com/",
-                },
-                {
-                  img: "/case-studies/smarters-city.jpeg",
-                  categoryKey: "caseStudiesSection.smartersCategory",
-                  titleKey: "caseStudiesSection.smartersTitle",
-                  descKey: "caseStudiesSection.smartersDesc",
-                  stat: null,
-                  link: "https://smarters.city/",
-                },
-                {
-                  img: "/case-studies/vantage.jpeg",
-                  categoryKey: "caseStudiesSection.vantageCategory",
-                  titleKey: "caseStudiesSection.vantageTitle",
-                  descKey: "caseStudiesSection.vantageDesc",
-                  stat: null,
-                  link: "https://vantageinc.ai/",
-                },
-                {
-                  img: "/case-studies/propbot.png",
-                  categoryKey: "caseStudiesSection.propbotCategory",
-                  titleKey: "caseStudiesSection.propbotTitle",
-                  descKey: "caseStudiesSection.propbotDesc",
-                  stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" },
-                  link: "https://propbot.cc",
-                },
-              ].map((cs) => (
-                <div
+            <CaseStudyGrid>
+              {caseStudies.map((cs) => (
+                <CaseStudyCard
                   key={cs.titleKey}
+                  className="case-card"
                   onClick={() => window.open(cs.link, "_blank", "noopener,noreferrer")}
-                  style={{
-                    background: "#fafafa",
-                    border: "1.5px solid #e5e7eb",
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "box-shadow 0.2s ease, transform 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.09)";
-                    e.currentTarget.style.transform = "translateY(-3px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "none";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
                 >
-                  <div style={{ height: "220px", overflow: "hidden", borderRadius: "14px 14px 0 0" }}>
-                    <img
-                      src={cs.img}
-                      alt={t(cs.titleKey)}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }}
-                    />
+                  <div className="case-img">
+                    <img src={cs.img} alt={t(cs.titleKey)} loading="lazy" />
                   </div>
-                  <div style={{ padding: "1.5rem" }}>
-                    <span
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        color: "#f97b72",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                      }}
-                    >
-                      {t(cs.categoryKey)}
-                    </span>
-                    <h3
-                      style={{
-                        fontSize: "1.15rem",
-                        fontWeight: 700,
-                        color: "#111827",
-                        margin: "0.4rem 0 0.5rem",
-                      }}
-                    >
-                      {t(cs.titleKey)}
-                    </h3>
-                    <p style={{ fontSize: "0.9rem", color: "#6b7280", lineHeight: 1.6, marginBottom: cs.stat ? "1rem" : 0 }}>
-                      {t(cs.descKey)}
-                    </p>
+                  <div className="case-content">
+                    <span className="case-category">{t(cs.categoryKey)}</span>
+                    <h3 className="case-title">{t(cs.titleKey)}</h3>
+                    <p className="case-desc">{t(cs.descKey)}</p>
                     {cs.stat && (
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "baseline",
-                          gap: "0.4rem",
-                          background: "#fff5f5",
-                          border: "1px solid #ffe3e1",
-                          borderRadius: "8px",
-                          padding: "0.5rem 0.875rem",
-                        }}
-                      >
-                        <span style={{ fontSize: "1.4rem", fontWeight: 900, color: "#f97b72", lineHeight: 1 }}>
-                          {cs.stat.value}
-                        </span>
-                        <span style={{ fontSize: "0.8rem", color: "#6b7280", fontWeight: 500 }}>
-                          {t(cs.stat.labelKey)}
-                        </span>
+                      <div className="case-stat">
+                        <span className="case-stat-value">{cs.stat.value}</span>
+                        <span className="case-stat-label">{t(cs.stat.labelKey)}</span>
                       </div>
                     )}
                   </div>
-                </div>
+                </CaseStudyCard>
               ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Featured Work Section */}
-        <div
-          style={{
-            background: "white",
-            marginTop: "-1px",
-            width: "100%",
-            overflow: "hidden",
-          }}
-        >
-          <Section
-            className="full-width"
-            style={{
-              padding: "2rem 0",
-              margin: "0",
-              borderTop: "none",
-              borderBottom: "1px solid #e5e7eb",
-              position: "relative",
-              zIndex: 999999,
-              overflow: "visible",
-              background: "white",
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.2 }}
-              style={{
-                textAlign: "center",
-                marginBottom: "2rem",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "600",
-                  marginBottom: "0.5rem",
-                  color: "#6B7280",
-                  paddingLeft: isMobile ? "1.5rem" : "1rem",
-                  paddingRight: isMobile ? "1.5rem" : "1rem",
-                }}
-              >
-                {t("featuredWorkSection.title")}
-              </h3>
-              <p
-                style={{
-                  fontSize: "1rem",
-                  maxWidth: "600px",
-                  margin: "auto",
-                  color: "#9CA3AF",
-                  paddingLeft: isMobile ? "1.5rem" : "1rem",
-                  paddingRight: isMobile ? "1.5rem" : "1rem",
-                }}
-              >
-                {t("featuredWorkSection.subtitle")}
-              </p>
-            </motion.div>
-
-            <ProjectTabs
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              isMobile={isMobile}
-            />
-
-            {(() => {
-              const projects = [
-                // SaaS first
-                {
-                  image: "/smarters-card.png",
-                  title: t("featuredWorkSection.smartersCity.title"),
-                  description: t(
-                    "featuredWorkSection.smartersCity.description",
-                  ),
-                  metrics: t("featuredWorkSection.smartersCity.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://smarters.city/",
-                  hoverContent: (
-                    <>
-                      <strong>Embedded Dev Partners</strong> — boosted UI +
-                      APIs, kept their roadmap on track
-                    </>
-                  ),
-                  category: "saas",
-                  delay: 0.1,
-                },
-                {
-                  image: "/valthor-logo.e3b5a398.png",
-                  title: "Valthor CRM",
-                  description:
-                    lang === "es"
-                      ? "Plataforma CRM moderna optimizada con IA"
-                      : "Modern CRM platform optimized with AI",
-                  metrics:
-                    lang === "es"
-                      ? ["Omnichannel", "99.9% uptime", "SEO optimized"]
-                      : ["Omnichannel", "99.9% uptime", "SEO optimized"],
-                  link: "https://www.valthorcrm.com/",
-                  hoverContent: (
-                    <>
-                      <strong>Modern CRM platform</strong> — powered with{" "}
-                      <strong>AI</strong>.
-                    </>
-                  ),
-                  badges: ["CRM", "AI", "24/7"],
-                  category: "saas",
-                  delay: 0.2,
-                },
-                {
-                  image: "/Cicero.png",
-                  title: t("featuredWorkSection.cicero.title"),
-                  description: t("featuredWorkSection.cicero.description"),
-                  metrics: t("featuredWorkSection.cicero.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://www.linkedin.com/company/cicerolearn/",
-                  hoverContent: (
-                    <>
-                      <strong>Product direction + early development</strong> —
-                      AI-powered personal librarian. View on LinkedIn.
-                    </>
-                  ),
-                  badges: ["AI", "Early-stage", "View on LinkedIn"],
-                  category: "saas",
-                  delay: 0.3,
-                  imageScale: 0.7,
-                },
-                {
-                  image: "/vantage.svg",
-                  title: t("featuredWorkSection.vantage.title"),
-                  description: t("featuredWorkSection.vantage.description"),
-                  metrics: t("featuredWorkSection.vantage.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://vantageinc.ai/",
-                  hoverContent: (
-                    <>
-                      <strong>Staff Augmentation</strong> — embedded engineers &
-                      QA, accelerating their roadmap and product velocity.
-                    </>
-                  ),
-                  badges: ["Staff Aug", "Engineers + QA", "Faster roadmap"],
-                  category: "saas",
-                  delay: 0.35,
-                  imageScale: 0.75,
-                },
-                {
-                  image: "/vivabots_azul.png",
-                  title: "Vivabots RPA",
-                  description:
-                    lang === "es"
-                      ? "Plataforma RPA moderna y optimizada"
-                      : "Modern and optimized RPA platform",
-                  metrics: ["99.9% uptime", "99.9% efficiency"],
-                  link: "https://vivabots.com/",
-                  hoverContent: (
-                    <>
-                      Modern and Powerful <strong>RPA platform</strong>{" "}
-                    </>
-                  ),
-                  badges: ["RPA Platform", "Web & Desktop", "3,200+ Bots"],
-                  category: "saas",
-                  delay: 0.4,
-                },
-                // Then the rest
-                {
-                  image: "/estudio-sab.png",
-                  title: t("featuredWorkSection.estudioSab.title"),
-                  description: t("featuredWorkSection.estudioSab.description"),
-                  metrics: t("featuredWorkSection.estudioSab.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://estudiosab.com/",
-                  hoverContent: (
-                    <>
-                      <strong>All-In Dev Studio</strong> — designed, built,
-                      shipped.
-                    </>
-                  ),
-                  badges: ["Fast pages", "SEO ready", "Modern stack"],
-                  category: "web-performance",
-                  delay: 0.5,
-                },
-                {
-                  image: "/Skylar.png",
-                  title: t("featuredWorkSection.skylar.title"),
-                  description: t("featuredWorkSection.skylar.description"),
-                  metrics: t("featuredWorkSection.skylar.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://skylar.ar/",
-                  hoverContent: (
-                    <>
-                      <strong>Code-Side Overhaul</strong> — rebuilt store,
-                      conversions up 28%
-                    </>
-                  ),
-                  badges: ["≤2s TTI", "+28% conversions", "Live catalog"],
-                  category: "commerce",
-                  delay: 0.55,
-                },
-                {
-                  image: "/HotDate.png",
-                  title: t("featuredWorkSection.hotDateKitchen.title"),
-                  description: t(
-                    "featuredWorkSection.hotDateKitchen.description",
-                  ),
-                  metrics: t("featuredWorkSection.hotDateKitchen.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://hotdatekitchen.com/",
-                  hoverContent: (
-                    <>
-                      <strong>Landing + E-commerce</strong> — premium snack
-                      brand, Shopify store, 99% recommend
-                    </>
-                  ),
-                  badges: [
-                    "Landing page",
-                    "E-commerce",
-                    "Carbon neutral brand",
-                  ],
-                  category: "commerce",
-                  delay: 0.6,
-                  imageScale: 0.9,
-                },
-                {
-                  image: "/propbot-logo.svg",
-                  title: t("featuredWorkSection.propbot.title"),
-                  description: t("featuredWorkSection.propbot.description"),
-                  metrics: t("featuredWorkSection.propbot.metrics", {
-                    returnObjects: true,
-                  }),
-                  link: "https://propbot.cc",
-                  hoverContent: (
-                    <>
-                      <strong>AI Chatbot</strong> for real estate — instant
-                      responses, smart filtering, auto-scheduling.
-                    </>
-                  ),
-                  badges: ["AI", "WhatsApp", "24/7"],
-                  category: "saas",
-                  delay: 0.65,
-                },
-                {
-                  image: "/GBS.png",
-                  title: "GBS Abogados",
-                  description:
-                    lang === "es"
-                      ? "Plataforma web moderna y optimizada"
-                      : "Modern and optimized web platform",
-                  metrics:
-                    lang === "es"
-                      ? ["+40% speed", "99.9% uptime", "SEO optimized"]
-                      : ["+40% speed", "99.9% uptime", "SEO optimized"],
-                  link: "#",
-                  hoverContent: (
-                    <>
-                      <strong>Web Development</strong> — modern platform,
-                      optimized performance.
-                    </>
-                  ),
-                  badges: ["Dynamic transitions", "SEO ready", "Fast load"],
-                  category: "web-performance",
-                  delay: 0.65,
-                },
-                {
-                  image: "/kdabogados.png",
-                  title: "KD Abogados",
-                  description:
-                    lang === "es"
-                      ? "Sitio web profesional y responsive"
-                      : "Professional and responsive website",
-                  metrics:
-                    lang === "es"
-                      ? ["Fast and secure", "99.9% uptime", "SEO optimized"]
-                      : ["Fast and secure", "99.9% uptime", "SEO optimized"],
-                  link: "https://kdabogados.com.ar/",
-                  hoverContent: (
-                    <>
-                      <strong>Web Development</strong> — professional website,
-                      responsive design.
-                    </>
-                  ),
-                  badges: ["Responsive", "SEO ready", "Fast load"],
-                  category: "web-performance",
-                  delay: 0.7,
-                },
-              ];
-
-              const filteredProjects = projects.filter(
-                (project) =>
-                  activeTab === "all" || project.category === activeTab,
-              );
-
-              // Duplicar proyectos para efecto infinito
-              // Si hay pocas tarjetas, duplicar más veces para que el carrusel se vea mejor
-              const minDuplications = filteredProjects.length <= 3 ? 4 : 2;
-              const duplicatedProjects = Array(minDuplications)
-                .fill(filteredProjects)
-                .flat();
-
-              return (
-                <>
-                  <style
-                    dangerouslySetInnerHTML={{
-                      __html: `
-                  @keyframes infiniteScrollCarousel {
-                    0% {
-                      transform: translateX(0);
-                    }
-                    100% {
-                      transform: translateX(-50%);
-                    }
-                  }
-                `,
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: "100%",
-                      position: "relative",
-                      zIndex: 999999,
-                      overflow: "hidden",
-                      padding: "0",
-                      display: "flex",
-                      alignItems: "center",
-                      minHeight: "280px",
-                      height: "280px",
-                    }}
-                    onMouseEnter={() => setCarouselPaused(true)}
-                    onMouseLeave={() => setCarouselPaused(false)}
-                  >
-                    <div
-                      ref={carouselTrackRef}
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: isMobile ? "15px" : "0.75rem",
-                        animation: "infiniteScrollCarousel 40s linear infinite",
-                        width: "fit-content",
-                        willChange: "transform",
-                        animationPlayState: carouselPaused
-                          ? "paused"
-                          : "running",
-                      }}
-                    >
-                      {duplicatedProjects.map((project, index) => (
-                        <div
-                          key={`${project.title}-${index}`}
-                          style={{
-                            flexShrink: 0,
-                            flexGrow: 0,
-                          }}
-                        >
-                          <FeaturedWorkCard
-                            image={project.image}
-                            title={project.title}
-                            description={project.description}
-                            metrics={project.metrics}
-                            link={project.link}
-                            hoverContent={project.hoverContent}
-                            badges={project.badges}
-                            category={project.category}
-                            delay={0}
-                            imageScale={project.imageScale}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              );
-            })()}
-          </Section>
-        </div>
-
-        {/* Original Plan Section */}
-        <PlanSection>
-          <SectionTitle style={{ "--i": 2 }}>{t("planTitle")}</SectionTitle>
-          <PlanSteps>
-            <li style={{ "--i": 0 }}>
-              <strong>1</strong>
-              {t("planSteps.step1")}
-            </li>
-            <li style={{ "--i": 1 }}>
-              <strong>2</strong>
-              {t("planSteps.step2")}
-            </li>
-            <li style={{ "--i": 2 }}>
-              <strong>3</strong>
-              {t("planSteps.step3")}
-            </li>
-          </PlanSteps>
-
-          {/* New CTA button below plan section */}
-          <div style={{ textAlign: "center", marginTop: "3rem" }}>
-            <CTAButton
-              href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
-              target={isMobile ? "_blank" : "_self"}
-              rel={isMobile ? "noopener noreferrer" : undefined}
-              className="secondary-cta"
-            >
-              {t("homeServicesSection.startJourneyButton")}
-            </CTAButton>
-          </div>
-        </PlanSection>
-
-        {/* Testimonials Carousel Section */}
-        <Section
-          className="full-width testimonials-section"
-          style={{
-            background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-            padding: "4rem 1rem",
-            margin: "0",
-            marginTop: "0",
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.2 }}
-            style={{ textAlign: "center", marginBottom: "3rem" }}
-          >
-            <h2
-              style={{
-                fontSize: isMobile ? "1.8rem" : "2rem",
-                fontWeight: "700",
-                marginBottom: "1rem",
-              }}
-            >
-              {t("reviewsTitle")}
-            </h2>
-            <p
-              style={{
-                fontSize: isMobile ? "1rem" : "1.1rem",
-                maxWidth: "800px",
-                margin: "0 auto",
-                color: "#444444",
-              }}
-            >
-              {t("reviewsSubtitle")}
-            </p>
-          </motion.div>
-
-          <TestimonialsCarousel testimonials={testimonialData} />
+            </CaseStudyGrid>
+          </SectionInner>
         </Section>
 
-        {/* Final CTA Section */}
+        {/* ═══════════ FEATURED WORK CAROUSEL ═══════════ */}
+        <CarouselSection>
+          <div className="gsap-fade-up" style={{ textAlign: "center", marginBottom: 32, padding: "0 24px" }}>
+            <h3 style={{ fontSize: "1.4rem", fontWeight: 600, color: "#6B7280", marginBottom: 8 }}>
+              {t("featuredWorkSection.title")}
+            </h3>
+            <p style={{ fontSize: "1rem", maxWidth: 600, margin: "0 auto", color: "#9CA3AF" }}>
+              {t("featuredWorkSection.subtitle")}
+            </p>
+          </div>
+
+          <div style={{ overflow: "hidden" }}>
+            <CarouselTrack>
+              {duplicatedProjects.map((project, i) => (
+                <CarouselCard
+                  key={`${project.title}-${i}`}
+                  $hasLink={project.link && project.link !== "#"}
+                  onClick={() => {
+                    if (project.link && project.link !== "#") {
+                      window.open(project.link, "_blank", "noopener,noreferrer");
+                    }
+                  }}
+                >
+                  <div className="carousel-logo">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      style={{
+                        transform: project.imageScale ? `scale(${project.imageScale})` : undefined,
+                      }}
+                      loading="lazy"
+                    />
+                  </div>
+                  <span className="carousel-title">{project.title}</span>
+                </CarouselCard>
+              ))}
+            </CarouselTrack>
+          </div>
+        </CarouselSection>
+
+        {/* ═══════════ HOW IT WORKS ═══════════ */}
+        <PlanSection ref={planRef}>
+          <SectionInner>
+            <div className="gsap-fade-up" style={{ textAlign: "center" }}>
+              <SectionTitle style={{ color: "white" }}>
+                {t("planTitle")}
+              </SectionTitle>
+            </div>
+
+            <PlanSteps>
+              {[
+                { num: "01", text: t("planSteps.step1") },
+                { num: "02", text: t("planSteps.step2") },
+                { num: "03", text: t("planSteps.step3") },
+              ].map((step, i) => (
+                <PlanStep key={i} className="plan-step">
+                  <div className="step-number">{step.num}</div>
+                  <div className="step-text">{step.text}</div>
+                </PlanStep>
+              ))}
+            </PlanSteps>
+
+            <div className="gsap-fade-up" style={{ textAlign: "center", marginTop: 48 }}>
+              <CTAButton
+                href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
+                target={isMobile ? "_blank" : "_self"}
+                rel={isMobile ? "noopener noreferrer" : undefined}
+                className="secondary-cta"
+              >
+                {t("homeServicesSection.startJourneyButton")}
+              </CTAButton>
+            </div>
+          </SectionInner>
+        </PlanSection>
+
+        {/* ═══════════ TESTIMONIALS ═══════════ */}
+        <TestimonialsSection>
+          <div className="reviews-header gsap-fade-up">
+            <div className="reviews-eyebrow">{t("reviewsTitle")}</div>
+            <div className="reviews-title">{t("reviewsSubtitle")}</div>
+          </div>
+          <ReviewsInfiniteMarquee testimonials={testimonialData} />
+        </TestimonialsSection>
+
+        {/* ═══════════ FINAL CTA ═══════════ */}
         <HomeCallToAction />
       </Container>
     </>

@@ -2,9 +2,9 @@ import styled, { keyframes } from "styled-components";
 
 // Definición del keyframe para el pulso del botón
 const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(249, 123, 114, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(249, 123, 114, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(249, 123, 114, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(204, 90, 80, 0.3); }
+  70% { box-shadow: 0 0 0 10px rgba(204, 90, 80, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(204, 90, 80, 0); }
 `;
 
 export const LightButton = styled.button`

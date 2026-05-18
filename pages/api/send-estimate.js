@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       subject: `New contact from ${name}${company ? ` — ${company}` : ""}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #1e293b; border-bottom: 2px solid #f97b72; padding-bottom: 10px;">
+          <h2 style="color: #1e293b; border-bottom: 2px solid #CC5A50; padding-bottom: 10px;">
             New Contact Message
           </h2>
 

@@ -20,14 +20,14 @@
   "pleaseCompleteCaptcha": "Por favor completa la verificación del captcha",
   "messageSentSuccessfully": "Mensaje enviado con éxito",
   "errorSendingMessage": "Error al enviar el mensaje",
-  "modalSendTitle": "Estado del Mensaje",
+  "modalSendTitle": "¡Enviado!",
   "modalCloseButtonText": "Cerrar",
   "joinOurCommunity": "Unite a Nuestra Comunidad",
   "privacyPolicy": "Política de Privacidad",
   "faq": "Preguntas Frecuentes",
   "FAQs": "Preguntas Frecuentes",
   "Blog": "Blog",
-  "seoTitle": "Constru\u00ed con personas que lo entienden | OpenGateHub",
+  "seoTitle": "Construí con personas que lo entienden | OpenGateHub",
   "articleNotFound": "Artículo no encontrado. Por favor, visita el índice de nuestro blog para ver las publicaciones recientes.",
   "seoDescription": "Ayudamos a empresas a escalar su operación con automatización de flujos y staff augmentation con impacto medible en negocio.",
   "heroAnimatedText": {
@@ -41,7 +41,7 @@
   "heroTrustChip1": "9.7/10 CSAT",
   "heroTrustChip2": "Kickoff en 7.3 días",
   "heroTrustChip3": "50+ sprints entregados",
-  "heroAlt": "Ilustraci\u00f3n de equipo tech - OpenGateHub",
+  "heroAlt": "Ilustración de equipo tech - OpenGateHub",
   "problemTitle": "Las operaciones manuales son <highlight>costosas</highlight>.",
   "problemText": "Cuando los equipos dependen de planillas, tareas repetitivas y herramientas desconectadas, la ejecución se vuelve lenta, aumentan los errores y se pierde visibilidad sobre procesos críticos.",
   "weGetYouTitle": "Tu equipo <highlight>no debería estar haciendo esto</highlight>.",
@@ -75,30 +75,49 @@
   "innovativeSolution": "nuestro equipo trabaja para hacer realidad tu visión mientras apoya el",
   "forBusiness": "crecimiento de tu negocio.",
   "contactPage": {
-    "heroTitle": "Hablemos de tu operación",
-    "heroSubtitle": "Reservá una llamada gratuita, o mandanos un mensaje y juntos encontramos el mejor próximo paso.",
-    "bookCallTitle": "Reservá una llamada gratuita",
-    "bookCallDescription": "15 minutos. Mapeamos tu mayor cuello de botella operativo y te decimos honestamente si podemos ayudar.",
-    "bookCallButton": "Reservar una llamada de 15 min",
-    "bookCallDisclaimer": "Sin compromiso. Te vas con un próximo paso concreto.",
-    "getEstimateTitle": "O mandanos un mensaje",
-    "getEstimateDescription": "¿No estás listo para una llamada? Contanos qué está pasando y te respondemos con una recomendación específica — generalmente en menos de 24 horas.",
-    "whatHappensNext": "Qué pasa después de que nos escribís",
-    "step1Title": "Leemos tu mensaje con atención",
-    "step2Title": "Te enviamos una recomendación específica",
-    "step3Title": "Vos decidís qué hacer después — sin presión",
-    "footerCTAText": "¿Preferís hablar primero?",
-    "footerCTALink": "Reservar una llamada de 15 min"
+    "getIn": "Ponte en",
+    "touch": "Contacto",
+    "getInTouchSubtitleNew": "¡Conectemos! Estamos aquí para entender tu visión y explorar cómo podemos crear soluciones impactantes juntos.",
+    "phoneNumberLabel": "Número de Teléfono",
+    "emailLabel": "Correo Electrónico",
+    "phone": "+54 9 11 2348-5638",
+    "email": "info@opengatehub.com",
+    "comeAnd": "Ven y",
+    "joinUs": "Únete a Nosotros",
+    "heroTitle": "Optimicemos tu operación",
+    "heroSubtitle": "Elegí el camino más rápido: auditoría de automatización o estimado de ejecución.",
+    "bookCallTitle": "Reservá una auditoría de automatización",
+    "bookCallDescription": "Para equipos que quieren reducir trabajo manual y acelerar la operación.",
+    "bookCallButton": "Reservar auditoría de 15 min",
+    "getEstimateTitle": "Solicitá un estimado de ejecución",
+    "getEstimateDescription": "Contanos tus necesidades y te recomendamos el modelo ideal: Automatización, Staff Augmentation o ambos.",
+    "whatHappensNext": "Qué sucede después",
+    "step1Title": "Revisamos tu solicitud en 24 horas",
+    "step2Title": "Te recomendamos el mejor modelo de engagement",
+    "step3Title": "Recibes un próximo paso claro — llamada o propuesta.",
+    "bookCallDisclaimer": "Sin compromiso. Te llevás próximos pasos claros y acciones priorizadas.",
+    "footerCTAText": "¿Prefieres hablar primero?",
+    "footerCTALink": "Reservar llamada"
   },
   "contactForm": {
-    "companyOptional": "Empresa (opcional)",
-    "messagePlaceholder": "¿Qué está pasando? Contanos con qué estás lidiando — cuanto más contexto, mejor.",
-    "pleaseDescribeProblem": "Contanos un poco más (mínimo 10 caracteres)",
-    "sendBtn": "Enviar →",
+    "company": "Empresa",
+    "engagementType": "Necesidad principal de engagement",
+    "optionWorkflow": "Automatización de Flujos",
+    "optionStaff": "Staff Augmentation",
+    "optionBoth": "Ambos: Automatización + Staff Augmentation",
+    "budget": "Presupuesto estimado",
+    "timeline": "Plazo / urgencia",
+    "bottleneck": "Principal cuello de botella operativo (opcional)",
+    "notSureYet": "Todavía no lo sé",
+    "pleaseEnterCompany": "Por favor ingresa el nombre de tu empresa",
+    "pleaseSelectEngagement": "Por favor selecciona un tipo de engagement",
+    "pleaseSelectBudget": "Por favor selecciona un rango de presupuesto",
+    "pleaseSelectTimeline": "Por favor selecciona un plazo",
+    "requestEstimate": "Quiero mi plan de ejecución",
     "submitting": "Enviando...",
-    "trustNote": "Respondemos en menos de 24h — sin pitch, solo un próximo paso concreto.",
-    "successMessage": "Recibimos tu mensaje y respondemos dentro de las 24 horas.",
-    "successQuickAction": "¿Urgente? Reservá una llamada de 15 min"
+    "estimateRequestSent": "Solicitud recibida con éxito. La revisaremos en menos de 24 horas y te enviaremos próximos pasos.",
+    "successNextStep": "Próximo paso: recibirás recomendación de Automatización, Staff Augmentation o ambos.",
+    "successQuickAction": "¿Urgente? Reservá una auditoría de 15 min"
   },
   "homeCallToAction": {
     "title": "Cada semana que esperás, te cuesta.",
@@ -212,40 +231,6 @@
     "ctaButtonText": "Obtener Estimado de Automatización",
     "ctaHighlightWord": "automatizar"
   },
-  "n8nAutomation": {
-    "heroTitle": "n8n Automation",
-    "heroSubtitle": "Conectá tus herramientas y automatizá flujos de trabajo sin código",
-    "whatIsTitle": "¿Qué es n8n?",
-    "whatIsDescription": "n8n es una plataforma visual de automatización de flujos de trabajo de código abierto. Permite conectar aplicaciones, automatizar procesos y crear integraciones personalizadas sin necesidad de programar.",
-    "articleLink": "Lee nuestro artículo completo sobre n8n",
-    "whyChooseTitle": "¿Por qué elegir n8n?",
-    "benefits": {
-      "openSourceTitle": "Open Source",
-      "openSourceDescription": "Código abierto y económico, sin costos ocultos",
-      "noCodeTitle": "Sin Código",
-      "noCodeDescription": "Interfaz visual intuitiva, sin programación requerida",
-      "integrationsTitle": "200+ Integraciones",
-      "integrationsDescription": "Conecta con todas tus herramientas favoritas",
-      "flexibleTitle": "Flexible",
-      "flexibleDescription": "Cloud o self-hosted, según tus necesidades",
-      "productivityTitle": "Productividad",
-      "productivityDescription": "Aumenta la eficiencia y reduce errores",
-      "scalableTitle": "Escalable",
-      "scalableDescription": "Crece con tu negocio, desde startups hasta enterprise"
-    },
-    "useCasesTitle": "Casos de uso comunes",
-    "useCases": {
-      "dataSyncTitle": "Sincronización de datos",
-      "dataSyncDescription": "Sincroniza información entre CRM, email marketing y sistemas de soporte",
-      "leadManagementTitle": "Gestión de leads",
-      "leadManagementDescription": "Captura leads y automatiza el seguimiento y notificaciones",
-      "orderProcessingTitle": "Procesamiento de pedidos",
-      "orderProcessingDescription": "Automatiza el cumplimiento de pedidos y gestión de inventario"
-    },
-    "ctaTitle": "¿Listo para automatizar tu negocio?",
-    "ctaDescription": "Con n8n, tu equipo se enfoca en lo que realmente importa y tu negocio escala con procesos inteligentes y confiables.",
-    "ctaHighlightWord": "automatizar"
-  },
   "aboutUsCallToAction": {
     "title": "Creemos algo increíble juntos",
     "description": "Programa una consulta gratuita e inicia tu transformación digital.",
@@ -258,51 +243,6 @@
   },
   "contactUsMetaTitle": "Contacto - OpenGateHub",
   "contactUsMetaDescription": "Elegí el camino más rápido para mejorar tu operación: auditoría de automatización o estimado de ejecución.",
-  "contactPage": {
-    "getIn": "Ponte en",
-    "touch": "Contacto",
-    "getInTouchSubtitleNew": "¡Conectemos! Estamos aquí para entender tu visión y explorar cómo podemos crear soluciones impactantes juntos.",
-    "phoneNumberLabel": "Número de Teléfono",
-    "emailLabel": "Correo Electrónico",
-    "phone": "+54 9 11 2348-5638",
-    "email": "info@opengatehub.com",
-    "comeAnd": "Ven y",
-    "joinUs": "Únete a Nosotros",
-    "heroTitle": "Optimicemos tu operación",
-    "heroSubtitle": "Elegí el camino más rápido: auditoría de automatización o estimado de ejecución.",
-    "bookCallTitle": "Reservá una auditoría de automatización",
-    "bookCallDescription": "Para equipos que quieren reducir trabajo manual y acelerar la operación.",
-    "bookCallButton": "Reservar auditoría de 15 min",
-    "getEstimateTitle": "Solicitá un estimado de ejecución",
-    "getEstimateDescription": "Contanos tus necesidades y te recomendamos el modelo ideal: Automatización, Staff Augmentation o ambos.",
-    "whatHappensNext": "Qué sucede después",
-    "step1Title": "Revisamos tu solicitud en 24 horas",
-    "step2Title": "Te recomendamos el mejor modelo de engagement",
-    "step3Title": "Recibes un próximo paso claro — llamada o propuesta.",
-    "bookCallDisclaimer": "Sin compromiso. Te llevás próximos pasos claros y acciones priorizadas.",
-    "footerCTAText": "¿Prefieres hablar primero?",
-    "footerCTALink": "Reservar llamada"
-  },
-  "contactForm": {
-    "company": "Empresa",
-    "engagementType": "Necesidad principal de engagement",
-    "optionWorkflow": "Automatización de Flujos",
-    "optionStaff": "Staff Augmentation",
-    "optionBoth": "Ambos: Automatización + Staff Augmentation",
-    "budget": "Presupuesto estimado",
-    "timeline": "Plazo / urgencia",
-    "bottleneck": "Principal cuello de botella operativo (opcional)",
-    "notSureYet": "Todavía no lo sé",
-    "pleaseEnterCompany": "Por favor ingresa el nombre de tu empresa",
-    "pleaseSelectEngagement": "Por favor selecciona un tipo de engagement",
-    "pleaseSelectBudget": "Por favor selecciona un rango de presupuesto",
-    "pleaseSelectTimeline": "Por favor selecciona un plazo",
-    "requestEstimate": "Quiero mi plan de ejecución",
-    "submitting": "Enviando...",
-    "estimateRequestSent": "Solicitud recibida con éxito. La revisaremos en menos de 24 horas y te enviaremos próximos pasos.",
-    "successNextStep": "Próximo paso: recibirás recomendación de Automatización, Staff Augmentation o ambos.",
-    "successQuickAction": "¿Urgente? Reservá una auditoría de 15 min"
-  },
   "companyHistoryTitle": "Nuestro Camino",
   "companyHistoryDescription": "Nuestra historia comenzó con una simple creencia: que la tecnología debe servir a un propósito superior. Desde nuestras raíces en Argentina hasta nuestro alcance global actual, hemos tenido el privilegio de trabajar con líderes que se atreven a pensar diferente sobre el éxito.",
   "companyHistoryExpandableDescription1": "Iniciamos OpenGateHub con la visión de cerrar la brecha entre la innovación tecnológica y el impacto significativo. Nuestra experiencia trabajando con empresas estadounidenses nos enseñó que las mejores soluciones surgen cuando el beneficio se encuentra con el propósito.",
@@ -330,124 +270,7 @@
   "commitmentToInnovationExpandableDescription2": "Nuestro enfoque de la innovación es holístico, considerando no solo la viabilidad técnica sino también el impacto social y la sostenibilidad ambiental.",
   "commitmentToInnovationExpandableDescription3": "Nos mantenemos a la vanguardia tanto de los avances tecnológicos como de las metodologías de medición de impacto, asegurando que tus soluciones sean tanto innovadoras como significativas.",
   "commitmentToInnovationExpandableDescription4": "Nuestro objetivo es ayudarte a construir soluciones que no solo resuelvan los problemas de hoy sino que ayuden a crear un mejor mañana.",
-  "frontendTitle": "Front-end",
-  "frontendDescription": "Creando interfaces de usuario atractivas con diseños intuitivos e interacciones fluidas para mejorar la experiencia y accesibilidad.",
-  "howWeBuildIntro": "Esta capacidad se entrega a través de nuestros modelos de engagement Staff Augmentation y Automatización de Flujos.",
-  "backendTitle": "Backend & Cloud",
-  "backendDescription": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
-  "uxuiTitle": "Diseño UX/UI",
-  "uxuiDescription": "Diseñamos interfaces intuitivas y atractivas para mejorar la experiencia y el compromiso de tus usuarios.",
-  "graphicDesignTitle": "Diseño Gráfico",
-  "aiTitle": "Inteligencia Artificial",
-  "graphicDesignDescription": "Fusionamos diseño gráfico innovador con desarrollo tecnológico para crear experiencias visuales excepcionales.",
   "learnMoreButtonText": "Saber Más",
-  "modalSendTitle": "¡Enviado!",
-  "modalCloseButtonText": "Cerrar",
-  "frontend": {
-    "title": "Frontend",
-    "description": "En la era digital actual, tener una plataforma rápida y fácil de usar ya no es una ventaja, es una necesidad. Sin embargo, muchas empresas se encuentran con páginas web que no funcionan bien en dispositivos móviles, interfaces que no conectan con los usuarios o experiencias de navegación lentas que alejan a los clientes.",
-    "solutions": {
-      "title": "Soluciones",
-      "responsive": "Responsivas, que se adaptan a cualquier pantalla y dispositivo.",
-      "interactive": "Interactivas, garantizando una experiencia de navegación ágil y atractiva.",
-      "customized": "Personalizadas, alineadas con los objetivos de tu negocio y las expectativas de tus usuarios."
-    },
-    "benefits": "Con un enfoque en tecnologías lídsos como React y frameworks modernos, optimizamos el rendimiento de tu sitio, mejoramos la retención de usuarios y ayudamos a incrementar tus conversiones al facilitar procesos como compras o registros. Cada detalle se diseña pensando en tus clientes y en cómo brindarles una experiencia única que los invite a regresar.",
-    "stepsTitle": "¿Cómo podemos ayudarte?",
-    "steps": {
-      "step1": "Contactanos: Escribinos por correo o llena nuestro formulario de contacto en línea.",
-      "step2": "Contanos tu necesidad: Explicanos tus objetivos, retos o cualquier problema que estés enfrentando.",
-      "step3": "Creamos tu plan: Te proponemos soluciones personalizadas y diseñamos juntos una plataforma que no solo resuelva tus problemas, sino que impulse el crecimiento de tu negocio."
-    },
-    "callToAction": "¿Listo para destacar en el mundo digital? Hablemos y diseñemos juntos una plataforma que haga brillar tu marca."
-  },
-  "backend": {
-    "title": "Backend & Cloud",
-    "description": "El backend y las soluciones cloud son el motor detrás de cualquier aplicación exitosa, garantizando que los sistemas sean rápidos, seguros y escalables. Sin embargo, muchas empresas enfrentan desafíos como la incapacidad de escalar sus plataformas, tiempos de respuesta lentos o infraestructuras que no aprovechan el poder de la nube. Aquí es donde vos, como líder de tu negocio, podés marcar la diferencia.",
-    "solutions": {
-      "title2": "Soluciones Empresariales",
-      "scalable": "Arquitectura backend de nivel empresarial utilizando Node.js, Python y Go, con microservicios y containerización para una escalabilidad perfecta.",
-      "secure": "Implementaciones avanzadas de seguridad incluyendo OAuth 2.0, JWT y encriptación end-to-end para garantizar la integridad de datos y el cumplimiento normativo.",
-      "cloud": "Infraestructura multi-cloud aprovechando servicios de AWS, Google Cloud y Azure para alta disponibilidad y recuperación ante desastres.",
-      "efficient": "Optimización de rendimiento mediante estrategias de caché, balanceo de carga y pipelines automatizados de CI/CD."
-    },
-    "benefits": "Con nuestra experiencia en backend y cloud, vos lideras la transformación digital de tu empresa. Te proporcionamos las herramientas tecnológicas necesarias para ofrecer una experiencia impecable a tus usuarios y alcanzar tus objetivos. Al implementar soluciones modernas como bases de datos escalables (PostgreSQL, MongoDB), GraphQL y sistemas de microservicios, construimos un backend que te respalda en cada paso del camino.",
-    "stepsTitle": "¿Cómo hacemos equipo con vos?",
-    "steps": {
-      "step1": "Contactanos: Compartí tus retos y metas completando nuestro formulario en línea.",
-      "step2": "Planificamos juntos: Diseñamos una solución que responde a tus objetivos específicos.",
-      "step3": "Tu éxito, nuestra prioridad: Implementamos un sistema backend y cloud que potencia tu liderazgo."
-    },
-    "callToAction": "Vos sos la fuerza impulsora detrás de esta transformación. Hablemos y construyamos una infraestructura tecnológica que dé vida a tu visión empresarial."
-  },
-  "uxui": {
-    "title": "Diseño UX/UI",
-    "description": "El diseño UX/UI es el puente entre tus ideas y la experiencia de tus usuarios. Una interfaz bien diseñada no solo mejora la estética, sino que también optimiza la funcionalidad, generando mayor satisfacción y fidelización. Sin embargo, muchas empresas se enfrentan a interfaces confusas, flujos poco intuitivos y diseños que no reflejan su identidad.",
-    "solutions": {
-      "title2": "Soluciones",
-      "intuitive": "Diseños intuitivos que hacen que cada interacción sea sencilla y agradable.",
-      "engaging": "Interfaces visualmente atractivas que captan la atención y refuerzan la identidad de tu marca.",
-      "functional": "Experiencias funcionales que reducen fricciones y aumentan la conversión."
-    },
-    "businessImpactTitle": "¿Cómo transformaría esto tu negocio?",
-    "businessImpact": "Con un diseño UX/UI optimizado, los usuarios encuentran lo que buscan más rápido, completan acciones clave con facilidad y se sienten más conectados con tu marca. Esto se traduce en mayores conversiones, retención de clientes y diferenciación frente a la competencia. ¡El diseño adecuado transforma tu plataforma en una herramienta de crecimiento para tu negocio!",
-    "stepsTitle": "¿Cómo transformamos tu experiencia de usuario?",
-    "steps": {
-      "step1": "Explorá tus necesidades: Te escuchamos para entender tus objetivos y las expectativas de tus usuarios.",
-      "step2": "Diseñamos conceptos: Creamos wireframes y prototipos que dan vida a tus ideas.",
-      "step3": "Iteramos con vos: Refinamos los diseños con base en tu feedback para lograr la perfección.",
-      "step4": "Implementamos la solución: Desarrollamos una experiencia UX/UI funcional, visual y alineada con tu visión."
-    },
-    "callToAction": "¿Listo para ofrecer una experiencia inolvidable? Contactá a nuestro equipo y juntos diseñaremos una plataforma que cautive a tus usuarios y potencie tu negocio."
-  },
-  "graphicDesign": {
-    "title": "Diseño Gráfico",
-    "questions": {
-      "q1": "¿Tu marca no se distingue en el mercado?",
-      "q2": "¿Tus clientes no conectan con tu identidad visual?",
-      "q3": "¿Sientes que tus materiales gráficos no reflejan la calidad de tus productos o servicios?"
-    },
-    "description": "Un diseño gráfico estratégico puede ser la clave para transformar tu marca en una historia visual poderosa. Sin embargo, muchas empresas se enfrentan a desafíos como falta de coherencia visual, diseños que no conectan con su público y materiales que no transmiten su valor real. Aquí es donde vos, como líder visionario de tu negocio, podés convertirte en el héroe al transformar estas dificultades en oportunidades.",
-    "solutions": {
-      "title": "Lo que podemos crear para vos",
-      "branding": "Desarrollamos identidades visuales únicas que diferencian tu marca.",
-      "materials": "Creamos materiales gráficos impactantes, desde presentaciones hasta campañas digitales.",
-      "consistency": "Garantizamos coherencia en todos los elementos visuales, fortaleciendo la confianza de tus clientes."
-    },
-    "vision": "Después de trabajar juntos, tu negocio tendrá una identidad visual memorable que no solo atraerá a tus clientes ideales, sino que también los inspirará a confiar en tu marca. Verás cómo tus gráficos comunican profesionalismo y conectan emocionalmente con tu audiencia, potenciando el crecimiento y el impacto de tu negocio.",
-    "stepsTitle": "¿Cómo trabajamos con vos?",
-    "steps": {
-      "step1": "Descubrimos tu esencia: Analizamos tu marca, tus valores y lo que hace única a tu empresa.",
-      "step2": "Diseñamos soluciones: Creamos propuestas visuales que expresan claramente tu identidad.",
-      "step3": "Refinamos juntos: Ajustamos los diseños hasta que reflejen exactamente tu visión.",
-      "step4": "Elevamos tu marca: Transformamos tus materiales en herramientas visuales que destacan."
-    },
-    "callToAction": "El momento de destacar es ahora. Contactá a nuestro equipo y construyamos juntos una identidad visual que impulse tu éxito."
-  },
-  "aiSolutions": {
-    "title": "Soluciones de IA",
-    "questions": {
-      "q1": "¿Te cuesta aprovechar el poder de la inteligencia artificial en tu negocio?",
-      "q2": "¿Encuentras complicado automatizar procesos y analizar datos de manera efectiva?",
-      "q3": "¿Tu negocio está perdiendo la ventaja competitiva que la IA puede ofrecer?"
-    },
-    "description": "Las soluciones impulsadas por inteligencia artificial pueden transformar las operaciones de tu negocio, desbloqueando nuevas oportunidades de eficiencia y crecimiento. Sin embargo, muchas empresas enfrentan obstáculos como la falta de experiencia, altos costos de implementación y estrategias poco claras para integrar la IA. Vos, como líder innovador, tienes el poder de superar estos desafíos y llevar tu negocio hacia el futuro.",
-    "solutions": {
-      "title": "¿Qué podemos crear para vos?",
-      "automation": "Diseñamos sistemas de automatización inteligente para optimizar tus operaciones.",
-      "analytics": "Desarrollamos herramientas avanzadas de análisis para obtener información accionable de tus datos.",
-      "customAI": "Construimos modelos de IA personalizados que se alinean con los objetivos de tu negocio."
-    },
-    "vision": "Al asociarte con nosotros, tu negocio obtendrá las herramientas necesarias para aprovechar la IA de manera efectiva. Imagina flujos de trabajo optimizados, decisiones basadas en datos y una ventaja competitiva significativa que impulse tu crecimiento. Juntos, haremos de la IA una piedra angular de tu éxito.",
-    "stepsTitle": "¿Cómo trabajamos con vos?",
-    "steps": {
-      "step1": "Entender tus necesidades: Evaluamos tus objetivos comerciales e identificamos oportunidades de IA.",
-      "step2": "Diseñar soluciones: Creamos estrategias y modelos de IA adaptados a tus necesidades.",
-      "step3": "Colaborar de cerca: Refinamos las soluciones con base en tu retroalimentación y garantizamos una integración sin problemas.",
-      "step4": "Empoderar tu negocio: Entregamos herramientas impulsadas por IA que transforman tus operaciones."
-    },
-    "callToAction": "El futuro es la IA. Contáctanos hoy y llevemos soluciones inteligentes a tu negocio."
-  },
   "faqsTitle": "Preguntas Frecuentes",
   "faqs": {
     "softwareFactory": {
@@ -777,32 +600,56 @@
     "estudioSab": {
       "title": "Estudio Sab",
       "description": "Desarrollo web full-stack para un estudio de diseño creativo.",
-      "metrics": ["Desarrollo completo", "Diseño moderno", "Sitio web en vivo"]
+      "metrics": [
+        "Desarrollo completo",
+        "Diseño moderno",
+        "Sitio web en vivo"
+      ]
     },
     "skylar": {
       "title": "Skylar",
       "description": "Plataforma de e-commerce para una marca líder de útiles escolares en Argentina.",
-      "metrics": ["≤2s TTI", "+28% conversiones", "Catálogo en vivo"]
+      "metrics": [
+        "≤2s TTI",
+        "+28% conversiones",
+        "Catálogo en vivo"
+      ]
     },
     "vantage": {
       "title": "Vantage",
       "description": "Staff augmentation — ingenieros y QA embebidos en su equipo, acelerando la entrega del roadmap y mejorando la velocidad de desarrollo.",
-      "metrics": ["Staff Augmentation", "Roadmap acelerado", "QA embebido"]
+      "metrics": [
+        "Staff Augmentation",
+        "Roadmap acelerado",
+        "QA embebido"
+      ]
     },
     "hotDateKitchen": {
       "title": "Hot Date Kitchen",
       "description": "Landing y e-commerce para una marca premium de snacks veganos. Dátiles artesanales, tienda Shopify y narrativa enfocada en sustentabilidad.",
-      "metrics": ["Landing + E-commerce", "Shopify", "Marca carbono neutral"]
+      "metrics": [
+        "Landing + E-commerce",
+        "Shopify",
+        "Marca carbono neutral"
+      ]
     },
     "cicero": {
       "title": "Cicero",
       "description": "Bibliotecario personal con IA (etapa temprana).",
-      "metrics": ["Dirección de producto", "Desarrollo temprano", "Ver en LinkedIn"]
+      "metrics": [
+        "Dirección de producto",
+        "Desarrollo temprano",
+        "Ver en LinkedIn"
+      ]
     },
     "propbot": {
       "title": "PropBot",
       "description": "Chatbot con IA para inmobiliarias que responde en 5 segundos, filtra propiedades y agenda visitas automáticamente en WhatsApp, Instagram y Facebook.",
-      "metrics": ["Respuesta <5s", "+23 visitas/mes", "24/7 multicanal"]
+      "metrics": [
+        "Respuesta <5s",
+        "+23 visitas/mes",
+        "24/7 multicanal"
+      ]
     }
   },
   "metricsSection": {
@@ -853,41 +700,41 @@
     "title": "Los Rostros Detrás del Código",
     "subtitle": "Conoce a las personas que convierten desafíos en soluciones e ideas en realidad.",
     "members": {
-                     "javier": {
-                 "name": "Javier",
-                 "role": "Ingeniero Frontend Senior",
-                 "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
-               },
-                     "giuliano": {
-                 "name": "Giuliano",
-                 "role": "Ingeniero Full Stack",
-                 "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
-               },
-                     "laura": {
-                 "name": "Laura",
-                 "role": "Desarrolladora Frontend",
-                 "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
-               },
-                     "gustavo": {
-                 "name": "Gustavo",
+      "javier": {
+        "name": "Javier",
+        "role": "Ingeniero Frontend Senior",
+        "description": "Javier ha estado construyendo aplicaciones web el tiempo suficiente para saber qué funciona y qué no. Es nuestro experto en React, Vue y arquitecturas basadas en la nube, y tiene una habilidad especial para resolver problemas difíciles sin complicar las cosas. Experimentado, confiable y fácil de trabajar — por eso confiamos en él con las cosas importantes."
+      },
+      "giuliano": {
+        "name": "Giuliano",
+        "role": "Ingeniero Full Stack",
+        "description": "Giuliano aporta curiosidad, creatividad y pasión por construir soluciones digitales significativas. Con habilidades que abarcan Node.js, PHP, .NET, React y frameworks modernos de UI, siempre está explorando nuevas tecnologías para entregar mejores resultados. Más allá del código, Giuliano valora el trabajo en equipo, la resolución de problemas y crear software que genere un impacto positivo."
+      },
+      "laura": {
+        "name": "Laura",
+        "role": "Desarrolladora Frontend",
+        "description": "Laura sabe cómo hacer que un sitio web se vea genial y aparezca donde importa. Ha trabajado en más de 50 proyectos para clientes en Argentina, España y Estados Unidos, combinando WordPress, Elementor y SEO para crear sitios que la gente realmente disfruta usar. Con formación en artes visuales y pasión por la pintura, aporta un toque creativo único a cada proyecto, asegurándose de que nuestro trabajo no solo se vea bien, sino que también sea encontrado."
+      },
+      "gustavo": {
+        "name": "Gustavo",
         "role": "CTO",
-                 "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
-               },
-                     "alejandria": {
-                 "name": "Alejandría",
-                 "role": "Analista QA",
-                 "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
-              },
-                     "vadym": {
-                 "name": "Vadym",
-                 "role": "Desarrollador Full Stack",
-                 "description": "Desarrollador Full Stack con gran atención al detalle y pasión por construir productos digitales de alta calidad. Especializado en desarrollo frontend moderno y experiencias 3D e interactivas avanzadas con Three.js, combinado con sólida experiencia backend en Node.js y Python. Con experiencia en testing de automatización y sistemas cloud, Vadym aporta confiabilidad, precisión y escalabilidad a cada proyecto en el que trabaja."
-               },
-                     "ilia": {
-                 "name": "Ilia",
-                 "role": "Ingeniero Senior de Automatización QA",
-                 "description": "Ingeniero Senior de Automatización QA con un fuerte enfoque en construir sistemas de testing confiables y escalables. Especializado en frameworks de automatización basados en Python, testing end-to-end e integración CI/CD, asegurando releases de alta calidad en plataformas complejas. Con experiencia liderando iniciativas de automatización y mentoreando equipos, Ilia aporta estructura, eficiencia y confianza a cada proceso de desarrollo."
-               }
+        "description": "Gustavo es un líder tecnológico experimentado con dominio de una impresionante gama de tecnologías — desde PHP, Java y Python hasta frameworks modernos como Angular, Node.js, Express y Laravel. A lo largo de los años, ha construido y liderado el desarrollo de sistemas de gran escala y alto rendimiento, siempre con la mirada puesta en la escalabilidad y la calidad. Ve el panorama general, resuelve problemas complejos sin esfuerzo, y sabe cómo guiar a un equipo para que entregue su mejor trabajo."
+      },
+      "alejandria": {
+        "name": "Alejandría",
+        "role": "Analista QA",
+        "description": "Alejandría se asegura de que lo que entregamos realmente funcione. Planifica y ejecuta pruebas funcionales, de regresión e integración en web y móvil, mantiene la cobertura organizada en Xray/Jira, y valida APIs con Postman. Con habilidades en SQL, verifica los datos en la fuente y detecta casos extremos temprano. Su formación en UX/UI le ayuda a pensar como usuario, escribir reportes de bugs claros, y promover entregas confiables y fáciles de usar. Confiable y orientada a los detalles, es quien se asegura de que nada se escape antes del lanzamiento."
+      },
+      "vadym": {
+        "name": "Vadym",
+        "role": "Desarrollador Full Stack",
+        "description": "Desarrollador Full Stack con gran atención al detalle y pasión por construir productos digitales de alta calidad. Especializado en desarrollo frontend moderno y experiencias 3D e interactivas avanzadas con Three.js, combinado con sólida experiencia backend en Node.js y Python. Con experiencia en testing de automatización y sistemas cloud, Vadym aporta confiabilidad, precisión y escalabilidad a cada proyecto en el que trabaja."
+      },
+      "ilia": {
+        "name": "Ilia",
+        "role": "Ingeniero Senior de Automatización QA",
+        "description": "Ingeniero Senior de Automatización QA con un fuerte enfoque en construir sistemas de testing confiables y escalables. Especializado en frameworks de automatización basados en Python, testing end-to-end e integración CI/CD, asegurando releases de alta calidad en plataformas complejas. Con experiencia liderando iniciativas de automatización y mentoreando equipos, Ilia aporta estructura, eficiencia y confianza a cada proceso de desarrollo."
+      }
     }
   },
   "calculator": {

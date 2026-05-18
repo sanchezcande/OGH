@@ -1,10 +1,14 @@
-import { createGlobalStyle, keyframes } from "styled-components";
+import { createGlobalStyle } from "styled-components";
 
 const GlobalStyles = createGlobalStyle`
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -15,12 +19,13 @@ const GlobalStyles = createGlobalStyle`
     overflow-x: hidden;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   #__next {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; 
+    min-height: 100vh;
   }
 
   a {
@@ -37,7 +42,42 @@ const GlobalStyles = createGlobalStyle`
     font-family: inherit;
     cursor: pointer;
   }
-     @keyframes fadeInUp {
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: rgba(17, 17, 17, 0.1);
+    color: inherit;
+  }
+
+  /* Smooth scroll for anchors */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  @keyframes fadeInUp {
     from {
       opacity: 0;
       transform: translateY(20px);
@@ -47,7 +87,8 @@ const GlobalStyles = createGlobalStyle`
       transform: translateY(0);
     }
   }
-     @keyframes slideInFromLeft {
+
+  @keyframes slideInFromLeft {
     from {
       opacity: 0;
       transform: translateX(-30px);

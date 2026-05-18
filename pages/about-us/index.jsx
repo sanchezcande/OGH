@@ -1,16 +1,28 @@
 import React, { useEffect, useRef } from "react";
 import {
-  ImageText,
-  Container,
+  PageWrapper,
+  PageHeader,
+  PageTitle,
+  PageSubtitle,
+  TextRevealSection,
+  TextRevealInner,
+  RevealText,
+  RevealWord,
+  FounderStrip,
   HighlightedWord,
-  CompanyDescription,
 } from "../../src/styles/pagesStyles/AboutUs.styles";
 import { useTranslation } from "react-i18next";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
 import SEO from "../../src/components/SEO/SEO";
 import Image from "next/image";
 import AboutTimeline from "../../src/components/Timeline/AboutTimeline";
 import TeamSection from "../../src/components/TeamSection/TeamSection";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export const AboutUsCallToAction = () => {
   const { t } = useTranslation();
@@ -28,89 +40,165 @@ export const AboutUsCallToAction = () => {
 
 const AboutUs = React.forwardRef((props, ref) => {
   const { t } = useTranslation();
-  const imageRef = useRef(null);
-  const textRef = useRef(null);
-  const companyDescRef = useRef(null);
+  const headerRef = useRef(null);
+  const revealRef = useRef(null);
+  const founderRef = useRef(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2, rootMargin: "0px 0px -50px 0px" },
-    );
+    const rafId = requestAnimationFrame(() => {
+      const ctx = gsap.context(() => {
+        /* ---------- HEADER ANIMATIONS ---------- */
+        const title = headerRef.current?.querySelector(".page-title");
+        const sub = headerRef.current?.querySelector(".page-sub");
 
-    const currentImageRef = imageRef.current;
-    const currentTextRef = textRef.current;
-    const currentCompanyDescRef = companyDescRef.current;
+        if (title) {
+          gsap.fromTo(title,
+            { opacity: 0, y: 50, scale: 0.97 },
+            { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: "power3.out", delay: 0.1 }
+          );
+        }
+        if (sub) {
+          gsap.fromTo(sub,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 1, ease: "power3.out", delay: 0.4 }
+          );
+        }
 
-    if (currentImageRef) observer.observe(currentImageRef);
-    if (currentTextRef) observer.observe(currentTextRef);
-    if (currentCompanyDescRef) observer.observe(currentCompanyDescRef);
+        /* ---------- TEXT REVEAL (pinned scroll) ---------- */
+        const revealSection = revealRef.current?.closest("section");
+        const words = revealRef.current?.querySelectorAll(".reveal-word");
+
+        if (words?.length && revealSection) {
+          gsap.to(words, {
+            opacity: 1,
+            stagger: 0.05,
+            scrollTrigger: {
+              trigger: revealSection,
+              start: "top top",
+              end: "+=150%",
+              pin: true,
+              scrub: 0.3,
+              anticipatePin: 1,
+            },
+          });
+        }
+
+        /* ---------- FOUNDER STRIP ---------- */
+        const founder = founderRef.current;
+        if (founder) {
+          const accentLine = founder.querySelector(".founder-accent-line");
+          const eyebrow = founder.querySelector(".founder-eyebrow");
+          const columns = founder.querySelector(".founder-columns");
+          const credit = founder.querySelector(".founder-credit");
+
+          gsap.set(accentLine, { height: 0 });
+          gsap.set(founder, { clipPath: "inset(100% 0 0 0)" });
+
+          const fTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: founder,
+              start: "top 85%",
+              end: "bottom 15%",
+              scrub: 0.5,
+            },
+          });
+
+          // Wipe in from bottom (0→0.4)
+          fTl.to(founder, { clipPath: "inset(0% 0 0 0)", ease: "none" }, 0);
+          // Accent line
+          fTl.to(accentLine, { height: "100%" }, 0.2);
+          // Stay visible (0.4→0.6) — dead zone
+          // Wipe out to top (0.6→1)
+          fTl.to(founder, { clipPath: "inset(0 0 100% 0)", ease: "none" }, 0.6);
+        }
+
+        ScrollTrigger.refresh();
+      });
+
+      headerRef._gsapCtx = ctx;
+    });
 
     return () => {
-      if (currentImageRef) observer.unobserve(currentImageRef);
-      if (currentTextRef) observer.unobserve(currentTextRef);
-      if (currentCompanyDescRef) observer.unobserve(currentCompanyDescRef);
+      cancelAnimationFrame(rafId);
+      if (headerRef._gsapCtx) headerRef._gsapCtx.revert();
     };
   }, []);
 
+  // Split text into words for reveal effect
+  const aboutText = t("aboutUsText") + " " + t("aboutUsLastLine") + " " + t("aboutUsTextBold");
+  const words = aboutText.split(/\s+/).filter(Boolean);
+
   return (
-    <Container ref={ref}>
+    <PageWrapper ref={ref}>
       <SEO
         title="About OpenGateHub — Workflow Automation & Staff Augmentation LATAM"
         description="We're a human-first automation and engineering company from Latin America. Nearshore senior teams that embed into your workflow — 9.7/10 CSAT, 87% on-time delivery. 300+ processes automated across 50+ companies."
         keywords="OpenGateHub, workflow automation company LATAM, staff augmentation Latin America, nearshore engineering team, process automation, nearshore development company, about OpenGateHub, automation agency Latin America"
       />
 
-      <CompanyDescription ref={companyDescRef}>
-        <h1>
+      {/* --- HEADER --- */}
+      <PageHeader ref={headerRef}>
+        <PageTitle className="page-title">
           {t("aboutUsTitle_part1")}
-          <HighlightedWord className="animate">
-            {t("aboutUsTitle_highlight")}
-          </HighlightedWord>
-        </h1>
-        <h2 className="subtitle">{t("aboutUsSubtitle")}</h2>
-        <p>
-          {t("aboutUsText")}
-          {t("aboutUsLastLine")}
-          <span className="bold-text">{t("aboutUsTextBold")}</span>
-        </p>
-      </CompanyDescription>
+          <span style={{ color: "#CC5A50" }}>{t("aboutUsTitle_highlight")}</span>
+          {t("aboutUsTitle_part2")}
+        </PageTitle>
+        <PageSubtitle className="page-sub">{t("aboutUsSubtitle")}</PageSubtitle>
+      </PageHeader>
 
-      <ImageText>
-        <div className="image-container" ref={imageRef}>
-          <Image
-            src="/images/Cande.png"
-            width={250}
-            height={250}
-            quality={100}
-            alt={t("heroAlt") || "OpenGateHub Team"}
-            priority
-          />
+      {/* --- TEXT REVEAL (pinned) --- */}
+      <TextRevealSection>
+        <TextRevealInner ref={revealRef}>
+          <RevealText>
+            {words.map((word, i) => (
+              <RevealWord key={i} className="reveal-word">
+                {word}
+              </RevealWord>
+            ))}
+          </RevealText>
+        </TextRevealInner>
+      </TextRevealSection>
 
-          <div className="founder-info">
-            <h3 className="founder-name">Candelaria Sanchez</h3>
-            <p className="founder-role">Co-founder & CTO</p>
+      {/* --- FOUNDER (dark editorial block) --- */}
+      <FounderStrip ref={founderRef}>
+        <div className="founder-inner">
+          <div className="founder-accent-line" />
+          <div className="founder-content">
+            <span className="founder-eyebrow">From the founder</span>
+            <div className="founder-columns">
+              {t("aboutUsFounderBio").split("\n\n").map((paragraph, i) => (
+                <p key={i} className="founder-quote">{paragraph}</p>
+              ))}
+            </div>
+            <div className="founder-credit">
+              <div className="founder-avatar">
+                <Image
+                  src="/images/Cande.png"
+                  width={40}
+                  height={40}
+                  quality={90}
+                  alt="Candelaria Sanchez"
+                  style={{ objectFit: "cover", objectPosition: "center top" }}
+                />
+              </div>
+              <div className="founder-meta">
+                <span className="founder-name">Candelaria Sanchez</span>
+                <span className="founder-role">Co-founder & CTO</span>
+              </div>
+            </div>
           </div>
         </div>
+      </FounderStrip>
 
-        <div className="founder-bio" ref={textRef}>
-          <p className="bio-text">{t("aboutUsFounderBio")}</p>
-        </div>
-      </ImageText>
-
+      {/* --- TIMELINE --- */}
       <AboutTimeline />
 
+      {/* --- TEAM --- */}
       <TeamSection />
 
+      {/* --- CTA --- */}
       <AboutUsCallToAction />
-    </Container>
+    </PageWrapper>
   );
 });
 

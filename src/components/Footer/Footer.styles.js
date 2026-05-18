@@ -1,241 +1,171 @@
 import styled from "styled-components";
-import {
-  FaInstagram,
-  FaLinkedin,
-  FaGithub,
-  FaEnvelope,
-  FaWhatsapp,
-} from "react-icons/fa";
 
 export const FooterContainer = styled.footer`
-  background-color: #ffffff;
+  background: #fafafa;
   border-top: 1px solid #e5e7eb;
   color: #1f2937;
-  padding: 32px 60px 24px 60px;
-  text-align: center;
   width: 100%;
-  min-width: 100vw;
-  position: relative;
   box-sizing: border-box;
-
-  h4 {
-    margin-bottom: 12px;
-    margin-top: 0;
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000 !important;
-  }
-
-  a {
-    text-decoration: none;
-    color: #1f2937;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: #f97b72;
-    }
-  }
-
-  @media (max-width: 900px) {
-    padding: 32px 40px 24px 40px;
-  }
-
-  @media (max-width: 550px) {
-    padding: 32px 20px 24px 20px;
-  }
 `;
 
-export const FooterContent = styled.div`
+export const FooterTop = styled.div`
   display: grid;
-  grid-template-columns: minmax(140px, 1.2fr) minmax(180px, 1.6fr) minmax(120px, 1fr) minmax(120px, 1fr);
-  gap: 40px;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 60px 32px;
   text-align: left;
-  width: 100%;
-  box-sizing: border-box;
-  justify-content: space-between;
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: 32px;
+    padding: 40px 40px 24px;
   }
 
   @media (max-width: 550px) {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 18px;
-    justify-items: center;
+    gap: 28px;
+    padding: 32px 24px 20px;
+  }
+`;
+
+export const FooterColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &.brand-col {
+    gap: 12px;
+  }
+
+  .brand-desc {
+    font-size: 13px;
+    color: #6B7280;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 240px;
+  }
+
+  @media (max-width: 550px) {
     align-items: center;
-    > div {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
+
+    .brand-desc {
+      max-width: 300px;
+      text-align: center;
     }
   }
 `;
 
-export const FooterText = styled.p`
+export const FooterHeading = styled.h4`
+  font-size: 12px;
+  font-weight: 700;
+  color: #111111;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
+`;
+
+export const FooterLink = styled.a`
   font-size: 13px;
-  margin: 6px 0;
-  color: #000000 !important;
-  line-height: 1.5;
+  color: #4B5563;
+  text-decoration: none;
+  padding: 4px 0;
   transition: color 0.2s ease;
+  display: inline-block;
 
-  a {
-    color: #000000 !important;
-    font-weight: 400;
-    
-    &:hover {
-      color: #f97b72 !important;
+  &:hover {
+    color: #CC5A50;
+  }
+`;
+
+export const SocialRow = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+
+  @media (max-width: 550px) {
+    justify-content: center;
+  }
+`;
+
+export const SocialIcon = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    fill: #374151;
+    transition: fill 0.2s ease;
+  }
+
+  &:hover {
+    background: rgba(204, 90, 80, 0.08);
+
+    svg {
+      fill: #CC5A50;
     }
   }
 `;
 
-export const ServicesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px 24px;
-  column-gap: 24px;
-  row-gap: 4px;
-
-  @media (max-width: 550px) {
-    grid-template-columns: 1fr;
-    gap: 4px 0;
-  }
-`;
-
-export const SocialMediaContainer = styled.div`
+export const EmailRow = styled.div`
   display: flex;
-  gap: 16px;
-  margin: 0 0 12px 0;
   align-items: center;
-  justify-content: flex-start;
-  flex-direction: row;
-
-  a svg {
-    width: 20px;
-    height: 20px;
-    fill: #000000;
-    transition: all 0.2s ease;
-    vertical-align: middle;
-    display: block;
-  }
-
-  a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-  }
-
-  a:hover svg {
-    fill: #f97b72;
-    transform: scale(1.05);
-  }
-
-  @media (max-width: 550px) {
-    margin: 0 auto 12px auto;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-  }
-`;
-
-export const Linkedin = styled(FaLinkedin)`
-  width: 20px;
-  height: 20px;
-  fill: #000000;
-  transition: all 0.2s ease;
-  display: block;
-  &:hover {
-    fill: #f97b72;
-    transform: scale(1.05);
-  }
-`;
-export const Github = styled(FaGithub)`
-  width: 20px;
-  height: 20px;
-  fill: #000000;
-  transition: all 0.2s ease;
-  display: block;
-  &:hover {
-    fill: #f97b72;
-    transform: scale(1.05);
-  }
-`;
-export const Instagram = styled(FaInstagram)`
-  width: 20px;
-  height: 20px;
-  fill: #000000;
-  transition: all 0.2s ease;
-  display: block;
-  &:hover {
-    fill: #f97b72;
-    transform: scale(1.05);
-  }
-`;
-
-export const Mail = styled(FaEnvelope)`
-  width: 16px;
-  height: 16px;
-  fill: #000000;
-  transition: fill 0.2s ease;
-`;
-// export const Tel = styled(FaWhatsapp)`
-//   width: 20px;
-//   height: 20px;
-//   fill: #fff;
-//   margin-bottom: 5px;
-// `;
-export const TelMailContainer = styled.div`
-  margin: 0 0 12px 0;
-  display: flex;
   gap: 8px;
-  align-items: center;
+  margin-top: 8px;
+  font-size: 13px;
 
-  &:empty {
-    display: none;
-    margin: 0;
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: #6B7280;
+    flex-shrink: 0;
   }
 
   a {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    align-items: center;
-    color: #000000 !important;
+    color: #4B5563;
+    text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #f97b72 !important;
-      
-      ${Mail} {
-        fill: #f97b72;
-      }
+      color: #CC5A50;
     }
   }
-`;
 
-export const Title = styled.h3`
-  font-weight: 800;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  margin-left: 10px;
-
-  span {
-    margin-top: 2px;
-    font-weight: 400;
-    color: ${({ theme }) => theme.colors.primary};
+  @media (max-width: 550px) {
+    justify-content: center;
   }
 `;
 
-export const LogoImgContainer = styled.div`
+export const FooterBottom = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 60px;
+  border-top: 1px solid #e5e7eb;
   display: flex;
-  gap: 5px;
-  margin-left: -6px;
-  margin-top: 0;
-  margin-bottom: 0;
+  align-items: center;
+  justify-content: center;
+
+  span {
+    font-size: 12px;
+    color: #9CA3AF;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 900px) {
+    padding: 16px 40px;
+  }
+
+  @media (max-width: 550px) {
+    padding: 16px 24px;
+  }
 `;

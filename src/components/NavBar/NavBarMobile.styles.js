@@ -74,7 +74,7 @@ export const LangMenuItem = styled.li`
 
   &:active {
     background-color: transparent;
-    color: #f97b72;
+    color: #111111;
     border-left: none;
     padding-left: 24px;
   }
@@ -116,7 +116,7 @@ export const MenuItem = styled.li`
 
   &:active {
     background-color: #f9fafb;
-    color: #f97b72;
+    color: #111111;
   }
 `;
 

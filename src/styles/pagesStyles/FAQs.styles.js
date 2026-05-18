@@ -62,7 +62,7 @@ export const FAQList = styled.ul`
       position: absolute;
       left: 0;
       top: 0;
-      color: ${({ theme }) => theme.colors.accent}; // coral
+      color: #111111; // monochromatic primary
       font-size: 1.5rem;
       font-weight: bold;
       transition: transform 0.3s ease;

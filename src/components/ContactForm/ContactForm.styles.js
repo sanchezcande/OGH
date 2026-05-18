@@ -46,11 +46,11 @@ export const Input = styled.input`
   }
 
   &:focus {
-    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    box-shadow: 0 0 8px rgba(17, 17, 17, 0.15);
     outline: none;
   }
   &:hover {
-    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    box-shadow: 0 0 8px rgba(17, 17, 17, 0.15);
   }
 
   &[type="number"] {
@@ -85,11 +85,11 @@ export const TextArea = styled.textarea`
   }
 
   &:focus {
-    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    box-shadow: 0 0 8px rgba(17, 17, 17, 0.15);
     outline: none;
   }
   &:hover {
-    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    box-shadow: 0 0 8px rgba(17, 17, 17, 0.15);
   }
 
   &.error.touched {
@@ -141,11 +141,11 @@ export const Select = styled.select`
   padding-right: 32px;
 
   &:focus {
-    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    box-shadow: 0 0 8px rgba(17, 17, 17, 0.15);
     outline: none;
   }
   &:hover {
-    box-shadow: 0 0 8px rgba(249, 123, 114, 0.5);
+    box-shadow: 0 0 8px rgba(17, 17, 17, 0.15);
   }
 
   option {

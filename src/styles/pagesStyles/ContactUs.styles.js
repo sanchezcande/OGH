@@ -22,28 +22,25 @@ const drawLine = keyframes`
 
 export const HighlightedText = styled.span`
   display: inline-block;
-  color: white; // Text always white
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.05em 0.25em;
   white-space: nowrap;
-  position: relative; // For positioning the pseudo-element
+  position: relative;
+  z-index: 1;
 
-  // The text itself should be visible from the start
-  // But we need a pseudo-element for the background
-
-  // This creates the pink background that will be animated
   &::before {
     content: "";
     position: absolute;
-    top: 0;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background-color: ${({ theme }) => theme.colors.accent || "#FF6B6B"};
+    background-color: #111111;
     border-radius: 4px;
-    transform: scaleX(0); // Initially scaled to 0 width
-    transform-origin: left; // Will grow from left
-    z-index: -1; // Behind the text
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: -1;
   }
 `;
 
@@ -137,7 +134,7 @@ export const ContactInfo = styled.div`
 // Now define LeftColumn and RightColumn that use the above components
 export const LeftColumn = styled.div`
   flex: 1;
-  background-color: #fff0f0; // Light pink background from image
+  background-color: #FAFAFA; // Light neutral background
   padding: 2.5rem;
   border-radius: ${({ theme }) => theme.borderRadius || "12px"};
   display: flex;
@@ -202,8 +199,7 @@ export const RightColumn = styled.div`
     // Style for the send button to match captcha width
     button[type="submit"] {
       // Half width as requested
-      background-color: ${({ theme }) =>
-        theme.colors.accent || "#FF6B6B"} !important; // Use accent color (pink)
+      background-color: #111111 !important; // Primary black button
       color: white !important;
       margin-top: 15px;
       font-weight: bold;
@@ -278,7 +274,7 @@ export const Container = styled.div`
 `;
 
 export const IconWrapper = styled.div`
-  background-color: ${({ theme }) => theme.colors.accent || "#FF6B6B"};
+  background-color: #111111;
   color: white;
   padding: 0.8rem;
   border-radius: 50%;

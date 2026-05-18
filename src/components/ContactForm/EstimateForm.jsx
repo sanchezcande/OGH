@@ -110,14 +110,14 @@ const EstimateForm = () => {
     style: {
       ...baseInputStyle,
       marginBottom: errors[name] ? "0.25rem" : "0.75rem",
-      border: errors[name] ? "1px solid #F97B72" : baseInputStyle.border,
+      border: errors[name] ? "1px solid #EF4444" : baseInputStyle.border,
     },
     onFocus: (e) => {
       e.currentTarget.style.borderColor = "#94a3b8";
       e.currentTarget.style.outline = "none";
     },
     onBlur: (e) => {
-      e.currentTarget.style.borderColor = errors[name] ? "#F97B72" : "#e5e7eb";
+      e.currentTarget.style.borderColor = errors[name] ? "#EF4444" : "#e5e7eb";
     },
   });
 
@@ -178,14 +178,14 @@ const EstimateForm = () => {
             resize: "vertical",
             minHeight: "110px",
             marginBottom: errors.message ? "0.25rem" : "0.75rem",
-            border: errors.message ? "1px solid #F97B72" : baseInputStyle.border,
+            border: errors.message ? "1px solid #EF4444" : baseInputStyle.border,
           }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = "#94a3b8";
             e.currentTarget.style.outline = "none";
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = errors.message ? "#F97B72" : "#e5e7eb";
+            e.currentTarget.style.borderColor = errors.message ? "#EF4444" : "#e5e7eb";
           }}
         />
         {errors.message && (
@@ -215,7 +215,7 @@ const EstimateForm = () => {
             padding: "11px 20px",
             fontSize: "0.9rem",
             fontWeight: "600",
-            backgroundColor: isSubmitting ? "#9CA3AF" : "#f97b72",
+            backgroundColor: isSubmitting ? "#9CA3AF" : "#111111",
             color: "white",
             border: "none",
             borderRadius: "8px",
@@ -224,10 +224,10 @@ const EstimateForm = () => {
             marginTop: "0.25rem",
           }}
           onMouseEnter={(e) => {
-            if (!isSubmitting) e.currentTarget.style.backgroundColor = "#e06a5f";
+            if (!isSubmitting) e.currentTarget.style.backgroundColor = "#333333";
           }}
           onMouseLeave={(e) => {
-            if (!isSubmitting) e.currentTarget.style.backgroundColor = "#f97b72";
+            if (!isSubmitting) e.currentTarget.style.backgroundColor = "#111111";
           }}
         >
           {isSubmitting

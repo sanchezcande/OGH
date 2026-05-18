@@ -16,8 +16,7 @@ import {
   LangMenuContainer,
 } from "./NavBarMobile.styles";
 import { useTranslation } from "react-i18next";
-import Image from "next/image";
-import Logo4 from "../../../public/Logo4.png";
+import OGHLogo from "../Logo/OGHLogo";
 
 const NavBarMobile = () => {
   const { t, i18n } = useTranslation();
@@ -83,9 +82,9 @@ const NavBarMobile = () => {
   return (
     <NavBarContainer ref={menuRef}>
       <LogoIcon>
-        <Link href="/">
+        <Link href="/" aria-label="OpenGateHub Home">
           <Logo>
-            <Image src={Logo4} alt="OpenGateHub Logo" width={210} />
+            <OGHLogo size={18} />
           </Logo>
         </Link>
 

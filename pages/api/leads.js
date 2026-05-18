@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     subject: `Nueva lead calculadora — Ahorro potencial: ${savingsLabel}/mes`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
-        <div style="background: #f97b72; padding: 24px 32px; border-radius: 8px 8px 0 0;">
+        <div style="background: #CC5A50; padding: 24px 32px; border-radius: 8px 8px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 20px; font-weight: 700;">
             Nueva lead — Calculadora de Costos
           </h1>
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             <tr>
               <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Email</td>
               <td style="padding: 6px 0; font-size: 14px; font-weight: 600;">
-                <a href="mailto:${email}" style="color: #f97b72;">${email}</a>
+                <a href="mailto:${email}" style="color: #CC5A50;">${email}</a>
               </td>
             </tr>
           </table>
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
           </table>
         </div>
 
-        <div style="background: #fff5f5; border: 2px solid #f97b72; border-radius: 8px; padding: 20px 32px; margin: 0 32px 24px;">
+        <div style="background: #fff5f5; border: 2px solid #CC5A50; border-radius: 8px; padding: 20px 32px; margin: 0 32px 24px;">
           <h2 style="font-size: 14px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px;">
             Resultados calculados
           </h2>
@@ -128,8 +128,8 @@ export default async function handler(req, res) {
               <td style="padding: 5px 0; font-size: 14px; font-weight: 700;">${costLabel}</td>
             </tr>
             <tr>
-              <td style="padding: 5px 0; font-size: 15px; color: #f97b72; font-weight: 700;">Ahorro potencial</td>
-              <td style="padding: 5px 0; font-size: 15px; font-weight: 800; color: #f97b72;">${savingsLabel}/mes</td>
+              <td style="padding: 5px 0; font-size: 15px; color: #CC5A50; font-weight: 700;">Ahorro potencial</td>
+              <td style="padding: 5px 0; font-size: 15px; font-weight: 800; color: #CC5A50;">${savingsLabel}/mes</td>
             </tr>
           </table>
         </div>
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
         <div style="padding: 16px 32px 32px; text-align: center;">
           <a
             href="https://calendly.com/sanchezgcandelaria/15min"
-            style="display: inline-block; background: #f97b72; color: white; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 8px;"
+            style="display: inline-block; background: #CC5A50; color: white; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 8px;"
           >
             Agendar llamada con ${name} →
           </a>

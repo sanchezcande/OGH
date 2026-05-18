@@ -95,7 +95,7 @@ export default function MyApp({ Component, pageProps }) {
       <GlobalStyles />
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/browser-link-logo.png" type="image/png" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
       <Layout>
         <NavBar />

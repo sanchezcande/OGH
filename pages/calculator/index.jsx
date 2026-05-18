@@ -44,10 +44,10 @@ const TOTAL_STEPS = 4;
 // ─── Styled Components ─────────────────────────────────────────────────────────
 
 const OptionBtn = styled.button`
-  border: 2px solid ${(p) => (p.$selected ? "#f97b72" : "#e5e7eb")};
+  border: 2px solid ${(p) => (p.$selected ? "#111111" : "#e5e7eb")};
   border-radius: 10px;
   padding: 1rem 1.25rem;
-  background: ${(p) => (p.$selected ? "#fff5f5" : "white")};
+  background: ${(p) => (p.$selected ? "#F5F5F5" : "white")};
   cursor: pointer;
   text-align: left;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -58,17 +58,17 @@ const OptionBtn = styled.button`
   width: 100%;
 
   &:hover {
-    border-color: #f97b72;
-    background: #fff5f5;
+    border-color: #111111;
+    background: #F5F5F5;
     transform: translateY(-1px);
   }
 `;
 
 const CheckCard = styled.button`
-  border: 2px solid ${(p) => (p.$checked ? "#f97b72" : "#e5e7eb")};
+  border: 2px solid ${(p) => (p.$checked ? "#111111" : "#e5e7eb")};
   border-radius: 10px;
   padding: 0.875rem 1rem;
-  background: ${(p) => (p.$checked ? "#fff5f5" : "white")};
+  background: ${(p) => (p.$checked ? "#F5F5F5" : "white")};
   cursor: pointer;
   text-align: left;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -82,13 +82,13 @@ const CheckCard = styled.button`
   gap: 0.75rem;
 
   &:hover {
-    border-color: #f97b72;
-    background: #fff5f5;
+    border-color: #111111;
+    background: #F5F5F5;
   }
 `;
 
 const PrimaryBtn = styled.button`
-  background: #f97b72;
+  background: #111111;
   color: white;
   border: none;
   border-radius: 8px;
@@ -101,9 +101,9 @@ const PrimaryBtn = styled.button`
   white-space: nowrap;
 
   &:hover:not(:disabled) {
-    background: #e35a52;
+    background: #333333;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(249, 123, 114, 0.35);
+    box-shadow: 0 4px 14px rgba(17,17,17,0.2);
   }
 
   &:disabled {
@@ -132,8 +132,8 @@ const GhostBtn = styled.button`
 `;
 
 const MetricCard = styled.div`
-  background: #fff5f5;
-  border: 1px solid #ffe3e1;
+  background: #F5F5F5;
+  border: 1px solid #E5E5E5;
   border-radius: 12px;
   padding: 1.25rem 1rem;
   text-align: center;
@@ -155,9 +155,9 @@ const LeadInput = styled.input`
   box-sizing: border-box;
 
   &:focus {
-    border-color: ${(p) => (p.$error ? "#ef4444" : "#f97b72")};
+    border-color: ${(p) => (p.$error ? "#ef4444" : "#111111")};
     box-shadow: 0 0 0 3px
-      ${(p) => (p.$error ? "rgba(239,68,68,0.12)" : "rgba(249,123,114,0.15)")};
+      ${(p) => (p.$error ? "rgba(239,68,68,0.12)" : "rgba(17,17,17,0.2)")};
   }
 
   &::placeholder {
@@ -346,8 +346,8 @@ export default function Calculator() {
                       height: "20px",
                       minWidth: "20px",
                       borderRadius: "5px",
-                      border: `2px solid ${checked ? "#f97b72" : "#d1d5db"}`,
-                      background: checked ? "#f97b72" : "white",
+                      border: `2px solid ${checked ? "#111111" : "#d1d5db"}`,
+                      background: checked ? "#111111" : "white",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -400,7 +400,7 @@ export default function Calculator() {
           <p
             style={{
               fontSize: "0.8rem",
-              color: "#f97b72",
+              color: "#111111",
               fontWeight: 500,
               marginBottom: "1.5rem",
             }}
@@ -484,7 +484,7 @@ export default function Calculator() {
             style={{
               fontSize: "0.8rem",
               fontWeight: 600,
-              color: "#f97b72",
+              color: "#111111",
               textTransform: "uppercase",
               letterSpacing: "0.06em",
               marginBottom: "0.5rem",
@@ -575,7 +575,7 @@ export default function Calculator() {
               style={{
                 fontSize: isMobile ? "1.6rem" : "1.8rem",
                 fontWeight: 700,
-                color: "#f97b72",
+                color: "#111111",
                 lineHeight: 1,
               }}
             >
@@ -590,8 +590,8 @@ export default function Calculator() {
         {/* Savings highlight */}
         <div
           style={{
-            background: "linear-gradient(135deg, #fff5f5 0%, #ffe3e1 100%)",
-            border: "2px solid #f97b72",
+            background: "#F5F5F5",
+            border: "2px solid #111111",
             borderRadius: "12px",
             padding: "1.25rem 1.5rem",
             textAlign: "center",
@@ -612,7 +612,7 @@ export default function Calculator() {
             style={{
               fontSize: isMobile ? "2rem" : "2.4rem",
               fontWeight: 900,
-              color: "#f97b72",
+              color: "#111111",
               lineHeight: 1,
               marginBottom: "0.25rem",
             }}
@@ -626,7 +626,7 @@ export default function Calculator() {
             style={{
               fontSize: "1rem",
               fontWeight: 600,
-              color: "#e35a52",
+              color: "#333333",
               marginBottom: "0.5rem",
             }}
           >
@@ -684,7 +684,7 @@ export default function Calculator() {
               style={{
                 fontSize: "0.7rem",
                 fontWeight: 700,
-                color: "#f97b72",
+                color: "#111111",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
                 marginBottom: "0.3rem",
@@ -709,7 +709,7 @@ export default function Calculator() {
                 { value: "3x", label: t("calculator.socialProofStat2") },
               ].map((s) => (
                 <div key={s.value}>
-                  <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#f97b72" }}>
+                  <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#111111" }}>
                     {s.value}
                   </span>
                   <span style={{ fontSize: "0.78rem", color: "#6b7280", marginLeft: "0.3rem" }}>
@@ -866,13 +866,13 @@ export default function Calculator() {
         {/* Badge */}
         <div
           style={{
-            background: "#fff5f5",
-            border: "1px solid #ffe3e1",
+            background: "#F5F5F5",
+            border: "1px solid #E5E5E5",
             borderRadius: "100px",
             padding: "0.35rem 0.875rem",
             fontSize: "0.78rem",
             fontWeight: 600,
-            color: "#f97b72",
+            color: "#111111",
             marginBottom: "1.25rem",
             letterSpacing: "0.03em",
           }}
@@ -938,7 +938,7 @@ export default function Calculator() {
                 <span style={{ fontSize: "0.78rem", color: "#6b7280", fontWeight: 500 }}>
                   {t("calculator.stepOf", { step, total: TOTAL_STEPS })}
                 </span>
-                <span style={{ fontSize: "0.78rem", color: "#f97b72", fontWeight: 600 }}>
+                <span style={{ fontSize: "0.78rem", color: "#111111", fontWeight: 600 }}>
                   {Math.round(progressPct)}%
                 </span>
               </div>
@@ -947,7 +947,7 @@ export default function Calculator() {
                   style={{
                     height: "100%",
                     width: `${progressPct}%`,
-                    background: "#f97b72",
+                    background: "#111111",
                     borderRadius: "2px",
                     transition: "width 0.4s ease",
                   }}

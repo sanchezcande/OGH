@@ -9,7 +9,7 @@ import EstimateForm from "../../src/components/ContactForm/EstimateForm";
 const ContactUs = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min?hide_event_type_details=1&text_color=1e293b&primary_color=f97b72";
+  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min?hide_event_type_details=1&text_color=1e293b&primary_color=111111";
   const calendlyWidgetRef = useRef(null);
   const [scriptLoaded, setScriptLoaded] = React.useState(false);
 
@@ -133,7 +133,7 @@ const ContactUs = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   padding: "10px 20px",
-                  backgroundColor: "#f97b72",
+                  backgroundColor: "#111111",
                   color: "white",
                   borderRadius: "8px",
                   textDecoration: "none",
@@ -142,15 +142,15 @@ const ContactUs = () => {
                   transition: "all 0.3s ease",
                   width: "100%",
                   textAlign: "center",
-                  border: "2px solid #f97b72",
+                  border: "2px solid #111111",
                   cursor: "pointer",
                   boxShadow: "none",
                   position: "relative",
                   overflow: "hidden",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#e06a5f";
-                  e.currentTarget.style.borderColor = "#e06a5f";
+                  e.currentTarget.style.backgroundColor = "#333333";
+                  e.currentTarget.style.borderColor = "#333333";
                   // Crear la línea inferior
                   if (!e.currentTarget.querySelector(".bottom-line")) {
                     const line = document.createElement("div");
@@ -164,8 +164,8 @@ const ContactUs = () => {
                   }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f97b72";
-                  e.currentTarget.style.borderColor = "#f97b72";
+                  e.currentTarget.style.backgroundColor = "#111111";
+                  e.currentTarget.style.borderColor = "#111111";
                   const line = e.currentTarget.querySelector(".bottom-line");
                   if (line) {
                     line.style.transform = "scaleX(0)";
@@ -283,7 +283,7 @@ const ContactUs = () => {
                     width: "48px",
                     height: "48px",
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, #F97B72 0%, #E35A52 100%)",
+                    background: "linear-gradient(135deg, #111111 0%, #333333 100%)",
                     color: "white",
                     display: "flex",
                     alignItems: "center",
@@ -340,22 +340,22 @@ const ContactUs = () => {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: "#F97B72",
+              color: "#111111",
               fontWeight: "600",
               textDecoration: "none",
               fontSize: "0.9rem",
-              borderBottom: "2px solid #F97B72",
+              borderBottom: "2px solid #111111",
               paddingBottom: "2px",
               transition: "all 0.2s ease",
               display: "inline-block",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#E35A52";
-              e.currentTarget.style.borderBottomColor = "#E35A52";
+              e.currentTarget.style.color = "#333333";
+              e.currentTarget.style.borderBottomColor = "#333333";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#F97B72";
-              e.currentTarget.style.borderBottomColor = "#F97B72";
+              e.currentTarget.style.color = "#111111";
+              e.currentTarget.style.borderBottomColor = "#111111";
             }}
           >
             {t("contactPage.footerCTALink") || "Book a call"} →

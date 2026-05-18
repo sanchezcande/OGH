@@ -41,7 +41,6 @@
   "contactUsTitle": "Reach Out!",
   "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
   "weAre": "We are",
-  "aiTitle": "Artificial Intelligence",
   "specializedIn": "Focused on your success. We help",
   "webAndMobileApp": "bring your ideas to life",
   "crafting": " with tailored digital solutions. From intuitive websites to innovative mobile apps,",
@@ -212,40 +211,6 @@
     "ctaButtonText": "Get an Automation Estimate",
     "ctaHighlightWord": "automate"
   },
-  "n8nAutomation": {
-    "heroTitle": "n8n Automation",
-    "heroSubtitle": "Connect your tools and automate workflows without code",
-    "whatIsTitle": "What is n8n?",
-    "whatIsDescription": "n8n is an open-source, visual workflow automation platform. It empowers businesses and teams to connect apps, automate processes, and build custom integrations—no coding required.",
-    "articleLink": "Read our complete article on n8n",
-    "whyChooseTitle": "Why choose n8n?",
-    "benefits": {
-      "openSourceTitle": "Open Source",
-      "openSourceDescription": "Open-source and cost-effective, no hidden costs",
-      "noCodeTitle": "No Code",
-      "noCodeDescription": "Intuitive visual interface, no programming required",
-      "integrationsTitle": "200+ Integrations",
-      "integrationsDescription": "Connect with all your favorite tools",
-      "flexibleTitle": "Flexible",
-      "flexibleDescription": "Cloud or self-hosted, based on your needs",
-      "productivityTitle": "Productivity",
-      "productivityDescription": "Increase efficiency and reduce errors",
-      "scalableTitle": "Scalable",
-      "scalableDescription": "Grows with your business, from startups to enterprise"
-    },
-    "useCasesTitle": "Common use cases",
-    "useCases": {
-      "dataSyncTitle": "Data synchronization",
-      "dataSyncDescription": "Sync information between CRM, email marketing and support systems",
-      "leadManagementTitle": "Lead management",
-      "leadManagementDescription": "Capture leads and automate follow-up and notifications",
-      "orderProcessingTitle": "Order processing",
-      "orderProcessingDescription": "Automate order fulfillment and inventory management"
-    },
-    "ctaTitle": "Ready to automate your business?",
-    "ctaDescription": "With n8n, your team focuses on what really matters and your business scales with smart, reliable processes.",
-    "ctaHighlightWord": "automate"
-  },
   "aboutUsCallToAction": {
     "title": "Let's Build Something That Feels Right",
     "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
@@ -319,123 +284,9 @@
   "commitmentToInnovationTitle_highlight": "Purpose",
   "commitmentToInnovationDescription": "We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.",
 
-  "frontendTitle": "Front-end",
-  "frontendDescription": "Developing interactive and responsive user interfaces for a smooth and efficient browsing experience.",
-  "howWeBuildIntro": "This capability is delivered through our Staff Augmentation and Workflow Automation engagement models.",
-  "backendTitle": "Backend & Cloud",
-  "backendDescription": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
-  "uxuiTitle": "UX/UI Design",
-  "uxuiDescription": "We design intuitive and attractive interfaces to enhance the experience and engagement of your users.",
-  "graphicDesignTitle": "Graphic Design",
-  "graphicDesignDescription": "We merge innovative graphic design with technological development to create exceptional visual experiences.",
   "learnMoreButtonText": "Learn More",
   "modalSendTitle": "Send!",
   "modalCloseButtonText": "Close",
-  "frontend": {
-    "title": "Frontend",
-    "description": "In today's digital age, having a fast and user-friendly platform is not just an advantage—it's essential. Yet, many businesses struggle with websites that don't perform well on mobile devices, interfaces that fail to engage users, or slow browsing experiences that drive customers away.",
-    "solutions": {
-      "title": "Solutions",
-      "responsive": "Responsive, seamlessly adapting to any screen or device.",
-      "interactive": "Interactive, ensuring a smooth, fast, and engaging browsing experience.",
-      "customized": "Tailored, aligned with your business goals and user expectations."
-    },
-    "benefits": "With a focus on cutting-edge technologies like React and modern frameworks, we optimize your site's performance, enhance user retention, and boost conversions by simplifying processes like purchases or registrations. Every detail is designed with your customers in mind, offering a unique experience that keeps them coming back.",
-    "stepsTitle": "How can we help you?",
-    "steps": {
-      "step1": "Reach out to us: Send us an email or fill out our online contact form.",
-      "step2": "Tell us your needs: Share your goals, challenges, or any problems you're facing.",
-      "step3": "We craft your plan: We'll propose tailored solutions and work with you to design a platform that not only solves your problems but also drives your business growth."
-    },
-    "callToAction": "Ready to shine in the digital world? Let's connect and create a platform that elevates your brand."
-  },
-  "backend": {
-    "title": "Backend & Cloud",
-    "description": "Backend and cloud solutions are the engine behind any successful application, ensuring systems are fast, secure, and scalable. However, many businesses face challenges like platforms that can't scale, slow response times, or infrastructures that don't harness the power of the cloud. This is where you, as the leader of your business, become the hero of your digital transformation.",
-    "solutions": {
-      "title2": "Enterprise Solutions",
-      "scalable": "Enterprise-grade backend architecture utilizing Node.js, Python, and Go, with microservices and containerization for seamless scalability.",
-      "secure": "Advanced security implementations including OAuth 2.0, JWT, and end-to-end encryption to ensure data integrity and compliance.",
-      "cloud": "Multi-cloud infrastructure leveraging AWS, Google Cloud, and Azure services for high availability and disaster recovery.",
-      "efficient": "Performance optimization through caching strategies, load balancing, and automated CI/CD pipelines."
-    },
-    "benefits": "With our expertise in backend and cloud, you lead your company's digital transformation. We equip you with the technological tools you need to deliver seamless experiences to your users and achieve your goals. By implementing modern solutions like scalable databases (PostgreSQL, MongoDB), GraphQL, and microservices systems, we build a backend that supports you every step of the way.",
-    "stepsTitle": "How do we team up with you?",
-    "steps": {
-      "step1": "Reach out: Share your challenges and goals by completing our online form.",
-      "step2": "Plan together: We design a solution that aligns with your specific objectives.",
-      "step3": "Your success, our priority: We implement a backend and cloud system that empowers your leadership."
-    },
-    "callToAction": "You are the driving force behind this transformation. Let's talk and build a tech infrastructure that brings your business vision to life."
-  },
-  "uxui": {
-    "title": "UX/UI Design",
-    "description": "UX/UI design bridges the gap between your ideas and the user experience. A well-designed interface not only enhances aesthetics but also optimizes functionality, creating greater satisfaction and loyalty. However, many businesses face challenges like confusing interfaces, unintuitive flows, and designs that don't reflect their brand identity.",
-    "solutions": {
-      "title2": "Solutions",
-      "intuitive": "Intuitive designs that make every interaction simple and enjoyable.",
-      "engaging": "Visually engaging interfaces that grab attention and reinforce your brand identity.",
-      "functional": "Functional experiences that reduce friction and boost conversions."
-    },
-    "businessImpactTitle": "How will this transform your business?",
-    "businessImpact": "With an optimized UX/UI design, users find what they need faster, complete key actions effortlessly, and feel more connected to your brand. This translates into higher conversions, customer retention, and a competitive edge. The right design transforms your platform into a growth engine for your business!",
-    "stepsTitle": "How do we transform your user experience?",
-    "steps": {
-      "step1": "Discover your needs: We listen to understand your goals and user expectations.",
-      "step2": "Design concepts: We create wireframes and prototypes that bring your ideas to life.",
-      "step3": "Iterate with you: We refine the designs based on your feedback to achieve perfection.",
-      "step4": "Deliver the solution: We develop a UX/UI experience that's functional, visual, and aligned with your vision."
-    },
-    "callToAction": "Ready to deliver an unforgettable experience? Contact our team, and together we'll design a platform that captivates your users and drives your business forward."
-  },
-  "graphicDesign": {
-    "title": "Graphic Design",
-    "questions": {
-      "q1": "Is your brand failing to stand out in the market?",
-      "q2": "Are your customers not connecting with your visual identity?",
-      "q3": "Do you feel your graphic materials don't reflect the quality of your products or services?"
-    },
-    "description": "Strategic graphic design can be the key to transforming your brand into a powerful visual story. However, many businesses face challenges like inconsistent visuals, designs that fail to connect with their audience, and materials that don't convey their true value. This is where you, as the visionary leader of your business, can become the hero by turning these challenges into opportunities.",
-    "solutions": {
-      "title": "What We Can Create for You",
-      "branding": "We craft unique visual identities that make your brand stand out.",
-      "materials": "We create impactful graphic materials, from presentations to digital campaigns.",
-      "consistency": "We ensure consistency across all visual elements, strengthening customer trust."
-    },
-    "vision": "After working with us, your business will have a memorable visual identity that not only attracts your ideal customers but also inspires them to trust your brand. You'll see how your graphics communicate professionalism and emotionally connect with your audience, driving growth and amplifying your business impact.",
-    "stepsTitle": "How do we work with you?",
-    "steps": {
-      "step1": "Discover your essence: We analyze your brand, values, and what makes your business unique.",
-      "step2": "Design solutions: We create visual proposals that clearly express your identity.",
-      "step3": "Refine together: We adjust the designs until they perfectly match your vision.",
-      "step4": "Elevate your brand: We transform your materials into standout visual tools."
-    },
-    "callToAction": "The time to stand out is now. Contact our team and let's build a visual identity that drives your success."
-  },
-  "aiSolutions": {
-    "title": "AI Solutions",
-    "questions": {
-      "q1": "Are you struggling to harness the power of artificial intelligence in your business?",
-      "q2": "Do you find it challenging to automate processes and analyze data effectively?",
-      "q3": "Is your business missing out on the competitive edge AI can provide?"
-    },
-    "description": "AI-driven solutions can transform your business operations, unlocking new opportunities for efficiency and growth. However, many companies face obstacles such as a lack of expertise, high implementation costs, and unclear strategies for AI integration. You, as an innovative leader, have the power to overcome these challenges and lead your business into the future.",
-    "solutions": {
-      "title": "What We Can Create for You",
-      "automation": "We design intelligent automation systems to optimize your operations.",
-      "analytics": "We develop advanced analytics tools to extract actionable insights from your data.",
-      "customAI": "We build tailored AI models that align with your business goals."
-    },
-    "vision": "By partnering with us, your business will gain the tools to leverage AI effectively. Imagine streamlined workflows, data-driven decisions, and a significant competitive advantage that propels your growth. Together, we'll make AI a cornerstone of your success.",
-    "stepsTitle": "How do we work with you?",
-    "steps": {
-      "step1": "Understand your needs: We assess your business goals and identify AI opportunities.",
-      "step2": "Design solutions: We create AI strategies and models tailored to your requirements.",
-      "step3": "Collaborate closely: We refine solutions based on your feedback and ensure seamless integration.",
-      "step4": "Empower your business: We deliver AI-driven tools that transform your operations."
-    },
-    "callToAction": "The future is AI. Contact us today and let's bring intelligent solutions to your business."
-  },
   "faqsTitle": "Frequently Asked Questions",
   "faqs": {
     "softwareFactory": {

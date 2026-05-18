@@ -92,7 +92,7 @@ export const Content = styled.div`
 `;
 
 export const Highlight = styled.span`
-  color: ${({ theme }) => theme.colors.accentDark};
+  color: #111111;
   font-weight: bold;
 `;
 

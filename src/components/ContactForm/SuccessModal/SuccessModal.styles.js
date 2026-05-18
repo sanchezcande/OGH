@@ -47,9 +47,9 @@ const ModalContent = styled.div`
 `;
 
 const CloseButton = styled.button`
-  background: #f97b72;
+  background: #111111;
   color: white;
-  border: 2px solid #f97b72;
+  border: 2px solid #111111;
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
@@ -58,10 +58,10 @@ const CloseButton = styled.button`
   font-size: 0.9rem;
   transition: all 0.3s ease;
   box-shadow: none;
-  
+
   &:hover {
-    background: #e06a5f;
-    border-color: #e06a5f;
+    background: #333333;
+    border-color: #333333;
   }
   
   &:active {

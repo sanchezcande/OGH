@@ -65,7 +65,7 @@ const SEO = ({
       {twitterHandle && <meta name="twitter:site" content={twitterHandle} />}
 
       {/* Favicon */}
-      <link rel="icon" href="/browser-link-logo.png" type="image/png" />
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
       {children}
     </Head>

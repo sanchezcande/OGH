@@ -3,8 +3,7 @@ import Link from "next/link";
 import styles from "./NavBarDesktop.module.css";
 import { FaAngleDown, FaGlobe } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import Image from "next/image";
-import Logo4 from "../../../public/Logo4.png";
+import OGHLogo from "../Logo/OGHLogo";
 
 const NavBarDesktop = () => {
   const { t, i18n } = useTranslation();
@@ -72,8 +71,8 @@ const NavBarDesktop = () => {
 
   return (
     <nav className={styles.navBarContainer}>
-      <Link href="/" className={styles.logo}>
-        <Image src={Logo4} alt="OpenGateHub Logo" height={24} />
+      <Link href="/" className={styles.logo} aria-label="OpenGateHub Home">
+        <OGHLogo size={20} />
       </Link>
       <ul className={styles.navLinks}>
         {(() => {

@@ -19,7 +19,7 @@
 
 .span {
   font-weight: 400;
-  color: #f97b72; /* accent coral */
+  color: #71717A;
 }
 
 .navLinks {
@@ -48,14 +48,14 @@
 }
 
 .navLink:hover {
-  color: #f97b72;
+  color: #111111;
 }
 
 .highlightBar {
   position: absolute;
   bottom: 0;
   height: 2px;
-  background-color: #f97b72;
+  background-color: #CC5A50;
   border-radius: 2px;
   transition:
     left 0.3s ease,
@@ -196,7 +196,7 @@
 
 .servicesMenuItem:hover {
   background-color: #f9fafb;
-  color: #f97b72;
+  color: #111111;
 }
 
 /* Media Queries */

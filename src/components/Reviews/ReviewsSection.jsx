@@ -7,7 +7,7 @@ import { InView } from "../InView/InView";
 const StarRating = () => (
   <div style={{ display: "flex", gap: "2px", marginBottom: "0.75rem" }}>
     {[1,2,3,4,5].map((s) => (
-      <span key={s} style={{ color: "#f97b72", fontSize: "1rem" }}>★</span>
+      <span key={s} style={{ color: "#111111", fontSize: "1rem" }}>★</span>
     ))}
   </div>
 );
@@ -39,7 +39,7 @@ const ReviewCardInline = ({ review, company, role, isMobile }) => (
     </p>
     <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "0.75rem" }}>
       <div style={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem" }}>{company}</div>
-      {role && <div style={{ color: "#f97b72", fontSize: "0.82rem", marginTop: "2px" }}>{role}</div>}
+      {role && <div style={{ color: "#111111", fontSize: "0.82rem", marginTop: "2px" }}>{role}</div>}
     </div>
   </div>
 );
@@ -94,7 +94,7 @@ export const ReviewsSection = () => {
                   width: i === currentPage ? "24px" : "8px",
                   height: "8px",
                   borderRadius: "100px",
-                  background: i === currentPage ? "#f97b72" : "#d1d5db",
+                  background: i === currentPage ? "#111111" : "#d1d5db",
                   border: "none",
                   cursor: "pointer",
                   padding: 0,
