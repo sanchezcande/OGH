@@ -244,7 +244,7 @@ export default function HomePage() {
         });
       });
 
-      // 4. TEXT REVEAL ON SCROLL
+      // 4. TEXT REVEAL ON SCROLL (pinned, like staff-augmentation)
       if (revealRef.current) {
         const words = revealRef.current.querySelectorAll(".reveal-word");
         if (words.length > 0) {
@@ -253,9 +253,11 @@ export default function HomePage() {
             stagger: 0.05,
             scrollTrigger: {
               trigger: revealSectionRef.current,
-              start: "top 75%",
-              end: "bottom 25%",
+              start: "top top",
+              end: "+=150%",
+              pin: true,
               scrub: 0.3,
+              anticipatePin: 1,
             },
           });
         }
@@ -613,17 +615,17 @@ export default function HomePage() {
   ];
 
   const projects = [
-    { image: "/smarters-card.png", title: t("featuredWorkSection.smartersCity.title"), link: "https://smarters.city/", category: "saas" },
-    { image: "/valthor-logo.e3b5a398.png", title: "Valthor CRM", link: "https://www.valthorcrm.com/", category: "saas" },
-    { image: "/Cicero.png", title: t("featuredWorkSection.cicero.title"), link: "https://www.linkedin.com/company/cicerolearn/", category: "saas", imageScale: 0.7 },
-    { image: "/vantage.svg", title: t("featuredWorkSection.vantage.title"), link: "https://vantageinc.ai/", category: "saas", imageScale: 0.75 },
-    { image: "/vivabots_azul.png", title: "Vivabots RPA", link: "https://vivabots.com/", category: "saas" },
-    { image: "/estudio-sab.png", title: t("featuredWorkSection.estudioSab.title"), link: "https://estudiosab.com/", category: "web-performance" },
-    { image: "/Skylar.png", title: t("featuredWorkSection.skylar.title"), link: "https://skylar.ar/", category: "commerce" },
-    { image: "/HotDate.png", title: t("featuredWorkSection.hotDateKitchen.title"), link: "https://hotdatekitchen.com/", category: "commerce", imageScale: 0.9 },
-    { image: "/propbot-logo.svg", title: t("featuredWorkSection.propbot.title"), link: "https://propbot.cc", category: "saas" },
-    { image: "/GBS.png", title: "GBS Abogados", link: "#", category: "web-performance" },
-    { image: "/kdabogados.png", title: "KD Abogados", link: "https://kdabogados.com.ar/", category: "web-performance" },
+    { image: "/smarters-card.png", title: t("featuredWorkSection.smartersCity.title"), link: "https://smarters.city/", fill: true },
+    { image: "/valthor-logo.e3b5a398.png", title: "Valthor CRM", link: "https://www.valthorcrm.com/" },
+    { image: "/Cicero.png", title: t("featuredWorkSection.cicero.title"), link: "https://www.linkedin.com/company/cicerolearn/", fill: true },
+    { image: "/vantage.svg", title: t("featuredWorkSection.vantage.title"), link: "https://vantageinc.ai/" },
+    { image: "/vivabots_azul.png", title: "Vivabots RPA", link: "https://vivabots.com/" },
+    { image: "/estudio-sab.png", title: t("featuredWorkSection.estudioSab.title"), link: "https://estudiosab.com/", fill: true },
+    { image: "/Skylar.png", title: t("featuredWorkSection.skylar.title"), link: "https://skylar.ar/" },
+    { image: "/HotDate.png", title: t("featuredWorkSection.hotDateKitchen.title"), link: "https://hotdatekitchen.com/" },
+    { image: "/propbot-logo.svg", title: t("featuredWorkSection.propbot.title"), link: "https://propbot.cc" },
+    { image: "/GBS.png", title: "GBS Abogados", link: "#", fill: true },
+    { image: "/kdabogados.png", title: "KD Abogados", link: "https://kdabogados.com.ar/", fill: true },
   ];
 
   const duplicatedProjects = [...projects, ...projects];
@@ -779,25 +781,28 @@ export default function HomePage() {
             ))}
           </MarqueeTrack>
         </MarqueeBanner>
+      </Container>
 
-        {/* ═══════════ TEXT REVEAL SECTION ═══════════ */}
-        <TextRevealSection ref={revealSectionRef}>
-          <TextRevealContent ref={revealRef}>
-            <div className="gsap-fade-up" style={{ marginBottom: 32 }}>
-              <SectionEyebrow>
-                {lang === "es" ? "El problema" : "The Problem"}
-              </SectionEyebrow>
-            </div>
-            <RevealText>
-              {revealFullText.split(" ").map((word, i) => (
-                <span className="reveal-word" key={i}>
-                  {word}{" "}
-                </span>
-              ))}
-            </RevealText>
-          </TextRevealContent>
-        </TextRevealSection>
+      {/* ═══════════ TEXT REVEAL SECTION (outside flex container for GSAP pin) ═══════════ */}
+      <div style={{ height: "6rem", background: "#fff" }} />
+      <TextRevealSection ref={revealSectionRef}>
+        <TextRevealContent ref={revealRef}>
+          <div className="gsap-fade-up" style={{ marginBottom: 32 }}>
+            <SectionEyebrow>
+              {lang === "es" ? "El problema" : "The Problem"}
+            </SectionEyebrow>
+          </div>
+          <RevealText>
+            {revealFullText.split(" ").map((word, i) => (
+              <span className="reveal-word" key={i}>
+                {word}{" "}
+              </span>
+            ))}
+          </RevealText>
+        </TextRevealContent>
+      </TextRevealSection>
 
+      <Container>
         {/* ═══════════ BENCHMARKS ═══════════ */}
         <Section $bg="#f8fafc" $padding="100px 24px" $mobilePadding="60px 16px">
           <SectionInner ref={benchmarkRef}>
@@ -1163,9 +1168,9 @@ export default function HomePage() {
           </SectionInner>
         </Section>
 
-        {/* ═══════════ FEATURED WORK CAROUSEL ═══════════ */}
+        {/* ═══════════ FEATURED WORK ═══════════ */}
         <CarouselSection>
-          <div className="gsap-fade-up" style={{ textAlign: "center", marginBottom: 32, padding: "0 24px" }}>
+          <div style={{ textAlign: "center", marginBottom: 32, padding: "0 24px" }}>
             <h3 style={{ fontSize: "1.4rem", fontWeight: 600, color: "#6B7280", marginBottom: 8 }}>
               {t("featuredWorkSection.title")}
             </h3>
@@ -1173,7 +1178,6 @@ export default function HomePage() {
               {t("featuredWorkSection.subtitle")}
             </p>
           </div>
-
           <div style={{ overflow: "hidden" }}>
             <CarouselTrack>
               {duplicatedProjects.map((project, i) => (
@@ -1190,9 +1194,6 @@ export default function HomePage() {
                     <img
                       src={project.image}
                       alt={project.title}
-                      style={{
-                        transform: project.imageScale ? `scale(${project.imageScale})` : undefined,
-                      }}
                       loading="lazy"
                     />
                   </div>

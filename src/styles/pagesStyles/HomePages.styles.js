@@ -339,17 +339,14 @@ export const MarqueeItem = styled.span`
    ═══════════════════════════════════════════ */
 
 export const TextRevealSection = styled.section`
+  position: relative;
+  height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 140px 2rem;
+  padding: 0 2rem;
   background: #fff;
-  position: relative;
-
-  @media (max-width: 768px) {
-    padding: 80px 20px;
-  }
 `;
 
 export const TextRevealContent = styled.div`
@@ -754,18 +751,16 @@ export const CaseStudyCard = styled.div`
 export const CarouselSection = styled.div`
   width: 100%;
   overflow: hidden;
-  background: white;
-  padding: 60px 0;
-  border-top: 1px solid #E5E7EB;
-  border-bottom: 1px solid #E5E7EB;
+  background: #fff;
+  padding: 40px 0;
 `;
 
 export const CarouselTrack = styled.div`
   display: flex;
-  gap: 16px;
-  animation: ${marquee} 40s linear infinite;
+  align-items: center;
+  gap: 56px;
+  animation: ${marquee} 30s linear infinite;
   width: fit-content;
-  will-change: transform;
 
   &:hover {
     animation-play-state: paused;
@@ -777,42 +772,45 @@ export const CarouselCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 32px;
-  width: 280px;
-  text-align: center;
+  gap: 10px;
   cursor: ${({ $hasLink }) => ($hasLink ? "pointer" : "default")};
-  transition: all 0.3s ease;
-  border-radius: 12px;
+  transition: transform 0.3s ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.02);
+    transform: translateY(-2px);
   }
 
   .carousel-logo {
-    height: 100px;
+    height: 36px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
 
     img {
-      max-width: 180px;
-      max-height: 90px;
+      height: 100%;
+      width: auto;
       object-fit: contain;
-      filter: grayscale(20%);
-      transition: filter 0.3s ease, transform 0.3s ease;
+      filter: grayscale(1);
+      opacity: 0.35;
+      transition: filter 0.4s ease, opacity 0.4s ease;
     }
   }
 
   &:hover .carousel-logo img {
-    filter: grayscale(0%);
-    transform: scale(1.04);
+    filter: grayscale(0);
+    opacity: 0.9;
   }
 
   .carousel-title {
-    font-size: 0.82rem;
-    color: #6B7280;
+    font-size: 0.7rem;
     font-weight: 500;
+    color: #c0c0c0;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+  }
+
+  &:hover .carousel-title {
+    color: #666;
   }
 `;
 
