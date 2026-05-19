@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import SEO from "../../src/components/SEO/SEO";
 import Script from "next/script";
-import { motion } from "framer-motion";
 import useMediaQuery from "../../src/Hooks/useMediaQuery";
 import EstimateForm from "../../src/components/ContactForm/EstimateForm";
 import styled from "styled-components";
@@ -39,15 +38,27 @@ const HeroSection = styled.section`
 
 const HeroTitle = styled.h1`
   font-size: clamp(2.2rem, 5vw, 3.2rem);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.15;
+  line-height: 1.1;
   margin-bottom: 1rem;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.4);
 
-  span {
-    color: rgba(255, 255, 255, 0.35);
-    font-weight: 400;
+  .word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+
+    .word-inner {
+      display: inline-block;
+      transform: translateY(120%);
+      will-change: transform;
+    }
+  }
+
+  .highlight {
+    color: #fff;
   }
 `;
 
@@ -57,6 +68,7 @@ const HeroSub = styled.p`
   line-height: 1.6;
   max-width: 480px;
   margin: 0 auto;
+  opacity: 0;
 
   @media (max-width: 768px) {
     font-size: 0.95rem;
@@ -212,103 +224,90 @@ const StepsTitle = styled.h2`
   text-align: center;
 `;
 
-const StepsTimeline = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  position: relative;
-  max-width: 600px;
+const StepsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  max-width: 960px;
   margin: 0 auto;
+  align-items: stretch;
 
-  /* Vertical line */
-  &::before {
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    gap: 1rem;
+  }
+`;
+
+const StepCard = styled.div`
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  padding: 2.5rem 2rem;
+  position: relative;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(20px);
+  transition: border-color 0.5s ease;
+
+  /* Corner accent bracket — top-left */
+  &::before, &::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 23px;
+    background: rgba(255, 255, 255, 0.5);
+  }
+  &::before {
+    top: -1px;
+    left: -1px;
+    width: 0;
+    height: 1px;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  &::after {
+    top: -1px;
+    left: -1px;
     width: 1px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.06);
-
-    @media (max-width: 768px) {
-      left: 19px;
-    }
+    height: 0;
+    transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
-`;
-
-const StepLine = styled.div`
-  position: absolute;
-  top: 0;
-  left: 23px;
-  width: 1px;
-  height: 0;
-  background: #CC5A50;
-  z-index: 1;
-  transition: none;
-
-  @media (max-width: 768px) {
-    left: 19px;
-  }
-`;
-
-const Step = styled.div`
-  display: flex;
-  gap: 2rem;
-  padding: 2.5rem 0;
-  opacity: 0;
-  transform: translateX(-20px);
-
-  @media (max-width: 768px) {
-    gap: 1.5rem;
-    padding: 2rem 0;
-  }
-`;
-
-const StepDot = styled.div`
-  width: 47px;
-  min-width: 47px;
-  height: 47px;
-  border-radius: 50%;
-  background: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
-  position: relative;
-  z-index: 2;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
   &.active {
-    border-color: #CC5A50;
-    color: #CC5A50;
-    box-shadow: 0 0 20px rgba(204, 90, 80, 0.2);
+    border-color: rgba(255, 255, 255, 0.08);
+    &::before { width: 28px; }
+    &::after { height: 28px; }
   }
 
   @media (max-width: 768px) {
-    width: 39px;
-    min-width: 39px;
-    height: 39px;
-    font-size: 0.7rem;
+    padding: 2rem 1.5rem;
   }
 `;
 
-const StepContent = styled.div`
-  padding-top: 0.6rem;
+const StepNum = styled.span`
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #CC5A50;
+  text-shadow: 0 0 40px rgba(204, 90, 80, 0.25);
+  display: block;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+
+  @media (max-width: 768px) {
+    font-size: 2.2rem;
+  }
 `;
 
 const StepLabel = styled.h3`
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.01em;
 `;
 
 const StepText = styled.p`
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.35);
   line-height: 1.6;
 `;
 
@@ -319,6 +318,18 @@ const stepsData = [
   { num: "02", labelEn: "Recommend", labelEs: "Recomendación", textEn: "We recommend the best engagement model — automation, augmentation, or both.", textEs: "Recomendamos el mejor modelo — automatización, augmentation, o ambos." },
   { num: "03", labelEn: "Execute", labelEs: "Ejecución", textEn: "You get a clear next step — a strategy call or a detailed proposal.", textEs: "Obtenés un siguiente paso claro — una llamada estratégica o propuesta detallada." },
 ];
+
+const splitHeroWords = (text, highlights = []) =>
+  text.split(" ").map((word, i) => {
+    const isHl = highlights.some(
+      (h) => word.toLowerCase().replace(/[^a-záéíóúñ]/gi, "") === h.toLowerCase()
+    );
+    return (
+      <span className="word" key={i}>
+        <span className={`word-inner${isHl ? " highlight" : ""}`}>{word}&nbsp;</span>
+      </span>
+    );
+  });
 
 const ContactUs = () => {
   const { t, i18n } = useTranslation();
@@ -333,7 +344,6 @@ const ContactUs = () => {
   const heroSubRef = useRef(null);
   const cardsRef = useRef(null);
   const stepsRef = useRef(null);
-  const stepLineRef = useRef(null);
 
   useEffect(() => {
     if (scriptLoaded && !isMobile && calendlyWidgetRef.current && typeof window !== "undefined" && window.Calendly) {
@@ -347,106 +357,105 @@ const ContactUs = () => {
   // Scroll animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero parallax — title moves slower than subtitle
-      if (heroTitleRef.current) {
-        gsap.to(heroTitleRef.current, {
-          yPercent: -30,
-          opacity: 0.3,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.3,
-          },
+      // Hero entrance — word-by-word reveal (same as home hero)
+      const words = heroTitleRef.current?.querySelectorAll(".word-inner");
+      if (words?.length) {
+        gsap.to(words, {
+          y: 0,
+          duration: 1,
+          stagger: 0.08,
+          ease: "power4.out",
+          delay: 0.3,
         });
       }
       if (heroSubRef.current) {
-        gsap.to(heroSubRef.current, {
-          yPercent: -15,
-          opacity: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.3,
-          },
-        });
+        gsap.fromTo(heroSubRef.current,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.9 }
+        );
       }
 
-      // Hero initial entrance
+      // Hero parallax on scroll — use fromTo to avoid capturing entrance animation's inline opacity:0
       if (heroRef.current) {
-        gsap.from(heroTitleRef.current, { opacity: 0, y: 40, duration: 0.8, ease: "power3.out" });
-        gsap.from(heroSubRef.current, { opacity: 0, y: 30, duration: 0.8, ease: "power3.out", delay: 0.15 });
+        gsap.fromTo(heroTitleRef.current,
+          { yPercent: 0, opacity: 1, scale: 1 },
+          {
+            yPercent: -50,
+            opacity: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "top top",
+              end: "bottom top",
+              scrub: true,
+            },
+          }
+        );
+        gsap.fromTo(heroSubRef.current,
+          { yPercent: 0, opacity: 1 },
+          {
+            yPercent: -25,
+            opacity: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "top top",
+              end: "80% top",
+              scrub: true,
+            },
+          }
+        );
       }
 
-      // Cards stagger reveal
+      // Cards stagger reveal on scroll
       const cards = cardsRef.current?.querySelectorAll(".contact-card");
       if (cards?.length) {
-        cards.forEach((card, i) => {
-          gsap.to(card, {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power3.out",
-            delay: i * 0.12,
-            scrollTrigger: {
-              trigger: card,
-              start: "top 85%",
-              once: true,
-            },
-          });
+        ScrollTrigger.create({
+          trigger: cardsRef.current,
+          start: "top 90%",
+          once: true,
+          onEnter: () => {
+            cards.forEach((card, i) => {
+              gsap.to(card, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                delay: i * 0.15,
+              });
+            });
+          },
         });
+        // Fallback: if already in view on load
+        setTimeout(() => {
+          cards.forEach((card) => {
+            if (card.style.opacity === "0" || card.style.opacity === "") {
+              gsap.to(card, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
+            }
+          });
+        }, 500);
       }
 
-      // Steps timeline — line draws + steps reveal one by one
-      const steps = stepsRef.current?.querySelectorAll(".contact-step");
-      const dots = stepsRef.current?.querySelectorAll(".step-dot");
+      // Steps — deblur reveal + corner bracket animation
+      const steps = stepsRef.current?.querySelectorAll(".step-card");
       if (steps?.length) {
-        // Animate the red line growing
-        if (stepLineRef.current) {
-          gsap.to(stepLineRef.current, {
-            height: "100%",
-            duration: 1.8,
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: stepsRef.current,
-              start: "top 75%",
-              once: true,
-            },
-          });
-        }
-
-        steps.forEach((step, i) => {
-          gsap.to(step, {
-            opacity: 1,
-            x: 0,
-            duration: 0.6,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: stepsRef.current,
-              start: "top 75%",
-              once: true,
-            },
-            delay: i * 0.3,
-          });
-
-          // Dot lights up
-          if (dots?.[i]) {
-            gsap.delayedCall(i * 0.3 + 0.3, () => {
-              dots[i].classList.add("active");
+        ScrollTrigger.create({
+          trigger: stepsRef.current,
+          start: "top 80%",
+          once: true,
+          onEnter: () => {
+            steps.forEach((step, i) => {
+              gsap.to(step, {
+                opacity: 1,
+                filter: "blur(0px)",
+                y: 0,
+                duration: 1,
+                ease: "power3.out",
+                delay: i * 0.2,
+                onComplete: () => step.classList.add("active"),
+              });
             });
-            // Re-trigger with scroll
-            ScrollTrigger.create({
-              trigger: stepsRef.current,
-              start: "top 75%",
-              once: true,
-              onEnter: () => {
-                setTimeout(() => dots[i].classList.add("active"), i * 300 + 300);
-              },
-            });
-          }
+          },
         });
       }
     });
@@ -470,13 +479,16 @@ const ContactUs = () => {
         />
       )}
 
-      {/* Hero (dark) */}
+      {/* Hero (dark) + parallax */}
       <DarkSection>
         <HeroSection ref={heroRef}>
-          <HeroTitle>
-            {t("contactPage.heroTitle") || <>Let's optimize <span>your operations</span></>}
+          <HeroTitle ref={heroTitleRef}>
+            {splitHeroWords(
+              isSpanish ? "Optimicemos tus operaciones" : "Let's optimize your operations",
+              isSpanish ? ["Optimicemos"] : ["optimize"]
+            )}
           </HeroTitle>
-          <HeroSub>
+          <HeroSub ref={heroSubRef}>
             {t("contactPage.heroSubtitle") ||
               "Choose the fastest path forward: book an automation audit or request an execution estimate."}
           </HeroSub>
@@ -535,15 +547,15 @@ const ContactUs = () => {
 
       {/* What Happens Next (dark) */}
       <StepsOuter>
-        <StepsInner ref={stepsRef}>
+        <StepsInner>
           <StepsTitle>{t("contactPage.whatHappensNext") || "What happens next"}</StepsTitle>
-          <StepsGrid>
-            {stepsData.map((step, i) => (
-              <Step key={step.num} className="contact-step">
-                <StepNumber>{step.num}</StepNumber>
+          <StepsGrid ref={stepsRef}>
+            {stepsData.map((step) => (
+              <StepCard key={step.num} className="step-card">
+                <StepNum>{step.num}</StepNum>
                 <StepLabel>{isSpanish ? step.labelEs : step.labelEn}</StepLabel>
                 <StepText>{isSpanish ? step.textEs : step.textEn}</StepText>
-              </Step>
+              </StepCard>
             ))}
           </StepsGrid>
         </StepsInner>
