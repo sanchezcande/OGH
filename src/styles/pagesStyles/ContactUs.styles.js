@@ -136,7 +136,7 @@ export const LeftColumn = styled.div`
   flex: 1;
   background-color: #FAFAFA; // Light neutral background
   padding: 2.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius || "12px"};
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem; // Spacing between elements in left column

@@ -101,7 +101,7 @@ export const MetricsGrid = styled.div`
 
 export const MetricCard = styled.div`
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 4px;
   padding: 1.25rem;
   text-align: center;
   box-shadow:

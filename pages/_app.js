@@ -9,6 +9,12 @@ import ScrollToTopButton from "../src/components/Button/ScrollToTopButton";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import gsap from "gsap";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 // import { FaWhatsapp  } from "react-icons/fa";
 
 const Layout = styled.div`
@@ -76,7 +82,13 @@ export default function MyApp({ Component, pageProps }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const handleStart = () => setLoading(true);
+    const handleStart = () => {
+      setLoading(true);
+      // Kill all ScrollTrigger instances before React unmounts the page.
+      // ScrollTrigger pin wraps elements in new parents; if React tries
+      // removeChild on the original tree it crashes.
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    };
     const handleComplete = () => setLoading(false);
 
     router.events.on("routeChangeStart", handleStart);

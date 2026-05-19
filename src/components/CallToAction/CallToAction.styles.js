@@ -11,7 +11,7 @@ export const CallToActionContainer = styled.div`
   padding: 2.5rem 2rem;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   color: #1e293b;
-  border-radius: 12px;
+  border-radius: 4px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   max-width: 900px;
   position: relative;

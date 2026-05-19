@@ -95,7 +95,7 @@ const ContactUs = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             style={{
               background: "white",
-              borderRadius: "12px",
+              borderRadius: "4px",
               padding: isMobile ? "1.5rem" : "1.75rem",
               border: "none",
               boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12)",
@@ -210,7 +210,7 @@ const ContactUs = () => {
             transition={{ duration: 0.4, delay: 0.2 }}
             style={{
               background: "white",
-              borderRadius: "12px",
+              borderRadius: "4px",
               padding: isMobile ? "1.5rem" : "1.75rem",
               border: "1px solid #e5e7eb",
               boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
@@ -323,7 +323,7 @@ const ContactUs = () => {
             textAlign: "center",
             padding: "1.25rem",
             background: "#f8fafc",
-            borderRadius: "12px",
+            borderRadius: "4px",
           }}
         >
           <p

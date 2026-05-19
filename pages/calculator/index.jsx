@@ -45,7 +45,7 @@ const TOTAL_STEPS = 4;
 
 const OptionBtn = styled.button`
   border: 2px solid ${(p) => (p.$selected ? "#111111" : "#e5e7eb")};
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 1rem 1.25rem;
   background: ${(p) => (p.$selected ? "#F5F5F5" : "white")};
   cursor: pointer;
@@ -66,7 +66,7 @@ const OptionBtn = styled.button`
 
 const CheckCard = styled.button`
   border: 2px solid ${(p) => (p.$checked ? "#111111" : "#e5e7eb")};
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 0.875rem 1rem;
   background: ${(p) => (p.$checked ? "#F5F5F5" : "white")};
   cursor: pointer;
@@ -134,7 +134,7 @@ const GhostBtn = styled.button`
 const MetricCard = styled.div`
   background: #F5F5F5;
   border: 1px solid #E5E5E5;
-  border-radius: 12px;
+  border-radius: 4px;
   padding: 1.25rem 1rem;
   text-align: center;
   flex: 1;
@@ -592,7 +592,7 @@ export default function Calculator() {
           style={{
             background: "#F5F5F5",
             border: "2px solid #111111",
-            borderRadius: "12px",
+            borderRadius: "4px",
             padding: "1.25rem 1.5rem",
             textAlign: "center",
             marginBottom: "2rem",
@@ -659,7 +659,7 @@ export default function Calculator() {
           style={{
             background: "#f9fafb",
             border: "1px solid #e5e7eb",
-            borderRadius: "12px",
+            borderRadius: "4px",
             padding: "1.25rem",
             marginBottom: "2rem",
             display: "flex",
@@ -913,7 +913,7 @@ export default function Calculator() {
             width: "100%",
             maxWidth: "580px",
             background: "white",
-            borderRadius: "16px",
+            borderRadius: "4px",
             boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
             overflow: "hidden",
           }}

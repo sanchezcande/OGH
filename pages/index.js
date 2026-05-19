@@ -84,7 +84,137 @@ if (typeof window !== "undefined") {
    ═══════════════════════════════════════════ */
 
 const ReviewsInfiniteMarquee = ({ testimonials }) => {
-  // Duplicate array for seamless infinite loop
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeCard, setActiveCard] = useState(0);
+  const scrollRef = useRef(null);
+  const isTouching = useRef(false);
+  const autoScrollRAF = useRef(null);
+  const resumeTimer = useRef(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Auto-scroll for mobile: scrolls continuously, pauses on touch, resumes after release
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const speed = 0.5; // px per frame
+    const totalCards = testimonials.length;
+
+    const step = () => {
+      if (!isTouching.current && el) {
+        el.scrollLeft += speed;
+        // When we've scrolled past the duplicated set, jump back seamlessly
+        const singleSetWidth = el.scrollWidth / 2;
+        if (el.scrollLeft >= singleSetWidth) {
+          el.scrollLeft -= singleSetWidth;
+        }
+      }
+      autoScrollRAF.current = requestAnimationFrame(step);
+    };
+
+    autoScrollRAF.current = requestAnimationFrame(step);
+    return () => {
+      if (autoScrollRAF.current) cancelAnimationFrame(autoScrollRAF.current);
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    };
+  }, [isMobile, testimonials.length]);
+
+  const handleTouchStart = useCallback(() => {
+    isTouching.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    // Resume auto-scroll after 3s of no touch
+    resumeTimer.current = setTimeout(() => {
+      isTouching.current = false;
+    }, 3000);
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const card = el.children[0];
+    if (!card) return;
+    const cardWidth = card.offsetWidth;
+    const gap = 16;
+    const index = Math.round(el.scrollLeft / (cardWidth + gap)) % testimonials.length;
+    setActiveCard(Math.min(index, testimonials.length - 1));
+  }, [testimonials.length]);
+
+  if (isMobile) {
+    // Duplicate for seamless infinite scroll
+    const doubled = [...testimonials, ...testimonials];
+    return (
+      <div style={{ width: "100%" }}>
+        <style>{`.reviews-mobile-scroll::-webkit-scrollbar { display: none; }`}</style>
+        <div
+          ref={scrollRef}
+          className="reviews-mobile-scroll"
+          onScroll={handleScroll}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            display: "flex",
+            gap: "16px",
+            overflowX: "scroll",
+            WebkitOverflowScrolling: "touch",
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            paddingBottom: "8px",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            touchAction: "pan-x",
+          }}
+        >
+          {doubled.map((t, i) => (
+            <TestimonialCardStyled
+              key={i}
+              style={{
+                width: "80vw",
+                minWidth: "80vw",
+                flexShrink: 0,
+              }}
+            >
+              <div className="stars">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <span key={s}>★</span>
+                ))}
+              </div>
+              <p className="quote">&ldquo;{t.content}&rdquo;</p>
+              <div className="author">
+                <div className="author-company">{t.company}</div>
+                {t.role && <div className="author-role">{t.role}</div>}
+              </div>
+            </TestimonialCardStyled>
+          ))}
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
+          {testimonials.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: i === activeCard ? "24px" : "8px",
+                height: "8px",
+                borderRadius: "100px",
+                background: i === activeCard ? "#ffffff" : "rgba(255,255,255,0.25)",
+                transition: "all 0.25s ease",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: infinite marquee via CSS animation
   const doubled = [...testimonials, ...testimonials];
   return (
     <ReviewsMarquee $duration="50s">
@@ -302,20 +432,21 @@ export default function HomePage() {
         });
       }
 
-      // 7. CASE STUDY CARDS scale reveal
+      // 7. CASE STUDY CARDS 3D perspective reveal
       const caseCards = caseStudyRef.current?.querySelectorAll(".case-card");
       if (caseCards?.length) {
         caseCards.forEach((card, i) => {
           gsap.to(card, {
             opacity: 1,
             y: 0,
+            rotateX: 0,
             scale: 1,
-            duration: 0.8,
-            delay: i * 0.12,
+            duration: 1,
+            delay: i * 0.15,
             ease: "power3.out",
             scrollTrigger: {
               trigger: card,
-              start: "top 85%",
+              start: "top 88%",
               once: true,
             },
           });
@@ -609,7 +740,7 @@ export default function HomePage() {
   const caseStudies = [
     { img: "/case-studies/valthor.jpeg", categoryKey: "caseStudiesSection.valthorCategory", titleKey: "caseStudiesSection.valthorTitle", descKey: "caseStudiesSection.valthorDesc", stat: { value: "40%", labelKey: "caseStudiesSection.valthorStat" }, link: "https://www.valthorcrm.com/" },
     { img: "/case-studies/hot-date-kitchen.jpeg", categoryKey: "caseStudiesSection.hotdateCategory", titleKey: "caseStudiesSection.hotdateTitle", descKey: "caseStudiesSection.hotdateDesc", stat: null, link: "https://hotdatekitchen.com/" },
-    { img: "/case-studies/smarters-city.jpeg", categoryKey: "caseStudiesSection.smartersCategory", titleKey: "caseStudiesSection.smartersTitle", descKey: "caseStudiesSection.smartersDesc", stat: null, link: "https://smarters.city/" },
+    { img: "/case-studies/smarters-city.jpeg", categoryKey: "caseStudiesSection.smartersCategory", titleKey: "caseStudiesSection.smartersTitle", descKey: "caseStudiesSection.smartersDesc", stat: null, link: "https://smarters.city/", imgStyle: { objectPosition: "top center", marginTop: "-45px" } },
     { img: "/case-studies/vantage.jpeg", categoryKey: "caseStudiesSection.vantageCategory", titleKey: "caseStudiesSection.vantageTitle", descKey: "caseStudiesSection.vantageDesc", stat: null, link: "https://vantageinc.ai/" },
     { img: "/case-studies/propbot.png", categoryKey: "caseStudiesSection.propbotCategory", titleKey: "caseStudiesSection.propbotTitle", descKey: "caseStudiesSection.propbotDesc", stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" }, link: "https://propbot.cc" },
   ];
@@ -827,7 +958,7 @@ export default function HomePage() {
                       style={{
                         width: 40,
                         height: 40,
-                        borderRadius: 12,
+                        borderRadius: 4,
                         background: "rgba(0, 0, 0, 0.05)",
                         color: "#111111",
                         display: "flex",
@@ -864,7 +995,7 @@ export default function HomePage() {
               style={{
                 background: "white",
                 border: "1px solid #E5E7EB",
-                borderRadius: 16,
+                borderRadius: 4,
                 padding: isMobile ? 20 : 28,
                 boxShadow: "0 6px 24px rgba(15, 23, 42, 0.05)",
               }}
@@ -1079,7 +1210,7 @@ export default function HomePage() {
                   style={{
                     background: "white",
                     border: "1.5px solid #e5e7eb",
-                    borderRadius: 14,
+                    borderRadius: 4,
                     padding: "24px 16px",
                     position: "relative",
                     overflow: "hidden",
@@ -1149,7 +1280,7 @@ export default function HomePage() {
                   onClick={() => window.open(cs.link, "_blank", "noopener,noreferrer")}
                 >
                   <div className="case-img">
-                    <img src={cs.img} alt={t(cs.titleKey)} loading="lazy" />
+                    <img src={cs.img} alt={t(cs.titleKey)} loading="lazy" style={cs.imgStyle} />
                   </div>
                   <div className="case-content">
                     <span className="case-category">{t(cs.categoryKey)}</span>

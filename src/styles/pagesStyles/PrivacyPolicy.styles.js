@@ -6,7 +6,7 @@ export const PrivacyPolicyContainer = styled.section`
   padding: 3rem 2rem;
   margin: 2rem auto;
   max-width: 1200px;
-  border-radius: 12px;
+  border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 `;
 

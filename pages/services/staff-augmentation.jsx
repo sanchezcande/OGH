@@ -175,7 +175,7 @@ const FeaturesGrid = styled.div`
 const FeatureCard = styled.div`
   background: #fff;
   border: 1px solid #e8e8e8;
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 2rem;
   transition: border-color 0.3s, box-shadow 0.3s;
 
@@ -261,7 +261,7 @@ const StepCard = styled.div`
   min-height: 240px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 3rem 3.5rem;
   display: flex;
   flex-direction: row;
@@ -333,7 +333,7 @@ const UseCasesGrid = styled.div`
 const UseCaseCard = styled.div`
   background: #fafafa;
   border: 1px solid #e8e8e8;
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 2.5rem;
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
 
@@ -347,7 +347,7 @@ const UseCaseCard = styled.div`
 const UseCaseIcon = styled.div`
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: 4px;
   background: #CC5A50;
   display: flex;
   align-items: center;

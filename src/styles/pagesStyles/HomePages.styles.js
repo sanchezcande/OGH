@@ -481,7 +481,7 @@ export const ServiceCard = styled.div`
   width: 380px;
   min-width: 380px;
   background: white;
-  border-radius: 20px;
+  border-radius: 4px;
   padding: 40px 32px;
   border: 1px solid #E5E7EB;
   position: relative;
@@ -598,7 +598,7 @@ export const BenchmarkGrid = styled.div`
 export const BenchmarkCard = styled.div`
   background: white;
   border: 1px solid #E5E7EB;
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 28px 24px;
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
   opacity: 0;
@@ -651,94 +651,119 @@ export const CaseStudyGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  perspective: 1200px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    perspective: 800px;
   }
 `;
 
 export const CaseStudyCard = styled.div`
-  background: #fafafa;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   opacity: 0;
-  transform: translateY(60px) scale(0.95);
+  transform: translateY(80px) rotateX(8deg) scale(0.96);
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #111;
+    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
   &.visible {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0) rotateX(0deg) scale(1);
   }
 
   &:hover {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-    transform: translateY(-6px) scale(1.01);
-    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.10);
+    transform: translateY(-4px);
+    border-color: #d1d5db;
+  }
+
+  &:hover::after {
+    width: 100%;
   }
 
   .case-img {
-    height: 220px;
+    height: 240px;
     overflow: hidden;
+    border-bottom: 1px solid #e5e7eb;
 
     img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center 30%;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      height: auto;
+      display: block;
+      object-position: top center;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: grayscale(15%);
     }
   }
 
   &:hover .case-img img {
-    transform: scale(1.06);
+    transform: scale(1.04);
+    filter: grayscale(0%);
   }
 
   .case-content {
-    padding: 24px;
+    padding: 28px 28px 24px;
   }
 
   .case-category {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
-    color: #71717A;
+    color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.1em;
   }
 
   .case-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #111827;
-    margin: 8px 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #111;
+    margin: 10px 0;
+    letter-spacing: -0.01em;
   }
 
   .case-desc {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: #6B7280;
-    line-height: 1.6;
+    line-height: 1.65;
   }
 
   .case-stat {
     display: inline-flex;
     align-items: baseline;
-    gap: 6px;
-    background: #F5F5F5;
-    border: 1px solid #E4E4E7;
-    border-radius: 10px;
-    padding: 8px 14px;
-    margin-top: 16px;
+    gap: 8px;
+    background: transparent;
+    border-left: 3px solid #111;
+    border-radius: 0;
+    padding: 6px 14px;
+    margin-top: 20px;
   }
 
   .case-stat-value {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 900;
-    color: #111111;
+    color: #111;
+    letter-spacing: -0.02em;
   }
 
   .case-stat-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: #6B7280;
     font-weight: 500;
   }
@@ -859,7 +884,7 @@ export const PlanStep = styled.div`
   max-width: 340px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  border-radius: 4px;
   padding: 36px 28px;
   text-align: center;
   backdrop-filter: blur(10px);
@@ -957,6 +982,7 @@ export const TestimonialsSection = styled.section`
 
   @media (max-width: 768px) {
     padding: 60px 0;
+    overflow: visible;
   }
 `;
 
@@ -979,7 +1005,7 @@ export const ReviewsMarquee = styled.div`
 
 export const TestimonialCardStyled = styled.div`
   background: rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
+  border-radius: 4px;
   padding: 32px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -1228,7 +1254,7 @@ export const ZoomRevealSection = styled.section`
     gap: 2px;
     max-width: 1000px;
     width: 100%;
-    border-radius: 20px;
+    border-radius: 4px;
     overflow: hidden;
 
     @media (max-width: 768px) {
