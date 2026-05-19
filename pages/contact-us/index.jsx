@@ -206,109 +206,147 @@ const Disclaimer = styled.p`
 
 const StepsOuter = styled.div`
   background: #0a0a0a;
-  padding: 5rem 1.5rem 6rem;
+  padding: 6rem 1.5rem 7rem;
 `;
 
 const StepsInner = styled.div`
-  max-width: 960px;
+  max-width: 900px;
   margin: 0 auto;
 `;
 
 const StepsTitle = styled.h2`
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #CC5A50;
-  margin-bottom: 3.5rem;
+  margin-bottom: 4rem;
   text-align: center;
+`;
+
+const StepsTimeline = styled.div`
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+`;
+
+const TimelineTrack = styled.div`
+  position: absolute;
+  top: 28px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+
+  .timeline-fill {
+    height: 100%;
+    width: 0%;
+    background: #CC5A50;
+    transition: none;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const StepsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  max-width: 960px;
-  margin: 0 auto;
-  align-items: stretch;
+  gap: 0;
+  position: relative;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    max-width: 420px;
-    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
   }
 `;
 
 const StepCard = styled.div`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-  padding: 2.5rem 2rem;
+  padding: 0 2.5rem;
   position: relative;
   opacity: 0;
-  filter: blur(8px);
   transform: translateY(20px);
-  transition: border-color 0.5s ease;
 
-  /* Corner accent bracket — top-left */
-  &::before, &::after {
-    content: "";
-    position: absolute;
-    background: rgba(255, 255, 255, 0.5);
+  &:first-child {
+    padding-left: 0;
   }
-  &::before {
-    top: -1px;
-    left: -1px;
-    width: 0;
-    height: 1px;
-    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  &::after {
-    top: -1px;
-    left: -1px;
-    width: 1px;
-    height: 0;
-    transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  &.active {
-    border-color: rgba(255, 255, 255, 0.08);
-    &::before { width: 28px; }
-    &::after { height: 28px; }
+  &:last-child {
+    padding-right: 0;
   }
 
   @media (max-width: 768px) {
-    padding: 2rem 1.5rem;
+    padding: 0;
+    margin-bottom: 2.5rem;
+    &:last-child { margin-bottom: 0; }
+  }
+`;
+
+const StepDot = styled.div`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  margin-bottom: 2rem;
+  position: relative;
+  transition: all 0.8s ease;
+
+  &.lit {
+    background: #CC5A50;
+    box-shadow: 0 0 12px rgba(204, 90, 80, 0.4);
+  }
+
+  &.done {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: none;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 1.25rem;
   }
 `;
 
 const StepNum = styled.span`
-  font-size: 2.8rem;
-  font-weight: 700;
-  color: #CC5A50;
-  text-shadow: 0 0 40px rgba(204, 90, 80, 0.25);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.15);
   display: block;
-  margin-bottom: 1.25rem;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  margin-bottom: 0.75rem;
+  transition: color 0.6s ease;
 
-  @media (max-width: 768px) {
-    font-size: 2.2rem;
+  .step-card.active & {
+    color: rgba(255, 255, 255, 0.5);
   }
 `;
 
 const StepLabel = styled.h3`
-  font-size: 1.1rem;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #fff;
-  margin-bottom: 0.6rem;
+  color: rgba(255, 255, 255, 0.2);
+  margin-bottom: 0.75rem;
   letter-spacing: -0.01em;
+  transition: color 0.6s ease;
+
+  .step-card.active & {
+    color: #fff;
+  }
 `;
 
 const StepText = styled.p`
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.35);
-  line-height: 1.6;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.12);
+  line-height: 1.65;
+  transition: color 0.6s ease;
+
+  .step-card.active & {
+    color: rgba(255, 255, 255, 0.6);
+  }
 `;
 
 /* ═══════════ COMPONENT ═══════════ */
@@ -344,6 +382,7 @@ const ContactUs = () => {
   const heroSubRef = useRef(null);
   const cardsRef = useRef(null);
   const stepsRef = useRef(null);
+  const fillRef = useRef(null);
 
   useEffect(() => {
     if (scriptLoaded && !isMobile && calendlyWidgetRef.current && typeof window !== "undefined" && window.Calendly) {
@@ -436,24 +475,53 @@ const ContactUs = () => {
         }, 500);
       }
 
-      // Steps — deblur reveal + corner bracket animation
-      const steps = stepsRef.current?.querySelectorAll(".step-card");
+      // Steps — timeline draw + sequential reveal
+      const stepsEl = stepsRef.current;
+      const steps = stepsEl?.querySelectorAll(".step-card");
+      const dots = stepsEl?.querySelectorAll(".step-dot");
+      const fill = fillRef.current;
+
       if (steps?.length) {
         ScrollTrigger.create({
-          trigger: stepsRef.current,
-          start: "top 80%",
+          trigger: stepsEl,
+          start: "top 75%",
           once: true,
           onEnter: () => {
-            steps.forEach((step, i) => {
-              gsap.to(step, {
-                opacity: 1,
-                filter: "blur(0px)",
-                y: 0,
-                duration: 1,
-                ease: "power3.out",
-                delay: i * 0.2,
-                onComplete: () => step.classList.add("active"),
+            // Line draws smoothly in one motion
+            if (fill) {
+              gsap.to(fill, {
+                width: "100%",
+                duration: 2.5,
+                ease: "power1.inOut",
               });
+            }
+
+            // All cards fade in together as one fluid motion, slightly staggered
+            gsap.to(steps, {
+              opacity: 1,
+              y: 0,
+              duration: 1.4,
+              stagger: 0.3,
+              ease: "power2.out",
+              onComplete: function () {
+                // Activate all text at the end
+                steps.forEach((s) => s.classList.add("active"));
+              },
+            });
+
+            // Dots light up following the line, then settle
+            dots.forEach((dot, i) => {
+              const delay = (i / steps.length) * 2.5;
+              gsap.delayedCall(delay + 0.1, () => {
+                dot.classList.add("lit");
+              });
+              // Previous goes done when next lights
+              if (i > 0) {
+                gsap.delayedCall(delay + 0.1, () => {
+                  dots[i - 1].classList.remove("lit");
+                  dots[i - 1].classList.add("done");
+                });
+              }
             });
           },
         });
@@ -549,15 +617,21 @@ const ContactUs = () => {
       <StepsOuter>
         <StepsInner>
           <StepsTitle>{t("contactPage.whatHappensNext") || "What happens next"}</StepsTitle>
-          <StepsGrid ref={stepsRef}>
-            {stepsData.map((step) => (
-              <StepCard key={step.num} className="step-card">
-                <StepNum>{step.num}</StepNum>
-                <StepLabel>{isSpanish ? step.labelEs : step.labelEn}</StepLabel>
-                <StepText>{isSpanish ? step.textEs : step.textEn}</StepText>
-              </StepCard>
-            ))}
-          </StepsGrid>
+          <StepsTimeline>
+            <TimelineTrack>
+              <div className="timeline-fill" ref={fillRef} />
+            </TimelineTrack>
+            <StepsGrid ref={stepsRef}>
+              {stepsData.map((step) => (
+                <StepCard key={step.num} className="step-card">
+                  <StepDot className="step-dot" />
+                  <StepNum>{step.num}</StepNum>
+                  <StepLabel>{isSpanish ? step.labelEs : step.labelEn}</StepLabel>
+                  <StepText>{isSpanish ? step.textEs : step.textEn}</StepText>
+                </StepCard>
+              ))}
+            </StepsGrid>
+          </StepsTimeline>
         </StepsInner>
       </StepsOuter>
     </PageWrapper>

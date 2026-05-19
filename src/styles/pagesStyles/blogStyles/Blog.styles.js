@@ -8,65 +8,16 @@ const shimmer = keyframes`
 export const BlogContainer = styled.div`
   background: #fff;
   min-height: 100vh;
-  max-width: 1100px;
   margin: 0 auto;
-  padding: 88px 40px 100px;
-
-  @media (min-width: 1600px) {
-    max-width: 1400px;
-    padding: 88px 60px 100px;
-  }
+  padding: 88px 0 100px;
 
   @media (max-width: 768px) {
+    width: auto !important;
     padding: 72px 20px 60px;
   }
 `;
 
-export const BlogHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 36px;
-
-  h1 {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #999;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin: 0;
-  }
-
-  @media (max-width: 640px) {
-    flex-direction: column;
-    gap: 16px;
-  }
-`;
-
-export const SearchInput = styled.input`
-  width: 200px;
-  padding: 6px 0;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  background: transparent;
-  font-size: 0.82rem;
-  color: #111;
-  outline: none;
-  transition: border-color 0.3s ease;
-
-  &::placeholder {
-    color: #ccc;
-  }
-
-  &:focus {
-    border-color: #111;
-  }
-
-  @media (max-width: 640px) {
-    width: 100%;
-  }
-`;
+export const BlogHeader = styled.div``;
 
 /* ---------- FEATURED (first article) ---------- */
 export const FeaturedCard = styled.article`
@@ -153,6 +104,75 @@ export const FeaturedCard = styled.article`
 
     @media (max-width: 768px) {
       display: none;
+    }
+  }
+
+  /* ── Search pill inside featured ── */
+  .search-pill {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 100px;
+    cursor: text;
+    transition: background 0.3s ease, width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: auto;
+
+    &:focus-within {
+      background: rgba(0, 0, 0, 0.55);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      flex-shrink: 0;
+      transition: color 0.3s ease;
+    }
+
+    &:focus-within svg {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    input {
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 0.75rem;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      outline: none;
+      width: 120px;
+      transition: width 0.3s ease;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      &:focus {
+        width: 160px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      top: 14px;
+      right: 14px;
+      padding: 6px 12px;
+
+      input {
+        width: 100px;
+        &:focus { width: 120px; }
+      }
     }
   }
 `;
@@ -264,4 +284,6 @@ export const ArticleCard = styled.article`
 
 /* keep exports for backwards compat */
 export const SearchBarContainer = styled.div``;
+export const SearchInput = styled.input``;
+export const SearchRow = styled.div``;
 export const BlogHero = styled.div``;

@@ -55,10 +55,27 @@ const HeroTitle = styled.h1`
   font-family: "Space Grotesk", sans-serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 700;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.4);
   letter-spacing: -0.02em;
   line-height: 1.1;
   margin: 0 0 1.5rem;
+
+  .word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+
+    .word-inner {
+      display: inline-block;
+      transform: translateY(120%);
+      will-change: transform;
+    }
+  }
+
+  .highlight {
+    color: #fff;
+  }
 `;
 
 const HeroSubtitle = styled.p`
@@ -399,11 +416,23 @@ const CTAWrapper = styled.div`
   position: relative;
 `;
 
+const splitHeroWords = (text, highlights = []) =>
+  text.split(" ").map((word, i) => {
+    const clean = word.toLowerCase().replace(/[^a-záéíóúñ]/gi, "");
+    const isHl = highlights.some((h) => clean === h.toLowerCase());
+    return (
+      <span className="word" key={i}>
+        <span className={`word-inner${isHl ? " highlight" : ""}`}>{word}&nbsp;</span>
+      </span>
+    );
+  });
+
 /* ===================================================================
    PAGE COMPONENT
    =================================================================== */
 const StaffAugmentation = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isSpanish = i18n.language === "es";
   const [isMobile, setIsMobile] = useState(false);
 
   // Refs
@@ -433,14 +462,20 @@ const StaffAugmentation = () => {
       ctx = gsap.context(() => {
 
         /* ---------- 1. CINEMATIC HERO ---------- */
-        // Entrance (once)
-        gsap.fromTo(heroTitleRef.current,
-          { opacity: 0, y: 50 },
-          { opacity: 1, y: 0, duration: 1.2, ease: "power3.out", delay: 0.1 }
-        );
+        // Word-by-word reveal entrance
+        const heroWords = heroTitleRef.current?.querySelectorAll(".word-inner");
+        if (heroWords?.length) {
+          gsap.to(heroWords, {
+            y: 0,
+            duration: 1,
+            stagger: 0.08,
+            ease: "power4.out",
+            delay: 0.3,
+          });
+        }
         gsap.fromTo(heroSubRef.current,
           { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 1, ease: "power3.out", delay: 0.4 }
+          { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.9 }
         );
 
         // Exit/return on scroll (scrub = bidirectional)
@@ -453,8 +488,8 @@ const StaffAugmentation = () => {
           },
         });
         heroTl
-          .to(heroTitleRef.current, { scale: 0.85, opacity: 0, y: -40 })
-          .to(heroSubRef.current, { opacity: 0, y: -30 }, 0.1);
+          .fromTo(heroTitleRef.current, { scale: 1, opacity: 1, y: 0 }, { scale: 0.85, opacity: 0, y: -40 })
+          .fromTo(heroSubRef.current, { opacity: 1, y: 0 }, { opacity: 0, y: -30 }, 0.1);
 
         /* ---------- 2. SCROLL TEXT REVEAL (pinned) ---------- */
         if (revealTextRef.current) {
@@ -537,7 +572,30 @@ const StaffAugmentation = () => {
           });
         }
 
-        /* COMMITMENT section — typewriter handles its own reveal */
+        /* COMMITMENT section — manual scroll reveal (after pins settle) */
+        if (commitmentRef.current) {
+          const srWords = commitmentRef.current.querySelectorAll(".sr-word");
+          if (srWords.length) {
+            ScrollTrigger.create({
+              trigger: commitmentRef.current,
+              start: "top 65%",
+              end: "top 15%",
+              scrub: true,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                const p = self.progress;
+                const total = srWords.length;
+                for (let i = 0; i < total; i++) {
+                  const ws = i / total;
+                  const we = (i + 1) / total;
+                  let wp = (p - ws) / (we - ws);
+                  wp = Math.max(0, Math.min(1, wp));
+                  srWords[i].style.opacity = String(0.12 + wp * 0.78);
+                }
+              },
+            });
+          }
+        }
 
         ScrollTrigger.refresh();
       });
@@ -713,7 +771,12 @@ const StaffAugmentation = () => {
           <HeroGrid />
           <HeroContent>
             <div ref={heroTitleRef}>
-              <HeroTitle>Staff Augmentation</HeroTitle>
+              <HeroTitle>
+                {splitHeroWords(
+                  isSpanish ? "Staff Augmentation" : "Staff Augmentation",
+                  ["Staff"]
+                )}
+              </HeroTitle>
             </div>
             <div ref={heroSubRef}>
               <HeroSubtitle>

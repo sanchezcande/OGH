@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   BlogContainer,
-  BlogHeader,
   FeaturedCard,
   Gallery,
   ArticleCard,
-  SearchInput,
 } from "../../src/styles/pagesStyles/blogStyles/Blog.styles";
 import { useRouter } from "next/router";
 import SEO from "../../src/components/SEO/SEO";
@@ -17,14 +15,17 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-function FeaturedArticle({ article }) {
+function FeaturedArticle({ article, searchTerm, onSearchChange }) {
   const [loaded, setLoaded] = useState(false);
   const router = useRouter();
 
   return (
     <FeaturedCard
       className="featured-card"
-      onClick={() => router.push(`/blog/${article.slug}`)}
+      onClick={(e) => {
+        if (e.target.tagName === "INPUT") return;
+        router.push(`/blog/${article.slug}`);
+      }}
     >
       <div className={`featured-img-wrapper${loaded ? " loaded" : ""}`}>
         <img
@@ -33,6 +34,20 @@ function FeaturedArticle({ article }) {
           onLoad={() => setLoaded(true)}
         />
       </div>
+
+      <div className="search-pill" onClick={(e) => e.stopPropagation()}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      </div>
+
       <div className="featured-overlay">
         <span className="featured-tag">Featured</span>
         <h2 className="featured-title">{article.title}</h2>
@@ -71,13 +86,31 @@ export default function Blog() {
   const articles = t("articles", { returnObjects: true }) || [];
   const [searchTerm, setSearchTerm] = useState("");
   const galleryRef = useRef(null);
-  const featuredRef = useRef(null);
+  const containerRef = useRef(null);
 
-  const filteredArticles = articles.filter(
-    (article) =>
-      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.summary.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Match blog width to navbar width
+  useEffect(() => {
+    const syncWidth = () => {
+      const nav = document.querySelector("nav");
+      if (nav && containerRef.current) {
+        containerRef.current.style.width = `${nav.offsetWidth}px`;
+      }
+    };
+    syncWidth();
+    window.addEventListener("resize", syncWidth);
+    const interval = setInterval(syncWidth, 500);
+    return () => {
+      window.removeEventListener("resize", syncWidth);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const filteredArticles = useMemo(() =>
+    articles.filter(
+      (article) =>
+        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        article.summary.toLowerCase().includes(searchTerm.toLowerCase()),
+    ), [articles, searchTerm]);
 
   const featured = filteredArticles[0];
   const rest = filteredArticles.slice(1);
@@ -86,7 +119,6 @@ export default function Blog() {
     if (typeof window === "undefined") return;
 
     const ctx = gsap.context(() => {
-      // Featured: fade in
       const featuredEl = document.querySelector(".featured-card");
       if (featuredEl) {
         gsap.fromTo(featuredEl,
@@ -95,7 +127,6 @@ export default function Blog() {
         );
       }
 
-      // Grid cards: stagger entrance + parallax on images
       if (galleryRef.current) {
         const cards = galleryRef.current.querySelectorAll(".article-card");
 
@@ -146,17 +177,14 @@ export default function Blog() {
         description="Practical guides on workflow automation, n8n, AI tools, staff augmentation in Latin America, and nearshore development."
         keywords="workflow automation blog, staff augmentation LATAM blog, process improvement, n8n tutorials, AI business guides"
       />
-      <BlogContainer>
-        <BlogHeader>
-          <SearchInput
-            type="text"
-            placeholder={t("searchPlaceholder") || "Search..."}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+      <BlogContainer ref={containerRef}>
+        {featured && (
+          <FeaturedArticle
+            article={featured}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
           />
-        </BlogHeader>
-
-        {featured && <FeaturedArticle article={featured} />}
+        )}
 
         <Gallery ref={galleryRef}>
           {rest.map((article) => (

@@ -14,7 +14,6 @@ const ScrollRevealText = ({ text, className, style }) => {
     const el = containerRef.current;
     if (!el || !text) return;
 
-    // Small delay to ensure DOM is painted
     const raf = requestAnimationFrame(() => {
       const words = el.querySelectorAll(".sr-word");
       if (!words.length) return;
