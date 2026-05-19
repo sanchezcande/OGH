@@ -148,7 +148,6 @@ export default function Blog() {
       />
       <BlogContainer>
         <BlogHeader>
-          <h1>Blog</h1>
           <SearchInput
             type="text"
             placeholder={t("searchPlaceholder") || "Search..."}

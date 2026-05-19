@@ -10,18 +10,23 @@ export const BlogContainer = styled.div`
   min-height: 100vh;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 110px 40px 100px;
+  padding: 88px 40px 100px;
+
+  @media (min-width: 1600px) {
+    max-width: 1400px;
+    padding: 88px 60px 100px;
+  }
 
   @media (max-width: 768px) {
-    padding: 90px 20px 60px;
+    padding: 72px 20px 60px;
   }
 `;
 
 export const BlogHeader = styled.div`
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 56px;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 36px;
 
   h1 {
     font-family: "Space Grotesk", sans-serif;
@@ -35,7 +40,7 @@ export const BlogHeader = styled.div`
 
   @media (max-width: 640px) {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 `;
 
@@ -157,6 +162,10 @@ export const Gallery = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 48px 40px;
+
+  @media (min-width: 1600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
