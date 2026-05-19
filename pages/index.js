@@ -822,7 +822,7 @@ export default function HomePage() {
     "@type": "Organization",
     name: "OpenGateHub",
     url: "https://opengatehub.com",
-    logo: "https://opengatehub.com/browser-link-logo.png",
+    logo: "https://opengatehub.com/og-image.png",
     sameAs: ["https://www.linkedin.com/company/opengatehub"],
     description: "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and embedded engineering teams.",
   };

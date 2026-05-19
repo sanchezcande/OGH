@@ -45,7 +45,7 @@ export default class MyDocument extends Document {
                 "@type": "Organization",
                 "name": "OpenGateHub",
                 "url": "https://opengatehub.com",
-                "logo": "https://opengatehub.com/browser-link-logo.png",
+                "logo": "https://opengatehub.com/og-image.png",
                 "description": "OpenGateHub is a workflow automation and staff augmentation company from Latin America. We help companies eliminate manual work through AI integration, n8n automation, and embedded nearshore engineering teams.",
                 "sameAs": [
                   "https://www.linkedin.com/company/opengatehub"

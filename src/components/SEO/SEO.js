@@ -19,7 +19,7 @@ const SEO = ({
   const fullCanonical = canonical || `${siteUrl}${router.asPath.split("?")[0]}`;
   const defaultTitle = "Workflow Automation & Staff Augmentation in Latin America | OpenGateHub";
   const defaultDescription = "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and nearshore engineering teams from Latin America. Kickoff in 7.3 days. 9.7/10 CSAT.";
-  const defaultOgImage = "https://opengatehub.com/Reducido4oscuro.png";
+  const defaultOgImage = "https://opengatehub.com/og-image.png";
 
   const displayTitle = title || defaultTitle;
   const displayDescription = description || defaultDescription;
