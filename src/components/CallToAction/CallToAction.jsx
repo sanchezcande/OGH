@@ -121,7 +121,7 @@ const CallToActionBlock = ({
           target={finalTarget}
           rel={finalRel}
         >
-          {buttonText}
+          {buttonText} <span className="cta-arrow">→</span>
         </CallToActionButton>
       </motion.div>
     </CallToActionContainer>

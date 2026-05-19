@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import SEO from "../../src/components/SEO/SEO";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+import ScrollRevealText from "../../src/components/TypewriterText/TypewriterText";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -536,20 +537,7 @@ const StaffAugmentation = () => {
           });
         }
 
-        /* ---------- COMMITMENT FADE ---------- */
-        if (commitmentRef.current) {
-          gsap.from(commitmentRef.current, {
-            opacity: 0,
-            y: 40,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: commitmentRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          });
-        }
+        /* COMMITMENT section — typewriter handles its own reveal */
 
         ScrollTrigger.refresh();
       });
@@ -846,9 +834,18 @@ const StaffAugmentation = () => {
             <SectionLabel style={{ color: "#666" }}>
               {t("staffAugmentation.whyChooseTitle")}
             </SectionLabel>
-            <CommitmentText>
-              {t("staffAugmentation.benefits.commitment")}
-            </CommitmentText>
+            <ScrollRevealText
+              text={t("staffAugmentation.benefits.commitment")}
+              className=""
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
+                lineHeight: 1.7,
+                maxWidth: "700px",
+                margin: "0 auto",
+                minHeight: "6em",
+              }}
+            />
           </SectionContainer>
         </CommitmentSection>
 

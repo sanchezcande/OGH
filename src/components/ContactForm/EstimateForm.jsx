@@ -93,12 +93,12 @@ const EstimateForm = () => {
 
   const baseInputStyle = {
     marginBottom: "0.75rem",
-    padding: "0.65rem 0.75rem",
+    padding: "0.7rem 0.85rem",
     border: "1px solid #e5e7eb",
-    borderRadius: "6px",
+    borderRadius: "4px",
     fontSize: "0.875rem",
-    backgroundColor: "#ffffff",
-    color: "#1f2937",
+    backgroundColor: "#fff",
+    color: "#111",
     width: "100%",
     outline: "none",
     transition: "border-color 0.2s ease",
@@ -210,25 +210,6 @@ const EstimateForm = () => {
         <StyledButton
           type="submit"
           disabled={isSubmitting}
-          style={{
-            width: "100%",
-            padding: "11px 20px",
-            fontSize: "0.9rem",
-            fontWeight: "600",
-            backgroundColor: isSubmitting ? "#9CA3AF" : "#111111",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-            transition: "background-color 0.2s ease",
-            marginTop: "0.25rem",
-          }}
-          onMouseEnter={(e) => {
-            if (!isSubmitting) e.currentTarget.style.backgroundColor = "#333333";
-          }}
-          onMouseLeave={(e) => {
-            if (!isSubmitting) e.currentTarget.style.backgroundColor = "#111111";
-          }}
         >
           {isSubmitting
             ? t("contactForm.submitting", "Sending...")

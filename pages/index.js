@@ -495,9 +495,9 @@ export default function HomePage() {
           end: "bottom bottom",
           onUpdate: (self) => {
             const p = self.progress;
-            // Reserve 10% at start (step 1 breathes) and 30% at end (step 3 stays)
-            const adjusted = Math.min(1, Math.max(0, (p - 0.10) / 0.60));
-            const idx = Math.min(Math.floor(adjusted * 3), 2);
+            // 4 phases: step1, step2, step3, CTA button
+            const adjusted = Math.min(1, Math.max(0, (p - 0.08) / 0.85));
+            const idx = Math.min(Math.floor(adjusted * 4), 3);
             if (idx !== lastPlanIdx) {
               lastPlanIdx = idx;
               setActivePlanStep(idx);
@@ -1381,7 +1381,7 @@ export default function HomePage() {
         </CarouselSection>
 
         {/* ═══════════ HOW IT WORKS (sticky scroll) ═══════════ */}
-        <div ref={planRef} style={{ position: "relative", height: "400vh" }}>
+        <div ref={planRef} style={{ position: "relative", height: "800vh" }}>
           <PlanSection style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <SectionInner>
               <div style={{ textAlign: "center" }}>
@@ -1413,9 +1413,9 @@ export default function HomePage() {
               <div style={{
                 textAlign: "center",
                 marginTop: 48,
-                opacity: activePlanStep >= 2 ? 1 : 0,
-                transform: activePlanStep >= 2 ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.5s ease, transform 0.5s ease",
+                opacity: activePlanStep >= 3 ? 1 : 0,
+                transform: activePlanStep >= 3 ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
               }}>
                 <CTAButton
                   href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}

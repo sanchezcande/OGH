@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import SEO from "../../src/components/SEO/SEO";
 import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
+import ScrollRevealText from "../../src/components/TypewriterText/TypewriterText";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -467,6 +468,47 @@ const MobileProcessCard = styled.div`
 /* ===================================================================
    PAGE COMPONENT
    =================================================================== */
+function CountUp({ target, suffix = "", decimals = 0, duration = 1400 }) {
+  const [display, setDisplay] = useState("0" + (decimals > 0 ? "." + "0".repeat(decimals) : "") + suffix);
+  const ref = useRef(null);
+  const animated = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !animated.current) {
+          animated.current = true;
+          const start = performance.now();
+          const step = (now) => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = eased * target;
+            setDisplay(current.toFixed(decimals) + suffix);
+            if (progress < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, suffix, decimals, duration]);
+
+  return <span ref={ref}>{display}</span>;
+}
+
+function parseMetricValue(value) {
+  const match = value.match(/^([\d.]+)\s*(.*)$/);
+  if (!match) return { target: 0, suffix: value, decimals: 0 };
+  const num = parseFloat(match[1]);
+  const suffix = match[2] || "";
+  const decimals = match[1].includes(".") ? match[1].split(".")[1].length : 0;
+  return { target: num, suffix, decimals };
+}
+
 const SoftwareFactory = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -621,20 +663,7 @@ const SoftwareFactory = () => {
         });
       }
 
-      /* ---------- COMMITMENT FADE ---------- */
-      if (commitmentRef.current) {
-        gsap.from(commitmentRef.current, {
-          opacity: 0,
-          y: 40,
-          duration: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: commitmentRef.current,
-            start: "top 80%",
-            toggleActions: "play none none none",
-          },
-        });
-      }
+      /* COMMITMENT section — typewriter handles its own reveal */
     });
 
     return () => ctx.revert();
@@ -765,7 +794,9 @@ const SoftwareFactory = () => {
             <MetricsGrid>
               {metrics.map((m, i) => (
                 <MetricCard key={i} ref={(el) => (metricsCardsRef.current[i] = el)}>
-                  <MetricValue>{m.value}</MetricValue>
+                  <MetricValue>
+                    <CountUp {...parseMetricValue(m.value)} />
+                  </MetricValue>
                   <MetricTitle>{m.title}</MetricTitle>
                   <MetricDesc>{m.desc}</MetricDesc>
                 </MetricCard>
@@ -878,11 +909,19 @@ const SoftwareFactory = () => {
             <SectionLabel style={{ color: "#666" }}>
               {isSpanish ? "Compromiso" : "Our Commitment"}
             </SectionLabel>
-            <CommitmentText>
-              {isSpanish
+            <ScrollRevealText
+              text={isSpanish
                 ? "Automatizamos tus procesos más críticos para que tu equipo se enfoque en lo que realmente importa. Sin fricciones, sin complejidad innecesaria."
                 : "We automate your most critical processes so your team can focus on what truly matters. No friction, no unnecessary complexity."}
-            </CommitmentText>
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
+                lineHeight: 1.7,
+                maxWidth: "700px",
+                margin: "0 auto",
+                minHeight: "6em",
+              }}
+            />
           </SectionContainer>
         </CommitmentSection>
 

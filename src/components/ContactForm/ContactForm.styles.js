@@ -154,15 +154,54 @@ export const Select = styled.select`
   }
 `;
 
-export const StyledButton = styled(DarkButton)`
-  margin-top: 10px;
-  display: inline-block;
+export const StyledButton = styled.button`
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
-  &.error {
-    animation: none;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.15) 50%,
+      transparent 80%
+    );
+    transition: none;
+    pointer-events: none;
   }
 
-  &.valid {
-    animation: none;
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+    &::before {
+      transition: left 0.5s ease;
+      left: 150%;
+    }
+  }
+
+  &:disabled {
+    background: #9CA3AF;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 `;

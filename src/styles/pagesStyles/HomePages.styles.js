@@ -223,21 +223,36 @@ export const CTAButton = styled.a`
   &.primary-cta {
     background: white;
     color: #111111;
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0), 0 8px 32px rgba(255, 255, 255, 0.1);
 
     &::before {
       content: "";
       position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-      background-size: 200% 100%;
-      animation: ${shimmer} 3s ease-in-out infinite;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(0, 0, 0, 0.06) 50%,
+        transparent 80%
+      );
+      transition: none;
+      pointer-events: none;
     }
 
     &:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 0 40px rgba(255, 255, 255, 0.15), 0 12px 40px rgba(255, 255, 255, 0.1);
-      color: #111111;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(255, 255, 255, 0.15);
+
+      span {
+        transform: translateX(4px);
+      }
+
+      &::before {
+        transition: left 0.5s ease;
+        left: 150%;
+      }
     }
   }
 
@@ -247,11 +262,33 @@ export const CTAButton = styled.a`
     border: 1.5px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(4px);
 
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 80%
+      );
+      transition: none;
+      pointer-events: none;
+    }
+
     &:hover {
-      border-color: rgba(255, 255, 255, 0.5);
+      border-color: rgba(255, 255, 255, 0.6);
       color: white;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.08);
       transform: translateY(-2px);
+
+      &::before {
+        transition: left 0.5s ease;
+        left: 150%;
+      }
     }
   }
 
@@ -888,8 +925,8 @@ export const PlanStep = styled.div`
   padding: 36px 28px;
   text-align: center;
   backdrop-filter: blur(10px);
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
               background 0.3s ease,
               border-color 0.3s ease,
               box-shadow 0.3s ease;

@@ -10,7 +10,6 @@ import {
   MenuItem,
   LanguageMenu,
   LangMenuItem,
-  Span,
   ArrowIcon,
   WorldIcon,
   LangMenuContainer,
@@ -24,6 +23,8 @@ const NavBarMobile = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en");
+  const [isDark, setIsDark] = useState(true);
+  const menuRef = useRef(null);
 
   const closeAllMenus = useCallback(() => {
     setMenuOpen(false);
@@ -31,13 +32,13 @@ const NavBarMobile = () => {
   }, []);
 
   const toggleMenu = useCallback(() => {
-    setMenuOpen(!menuOpen);
+    setMenuOpen((prev) => !prev);
     setShowLangMenu(false);
-  }, [menuOpen]);
+  }, []);
 
   const toggleLangMenu = useCallback(() => {
-    setShowLangMenu(!showLangMenu);
-  }, [showLangMenu]);
+    setShowLangMenu((prev) => !prev);
+  }, []);
 
   const handleLangChange = useCallback(
     (lang) => {
@@ -51,77 +52,110 @@ const NavBarMobile = () => {
   const handleNavigation = useCallback(
     (href) => {
       closeAllMenus();
-      // Prevent double clicks and ensure smooth navigation
       router.push(href);
     },
     [closeAllMenus, router],
   );
 
-  // Close menu when clicking outside
-  const menuRef = useRef(null);
-
+  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         closeAllMenus();
       }
     };
-
     if (menuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("touchstart", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [menuOpen, closeAllMenus]);
 
+  // Detect background color of the section behind navbar
+  useEffect(() => {
+    const getActualBg = (el) => {
+      while (el && el !== document.documentElement) {
+        const bg = window.getComputedStyle(el).backgroundColor;
+        const match = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+        if (match) {
+          const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
+          if (a > 0.5) return { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) };
+        }
+        el = el.parentElement;
+      }
+      return { r: 255, g: 255, b: 255 };
+    };
+
+    const checkBackground = () => {
+      const nav = menuRef.current;
+      if (!nav) return;
+      const rect = nav.getBoundingClientRect();
+      const midX = rect.left + rect.width / 2;
+      const midY = rect.top + rect.height + 4;
+
+      nav.style.pointerEvents = "none";
+      nav.style.visibility = "hidden";
+      const el = document.elementFromPoint(midX, midY);
+      nav.style.pointerEvents = "";
+      nav.style.visibility = "";
+
+      if (!el) return;
+
+      const { r, g, b } = getActualBg(el);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      setIsDark(brightness < 128);
+    };
+
+    checkBackground();
+    const interval = setInterval(checkBackground, 250);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <NavBarContainer ref={menuRef}>
+    <NavBarContainer ref={menuRef} $isDark={isDark}>
       <LogoIcon>
         <Link href="/" aria-label="OpenGateHub Home">
           <Logo>
-            <OGHLogo size={18} />
+            <OGHLogo size={17} variant={isDark ? "light" : "dark"} />
           </Logo>
         </Link>
-
-        <MenuIcon onClick={toggleMenu} open={menuOpen}>
-          ☰
+        <MenuIcon onClick={toggleMenu} $isDark={isDark}>
+          {menuOpen ? "✕" : "☰"}
         </MenuIcon>
       </LogoIcon>
       {menuOpen && (
-        <Menu open={menuOpen}>
-          <MenuItem onClick={() => handleNavigation("/services/workflow-automation")}>
+        <Menu $isDark={isDark}>
+          <MenuItem $isDark={isDark} onClick={() => handleNavigation("/services/workflow-automation")}>
             Workflow Automation
           </MenuItem>
-          <MenuItem onClick={() => handleNavigation("/services/staff-augmentation")}>
+          <MenuItem $isDark={isDark} onClick={() => handleNavigation("/services/staff-augmentation")}>
             Staff Augmentation
           </MenuItem>
-<MenuItem onClick={() => handleNavigation("/blog")}>
+          <MenuItem $isDark={isDark} onClick={() => handleNavigation("/blog")}>
             {t("Blog")}
           </MenuItem>
-          <MenuItem onClick={() => handleNavigation("/about-us")}>
+          <MenuItem $isDark={isDark} onClick={() => handleNavigation("/about-us")}>
             {t("aboutUs")}
           </MenuItem>
-          <MenuItem onClick={() => handleNavigation("/contact-us")}>
+          <MenuItem $isDark={isDark} onClick={() => handleNavigation("/contact-us")}>
             {t("contactUs")}
           </MenuItem>
-          <MenuItem onClick={toggleLangMenu}>
+          <MenuItem $isDark={isDark} onClick={toggleLangMenu}>
             <LangMenuContainer>
-              <WorldIcon />
-              {selectedLang === "en" ? "Language  " : "Idioma  "}
-              <ArrowIcon open={showLangMenu} />
+              <WorldIcon $isDark={isDark} />
+              {selectedLang === "en" ? "Language" : "Idioma"}
+              <ArrowIcon open={showLangMenu} $isDark={isDark} />
             </LangMenuContainer>
           </MenuItem>
           {showLangMenu && (
             <LanguageMenu open={showLangMenu}>
-              <LangMenuItem onClick={() => handleLangChange("en")}>
+              <LangMenuItem $isDark={isDark} onClick={() => handleLangChange("en")}>
                 {t("english")}
               </LangMenuItem>
-              <LangMenuItem onClick={() => handleLangChange("es")}>
+              <LangMenuItem $isDark={isDark} onClick={() => handleLangChange("es")}>
                 {t("spanish")}
               </LangMenuItem>
             </LanguageMenu>
