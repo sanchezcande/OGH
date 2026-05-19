@@ -487,37 +487,32 @@ const ContactUs = () => {
           start: "top 75%",
           once: true,
           onEnter: () => {
-            // Line draws smoothly in one motion
+            const dur = 3;
+            const n = steps.length;
+
+            // Line draws continuously
             if (fill) {
-              gsap.to(fill, {
-                width: "100%",
-                duration: 2.5,
-                ease: "power1.inOut",
-              });
+              gsap.to(fill, { width: "100%", duration: dur, ease: "none" });
             }
 
-            // All cards fade in together as one fluid motion, slightly staggered
-            gsap.to(steps, {
-              opacity: 1,
-              y: 0,
-              duration: 1.4,
-              stagger: 0.3,
-              ease: "power2.out",
-              onComplete: function () {
-                // Activate all text at the end
-                steps.forEach((s) => s.classList.add("active"));
-              },
-            });
+            // Each step activates when the line reaches it
+            steps.forEach((step, i) => {
+              const t = Math.max(0, ((i / n) * dur) - 0.9);
 
-            // Dots light up following the line, then settle
-            dots.forEach((dot, i) => {
-              const delay = (i / steps.length) * 2.5;
-              gsap.delayedCall(delay + 0.1, () => {
-                dot.classList.add("lit");
+              // Card fades in
+              gsap.to(step, {
+                opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: t,
+                onComplete: () => step.classList.add("active"),
               });
-              // Previous goes done when next lights
-              if (i > 0) {
-                gsap.delayedCall(delay + 0.1, () => {
+
+              // Dot lights up
+              if (dots[i]) {
+                gsap.delayedCall(t + 0.1, () => dots[i].classList.add("lit"));
+              }
+
+              // Previous dot goes white
+              if (i > 0 && dots[i - 1]) {
+                gsap.delayedCall(t + 0.1, () => {
                   dots[i - 1].classList.remove("lit");
                   dots[i - 1].classList.add("done");
                 });
