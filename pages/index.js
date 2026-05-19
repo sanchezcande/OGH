@@ -274,6 +274,38 @@ export async function getServerSideProps() {
 /* ═══════════════════════════════════════════
    MAIN HOMEPAGE
    ═══════════════════════════════════════════ */
+function CountUp({ target, suffix = "", decimals = 0, duration = 1400 }) {
+  const [display, setDisplay] = useState("0" + (decimals > 0 ? "." + "0".repeat(decimals) : "") + suffix);
+  const ref = useRef(null);
+  const animated = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !animated.current) {
+          animated.current = true;
+          const start = performance.now();
+          const step = (now) => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = eased * target;
+            setDisplay(current.toFixed(decimals) + suffix);
+            if (progress < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, suffix, decimals, duration]);
+
+  return <span ref={ref}>{display}</span>;
+}
+
 export default function HomePage() {
   const { t, i18n } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
@@ -296,8 +328,9 @@ export default function HomePage() {
   const parallaxShowcaseRef = useRef(null);
   const zoomRevealRef = useRef(null);
   const stickyMetricsRef = useRef(null);
-  const [activeMetric, setActiveMetric] = useState(0);
-  const [metricsProgress, setMetricsProgress] = useState(0);
+  const [activeMetric, setActiveMetric] = useState(-1);
+  const [activePlanStep, setActivePlanStep] = useState(0);
+  const metricsProgressRef = useRef(null);
   const metricCounterRefs = useRef([]);
 
   useEffect(() => {
@@ -453,22 +486,23 @@ export default function HomePage() {
         });
       }
 
-      // 8. PLAN STEPS stagger
-      const planSteps = planRef.current?.querySelectorAll(".plan-step");
-      if (planSteps?.length) {
-        planSteps.forEach((step, i) => {
-          gsap.to(step, {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            delay: i * 0.15,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: step,
-              start: "top 85%",
-              once: true,
-            },
-          });
+      // 8. PLAN STEPS — sticky pinned, reveal one by one on scroll
+      if (planRef.current) {
+        let lastPlanIdx = -1;
+        ScrollTrigger.create({
+          trigger: planRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          onUpdate: (self) => {
+            const p = self.progress;
+            // Reserve 10% at start (step 1 breathes) and 30% at end (step 3 stays)
+            const adjusted = Math.min(1, Math.max(0, (p - 0.10) / 0.60));
+            const idx = Math.min(Math.floor(adjusted * 3), 2);
+            if (idx !== lastPlanIdx) {
+              lastPlanIdx = idx;
+              setActivePlanStep(idx);
+            }
+          },
         });
       }
 
@@ -583,16 +617,24 @@ export default function HomePage() {
       // 13. STICKY METRICS scroll counter
       if (stickyMetricsRef.current) {
         const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
+        let lastIdx = -1;
         ScrollTrigger.create({
           trigger: stickyMetricsRef.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0,
           onUpdate: (self) => {
             const p = self.progress;
-            setMetricsProgress(p);
-            const idx = Math.min(Math.floor(p * numSlides), numSlides - 1);
-            setActiveMetric(idx);
+            // Update progress bar via DOM directly (no re-render)
+            if (metricsProgressRef.current) {
+              metricsProgressRef.current.style.width = `${p * 100}%`;
+            }
+            // 8% padding at start, 12% padding at end (last slide stays visible longer)
+            const adjusted = Math.min(1, Math.max(0, (p - 0.08) / 0.80));
+            const idx = Math.min(Math.floor(adjusted * numSlides), numSlides - 1);
+            if (idx !== lastIdx) {
+              lastIdx = idx;
+              setActiveMetric(idx);
+            }
           },
         });
       }
@@ -626,8 +668,9 @@ export default function HomePage() {
   }, [isMobile]);
 
   // Metric counter animation
-  const prevMetricRef = useRef(-1);
+  const prevMetricRef = useRef(-2);
   useEffect(() => {
+    if (activeMetric < 0) return;
     if (prevMetricRef.current === activeMetric) return;
     prevMetricRef.current = activeMetric;
     const el = metricCounterRefs.current[activeMetric];
@@ -1121,15 +1164,17 @@ export default function HomePage() {
             </div>
             <div className="zoom-grid">
               {[
-                { value: "9.7/10", label: "CSAT" },
-                { value: "7.3", label: lang === "es" ? "días avg kickoff" : "days avg kickoff" },
-                { value: "50+", label: lang === "es" ? "sprints entregados" : "sprints shipped" },
-                { value: "32%", label: lang === "es" ? "reducción de costos" : "cost reduction" },
-                { value: "4.9h", label: lang === "es" ? "recuperadas/semana" : "recovered/week" },
-                { value: "96%", label: lang === "es" ? "entregas a tiempo" : "on-time delivery" },
+                { target: 9.7, suffix: "/10", decimals: 1, label: "CSAT" },
+                { target: 7.3, suffix: "", decimals: 1, label: lang === "es" ? "días avg kickoff" : "days avg kickoff" },
+                { target: 50, suffix: "+", decimals: 0, label: lang === "es" ? "sprints entregados" : "sprints shipped" },
+                { target: 32, suffix: "%", decimals: 0, label: lang === "es" ? "reducción de costos" : "cost reduction" },
+                { target: 4.9, suffix: "h", decimals: 1, label: lang === "es" ? "recuperadas/semana" : "recovered/week" },
+                { target: 96, suffix: "%", decimals: 0, label: lang === "es" ? "entregas a tiempo" : "on-time delivery" },
               ].map((item, i) => (
                 <div className="zoom-card" key={i}>
-                  <div className="zoom-card-value">{item.value}</div>
+                  <div className="zoom-card-value">
+                    <CountUp target={item.target} suffix={item.suffix} decimals={item.decimals} />
+                  </div>
                   <div className="zoom-card-label">{item.label}</div>
                 </div>
               ))}
@@ -1140,11 +1185,11 @@ export default function HomePage() {
         {/* ═══════════ STICKY METRICS ═══════════ */}
         <StickyMetricsWrapper
           ref={stickyMetricsRef}
-          style={{ height: "600vh" }}
+          style={{ height: "700vh" }}
         >
           <StickyMetricsViewport>
             <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
-            <StickyMetricsProgress style={{ width: `${metricsProgress * 100}%` }} />
+            <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
             <StickyMetricDots>
               {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
                 <StickyMetricDot key={i} $active={activeMetric === i} />
@@ -1335,40 +1380,55 @@ export default function HomePage() {
           </div>
         </CarouselSection>
 
-        {/* ═══════════ HOW IT WORKS ═══════════ */}
-        <PlanSection ref={planRef}>
-          <SectionInner>
-            <div className="gsap-fade-up" style={{ textAlign: "center" }}>
-              <SectionTitle style={{ color: "white" }}>
-                {t("planTitle")}
-              </SectionTitle>
-            </div>
+        {/* ═══════════ HOW IT WORKS (sticky scroll) ═══════════ */}
+        <div ref={planRef} style={{ position: "relative", height: "400vh" }}>
+          <PlanSection style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <SectionInner>
+              <div style={{ textAlign: "center" }}>
+                <SectionTitle style={{ color: "white" }}>
+                  {t("planTitle")}
+                </SectionTitle>
+              </div>
 
-            <PlanSteps>
-              {[
-                { num: "01", text: t("planSteps.step1") },
-                { num: "02", text: t("planSteps.step2") },
-                { num: "03", text: t("planSteps.step3") },
-              ].map((step, i) => (
-                <PlanStep key={i} className="plan-step">
-                  <div className="step-number">{step.num}</div>
-                  <div className="step-text">{step.text}</div>
-                </PlanStep>
-              ))}
-            </PlanSteps>
+              <PlanSteps>
+                {[
+                  { num: "01", text: t("planSteps.step1") },
+                  { num: "02", text: t("planSteps.step2") },
+                  { num: "03", text: t("planSteps.step3") },
+                ].map((step, i) => (
+                  <PlanStep
+                    key={i}
+                    className="plan-step"
+                    style={{
+                      opacity: activePlanStep >= i ? 1 : 0,
+                      transform: activePlanStep >= i ? "translateY(0)" : "translateY(40px)",
+                    }}
+                  >
+                    <div className="step-number">{step.num}</div>
+                    <div className="step-text">{step.text}</div>
+                  </PlanStep>
+                ))}
+              </PlanSteps>
 
-            <div className="gsap-fade-up" style={{ textAlign: "center", marginTop: 48 }}>
-              <CTAButton
-                href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
-                target={isMobile ? "_blank" : "_self"}
-                rel={isMobile ? "noopener noreferrer" : undefined}
-                className="secondary-cta"
-              >
-                {t("homeServicesSection.startJourneyButton")}
-              </CTAButton>
-            </div>
-          </SectionInner>
-        </PlanSection>
+              <div style={{
+                textAlign: "center",
+                marginTop: 48,
+                opacity: activePlanStep >= 2 ? 1 : 0,
+                transform: activePlanStep >= 2 ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.5s ease, transform 0.5s ease",
+              }}>
+                <CTAButton
+                  href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
+                  target={isMobile ? "_blank" : "_self"}
+                  rel={isMobile ? "noopener noreferrer" : undefined}
+                  className="secondary-cta"
+                >
+                  {t("homeServicesSection.startJourneyButton")}
+                </CTAButton>
+              </div>
+            </SectionInner>
+          </PlanSection>
+        </div>
 
         {/* ═══════════ TESTIMONIALS ═══════════ */}
         <TestimonialsSection>
