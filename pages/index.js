@@ -171,7 +171,7 @@ const ReviewsInfiniteMarquee = ({ testimonials }) => {
             paddingBottom: "8px",
             scrollbarWidth: "none",
             msOverflowStyle: "none",
-            touchAction: "pan-x",
+            touchAction: "pan-x pan-y",
           }}
         >
           {doubled.map((t, i) => (
@@ -357,6 +357,8 @@ export default function HomePage() {
 
     const timer = setTimeout(() => {
       ctx = gsap.context(() => {
+      const mobile = window.innerWidth <= 768;
+
       // 1. HERO TEXT SPLIT REVEAL
       const words = titleRef.current?.querySelectorAll(".word-inner");
       if (words?.length) {
@@ -486,8 +488,8 @@ export default function HomePage() {
         });
       }
 
-      // 8. PLAN STEPS — sticky pinned, reveal one by one on scroll
-      if (planRef.current) {
+      // 8. PLAN STEPS — sticky pinned, reveal one by one on scroll (desktop only)
+      if (planRef.current && !mobile) {
         let lastPlanIdx = -1;
         ScrollTrigger.create({
           trigger: planRef.current,
@@ -552,10 +554,10 @@ export default function HomePage() {
         }
       }
 
-      // 11. ZOOM REVEAL - section scales from 1.15 to 1, border-radius reveals
+      // 11. ZOOM REVEAL - section scales from 1.15 to 1, border-radius reveals (desktop only)
       if (zoomRevealRef.current) {
         const inner = zoomRevealRef.current.querySelector(".zoom-inner");
-        if (inner) {
+        if (inner && !mobile) {
           gsap.fromTo(
             inner,
             { scale: 1.15, borderRadius: "40px" },
@@ -614,8 +616,8 @@ export default function HomePage() {
         });
       });
 
-      // 13. STICKY METRICS scroll counter
-      if (stickyMetricsRef.current) {
+      // 13. STICKY METRICS scroll counter (desktop only)
+      if (stickyMetricsRef.current && !mobile) {
         const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
         let lastIdx = -1;
         ScrollTrigger.create({
@@ -1183,38 +1185,69 @@ export default function HomePage() {
         </ZoomRevealSection>
 
         {/* ═══════════ STICKY METRICS ═══════════ */}
-        <StickyMetricsWrapper
-          ref={stickyMetricsRef}
-          style={{ height: "700vh" }}
-        >
-          <StickyMetricsViewport>
-            <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
-            <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
-            <StickyMetricDots>
-              {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
-                <StickyMetricDot key={i} $active={activeMetric === i} />
-              ))}
-            </StickyMetricDots>
-            {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
-              const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
-              return (
-                <StickyMetricSlide key={key} className={`metric-slide ${activeMetric === i ? "active" : ""}`}>
-                  <div className="metric-counter">
-                    <span
-                      ref={(el) => { metricCounterRefs.current[i] = el; }}
-                      data-value={d.value}
-                    >
-                      {d.value}
-                    </span>
-                    {d.unit && <span className="metric-unit">{d.unit}</span>}
-                  </div>
-                  <div className="metric-label">{d.label}</div>
-                  <div className="metric-desc">{d.description}</div>
-                </StickyMetricSlide>
-              );
-            })}
-          </StickyMetricsViewport>
-        </StickyMetricsWrapper>
+        {isMobile ? (
+          <Section $bg="#0a0a0a" $padding="80px 24px" $mobilePadding="60px 16px">
+            <SectionInner>
+              <div style={{ textAlign: "center", marginBottom: 40 }}>
+                <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.25em" }}>
+                  {t("metricsSection.title", "Proven Results")}
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+                {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key) => {
+                  const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
+                  return (
+                    <div key={key} style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: "3.5rem", fontWeight: 900, color: "#fff", lineHeight: 1, display: "flex", alignItems: "baseline", justifyContent: "center", gap: "0.05em" }}>
+                        {d.value}
+                        {d.unit && <span style={{ fontSize: "1.5rem", fontWeight: 500, color: "rgba(255,255,255,0.35)" }}>{d.unit}</span>}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.2em", marginTop: 12 }}>
+                        {d.label}
+                      </div>
+                      <div style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.35)", marginTop: 8, lineHeight: 1.5 }}>
+                        {d.description}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </SectionInner>
+          </Section>
+        ) : (
+          <StickyMetricsWrapper
+            ref={stickyMetricsRef}
+            style={{ height: "700vh" }}
+          >
+            <StickyMetricsViewport>
+              <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
+              <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
+              <StickyMetricDots>
+                {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
+                  <StickyMetricDot key={i} $active={activeMetric === i} />
+                ))}
+              </StickyMetricDots>
+              {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
+                const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
+                return (
+                  <StickyMetricSlide key={key} className={`metric-slide ${activeMetric === i ? "active" : ""}`}>
+                    <div className="metric-counter">
+                      <span
+                        ref={(el) => { metricCounterRefs.current[i] = el; }}
+                        data-value={d.value}
+                      >
+                        {d.value}
+                      </span>
+                      {d.unit && <span className="metric-unit">{d.unit}</span>}
+                    </div>
+                    <div className="metric-label">{d.label}</div>
+                    <div className="metric-desc">{d.description}</div>
+                  </StickyMetricSlide>
+                );
+              })}
+            </StickyMetricsViewport>
+          </StickyMetricsWrapper>
+        )}
 
         {/* ═══════════ CALCULATOR BANNER ═══════════ */}
         <CalculatorBanner $isMobile={isMobile} className="gsap-fade-up">
@@ -1380,9 +1413,9 @@ export default function HomePage() {
           </div>
         </CarouselSection>
 
-        {/* ═══════════ HOW IT WORKS (sticky scroll) ═══════════ */}
-        <div ref={planRef} style={{ position: "relative", height: "800vh" }}>
-          <PlanSection style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {/* ═══════════ HOW IT WORKS (sticky scroll on desktop, normal flow on mobile) ═══════════ */}
+        {isMobile ? (
+          <PlanSection>
             <SectionInner>
               <div style={{ textAlign: "center" }}>
                 <SectionTitle style={{ color: "white" }}>
@@ -1396,31 +1429,18 @@ export default function HomePage() {
                   { num: "02", text: t("planSteps.step2") },
                   { num: "03", text: t("planSteps.step3") },
                 ].map((step, i) => (
-                  <PlanStep
-                    key={i}
-                    className="plan-step"
-                    style={{
-                      opacity: activePlanStep >= i ? 1 : 0,
-                      transform: activePlanStep >= i ? "translateY(0)" : "translateY(40px)",
-                    }}
-                  >
+                  <PlanStep key={i}>
                     <div className="step-number">{step.num}</div>
                     <div className="step-text">{step.text}</div>
                   </PlanStep>
                 ))}
               </PlanSteps>
 
-              <div style={{
-                textAlign: "center",
-                marginTop: 48,
-                opacity: activePlanStep >= 3 ? 1 : 0,
-                transform: activePlanStep >= 3 ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-              }}>
+              <div style={{ textAlign: "center", marginTop: 48 }}>
                 <CTAButton
-                  href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
-                  target={isMobile ? "_blank" : "_self"}
-                  rel={isMobile ? "noopener noreferrer" : undefined}
+                  href="https://calendly.com/sanchezgcandelaria/15min"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="secondary-cta"
                 >
                   {t("homeServicesSection.startJourneyButton")}
@@ -1428,7 +1448,55 @@ export default function HomePage() {
               </div>
             </SectionInner>
           </PlanSection>
-        </div>
+        ) : (
+          <div ref={planRef} style={{ position: "relative", height: "800vh", zIndex: 2 }}>
+            <PlanSection style={{ position: "sticky", top: 0, height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <SectionInner>
+                <div style={{ textAlign: "center" }}>
+                  <SectionTitle style={{ color: "white" }}>
+                    {t("planTitle")}
+                  </SectionTitle>
+                </div>
+
+                <PlanSteps>
+                  {[
+                    { num: "01", text: t("planSteps.step1") },
+                    { num: "02", text: t("planSteps.step2") },
+                    { num: "03", text: t("planSteps.step3") },
+                  ].map((step, i) => (
+                    <PlanStep
+                      key={i}
+                      className="plan-step"
+                      style={{
+                        opacity: activePlanStep >= i ? 1 : 0,
+                        transform: activePlanStep >= i ? "translateY(0)" : "translateY(40px)",
+                      }}
+                    >
+                      <div className="step-number">{step.num}</div>
+                      <div className="step-text">{step.text}</div>
+                    </PlanStep>
+                  ))}
+                </PlanSteps>
+
+                <div style={{
+                  textAlign: "center",
+                  marginTop: 48,
+                  opacity: activePlanStep >= 3 ? 1 : 0,
+                  transform: activePlanStep >= 3 ? "translateY(0)" : "translateY(20px)",
+                  transition: "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
+                }}>
+                  <CTAButton
+                    href="/contact-us"
+                    target="_self"
+                    className="secondary-cta"
+                  >
+                    {t("homeServicesSection.startJourneyButton")}
+                  </CTAButton>
+                </div>
+              </SectionInner>
+            </PlanSection>
+          </div>
+        )}
 
         {/* ═══════════ TESTIMONIALS ═══════════ */}
         <TestimonialsSection>

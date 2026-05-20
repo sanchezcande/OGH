@@ -898,7 +898,8 @@ export const PlanSection = styled.section`
   }
 
   @media (max-width: 768px) {
-    padding: 60px 16px;
+    padding: 60px 16px 80px;
+    overflow: visible;
   }
 `;
 
@@ -1238,6 +1239,10 @@ export const ZoomRevealSection = styled.section`
   background: #0a0a0a;
   padding: 0;
 
+  @media (max-width: 768px) {
+    overflow: visible;
+  }
+
   .zoom-inner {
     min-height: 100vh;
     display: flex;
@@ -1251,6 +1256,8 @@ export const ZoomRevealSection = styled.section`
     @media (max-width: 768px) {
       padding: 60px 16px;
       min-height: auto;
+      transform: none !important;
+      border-radius: 0 !important;
     }
   }
 

@@ -69,13 +69,14 @@ const AboutUs = React.forwardRef((props, ref) => {
         const words = revealRef.current?.querySelectorAll(".reveal-word");
 
         if (words?.length && revealSection) {
+          const mobile = window.innerWidth <= 768;
           gsap.to(words, {
             opacity: 1,
             stagger: 0.05,
             scrollTrigger: {
               trigger: revealSection,
               start: "top top",
-              end: "+=150%",
+              end: mobile ? "+=80%" : "+=150%",
               pin: true,
               scrub: 0.3,
               anticipatePin: 1,
@@ -90,23 +91,38 @@ const AboutUs = React.forwardRef((props, ref) => {
           const mobile = window.innerWidth <= 768;
 
           gsap.set(accentLine, { height: 0 });
-          gsap.set(founder, { clipPath: "inset(100% 0 0 0)" });
 
-          const fTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: founder,
-              start: mobile ? "top 90%" : "top 85%",
-              end: mobile ? "top 30%" : "bottom 15%",
-              scrub: 0.5,
-            },
-          });
+          if (mobile) {
+            // Mobile: simple fade-in instead of clip-path to avoid white gap
+            gsap.set(founder, { opacity: 0, y: 30 });
 
-          // Wipe in from bottom
-          fTl.to(founder, { clipPath: "inset(0% 0 0 0)", ease: "none" }, 0);
-          // Accent line
-          fTl.to(accentLine, { height: "100%" }, 0.2);
+            const fTl = gsap.timeline({
+              scrollTrigger: {
+                trigger: founder,
+                start: "top 95%",
+                end: "top 50%",
+                scrub: 0.5,
+              },
+            });
 
-          if (!mobile) {
+            fTl.to(founder, { opacity: 1, y: 0, ease: "none" }, 0);
+            fTl.to(accentLine, { height: "100%" }, 0.2);
+          } else {
+            gsap.set(founder, { clipPath: "inset(100% 0 0 0)" });
+
+            const fTl = gsap.timeline({
+              scrollTrigger: {
+                trigger: founder,
+                start: "top 85%",
+                end: "bottom 15%",
+                scrub: 0.5,
+              },
+            });
+
+            // Wipe in from bottom
+            fTl.to(founder, { clipPath: "inset(0% 0 0 0)", ease: "none" }, 0);
+            // Accent line
+            fTl.to(accentLine, { height: "100%" }, 0.2);
             // Wipe out to top — desktop only
             fTl.to(founder, { clipPath: "inset(0 0 100% 0)", ease: "none" }, 0.6);
           }

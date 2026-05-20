@@ -47,6 +47,10 @@ export const TextRevealSection = styled.section`
   justify-content: center;
   background: #fff;
   padding: 0 2rem;
+
+  @media (max-width: 768px) {
+    height: 70vh;
+  }
 `;
 
 export const TextRevealInner = styled.div`
@@ -181,9 +185,7 @@ export const FounderStrip = styled.section`
     }
 
     .founder-accent-line {
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(to right, #CC5A50, rgba(204, 90, 80, 0.1));
+      display: none;
     }
   }
 `;

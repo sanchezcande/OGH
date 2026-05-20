@@ -480,8 +480,34 @@ const ContactUs = () => {
       const steps = stepsEl?.querySelectorAll(".step-card");
       const dots = stepsEl?.querySelectorAll(".step-dot");
       const fill = fillRef.current;
+      const mobile = window.innerWidth <= 768;
 
-      if (steps?.length) {
+      if (steps?.length && mobile) {
+        // Mobile: each step reveals individually on scroll
+        steps.forEach((step, i) => {
+          ScrollTrigger.create({
+            trigger: step,
+            start: "top 88%",
+            once: true,
+            onEnter: () => {
+              gsap.to(step, {
+                opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+                onComplete: () => step.classList.add("active"),
+              });
+
+              if (dots[i]) {
+                gsap.delayedCall(0.15, () => dots[i].classList.add("lit"));
+              }
+
+              if (i > 0 && dots[i - 1]) {
+                dots[i - 1].classList.remove("lit");
+                dots[i - 1].classList.add("done");
+              }
+            },
+          });
+        });
+      } else if (steps?.length) {
+        // Desktop: timeline draw + sequential reveal
         ScrollTrigger.create({
           trigger: stepsEl,
           start: "top 75%",
@@ -490,27 +516,22 @@ const ContactUs = () => {
             const dur = 3;
             const n = steps.length;
 
-            // Line draws continuously
             if (fill) {
               gsap.to(fill, { width: "100%", duration: dur, ease: "none" });
             }
 
-            // Each step activates when the line reaches it
             steps.forEach((step, i) => {
               const t = Math.max(0, ((i / n) * dur) - 0.9);
 
-              // Card fades in
               gsap.to(step, {
                 opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: t,
                 onComplete: () => step.classList.add("active"),
               });
 
-              // Dot lights up
               if (dots[i]) {
                 gsap.delayedCall(t + 0.1, () => dots[i].classList.add("lit"));
               }
 
-              // Previous dot goes white
               if (i > 0 && dots[i - 1]) {
                 gsap.delayedCall(t + 0.1, () => {
                   dots[i - 1].classList.remove("lit");
