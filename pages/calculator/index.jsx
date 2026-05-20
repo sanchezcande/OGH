@@ -8,10 +8,10 @@ import useMediaQuery from "../../src/Hooks/useMediaQuery";
 // ─── Calculation data (values/multipliers are language-independent) ────────────
 
 const TEAM_SIZE_VALUES = [
-  { labelKey: "calculator.team1to5", value: "1-5", multiplier: 3 },
-  { labelKey: "calculator.team6to15", value: "6-15", multiplier: 10 },
-  { labelKey: "calculator.team16to50", value: "16-50", multiplier: 33 },
-  { labelKey: "calculator.team50plus", value: "50+", multiplier: 60 },
+  { labelKey: "calculator.team1to5", value: "1-5", multiplier: 4 },
+  { labelKey: "calculator.team6to15", value: "6-15", multiplier: 12 },
+  { labelKey: "calculator.team16to50", value: "16-50", multiplier: 38 },
+  { labelKey: "calculator.team50plus", value: "50+", multiplier: 70 },
 ];
 
 const SALARY_VALUES = [
@@ -206,9 +206,9 @@ export default function Calculator() {
     SALARY_VALUES.find((s) => s.value === answers.salary)?.amount ?? 0;
   const tasksCount = answers.tasks.length;
 
-  const hoursLost = Math.round(teamMultiplier * tasksCount * 15);
+  const hoursLost = Math.round(teamMultiplier * tasksCount * 18);
   const monthlyCost = Math.round(hoursLost * (salaryAmount / 160));
-  const potentialSavings = Math.round(monthlyCost * 0.6);
+  const potentialSavings = Math.round(monthlyCost * 0.7);
   const annualSavings = potentialSavings * 12;
 
   // ── Navigation ────────────────────────────────────────────────────────────────
