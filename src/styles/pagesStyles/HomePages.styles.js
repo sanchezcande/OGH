@@ -1513,6 +1513,149 @@ export const StickyMetricDot = styled.div`
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 `;
 
+export const ShimmerCTA = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #111111;
+  font-weight: 600;
+  font-size: 0.97rem;
+  text-decoration: none;
+  border-bottom: 2px solid #111111;
+  padding-bottom: 2px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(0, 0, 0, 0.07) 50%,
+      transparent 80%
+    );
+    transition: none;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    color: #000;
+
+    &::before {
+      transition: left 0.5s ease;
+      left: 150%;
+    }
+  }
+`;
+
+/* ═══════════════════════════════════════════
+   MOBILE METRICS (auto-cycle carousel)
+   ═══════════════════════════════════════════ */
+export const MobileMetricsSection = styled.div`
+  position: relative;
+  width: 100%;
+  background: #0a0a0a;
+  padding: 80px 0;
+  overflow: hidden;
+
+  .mobile-metrics-eyebrow {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    margin-bottom: 48px;
+  }
+
+  .mobile-metrics-viewport {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-metric-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.85);
+    filter: blur(10px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+
+    .metric-counter {
+      font-size: clamp(4rem, 18vw, 6rem);
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      display: flex;
+      align-items: baseline;
+      gap: 0.05em;
+    }
+
+    .metric-unit {
+      font-size: clamp(1.2rem, 5vw, 2rem);
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: -0.02em;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-top: 16px;
+    }
+
+    .metric-desc {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 10px;
+      max-width: 300px;
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 24px;
+    }
+  }
+
+  ${StickyMetricDots} {
+    position: relative;
+    flex-direction: row;
+    justify-content: center;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin-top: 32px;
+    gap: 10px;
+  }
+`;
+
 /* ═══════════════════════════════════════════
    LEGACY EXPORTS (needed by other components)
    ═══════════════════════════════════════════ */

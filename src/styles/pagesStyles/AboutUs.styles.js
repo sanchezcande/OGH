@@ -185,7 +185,9 @@ export const FounderStrip = styled.section`
     }
 
     .founder-accent-line {
-      display: none;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(to right, #CC5A50, rgba(204, 90, 80, 0.1));
     }
   }
 `;

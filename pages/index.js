@@ -72,6 +72,7 @@ import {
   StickyMetricSlide,
   StickyMetricDots,
   StickyMetricDot,
+  ShimmerCTA,
 } from "../src/styles/pagesStyles/HomePages.styles";
 
 // Register GSAP
@@ -616,8 +617,8 @@ export default function HomePage() {
         });
       });
 
-      // 13. STICKY METRICS scroll counter (desktop only)
-      if (stickyMetricsRef.current && !mobile) {
+      // 13. STICKY METRICS scroll counter
+      if (stickyMetricsRef.current) {
         const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
         let lastIdx = -1;
         ScrollTrigger.create({
@@ -1080,11 +1081,10 @@ export default function HomePage() {
             </div>
 
             <div className="gsap-fade-up" style={{ textAlign: "center", padding: "32px 0 0" }}>
-              <Link
-                href="/calculator"
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#111111", fontWeight: 600, fontSize: "0.97rem", textDecoration: "none", borderBottom: "2px solid #111111", paddingBottom: 2 }}
-              >
-                {t("caseStudiesSection.benchmarksCTA", "Calculate your team's potential savings →")}
+              <Link href="/calculator" passHref legacyBehavior>
+                <ShimmerCTA>
+                  {t("caseStudiesSection.benchmarksCTA", "Calculate your team's potential savings →")}
+                </ShimmerCTA>
               </Link>
             </div>
           </SectionInner>
@@ -1185,69 +1185,38 @@ export default function HomePage() {
         </ZoomRevealSection>
 
         {/* ═══════════ STICKY METRICS ═══════════ */}
-        {isMobile ? (
-          <Section $bg="#0a0a0a" $padding="80px 24px" $mobilePadding="60px 16px">
-            <SectionInner>
-              <div style={{ textAlign: "center", marginBottom: 40 }}>
-                <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.25em" }}>
-                  {t("metricsSection.title", "Proven Results")}
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-                {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key) => {
-                  const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
-                  return (
-                    <div key={key} style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "3.5rem", fontWeight: 900, color: "#fff", lineHeight: 1, display: "flex", alignItems: "baseline", justifyContent: "center", gap: "0.05em" }}>
-                        {d.value}
-                        {d.unit && <span style={{ fontSize: "1.5rem", fontWeight: 500, color: "rgba(255,255,255,0.35)" }}>{d.unit}</span>}
-                      </div>
-                      <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.2em", marginTop: 12 }}>
-                        {d.label}
-                      </div>
-                      <div style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.35)", marginTop: 8, lineHeight: 1.5 }}>
-                        {d.description}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </SectionInner>
-          </Section>
-        ) : (
-          <StickyMetricsWrapper
-            ref={stickyMetricsRef}
-            style={{ height: "700vh" }}
-          >
-            <StickyMetricsViewport>
-              <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
-              <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
-              <StickyMetricDots>
-                {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
-                  <StickyMetricDot key={i} $active={activeMetric === i} />
-                ))}
-              </StickyMetricDots>
-              {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
-                const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
-                return (
-                  <StickyMetricSlide key={key} className={`metric-slide ${activeMetric === i ? "active" : ""}`}>
-                    <div className="metric-counter">
-                      <span
-                        ref={(el) => { metricCounterRefs.current[i] = el; }}
-                        data-value={d.value}
-                      >
-                        {d.value}
-                      </span>
-                      {d.unit && <span className="metric-unit">{d.unit}</span>}
-                    </div>
-                    <div className="metric-label">{d.label}</div>
-                    <div className="metric-desc">{d.description}</div>
-                  </StickyMetricSlide>
-                );
-              })}
-            </StickyMetricsViewport>
-          </StickyMetricsWrapper>
-        )}
+        <StickyMetricsWrapper
+          ref={stickyMetricsRef}
+          style={{ height: isMobile ? "400vh" : "700vh" }}
+        >
+          <StickyMetricsViewport>
+            <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
+            <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
+            <StickyMetricDots>
+              {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
+                <StickyMetricDot key={i} $active={activeMetric === i} />
+              ))}
+            </StickyMetricDots>
+            {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
+              const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
+              return (
+                <StickyMetricSlide key={key} className={`metric-slide ${activeMetric === i ? "active" : ""}`}>
+                  <div className="metric-counter">
+                    <span
+                      ref={(el) => { metricCounterRefs.current[i] = el; }}
+                      data-value={d.value}
+                    >
+                      {d.value}
+                    </span>
+                    {d.unit && <span className="metric-unit">{d.unit}</span>}
+                  </div>
+                  <div className="metric-label">{d.label}</div>
+                  <div className="metric-desc">{d.description}</div>
+                </StickyMetricSlide>
+              );
+            })}
+          </StickyMetricsViewport>
+        </StickyMetricsWrapper>
 
         {/* ═══════════ CALCULATOR BANNER ═══════════ */}
         <CalculatorBanner $isMobile={isMobile} className="gsap-fade-up">

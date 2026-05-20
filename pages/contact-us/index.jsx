@@ -483,28 +483,31 @@ const ContactUs = () => {
       const mobile = window.innerWidth <= 768;
 
       if (steps?.length && mobile) {
-        // Mobile: each step reveals individually on scroll
-        steps.forEach((step, i) => {
-          ScrollTrigger.create({
-            trigger: step,
-            start: "top 88%",
-            once: true,
-            onEnter: () => {
+        // Mobile: reveal all steps together when section enters viewport
+        ScrollTrigger.create({
+          trigger: stepsEl,
+          start: "top 95%",
+          once: true,
+          onEnter: () => {
+            steps.forEach((step, i) => {
               gsap.to(step, {
                 opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+                delay: i * 0.2,
                 onComplete: () => step.classList.add("active"),
               });
 
               if (dots[i]) {
-                gsap.delayedCall(0.15, () => dots[i].classList.add("lit"));
+                gsap.delayedCall(i * 0.2 + 0.15, () => dots[i].classList.add("lit"));
               }
 
               if (i > 0 && dots[i - 1]) {
-                dots[i - 1].classList.remove("lit");
-                dots[i - 1].classList.add("done");
+                gsap.delayedCall(i * 0.2 + 0.15, () => {
+                  dots[i - 1].classList.remove("lit");
+                  dots[i - 1].classList.add("done");
+                });
               }
-            },
-          });
+            });
+          },
         });
       } else if (steps?.length) {
         // Desktop: timeline draw + sequential reveal

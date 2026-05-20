@@ -90,23 +90,23 @@ const AboutUs = React.forwardRef((props, ref) => {
           const accentLine = founder.querySelector(".founder-accent-line");
           const mobile = window.innerWidth <= 768;
 
-          gsap.set(accentLine, { height: 0 });
+          gsap.set(accentLine, mobile ? { width: 0 } : { height: 0 });
 
           if (mobile) {
-            // Mobile: simple fade-in instead of clip-path to avoid white gap
-            gsap.set(founder, { opacity: 0, y: 30 });
+            // Mobile: clip-path reveal from bottom (same as desktop, no wipe-out)
+            gsap.set(founder, { clipPath: "inset(100% 0 0 0)" });
 
             const fTl = gsap.timeline({
               scrollTrigger: {
                 trigger: founder,
                 start: "top 95%",
-                end: "top 50%",
+                end: "top 40%",
                 scrub: 0.5,
               },
             });
 
-            fTl.to(founder, { opacity: 1, y: 0, ease: "none" }, 0);
-            fTl.to(accentLine, { height: "100%" }, 0.2);
+            fTl.to(founder, { clipPath: "inset(0% 0 0 0)", ease: "none" }, 0);
+            fTl.to(accentLine, { width: "100%" }, 0.2);
           } else {
             gsap.set(founder, { clipPath: "inset(100% 0 0 0)" });
 
