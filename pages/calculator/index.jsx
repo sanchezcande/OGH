@@ -859,7 +859,7 @@ export default function Calculator() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: isMobile ? "2rem 1rem 3rem" : "3rem 1rem 4rem",
+          padding: isMobile ? "5rem 1rem 3rem" : "6rem 1rem 4rem",
           background: "#fafafa",
         }}
       >
