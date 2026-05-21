@@ -199,7 +199,7 @@ const AboutUs = React.forwardRef((props, ref) => {
               </div>
               <div className="founder-meta">
                 <span className="founder-name">Candelaria Sanchez</span>
-                <span className="founder-role">Co-founder & CTO</span>
+                <span className="founder-role">Founder & CTO</span>
               </div>
             </div>
           </div>
