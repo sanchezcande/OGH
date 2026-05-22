@@ -180,7 +180,7 @@ const AboutUs = React.forwardRef((props, ref) => {
         <div className="founder-inner">
           <div className="founder-accent-line" />
           <div className="founder-content">
-            <span className="founder-eyebrow">From the founder</span>
+            <span className="founder-eyebrow">Meet the Founder</span>
             <div className="founder-columns">
               {t("aboutUsFounderBio").split("\n\n").map((paragraph, i) => (
                 <p key={i} className="founder-quote">{paragraph}</p>
