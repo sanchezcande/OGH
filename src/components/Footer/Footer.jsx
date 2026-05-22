@@ -62,7 +62,7 @@ const Footer = () => {
           <FooterLink as={Link} href="/privacy-policy">{t("privacyPolicy")}</FooterLink>
           <EmailRow>
             <FaEnvelope />
-            <a href="mailto:info@opengatehub.com">info@opengatehub.com</a>
+            <a href="mailto:candelaria@opengatehub.com">candelaria@opengatehub.com</a>
           </EmailRow>
         </FooterColumn>
       </FooterTop>
