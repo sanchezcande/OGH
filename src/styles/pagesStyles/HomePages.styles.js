@@ -79,7 +79,7 @@ export const Container = styled.div`
 export const Hero = styled.section`
   position: relative;
   width: 100vw;
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -89,40 +89,13 @@ export const Hero = styled.section`
   background: #0a0a0a;
   padding: 120px 24px 80px;
 
-  /* Film grain overlay */
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -200%;
-    width: 400%;
-    height: 400%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    animation: ${grain} 8s steps(10) infinite;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.5;
-  }
-
-  /* Gradient mesh */
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 0, 0, 0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(0, 0, 0, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 60% at 20% 80%, rgba(0, 0, 0, 0.03) 0%, transparent 50%);
-    z-index: 1;
-    pointer-events: none;
-  }
-
   & > * {
     position: relative;
     z-index: 2;
   }
 
   @media (max-width: 768px) {
-    min-height: 90vh;
+    min-height: 70vh;
     padding: 100px 16px 60px;
   }
 `;
@@ -130,9 +103,9 @@ export const Hero = styled.section`
 export const HeroOrb = styled.div`
   position: absolute;
   border-radius: 50%;
-  filter: blur(${({ $blur }) => $blur || "120px"});
-  opacity: ${({ $opacity }) => $opacity || 0.3};
-  background: ${({ $color }) => $color || "rgba(120, 120, 120, 0.4)"};
+  filter: blur(${({ $blur }) => $blur || "140px"});
+  opacity: ${({ $opacity }) => $opacity || 0.2};
+  background: ${({ $color }) => $color || "rgba(120, 120, 120, 0.3)"};
   width: ${({ $size }) => $size || "600px"};
   height: ${({ $size }) => $size || "600px"};
   top: ${({ $top }) => $top || "auto"};
@@ -147,12 +120,12 @@ export const HeroOrb = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: rgba(255, 255, 255, 0.45);
-  font-size: clamp(2.8rem, 6vw, 5rem);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  max-width: 900px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  max-width: 680px;
   margin: 0 auto 24px;
 
   .word {
@@ -174,30 +147,30 @@ export const Title = styled.h1`
   }
 
   @media (max-width: 768px) {
-    font-size: clamp(2rem, 8vw, 3rem);
-    letter-spacing: -0.02em;
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+    letter-spacing: -0.015em;
   }
 `;
 
 export const Subtitle = styled.p`
-  color: rgba(255, 255, 255, 0.6);
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: clamp(0.85rem, 1.1vw, 0.95rem);
   font-weight: 400;
   line-height: 1.7;
-  max-width: 600px;
-  margin: 0 auto 40px;
+  max-width: 480px;
+  margin: 0 auto 36px;
   opacity: 0;
   transform: translateY(20px);
 
   @media (max-width: 768px) {
-    font-size: 1rem;
-    margin-bottom: 32px;
+    font-size: 0.85rem;
+    margin-bottom: 28px;
   }
 `;
 
 export const HeroCTAGroup = styled.div`
   display: flex;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -209,9 +182,9 @@ export const CTAButton = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 16px 32px;
-  font-weight: 600;
-  font-size: 1rem;
+  padding: 11px 24px;
+  font-weight: 500;
+  font-size: 0.82rem;
   border-radius: 60px;
   text-decoration: none;
   cursor: pointer;
@@ -300,25 +273,25 @@ export const CTAButton = styled.a`
 
 export const TrustChips = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 48px;
+  margin-top: 32px;
   opacity: 0;
   transform: translateY(20px);
 `;
 
 export const TrustChip = styled.span`
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 100px;
-  padding: 6px 16px;
-  font-size: 0.78rem;
+  padding: 5px 14px;
+  font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);
   transition: all 0.3s ease;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 
   &:hover {
     border-color: rgba(255, 255, 255, 0.25);
@@ -453,12 +426,12 @@ export const SectionEyebrow = styled.div`
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: clamp(2rem, 3.5vw, 2.8rem);
-  font-weight: 800;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
   color: #111827;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-  margin-bottom: 16px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
 
   .highlighted-word {
     color: #fff;
@@ -477,7 +450,7 @@ export const SectionTitle = styled.h2`
   }
 
   @media (max-width: 768px) {
-    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
   }
 `;
 
