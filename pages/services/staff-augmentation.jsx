@@ -23,8 +23,8 @@ const PageWrapper = styled.div`
 /* ---------- HERO ---------- */
 const HeroSection = styled.section`
   position: relative;
-  height: 100vh;
-  min-height: 600px;
+  height: 80vh;
+  min-height: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,10 +36,6 @@ const HeroSection = styled.section`
 const HeroGrid = styled.div`
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
   pointer-events: none;
 `;
 
@@ -48,17 +44,17 @@ const HeroContent = styled.div`
   z-index: 2;
   text-align: center;
   padding: 0 2rem;
-  max-width: 900px;
+  max-width: 640px;
 `;
 
 const HeroTitle = styled.h1`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 700;
+  font-size: clamp(1.5rem, 3.2vw, 2.2rem);
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.4);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin: 0 0 1.5rem;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 1.25rem;
 
   .word {
     display: inline-block;
@@ -80,10 +76,10 @@ const HeroTitle = styled.h1`
 
 const HeroSubtitle = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1rem, 2vw, 1.35rem);
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.6;
-  max-width: 600px;
+  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.7;
+  max-width: 460px;
   margin: 0 auto;
 `;
 
@@ -96,7 +92,7 @@ const HeroLine = styled.div`
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(204, 90, 80, 0.3),
+    rgba(255, 255, 255, 0.06),
     transparent
   );
 `;
@@ -160,11 +156,11 @@ const SectionLabel = styled.span`
 
 const SectionHeading = styled.h2`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 600;
   color: #111;
-  letter-spacing: -0.02em;
-  margin: 0 0 1rem;
+  letter-spacing: -0.015em;
+  margin: 0 0 0.85rem;
 `;
 
 const SectionSubtext = styled.p`

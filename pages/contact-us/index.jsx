@@ -26,21 +26,21 @@ const DarkSection = styled.div`
 `;
 
 const HeroSection = styled.section`
-  padding: 10rem 1.5rem 5rem;
+  padding: 9rem 1.5rem 5rem;
   text-align: center;
-  max-width: 640px;
+  max-width: 560px;
   margin: 0 auto;
 
   @media (max-width: 768px) {
-    padding: 7rem 1.25rem 3rem;
+    padding: 7rem 1.25rem 3.5rem;
   }
 `;
 
 const HeroTitle = styled.h1`
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-size: clamp(1.4rem, 3.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
   margin-bottom: 1rem;
   color: rgba(255, 255, 255, 0.4);
 
@@ -63,15 +63,15 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroSub = styled.p`
-  font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.6;
-  max-width: 480px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.7;
+  max-width: 400px;
   margin: 0 auto;
   opacity: 0;
 
   @media (max-width: 768px) {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
   }
 `;
 
