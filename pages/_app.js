@@ -102,6 +102,19 @@ export default function MyApp({ Component, pageProps }) {
     };
   }, [router]);
 
+  const isStandalone = router.pathname === "/labsmail";
+
+  if (isStandalone) {
+    return (
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <Component {...pageProps} />
+      </>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
