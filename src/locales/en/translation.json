@@ -616,7 +616,7 @@
     "mangilDesc": "Custom CRM for a health coaching and peptide distribution business — client pipeline, delivery tracking, peptide catalog with margin analysis, memberships, and financial dashboards, all in one system.",
     "labsmailCategory": "AI · Outreach",
     "labsmailTitle": "LabsMail",
-    "labsmailDesc": "AI-powered cold email engine we built internally and now offer as a service. Researches each prospect individually, writes hyper-personalized emails with Claude, and manages multi-channel campaigns with full pipeline tracking.",
+    "labsmailDesc": "AI-powered cold email engine that researches each prospect individually, writes hyper-personalized emails, and manages multi-channel campaigns with full pipeline tracking. Available as a done-for-you service.",
     "labsmailStat": "avg reply rate"
   },
   "featuredWorkSection": {
