@@ -66,12 +66,9 @@ import {
   TiltCard,
   ZoomRevealSection,
   GridBackground,
-  StickyMetricsWrapper,
-  StickyMetricsViewport,
-  StickyMetricsProgress,
-  StickyMetricSlide,
-  StickyMetricDots,
-  StickyMetricDot,
+  MetricsGridSection,
+  MetricsGridInner,
+  MetricsGridCard,
   ShimmerCTA,
 } from "../src/styles/pagesStyles/HomePages.styles";
 
@@ -328,11 +325,7 @@ export default function HomePage() {
   const servicesRef = useRef(null);
   const parallaxShowcaseRef = useRef(null);
   const zoomRevealRef = useRef(null);
-  const stickyMetricsRef = useRef(null);
-  const [activeMetric, setActiveMetric] = useState(-1);
   const [activePlanStep, setActivePlanStep] = useState(0);
-  const metricsProgressRef = useRef(null);
-  const metricCounterRefs = useRef([]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
@@ -617,31 +610,6 @@ export default function HomePage() {
         });
       });
 
-      // 13. STICKY METRICS scroll counter
-      if (stickyMetricsRef.current) {
-        const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
-        let lastIdx = -1;
-        ScrollTrigger.create({
-          trigger: stickyMetricsRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            const p = self.progress;
-            // Update progress bar via DOM directly (no re-render)
-            if (metricsProgressRef.current) {
-              metricsProgressRef.current.style.width = `${p * 100}%`;
-            }
-            // 8% padding at start, 12% padding at end (last slide stays visible longer)
-            const adjusted = Math.min(1, Math.max(0, (p - 0.08) / 0.80));
-            const idx = Math.min(Math.floor(adjusted * numSlides), numSlides - 1);
-            if (idx !== lastIdx) {
-              lastIdx = idx;
-              setActiveMetric(idx);
-            }
-          },
-        });
-      }
-
       // 14. SECTION FADE INS
       gsap.utils.toArray(".gsap-fade-up").forEach((el) => {
         gsap.from(el, {
@@ -670,33 +638,7 @@ export default function HomePage() {
     };
   }, [isMobile]);
 
-  // Metric counter animation
-  const prevMetricRef = useRef(-2);
-  useEffect(() => {
-    if (activeMetric < 0) return;
-    if (prevMetricRef.current === activeMetric) return;
-    prevMetricRef.current = activeMetric;
-    const el = metricCounterRefs.current[activeMetric];
-    if (!el) return;
-    const raw = el.dataset.value;
-    const isFloat = raw.includes(".");
-    const hasPlus = raw.includes("+");
-    const numVal = parseFloat(raw.replace("+", ""));
-    if (isNaN(numVal)) { el.textContent = raw; return; }
-    const dur = 800;
-    const start = performance.now();
-    const animate = (now) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / dur, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = numVal * eased;
-      el.textContent = isFloat ? current.toFixed(1) : Math.round(current).toString();
-      if (hasPlus && progress >= 1) el.textContent += "+";
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-    el.textContent = isFloat ? "0.0" : "0";
-    requestAnimationFrame(animate);
-  }, [activeMetric]);
+  // (Metric counter animation removed — now uses CountUp component directly)
 
   /* ─── PARSE HIGHLIGHTED TEXT (from translations) ─── */
   const parseHighlightedText = useCallback((text) => {
@@ -1183,39 +1125,27 @@ export default function HomePage() {
           </div>
         </ZoomRevealSection>
 
-        {/* ═══════════ STICKY METRICS ═══════════ */}
-        <StickyMetricsWrapper
-          ref={stickyMetricsRef}
-          style={{ height: isMobile ? "400vh" : "700vh" }}
-        >
-          <StickyMetricsViewport>
-            <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
-            <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
-            <StickyMetricDots>
-              {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
-                <StickyMetricDot key={i} $active={activeMetric === i} />
-              ))}
-            </StickyMetricDots>
-            {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
-              const d = t(`metricsSection.metrics.${key}`, { returnObjects: true });
-              return (
-                <StickyMetricSlide key={key} className={`metric-slide ${activeMetric === i ? "active" : ""}`}>
-                  <div className="metric-counter">
-                    <span
-                      ref={(el) => { metricCounterRefs.current[i] = el; }}
-                      data-value={d.value}
-                    >
-                      {d.value}
-                    </span>
-                    {d.unit && <span className="metric-unit">{d.unit}</span>}
-                  </div>
-                  <div className="metric-label">{d.label}</div>
-                  <div className="metric-desc">{d.description}</div>
-                </StickyMetricSlide>
-              );
-            })}
-          </StickyMetricsViewport>
-        </StickyMetricsWrapper>
+        {/* ═══════════ METRICS GRID ═══════════ */}
+        <MetricsGridSection className="gsap-fade-up">
+          <MetricsGridInner>
+            {[
+              { value: 7.3, suffix: "", decimals: 1, unit: "days", label: lang === "es" ? "Kickoff promedio" : "Avg Kickoff", desc: lang === "es" ? "De SOW firmado a primer PR mergeado" : "From signed SOW to first merged PR" },
+              { value: 87, suffix: "", decimals: 0, unit: "%", label: lang === "es" ? "Entregas a tiempo" : "On-Time Delivery", desc: lang === "es" ? "Milestones entregados en fecha" : "Milestones delivered on schedule" },
+              { value: 9.7, suffix: "", decimals: 1, unit: "/10", label: "CSAT", desc: lang === "es" ? "Satisfacción de clientes" : "Customer satisfaction score" },
+              { value: 50, suffix: "+", decimals: 0, unit: "", label: lang === "es" ? "Sprints entregados" : "Sprints Shipped", desc: lang === "es" ? "Entregas exitosas en múltiples proyectos" : "Across multiple client projects" },
+              { value: 28, suffix: "", decimals: 0, unit: "%", label: lang === "es" ? "Reducción cycle time" : "Cycle Time Reduction", desc: lang === "es" ? "vs. baseline inicial del cliente" : "vs. client's initial baseline" },
+            ].map((m, i) => (
+              <MetricsGridCard key={i}>
+                <div className="mg-value">
+                  <CountUp target={m.value} suffix={m.suffix} decimals={m.decimals} duration={1200} />
+                  {m.unit && <span className="mg-unit">{m.unit}</span>}
+                </div>
+                <div className="mg-label">{m.label}</div>
+                <div className="mg-desc">{m.desc}</div>
+              </MetricsGridCard>
+            ))}
+          </MetricsGridInner>
+        </MetricsGridSection>
 
         {/* ═══════════ CALCULATOR BANNER ═══════════ */}
         <CalculatorBanner $isMobile={isMobile} className="gsap-fade-up">
