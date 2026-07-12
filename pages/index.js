@@ -790,6 +790,7 @@ export default function HomePage() {
     { img: "/case-studies/vantage.jpeg", categoryKey: "caseStudiesSection.vantageCategory", titleKey: "caseStudiesSection.vantageTitle", descKey: "caseStudiesSection.vantageDesc", stat: null, link: "https://vantageinc.ai/" },
     { img: "/case-studies/propbot.png", categoryKey: "caseStudiesSection.propbotCategory", titleKey: "caseStudiesSection.propbotTitle", descKey: "caseStudiesSection.propbotDesc", stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" }, link: "https://propbot.cc" },
     { img: "/case-studies/sistema-manu-gil.png", categoryKey: "caseStudiesSection.mangilCategory", titleKey: "caseStudiesSection.mangilTitle", descKey: "caseStudiesSection.mangilDesc", stat: null, link: "#", imgStyle: { objectPosition: "top left" } },
+    { img: "/case-studies/labsmail.png", categoryKey: "caseStudiesSection.labsmailCategory", titleKey: "caseStudiesSection.labsmailTitle", descKey: "caseStudiesSection.labsmailDesc", stat: { value: "11.4%", labelKey: "caseStudiesSection.labsmailStat" }, link: "/labsmail" },
   ];
 
   const projects = [

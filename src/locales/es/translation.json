@@ -594,7 +594,11 @@
     "propbotStat": "consultas recuperadas",
     "mangilCategory": "CRM · Coaching",
     "mangilTitle": "Sistema Manu Gil",
-    "mangilDesc": "CRM a medida para un negocio de coaching de salud y distribución de péptidos — pipeline de clientes, seguimiento de entregas, catálogo de péptidos con análisis de márgenes, membresías y dashboards financieros, todo en un solo sistema."
+    "mangilDesc": "CRM a medida para un negocio de coaching de salud y distribución de péptidos — pipeline de clientes, seguimiento de entregas, catálogo de péptidos con análisis de márgenes, membresías y dashboards financieros, todo en un solo sistema.",
+    "labsmailCategory": "IA · Outreach",
+    "labsmailTitle": "LabsMail",
+    "labsmailDesc": "Motor de cold email con IA que construimos internamente y ahora ofrecemos como servicio. Investiga cada prospecto individualmente, escribe emails hiperpersonalizados con Claude y gestiona campañas multicanal con tracking completo del pipeline.",
+    "labsmailStat": "tasa de respuesta promedio"
   },
   "featuredWorkSection": {
     "title": "Trabajos Destacados",
