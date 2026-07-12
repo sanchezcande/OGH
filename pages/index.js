@@ -789,6 +789,7 @@ export default function HomePage() {
     { img: "/case-studies/smarters-city.jpeg", categoryKey: "caseStudiesSection.smartersCategory", titleKey: "caseStudiesSection.smartersTitle", descKey: "caseStudiesSection.smartersDesc", stat: null, link: "https://smarters.city/", imgStyle: { objectPosition: "top center", marginTop: "-45px" } },
     { img: "/case-studies/vantage.jpeg", categoryKey: "caseStudiesSection.vantageCategory", titleKey: "caseStudiesSection.vantageTitle", descKey: "caseStudiesSection.vantageDesc", stat: null, link: "https://vantageinc.ai/" },
     { img: "/case-studies/propbot.png", categoryKey: "caseStudiesSection.propbotCategory", titleKey: "caseStudiesSection.propbotTitle", descKey: "caseStudiesSection.propbotDesc", stat: { value: "60%", labelKey: "caseStudiesSection.propbotStat" }, link: "https://propbot.cc" },
+    { img: "/case-studies/sistema-manu-gil.png", categoryKey: "caseStudiesSection.mangilCategory", titleKey: "caseStudiesSection.mangilTitle", descKey: "caseStudiesSection.mangilDesc", stat: null, link: "#", imgStyle: { objectPosition: "top left" } },
   ];
 
   const projects = [
@@ -801,6 +802,7 @@ export default function HomePage() {
     { image: "/Skylar.png", title: t("featuredWorkSection.skylar.title"), link: "https://skylar.ar/" },
     { image: "/HotDate.png", title: t("featuredWorkSection.hotDateKitchen.title"), link: "https://hotdatekitchen.com/" },
     { image: "/propbot-logo.svg", title: t("featuredWorkSection.propbot.title"), link: "https://propbot.cc" },
+    { image: "/sistema-manu-gil-logo.png", title: "Sistema Manu Gil", link: "#" },
     { image: "/GBS.png", title: "GBS Abogados", link: "#", fill: true },
     { image: "/kdabogados.png", title: "KD Abogados", link: "https://kdabogados.com.ar/", fill: true },
   ];
@@ -914,10 +916,6 @@ export default function HomePage() {
       <Container>
         {/* ═══════════ HERO ═══════════ */}
         <Hero ref={heroRef}>
-          <HeroOrb className="hero-orb" $color="rgba(80, 80, 80, 0.2)" $size="700px" $top="-200px" $right="-200px" $blur="150px" $duration="25s" />
-          <HeroOrb className="hero-orb" $color="rgba(60, 60, 60, 0.15)" $size="500px" $bottom="-150px" $left="-100px" $blur="130px" $duration="30s" $delay="5s" />
-          <HeroOrb className="hero-orb" $color="rgba(100, 100, 100, 0.1)" $size="400px" $top="30%" $left="60%" $blur="100px" $duration="20s" $delay="2s" />
-
           <Title ref={titleRef}>
             {splitWords(heroText, highlightWords)}
           </Title>

@@ -610,7 +610,10 @@
     "propbotCategory": "AI · Automation",
     "propbotTitle": "PropBot",
     "propbotDesc": "AI-powered chatbot for real estate agencies that responds to inquiries in 5 seconds, filters properties via natural language, and auto-schedules viewings — 24/7 on WhatsApp, Instagram, and Facebook.",
-    "propbotStat": "recovered inquiries"
+    "propbotStat": "recovered inquiries",
+    "mangilCategory": "CRM · Coaching",
+    "mangilTitle": "Sistema Manu Gil",
+    "mangilDesc": "Custom CRM for a health coaching and peptide distribution business — client pipeline, delivery tracking, peptide catalog with margin analysis, memberships, and financial dashboards, all in one system."
   },
   "featuredWorkSection": {
     "title": "Featured Work",

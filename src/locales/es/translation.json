@@ -591,7 +591,10 @@
     "propbotCategory": "IA · Automatización",
     "propbotTitle": "PropBot",
     "propbotDesc": "Chatbot con IA para inmobiliarias que responde consultas en 5 segundos, filtra propiedades por lenguaje natural y agenda visitas automáticamente — 24/7 en WhatsApp, Instagram y Facebook.",
-    "propbotStat": "consultas recuperadas"
+    "propbotStat": "consultas recuperadas",
+    "mangilCategory": "CRM · Coaching",
+    "mangilTitle": "Sistema Manu Gil",
+    "mangilDesc": "CRM a medida para un negocio de coaching de salud y distribución de péptidos — pipeline de clientes, seguimiento de entregas, catálogo de péptidos con análisis de márgenes, membresías y dashboards financieros, todo en un solo sistema."
   },
   "featuredWorkSection": {
     "title": "Trabajos Destacados",
