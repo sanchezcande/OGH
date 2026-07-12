@@ -23,50 +23,50 @@ const theme = {
   fontWeights: {
     regular: 400,
     medium: 500,
-    semibold: 600,
-    bold: 700,
-    black: 700,
+    semibold: 500,
+    bold: 600,
+    black: 600,
   },
   fontSizes: {
     heroTitle: {
-      desktop: "clamp(2.5rem, 5vw, 3rem)",
-      mobile: "2rem",
+      desktop: "clamp(1.6rem, 3.2vw, 2.2rem)",
+      mobile: "1.5rem",
     },
     sectionTitle: {
-      desktop: "2rem",
-      mobile: "1.8rem",
+      desktop: "1.5rem",
+      mobile: "1.3rem",
     },
     heroSubtitle: {
-      desktop: "1.2rem",
-      mobile: "1.1rem",
+      desktop: "0.95rem",
+      mobile: "0.88rem",
     },
     sectionSubtitle: {
-      desktop: "1.1rem",
-      mobile: "1rem",
+      desktop: "0.95rem",
+      mobile: "0.88rem",
     },
     body: {
-      desktop: "1rem",
-      mobile: "0.95rem",
+      desktop: "0.92rem",
+      mobile: "0.88rem",
     },
     small: {
-      desktop: "0.9rem",
-      mobile: "0.85rem",
+      desktop: "0.82rem",
+      mobile: "0.78rem",
     },
     button: {
-      desktop: "1rem",
-      mobile: "0.95rem",
+      desktop: "0.88rem",
+      mobile: "0.85rem",
     },
     ctaButton: {
-      desktop: "1rem",
-      mobile: "1rem",
+      desktop: "0.88rem",
+      mobile: "0.88rem",
     },
     cardTitle: {
-      desktop: "1.15rem",
-      mobile: "1rem",
+      desktop: "1.02rem",
+      mobile: "0.95rem",
     },
     cardText: {
-      desktop: "0.9rem",
-      mobile: "0.85rem",
+      desktop: "0.85rem",
+      mobile: "0.8rem",
     },
   },
   lineHeights: {

@@ -86,8 +86,8 @@ export const FeaturedCard = styled.article`
 
   .featured-title {
     font-family: "Space Grotesk", sans-serif;
-    font-size: clamp(1.4rem, 2.8vw, 2rem);
-    font-weight: 700;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    font-weight: 500;
     color: #fff;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -231,8 +231,8 @@ export const ArticleCard = styled.article`
 
   h2 {
     font-family: "Space Grotesk", sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 500;
     margin: 0 0 8px;
     color: #111;
     line-height: 1.35;

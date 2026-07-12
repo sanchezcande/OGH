@@ -89,7 +89,7 @@ export const ReviewCard = styled.div`
 `;
 
 export const ReviewText = styled.p`
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   line-height: 1.6;
   color: ${({ theme }) => theme.colors.text};
   font-style: italic;
@@ -104,7 +104,7 @@ export const ReviewText = styled.p`
   display: block;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.88rem;
     line-height: 1.5;
     max-width: 90%;
   }
@@ -124,9 +124,9 @@ export const ReviewAuthor = styled.div`
 `;
 
 export const CompanyName = styled.span`
-  font-weight: 600;
+  font-weight: 500;
   color: ${({ theme }) => theme.colors.primary};
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 `;
 
 export const AuthorRole = styled.span`

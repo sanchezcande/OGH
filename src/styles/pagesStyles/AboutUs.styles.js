@@ -11,29 +11,29 @@ export const PageWrapper = styled.div`
 
 /* ---------- PAGE HEADER ---------- */
 export const PageHeader = styled.section`
-  max-width: 800px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 8rem 2rem 4rem;
+  padding: 7rem 2rem 3.5rem;
   text-align: center;
 `;
 
 export const PageTitle = styled.h1`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
-  font-weight: 700;
+  font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+  font-weight: 500;
   color: #111;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  margin: 0 0 1.25rem;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin: 0 0 1rem;
   opacity: 0;
 `;
 
 export const PageSubtitle = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
-  color: #777;
+  font-size: clamp(0.88rem, 1.5vw, 1rem);
+  color: #888;
   line-height: 1.65;
-  max-width: 580px;
+  max-width: 480px;
   margin: 0 auto;
   opacity: 0;
 `;
@@ -60,8 +60,8 @@ export const TextRevealInner = styled.div`
 
 export const RevealText = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-  font-weight: 500;
+  font-size: clamp(0.95rem, 1.8vw, 1.3rem);
+  font-weight: 400;
   line-height: 1.65;
   color: #111;
   letter-spacing: -0.005em;
@@ -249,17 +249,17 @@ export const TeamSection = styled.section`
   .team-title {
     text-align: center;
     font-family: "Space Grotesk", sans-serif;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
     color: #111;
     margin-bottom: 0.75rem;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: -0.02em;
     opacity: 0;
   }
 
   .team-subtitle {
     text-align: center;
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #777;
     margin-bottom: 3.5rem;
     max-width: 550px;

@@ -83,8 +83,8 @@ export const TimelineImageSide = styled.div`
     bottom: -15px;
     right: 20px;
     font-family: "Space Grotesk", sans-serif;
-    font-size: 9rem;
-    font-weight: 700;
+    font-size: 6rem;
+    font-weight: 600;
     color: rgba(255, 255, 255, 0.07);
     line-height: 1;
     user-select: none;
@@ -110,7 +110,7 @@ export const TimelineImageSide = styled.div`
     min-height: 300px;
 
     .item-number {
-      font-size: 6rem;
+      font-size: 4rem;
       right: 12px;
     }
   }
@@ -138,8 +138,8 @@ export const TimelineTextSide = styled.div`
 
   h3 {
     font-family: "Space Grotesk", sans-serif;
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 1.3rem;
+    font-weight: 500;
     color: #111111;
     line-height: 1.2;
     margin: 0 0 1.25rem 0;
@@ -172,7 +172,7 @@ export const TimelineTextSide = styled.div`
     padding: 2rem 1.5rem;
 
     h3 {
-      font-size: 1.4rem;
+      font-size: 1.15rem;
     }
 
     p {

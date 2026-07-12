@@ -11,8 +11,8 @@ export const PrivacyPolicyContainer = styled.section`
 `;
 
 export const PrivacyPolicyTitle = styled.h1`
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: 1.6rem;
+  font-weight: 500;
   margin-bottom: 2rem;
   text-align: center;
   color: ${({ theme }) => theme.colors.primary};
@@ -23,14 +23,14 @@ export const PrivacyPolicySection = styled.div`
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 500;
   margin-bottom: 1rem;
   color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const SectionContent = styled.p`
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1.8;
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: 1rem;

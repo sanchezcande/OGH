@@ -151,8 +151,8 @@ const SectionLabel = styled.span`
 
 const SectionHeading = styled.h2`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.4rem, 2.5vw, 2rem);
-  font-weight: 600;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-weight: 500;
   color: #111;
   letter-spacing: -0.015em;
   margin: 0 0 0.85rem;
@@ -160,7 +160,7 @@ const SectionHeading = styled.h2`
 
 const SectionSubtext = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1.1rem;
+  font-size: 0.92rem;
   color: #777;
   line-height: 1.6;
   max-width: 560px;
@@ -196,16 +196,16 @@ const MetricCard = styled.div`
 
 const MetricValue = styled.div`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 600;
   color: #111;
   margin-bottom: 0.5rem;
 `;
 
 const MetricTitle = styled.div`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 500;
   color: #333;
   margin-bottom: 0.4rem;
 `;
@@ -252,29 +252,29 @@ const FeatureCard = styled.div`
 `;
 
 const FeatureIcon = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 4px;
   background: #CC5A50;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1rem;
 `;
 
 const FeatureTitle = styled.h3`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.02rem;
+  font-weight: 500;
   color: #111;
   margin: 0 0 0.6rem;
 `;
 
 const FeatureDesc = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #888;
   line-height: 1.6;
   margin: 0;
@@ -304,8 +304,8 @@ const HorizontalHeader = styled.div`
 
 const HorizontalHeaderTitle = styled.h2`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+  font-weight: 500;
   color: #fff;
   letter-spacing: -0.02em;
   margin: 0;
@@ -353,8 +353,8 @@ const StepCard = styled.div`
 
 const StepNumber = styled.span`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 6rem;
-  font-weight: 700;
+  font-size: 4rem;
+  font-weight: 600;
   color: rgba(204, 90, 80, 0.12);
   line-height: 1;
   flex-shrink: 0;
@@ -364,15 +364,15 @@ const StepNumber = styled.span`
 
 const StepTitle = styled.h3`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 500;
   color: #fff;
   margin: 0 0 1rem;
 `;
 
 const StepDesc = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.5);
   line-height: 1.7;
   margin: 0;
@@ -417,8 +417,8 @@ const OutcomeCard = styled.div`
 
 const OutcomeNumber = styled.span`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: rgba(204, 90, 80, 0.3);
   flex-shrink: 0;
   min-width: 40px;
@@ -426,15 +426,15 @@ const OutcomeNumber = styled.span`
 
 const OutcomeTitle = styled.h3`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.02rem;
+  font-weight: 500;
   color: #111;
   margin: 0 0 0.5rem;
 `;
 
 const OutcomeDesc = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #888;
   line-height: 1.6;
   margin: 0;
@@ -450,7 +450,7 @@ const CommitmentSection = styled.section`
 
 const CommitmentText = styled.p`
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-size: clamp(0.92rem, 1.6vw, 1.15rem);
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.7;
   max-width: 700px;

@@ -59,8 +59,8 @@ export const FooterColumn = styled.div`
 `;
 
 export const FooterHeading = styled.h4`
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   color: #111111;
   text-transform: uppercase;
   letter-spacing: 0.06em;

@@ -122,19 +122,19 @@ const CardLabel = styled.span`
 `;
 
 const CardTitle = styled.h2`
-  font-size: 1.35rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 500;
   color: #111;
   margin-bottom: 0.5rem;
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 `;
 
 const CardDesc = styled.p`
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: #666;
   line-height: 1.55;
   margin-bottom: 1.5rem;

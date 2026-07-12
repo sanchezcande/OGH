@@ -365,8 +365,8 @@ export const TextRevealContent = styled.div`
 `;
 
 export const RevealText = styled.p`
-  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-  font-weight: 500;
+  font-size: clamp(0.95rem, 1.8vw, 1.3rem);
+  font-weight: 400;
   line-height: 1.65;
   color: #111;
   letter-spacing: -0.005em;
@@ -383,7 +383,7 @@ export const RevealText = styled.p`
   }
 
   @media (max-width: 768px) {
-    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-size: clamp(0.88rem, 3.5vw, 1.1rem);
   }
 `;
 
@@ -426,8 +426,8 @@ export const SectionEyebrow = styled.div`
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 600;
+  font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+  font-weight: 500;
   color: #111827;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -436,7 +436,7 @@ export const SectionTitle = styled.h2`
   .highlighted-word {
     color: #fff;
     position: relative;
-    font-weight: 700;
+    font-weight: 600;
     background: #111111;
     padding: 0.05em 0.2em;
     border-radius: 4px;
@@ -450,23 +450,23 @@ export const SectionTitle = styled.h2`
   }
 
   @media (max-width: 768px) {
-    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    font-size: clamp(1.2rem, 4vw, 1.4rem);
   }
 `;
 
 export const SectionText = styled.p`
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   line-height: 1.7;
   color: #6B7280;
   max-width: 700px;
 
   strong {
     color: #111111;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.88rem;
   }
 `;
 
@@ -532,7 +532,7 @@ export const ServiceCard = styled.div`
 `;
 
 export const ServiceIcon = styled.div`
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 20px;
   color: #111111;
   transition: transform 0.3s ease;
@@ -544,14 +544,14 @@ export const ServiceIcon = styled.div`
 `;
 
 export const ServiceTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 500;
   color: #111827;
   margin-bottom: 12px;
 `;
 
 export const ServiceDescription = styled.p`
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   line-height: 1.6;
   color: #6B7280;
   flex: 1;
@@ -563,8 +563,8 @@ export const ServiceBadge = styled.span`
   right: 16px;
   background: #111111;
   color: white;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: 0.65rem;
+  font-weight: 600;
   padding: 4px 12px;
   border-radius: 100px;
   letter-spacing: 0.04em;
@@ -629,8 +629,8 @@ export const BenchmarkCard = styled.div`
 `;
 
 export const BenchmarkValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #111111;
   line-height: 1;
   margin-bottom: 4px;
@@ -741,8 +741,8 @@ export const CaseStudyCard = styled.div`
   }
 
   .case-title {
-    font-size: 1.2rem;
-    font-weight: 800;
+    font-size: 1.02rem;
+    font-weight: 500;
     color: #111;
     margin: 10px 0;
     letter-spacing: -0.01em;
@@ -766,8 +766,8 @@ export const CaseStudyCard = styled.div`
   }
 
   .case-stat-value {
-    font-size: 1.5rem;
-    font-weight: 900;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: #111;
     letter-spacing: -0.02em;
   }
@@ -913,8 +913,8 @@ export const PlanStep = styled.div`
   }
 
   .step-number {
-    font-size: 3rem;
-    font-weight: 900;
+    font-size: 2rem;
+    font-weight: 600;
     color: rgba(255, 255, 255, 0.3);
     line-height: 1;
     margin-bottom: 16px;
@@ -980,8 +980,8 @@ export const TestimonialsSection = styled.section`
   }
 
   .reviews-title {
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
-    font-weight: 800;
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 500;
     color: #ffffff;
     letter-spacing: -0.03em;
     line-height: 1.2;
@@ -1148,8 +1148,8 @@ export const ParallaxShowcase = styled.section`
   }
 
   .parallax-number {
-    font-size: clamp(5rem, 12vw, 10rem);
-    font-weight: 900;
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    font-weight: 700;
     color: transparent;
     -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.2);
     line-height: 1;
@@ -1166,8 +1166,8 @@ export const ParallaxShowcase = styled.section`
   }
 
   .parallax-stat-label {
-    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-    font-weight: 600;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 12px;
     letter-spacing: -0.01em;
@@ -1235,8 +1235,8 @@ export const ZoomRevealSection = styled.section`
   }
 
   .zoom-title {
-    font-size: clamp(2.2rem, 5vw, 4rem);
-    font-weight: 800;
+    font-size: clamp(1.5rem, 3.2vw, 2.2rem);
+    font-weight: 500;
     color: white;
     text-align: center;
     letter-spacing: -0.03em;
@@ -1253,7 +1253,7 @@ export const ZoomRevealSection = styled.section`
   }
 
   .zoom-subtitle {
-    font-size: 1.15rem;
+    font-size: 0.92rem;
     color: rgba(255, 255, 255, 0.5);
     text-align: center;
     max-width: 600px;
@@ -1303,8 +1303,8 @@ export const ZoomRevealSection = styled.section`
     }
 
     .zoom-card-value {
-      font-size: 2.5rem;
-      font-weight: 900;
+      font-size: 1.8rem;
+      font-weight: 600;
       color: #ffffff;
       margin-bottom: 8px;
       font-variant-numeric: tabular-nums;
@@ -1420,8 +1420,8 @@ export const StickyMetricSlide = styled.div`
   }
 
   .metric-counter {
-    font-size: clamp(5rem, 14vw, 12rem);
-    font-weight: 900;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 700;
     color: #ffffff;
     line-height: 1;
     letter-spacing: -0.04em;
@@ -1433,8 +1433,8 @@ export const StickyMetricSlide = styled.div`
   }
 
   .metric-unit {
-    font-size: clamp(1.5rem, 4vw, 3.5rem);
-    font-weight: 500;
+    font-size: clamp(1.2rem, 3vw, 2.5rem);
+    font-weight: 400;
     color: rgba(255, 255, 255, 0.35);
     letter-spacing: -0.02em;
   }
@@ -1491,8 +1491,8 @@ export const ShimmerCTA = styled.a`
   align-items: center;
   gap: 6px;
   color: #111111;
-  font-weight: 600;
-  font-size: 0.97rem;
+  font-weight: 500;
+  font-size: 0.88rem;
   text-decoration: none;
   border-bottom: 2px solid #111111;
   padding-bottom: 2px;
@@ -1579,8 +1579,8 @@ export const MobileMetricsSection = styled.div`
     }
 
     .metric-counter {
-      font-size: clamp(4rem, 18vw, 6rem);
-      font-weight: 900;
+      font-size: clamp(3rem, 14vw, 4.5rem);
+      font-weight: 700;
       color: #ffffff;
       line-height: 1;
       letter-spacing: -0.04em;
@@ -1591,8 +1591,8 @@ export const MobileMetricsSection = styled.div`
     }
 
     .metric-unit {
-      font-size: clamp(1.2rem, 5vw, 2rem);
-      font-weight: 500;
+      font-size: clamp(1rem, 4vw, 1.5rem);
+      font-weight: 400;
       color: rgba(255, 255, 255, 0.35);
       letter-spacing: -0.02em;
     }

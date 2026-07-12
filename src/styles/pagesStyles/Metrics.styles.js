@@ -58,8 +58,8 @@ export const MetricsHeader = styled.div`
   animation: ${fadeInUp} 0.8s ease-out forwards;
 
   h2 {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 500;
     color: #111111;
     margin: 0 0 1rem 0;
     background: linear-gradient(135deg, #111111 0%, #333333 100%);
@@ -68,12 +68,12 @@ export const MetricsHeader = styled.div`
     background-clip: text;
 
     @media (max-width: 768px) {
-      font-size: 1.8rem;
+      font-size: 1.3rem;
     }
   }
 
   p {
-    font-size: 1.1rem;
+    font-size: 0.92rem;
     color: #71717A;
     margin: 0;
     max-width: 600px;
@@ -126,8 +126,8 @@ export const MetricCard = styled.div`
 `;
 
 export const MetricValue = styled.div`
-  font-size: 2.25rem;
-  font-weight: 700;
+  font-size: 1.7rem;
+  font-weight: 600;
   color: #111111;
   margin-bottom: 0.5rem;
   display: flex;
@@ -136,13 +136,13 @@ export const MetricValue = styled.div`
   gap: 0.5rem;
 
   @media (max-width: 768px) {
-    font-size: 1.75rem;
+    font-size: 1.4rem;
   }
 `;
 
 export const MetricUnit = styled.span`
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 500;
   color: #71717A;
 
   @media (max-width: 768px) {
@@ -151,8 +151,8 @@ export const MetricUnit = styled.span`
 `;
 
 export const MetricLabel = styled.h3`
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 500;
   color: #111111;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
@@ -184,13 +184,13 @@ export const MetricIcon = styled.div`
   justify-content: center;
   margin: 0 auto 0.5rem;
   color: white;
-  font-size: 1.15rem;
+  font-size: 1rem;
   animation: ${pulse} 2s ease-in-out infinite;
 
   @media (max-width: 768px) {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 0.88rem;
   }
 `;
 

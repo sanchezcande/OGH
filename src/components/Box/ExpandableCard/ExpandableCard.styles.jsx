@@ -84,8 +84,8 @@ export const CloseButton = styled.button`
 `;
 
 export const CardTitle = styled.h3`
-  font-weight: 600;
-  font-size: 1.4em;
+  font-weight: 500;
+  font-size: 1.1em;
 `;
 
 export const CardDescription = styled.p`
