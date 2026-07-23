@@ -1338,152 +1338,75 @@ export const GridBackground = styled.div`
    STICKY METRICS (full-viewport scroll counter)
    ═══════════════════════════════════════════ */
 
-export const StickyMetricsWrapper = styled.div`
-  position: relative;
+export const MetricsGridSection = styled.div`
   width: 100vw;
   align-self: stretch;
-`;
-
-export const StickyMetricsViewport = styled.div`
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  width: 100%;
   background: #0a0a0a;
+  padding: 96px 40px;
+
+  @media (max-width: 768px) {
+    padding: 64px 20px;
+  }
+`;
+
+export const MetricsGridInner = styled.div`
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .sticky-metrics-eyebrow {
-    position: absolute;
-    top: 48px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    z-index: 5;
-    white-space: nowrap;
-
-    @media (max-width: 768px) {
-      top: 32px;
-      font-size: 0.65rem;
-    }
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
-export const StickyMetricsProgress = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 2px;
-  background: #fff;
-  transition: width 0.1s linear;
-  z-index: 10;
-`;
+export const MetricsGridCard = styled.div`
+  background: #0a0a0a;
+  padding: 40px 24px;
+  text-align: center;
 
-export const StickyMetricSlide = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.85);
-  filter: blur(10px);
-  z-index: 2;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-  &.active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: scale(1);
-    filter: blur(0px);
-  }
-
-  .metric-counter {
-    font-size: clamp(3.5rem, 10vw, 8rem);
+  .mg-value {
+    font-size: clamp(2rem, 4vw, 2.8rem);
     font-weight: 700;
     color: #ffffff;
     line-height: 1;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
-    position: relative;
     display: flex;
     align-items: baseline;
+    justify-content: center;
     gap: 0.05em;
   }
 
-  .metric-unit {
-    font-size: clamp(1.2rem, 3vw, 2.5rem);
+  .mg-unit {
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.35);
-    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.3);
   }
 
-  .metric-label {
-    font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+  .mg-label {
+    font-size: 0.72rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    margin-top: 20px;
+    letter-spacing: 0.15em;
+    margin-top: 14px;
   }
 
-  .metric-desc {
-    font-size: clamp(0.8rem, 1vw, 0.95rem);
-    color: rgba(255, 255, 255, 0.35);
-    margin-top: 12px;
-    max-width: 500px;
-    text-align: center;
-    line-height: 1.5;
-
-    @media (max-width: 768px) {
-      padding: 0 24px;
-    }
+  .mg-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.25);
+    margin-top: 8px;
+    line-height: 1.4;
   }
-`;
-
-export const StickyMetricDots = styled.div`
-  position: absolute;
-  right: 32px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10;
-
-  @media (max-width: 768px) {
-    right: 16px;
-    gap: 10px;
-  }
-`;
-
-export const StickyMetricDot = styled.div`
-  width: 6px;
-  height: ${({ $active }) => ($active ? "32px" : "6px")};
-  border-radius: 100px;
-  background: ${({ $active }) => ($active ? "#ffffff" : "rgba(255,255,255,0.2)")};
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 `;
 
 export const ShimmerCTA = styled.a`
@@ -1528,106 +1451,7 @@ export const ShimmerCTA = styled.a`
   }
 `;
 
-/* ═══════════════════════════════════════════
-   MOBILE METRICS (auto-cycle carousel)
-   ═══════════════════════════════════════════ */
-export const MobileMetricsSection = styled.div`
-  position: relative;
-  width: 100%;
-  background: #0a0a0a;
-  padding: 80px 0;
-  overflow: hidden;
-
-  .mobile-metrics-eyebrow {
-    text-align: center;
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    margin-bottom: 48px;
-  }
-
-  .mobile-metrics-viewport {
-    position: relative;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .mobile-metric-slide {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.85);
-    filter: blur(10px);
-    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
-      transform: scale(1);
-      filter: blur(0px);
-    }
-
-    .metric-counter {
-      font-size: clamp(3rem, 14vw, 4.5rem);
-      font-weight: 700;
-      color: #ffffff;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      font-variant-numeric: tabular-nums;
-      display: flex;
-      align-items: baseline;
-      gap: 0.05em;
-    }
-
-    .metric-unit {
-      font-size: clamp(1rem, 4vw, 1.5rem);
-      font-weight: 400;
-      color: rgba(255, 255, 255, 0.35);
-      letter-spacing: -0.02em;
-    }
-
-    .metric-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.55);
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-top: 16px;
-    }
-
-    .metric-desc {
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.35);
-      margin-top: 10px;
-      max-width: 300px;
-      text-align: center;
-      line-height: 1.5;
-      padding: 0 24px;
-    }
-  }
-
-  ${StickyMetricDots} {
-    position: relative;
-    flex-direction: row;
-    justify-content: center;
-    right: auto;
-    top: auto;
-    transform: none;
-    margin-top: 32px;
-    gap: 10px;
-  }
-`;
+/* MetricsGridSection is already responsive */
 
 /* ═══════════════════════════════════════════
    LEGACY EXPORTS (needed by other components)
