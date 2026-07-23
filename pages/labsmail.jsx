@@ -555,7 +555,7 @@ Cande`}</EmailBody>
     <CTAWrap id="book">
       <CTATitle>Ready to fill your pipeline?</CTATitle>
       <CTADesc>Book a free strategy call. We&apos;ll show you exactly how LabsMail would work for your market.</CTADesc>
-      <HeroCTA href="https://calendly.com" target="_blank" rel="noopener noreferrer">
+      <HeroCTA href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true" target="_blank" rel="noopener noreferrer">
         Book a free strategy call
         <Arrow />
       </HeroCTA>

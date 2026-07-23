@@ -617,30 +617,7 @@ export default function HomePage() {
         });
       });
 
-      // 13. STICKY METRICS scroll counter
-      if (stickyMetricsRef.current) {
-        const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
-        let lastIdx = -1;
-        ScrollTrigger.create({
-          trigger: stickyMetricsRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            const p = self.progress;
-            // Update progress bar via DOM directly (no re-render)
-            if (metricsProgressRef.current) {
-              metricsProgressRef.current.style.width = `${p * 100}%`;
-            }
-            // 8% padding at start, 12% padding at end (last slide stays visible longer)
-            const adjusted = Math.min(1, Math.max(0, (p - 0.08) / 0.80));
-            const idx = Math.min(Math.floor(adjusted * numSlides), numSlides - 1);
-            if (idx !== lastIdx) {
-              lastIdx = idx;
-              setActiveMetric(idx);
-            }
-          },
-        });
-      }
+      // 13. METRICS auto-cycle (no scroll hijacking)
 
       // 14. SECTION FADE INS
       gsap.utils.toArray(".gsap-fade-up").forEach((el) => {
@@ -669,6 +646,34 @@ export default function HomePage() {
       if (ctx) ctx.revert();
     };
   }, [isMobile]);
+
+  // Auto-cycle metrics when section is in view
+  const metricsCycleRef = useRef(null);
+  useEffect(() => {
+    const el = stickyMetricsRef.current;
+    if (!el) return;
+    const numSlides = 5;
+    let interval = null;
+    const startCycle = () => {
+      if (activeMetric < 0) setActiveMetric(0);
+      interval = setInterval(() => {
+        setActiveMetric(prev => {
+          const next = (prev + 1) % numSlides;
+          if (metricsProgressRef.current) {
+            metricsProgressRef.current.style.width = `${((next + 1) / numSlides) * 100}%`;
+          }
+          return next;
+        });
+      }, 3000);
+      metricsCycleRef.current = interval;
+    };
+    const stopCycle = () => { if (interval) clearInterval(interval); };
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { startCycle(); } else { stopCycle(); }
+    }, { threshold: 0.3 });
+    observer.observe(el);
+    return () => { observer.disconnect(); stopCycle(); };
+  }, []);
 
   // Metric counter animation
   const prevMetricRef = useRef(-2);
@@ -925,7 +930,7 @@ export default function HomePage() {
 
           <HeroCTAGroup ref={ctaGroupRef}>
             <CTAButton
-              href={isMobile ? "https://calendly.com/sanchezgcandelaria/15min" : "/contact-us"}
+              href={isMobile ? "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true" : "/contact-us"}
               target={isMobile ? "_blank" : "_self"}
               rel={isMobile ? "noopener noreferrer" : undefined}
               className="primary-cta"
@@ -1183,17 +1188,14 @@ export default function HomePage() {
           </div>
         </ZoomRevealSection>
 
-        {/* ═══════════ STICKY METRICS ═══════════ */}
-        <StickyMetricsWrapper
-          ref={stickyMetricsRef}
-          style={{ height: isMobile ? "400vh" : "700vh" }}
-        >
-          <StickyMetricsViewport>
+        {/* ═══════════ AUTO-CYCLE METRICS ═══════════ */}
+        <StickyMetricsWrapper style={{ height: "auto" }}>
+          <StickyMetricsViewport style={{ position: "relative", height: "100vh" }}>
             <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
             <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
             <StickyMetricDots>
               {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
-                <StickyMetricDot key={i} $active={activeMetric === i} />
+                <StickyMetricDot key={i} $active={activeMetric === i} onClick={() => setActiveMetric(i)} style={{ cursor: "pointer" }} />
               ))}
             </StickyMetricDots>
             {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
@@ -1406,7 +1408,7 @@ export default function HomePage() {
 
               <div style={{ textAlign: "center", marginTop: 48 }}>
                 <CTAButton
-                  href="https://calendly.com/sanchezgcandelaria/15min"
+                  href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="secondary-cta"

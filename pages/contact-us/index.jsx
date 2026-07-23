@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import SEO from "../../src/components/SEO/SEO";
-import Script from "next/script";
 import useMediaQuery from "../../src/Hooks/useMediaQuery";
 import EstimateForm from "../../src/components/ContactForm/EstimateForm";
 import styled from "styled-components";
@@ -140,17 +139,6 @@ const CardDesc = styled.p`
   margin-bottom: 1.5rem;
 `;
 
-const CalendlyEmbed = styled.div`
-  min-width: 320px;
-  height: 660px;
-  width: 100%;
-  border-radius: 4px;
-  overflow: hidden;
-
-  & iframe {
-    border-radius: 4px;
-  }
-`;
 
 const MobileBookButton = styled.a`
   display: block;
@@ -373,9 +361,12 @@ const ContactUs = () => {
   const { t, i18n } = useTranslation();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isSpanish = i18n.language === "es";
-  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min?hide_event_type_details=1&text_color=1e293b&primary_color=111111";
-  const calendlyWidgetRef = useRef(null);
-  const [scriptLoaded, setScriptLoaded] = React.useState(false);
+  const bookingUrl = "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true";
+
+  const openBooking = useCallback((e) => {
+    e.preventDefault();
+    window.open(bookingUrl, "gcal-booking", "width=600,height=700,scrollbars=yes");
+  }, []);
 
   const heroRef = useRef(null);
   const heroTitleRef = useRef(null);
@@ -384,14 +375,6 @@ const ContactUs = () => {
   const stepsRef = useRef(null);
   const fillRef = useRef(null);
 
-  useEffect(() => {
-    if (scriptLoaded && !isMobile && calendlyWidgetRef.current && typeof window !== "undefined" && window.Calendly) {
-      window.Calendly.initInlineWidget({
-        url: calendlyUrl,
-        parentElement: calendlyWidgetRef.current,
-      });
-    }
-  }, [scriptLoaded, isMobile]);
 
   // Scroll animations
   useEffect(() => {
@@ -558,13 +541,6 @@ const ContactUs = () => {
         keywords="automation audit, contact OpenGateHub, workflow consulting LATAM, business automation experts Latin America, book a call, nearshore consulting, staff augmentation consultation"
       />
 
-      {!isMobile && (
-        <Script
-          src="https://assets.calendly.com/assets/external/widget.js"
-          strategy="lazyOnload"
-          onLoad={() => setScriptLoaded(true)}
-        />
-      )}
 
       {/* Hero (dark) + parallax */}
       <DarkSection>
@@ -596,21 +572,12 @@ const ContactUs = () => {
                 "For teams that want to reduce manual work and improve operational speed."}
             </CardDesc>
 
-            {isMobile ? (
-              <MobileBookButton
-                href={calendlyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("contactPage.bookCallButton") || "Book a 15-min automation audit"} →
-              </MobileBookButton>
-            ) : (
-              <CalendlyEmbed
-                ref={calendlyWidgetRef}
-                className="calendly-inline-widget"
-                data-url={calendlyUrl}
-              />
-            )}
+            <MobileBookButton
+              href={bookingUrl}
+              onClick={openBooking}
+            >
+              {t("contactPage.bookCallButton") || "Book a 15-min automation audit"} →
+            </MobileBookButton>
             <Disclaimer>
               {t("contactPage.bookCallDisclaimer") || "No commitment. You'll leave with a clear next step and priority actions."}
             </Disclaimer>

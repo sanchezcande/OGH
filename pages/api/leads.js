@@ -136,7 +136,7 @@ export default async function handler(req, res) {
 
         <div style="padding: 16px 32px 32px; text-align: center;">
           <a
-            href="https://calendly.com/sanchezgcandelaria/15min"
+            href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true"
             style="display: inline-block; background: #CC5A50; color: white; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 8px;"
           >
             Agendar llamada con ${name} →

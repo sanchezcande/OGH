@@ -22,10 +22,8 @@ const CallToActionBlock = ({
   const ref = useRef(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
   
-  // En desktop: redirigir a /contact-us donde está el embed
-  // En mobile: redirigir directamente a Calendly
-  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min";
-  const defaultHref = isMobile ? calendlyUrl : "/contact-us";
+  const bookingUrl = "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true";
+  const defaultHref = isMobile ? bookingUrl : "/contact-us";
   const defaultTarget = isMobile ? "_blank" : "_self";
   const finalHref = ctaHref || defaultHref;
   const finalTarget = ctaTarget || defaultTarget;

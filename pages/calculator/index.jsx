@@ -464,7 +464,7 @@ export default function Calculator() {
             {t("calculator.successBody")}
           </p>
           <a
-            href="https://calendly.com/sanchezgcandelaria/15min"
+            href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true"
             target="_blank"
             rel="noopener noreferrer"
           >

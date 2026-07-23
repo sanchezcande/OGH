@@ -13,7 +13,7 @@ import {
 const EstimateForm = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const calendlyUrl = "https://calendly.com/sanchezgcandelaria/15min";
+  const bookingUrl = "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -235,7 +235,7 @@ const EstimateForm = () => {
           onClose={() => { setIsModalOpen(false); setFormStatus(""); setModalKind("info"); }}
           showQuickAction={modalKind === "success"}
           quickActionText={t("contactForm.successQuickAction", "Urgent? Book a 15-min automation audit")}
-          quickActionHref={calendlyUrl}
+          quickActionHref={bookingUrl}
         />
       )}
     </>
