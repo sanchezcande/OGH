@@ -617,7 +617,28 @@ export default function HomePage() {
         });
       });
 
-      // 13. METRICS auto-cycle (no scroll hijacking)
+      // 13. STICKY METRICS scroll counter
+      if (stickyMetricsRef.current) {
+        const numSlides = stickyMetricsRef.current.querySelectorAll(".metric-slide").length;
+        let lastIdx = -1;
+        ScrollTrigger.create({
+          trigger: stickyMetricsRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          onUpdate: (self) => {
+            const p = self.progress;
+            if (metricsProgressRef.current) {
+              metricsProgressRef.current.style.width = `${p * 100}%`;
+            }
+            const adjusted = Math.min(1, Math.max(0, (p - 0.08) / 0.80));
+            const idx = Math.min(Math.floor(adjusted * numSlides), numSlides - 1);
+            if (idx !== lastIdx) {
+              lastIdx = idx;
+              setActiveMetric(idx);
+            }
+          },
+        });
+      }
 
       // 14. SECTION FADE INS
       gsap.utils.toArray(".gsap-fade-up").forEach((el) => {
@@ -646,34 +667,6 @@ export default function HomePage() {
       if (ctx) ctx.revert();
     };
   }, [isMobile]);
-
-  // Auto-cycle metrics when section is in view
-  const metricsCycleRef = useRef(null);
-  useEffect(() => {
-    const el = stickyMetricsRef.current;
-    if (!el) return;
-    const numSlides = 5;
-    let interval = null;
-    const startCycle = () => {
-      if (activeMetric < 0) setActiveMetric(0);
-      interval = setInterval(() => {
-        setActiveMetric(prev => {
-          const next = (prev + 1) % numSlides;
-          if (metricsProgressRef.current) {
-            metricsProgressRef.current.style.width = `${((next + 1) / numSlides) * 100}%`;
-          }
-          return next;
-        });
-      }, 3000);
-      metricsCycleRef.current = interval;
-    };
-    const stopCycle = () => { if (interval) clearInterval(interval); };
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { startCycle(); } else { stopCycle(); }
-    }, { threshold: 0.3 });
-    observer.observe(el);
-    return () => { observer.disconnect(); stopCycle(); };
-  }, []);
 
   // Metric counter animation
   const prevMetricRef = useRef(-2);
@@ -1188,14 +1181,17 @@ export default function HomePage() {
           </div>
         </ZoomRevealSection>
 
-        {/* ═══════════ AUTO-CYCLE METRICS ═══════════ */}
-        <StickyMetricsWrapper style={{ height: "auto" }}>
-          <StickyMetricsViewport style={{ position: "relative", height: "100vh" }}>
+        {/* ═══════════ STICKY METRICS ═══════════ */}
+        <StickyMetricsWrapper
+          ref={stickyMetricsRef}
+          style={{ height: isMobile ? "400vh" : "700vh" }}
+        >
+          <StickyMetricsViewport>
             <div className="sticky-metrics-eyebrow">{t("metricsSection.title", "Proven Results")}</div>
             <StickyMetricsProgress ref={metricsProgressRef} style={{ width: 0 }} />
             <StickyMetricDots>
               {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((_, i) => (
-                <StickyMetricDot key={i} $active={activeMetric === i} onClick={() => setActiveMetric(i)} style={{ cursor: "pointer" }} />
+                <StickyMetricDot key={i} $active={activeMetric === i} />
               ))}
             </StickyMetricDots>
             {["avgKickoff","onTimeDelivery","npsScore","sprintsShipped","cycleTimeReduction"].map((key, i) => {
