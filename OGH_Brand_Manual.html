@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenGateHub - Brand Manual</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #111111;
+    background: #fff;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  .page-break {
+    page-break-after: always;
+    border-bottom: 1px solid #E4E4E7;
+    margin: 60px 0;
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 120px 40px;
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .cover-logo {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 12px;
+  }
+  .cover-logo .accent { color: #CC5A50; }
+  .cover-subtitle {
+    font-size: 14px;
+    color: #71717A;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 24px;
+  }
+  .cover-date {
+    font-size: 13px;
+    color: #71717A;
+    margin-top: 8px;
+  }
+
+  /* Sections */
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  h1 .accent { color: #CC5A50; }
+  .section-number {
+    font-size: 12px;
+    color: #CC5A50;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+  p, li {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  ul { padding-left: 20px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+
+  /* Color swatches */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .color-swatch {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #E4E4E7;
+  }
+  .color-swatch .preview {
+    height: 80px;
+  }
+  .color-swatch .info {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .color-swatch .info .name {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .color-swatch .info .hex {
+    font-family: 'JetBrains Mono', monospace;
+    color: #71717A;
+    font-size: 12px;
+  }
+
+  /* Logo construction */
+  .logo-demo {
+    padding: 40px;
+    border-radius: 4px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-demo.dark { background: #111; }
+  .logo-demo.light { background: #FAFAFA; border: 1px solid #E4E4E7; }
+  .logo-text {
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    user-select: none;
+  }
+  .logo-text .accent { color: #CC5A50; }
+
+  /* Font specimens */
+  .font-specimen {
+    padding: 24px;
+    background: #FAFAFA;
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+  .font-specimen .sample {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .font-specimen .meta {
+    font-size: 12px;
+    color: #71717A;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #E4E4E7;
+  }
+  th {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #71717A;
+  }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #F5F5F5;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* Do/Don't */
+  .do-dont {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+  }
+  .do-box, .dont-box {
+    padding: 20px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  .do-box { background: #F0FDF4; border-left: 3px solid #10B981; }
+  .dont-box { background: #FEF2F2; border-left: 3px solid #EF4444; }
+  .do-box strong { color: #10B981; }
+  .dont-box strong { color: #EF4444; }
+
+  /* Metrics badge */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .metric-card {
+    text-align: center;
+    padding: 20px 12px;
+    background: #FAFAFA;
+    border-radius: 4px;
+  }
+  .metric-card .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #CC5A50;
+    letter-spacing: -0.03em;
+  }
+  .metric-card .label {
+    font-size: 12px;
+    color: #71717A;
+    margin-top: 4px;
+  }
+
+  @media print {
+    .page { padding: 40px 30px; }
+    .page-break { page-break-after: always; border: none; margin: 0; }
+    .cover { min-height: auto; padding: 80px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-logo">open<span class="accent">gate</span>hub</div>
+  <div class="cover-subtitle">Brand Manual</div>
+  <div class="cover-date">June 2026</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 1. BRAND IDENTITY -->
+<div class="page">
+  <div class="section-number">01 — Brand Identity</div>
+  <h1>Who we <span class="accent">are</span></h1>
+
+  <p><strong>OpenGateHub</strong> is a software and automation company from Argentina that helps businesses eliminate manual work through workflow automation, AI integration, and embedded nearshore engineering teams.</p>
+
+  <h2>Tagline</h2>
+  <p style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">"Workflow automation & staff augmentation for teams that move fast."</p>
+
+  <h2>Mission</h2>
+  <p>We believe in doing meaningful work with people who care. Our mission is to support founders and teams who want to create value with integrity, for their users, their investors, and the world they're part of.</p>
+
+  <h2>Vision</h2>
+  <p>We build technology by putting <strong>people first</strong> — because strong products start with strong teams. We're not another dev agency. We form long-term partnerships with teams that value cultural fit as much as technical excellence.</p>
+
+  <h2>Origin Story</h2>
+  <p>OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.</p>
+
+  <h2>Founder</h2>
+  <p><strong>Candelaria Sanchez</strong> — Founder & CTO. Software engineer, filmmaker turned founder, based in Bali. She started OpenGateHub because she kept seeing the same problem everywhere: companies hiring great engineers who just didn't fit the team. Smart people in the wrong context, producing friction instead of flow. So she built a company where cultural fit isn't a nice-to-have — it's the first filter.</p>
+
+  <h2>Proof Points</h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="value">9.7/10</div>
+      <div class="label">CSAT Score</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">7.3d</div>
+      <div class="label">Avg. Kickoff</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">50+</div>
+      <div class="label">Sprints Shipped</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">87%</div>
+      <div class="label">On-Time Delivery</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 2. LOGO -->
+<div class="page">
+  <div class="section-number">02 — Logo</div>
+  <h1>Logo <span class="accent">Construction</span></h1>
+
+  <h2>Primary Logo (Wordmark)</h2>
+  <p>The OpenGateHub logo is a pure typographic wordmark. There is no icon or symbol — the brand name <em>is</em> the logo. It's set in <strong>Space Grotesk Bold</strong> with tight letter-spacing (-0.04em).</p>
+
+  <h3>Dark background</h3>
+  <div class="logo-demo dark">
+    <span class="logo-text" style="font-size: 36px; color: #fff;">open<span class="accent">gate</span>hub</span>
+  </div>
+
+  <h3>Light background</h3>
+  <div class="logo-demo light">
+    <span class="logo-text" style="font-size: 36px; color: #111;">open<span class="accent">gate</span>hub</span>
+  </div>
+
+  <h2>Construction Rules</h2>
+  <ul>
+    <li>The wordmark is always <strong>lowercase</strong>: <code>opengatehub</code></li>
+    <li>The word "gate" is always in the accent color <strong>#CC5A50</strong></li>
+    <li>"open" and "hub" remain in the base color (white on dark, #111 on light)</li>
+    <li>Font: <strong>Space Grotesk, weight 700</strong></li>
+    <li>Letter-spacing: <strong>-0.04em</strong></li>
+    <li>No period, no capitalization, no modifications</li>
+  </ul>
+
+  <h2>Clear Space</h2>
+  <p>Maintain a minimum clear space equal to the height of the letter "g" on all sides of the logo.</p>
+
+  <h2>Minimum Size</h2>
+  <p>The logo should never be rendered smaller than <strong>18px</strong> (digital) or <strong>12pt</strong> (print) to ensure legibility.</p>
+
+  <div class="do-dont">
+    <div class="do-box">
+      <strong>DO</strong>
+      <ul style="margin-top: 8px;">
+        <li>Use the wordmark as-is</li>
+        <li>Maintain the accent on "gate"</li>
+        <li>Keep it lowercase always</li>
+        <li>Use on solid backgrounds</li>
+      </ul>
+    </div>
+    <div class="dont-box">
+      <strong>DON'T</strong>
+      <ul style="margin-top: 8px;">
+        <li>Capitalize any letters</li>
+        <li>Change the accent color</li>
+        <li>Add shadows or effects</li>
+        <li>Separate "open", "gate", "hub"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 3. COLORS -->
+<div class="page">
+  <div class="section-number">03 — Color Palette</div>
+  <h1>Brand <span class="accent">Colors</span></h1>
+
+  <h2>Primary Colors</h2>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="preview" style="background: #111111;"></div>
+      <div class="info">
+        <div class="name">Primary Black</div>
+        <div class="hex">#111111</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #CC5A50;"></div>
+      <div class="info">
+        <div class="name">Accent (Muted Burgundy)</div>
+        <div class="hex">#CC5A50</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #FFFFFF; border-bottom: 1px solid #eee;"></div>
+      <div class="info">
+        <div class="name">Background White</div>
+        <div class="hex">#FFFFFF</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Secondary / UI Colors</h2>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="preview" style="background: #000000;"></div>
+      <div class="info">
+        <div class="name">Primary Dark</div>
+        <div class="hex">#000000</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #333333;"></div>
+      <div class="info">
+        <div class="name">Accent Dark</div>
+        <div class="hex">#333333</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #F5F5F5;"></div>
+      <div class="info">
+        <div class="name">Secondary / Light</div>
+        <div class="hex">#F5F5F5</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #FAFAFA;"></div>
+      <div class="info">
+        <div class="name">Background Alt</div>
+        <div class="hex">#FAFAFA</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #71717A;"></div>
+      <div class="info">
+        <div class="name">Text Muted</div>
+        <div class="hex">#71717A</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #E4E4E7;"></div>
+      <div class="info">
+        <div class="name">Muted / Borders</div>
+        <div class="hex">#E4E4E7</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Semantic Colors</h2>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="preview" style="background: #10B981;"></div>
+      <div class="info">
+        <div class="name">Success</div>
+        <div class="hex">#10B981</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #F59E0B;"></div>
+      <div class="info">
+        <div class="name">Warning</div>
+        <div class="hex">#F59E0B</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="preview" style="background: #EF4444;"></div>
+      <div class="info">
+        <div class="name">Error</div>
+        <div class="hex">#EF4444</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 4. TYPOGRAPHY -->
+<div class="page">
+  <div class="section-number">04 — Typography</div>
+  <h1>Type <span class="accent">System</span></h1>
+
+  <h2>Primary Font: Space Grotesk</h2>
+  <p>Used for all headings, body text, buttons, and UI elements.</p>
+
+  <div class="font-specimen">
+    <div class="sample">Aa Bb Cc Dd Ee Ff Gg</div>
+    <div class="meta">Space Grotesk — 400 Regular / 500 Medium / 600 Bold / 700 Black</div>
+  </div>
+
+  <h2>Monospace Font: JetBrains Mono</h2>
+  <p>Used for code snippets, technical content, and data.</p>
+
+  <div class="font-specimen">
+    <div class="sample" style="font-family: 'JetBrains Mono', monospace; font-size: 24px;">const build = () => ship();</div>
+    <div class="meta">JetBrains Mono — 400 Regular / 500 Medium</div>
+  </div>
+
+  <h2>Type Scale</h2>
+  <table>
+    <thead>
+      <tr><th>Element</th><th>Desktop</th><th>Mobile</th><th>Weight</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Hero Title</td><td><code>clamp(1.6rem, 3.2vw, 2.2rem)</code></td><td><code>1.5rem</code></td><td>700</td></tr>
+      <tr><td>Section Title</td><td><code>1.5rem</code></td><td><code>1.3rem</code></td><td>700</td></tr>
+      <tr><td>Hero Subtitle</td><td><code>0.95rem</code></td><td><code>0.88rem</code></td><td>400</td></tr>
+      <tr><td>Body</td><td><code>0.92rem</code></td><td><code>0.88rem</code></td><td>400</td></tr>
+      <tr><td>Small</td><td><code>0.82rem</code></td><td><code>0.78rem</code></td><td>400</td></tr>
+      <tr><td>Button</td><td><code>0.88rem</code></td><td><code>0.85rem</code></td><td>500</td></tr>
+      <tr><td>Card Title</td><td><code>1.02rem</code></td><td><code>0.95rem</code></td><td>600</td></tr>
+      <tr><td>Card Text</td><td><code>0.85rem</code></td><td><code>0.8rem</code></td><td>400</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Line Heights</h2>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Value</th><th>Usage</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Tight</td><td><code>1.2</code></td><td>Headings, hero titles</td></tr>
+      <tr><td>Normal</td><td><code>1.5</code></td><td>Body text, descriptions</td></tr>
+      <tr><td>Relaxed</td><td><code>1.6</code></td><td>Long-form content</td></tr>
+      <tr><td>Loose</td><td><code>1.8</code></td><td>Captions, small text</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 5. VISUAL STYLE -->
+<div class="page">
+  <div class="section-number">05 — Visual Style</div>
+  <h1>Design <span class="accent">System</span></h1>
+
+  <h2>Border Radius</h2>
+  <p>All components use <strong>4px</strong> border radius — small, large, and default are all 4px. The design language is sharp and minimal, not rounded.</p>
+
+  <h2>Shadows</h2>
+  <table>
+    <thead>
+      <tr><th>State</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Default</td><td><code>0 4px 20px rgba(0, 0, 0, 0.06)</code></td></tr>
+      <tr><td>Hover</td><td><code>0 10px 25px rgba(0, 0, 0, 0.1)</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Transitions</h2>
+  <p>Standard transition: <code>all 0.3s ease</code>. Used for hover states, color changes, and transforms.</p>
+
+  <h2>Spacing Scale</h2>
+  <table>
+    <thead>
+      <tr><th>Token</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>xs</td><td><code>4px</code></td></tr>
+      <tr><td>small</td><td><code>8px</code></td></tr>
+      <tr><td>medium</td><td><code>16px</code></td></tr>
+      <tr><td>large</td><td><code>24px</code></td></tr>
+      <tr><td>xl</td><td><code>32px</code></td></tr>
+      <tr><td>xxl</td><td><code>48px</code></td></tr>
+      <tr><td>xxxl</td><td><code>64px</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Scrollbar</h2>
+  <p>Custom thin scrollbar: 8px width, transparent track, subtle gray thumb (<code>rgba(0,0,0,0.15)</code>).</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 6. TONE OF VOICE -->
+<div class="page">
+  <div class="section-number">06 — Tone of Voice</div>
+  <h1>How we <span class="accent">speak</span></h1>
+
+  <h2>Brand Personality</h2>
+  <p>Direct, warm, and grounded. We sound like a smart colleague — not a corporate brochure. We're data-driven but human. We say what we mean, and we don't oversell.</p>
+
+  <h2>Principles</h2>
+  <ul>
+    <li><strong>Clarity over cleverness</strong> — Simple words, short sentences, no jargon</li>
+    <li><strong>Outcomes over features</strong> — Talk about what changes, not what we built</li>
+    <li><strong>Honest over impressive</strong> — No inflated metrics, no buzzwords</li>
+    <li><strong>Human over corporate</strong> — We talk like people, not press releases</li>
+  </ul>
+
+  <div class="do-dont">
+    <div class="do-box">
+      <strong>USE</strong>
+      <ul style="margin-top: 8px;">
+        <li>"We help you take that time back"</li>
+        <li>"No pitch, just a clear next step"</li>
+        <li>"We build with clarity, intention, and care"</li>
+        <li>"Cultural fit is the first filter"</li>
+      </ul>
+    </div>
+    <div class="dont-box">
+      <strong>AVOID</strong>
+      <ul style="margin-top: 8px;">
+        <li>"Leverage synergies"</li>
+        <li>"Cutting-edge solutions"</li>
+        <li>"Seamless, robust, scalable"</li>
+        <li>"We're passionate about innovation"</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Key Messages</h2>
+  <ul>
+    <li>"Your team loses 8+ hours/week to tasks automation handles in minutes."</li>
+    <li>"We're not another dev agency. We form long-term partnerships."</li>
+    <li>"Being human-first means reducing friction, not adding process."</li>
+    <li>"We don't chase trends — we build what matters."</li>
+    <li>"Every week you wait, it costs you."</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 7. SERVICES -->
+<div class="page">
+  <div class="section-number">07 — Services</div>
+  <h1>What we <span class="accent">do</span></h1>
+
+  <h2>1. Workflow Automation</h2>
+  <p>We help companies remove manual work, connect systems, and standardize operations. We design, build, and deploy automations that reduce errors, accelerate execution, and free teams for higher-value work.</p>
+  <p><strong>Process:</strong> Workflow Audit → Automation Blueprint → Build & Integrate → Deploy & Enable → Optimize & Scale</p>
+
+  <h2>2. Staff Augmentation</h2>
+  <p>We scale teams prioritizing cultural fit and human quality. We don't just find expert developers — we find people who align with your values, your way of working, and your vision. We work as part of your team to deliver quality results and accelerate your roadmap.</p>
+  <p><strong>Process:</strong> Understand Culture → Select for Fit → Quick Integration → Work Together</p>
+
+  <h2>Engagement Model</h2>
+  <ol>
+    <li><strong>Operational Discovery:</strong> Map current process, bottlenecks, and priorities</li>
+    <li><strong>Execution Plan:</strong> Define the right model (Automation, Staff Aug, or both)</li>
+    <li><strong>Launch & Optimize:</strong> Implement, measure impact, and improve continuously</li>
+  </ol>
+
+  <h2>Technologies</h2>
+  <p>React, Next.js, Node.js, Prisma, Tailwind CSS, n8n, Make, AWS, Firebase, Stripe, and more.</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 8. VALUES -->
+<div class="page">
+  <div class="section-number">08 — Core Values</div>
+  <h1>What we <span class="accent">believe</span></h1>
+
+  <h2>People First</h2>
+  <p>The strength of what we build comes from who we build it with. Our team isn't just talented — they're thoughtful, reliable, and genuinely committed to creating products with purpose.</p>
+
+  <h2>Cultural Fit as Priority</h2>
+  <p>Every engineer is matched for how they communicate, how they work, and whether they'll genuinely care about what they're building. Cultural fit isn't a nice-to-have — it's the first filter.</p>
+
+  <h2>Innovation with Purpose</h2>
+  <p>We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.</p>
+
+  <h2>Meaningful Work</h2>
+  <p>We believe in doing meaningful work — with people who care. We support founders and teams who want to create value with integrity.</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 9. SOCIAL & CONTACT -->
+<div class="page">
+  <div class="section-number">09 — Contact & Social</div>
+  <h1>Where to <span class="accent">find us</span></h1>
+
+  <h2>Digital Presence</h2>
+  <table>
+    <tbody>
+      <tr><td><strong>Website</strong></td><td>www.opengatehub.com</td></tr>
+      <tr><td><strong>Email</strong></td><td>info@opengatehub.com</td></tr>
+      <tr><td><strong>Phone</strong></td><td>+54 9 11 2348-5638</td></tr>
+      <tr><td><strong>LinkedIn</strong></td><td>linkedin.com/in/candelaria-sanchez</td></tr>
+      <tr><td><strong>GitHub</strong></td><td>github.com/OpenGateHub</td></tr>
+      <tr><td><strong>Instagram</strong></td><td>@candelaria.sanchezg</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Legal</h2>
+  <p>&copy; 2026 OpenGateHub. All rights reserved.</p>
+</div>
+
+</body>
+</html>
