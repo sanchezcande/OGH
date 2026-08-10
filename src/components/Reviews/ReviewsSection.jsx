@@ -67,7 +67,7 @@ export const ReviewsSection = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeMobileCard, setActiveMobileCard] = useState(0);
   const scrollRef = useRef(null);
-  const reviewKeys = ["farzad", "vantage", "skylar", "techvision", "greenleaf", "innovatelab"];
+  const reviewKeys = ["farzad", "vantage", "techvision", "greenleaf", "innovatelab"];
 
   const handleMobileScroll = useCallback(() => {
     const el = scrollRef.current;
