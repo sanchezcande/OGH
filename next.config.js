@@ -19,16 +19,16 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  /*async redirects() {
+  async redirects() {
     return [
       {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.opengatehub.com' }],
-        destination: 'https://opengatehub.com/:path*',
-        permanent: true,
+        source: "/devs",
+        destination:
+          "https://simplistic-war-2a4.notion.site/2c372604367540fbac7fe268bb150552?pvs=105",
+        permanent: false,
       },
     ];
-  },*/
+  },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
