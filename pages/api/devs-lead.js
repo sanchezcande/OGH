@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { guardarLead, hayBase } from "../../lib/db";
+import { avisar } from "../../lib/notificar";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -33,6 +34,12 @@ export default async function handler(req, res) {
       console.error("devs-lead: no pude guardar en Postgres:", e.message);
     }
   }
+
+  await avisar("Nuevo dev en la guía", {
+    Nombre: nombre, Email: email, Seniority: seniority,
+    Busca: buscando, "Dónde se traba": trabadoEn,
+    Guardado: guardado ? "sí" : "NO",
+  });
 
   if (resend) {
     try {

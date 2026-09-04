@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { guardarLeadCalc, hayBase } from "../../lib/db";
+import { avisar } from "../../lib/notificar";
 
 // Solo por variable de entorno. NUNCA NEXT_PUBLIC_: ese prefijo publica el valor
 // en el bundle del navegador, o sea que la key quedaría a la vista de cualquiera.
@@ -56,6 +57,12 @@ export default async function handler(req, res) {
       console.error("leads: no pude guardar en Postgres:", e.message);
     }
   }
+
+  await avisar("Nueva lead de la calculadora", {
+    Nombre: name, Email: email, Equipo: teamSize, Sueldo: salary,
+    Industria: industry, "Ahorro estimado": potentialSavings ? fmt(potentialSavings) + "/mes" : null,
+    Guardado: guardado ? "sí" : "NO",
+  });
 
   if (!resend) {
     console.error("Resend not configured");
