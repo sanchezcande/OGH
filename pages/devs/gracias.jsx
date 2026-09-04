@@ -11,6 +11,9 @@ import styled from "styled-components";
 const VIDEO = process.env.NEXT_PUBLIC_DEVS_VIDEO_ID || "";
 const CHECKOUT = process.env.NEXT_PUBLIC_DEVS_CHECKOUT || "";
 const PRECIO = process.env.NEXT_PUBLIC_DEVS_PRECIO || "USD 20";
+// Mientras no haya video Y link de pago, no mostramos nada de la guía: los
+// recuadros de "falta configurar" son notas internas, no cosas para el visitante.
+const HAY_OFERTA = Boolean(VIDEO && CHECKOUT);
 
 const INCLUYE = [
   "Dónde están los trabajos que no ves publicados",
@@ -31,50 +34,40 @@ export default function Gracias() {
       </Head>
       <Fondo>
         <Caja>
-          <Kicker>Ya estás anotado</Kicker>
-          <H1>Mirá esto antes de irte</H1>
-          <Bajada>Dos minutos. Te cuento qué miro yo cuando te entrevisto.</Bajada>
+          <Kicker>Listo, quedaste anotado</Kicker>
+          <H1>{HAY_OFERTA ? "Mirá esto antes de irte" : "Gracias por sumarte"}</H1>
+          <Bajada>
+            {HAY_OFERTA
+              ? "Dos minutos. Te cuento qué miro yo cuando te entrevisto."
+              : "Ya estás en la lista. Te escribo cuando aparezca un proyecto que encaje con lo tuyo, y si tengo alguna duda de tu perfil te pregunto por mail."}
+          </Bajada>
 
-          {VIDEO ? (
-            <Video>
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${VIDEO}?rel=0`}
-                title="Lo que yo noto y nadie te pregunta"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            </Video>
-          ) : (
-            <Placeholder>
-              Falta cargar el video.<br />
-              <small>Poné NEXT_PUBLIC_DEVS_VIDEO_ID en Vercel con el id de YouTube.</small>
-            </Placeholder>
+          {HAY_OFERTA && (
+            <>
+              <Video>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${VIDEO}?rel=0`}
+                  title="Lo que yo noto y nadie te pregunta"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
+              </Video>
+
+              <Card>
+                <CardTit>La guía completa</CardTit>
+                <Lista>
+                  {INCLUYE.map((x, i) => (
+                    <li key={i}><b>{i + 1}</b>{x}</li>
+                  ))}
+                </Lista>
+                <Bonus>+ la lista de grupos donde se publican las búsquedas antes que en ningún lado</Bonus>
+                <Comprar href={CHECKOUT} target="_blank" rel="noopener noreferrer">
+                  Quiero la guía · {PRECIO}
+                </Comprar>
+                <Nota>Te llega por mail apenas pagás.</Nota>
+              </Card>
+            </>
           )}
-
-          <Card>
-            <CardTit>La guía completa</CardTit>
-            <Lista>
-              {INCLUYE.map((x, i) => (
-                <li key={i}>
-                  <b>{i + 1}</b>
-                  {x}
-                </li>
-              ))}
-            </Lista>
-            <Bonus>+ la lista de grupos donde se publican las búsquedas antes que en ningún lado</Bonus>
-
-            {CHECKOUT ? (
-              <Comprar href={CHECKOUT} target="_blank" rel="noopener noreferrer">
-                Quiero la guía · {PRECIO}
-              </Comprar>
-            ) : (
-              <Placeholder as="div" style={{ margin: "22px 0 0" }}>
-                Falta el link de pago.<br />
-                <small>Poné NEXT_PUBLIC_DEVS_CHECKOUT en Vercel con el link de Gumroad.</small>
-              </Placeholder>
-            )}
-            <Nota>Te llega por mail apenas pagás.</Nota>
-          </Card>
         </Caja>
       </Fondo>
     </>
