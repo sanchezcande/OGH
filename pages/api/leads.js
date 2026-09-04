@@ -1,9 +1,9 @@
 import { Resend } from "resend";
+import { guardarLeadCalc, hayBase } from "../../lib/db";
 
-const apiKey =
-  process.env.RESEND_API_KEY ||
-  process.env.NEXT_PUBLIC_RESEND_API_KEY ||
-  "re_isRWc7Ao_6CGPPjPhSHuz6C49jnEpd8ey";
+// Solo por variable de entorno. NUNCA NEXT_PUBLIC_: ese prefijo publica el valor
+// en el bundle del navegador, o sea que la key quedaría a la vista de cualquiera.
+const apiKey = process.env.RESEND_API_KEY;
 
 let resend;
 try {
@@ -45,10 +45,21 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid email address" });
   }
 
-  // Always return success even if email fails (avoid blocking UX)
+  // Lo primero es guardar. El mail es un aviso, no el registro: si Resend falla
+  // (clave vencida, límite, lo que sea) el lead tiene que existir igual.
+  let guardado = false;
+  if (hayBase()) {
+    try {
+      await guardarLeadCalc(req.body);
+      guardado = true;
+    } catch (e) {
+      console.error("leads: no pude guardar en Postgres:", e.message);
+    }
+  }
+
   if (!resend) {
     console.error("Resend not configured");
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, guardado });
   }
 
   const taskList = Array.isArray(tasks) ? tasks : [];
@@ -67,6 +78,9 @@ export default async function handler(req, res) {
           </h1>
           <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0; font-size: 14px;">
             Ahorro potencial estimado: <strong>${savingsLabel}/mes</strong>
+          </p>
+          <p style="color: rgba(255,255,255,0.85); margin: 4px 0 0; font-size: 12px;">
+            ${guardado ? "Guardado en la base" : "⚠️ NO se guardó en la base"}
           </p>
         </div>
 
@@ -151,10 +165,10 @@ export default async function handler(req, res) {
   });
 
   if (error) {
+    // No bloqueamos al usuario, pero ya no se pierde: quedó en la base.
     console.error("Resend error:", error);
-    // Still return success to not block the user
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, guardado });
   }
 
-  return res.status(200).json({ success: true });
+  return res.status(200).json({ success: true, guardado });
 }

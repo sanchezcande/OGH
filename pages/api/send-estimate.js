@@ -2,7 +2,8 @@ import { Resend } from "resend";
 
 // Leer la API key directamente (Next.js carga .env.local automáticamente)
 // También intentar leer desde diferentes fuentes por si acaso
-const apiKey = process.env.RESEND_API_KEY || process.env.NEXT_PUBLIC_RESEND_API_KEY || "re_isRWc7Ao_6CGPPjPhSHuz6C49jnEpd8ey";
+// Solo por variable de entorno (ver nota en leads.js).
+const apiKey = process.env.RESEND_API_KEY;
 
 // Debug: verificar si la key se está leyendo
 console.log("=== RESEND API KEY DEBUG ===");

@@ -22,12 +22,6 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/devs",
-        destination:
-          "https://simplistic-war-2a4.notion.site/2c372604367540fbac7fe268bb150552?pvs=105",
-        permanent: false,
-      },
-      {
         source: "/discoverycall",
         destination: "https://calendar.app.google/JnGP5JWka16VhZEP7",
         permanent: false,

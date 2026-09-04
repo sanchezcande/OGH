@@ -13,6 +13,7 @@
     "@studio-freight/lenis": "^1.0.42",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^5.17.0",
+    "@vercel/postgres": "^0.10.0",
     "emailjs-com": "^3.2.0",
     "eslint-config-next": "^15.1.2",
     "express": "^4.19.2",
