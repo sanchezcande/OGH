@@ -103,6 +103,9 @@ export default function MyApp({ Component, pageProps }) {
   }, [router]);
 
   const isStandalone = router.pathname === "/labsmail";
+  // El embudo de devs va sin navbar ni footer: es una landing de conversión,
+  // no una sección del sitio (pero sí necesita el theme y los estilos globales).
+  const sinChrome = router.pathname.startsWith("/devs");
 
   if (isStandalone) {
     return (
@@ -123,13 +126,13 @@ export default function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
       <Layout>
-        <NavBar />
+        {!sinChrome && <NavBar />}
         {loading && <Loader />}
         <Main>
           <Component {...pageProps} />
         </Main>
-        <Footer />
-        <ScrollToTopButton />
+        {!sinChrome && <Footer />}
+        {!sinChrome && <ScrollToTopButton />}
         {/* <FloatingWhatsAppButton
           href="https://wa.me/+5491123485638"
           target="_blank"

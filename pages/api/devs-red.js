@@ -2,9 +2,10 @@ import { guardarDev, hayBase } from "../../lib/db";
 import { avisar } from "../../lib/notificar";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Sin "cv" ni "proyecto": el form nuevo no los pide (el CV se pide por email después).
 const OBLIGATORIOS = ["nombre", "email", "pais", "roles", "seniority", "experiencia",
   "stack", "cuandoArrancas", "dedicacion", "tarifa", "situacion", "ingles",
-  "clientesExt", "comoLlegaste", "cv", "proyecto"];
+  "clientesExt", "comoLlegaste", "whatsapp"];
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

@@ -2,72 +2,43 @@ import React from "react";
 import Head from "next/head";
 import styled from "styled-components";
 
-// Página de después del formulario: el video de Cande y el botón de compra.
-// Las dos cosas se configuran por variable de entorno para no tocar código
-// cuando cambie el video o el link de pago:
-//   NEXT_PUBLIC_DEVS_VIDEO_ID  → id de YouTube (el video "no listado")
-//   NEXT_PUBLIC_DEVS_CHECKOUT  → link de Gumroad
-// Van con NEXT_PUBLIC_ a propósito: son públicos, no son secretos.
+// Página post-formulario (rediseño Cande sept 2026):
+// "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
+// El video se configura por variable de entorno para no tocar código:
+//   NEXT_PUBLIC_DEVS_VIDEO_ID → id de YouTube (video "no listado")
+// Mientras no esté seteado, se muestra un placeholder para maquetar.
 const VIDEO = process.env.NEXT_PUBLIC_DEVS_VIDEO_ID || "";
-const CHECKOUT = process.env.NEXT_PUBLIC_DEVS_CHECKOUT || "";
-const PRECIO = process.env.NEXT_PUBLIC_DEVS_PRECIO || "USD 20";
-// Mientras no haya video Y link de pago, no mostramos nada de la guía: los
-// recuadros de "falta configurar" son notas internas, no cosas para el visitante.
-const HAY_OFERTA = Boolean(VIDEO && CHECKOUT);
-
-const INCLUYE = [
-  "Dónde están los trabajos que no ves publicados",
-  "El CV que pasa el filtro automático y frena al humano",
-  "El primer mensaje (el 90% manda copiar y pegar)",
-  "Las 7 preguntas que hago, y qué busco en cada una",
-  "Qué contar sin que te lo pregunten",
-  "Las preguntas del final que te dejan bien parado",
-  "Cuánto pedir, y cómo no dar el número primero",
-];
 
 export default function Gracias() {
   return (
     <>
       <Head>
-        <title>Listo · Lo que yo noto y nadie te pregunta</title>
+        <title>Recibimos tu aplicación</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Fondo>
         <Caja>
-          <Kicker>Listo, quedaste anotado</Kicker>
-          <H1>{HAY_OFERTA ? "Mirá esto antes de irte" : "Gracias por sumarte"}</H1>
-          <Bajada>
-            {HAY_OFERTA
-              ? "Dos minutos. Te cuento qué miro yo cuando te entrevisto."
-              : "Ya estás en la lista. Te escribo cuando aparezca un proyecto que encaje con lo tuyo, y si tengo alguna duda de tu perfil te pregunto por mail."}
-          </Bajada>
+          <Kicker>✓ Recibimos tu aplicación</Kicker>
+          <H1>Una cosa SÚPER importante</H1>
+          <Bajada>Mirá este video muy importante acá abajo 👇</Bajada>
 
-          {HAY_OFERTA && (
-            <>
-              <Video>
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${VIDEO}?rel=0`}
-                  title="Lo que yo noto y nadie te pregunta"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />
-              </Video>
-
-              <Card>
-                <CardTit>La guía completa</CardTit>
-                <Lista>
-                  {INCLUYE.map((x, i) => (
-                    <li key={i}><b>{i + 1}</b>{x}</li>
-                  ))}
-                </Lista>
-                <Bonus>+ la lista de grupos donde se publican las búsquedas antes que en ningún lado</Bonus>
-                <Comprar href={CHECKOUT} target="_blank" rel="noopener noreferrer">
-                  Quiero la guía · {PRECIO}
-                </Comprar>
-                <Nota>Te llega por mail apenas pagás.</Nota>
-              </Card>
-            </>
+          {VIDEO ? (
+            <VideoMarco>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${VIDEO}?rel=0`}
+                title="Un mensaje importante"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </VideoMarco>
+          ) : (
+            <Placeholder>
+              <Play>▶</Play>
+              <PlaceholderTxt>Acá va el video de Cande</PlaceholderTxt>
+              <PlaceholderSub>(placeholder — se configura con NEXT_PUBLIC_DEVS_VIDEO_ID)</PlaceholderSub>
+            </Placeholder>
           )}
+
         </Caja>
       </Fondo>
     </>
@@ -75,43 +46,36 @@ export default function Gracias() {
 }
 
 const Fondo = styled.div`
-  min-height: 100vh; background: #0d0d0e; color: #fff;
-  display: flex; justify-content: center; padding: 48px 20px 80px;
+  min-height: 100vh; background: #131013; color: #f5f0f2;
+  display: flex; justify-content: center;
+  padding: 72px 20px 110px;
+  @media (max-width: 760px) { padding: 46px 18px 90px; }
   font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 `;
-const Caja = styled.div` width: 100%; max-width: 620px; `;
-const Kicker = styled.div`
-  font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-  color: #cc5a50; font-weight: 700; margin-bottom: 14px;
+const Caja = styled.div` width: 100%; max-width: 680px; text-align: center; `;
+const Kicker = styled.p`
+  display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: #6fcf9f; background: rgba(46,125,91,.18);
+  border-radius: 999px; padding: 8px 16px; margin: 0 0 26px;
 `;
-const H1 = styled.h1` font-size: clamp(26px, 5.5vw, 36px); line-height: 1.12; margin: 0 0 10px; font-weight: 700; `;
-const Bajada = styled.p` font-size: 16px; line-height: 1.6; color: #b9b2b5; margin: 0 0 28px; `;
-const Video = styled.div`
-  position: relative; width: 100%; aspect-ratio: 16 / 9;
-  border-radius: 12px; overflow: hidden; background: #161617; margin-bottom: 32px;
-  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0 }
+const H1 = styled.h1` font-size: clamp(30px, 5.5vw, 42px); line-height: 1.12; margin: 0 0 14px; font-weight: 700; letter-spacing: -.01em; `;
+const Bajada = styled.p` font-size: 18px; line-height: 1.55; color: #c9bcc2; margin: 0 0 34px; font-weight: 600; `;
+const VideoMarco = styled.div`
+  position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
+  background: #000; box-shadow: 0 18px 50px rgba(26,21,24,.18);
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 `;
-const Placeholder = styled.p`
-  background: #2e2317; border: 1px dashed #6b5426; border-radius: 12px;
-  padding: 26px; text-align: center; color: #e2ac5e; font-size: 14.5px;
-  line-height: 1.6; margin: 0 0 32px;
-  small { color: #a58248; font-size: 12.5px }
+const Placeholder = styled.div`
+  width: 100%; aspect-ratio: 16 / 9; border-radius: 14px;
+  background: linear-gradient(135deg, #1e191c, #3a2b31); border: 1px solid #322b2f;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 18px 50px rgba(26,21,24,.18);
 `;
-const Card = styled.div` background: #161617; border: 1px solid #2a2a2c; border-radius: 14px; padding: 28px 26px; `;
-const CardTit = styled.h2` font-size: 19px; margin: 0 0 18px; font-weight: 700; `;
-const Lista = styled.ol`
-  list-style: none; margin: 0; padding: 0;
-  li { display: flex; gap: 12px; font-size: 14.5px; line-height: 1.5; color: #d6cfd2; margin-bottom: 11px }
-  b { color: #cc5a50; font-variant-numeric: tabular-nums; flex: 0 0 14px }
+const Play = styled.div`
+  width: 74px; height: 74px; border-radius: 50%; background: #cc5a50; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; padding-left: 6px; margin-bottom: 6px;
 `;
-const Bonus = styled.p`
-  font-size: 14px; color: #b9b2b5; border-top: 1px solid #2a2a2c;
-  margin: 18px 0 0; padding-top: 16px;
-`;
-const Comprar = styled.a`
-  display: block; text-align: center; text-decoration: none; margin-top: 22px;
-  background: #cc5a50; color: #fff; font-size: 16px; font-weight: 700;
-  border-radius: 10px; padding: 16px; transition: background .15s;
-  &:hover { background: #b8483f }
-`;
-const Nota = styled.p` font-size: 12.5px; color: #6f686b; text-align: center; margin: 12px 0 0; `;
+const PlaceholderTxt = styled.p` color: #fff; font-size: 17px; font-weight: 700; margin: 0; `;
+const PlaceholderSub = styled.p` color: rgba(255,255,255,.55); font-size: 12.5px; margin: 0; `;
+const Nota = styled.p` font-size: 14px; color: #9d8e95; margin: 26px 0 0; `;
