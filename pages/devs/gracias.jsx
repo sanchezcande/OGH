@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import Script from "next/script";
 import styled from "styled-components";
 
 // Página post-formulario (rediseño Cande sept 2026):
@@ -9,8 +8,45 @@ import styled from "styled-components";
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
 const WISTIA_ID = "4a5ghftho0";
+// Link de compra. Cuando el video termina aparece el botón; si está vacío, no
+// aparece nada (mejor eso que un botón que no lleva a ningún lado).
+// Mientras no esté el link de Gumroad el botón igual aparece, pero no navega:
+// sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
+const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
 
 export default function Gracias() {
+  const [termino, setTermino] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Los dos scripts de Wistia, a mano. Con next/script el del media (type=module)
+    // no llegaba nunca al DOM y el <wistia-player> se quedaba sin definir.
+    const cargar = (src, tipo) => {
+      if (document.querySelector(`script[src="${src}"]`)) return;
+      const el = document.createElement("script");
+      el.src = src;
+      el.async = true;
+      if (tipo) el.type = tipo;
+      document.head.appendChild(el);
+    };
+    cargar("https://fast.wistia.com/player.js");
+    cargar(`https://fast.wistia.com/embed/${WISTIA_ID}.js`, "module");
+
+    // Wistia cambió de API con el web component y sus eventos ('end', 'ended') no
+    // disparan parejo. Miramos el reloj del player, que sí es confiable y además
+    // cubre el caso de que alguien arrastre la barra hasta el final.
+    const reloj = setInterval(() => {
+      const p = document.querySelector("wistia-player");
+      if (!p || !p.duration) return;
+      if (p.currentTime >= p.duration - 1.5) {
+        setTermino(true);
+        clearInterval(reloj);
+      }
+    }, 500);
+    return () => clearInterval(reloj);
+  }, []);
+
   return (
     <>
       <Head>
@@ -18,9 +54,6 @@ export default function Gracias() {
         <meta name="robots" content="noindex" />
         <style>{`wistia-player[media-id='${WISTIA_ID}']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/${WISTIA_ID}/swatch');display:block;filter:blur(5px);padding-top:56.25%;}`}</style>
       </Head>
-      {/* afterInteractive: el video no bloquea el primer pintado de la página */}
-      <Script src="https://fast.wistia.com/player.js" strategy="afterInteractive" />
-      <Script src={`https://fast.wistia.com/embed/${WISTIA_ID}.js`} type="module" strategy="afterInteractive" />
       <Fondo>
         <Caja>
           <Kicker>✓ Recibimos tu aplicación</Kicker>
@@ -30,6 +63,21 @@ export default function Gracias() {
           <VideoMarco>
             <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
           </VideoMarco>
+
+          {termino && (
+            <Cierre>
+              <CierreTxt>Está todo acá adentro.</CierreTxt>
+              <Comprar
+                href={GUMROAD || undefined}
+                target={GUMROAD ? "_blank" : undefined}
+                rel={GUMROAD ? "noopener noreferrer" : undefined}
+                $listo={!!GUMROAD}
+                onClick={e => { if (!GUMROAD) e.preventDefault(); }}
+              >
+                🔥 SÍ, LO QUIERO YA!
+              </Comprar>
+            </Cierre>
+          )}
 
         </Caja>
       </Fondo>
@@ -58,3 +106,30 @@ const VideoMarco = styled.div`
   wistia-player { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 `;
 const Nota = styled.p` font-size: 14px; color: #9d8e95; margin: 26px 0 0; `;
+
+const Cierre = styled.div`
+  margin-top: 30px;
+  animation: entrar .5s cubic-bezier(.32,.72,0,1) both;
+  @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+`;
+const CierreTxt = styled.p`
+  margin: 0 0 16px; font-size: 17px; color: #b9b0b4;
+`;
+const Pendiente = styled.p`
+  margin: 12px 0 0; font-size: 13px; color: #8a7f84;
+`;
+const Comprar = styled.a`
+  cursor: ${p => (p.$listo ? "pointer" : "not-allowed")};
+  display: inline-block; background: #cc5a50; color: #fff; text-decoration: none;
+  font-size: 18px; font-weight: 700; letter-spacing: .03em;
+  padding: 17px 34px; border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(204,90,80,.32);
+  transition: transform .16s ease, background .16s ease;
+  /* El sitio tiene un a:hover global que le pisa el color y el texto quedaba
+     casi del mismo tono que el fondo. Por eso se repite el blanco en cada estado. */
+  &:hover, &:focus, &:active, &:visited { color: #fff; }
+  &:hover { background: #b84a41; transform: translateY(-2px); }
+  &:active { transform: translateY(0); }
+  &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+`;
