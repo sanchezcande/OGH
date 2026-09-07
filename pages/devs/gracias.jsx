@@ -1,13 +1,14 @@
 import React from "react";
 import Head from "next/head";
+import Script from "next/script";
 import styled from "styled-components";
 
 // Página post-formulario (rediseño Cande sept 2026):
 // "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
-// El video se configura por variable de entorno para no tocar código:
-//   NEXT_PUBLIC_DEVS_VIDEO_ID → id de YouTube (video "no listado")
-// Mientras no esté seteado, se muestra un placeholder para maquetar.
-const VIDEO = process.env.NEXT_PUBLIC_DEVS_VIDEO_ID || "";
+// El video está en Wistia. Su player es un web component: hay que cargar dos
+// scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
+// Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
+const WISTIA_ID = "4a5ghftho0";
 
 export default function Gracias() {
   return (
@@ -15,29 +16,20 @@ export default function Gracias() {
       <Head>
         <title>Recibimos tu aplicación</title>
         <meta name="robots" content="noindex" />
+        <style>{`wistia-player[media-id='${WISTIA_ID}']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/${WISTIA_ID}/swatch');display:block;filter:blur(5px);padding-top:56.25%;}`}</style>
       </Head>
+      {/* afterInteractive: el video no bloquea el primer pintado de la página */}
+      <Script src="https://fast.wistia.com/player.js" strategy="afterInteractive" />
+      <Script src={`https://fast.wistia.com/embed/${WISTIA_ID}.js`} type="module" strategy="afterInteractive" />
       <Fondo>
         <Caja>
           <Kicker>✓ Recibimos tu aplicación</Kicker>
           <H1>Una cosa SÚPER importante</H1>
           <Bajada>Mirá este video muy importante acá abajo 👇</Bajada>
 
-          {VIDEO ? (
-            <VideoMarco>
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${VIDEO}?rel=0`}
-                title="Un mensaje importante"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </VideoMarco>
-          ) : (
-            <Placeholder>
-              <Play>▶</Play>
-              <PlaceholderTxt>Acá va el video de Cande</PlaceholderTxt>
-              <PlaceholderSub>(placeholder — se configura con NEXT_PUBLIC_DEVS_VIDEO_ID)</PlaceholderSub>
-            </Placeholder>
-          )}
+          <VideoMarco>
+            <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
+          </VideoMarco>
 
         </Caja>
       </Fondo>
@@ -63,19 +55,6 @@ const Bajada = styled.p` font-size: 18px; line-height: 1.55; color: #c9bcc2; mar
 const VideoMarco = styled.div`
   position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
   background: #000; box-shadow: 0 18px 50px rgba(26,21,24,.18);
-  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  wistia-player { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 `;
-const Placeholder = styled.div`
-  width: 100%; aspect-ratio: 16 / 9; border-radius: 14px;
-  background: linear-gradient(135deg, #1e191c, #3a2b31); border: 1px solid #322b2f;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-  box-shadow: 0 18px 50px rgba(26,21,24,.18);
-`;
-const Play = styled.div`
-  width: 74px; height: 74px; border-radius: 50%; background: #cc5a50; color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; padding-left: 6px; margin-bottom: 6px;
-`;
-const PlaceholderTxt = styled.p` color: #fff; font-size: 17px; font-weight: 700; margin: 0; `;
-const PlaceholderSub = styled.p` color: rgba(255,255,255,.55); font-size: 12.5px; margin: 0; `;
 const Nota = styled.p` font-size: 14px; color: #9d8e95; margin: 26px 0 0; `;
