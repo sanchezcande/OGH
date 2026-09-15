@@ -20,13 +20,17 @@ export default async function handler(req, res) {
   d.email = String(d.email).trim().toLowerCase();
 
   let guardado = false;
+  let errBase = null;
   if (hayBase()) {
     try {
       await guardarDev(d);
       guardado = true;
     } catch (e) {
+      errBase = e.message;
       console.error("devs-red: no pude guardar:", e.message);
     }
+  } else {
+    errBase = "sin POSTGRES_URL";
   }
 
   const mailCV = await pedirCV(d.nombre, d.email);
@@ -45,5 +49,7 @@ export default async function handler(req, res) {
     "Mail CV": mailCV ? "enviado" : "NO salió",
   });
 
+  // _debug: solo para diagnóstico manual; no expone secretos, solo el mensaje de error.
+  if (d._debug === "claude") return res.status(200).json({ ok: true, guardado, errBase });
   return res.status(200).json({ ok: true, guardado });
 }
