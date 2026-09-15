@@ -1,5 +1,6 @@
 import { guardarDev, hayBase } from "../../lib/db";
 import { avisar } from "../../lib/notificar";
+import { pedirCV } from "../../lib/pedirCV";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Sin "cv" ni "proyecto": el form nuevo no los pide (el CV se pide por email después).
@@ -28,6 +29,8 @@ export default async function handler(req, res) {
     }
   }
 
+  const mailCV = await pedirCV(d.nombre, d.email);
+
   await avisar("Nuevo dev en la red", {
     Nombre: d.nombre,
     Email: d.email,
@@ -39,6 +42,7 @@ export default async function handler(req, res) {
     Inglés: d.ingles,
     "Llegó por": d.comoLlegaste,
     Guardado: guardado ? "sí" : "NO",
+    "Mail CV": mailCV ? "enviado" : "NO salió",
   });
 
   return res.status(200).json({ ok: true, guardado });
