@@ -46,9 +46,11 @@ export default function Gracias() {
       if (frac >= 0.25) evento("video_25");
       if (frac >= 0.5) evento("video_50");
       if (frac >= 0.75) evento("video_75");
+      // El botón de compra aparece a la MITAD del video (decisión Cande 17/09:
+      // su primer candidato vio 65% y se fue sin haber visto nunca el botón).
+      if (frac >= 0.5) setTermino(true);
       if (p.currentTime >= p.duration - 1.5) {
         evento("video_fin");
-        setTermino(true);
         clearInterval(reloj);
       }
     }, 500);
