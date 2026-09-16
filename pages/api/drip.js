@@ -31,16 +31,16 @@ Cande`,
   },
   {
     col: "drip6", dias: 6,
-    asunto: "Los puestos están empezando a salir",
+    asunto: "Un consejo antes de que te toque",
     cuerpo: (pila) => `Hola${pila}!
 
-Te aviso que las búsquedas están avanzando y en las próximas semanas empiezo a contactar candidatos.
+Te escribo con un consejo honesto: cuando un puesto aparece, todo pasa rápido — te contacto, coordinamos, y la entrevista es en días. Ahí ya no hay tiempo de prepararse. La preparación se hace ahora, que no hay apuro.
 
-Un consejo honesto: los que llegan preparados a la entrevista son los que quedan. Para eso armé la guía — no es teoría, es exactamente lo que yo miro cuando entrevisto.
+Para eso armé la guía: no es teoría, es exactamente lo que yo miro cuando entrevisto a un dev.
 
 Todavía está con el descuento: ${GUIA}
 
-Preparate, que cuando te toque quiero que la rompas.
+Preparate tranquilo ahora, que cuando te toque quiero que la rompas.
 
 Cande`,
   },
