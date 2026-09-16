@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { evento } from "../../lib/embudo";
 
 // Red de devs de OpenGateHub — versión corta en PASOS.
 // Decisiones (Cande, sept 2026):
@@ -106,6 +107,7 @@ export default function RedDeDevs() {
   const opVista = (c, i) => (en && c.opsEn ? c.opsEn[i] : c.ops[i]);
 
   const [paso, setPaso] = useState(0);
+  React.useEffect(() => { evento("form_visto"); }, []);
   const [f, setF] = useState(inicial);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
@@ -152,6 +154,7 @@ export default function RedDeDevs() {
       return;
     }
     setError("");
+    evento(paso === 0 ? "paso_2" : "paso_3");
     setPaso((p) => p + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -172,6 +175,7 @@ export default function RedDeDevs() {
         body: JSON.stringify(f),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
+      evento("enviado");
       router.push("/devs/gracias");
     } catch (err) {
       setError(err.message || (en ? "Something failed. Try again." : "Algo falló. Probá de nuevo."));

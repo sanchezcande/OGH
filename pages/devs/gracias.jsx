@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import styled from "styled-components";
+import { evento } from "../../lib/embudo";
 
 // Página post-formulario (rediseño Cande sept 2026):
 // "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
@@ -19,6 +20,7 @@ export default function Gracias() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    evento("gracias_vista");
 
     // Los dos scripts de Wistia, a mano. Con next/script el del media (type=module)
     // no llegaba nunca al DOM y el <wistia-player> se quedaba sin definir.
@@ -39,7 +41,13 @@ export default function Gracias() {
     const reloj = setInterval(() => {
       const p = document.querySelector("wistia-player");
       if (!p || !p.duration) return;
+      const frac = p.currentTime / p.duration;
+      if (p.currentTime > 0.5) evento("video_play");
+      if (frac >= 0.25) evento("video_25");
+      if (frac >= 0.5) evento("video_50");
+      if (frac >= 0.75) evento("video_75");
       if (p.currentTime >= p.duration - 1.5) {
+        evento("video_fin");
         setTermino(true);
         clearInterval(reloj);
       }
@@ -66,13 +74,12 @@ export default function Gracias() {
 
           {termino && (
             <Cierre>
-              <CierreTxt>Está todo acá adentro.</CierreTxt>
               <Comprar
                 href={GUMROAD || undefined}
                 target={GUMROAD ? "_blank" : undefined}
                 rel={GUMROAD ? "noopener noreferrer" : undefined}
                 $listo={!!GUMROAD}
-                onClick={e => { if (!GUMROAD) e.preventDefault(); }}
+                onClick={e => { evento("click_gumroad"); if (!GUMROAD) e.preventDefault(); }}
               >
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>
@@ -112,9 +119,6 @@ const Cierre = styled.div`
   animation: entrar .5s cubic-bezier(.32,.72,0,1) both;
   @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { animation: none; }
-`;
-const CierreTxt = styled.p`
-  margin: 0 0 16px; font-size: 17px; color: #b9b0b4;
 `;
 const Pendiente = styled.p`
   margin: 12px 0 0; font-size: 13px; color: #8a7f84;
