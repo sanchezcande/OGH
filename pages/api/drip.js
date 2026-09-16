@@ -18,13 +18,13 @@ const TOQUES = [
     asunto: "Viste el video?",
     cuerpo: (pila) => `Hola${pila}!
 
-Te escribo cortito: ya tengo tu aplicación y las búsquedas siguen su curso.
+Ya estás adentro de mis búsquedas — eso es lo primero.
 
-Mientras tanto, si no viste el video que te dejé después del form, miralo — ahí te cuento de la guía con la que llegás preparado a estas entrevistas: las 9 preguntas que hago, el CV que pasa el filtro, qué contar sin que te lo pregunten.
+Lo segundo: en algún momento te va a tocar una entrevista conmigo. Y es la única entrevista en la que podés saber de antemano exactamente qué te van a preguntar y qué estoy midiendo con cada respuesta — porque las preguntas las escribí yo, y están todas en la guía que te muestro en el video.
 
-El descuento sigue por poco tiempo: ${GUIA}
+Si no lo viste, miralo. La guía está acá, todavía con descuento: ${GUIA}
 
-Cuanto más preparado llegues, mejor puesto te puedo conseguir. Ahí ganamos los dos.
+De los que aplican conmigo, los que llegan preparados son los que quedan.
 
 Cande`,
   },
@@ -33,26 +33,30 @@ Cande`,
     asunto: "Tu CV tiene 6 segundos",
     cuerpo: (pila) => `Hola${pila}!
 
-Un dato de mi lado del escritorio: un CV se mira 6 segundos antes de decidir si se sigue leyendo o no. Y la mayoría muere ahí, no por falta de talento — por cómo está armado.
+Un dato de mi lado del escritorio: un CV se mira 6 segundos. En 6 segundos se decide si hay entrevista o no hay nada.
 
-En la guía hay un CV entero, real, con el porqué de cada línea: qué pasa el filtro automático y qué hace que el humano que lo abre frene.
+Lo bravo: al que queda afuera nadie le avisa por qué. Sigue mandando el mismo CV, y pierde en esos 6 segundos una y otra vez sin enterarse.
 
-Está acá, con el descuento: ${GUIA}
+En la guía hay un CV entero, real, con el porqué de cada línea: qué pasa el filtro automático y qué hace frenar al humano que lo abre. Es la diferencia entre existir o no existir en una búsqueda.
+
+${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d3", dias: 3,
-    asunto: "Ninguna de mis preguntas es técnica",
+    asunto: "Sé exactamente qué te van a preguntar",
     cuerpo: (pila) => `Hola${pila}!
 
-Algo que sorprende a casi todos los que entrevisto: mis 9 preguntas no son técnicas. Lo técnico ya lo veo en tu experiencia — lo que decido en la entrevista es otra cosa, y casi nadie viene preparado para eso.
+Porque las preguntas las hago yo 🙂
 
-Las 9 están en la guía, con lo que estoy midiendo en cada una. Leerlas antes de una entrevista cambia el partido.
+Y te cuento algo que sorprende a todos los que entrevisto: ninguna de las 9 es técnica. Lo técnico ya lo vi en tu perfil — en la entrevista decido otra cosa. Y para esa otra cosa casi nadie viene preparado.
 
-${GUIA}
+Los que sí, se notan en los primeros dos minutos. Y son los que quedan.
 
-Después de este te dejo descansar unos días, prometido 🙂
+Las 9 preguntas están en la guía, con lo que estoy midiendo en cada una: ${GUIA}
+
+Después de este mail te dejo descansar unos días, prometido 🙂
 
 Cande`,
   },
@@ -61,26 +65,26 @@ Cande`,
     asunto: "Un consejo antes de que te toque",
     cuerpo: (pila) => `Hola${pila}!
 
-Te escribo con un consejo honesto: cuando un puesto aparece, todo pasa rápido — te contacto, coordinamos, y la entrevista es en días. Ahí ya no hay tiempo de prepararse. La preparación se hace ahora, que no hay apuro.
+Un consejo honesto: cuando el puesto aparece, todo pasa rápido. Te escribo, coordinamos, y la entrevista es en días. Ahí ya no hay tiempo de prepararse.
 
-Para eso armé la guía: no es teoría, es exactamente lo que yo miro cuando entrevisto a un dev.
+Y es UNA entrevista. No hay segunda primera impresión.
 
-Todavía está con el descuento: ${GUIA}
+La preparación se hace ahora, que no hay apuro. Para eso está la guía — no es teoría: es exactamente lo que yo miro cuando tengo un dev enfrente. ${GUIA}
 
-Preparate tranquilo ahora, que cuando te toque quiero que la rompas.
+Un puesto de estos paga en dólares. Prepararlo cuesta 27.
 
 Cande`,
   },
   {
     col: "drip_d12", dias: 12,
-    asunto: "Lo que la IA cambió para los devs",
+    asunto: "Uno más del montón, o no",
     cuerpo: (pila) => `Hola${pila}!
 
-No te voy a decir nada que no sepas: conseguir trabajo como dev se puso más difícil. Más gente aplicando, filtros automáticos en todos lados, y la IA levantando la vara.
+No te digo nada nuevo: conseguir trabajo de dev se puso más difícil que nunca. Más gente aplicando, filtros automáticos en todos lados, la IA levantando la vara.
 
-Lo que sí te digo: los que se preparan distinto quedan. Dónde buscar para no ser uno de cien, qué escribir en el primer mensaje, qué contar sin que te lo pregunten — eso es la guía, y es lo que separa al que queda del que sigue aplicando.
+Eso significa que en cada búsqueda hay dos tipos de candidatos: los que se prepararon distinto, y el montón. No hay tercera categoría.
 
-${GUIA}
+La guía existe para ponerte en la primera: dónde buscar para no ser uno de cien, qué escribir en el primer mensaje, qué contar sin que te lo pregunten. ${GUIA}
 
 Cande`,
   },
@@ -89,11 +93,13 @@ Cande`,
     asunto: "Último mail sobre esto",
     cuerpo: (pila) => `Hola${pila}!
 
-Este es el último mail que te mando sobre la guía — no soy de insistir y ya te conté todo lo que tiene.
+Este es el último mail que te mando sobre la guía. No soy de insistir, y ya te conté todo lo que tiene.
 
-Queda acá por si algún día la querés: ${GUIA}
+Solo te dejo esto: entrevisté a mucha gente, y la diferencia entre los que quedan y los que no casi nunca es el talento. Es la preparación. Lo vi demasiadas veces como para no decírtelo.
 
-Lo importante: seguís en mi radar. Cuando aparezca una búsqueda que encaje con tu perfil, te escribo yo.
+Queda acá por si la querés: ${GUIA}
+
+Y lo importante: seguís en mi radar. Cuando haya una búsqueda para tu perfil, te escribo yo.
 
 Que andes bien!
 
