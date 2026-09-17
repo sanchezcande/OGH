@@ -50,11 +50,11 @@ Cande`,
 
 Porque las preguntas las hago yo 🙂
 
-Y te cuento algo que sorprende a todos los que entrevisto: ninguna de las 9 es técnica. Lo técnico ya lo vi en tu perfil — en la entrevista decido otra cosa. Y para esa otra cosa casi nadie viene preparado.
+Y te cuento algo que sorprende a todos los que entrevisto: ninguna es técnica. Lo técnico ya lo vi en tu perfil — en la entrevista decido otra cosa. Y para esa otra cosa casi nadie viene preparado.
 
 Los que sí, se notan en los primeros dos minutos. Y son los que quedan.
 
-Las 9 preguntas están en la guía, con lo que estoy midiendo en cada una: ${GUIA}
+Están en la guía con lo que mido en cada una — más un bonus con otras que también hago: ${GUIA}
 
 Después de este mail te dejo descansar unos días, prometido 🙂
 
