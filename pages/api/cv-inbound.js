@@ -33,6 +33,11 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   try {
     const evt = req.body || {};
+    // Caja negra temporal: guardar el payload crudo para depurar la forma real.
+    try {
+      await sql`CREATE TABLE IF NOT EXISTS webhook_debug (id SERIAL PRIMARY KEY, payload JSONB, creado TIMESTAMPTZ DEFAULT NOW())`;
+      await sql`INSERT INTO webhook_debug (payload) VALUES (${JSON.stringify(evt).slice(0, 50000)})`;
+    } catch {}
     if (evt.type && evt.type !== "email.received") return res.status(200).json({ ok: true, ignorado: evt.type });
     const d = evt.data || evt;
 
