@@ -9,7 +9,7 @@ import { Resend } from "resend";
 // cada persona recibe cada mail UNA sola vez. drip_off silencia a cualquiera.
 const KEY = process.env.RESEND_API_KEY;
 const FROM = process.env.DEVS_MAIL_FROM || "OpenGateHub <onboarding@resend.dev>";
-const REPLY_TO = process.env.DEVS_MAIL_REPLYTO || "hubopengate@gmail.com";
+const REPLY_TO = process.env.DEVS_MAIL_REPLYTO || "cv@in.opengatehub.com";
 const GUIA = "https://get.opengatehub.com/l/acelerador-de-carrera";
 
 const TOQUES = [
