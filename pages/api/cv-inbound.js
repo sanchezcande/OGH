@@ -13,18 +13,19 @@ export const config = { api: { bodyParser: { sizeLimit: "15mb" } } };
 const RESEND_KEY = process.env.RESEND_API_KEY;
 
 async function bajarAdjunto(a, emailId) {
-  // Resend manda el contenido base64 en el payload cuando es chico; si no,
-  // deja una URL o hay que pedirlo por API.
+  // El webhook trae solo la referencia. El contenido se pide a la API de
+  // recepción, que devuelve un download_url temporal en el CDN de Resend.
   if (a.content) return Buffer.from(a.content, "base64");
-  const url = a.download_url || a.url;
-  if (url) {
-    const r = await fetch(url, { headers: RESEND_KEY ? { Authorization: `Bearer ${RESEND_KEY}` } : {} });
-    if (r.ok) return Buffer.from(await r.arrayBuffer());
-  }
   if (emailId && a.id && RESEND_KEY) {
-    const r = await fetch(`https://api.resend.com/emails/${emailId}/attachments/${a.id}`,
+    const meta = await fetch(`https://api.resend.com/emails/receiving/${emailId}/attachments/${a.id}`,
       { headers: { Authorization: `Bearer ${RESEND_KEY}` } });
-    if (r.ok) return Buffer.from(await r.arrayBuffer());
+    if (meta.ok) {
+      const { download_url } = await meta.json();
+      if (download_url) {
+        const r = await fetch(download_url);
+        if (r.ok) return Buffer.from(await r.arrayBuffer());
+      }
+    }
   }
   return null;
 }
@@ -33,11 +34,6 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   try {
     const evt = req.body || {};
-    // Caja negra temporal: guardar el payload crudo para depurar la forma real.
-    try {
-      await sql`CREATE TABLE IF NOT EXISTS webhook_debug (id SERIAL PRIMARY KEY, payload JSONB, creado TIMESTAMPTZ DEFAULT NOW())`;
-      await sql`INSERT INTO webhook_debug (payload) VALUES (${JSON.stringify(evt).slice(0, 50000)})`;
-    } catch {}
     if (evt.type && evt.type !== "email.received") return res.status(200).json({ ok: true, ignorado: evt.type });
     const d = evt.data || evt;
 
