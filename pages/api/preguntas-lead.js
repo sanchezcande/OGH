@@ -37,6 +37,12 @@ async function guardar({ nombre, email, origen }) {
       actualizado TIMESTAMPTZ DEFAULT NOW()
     )`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS leads_preguntas_email ON leads_preguntas (email)`;
+  // Cadena de nurture (ver /api/drip-preguntas): cada columna es un toque,
+  // se completa cuando sale, y drip_off la silencia para siempre.
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d3 TIMESTAMPTZ`;
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d7 TIMESTAMPTZ`;
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d14 TIMESTAMPTZ`;
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
   // Si lo vuelve a pedir no duplicamos: sumamos el pedido.
   const { rows } = await sql`
     INSERT INTO leads_preguntas (nombre, email, origen)
@@ -51,9 +57,9 @@ function mail(nombre) {
   const link = SITIO + PDF_PATH;
   const texto = `Hola${pila}!
 
-Acá tenés las 9 preguntas que uso para entrevistar developers: ${link}
+Acá tenés 9 de las preguntas que hago cuando entrevisto developers: ${link}
 
-Cada una tiene qué mide, las buenas y malas señales que escucho en la respuesta y qué repreguntar. Al final hay 4 más de repuesto.
+Cada una tiene qué mide, las buenas y malas señales que escucho en la respuesta y qué repreguntar.
 
 Un consejo antes de usarlas: cuando termina de responder, contá hasta cinco antes de hablar. El que armó la respuesta sobre la marcha empieza a rellenar, y ese segundo intento es el que te sirve.
 
@@ -66,9 +72,9 @@ Candelaria Sanchez, Founder & CTO, OpenGateHub`;
 
   const html = `<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;color:#111111;font-size:15px;line-height:1.6">
   <p>Hola${esc(pila)}!</p>
-  <p>Acá tenés las 9 preguntas que uso para entrevistar developers.</p>
+  <p>Acá tenés 9 de las preguntas que hago cuando entrevisto developers.</p>
   <p style="margin:26px 0"><a href="${link}" style="background:#111111;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:4px;font-weight:600;display:inline-block">Descargar el PDF</a></p>
-  <p>Cada una tiene qué mide, las buenas y malas señales que escucho en la respuesta y qué repreguntar. Al final hay 4 más de repuesto.</p>
+  <p>Cada una tiene qué mide, las buenas y malas señales que escucho en la respuesta y qué repreguntar.</p>
   <p>Un consejo antes de usarlas: cuando termina de responder, contá hasta cinco antes de hablar. El que armó la respuesta sobre la marcha empieza a rellenar, y ese segundo intento es el que te sirve.</p>
   <p>Si estás por contratar y querés que armemos juntos el plan, <a href="${LLAMADA}" style="color:#CC5A50;font-weight:600">agendá una llamada gratis de 30 minutos</a>.</p>
   <p>Y si tenés una duda sobre alguna pregunta, respondeme este mail.</p>
@@ -105,7 +111,7 @@ export default async function handler(req, res) {
       const { texto, html } = mail(nombre);
       const r = await resend.emails.send({
         from: FROM, to: email, replyTo: REPLY_TO,
-        subject: "Las 9 preguntas para entrevistar a un developer",
+        subject: "9 de las preguntas para entrevistar a un developer",
         text: texto, html,
       });
       mandado = !r?.error;

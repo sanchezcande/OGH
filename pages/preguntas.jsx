@@ -1,20 +1,55 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import styled from "styled-components";
 import { evento } from "../lib/embudo";
 
 // Landing del lead magnet para founders (Cande, 18/09/2026).
 // Flujo: ella manda este link por DM después de preguntarles qué están
-// construyendo. Página SIN formulario de email — el link ya es la entrega:
-// un botón clickeable que abre el PDF directo. El próximo paso es la llamada.
+// construyendo. La página SÍ pide email — con eso entran a la cadena de
+// nurture de founders (ver /api/drip-preguntas) y a la llamada.
 // Mismo look que el PDF: fondo blanco, Charter en títulos y Helvetica en texto.
 // Sin navbar ni footer (ver _app.js): es un embudo.
 
 const PDF = "/guias/9-preguntas-entrevista-developer.pdf";
 const LLAMADA = "https://strategy.opengatehub.com";
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Preguntas() {
+  const router = useRouter();
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [web, setWeb] = useState("");
+  const [estado, setEstado] = useState("form"); // form | enviando | listo
+  const [error, setError] = useState("");
+  const [mandado, setMandado] = useState(true);
+
   useEffect(() => { evento("preguntas_vista"); }, []);
+
+  const enviar = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!EMAIL_RE.test(email.trim())) return setError("Revisá el email, parece que le falta algo.");
+    setEstado("enviando");
+    try {
+      const r = await fetch("/api/preguntas-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, email, web, origen: router.query.o || "dm" }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setEstado("form");
+        return setError(j.error || "Algo falló. Probá de nuevo en un minuto.");
+      }
+      setMandado(j.mandado !== false);
+      setEstado("listo");
+      evento("preguntas_email_enviado");
+    } catch {
+      setEstado("form");
+      setError("Algo falló. Probá de nuevo en un minuto.");
+    }
+  };
 
   return (
     <>
@@ -39,27 +74,47 @@ export default function Preguntas() {
               <li><b>La repregunta</b> que separa al que lo vivió del que preparó la entrevista</li>
             </Lista>
 
-            <Boton
-              href={PDF}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => evento("preguntas_pdf_click")}
-            >
-              Descargar el PDF →
-            </Boton>
-            <Chico>Se abre directo, sin nada que completar.</Chico>
-
-            <Siguiente>
-              <p><b>¿Estás por contratar a tu developer?</b> En «Tu plan claro en 30 minutos» te armo el plan para encontrar y contratar al indicado para tu proyecto. Es gratis.</p>
-              <BotonSec
-                href={LLAMADA}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => evento("preguntas_llamada_click")}
-              >
-                Agendá tu llamada gratis →
-              </BotonSec>
-            </Siguiente>
+            {estado !== "listo" ? (
+              <Form onSubmit={enviar} noValidate>
+                <Campo>
+                  <label htmlFor="nombre">Nombre</label>
+                  <input id="nombre" autoComplete="given-name" value={nombre}
+                    onChange={(e) => setNombre(e.target.value)} placeholder="Martín" />
+                </Campo>
+                <Campo>
+                  <label htmlFor="email">Email</label>
+                  <input id="email" type="email" inputMode="email" autoComplete="email" required
+                    value={email} onChange={(e) => setEmail(e.target.value)} placeholder="martin@tuempresa.com" />
+                </Campo>
+                <Trampa aria-hidden="true">
+                  <input tabIndex={-1} autoComplete="off" value={web} onChange={(e) => setWeb(e.target.value)} />
+                </Trampa>
+                {error && <Error role="alert">{error}</Error>}
+                <BotonForm type="submit" disabled={estado === "enviando"}>
+                  {estado === "enviando" ? "Enviando…" : "Mandámelas por mail →"}
+                </BotonForm>
+                <Chico>Te llega en un minuto. Si no lo ves, fijate en spam o promociones.</Chico>
+              </Form>
+            ) : (
+              <Listo>
+                <Check>✓</Check>
+                <H2>{mandado ? "Listo, revisá tu mail" : "Listo, acá la tenés"}</H2>
+                <p>
+                  {mandado
+                    ? <>Te la mandé a <b>{email.trim().toLowerCase()}</b>. Si no la ves en un minuto, fijate en spam o promociones.</>
+                    : "No pude mandarte el mail, pero la podés bajar ahora mismo."}
+                </p>
+                <Link href={PDF} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_pdf_click")}>
+                  Descargarla ahora
+                </Link>
+                <Siguiente>
+                  <p><b>¿Estás por contratar a tu developer?</b> En «Tu plan claro en 30 minutos» te armo el plan para encontrar y contratar al indicado para tu proyecto. Es gratis.</p>
+                  <BotonSec href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click")}>
+                    Agendá tu llamada gratis →
+                  </BotonSec>
+                </Siguiente>
+              </Listo>
+            )}
 
             <Firma>
               <b>Candelaria Sanchez</b>
@@ -98,25 +153,51 @@ const H1 = styled.h1`
   font-family: ${SERIF}; font-weight: 700; font-size: clamp(32px, 5vw, 46px); line-height: 1.1;
   letter-spacing: -.01em; margin: 0 0 18px; color: #111111;
 `;
+const H2 = styled.h2` font-family: ${SERIF}; font-weight: 700; font-size: 28px; margin: 0 0 10px; color: #111111; `;
 const Bajada = styled.p` font-size: 18px; line-height: 1.5; color: #52525B; margin: 0 0 26px; `;
 const Lista = styled.ul`
-  list-style: none; padding: 0; margin: 0 0 30px; border-top: 1px solid #E4E4E7;
+  list-style: none; padding: 0; margin: 0 0 34px; border-top: 1px solid #E4E4E7;
   li { padding: 11px 0 11px 26px; border-bottom: 1px solid #E4E4E7; font-size: 15.5px; line-height: 1.45; position: relative; color: #3F3F46; }
   li::before { content: "✓"; position: absolute; left: 0; color: #2E7D5B; font-weight: 700; }
   b { color: #111111; font-weight: 600; }
 `;
-const Boton = styled.a`
-  font: inherit; font-size: 17px; font-weight: 600; cursor: pointer; border: 0; border-radius: 4px;
-  background: #CC5A50; color: #ffffff; padding: 17px 24px; text-decoration: none;
+const Form = styled.form` display: flex; flex-direction: column; gap: 14px; `;
+const Campo = styled.div`
+  display: flex; flex-direction: column; gap: 6px;
+  label { font-size: 13px; font-weight: 600; color: #111111; }
+  input {
+    font: inherit; font-size: 16px; padding: 13px 14px; border: 1px solid #D4D4D8; border-radius: 4px;
+    background: #FAFAFA; color: #111111; outline: none; transition: border-color .15s, background .15s;
+  }
+  input:focus { border-color: #111111; background: #ffffff; }
+`;
+const Trampa = styled.div` position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; `;
+const Error = styled.p` margin: 0; font-size: 14px; color: #B03A2E; `;
+const BotonForm = styled.button`
+  font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; border: 0; border-radius: 4px;
+  background: #CC5A50; color: #ffffff; padding: 15px 22px; margin-top: 6px; text-decoration: none;
   display: inline-block; text-align: center; transition: background .15s;
   &:hover, &:focus, &:visited, &:active { color: #ffffff; }
   &:hover { background: #B84A41; }
+  &:disabled { opacity: .6; cursor: default; }
   &:focus-visible { outline: 3px solid #111111; outline-offset: 2px; }
 `;
-const Chico = styled.p` margin: 10px 0 0; font-size: 13px; color: #71717A; `;
+const Chico = styled.p` margin: 0; font-size: 13px; color: #71717A; `;
+const Listo = styled.div`
+  background: #FAFAFA; border: 1px solid #E4E4E7; border-radius: 4px; padding: 28px;
+  p { font-size: 15.5px; line-height: 1.55; color: #3F3F46; margin: 0; }
+`;
+const Check = styled.div`
+  width: 36px; height: 36px; border-radius: 50%; background: #2E7D5B; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 14px;
+`;
+const Link = styled.a`
+  display: inline-block; margin-top: 14px; font-size: 15px; font-weight: 600; color: #111111; text-decoration: underline;
+  &:hover { color: #CC5A50; }
+`;
 const Siguiente = styled.div`
-  margin-top: 34px; padding-top: 26px; border-top: 1px solid #E4E4E7;
-  p { font-size: 15.5px; line-height: 1.55; color: #3F3F46; margin: 0 0 14px; }
+  margin-top: 26px; padding-top: 22px; border-top: 1px solid #E4E4E7;
+  p { margin-bottom: 14px; }
   b { color: #111111; }
 `;
 const BotonSec = styled.a`
