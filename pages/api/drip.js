@@ -18,9 +18,9 @@ const TOQUES = [
     asunto: "Viste el video?",
     cuerpo: (pila) => `Hola${pila}!
 
-Ya estás adentro de mis búsquedas — eso es lo primero.
+Ya estás adentro de mis búsquedas. Eso es lo primero.
 
-Lo segundo: en algún momento te va a tocar una entrevista conmigo. Y es la única entrevista en la que podés saber de antemano exactamente qué te van a preguntar y qué estoy midiendo con cada respuesta — porque las preguntas las escribí yo, y están todas en la guía que te muestro en el video.
+Lo segundo: en algún momento te va a tocar una entrevista conmigo. Y es la única entrevista en la que podés saber de antemano exactamente qué te van a preguntar y qué estoy midiendo con cada respuesta, porque las preguntas las escribí yo, y están todas en la guía que te muestro en el video.
 
 Si no lo viste, miralo. La guía está acá, todavía con descuento: ${GUIA}
 
@@ -50,11 +50,11 @@ Cande`,
 
 Porque las preguntas las hago yo 🙂
 
-Y te cuento algo que sorprende a todos los que entrevisto: ninguna es técnica. Lo técnico ya lo vi en tu perfil — en la entrevista decido otra cosa. Y para esa otra cosa casi nadie viene preparado.
+Y te cuento algo que sorprende a todos los que entrevisto: ninguna es técnica. Lo técnico ya lo vi en tu perfil. En la entrevista decido otra cosa. Y para esa otra cosa casi nadie viene preparado.
 
 Los que sí, se notan en los primeros dos minutos. Y son los que quedan.
 
-Están en la guía con lo que mido en cada una — más un bonus con otras que también hago: ${GUIA}
+Están en la guía con lo que mido en cada una, más un bonus con otras que también hago: ${GUIA}
 
 Después de este mail te dejo descansar unos días, prometido 🙂
 
@@ -69,7 +69,7 @@ Un consejo honesto: cuando el puesto aparece, todo pasa rápido. Te escribo, coo
 
 Y es UNA entrevista. No hay segunda primera impresión.
 
-La preparación se hace ahora, que no hay apuro. Para eso está la guía — no es teoría: es exactamente lo que yo miro cuando tengo un dev enfrente. ${GUIA}
+La preparación se hace ahora, que no hay apuro. Para eso está la guía: no es teoría, es exactamente lo que yo miro cuando tengo un dev enfrente. ${GUIA}
 
 Un puesto de estos paga en dólares. Prepararlo cuesta 27.
 

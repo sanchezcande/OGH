@@ -2,6 +2,7 @@ import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { hayBase } from "../../lib/db";
 import { avisar } from "../../lib/notificar";
+import { fraseCupos } from "../../lib/cupos";
 
 // Lead magnet para founders: "Las 9 preguntas que uso para entrevistar a un developer".
 // Llega desde LinkedIn (PD de los posts) a /preguntas. Orden (Cande, 17/09):
@@ -59,6 +60,7 @@ async function guardar({ nombre, email, origen }) {
 function mail(nombre) {
   const pila = nombre ? ` ${nombre.split(" ")[0]}` : "";
   const link = SITIO + PDF_PATH;
+  const cupos = fraseCupos();
   const texto = `Hola${pila}!
 
 Acá tenés 9 de las preguntas que hago cuando entrevisto developers: ${link}
@@ -67,7 +69,11 @@ Cada una tiene qué mide, las buenas y malas señales que escucho en la respuest
 
 Un consejo antes de usarlas: cuando termina de responder, contá hasta cinco antes de hablar. El que armó la respuesta sobre la marcha empieza a rellenar, y ese segundo intento es el que te sirve.
 
-Si estás por contratar y querés que armemos juntos el plan, agendá una llamada gratis de 30 minutos: ${LLAMADA}
+¿Estás por contratar a tu developer?
+
+Si querés contratar un programador del top 5%, de esos que te siguen el ritmo fácil, armo sesiones de planificación personalizadas, gratis. En 30 minutos te dejo un plan de acción concreto para encontrar y contratar al dev estrella de tu proyecto, sin que tengas que saber una línea de código ni ser técnico. No tiene costo.
+
+Son pocos lugares. ${cupos}. Reservá el tuyo: ${LLAMADA}
 
 Y si tenés una duda sobre alguna pregunta, respondeme este mail.
 
@@ -80,7 +86,10 @@ Candelaria Sanchez, Founder & CTO, OpenGateHub`;
   <p style="margin:26px 0"><a href="${link}" style="background:#111111;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:4px;font-weight:600;display:inline-block">Descargar el PDF</a></p>
   <p>Cada una tiene qué mide, las buenas y malas señales que escucho en la respuesta y qué repreguntar.</p>
   <p>Un consejo antes de usarlas: cuando termina de responder, contá hasta cinco antes de hablar. El que armó la respuesta sobre la marcha empieza a rellenar, y ese segundo intento es el que te sirve.</p>
-  <p>Si estás por contratar y querés que armemos juntos el plan, <a href="${LLAMADA}" style="color:#CC5A50;font-weight:600">agendá una llamada gratis de 30 minutos</a>.</p>
+  <p><b>¿Estás por contratar a tu developer?</b></p>
+  <p>Si querés contratar un programador del top 5%, de esos que te siguen el ritmo fácil, armo sesiones de planificación personalizadas, gratis. En 30 minutos te dejo un plan de acción concreto para encontrar y contratar al dev estrella de tu proyecto, sin que tengas que saber una línea de código ni ser técnico. No tiene costo.</p>
+  <p style="font-size:13px;color:#CC5A50;font-weight:600">Son pocos lugares. ${cupos}. Reservá el tuyo.</p>
+  <p style="margin:14px 0"><a href="${LLAMADA}" style="background:#CC5A50;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:4px;font-weight:600;display:inline-block">Agendá tu llamada gratis</a></p>
   <p>Y si tenés una duda sobre alguna pregunta, respondeme este mail.</p>
   <p style="margin-top:28px">Cande<br><span style="color:#71717A;font-size:13px">Candelaria Sanchez, Founder &amp; CTO, OpenGateHub</span></p>
 </div>`;

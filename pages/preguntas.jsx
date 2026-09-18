@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { evento } from "../lib/embudo";
+import { fraseCupos } from "../lib/cupos";
 
 // Landing del lead magnet para founders (Cande, 18/09/2026).
 // Flujo: ella manda este link por DM después de preguntarles qué están
@@ -23,6 +24,8 @@ export default function Preguntas() {
   const [estado, setEstado] = useState("form"); // form | enviando | listo
   const [error, setError] = useState("");
   const [mandado, setMandado] = useState(true);
+
+  const cupos = fraseCupos();
 
   useEffect(() => { evento("preguntas_vista"); }, []);
 
@@ -108,7 +111,9 @@ export default function Preguntas() {
                   Descargarla ahora
                 </Link>
                 <Siguiente>
-                  <p><b>¿Estás por contratar a tu developer?</b> En «Tu plan claro en 30 minutos» te armo el plan para encontrar y contratar al indicado para tu proyecto. Es gratis.</p>
+                  <p><b>¿Estás por contratar a tu developer?</b></p>
+                  <p>Si querés contratar un programador del top 5%, de esos que te siguen el ritmo fácil, armo sesiones de planificación personalizadas, gratis. En 30 minutos te dejo un plan de acción concreto para encontrar y contratar al dev estrella de tu proyecto, sin que tengas que saber una línea de código ni ser técnico. No tiene costo.</p>
+                  <Cupos>Son pocos lugares. {cupos}. Reservá el tuyo.</Cupos>
                   <BotonSec href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click")}>
                     Agendá tu llamada gratis →
                   </BotonSec>
@@ -199,6 +204,9 @@ const Siguiente = styled.div`
   margin-top: 26px; padding-top: 22px; border-top: 1px solid #E4E4E7;
   p { margin-bottom: 14px; }
   b { color: #111111; }
+`;
+const Cupos = styled.p`
+  font-size: 13.5px; font-weight: 600; color: #CC5A50; margin: -6px 0 14px !important;
 `;
 const BotonSec = styled.a`
   font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid #111111; border-radius: 4px;

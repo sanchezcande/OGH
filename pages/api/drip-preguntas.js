@@ -24,7 +24,7 @@ const TOQUES = [
 
 Estas 9 preguntas no las vas a encontrar en un curso de management ni en un blog de RRHH: son las que uso yo, entrevistando developers, afinadas durante años de hacerlo mal y corregir.
 
-Si ya entrevistaste a alguien con ellas, contame cómo te fue — me interesa de verdad.
+Si ya entrevistaste a alguien con ellas, contame cómo te fue. Me interesa de verdad.
 
 Y si todavía no las usaste: guardalas donde las vayas a ver antes de tu próxima entrevista técnica. La diferencia entre elegir bien y elegir mal casi nunca se nota en el papel. Se nota en cómo responde a estas 9.
 
@@ -50,7 +50,7 @@ Cande`,
     asunto: "La pregunta que más veces me salvó",
     cuerpo: (pila) => `Hola${pila}!
 
-Te dejo una que no está en el PDF porque la uso más para mí que para el candidato: después de la entrevista, antes de decidir, me pregunto — ¿lo contrataría si mañana tuviera que darle mi contraseña de todo?
+Te dejo una que no está en el PDF porque la uso más para mí que para el candidato: después de la entrevista, antes de decidir, me pregunto esto. ¿Lo contrataría si mañana tuviera que darle mi contraseña de todo?
 
 Suena exagerado, pero es la que más rápido me saca de la duda cuando alguien "parece bien" en el papel.
 
@@ -69,7 +69,7 @@ Un consejo honesto: cuando por fin encontrás candidatos, todo pasa rápido. Ent
 
 Y es UNA entrevista. No hay segunda primera impresión.
 
-El filtro se arma ANTES, cuando no hay apuro. Por eso la llamada es gratis y no vende nada — el objetivo es que llegues a esa entrevista con un criterio armado, no improvisando con lo que se te ocurra en el momento.
+El filtro se arma ANTES, cuando no hay apuro. Por eso la llamada es gratis y no vende nada: el objetivo es que llegues a esa entrevista con un criterio armado, no improvisando con lo que se te ocurra en el momento.
 
 30 minutos, sin costo: ${LLAMADA}
 
@@ -99,7 +99,7 @@ Solo te dejo esto: hablé con muchos founders no técnicos, y la diferencia entr
 
 Si todavía no armaste el tuyo, la oferta sigue en pie: 30 minutos, gratis. ${LLAMADA}
 
-Y si ya contrataste, contame cómo te fue — me interesa de verdad.
+Y si ya contrataste, contame cómo te fue. Me interesa de verdad.
 
 Cande`,
   },
