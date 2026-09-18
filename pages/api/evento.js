@@ -6,6 +6,7 @@ const FASES = new Set([
   "form_visto", "paso_2", "paso_3", "enviado",
   "gracias_vista", "video_play", "video_25", "video_50", "video_75", "video_fin",
   "click_gumroad",
+  "preguntas_vista", "preguntas_pdf_click", "preguntas_llamada_click",
 ]);
 
 export default async function handler(req, res) {

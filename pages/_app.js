@@ -105,7 +105,7 @@ export default function MyApp({ Component, pageProps }) {
   const isStandalone = router.pathname === "/labsmail";
   // El embudo de devs va sin navbar ni footer: es una landing de conversión,
   // no una sección del sitio (pero sí necesita el theme y los estilos globales).
-  const sinChrome = router.pathname.startsWith("/devs");
+  const sinChrome = router.pathname.startsWith("/devs") || router.pathname === "/preguntas";
 
   if (isStandalone) {
     return (
