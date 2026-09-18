@@ -37,11 +37,15 @@ async function guardar({ nombre, email, origen }) {
       actualizado TIMESTAMPTZ DEFAULT NOW()
     )`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS leads_preguntas_email ON leads_preguntas (email)`;
-  // Cadena de nurture (ver /api/drip-preguntas): cada columna es un toque,
-  // se completa cuando sale, y drip_off la silencia para siempre.
+  // Cadena de nurture (ver /api/drip-preguntas): misma cadencia y arquitectura
+  // que el goteo de devs — 1, 2, 3, descanso, 7, 12, 17 días. Cada columna es
+  // un toque, se completa cuando sale, y drip_off la silencia para siempre.
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d1 TIMESTAMPTZ`;
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d2 TIMESTAMPTZ`;
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d3 TIMESTAMPTZ`;
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d7 TIMESTAMPTZ`;
-  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d14 TIMESTAMPTZ`;
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d12 TIMESTAMPTZ`;
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d17 TIMESTAMPTZ`;
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
   // Si lo vuelve a pedir no duplicamos: sumamos el pedido.
   const { rows } = await sql`
