@@ -7,6 +7,13 @@ import { Resend } from "resend";
 //   días: 1, 2, 3, 7, 12, 17 después de aplicar.
 // Cada toque queda marcado en la fila: aunque el endpoint se llame mil veces,
 // cada persona recibe cada mail UNA sola vez. drip_off silencia a cualquiera.
+//
+// Versión de Cande + su mentor (18/09): el que llega ya vio el video y ya
+// conoce la oferta, así que los mails no vuelven a explicarla. Atacan las
+// razones por las que todavía no compró (ya sé entrevistarme, mi CV está
+// bien, no tengo plata, lo hago después...). Sin repetir "$500", "top 5%"
+// ni "ninguna excusa" del video: eso ya lo escuchó, acá se construye marca
+// a largo plazo, no se insiste con lo mismo.
 const KEY = process.env.RESEND_API_KEY;
 const FROM = process.env.DEVS_MAIL_FROM || "OpenGateHub <onboarding@resend.dev>";
 const REPLY_TO = process.env.DEVS_MAIL_REPLYTO || "cv@in.opengatehub.com";
@@ -15,93 +22,189 @@ const GUIA = "https://get.opengatehub.com/l/acelerador-de-carrera";
 const TOQUES = [
   {
     col: "drip_d1", dias: 1,
-    asunto: "Viste el video?",
+    asunto: "No es otro curso",
     cuerpo: (pila) => `Hola${pila}!
 
-Ya estás adentro de mis búsquedas. Eso es lo primero.
+Vi que llegaste hasta el video.
 
-Lo segundo: en algún momento te va a tocar una entrevista conmigo. Y es la única entrevista en la que podés saber de antemano exactamente qué te van a preguntar y qué estoy midiendo con cada respuesta, porque las preguntas las escribí yo, y están todas en la guía que te muestro en el video.
+Y quiero aclarar algo porque quizás pensaste: "otro curso más para conseguir trabajo".
 
-Si no lo viste, miralo. La guía está acá, todavía con descuento: ${GUIA}
+No.
 
-De los que aplican conmigo, los que llegan preparados son los que quedan.
+No te enseño a programar.
+
+Te enseño a conseguir que te contraten con el conocimiento que ya tenés.
+
+Porque podés ser muy buen developer y aun así:
+
+• tener un CV que no pasa el filtro
+• aplicar a puestos donde competís contra cientos de personas
+• responder mal una pregunta de entrevista
+• no saber vender tu experiencia
+• ponerte nervioso y no mostrar lo que realmente sabés
+
+Y esas cosas tienen muchísimo que ver con las oportunidades que terminás consiguiendo.
+
+Armé la guía justamente para trabajar todo eso.
+
+Si viste el video y todavía no la compraste, acá podés acceder.
+
+Quiero la guía: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d2", dias: 2,
-    asunto: "Tu CV tiene 6 segundos",
+    asunto: "El problema puede ser tu CV",
     cuerpo: (pila) => `Hola${pila}!
 
-Un dato de mi lado del escritorio: un CV se mira 6 segundos. En 6 segundos se decide si hay entrevista o no hay nada.
+Hay algo que veo constantemente.
 
-Lo bravo: al que queda afuera nadie le avisa por qué. Sigue mandando el mismo CV, y pierde en esos 6 segundos una y otra vez sin enterarse.
+Developers que son perfectamente capaces de hacer el trabajo, pero no consiguen entrevistas.
 
-En la guía hay un CV entero, real, con el porqué de cada línea: qué pasa el filtro automático y qué hace frenar al humano que lo abre. Es la diferencia entre existir o no existir en una búsqueda.
+Y entonces empiezan a pensar:
 
-${GUIA}
+"Hay demasiada competencia."
+"Ahora con la IA está imposible."
+"Las empresas no están contratando."
+"Mi perfil no es suficientemente bueno."
+
+A veces sí.
+
+Pero muchas veces el problema empieza mucho antes de la entrevista.
+
+Tu CV.
+Dónde estás aplicando.
+Cómo estás presentándote.
+Qué estás diciendo en ese primer contacto.
+
+Si estás haciendo todo eso bien, tu búsqueda cambia bastante.
+
+En la guía te muestro exactamente cómo lo abordo yo cuando estoy evaluando perfiles para mis búsquedas.
+
+Todavía podés acceder por el precio especial de este mes.
+
+Ver la guía: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d3", dias: 3,
-    asunto: "Sé exactamente qué te van a preguntar",
+    asunto: "Lo que pasa antes de la primera pregunta",
     cuerpo: (pila) => `Hola${pila}!
 
-Porque las preguntas las hago yo 🙂
+Una cosa que quizás te sorprenda.
 
-Y te cuento algo que sorprende a todos los que entrevisto: ninguna es técnica. Lo técnico ya lo vi en tu perfil. En la entrevista decido otra cosa. Y para esa otra cosa casi nadie viene preparado.
+Muchas entrevistas se pierden antes de que el entrevistador haga la primera pregunta.
 
-Los que sí, se notan en los primeros dos minutos. Y son los que quedan.
+No porque seas mal developer.
 
-Están en la guía con lo que mido en cada una, más un bonus con otras que también hago: ${GUIA}
+Sino porque llegás sin haber preparado cómo comunicar lo que sabés hacer.
 
-Después de este mail te dejo descansar unos días, prometido 🙂
+Cuando te preguntan por un proyecto, ¿sabés qué contar?
+
+Cuando te preguntan por un problema que resolviste, ¿sabés qué parte destacar?
+
+Cuando te preguntan algo que no sabés, ¿sabés cómo responder sin quedar mal?
+
+Y cuando termina la entrevista, ¿sabés qué decir para que se acuerden de vos?
+
+Eso es entrenable.
+
+Y es una de las cosas que trabajé dentro de la guía.
+
+Si tenés entrevistas próximamente, prefiero que llegues preparado.
+
+Quiero prepararme: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d7", dias: 7,
-    asunto: "Un consejo antes de que te toque",
+    asunto: "Lo que hacen los candidatos que quedan",
     cuerpo: (pila) => `Hola${pila}!
 
-Un consejo honesto: cuando el puesto aparece, todo pasa rápido. Te escribo, coordinamos, y la entrevista es en días. Ahí ya no hay tiempo de prepararse.
+Hay candidatos que responden exactamente lo que les preguntan.
 
-Y es UNA entrevista. No hay segunda primera impresión.
+Y hay otros que hacen algo diferente.
 
-La preparación se hace ahora, que no hay apuro. Para eso está la guía: no es teoría, es exactamente lo que yo miro cuando tengo un dev enfrente. ${GUIA}
+Ayudan al entrevistador a entender por qué deberían contratarlos.
 
-Un puesto de estos paga en dólares. Prepararlo cuesta 27.
+No esperan a que les hagan veinte preguntas perfectas.
+
+Saben cuándo contar algo.
+
+Saben qué contexto dar.
+
+Saben mostrar ownership.
+
+Saben hablar de resultados, no solamente de tareas.
+
+Y, sobre todo, hacen que sea fácil imaginarse trabajando con ellos.
+
+Eso no significa inventar cosas ni vender humo.
+
+Significa aprender a comunicar mejor el valor que ya tenés.
+
+Es una de las diferencias que más quiero que entiendas cuando hagas la guía.
+
+Acceder a la guía: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d12", dias: 12,
-    asunto: "Uno más del montón, o no",
+    asunto: "No esperes a tener la entrevista",
     cuerpo: (pila) => `Hola${pila}!
 
-No te digo nada nuevo: conseguir trabajo de dev se puso más difícil que nunca. Más gente aplicando, filtros automáticos en todos lados, la IA levantando la vara.
+Si estás buscando trabajo activamente, hay una decisión que para mí no tiene mucho sentido.
 
-Eso significa que en cada búsqueda hay dos tipos de candidatos: los que se prepararon distinto, y el montón. No hay tercera categoría.
+Esperar a tener una entrevista para empezar a prepararte.
 
-La guía existe para ponerte en la primera: dónde buscar para no ser uno de cien, qué escribir en el primer mensaje, qué contar sin que te lo pregunten. ${GUIA}
+Porque cuando aparece la oportunidad, ya estás corriendo.
+
+Tenés que adaptar el CV.
+Preparar la entrevista.
+Investigar la empresa.
+Pensar ejemplos.
+Practicar cómo contar tu experiencia.
+
+Y mientras tanto, seguís aplicando a otros puestos.
+
+Es mucho más fácil hacer todo esto antes.
+
+Por eso hice la guía como algo práctico: no para que consumas horas de teoría, sino para que puedas agarrarla y aplicar lo que dice en tu próxima búsqueda.
+
+El precio especial sigue disponible este mes.
+
+Quiero la guía: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d17", dias: 17,
-    asunto: "Último mail sobre esto",
+    asunto: "Último mail que te mando sobre esto",
     cuerpo: (pila) => `Hola${pila}!
 
-Este es el último mail que te mando sobre la guía. No soy de insistir, y ya te conté todo lo que tiene.
+Último mail que te mando sobre esto.
 
-Solo te dejo esto: entrevisté a mucha gente, y la diferencia entre los que quedan y los que no casi nunca es el talento. Es la preparación. Lo vi demasiadas veces como para no decírtelo.
+Si no estás buscando trabajo ahora, perfecto. Probablemente no lo necesites todavía.
 
-Queda acá por si la querés: ${GUIA}
+Pero si estás buscando una buena oportunidad y sabés que tus próximas entrevistas importan, yo no dejaría la preparación para después.
 
-Y lo importante: seguís en mi radar. Cuando haya una búsqueda para tu perfil, te escribo yo.
+La competencia cambió.
 
-Que andes bien!
+Hay más developers buscando las mismas oportunidades y las empresas tienen más formas de filtrar candidatos.
+
+No puedo garantizarte que una guía vaya a conseguirte un trabajo.
+
+Lo que sí puedo hacer es darte el proceso que uso para preparar y evaluar candidatos, para que llegues a esas oportunidades mucho mejor preparado.
+
+La guía sigue a 27 dólares durante este mes.
+
+Acceder a la guía: ${GUIA}
+
+Y si nos cruzamos en una búsqueda, quiero que llegues preparado.
 
 Cande`,
   },
