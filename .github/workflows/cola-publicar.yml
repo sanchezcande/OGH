@@ -17,9 +17,10 @@ jobs:
     steps:
       - name: Llamar a la cola
         run: |
+          # ojo: sin -L y contra www, porque curl descarta el Authorization al redirigir
           codigo=$(curl -s -o /tmp/salida.json -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.COLA_SECRET }}" \
-            https://opengatehub.com/api/cola-publicar)
+            https://www.opengatehub.com/api/cola-publicar)
           echo "HTTP $codigo"
           cat /tmp/salida.json
           test "$codigo" = "200"
