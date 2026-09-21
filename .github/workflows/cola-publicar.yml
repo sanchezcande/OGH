@@ -1,0 +1,25 @@
+name: Publicar la cola
+
+# Despierta al sitio cada 10 minutos para que publique lo que Cande dejó programado.
+# El plan Hobby de Vercel solo permite un cron por día, así que el reloj lo pone
+# GitHub Actions, que es gratis. El que publica sigue siendo /api/cola-publicar.
+#
+# Requiere un secreto del repo: COLA_SECRET (el mismo que está en Vercel).
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar a la cola
+        run: |
+          codigo=$(curl -s -o /tmp/salida.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.COLA_SECRET }}" \
+            https://opengatehub.com/api/cola-publicar)
+          echo "HTTP $codigo"
+          cat /tmp/salida.json
+          test "$codigo" = "200"
