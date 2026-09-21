@@ -29,10 +29,12 @@ async function tablas() {
       media JSONB DEFAULT '[]'::jsonb,-- URLs públicas (placas o video)
       portada TEXT,                   -- URL de la portada, solo reels
       cuando TIMESTAMPTZ NOT NULL,
-      estado TEXT DEFAULT 'esperando',-- esperando | ok | error
+      estado TEXT DEFAULT 'esperando',-- esperando | yendo | ok | error
+      contenedor TEXT,                -- id del contenedor de Meta, mientras procesa el video
       resultado TEXT,
       creado TIMESTAMPTZ DEFAULT NOW()
     )`;
+  await sql`ALTER TABLE cola_publicaciones ADD COLUMN IF NOT EXISTS contenedor TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS tokens_redes (
       red TEXT PRIMARY KEY,           -- ig | li
@@ -59,22 +61,25 @@ async function igPost(path, params, tok) {
   return j;
 }
 
-async function igEsperar(contenedor, tok, segundos = 240) {
-  const t0 = Date.now();
-  while (Date.now() - t0 < segundos * 1000) {
-    const r = await fetch(`${GRAPH}/${contenedor}?fields=status_code&access_token=${tok}`);
-    const j = await r.json();
-    if (j.status_code === "FINISHED") return true;
-    if (j.status_code === "ERROR") throw new Error("Meta no pudo procesar el video");
-    await esperar(5000);
-  }
-  throw new Error("se pasó el tiempo esperando a Meta");
+async function igListo(contenedor, tok) {
+  const r = await fetch(`${GRAPH}/${contenedor}?fields=status_code&access_token=${tok}`);
+  const j = await r.json();
+  if (j.status_code === "ERROR") throw new Error("Meta no pudo procesar el video");
+  return j.status_code === "FINISHED";
 }
 
 async function publicarIG(fila) {
   const { id: igid, token: tok } = await token("ig");
-  let contenedor;
 
+  // segunda pasada: el contenedor ya existía, solo falta ver si Meta terminó
+  if (fila.contenedor) {
+    if (!(await igListo(fila.contenedor, tok))) return null;   // todavía procesando
+    const pub = await igPost(`${igid}/media_publish`, { creation_id: fila.contenedor }, tok);
+    const r = await fetch(`${GRAPH}/${pub.id}?fields=permalink&access_token=${tok}`);
+    return (await r.json()).permalink || "https://www.instagram.com/candelaria.sanchezg/";
+  }
+
+  let contenedor;
   if (fila.red === "ig-car") {
     const hijos = [];
     for (const url of fila.media) {
@@ -90,7 +95,10 @@ async function publicarIG(fila) {
     // reel de prueba: lo ven solo los que no la siguen, y ella lo pasa al feed después
     if (fila.red === "ig-trial") params.trial_params = JSON.stringify({ graduation_strategy: "MANUAL" });
     contenedor = (await igPost(`${igid}/media`, params, tok)).id;
-    await igEsperar(contenedor, tok);
+    // los videos tardan: guardamos el contenedor y lo publica la corrida siguiente
+    await sql`UPDATE cola_publicaciones SET contenedor = ${contenedor}, estado = 'esperando'
+              WHERE id = ${fila.id}`;
+    if (!(await igListo(contenedor, tok))) return null;
   }
 
   const pub = await igPost(`${igid}/media_publish`, { creation_id: contenedor }, tok);
@@ -175,6 +183,11 @@ export default async function handler(req, res) {
 
     try {
       const url = fila.red.startsWith("ig") ? await publicarIG(fila) : await publicarLI(fila);
+      if (url === null) {          // el video sigue procesando: lo retomamos en 10 minutos
+        await sql`UPDATE cola_publicaciones SET estado = 'esperando' WHERE id = ${fila.id}`;
+        hechas.push({ id: fila.id, red: fila.red, item: fila.item, estado: "procesando" });
+        continue;
+      }
       await sql`UPDATE cola_publicaciones SET estado = 'ok', resultado = ${url} WHERE id = ${fila.id}`;
       hechas.push({ id: fila.id, red: fila.red, item: fila.item, url });
     } catch (e) {
@@ -187,4 +200,7 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, procesadas: hechas.length, hechas });
 }
 
-export const config = { maxDuration: 300 };
+// El plan Hobby de Vercel corta las funciones a 60 segundos, así que nunca esperamos
+// a que Meta procese un video dentro del request: se guarda el contenedor y la corrida
+// siguiente del cron (10 minutos después) lo publica cuando ya está listo.
+export const config = { maxDuration: 60 };
