@@ -23,7 +23,7 @@ async function tablas() {
   await sql`
     CREATE TABLE IF NOT EXISTS cola_publicaciones (
       id SERIAL PRIMARY KEY,
-      red TEXT NOT NULL,              -- ig-car | ig-reel | ig-trial | li-post | li-car
+      red TEXT NOT NULL,              -- ig-car | ig-reel | ig-trial | li-post | li-car | li-reel
       item TEXT NOT NULL,             -- c32, b7v4, o el índice del post de LinkedIn
       caption TEXT DEFAULT '',
       media JSONB DEFAULT '[]'::jsonb,-- URLs públicas (placas o video)
@@ -134,6 +134,38 @@ async function liSubirImagen(t, url) {
   return val.image;
 }
 
+// Video en LinkedIn: initializeUpload devuelve tramos, se sube cada uno y se cierra con
+// los ETag. Es la misma danza que hace publicar_li.py desde la Mac, portada al sitio para
+// que los videos de LinkedIn también salgan con la compu apagada (Cande, 22/09).
+async function liSubirVideo(t, url) {
+  const bytes = Buffer.from(await (await fetch(url)).arrayBuffer());
+  const ini = await fetch(`${LI_API}/rest/videos?action=initializeUpload`, {
+    method: "POST", headers: liHeaders(t),
+    body: JSON.stringify({ initializeUploadRequest: {
+      owner: t.urn, fileSizeBytes: bytes.length, uploadCaptions: false, uploadThumbnail: false } }),
+  });
+  if (!ini.ok) throw new Error("LinkedIn no aceptó el video: " + ini.status + " " + (await ini.text()).slice(0, 200));
+  const val = (await ini.json()).value;
+  const partes = [];
+  for (const ins of val.uploadInstructions) {
+    const tramo = bytes.subarray(Number(ins.firstByte), Number(ins.lastByte) + 1);
+    const put = await fetch(ins.uploadUrl, {
+      method: "PUT",
+      headers: { Authorization: "Bearer " + t.access_token, "Content-Type": "application/octet-stream" },
+      body: tramo,
+    });
+    if (!put.ok) throw new Error("LinkedIn rechazó un tramo del video: " + put.status);
+    partes.push(put.headers.get("etag") || put.headers.get("ETag"));
+  }
+  const fin = await fetch(`${LI_API}/rest/videos?action=finalizeUpload`, {
+    method: "POST", headers: liHeaders(t),
+    body: JSON.stringify({ finalizeUploadRequest: {
+      video: val.video, uploadToken: val.uploadToken || "", uploadedPartIds: partes } }),
+  });
+  if (!fin.ok) throw new Error("LinkedIn no pudo cerrar el video: " + fin.status);
+  return val.video;
+}
+
 async function publicarLI(fila) {
   const t = await token("li");
   if (t.vence && t.vence * 1000 < Date.now()) throw new Error("el token de LinkedIn venció");
@@ -143,7 +175,10 @@ async function publicarLI(fila) {
     distribution: { feedDistribution: "MAIN_FEED", targetEntities: [], thirdPartyDistributionChannels: [] },
     lifecycleState: "PUBLISHED", isReshareDisabledByAuthor: false,
   };
-  if (fila.red === "li-car" && fila.media.length) {
+  if (fila.red === "li-reel" && fila.media.length) {
+    const urn = await liSubirVideo(t, fila.media[0]);
+    cuerpo.content = { media: { id: urn, title: ((fila.caption || "").split("\n")[0] || "video").slice(0, 100) } };
+  } else if (fila.red === "li-car" && fila.media.length) {
     const ids = [];
     for (const url of fila.media) ids.push(await liSubirImagen(t, url));
     cuerpo.content = ids.length === 1
