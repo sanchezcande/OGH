@@ -138,17 +138,29 @@ async function liSubirImagen(t, url) {
 // los ETag. Es la misma danza que hace publicar_li.py desde la Mac, portada al sitio para
 // que los videos de LinkedIn también salgan con la compu apagada (Cande, 22/09).
 async function liSubirVideo(t, url) {
-  const bytes = Buffer.from(await (await fetch(url)).arrayBuffer());
+  // Los reels pesan entre 80 y 170 MB, así que NO bajamos el archivo entero a memoria:
+  // le pedimos al Blob solo el tramo que LinkedIn quiere en cada vuelta (Range) y lo
+  // mandamos derecho. Menos memoria y el subir empieza antes de terminar de bajar.
+  const cab = await fetch(url, { method: "HEAD" });
+  const peso = Number(cab.headers.get("content-length") || 0);
+  if (!peso) throw new Error("no pude medir el video en el Blob");
+  if (peso > 300 * 1024 * 1024) throw new Error("el video pesa demasiado para la cola: " + Math.round(peso / 1048576) + " MB");
+
   const ini = await fetch(`${LI_API}/rest/videos?action=initializeUpload`, {
     method: "POST", headers: liHeaders(t),
     body: JSON.stringify({ initializeUploadRequest: {
-      owner: t.urn, fileSizeBytes: bytes.length, uploadCaptions: false, uploadThumbnail: false } }),
+      owner: t.urn, fileSizeBytes: peso, uploadCaptions: false, uploadThumbnail: false } }),
   });
   if (!ini.ok) throw new Error("LinkedIn no aceptó el video: " + ini.status + " " + (await ini.text()).slice(0, 200));
   const val = (await ini.json()).value;
   const partes = [];
   for (const ins of val.uploadInstructions) {
-    const tramo = bytes.subarray(Number(ins.firstByte), Number(ins.lastByte) + 1);
+    const desde = Number(ins.firstByte), hasta = Number(ins.lastByte);
+    const pedazo = await fetch(url, { headers: { Range: `bytes=${desde}-${hasta}` } });
+    if (!pedazo.ok && pedazo.status !== 206 && pedazo.status !== 200) {
+      throw new Error("el Blob no me dio el tramo del video: " + pedazo.status);
+    }
+    const tramo = Buffer.from(await pedazo.arrayBuffer());
     const put = await fetch(ins.uploadUrl, {
       method: "PUT",
       headers: { Authorization: "Bearer " + t.access_token, "Content-Type": "application/octet-stream" },
@@ -202,6 +214,18 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "no" });
   }
   await tablas();
+
+  // Si una corrida se quedó a mitad (el plan Hobby corta a los 60 segundos), la fila
+  // quedaba en "yendo" para siempre y no la publicaba nadie. A los 15 minutos vuelve a
+  // la cola, hasta 3 veces, y recién ahí se da por perdida.
+  await sql`ALTER TABLE cola_publicaciones ADD COLUMN IF NOT EXISTS intentos INT DEFAULT 0`;
+  await sql`
+    UPDATE cola_publicaciones SET estado = 'esperando', intentos = intentos + 1
+    WHERE estado = 'yendo' AND creado < NOW() AND intentos < 3
+      AND cuando < NOW() - INTERVAL '15 minutes'`;
+  await sql`
+    UPDATE cola_publicaciones SET estado = 'error', resultado = 'se cortó 3 veces (video muy pesado?)'
+    WHERE estado = 'yendo' AND intentos >= 3 AND cuando < NOW() - INTERVAL '15 minutes'`;
 
   const { rows } = await sql`
     SELECT * FROM cola_publicaciones
