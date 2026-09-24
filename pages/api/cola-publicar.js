@@ -23,7 +23,7 @@ async function tablas() {
   await sql`
     CREATE TABLE IF NOT EXISTS cola_publicaciones (
       id SERIAL PRIMARY KEY,
-      red TEXT NOT NULL,              -- ig-car | ig-reel | ig-trial | li-post | li-car | li-reel
+      red TEXT NOT NULL,              -- ig-car | ig-reel | ig-trial | li-post | li-car | li-reel | tt-car
       item TEXT NOT NULL,             -- c32, b7v4, o el índice del post de LinkedIn
       caption TEXT DEFAULT '',
       media JSONB DEFAULT '[]'::jsonb,-- URLs públicas (placas o video)
@@ -205,6 +205,52 @@ async function publicarLI(fila) {
   return urn ? `https://www.linkedin.com/feed/update/${urn}/` : "publicado";
 }
 
+/* ---------- TikTok ---------- */
+
+const TT_API = "https://open.tiktokapis.com/v2";
+
+function ttHeaders(t) {
+  return { Authorization: "Bearer " + t.access_token, "Content-Type": "application/json; charset=UTF-8" };
+}
+
+// Fotos: la API de TikTok solo acepta PULL_FROM_URL (nunca push directo como el video),
+// así que fila.media ya viene con las URLs del puente opengatehub.com/api/tt-photo (ver
+// cola_nube.py). MEDIA_UPLOAD, no DIRECT_POST: sube como borrador a su bandeja, igual que
+// el reel, porque ella pidió elegir ella misma cuándo publicar, no que salga solo.
+async function publicarTT(fila) {
+  const t = await token("tt");
+  if (t.vence && t.vence * 1000 < Date.now()) throw new Error("el token de TikTok venció");
+
+  // segunda pasada: ya se mandó, solo falta ver si terminó de bajar las fotos
+  if (fila.contenedor) {
+    const r = await fetch(`${TT_API}/post/publish/status/fetch/`, {
+      method: "POST", headers: ttHeaders(t), body: JSON.stringify({ publish_id: fila.contenedor }),
+    });
+    const j = await r.json();
+    if (j.error && j.error.code !== "ok") throw new Error("TikTok: " + j.error.message);
+    const st = j.data && j.data.status;
+    if (st === "PUBLISH_COMPLETE" || st === "SEND_TO_USER_INBOX") {
+      return "https://www.tiktok.com/tiktokstudio/content";
+    }
+    if (st === "FAILED") throw new Error("TikTok: " + (j.data.fail_reason || "falló"));
+    return null;   // PROCESSING_DOWNLOAD todavía: se retoma en 10 minutos
+  }
+
+  const r = await fetch(`${TT_API}/post/publish/content/init/`, {
+    method: "POST", headers: ttHeaders(t),
+    body: JSON.stringify({
+      post_info: { title: (fila.caption || "").slice(0, 90) },
+      source_info: { source: "PULL_FROM_URL", photo_cover_index: 0, photo_images: fila.media },
+      post_mode: "MEDIA_UPLOAD",
+      media_type: "PHOTO",
+    }),
+  });
+  const j = await r.json();
+  if (j.error && j.error.code !== "ok") throw new Error("TikTok: " + j.error.message);
+  await sql`UPDATE cola_publicaciones SET contenedor = ${j.data.publish_id}, estado = 'esperando' WHERE id = ${fila.id}`;
+  return null;   // se confirma en la corrida siguiente
+}
+
 /* ---------- el cron ---------- */
 
 export default async function handler(req, res) {
@@ -241,7 +287,9 @@ export default async function handler(req, res) {
     if (!tomada.rows.length) continue;
 
     try {
-      const url = fila.red.startsWith("ig") ? await publicarIG(fila) : await publicarLI(fila);
+      const url = fila.red.startsWith("ig") ? await publicarIG(fila)
+                 : fila.red.startsWith("tt") ? await publicarTT(fila)
+                 : await publicarLI(fila);
       if (url === null) {          // el video sigue procesando: lo retomamos en 10 minutos
         await sql`UPDATE cola_publicaciones SET estado = 'esperando' WHERE id = ${fila.id}`;
         hechas.push({ id: fila.id, red: fila.red, item: fila.item, estado: "procesando" });
