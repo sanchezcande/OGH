@@ -93,7 +93,7 @@ async function publicarIG(fila) {
     const params = { media_type: "REELS", video_url: fila.media[0], caption: fila.caption || "" };
     if (fila.portada) params.cover_url = fila.portada;
     // reel de prueba: lo ven solo los que no la siguen, y ella lo pasa al feed después
-    if (fila.red === "ig-trial") params.trial_params = JSON.stringify({ graduation_strategy: "MANUAL" });
+    if (fila.red === "ig-trial" || fila.red === "ig-broll") params.trial_params = JSON.stringify({ graduation_strategy: "MANUAL" });
     contenedor = (await igPost(`${igid}/media`, params, tok)).id;
     // los videos tardan: guardamos el contenedor y lo publica la corrida siguiente
     await sql`UPDATE cola_publicaciones SET contenedor = ${contenedor}, estado = 'esperando'
