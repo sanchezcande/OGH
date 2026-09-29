@@ -38,6 +38,20 @@ export default async function handler(req, res) {
   if (b.accion === "programar") {
     const { red, item, caption = "", media = [], portada = null, cuando } = b;
     if (!red || !item || !cuando) return res.status(400).json({ error: "faltan datos" });
+    // Traba anti-duplicados (26-28/09 salieron repetidos b8v3 y b8v4 en Instagram): si eso
+    // ya salió o se está publicando, no se vuelve a encolar. En Instagram el reel al feed y
+    // el trial del mismo video cuentan como lo mismo. TikTok queda afuera: ahí "ok" es solo
+    // un borrador en su app, y reenviarlo es a propósito.
+    if (!red.startsWith("tt")) {
+      const sib = red === "ig-reel" ? "ig-trial" : red === "ig-trial" ? "ig-reel" : red;
+      const { rows: ya } = await sql`
+        SELECT red, estado FROM cola_publicaciones
+        WHERE item = ${item} AND (red = ${red} OR red = ${sib})
+          AND (estado IN ('ok', 'yendo') OR (estado = 'esperando' AND red <> ${red}))`;
+      if (ya.length) {
+        return res.status(409).json({ error: `duplicado: ya está ${ya[0].estado === "ok" ? "publicado" : "en la cola"} como ${ya[0].red}` });
+      }
+    }
     // una sola programación por cosa: si ya estaba, se pisa con la nueva hora
     await sql`
       DELETE FROM cola_publicaciones

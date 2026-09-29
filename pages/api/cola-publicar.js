@@ -74,12 +74,22 @@ async function igListo(contenedor, tok) {
 async function publicarIG(fila) {
   const { id: igid, token: tok } = await token("ig");
 
+  // Última traba anti-duplicados: si este mismo video ya salió en Instagram (como feed o
+  // como trial, por otra fila), no se publica de nuevo.
+  if (!fila.contenedor) {
+    const sib = fila.red === "ig-reel" ? "ig-trial" : fila.red === "ig-trial" ? "ig-reel" : fila.red;
+    const { rows: ya } = await sql`
+      SELECT red FROM cola_publicaciones
+      WHERE item = ${fila.item} AND id <> ${fila.id} AND estado = 'ok'
+        AND (red = ${fila.red} OR red = ${sib})`;
+    if (ya.length) throw new Error(`duplicado: ese ya salió en Instagram (${ya[0].red})`);
+  }
+
   // segunda pasada: el contenedor ya existía, solo falta ver si Meta terminó
   if (fila.contenedor) {
     if (!(await igListo(fila.contenedor, tok))) return null;   // todavía procesando
     const pub = await igPost(`${igid}/media_publish`, { creation_id: fila.contenedor }, tok);
-    const r = await fetch(`${GRAPH}/${pub.id}?fields=permalink&access_token=${tok}`);
-    return (await r.json()).permalink || "https://www.instagram.com/candelaria.sanchezg/";
+    return await igPublicado(fila, pub.id, tok);
   }
 
   let contenedor;
@@ -110,9 +120,20 @@ async function publicarIG(fila) {
   }
 
   const pub = await igPost(`${igid}/media_publish`, { creation_id: contenedor }, tok);
-  const r = await fetch(`${GRAPH}/${pub.id}?fields=permalink&access_token=${tok}`);
-  const j = await r.json();
-  return j.permalink || `https://www.instagram.com/candelaria.sanchezg/`;
+  return await igPublicado(fila, pub.id, tok);
+}
+
+// Apenas Meta confirma, la fila queda "ok" ANTES de pedir el link: si lo que viene después
+// falla, antes quedaba en "error" y se podía volver a encolar algo que YA había salido.
+async function igPublicado(fila, mediaId, tok) {
+  const perfil = "https://www.instagram.com/candelaria.sanchezg/";
+  await sql`UPDATE cola_publicaciones SET estado = 'ok', resultado = ${perfil} WHERE id = ${fila.id}`;
+  try {
+    const r = await fetch(`${GRAPH}/${mediaId}?fields=permalink&access_token=${tok}`);
+    return (await r.json()).permalink || perfil;
+  } catch {
+    return perfil;
+  }
 }
 
 /* ---------- LinkedIn ---------- */
