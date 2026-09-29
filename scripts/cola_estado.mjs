@@ -36,7 +36,7 @@ async function main() {
   // (antes un error en la nube quedaba mudo: el C36 del 28/09 se perdió sin aviso).
   const { rows } = await sql`
     SELECT id, red, item, cuando, estado, resultado, media, portada
-    FROM cola_publicaciones WHERE estado IN ('ok', 'error')`;
+    FROM cola_publicaciones`;   // todas: para saber cuál es la fila MÁS NUEVA de cada cosa
   console.log(JSON.stringify(rows));
 }
 
