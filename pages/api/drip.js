@@ -213,6 +213,10 @@ Cande`,
 const COLS = TOQUES.map((t) => t.col);
 
 export default async function handler(req, res) {
+  // Solo el cron de Vercel (manda "Bearer CRON_SECRET"): sin esto, cualquiera que pegara
+  // la URL varias veces le mandaba toda la secuencia de mails a todos en minutos.
+  const s = process.env.CRON_SECRET;
+  if (s && req.headers.authorization !== `Bearer ${s}`) return res.status(401).json({ error: "no" });
   if (!KEY) return res.status(200).json({ ok: false, error: "sin RESEND_API_KEY" });
   const resend = new Resend(KEY);
 

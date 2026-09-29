@@ -5,7 +5,7 @@ import { sql } from "@vercel/postgres";
 // Cómo encaja todo:
 //   1. En el dashboard ella toca "programar". El dashboard sube el archivo al Blob
 //      público (ogh-publicar) y escribe una fila acá, en `cola_publicaciones`.
-//   2. Un cron externo (GitHub Actions, cada 10 minutos) llama a este endpoint.
+//   2. El cron de Vercel (vercel.json, cada 10 minutos) llama a este endpoint.
 //   3. Este endpoint publica lo que ya venció y marca la fila.
 //
 // Los tokens viven en `tokens_redes` y los sube el dashboard: así se pueden renovar
@@ -64,7 +64,10 @@ async function igPost(path, params, tok) {
 async function igListo(contenedor, tok) {
   const r = await fetch(`${GRAPH}/${contenedor}?fields=status_code&access_token=${tok}`);
   const j = await r.json();
-  if (j.status_code === "ERROR") throw new Error("Meta no pudo procesar el video");
+  // sin esto, un token vencido o un contenedor vencido quedaban "esperando" para siempre
+  if (j.error) throw new Error("Meta: " + (j.error.message || JSON.stringify(j.error)));
+  if (j.status_code === "ERROR") throw new Error("Meta no pudo procesar el contenido");
+  if (j.status_code === "EXPIRED") throw new Error("Meta: el contenedor venció (24hs)");
   return j.status_code === "FINISHED";
 }
 
@@ -89,15 +92,20 @@ async function publicarIG(fila) {
     contenedor = (await igPost(`${igid}/media`, {
       media_type: "CAROUSEL", children: hijos.join(","), caption: fila.caption || "",
     }, tok)).id;
+    // El carrusel también tarda en quedar listo: publicarlo al toque dio "Media ID is not
+    // available" y el C36 del 28/09 no salió. Se espera igual que con los videos.
+    await sql`UPDATE cola_publicaciones SET contenedor = ${contenedor} WHERE id = ${fila.id}`;
+    if (!(await igListo(contenedor, tok))) return null;
   } else {
     const params = { media_type: "REELS", video_url: fila.media[0], caption: fila.caption || "" };
     if (fila.portada) params.cover_url = fila.portada;
     // reel de prueba: lo ven solo los que no la siguen, y ella lo pasa al feed después
     if (fila.red === "ig-trial" || fila.red === "ig-broll") params.trial_params = JSON.stringify({ graduation_strategy: "MANUAL" });
     contenedor = (await igPost(`${igid}/media`, params, tok)).id;
-    // los videos tardan: guardamos el contenedor y lo publica la corrida siguiente
-    await sql`UPDATE cola_publicaciones SET contenedor = ${contenedor}, estado = 'esperando'
-              WHERE id = ${fila.id}`;
+    // los videos tardan: guardamos el contenedor y lo publica la corrida siguiente.
+    // La fila sigue en "yendo" hasta el final (la vuelve a "esperando" el handler si
+    // devolvemos null): soltarla acá dejaba que otra corrida la publicara dos veces.
+    await sql`UPDATE cola_publicaciones SET contenedor = ${contenedor} WHERE id = ${fila.id}`;
     if (!(await igListo(contenedor, tok))) return null;
   }
 
@@ -247,7 +255,7 @@ async function publicarTT(fila) {
   });
   const j = await r.json();
   if (j.error && j.error.code !== "ok") throw new Error("TikTok: " + j.error.message);
-  await sql`UPDATE cola_publicaciones SET contenedor = ${j.data.publish_id}, estado = 'esperando' WHERE id = ${fila.id}`;
+  await sql`UPDATE cola_publicaciones SET contenedor = ${j.data.publish_id} WHERE id = ${fila.id}`;
   return null;   // se confirma en la corrida siguiente
 }
 
@@ -261,17 +269,19 @@ export default async function handler(req, res) {
   }
   await tablas();
 
-  // Si una corrida se quedó a mitad (el plan Hobby corta a los 60 segundos), la fila
-  // quedaba en "yendo" para siempre y no la publicaba nadie. A los 15 minutos vuelve a
-  // la cola, hasta 3 veces, y recién ahí se da por perdida.
+  // Si una corrida se muere a mitad, la fila quedaría en "yendo" para siempre. A los 15
+  // minutos DE QUE LA TOMÓ esa corrida (tomado_en, no la hora programada: con la hora
+  // programada, una fila atrasada se rescataba mientras otra corrida la estaba
+  // publicando, y salía dos veces) vuelve a la cola, hasta 3 veces.
   await sql`ALTER TABLE cola_publicaciones ADD COLUMN IF NOT EXISTS intentos INT DEFAULT 0`;
+  await sql`ALTER TABLE cola_publicaciones ADD COLUMN IF NOT EXISTS tomado_en TIMESTAMPTZ`;
   await sql`
     UPDATE cola_publicaciones SET estado = 'esperando', intentos = intentos + 1
-    WHERE estado = 'yendo' AND creado < NOW() AND intentos < 3
-      AND cuando < NOW() - INTERVAL '15 minutes'`;
+    WHERE estado = 'yendo' AND intentos < 3
+      AND COALESCE(tomado_en, cuando) < NOW() - INTERVAL '15 minutes'`;
   await sql`
     UPDATE cola_publicaciones SET estado = 'error', resultado = 'se cortó 3 veces (video muy pesado?)'
-    WHERE estado = 'yendo' AND intentos >= 3 AND cuando < NOW() - INTERVAL '15 minutes'`;
+    WHERE estado = 'yendo' AND intentos >= 3 AND COALESCE(tomado_en, cuando) < NOW() - INTERVAL '15 minutes'`;
 
   const { rows } = await sql`
     SELECT * FROM cola_publicaciones
@@ -282,7 +292,7 @@ export default async function handler(req, res) {
   for (const fila of rows) {
     // marcamos "yendo" antes de empezar: si el cron se superpone, nadie publica dos veces
     const tomada = await sql`
-      UPDATE cola_publicaciones SET estado = 'yendo'
+      UPDATE cola_publicaciones SET estado = 'yendo', tomado_en = NOW()
       WHERE id = ${fila.id} AND estado = 'esperando' RETURNING id`;
     if (!tomada.rows.length) continue;
 
@@ -307,7 +317,7 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, procesadas: hechas.length, hechas });
 }
 
-// El plan Hobby de Vercel corta las funciones a 60 segundos, así que nunca esperamos
-// a que Meta procese un video dentro del request: se guarda el contenedor y la corrida
-// siguiente del cron (10 minutos después) lo publica cuando ya está listo.
-export const config = { maxDuration: 60 };
+// Nunca esperamos a que Meta procese un video dentro del request: se guarda el
+// contenedor y la corrida siguiente del cron (10 minutos después) lo publica cuando ya
+// está listo. Con Pro hay hasta 300s: margen para varios reels de LinkedIn seguidos.
+export const config = { maxDuration: 300 };

@@ -60,7 +60,9 @@ export default async function handler(req, res) {
   if (b.accion === "estado") {
     const { rows } = await sql`
       SELECT id, red, item, cuando, estado, resultado FROM cola_publicaciones
-      WHERE creado > NOW() - INTERVAL '7 days' ORDER BY cuando ASC`;
+      WHERE creado > NOW() - INTERVAL '7 days' OR estado IN ('esperando', 'yendo')
+         OR (estado = 'error' AND creado > NOW() - INTERVAL '14 days')
+      ORDER BY cuando ASC`;
     return res.status(200).json({ ok: true, cola: rows });
   }
 

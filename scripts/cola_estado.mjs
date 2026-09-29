@@ -32,8 +32,11 @@ async function cargarEnv() {
 async function main() {
   await cargarEnv();
   const { sql } = await import("@vercel/postgres");
+  // ok: para reflejar lo publicado. error: para que el dashboard muestre lo que NO salió
+  // (antes un error en la nube quedaba mudo: el C36 del 28/09 se perdió sin aviso).
   const { rows } = await sql`
-    SELECT red, item, cuando, resultado FROM cola_publicaciones WHERE estado = 'ok'`;
+    SELECT id, red, item, cuando, estado, resultado, media, portada
+    FROM cola_publicaciones WHERE estado IN ('ok', 'error')`;
   console.log(JSON.stringify(rows));
 }
 
