@@ -14,18 +14,49 @@ import { evento } from "../lib/embudo";
 // Dos opciones y nada más: con una tercera se cae el porcentaje de los que eligen.
 //
 // Medición: usa el mismo /api/evento que el resto del embudo (funnel_eventos, que
-// solo guarda fase + sid anónimo). Si el link trae ?de=ig o ?de=li, se manda además
-// una fase con el sufijo, así se puede contar por red sin tocar la base. El ?de=
-// también viaja al destino para no perderlo en el camino.
+// solo guarda fase + sid anónimo). La red de dónde viene la persona se detecta sola,
+// así el link que Cande pone en la bio queda limpio (opengatehub.com/hola, sin ?de=,
+// que en una bio se ve técnico y da desconfianza). Se mira de dónde viene el click y,
+// si eso no dice nada, el navegador: Instagram y LinkedIn abren los links en su propio
+// navegador y se identifican en el user agent. Igual se puede forzar con ?de= para un
+// posteo puntual.
 
 const DESTINOS = {
   contrata: "https://strategy.opengatehub.com",
   dev: "/devs",
 };
 
-// Solo letras, números y guiones, hasta 24: es un parámetro público y se reenvía.
+// Solo letras, números y guiones, hasta 16 (lo que acepta /api/evento).
 const limpiarOrigen = (v) =>
-  typeof v === "string" && /^[a-zA-Z0-9_-]{1,24}$/.test(v) ? v.toLowerCase() : null;
+  typeof v === "string" && /^[a-z0-9]{1,16}$/i.test(v) ? v.toLowerCase() : null;
+
+const PorReferente = [
+  [/instagram\.com/i, "ig"],
+  [/linkedin\.com|lnkd\.in/i, "li"],
+  [/tiktok\.com/i, "tt"],
+  [/youtube\.com|youtu\.be/i, "yt"],
+  [/twitter\.com|^https?:\/\/x\.com|t\.co/i, "x"],
+  [/google\./i, "google"],
+];
+const PorNavegador = [
+  [/Instagram/i, "ig"],
+  [/LinkedInApp/i, "li"],
+  [/BytedanceWebview|musical_ly|TikTok/i, "tt"],
+];
+
+// Devuelve siempre algo: si no se puede saber, "directo". Así el total de las fases
+// con sufijo cierra con el total de visitas y no hay un agujero sin explicar.
+function detectarOrigen() {
+  const forzado = limpiarOrigen(new URLSearchParams(window.location.search).get("de"));
+  if (forzado) return forzado;
+  const ref = document.referrer || "";
+  if (ref) {
+    for (const [re, id] of PorReferente) if (re.test(ref)) return id;
+  }
+  const ua = navigator.userAgent || "";
+  for (const [re, id] of PorNavegador) if (re.test(ua)) return id;
+  return ref ? "otro" : "directo";
+}
 
 export default function Hola() {
   const router = useRouter();
@@ -33,10 +64,10 @@ export default function Hola() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const d = limpiarOrigen(new URLSearchParams(window.location.search).get("de"));
+    const d = detectarOrigen();
     setDe(d);
     evento("hola_vista");
-    if (d) evento(`hola_vista_${d}`);
+    evento(`hola_vista_${d}`);
   }, []);
 
   const elegir = (cual) => (e) => {
@@ -44,11 +75,10 @@ export default function Hola() {
     evento(`hola_${cual}`);
     if (de) evento(`hola_${cual}_${de}`);
     const base = DESTINOS[cual];
-    const url = de ? `${base}${base.includes("?") ? "&" : "?"}de=${de}` : base;
     // sendBeacon no bloquea, pero damos un respiro mínimo para que salga el evento.
     setTimeout(() => {
-      if (base.startsWith("http")) window.location.href = url;
-      else router.push(url);
+      if (base.startsWith("http")) window.location.href = base;
+      else router.push(base);
     }, 80);
   };
 
