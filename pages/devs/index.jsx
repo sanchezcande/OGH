@@ -192,6 +192,14 @@ export default function RedDeDevs() {
         <meta name="description" content={en
           ? "We have the highest placement rate for tech roles. Under a minute, no CV needed."
           : "Tenemos la tasa de colocación más alta en roles tech. Menos de un minuto, sin CV."} />
+        {/* Inter para el cuerpo: la Space Grotesk del sitio queda bien en un título
+            grande, pero en texto chico se lee poco seria. Misma decisión que /hola. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        />
       </Head>
       <Fondo>
         <Caja>
@@ -342,10 +350,12 @@ const Fondo = styled.div`
   /* Sin navbar en esta página: el aire de arriba es solo estético. */
   padding: 72px 20px 110px;
   @media (max-width: 760px) { padding: 46px 18px 90px; }
-  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 `;
 const Caja = styled.div` width: 100%; max-width: 620px; `;
-const H1 = styled.h1` font-size: clamp(30px, 5.5vw, 40px); line-height: 1.14; margin: 0 0 14px; font-weight: 700; letter-spacing: -.01em; `;
+const H1 = styled.h1`
+  font-family: "Space Grotesk", Inter, -apple-system, sans-serif;
+  font-size: clamp(30px, 5.5vw, 40px); line-height: 1.14; margin: 0 0 14px; font-weight: 700; letter-spacing: -.01em; `;
 const Bajada = styled.p` font-size: 17.5px; line-height: 1.55; color: #5a4b51; margin: 0 0 34px; max-width: 30em; font-weight: 600; `;
 const Aplica = styled.p` font-size: 15px; font-weight: 700; color: #cc5a50; margin: 0 0 14px; `;
 const Progreso = styled.div` margin: 0 0 34px; `;
