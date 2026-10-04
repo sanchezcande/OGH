@@ -45,101 +45,59 @@ export function aHtml(texto) {
 }
 
 
+// Reescritos el 04/10/2026 con la devolución de Hooman: los asuntos eran genéricos
+// y los mails largos. Ahora cada mail son 4 a 6 líneas y un solo link, y el asunto
+// lleva el nombre y arranca con un verbo de ella (pará, mirá, preparate), que es lo
+// que hace que suene a una persona y no a una marca.
+// Cande, 04/10: el asunto tiene que entenderse solo. Los que dejaban la situación sin
+// nombrar ("no sos vos", "los que quedan") los rechazó por crípticos.
+// Lo que NO se usa, aunque lo sugirió Hooman: asuntos que prometen un puesto concreto
+// ("tengo un rol abierto", "aplicá a este puesto"). El mail vende la guía, no un
+// trabajo, y ese malentendido ya está medido: 5 de 13 llamadas salieron del embudo sin
+// entender qué se vendía, y Leonel lo dijo textual ("me dio la sensación de que me
+// querían vender algo").
+const _conNombre = (pila, frase) =>
+  pila ? `${pila.trim()}, ${frase}` : frase.charAt(0).toUpperCase() + frase.slice(1);
+
 const TOQUES = [
   {
     col: "drip_d1", dias: 1,
-    asunto: "No es otro curso",
-    cuerpo: (pila) => `Hola${pila}!
+    asunto: (pila) => _conNombre(pila, "pará antes de mandar otro CV"),
+    cuerpo: (pila) => `Hola${pila},
 
-Vi que llegaste hasta el video.
+Siete segundos y medio. Eso es lo que mira una persona un CV antes de decidir si sigue leyendo. Está medido.
 
-Y quiero aclarar algo porque quizás pensaste: "otro curso más para conseguir trabajo".
+Lo que más me hace descartar a alguien no es el stack, es cómo está escrito.
 
-No.
+Te armé una guía con lo que miro yo, y con un CV entero corregido adentro. 27 dólares.
 
-No te enseño a programar.
-
-Te enseño a conseguir que te contraten con el conocimiento que ya tenés.
-
-Porque podés ser muy buen developer y aun así:
-
-• tener un CV que no pasa el filtro
-• aplicar a puestos donde competís contra cientos de personas
-• responder mal una pregunta de entrevista
-• no saber vender tu experiencia
-• ponerte nervioso y no mostrar lo que realmente sabés
-
-Y esas cosas tienen muchísimo que ver con las oportunidades que terminás consiguiendo.
-
-Armé la guía justamente para trabajar todo eso.
-
-Si viste el video y todavía no la compraste, acá podés acceder.
-
-Quiero la guía: ${GUIA}
+La quiero: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d2", dias: 2,
-    asunto: "El problema puede ser tu CV",
-    cuerpo: (pila) => `Hola${pila}!
+    asunto: (pila) => _conNombre(pila, "si no te contestan no es tu perfil"),
+    cuerpo: (pila) => `Hola${pila},
 
-Hay algo que veo constantemente.
+Mandás CVs y no te contesta nadie, y pensás que sos vos.
 
-Developers que son perfectamente capaces de hacer el trabajo, pero no consiguen entrevistas.
+Casi nunca sos vos. Es dónde estás aplicando y cómo estás llegando.
 
-Y entonces empiezan a pensar:
+Las dos cosas están adentro.
 
-"Hay demasiada competencia."
-"Ahora con la IA está imposible."
-"Las empresas no están contratando."
-"Mi perfil no es suficientemente bueno."
-
-A veces sí.
-
-Pero muchas veces el problema empieza mucho antes de la entrevista.
-
-Tu CV.
-Dónde estás aplicando.
-Cómo estás presentándote.
-Qué estás diciendo en ese primer contacto.
-
-Si estás haciendo todo eso bien, tu búsqueda cambia bastante.
-
-En la guía te muestro exactamente cómo lo abordo yo cuando estoy evaluando perfiles para mis búsquedas.
-
-Todavía podés acceder por el precio especial de este mes.
-
-Ver la guía: ${GUIA}
+Verla: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d3", dias: 3,
-    asunto: "Lo que pasa antes de la primera pregunta",
-    cuerpo: (pila) => `Hola${pila}!
+    asunto: (pila) => _conNombre(pila, "te lo digo antes de tu próxima entrevista"),
+    cuerpo: (pila) => `Hola${pila},
 
-Una cosa que quizás te sorprenda.
+Un montón de entrevistas ya están perdidas antes de que te pregunten nada. No por saber poco, sino por llegar sin saber qué contar.
 
-Muchas entrevistas se pierden antes de que el entrevistador haga la primera pregunta.
-
-No porque seas mal developer.
-
-Sino porque llegás sin haber preparado cómo comunicar lo que sabés hacer.
-
-Cuando te preguntan por un proyecto, sabés qué contar?
-
-Cuando te preguntan por un problema que resolviste, sabés qué parte destacar?
-
-Cuando te preguntan algo que no sabés, sabés cómo responder sin quedar mal?
-
-Y cuando termina la entrevista, sabés qué decir para que se acuerden de vos?
-
-Eso es entrenable.
-
-Y es una de las cosas que trabajé dentro de la guía.
-
-Si tenés entrevistas próximamente, prefiero que llegues preparado.
+Eso se entrena, y es la mitad de la guía.
 
 Quiero prepararme: ${GUIA}
 
@@ -147,90 +105,42 @@ Cande`,
   },
   {
     col: "drip_d7", dias: 7,
-    asunto: "Lo que hacen los candidatos que quedan",
-    cuerpo: (pila) => `Hola${pila}!
+    asunto: (pila) => _conNombre(pila, "qué hacen distinto los que quedan"),
+    cuerpo: (pila) => `Hola${pila},
 
-Hay candidatos que responden exactamente lo que les preguntan.
+Los que quedan no contestan mejor que vos. Cuentan cosas que nadie les preguntó.
 
-Y hay otros que hacen algo diferente.
+Cuáles, y en qué momento, está adentro.
 
-Ayudan al entrevistador a entender por qué deberían contratarlos.
-
-No esperan a que les hagan veinte preguntas perfectas.
-
-Saben cuándo contar algo.
-
-Saben qué contexto dar.
-
-Saben mostrar ownership.
-
-Saben hablar de resultados, no solamente de tareas.
-
-Y, sobre todo, hacen que sea fácil imaginarse trabajando con ellos.
-
-Eso no significa inventar cosas ni vender humo.
-
-Significa aprender a comunicar mejor el valor que ya tenés.
-
-Es una de las diferencias que más quiero que entiendas cuando hagas la guía.
-
-Acceder a la guía: ${GUIA}
+Quiero verlo: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d12", dias: 12,
-    asunto: "No esperes a tener la entrevista",
-    cuerpo: (pila) => `Hola${pila}!
+    asunto: (pila) => _conNombre(pila, "preparate antes de que te llamen"),
+    cuerpo: (pila) => `Hola${pila},
 
-Si estás buscando trabajo activamente, hay una decisión que para mí no tiene mucho sentido.
+El día que te llaman ya estás corriendo: adaptar el CV, mirar la empresa, pensar ejemplos.
 
-Esperar a tener una entrevista para empezar a prepararte.
+Todo eso es muchísimo más fácil antes.
 
-Porque cuando aparece la oportunidad, ya estás corriendo.
-
-Tenés que adaptar el CV.
-Preparar la entrevista.
-Investigar la empresa.
-Pensar ejemplos.
-Practicar cómo contar tu experiencia.
-
-Y mientras tanto, seguís aplicando a otros puestos.
-
-Es mucho más fácil hacer todo esto antes.
-
-Por eso hice la guía como algo práctico: no para que consumas horas de teoría, sino para que puedas agarrarla y aplicar lo que dice en tu próxima búsqueda.
-
-El precio especial sigue disponible este mes.
-
-Quiero la guía: ${GUIA}
+La quiero: ${GUIA}
 
 Cande`,
   },
   {
     col: "drip_d17", dias: 17,
-    asunto: "Último mail que te mando sobre esto",
-    cuerpo: (pila) => `Hola${pila}!
+    asunto: (pila) => _conNombre(pila, "último mail sobre esto"),
+    cuerpo: (pila) => `Hola${pila},
 
-Último mail que te mando sobre esto.
+Último mail que te mando sobre esto, prometido.
 
-Si no estás buscando trabajo ahora, perfecto. Probablemente no lo necesites todavía.
-
-Pero si estás buscando una buena oportunidad y sabés que tus próximas entrevistas importan, yo no dejaría la preparación para después.
-
-La competencia cambió.
-
-Hay más developers buscando las mismas oportunidades y las empresas tienen más formas de filtrar candidatos.
-
-No puedo garantizarte que una guía vaya a conseguirte un trabajo.
-
-Lo que sí puedo hacer es darte el proceso que uso para preparar y evaluar candidatos, para que llegues a esas oportunidades mucho mejor preparado.
-
-La guía sigue a 27 dólares durante este mes.
-
-Acceder a la guía: ${GUIA}
+No te puedo prometer que una guía te consiga trabajo. Lo que sí te puedo dar es el proceso que uso yo para evaluar gente.
 
 Y si nos cruzamos en una búsqueda, quiero que llegues preparado.
+
+Acceder: ${GUIA}
 
 Cande`,
   },
@@ -271,7 +181,7 @@ export default async function handler(req, res) {
       try {
         await resend.emails.send({
           from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto, text: t.cuerpo(pila), html: aHtml(t.cuerpo(pila)),
+          subject: t.asunto(pila), text: t.cuerpo(pila), html: aHtml(t.cuerpo(pila)),
         });
         await sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
         enviados[t.col]++;
