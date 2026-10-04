@@ -19,6 +19,32 @@ const FROM = process.env.DEVS_MAIL_FROM || "OpenGateHub <onboarding@resend.dev>"
 const REPLY_TO = process.env.DEVS_MAIL_REPLYTO || "cv@in.opengatehub.com";
 const GUIA = "https://get.opengatehub.com/l/acelerador-de-carrera";
 
+// El mail sale en texto Y en HTML. El HTML está por una sola razón: sin él no hay
+// forma de medir nada. Las aperturas se cuentan con un pixel que va adentro del
+// HTML, y los clicks los cuenta Resend reescribiendo los links del HTML. Un mail
+// de texto plano no tiene dónde poner ninguna de las dos cosas, y por eso hasta
+// el 04/10/2026 esta cadena no tuvo ni open rate ni CTR.
+// Se mantiene a propósito sin diseño: esto tiene que seguir pareciendo un mail
+// que escribió una persona, no una newsletter. Misma tipografía del sistema,
+// mismo texto, y el único link con el coral de la marca.
+const _esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+export function aHtml(texto) {
+  const cuerpo = _esc(texto)
+    .split("\n")
+    .map((l) => {
+      if (!l.trim()) return "";
+      const link = l.match(/^(.*?):\s*(https?:\/\/\S+)$/);
+      if (link) return `<p style="margin:0 0 18px"><a href="${link[2]}" style="color:#cc5a50">${link[1]}</a></p>`;
+      if (l.startsWith("\u2022 ")) return `<p style="margin:0 0 6px;padding-left:14px">${l}</p>`;
+      return `<p style="margin:0 0 16px">${l}</p>`;
+    })
+    .filter(Boolean)
+    .join("\n");
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1a1518;max-width:560px">\n${cuerpo}\n</div>`;
+}
+
+
 const TOQUES = [
   {
     col: "drip_d1", dias: 1,
@@ -245,7 +271,7 @@ export default async function handler(req, res) {
       try {
         await resend.emails.send({
           from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto, text: t.cuerpo(pila),
+          subject: t.asunto, text: t.cuerpo(pila), html: aHtml(t.cuerpo(pila)),
         });
         await sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
         enviados[t.col]++;

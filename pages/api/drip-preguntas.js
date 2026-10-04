@@ -1,5 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
+import { aHtml } from "./drip";
 
 // Cadena de nurture para founders que bajaron "9 de las preguntas" (leads_preguntas).
 // Versión de Cande + su mentor (18/09), reemplaza la anterior: progresión
@@ -206,7 +207,7 @@ export default async function handler(req, res) {
       try {
         await resend.emails.send({
           from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto, text: t.cuerpo(pila),
+          subject: t.asunto, text: t.cuerpo(pila), html: aHtml(t.cuerpo(pila)),
         });
         await sql.query(`UPDATE leads_preguntas SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
         enviados[t.col]++;
