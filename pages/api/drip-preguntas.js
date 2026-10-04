@@ -73,11 +73,11 @@ Eso es solo una parte.
 
 También quiero saber:
 
-¿Puede trabajar sin que alguien le diga qué hacer cada hora?
-¿Sabe comunicar un problema antes de que se convierta en un desastre?
-¿Puede entrar a un código que no conoce y orientarse?
-¿Entiende el producto o solamente ejecuta tareas?
-¿Lo dejarías trabajando directamente con un cliente?
+Puede trabajar sin que alguien le diga qué hacer cada hora?
+Sabe comunicar un problema antes de que se convierta en un desastre?
+Puede entrar a un código que no conoce y orientarse?
+Entiende el producto o solamente ejecuta tareas?
+Lo dejarías trabajando directamente con un cliente?
 
 Son cosas bastante difíciles de ver en un CV.
 

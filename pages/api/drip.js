@@ -127,13 +127,13 @@ No porque seas mal developer.
 
 Sino porque llegás sin haber preparado cómo comunicar lo que sabés hacer.
 
-Cuando te preguntan por un proyecto, ¿sabés qué contar?
+Cuando te preguntan por un proyecto, sabés qué contar?
 
-Cuando te preguntan por un problema que resolviste, ¿sabés qué parte destacar?
+Cuando te preguntan por un problema que resolviste, sabés qué parte destacar?
 
-Cuando te preguntan algo que no sabés, ¿sabés cómo responder sin quedar mal?
+Cuando te preguntan algo que no sabés, sabés cómo responder sin quedar mal?
 
-Y cuando termina la entrevista, ¿sabés qué decir para que se acuerden de vos?
+Y cuando termina la entrevista, sabés qué decir para que se acuerden de vos?
 
 Eso es entrenable.
 
