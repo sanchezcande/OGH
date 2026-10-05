@@ -10,13 +10,18 @@ import { aHtml } from "./drip";
 const KEY = process.env.RESEND_API_KEY;
 const FROM = process.env.DEVS_MAIL_FROM || "OpenGateHub <onboarding@resend.dev>";
 const REPLY_TO = process.env.PREGUNTAS_MAIL_REPLYTO || "candelaria@opengatehub.com";
-const LLAMADA = "https://strategy.opengatehub.com";
+// Igual que en la cadena de devs: el link pasa por opengatehub.com/api/ir, que anota el
+// click y redirige. Mide el CTR por mail sin el click tracking de Resend (ver ir.js).
+// Va con www a propósito: opengatehub.com sin www contesta 308 y manda a www, o sea un
+// salto de más en cada click. Un link del mail tiene que llegar derecho.
+const SITIO = "https://www.opengatehub.com";
+const LLAMADA = (col) => `${SITIO}/api/ir?a=llamada&m=${col.replace("drip_", "")}`;
 
 const TOQUES = [
   {
     col: "drip_d1", dias: 1,
     asunto: "El problema no es encontrar candidatos",
-    cuerpo: (pila) => `Hola${pila}!
+    cuerpo: (pila, llamada) => `Hola${pila}!
 
 Te mandé las 9 preguntas, pero me quedó algo dando vueltas.
 
@@ -32,14 +37,14 @@ Eso es justamente lo que trabajo con founders: bajar la búsqueda a criterios co
 
 Si estás por contratar, podemos revisar tu caso juntos.
 
-Agendá tu strategy call: ${LLAMADA}
+Agendá tu strategy call: ${llamada}
 
 Cande`,
   },
   {
     col: "drip_d2", dias: 2,
     asunto: "El costo real de un mal developer",
-    cuerpo: (pila) => `Hola${pila}!
+    cuerpo: (pila, llamada) => `Hola${pila}!
 
 Hay algo que suele subestimarse cuando un founder contrata a su primer developer.
 
@@ -56,14 +61,14 @@ Por eso prefiero dedicar bastante más tiempo al filtro ANTES de contratar.
 
 Si me contás qué estás construyendo, qué necesitás desarrollar y qué presupuesto tenés, podemos revisar cómo estructuraría la búsqueda en tu caso.
 
-Agendá tu strategy call: ${LLAMADA}
+Agendá tu strategy call: ${llamada}
 
 Cande`,
   },
   {
     col: "drip_d3", dias: 3,
     asunto: "Lo que no se ve en un CV",
-    cuerpo: (pila) => `Hola${pila}!
+    cuerpo: (pila, llamada) => `Hola${pila}!
 
 Después de trabajar varios años con developers, hay algo que aprendí.
 
@@ -85,14 +90,14 @@ Y son exactamente las cosas que podemos definir antes de que empieces a entrevis
 
 Si estás en esa etapa, podemos verlo juntos.
 
-Agendá tu strategy call: ${LLAMADA}
+Agendá tu strategy call: ${llamada}
 
 Cande`,
   },
   {
     col: "drip_d7", dias: 7,
     asunto: "El orden que casi nadie sigue",
-    cuerpo: (pila) => `Hola${pila}!
+    cuerpo: (pila, llamada) => `Hola${pila}!
 
 Un error que veo bastante.
 
@@ -116,14 +121,14 @@ Parece una diferencia pequeña, pero cambia bastante la contratación.
 
 Si querés, hacemos ese ejercicio con tu búsqueda actual.
 
-Agendá tu strategy call: ${LLAMADA}
+Agendá tu strategy call: ${llamada}
 
 Cande`,
   },
   {
     col: "drip_d12", dias: 12,
     asunto: "Podés hacerlo vos mismo",
-    cuerpo: (pila) => `Hola${pila}!
+    cuerpo: (pila, llamada) => `Hola${pila}!
 
 Probablemente estés pensando: "Entiendo el punto, pero puedo entrevistar developers yo mismo".
 
@@ -139,14 +144,14 @@ Ese es el problema que quiero ayudarte a resolver.
 
 Si estás contratando ahora, podemos mirar tu caso juntos.
 
-Agendá tu strategy call: ${LLAMADA}
+Agendá tu strategy call: ${llamada}
 
 Cande`,
   },
   {
     col: "drip_d17", dias: 17,
     asunto: "Último mail mío sobre esto",
-    cuerpo: (pila) => `Hola${pila}!
+    cuerpo: (pila, llamada) => `Hola${pila}!
 
 Último mail mío sobre esto.
 
@@ -165,7 +170,7 @@ Y si creo que puedo ayudarte más allá de la call, te voy a explicar cómo trab
 
 Si no, también te lo voy a decir.
 
-Agendá tu strategy call: ${LLAMADA}
+Agendá tu strategy call: ${llamada}
 
 Cande`,
   },
@@ -204,10 +209,11 @@ export default async function handler(req, res) {
     for (const r of rows) {
       if (yaLeMande.has(r.id)) continue;
       const pila = r.nombre ? " " + r.nombre.trim().split(/\s+/)[0] : "";
+      const cuerpo = t.cuerpo(pila, LLAMADA(t.col));   // una sola vez: va igual en texto y en HTML
       try {
         await resend.emails.send({
           from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto, text: t.cuerpo(pila), html: aHtml(t.cuerpo(pila)),
+          subject: t.asunto, text: cuerpo, html: aHtml(cuerpo),
         });
         await sql.query(`UPDATE leads_preguntas SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
         enviados[t.col]++;
