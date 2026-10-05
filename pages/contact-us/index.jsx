@@ -1,627 +1,295 @@
-import React, { useEffect, useRef, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import SEO from "../../src/components/SEO/SEO";
-import useMediaQuery from "../../src/Hooks/useMediaQuery";
-import EstimateForm from "../../src/components/ContactForm/EstimateForm";
+import React from "react";
+import Link from "next/link";
 import styled from "styled-components";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-/* ═══════════ STYLED COMPONENTS ═══════════ */
-
-const PageWrapper = styled.div`
-  background: #fff;
-  min-height: 100vh;
-  overflow-x: hidden;
-`;
-
-const DarkSection = styled.div`
-  background: #0a0a0a;
-  color: #fff;
-`;
-
-const HeroSection = styled.section`
-  padding: 9rem 1.5rem 5rem;
-  text-align: center;
-  max-width: 560px;
-  margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: 7rem 1.25rem 3.5rem;
-  }
-`;
-
-const HeroTitle = styled.h1`
-  font-size: clamp(1.4rem, 3.2vw, 2rem);
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-  margin-bottom: 1rem;
-  color: rgba(255, 255, 255, 0.4);
-
-  .word {
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: top;
-    padding-bottom: 0.08em;
-
-    .word-inner {
-      display: inline-block;
-      transform: translateY(120%);
-      will-change: transform;
-    }
-  }
-
-  .highlight {
-    color: #fff;
-  }
-`;
-
-const HeroSub = styled.p`
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.35);
-  line-height: 1.7;
-  max-width: 400px;
-  margin: 0 auto;
-  opacity: 0;
-
-  @media (max-width: 768px) {
-    font-size: 0.82rem;
-  }
-`;
-
-const WhiteSection = styled.div`
-  background: #fff;
-  padding: 5rem 1.5rem;
-
-  @media (max-width: 768px) {
-    padding: 2.5rem 1.25rem;
-  }
-`;
-
-const ContentGrid = styled.div`
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-`;
-
-const Card = styled.div`
-  background: #fafafa;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 4px;
-  padding: 2rem;
-  opacity: 0;
-  transform: translateY(30px);
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
-`;
-
-const CardLabel = styled.span`
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #CC5A50;
-  margin-bottom: 1rem;
-  display: block;
-`;
-
-const CardTitle = styled.h2`
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #111;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.01em;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-`;
-
-const CardDesc = styled.p`
-  font-size: 0.82rem;
-  color: #666;
-  line-height: 1.55;
-  margin-bottom: 1.5rem;
-`;
-
-
-const MobileBookButton = styled.a`
-  display: block;
-  width: 100%;
-  padding: 13px 24px;
-  text-align: center;
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: #fff;
-  background: #111;
-  border: none;
-  border-radius: 60px;
-  text-decoration: none;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-      105deg,
-      transparent 20%,
-      rgba(255, 255, 255, 0.15) 50%,
-      transparent 80%
-    );
-    transition: none;
-    pointer-events: none;
-  }
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-
-    &::before {
-      transition: left 0.5s ease;
-      left: 150%;
-    }
-  }
-`;
-
-const Disclaimer = styled.p`
-  font-size: 0.78rem;
-  color: #999;
-  margin-top: 1rem;
-  margin-bottom: 0;
-  line-height: 1.4;
-`;
-
-const StepsOuter = styled.div`
-  background: #0a0a0a;
-  padding: 6rem 1.5rem 7rem;
-`;
-
-const StepsInner = styled.div`
-  max-width: 900px;
-  margin: 0 auto;
-`;
-
-const StepsTitle = styled.h2`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #CC5A50;
-  margin-bottom: 4rem;
-  text-align: center;
-`;
-
-const StepsTimeline = styled.div`
-  position: relative;
-  max-width: 900px;
-  margin: 0 auto;
-`;
-
-const TimelineTrack = styled.div`
-  position: absolute;
-  top: 28px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-
-  .timeline-fill {
-    height: 100%;
-    width: 0%;
-    background: #CC5A50;
-    transition: none;
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const StepsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  position: relative;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-`;
-
-const StepCard = styled.div`
-  padding: 0 2.5rem;
-  position: relative;
-  opacity: 0;
-  transform: translateY(20px);
-
-  &:first-child {
-    padding-left: 0;
-  }
-  &:last-child {
-    padding-right: 0;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0;
-    margin-bottom: 2.5rem;
-    &:last-child { margin-bottom: 0; }
-  }
-`;
-
-const StepDot = styled.div`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  margin-bottom: 2rem;
-  position: relative;
-  transition: all 0.8s ease;
-
-  &.lit {
-    background: #CC5A50;
-    box-shadow: 0 0 12px rgba(204, 90, 80, 0.4);
-  }
-
-  &.done {
-    background: rgba(255, 255, 255, 0.25);
-    box-shadow: none;
-  }
-
-  @media (max-width: 768px) {
-    margin-bottom: 1.25rem;
-  }
-`;
-
-const StepNum = styled.span`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.15);
-  display: block;
-  margin-bottom: 0.75rem;
-  transition: color 0.6s ease;
-
-  .step-card.active & {
-    color: rgba(255, 255, 255, 0.5);
-  }
-`;
-
-const StepLabel = styled.h3`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.2);
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.01em;
-  transition: color 0.6s ease;
-
-  .step-card.active & {
-    color: #fff;
-  }
-`;
-
-const StepText = styled.p`
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.12);
-  line-height: 1.65;
-  transition: color 0.6s ease;
-
-  .step-card.active & {
-    color: rgba(255, 255, 255, 0.6);
-  }
-`;
-
-/* ═══════════ COMPONENT ═══════════ */
-
-const stepsData = [
-  { num: "01", labelEn: "Review", labelEs: "Revisión", textEn: "We review your request and respond within 24 hours with a clear assessment.", textEs: "Revisamos tu solicitud y respondemos en 24 horas con una evaluación clara." },
-  { num: "02", labelEn: "Recommend", labelEs: "Recomendación", textEn: "We recommend the best engagement model — automation, augmentation, or both.", textEs: "Recomendamos el mejor modelo — automatización, augmentation, o ambos." },
-  { num: "03", labelEn: "Execute", labelEs: "Ejecución", textEn: "You get a clear next step — a strategy call or a detailed proposal.", textEs: "Obtenés un siguiente paso claro — una llamada estratégica o propuesta detallada." },
-];
-
-const splitHeroWords = (text, highlights = []) =>
-  text.split(" ").map((word, i) => {
-    const isHl = highlights.some(
-      (h) => word.toLowerCase().replace(/[^a-záéíóúñ]/gi, "") === h.toLowerCase()
-    );
-    return (
-      <span className="word" key={i}>
-        <span className={`word-inner${isHl ? " highlight" : ""}`}>{word}&nbsp;</span>
-      </span>
-    );
-  });
-
-const ContactUs = () => {
-  const { t, i18n } = useTranslation();
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const isSpanish = i18n.language === "es";
-  const bookingUrl = "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1ThNS8Gy-jnfk0ofk43AmhVIiWWYchJ9YoZMzkmgQKElyTe0wsmtxGKXXuD8kuLKtndEf4pzEd?gv=true";
-
-  const openBooking = useCallback((e) => {
-    e.preventDefault();
-    window.open(bookingUrl, "gcal-booking", "width=600,height=700,scrollbars=yes");
-  }, []);
-
-  const heroRef = useRef(null);
-  const heroTitleRef = useRef(null);
-  const heroSubRef = useRef(null);
-  const cardsRef = useRef(null);
-  const stepsRef = useRef(null);
-  const fillRef = useRef(null);
-
-
-  // Scroll animations
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Hero entrance — word-by-word reveal (same as home hero)
-      const words = heroTitleRef.current?.querySelectorAll(".word-inner");
-      if (words?.length) {
-        gsap.to(words, {
-          y: 0,
-          duration: 1,
-          stagger: 0.08,
-          ease: "power4.out",
-          delay: 0.3,
-        });
-      }
-      if (heroSubRef.current) {
-        gsap.fromTo(heroSubRef.current,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.9 }
-        );
-      }
-
-      // Hero parallax on scroll — use fromTo to avoid capturing entrance animation's inline opacity:0
-      if (heroRef.current) {
-        gsap.fromTo(heroTitleRef.current,
-          { yPercent: 0, opacity: 1, scale: 1 },
-          {
-            yPercent: -50,
-            opacity: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: heroRef.current,
-              start: "top top",
-              end: "bottom top",
-              scrub: true,
-            },
-          }
-        );
-        gsap.fromTo(heroSubRef.current,
-          { yPercent: 0, opacity: 1 },
-          {
-            yPercent: -25,
-            opacity: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: heroRef.current,
-              start: "top top",
-              end: "80% top",
-              scrub: true,
-            },
-          }
-        );
-      }
-
-      // Cards stagger reveal on scroll
-      const cards = cardsRef.current?.querySelectorAll(".contact-card");
-      if (cards?.length) {
-        ScrollTrigger.create({
-          trigger: cardsRef.current,
-          start: "top 90%",
-          once: true,
-          onEnter: () => {
-            cards.forEach((card, i) => {
-              gsap.to(card, {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out",
-                delay: i * 0.15,
-              });
-            });
-          },
-        });
-        // Fallback: if already in view on load
-        setTimeout(() => {
-          cards.forEach((card) => {
-            if (card.style.opacity === "0" || card.style.opacity === "") {
-              gsap.to(card, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
-            }
-          });
-        }, 500);
-      }
-
-      // Steps — timeline draw + sequential reveal
-      const stepsEl = stepsRef.current;
-      const steps = stepsEl?.querySelectorAll(".step-card");
-      const dots = stepsEl?.querySelectorAll(".step-dot");
-      const fill = fillRef.current;
-      const mobile = window.innerWidth <= 768;
-
-      if (steps?.length && mobile) {
-        // Mobile: reveal all steps together when section enters viewport
-        ScrollTrigger.create({
-          trigger: stepsEl,
-          start: "top 95%",
-          once: true,
-          onEnter: () => {
-            steps.forEach((step, i) => {
-              gsap.to(step, {
-                opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-                delay: i * 0.2,
-                onComplete: () => step.classList.add("active"),
-              });
-
-              if (dots[i]) {
-                gsap.delayedCall(i * 0.2 + 0.15, () => dots[i].classList.add("lit"));
-              }
-
-              if (i > 0 && dots[i - 1]) {
-                gsap.delayedCall(i * 0.2 + 0.15, () => {
-                  dots[i - 1].classList.remove("lit");
-                  dots[i - 1].classList.add("done");
-                });
-              }
-            });
-          },
-        });
-      } else if (steps?.length) {
-        // Desktop: timeline draw + sequential reveal
-        ScrollTrigger.create({
-          trigger: stepsEl,
-          start: "top 75%",
-          once: true,
-          onEnter: () => {
-            const dur = 3;
-            const n = steps.length;
-
-            if (fill) {
-              gsap.to(fill, { width: "100%", duration: dur, ease: "none" });
-            }
-
-            steps.forEach((step, i) => {
-              const t = Math.max(0, ((i / n) * dur) - 0.9);
-
-              gsap.to(step, {
-                opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: t,
-                onComplete: () => step.classList.add("active"),
-              });
-
-              if (dots[i]) {
-                gsap.delayedCall(t + 0.1, () => dots[i].classList.add("lit"));
-              }
-
-              if (i > 0 && dots[i - 1]) {
-                gsap.delayedCall(t + 0.1, () => {
-                  dots[i - 1].classList.remove("lit");
-                  dots[i - 1].classList.add("done");
-                });
-              }
-            });
-          },
-        });
-      }
-    });
-
-    return () => ctx.revert();
-  }, []);
-
-  return (
-    <PageWrapper>
-      <SEO
-        title="Book a Free Automation Audit | LATAM Experts | OpenGateHub"
-        description="Book a free 15-minute automation audit with our LATAM experts. We'll identify your top operational bottlenecks and reply within 24 hours — no pitch, just a clear next step."
-        keywords="automation audit, contact OpenGateHub, workflow consulting LATAM, business automation experts Latin America, book a call, nearshore consulting, staff augmentation consultation"
-      />
-
-
-      {/* Hero (dark) + parallax */}
-      <DarkSection>
-        <HeroSection ref={heroRef}>
-          <HeroTitle ref={heroTitleRef}>
-            {splitHeroWords(
-              isSpanish ? "Optimicemos tus operaciones" : "Let's optimize your operations",
-              isSpanish ? ["Optimicemos"] : ["optimize"]
-            )}
-          </HeroTitle>
-          <HeroSub ref={heroSubRef}>
-            {t("contactPage.heroSubtitle") ||
-              "Choose the fastest path forward: book an automation audit or request an execution estimate."}
-          </HeroSub>
-        </HeroSection>
-      </DarkSection>
-
-      {/* Two Paths (white) */}
-      <WhiteSection>
-        <ContentGrid ref={cardsRef}>
-          {/* Path A: Book a Call */}
-          <Card className="contact-card">
-            <CardLabel>{t("contactPage.bookCallLabel") || "Fastest"}</CardLabel>
-            <CardTitle>
-              {t("contactPage.bookCallTitle") || "Book an automation audit"}
-            </CardTitle>
-            <CardDesc>
-              {t("contactPage.bookCallDescription") ||
-                "For teams that want to reduce manual work and improve operational speed."}
-            </CardDesc>
-
-            <MobileBookButton
-              href={bookingUrl}
-              onClick={openBooking}
-            >
-              {t("contactPage.bookCallButton") || "Book a 15-min automation audit"} →
-            </MobileBookButton>
-            <Disclaimer>
-              {t("contactPage.bookCallDisclaimer") || "No commitment. You'll leave with a clear next step and priority actions."}
-            </Disclaimer>
-          </Card>
-
-          {/* Path B: Get an Estimate */}
-          <Card className="contact-card">
-            <CardLabel>{t("contactPage.getEstimateLabel") || "Detailed"}</CardLabel>
-            <CardTitle>
-              {t("contactPage.getEstimateTitle") || "Request an execution estimate"}
-            </CardTitle>
-            <CardDesc>
-              {t("contactPage.getEstimateDescription") ||
-                "Share your needs and we'll recommend the best model: Workflow Automation, Staff Augmentation, or both."}
-            </CardDesc>
-
-            <EstimateForm />
-          </Card>
-        </ContentGrid>
-      </WhiteSection>
-
-      {/* What Happens Next (dark) */}
-      <StepsOuter>
-        <StepsInner>
-          <StepsTitle>{t("contactPage.whatHappensNext") || "What happens next"}</StepsTitle>
-          <StepsTimeline>
-            <TimelineTrack>
-              <div className="timeline-fill" ref={fillRef} />
-            </TimelineTrack>
-            <StepsGrid ref={stepsRef}>
-              {stepsData.map((step) => (
-                <StepCard key={step.num} className="step-card">
-                  <StepDot className="step-dot" />
-                  <StepNum>{step.num}</StepNum>
-                  <StepLabel>{isSpanish ? step.labelEs : step.labelEn}</StepLabel>
-                  <StepText>{isSpanish ? step.textEs : step.textEn}</StepText>
-                </StepCard>
-              ))}
-            </StepsGrid>
-          </StepsTimeline>
-        </StepsInner>
-      </StepsOuter>
-    </PageWrapper>
-  );
+import SEO from "../../src/components/SEO/SEO";
+import EstimateForm from "../../src/components/ContactForm/EstimateForm";
+import {
+  Body,
+  Button,
+  Display,
+  Eyebrow,
+  H2,
+  H3,
+  Lead,
+  Page,
+  Reveal,
+  Section,
+  Small,
+  TextLink,
+  Wrap,
+  color,
+  font,
+  mq,
+  useLang,
+} from "../../src/styles/kit";
+
+// La página de la llamada. Dos caminos: agendar (el principal) o escribir.
+// La agenda se abre siempre en una pestaña nueva, igual en computadora y en celular.
+const BOOKING_URL = "https://strategy.opengatehub.com";
+
+// Todo lo que se afirma acá está confirmado en docs/afirmaciones.md.
+const COPY = {
+  es: {
+    seo: {
+      title: "Agendá tu llamada gratis de 20 minutos | OpenGateHub",
+      description:
+        "Agendá una llamada gratis de 20 minutos con Candelaria Sanchez, founder de OpenGateHub, o escribinos y contanos qué developer necesitás.",
+    },
+    hero: {
+      eyebrow: "Contacto",
+      title: "Hablemos de tu búsqueda",
+      lead: "Agendá una llamada gratis de 20 minutos o escribinos.",
+    },
+    call: {
+      eyebrow: "La llamada",
+      title: "20 minutos, gratis",
+      who: "Hablás con Candelaria Sanchez, founder de OpenGateHub.",
+      what: "Nos contás qué estás construyendo y vemos cómo armar la búsqueda de tu developer.",
+      cta: "Agendá tu llamada",
+      note: "Sin compromiso. La agenda se abre en una pestaña nueva.",
+    },
+    form: {
+      eyebrow: "Por escrito",
+      title: "Preferís escribir?",
+    },
+    next: {
+      eyebrow: "Si nos escribís",
+      title: "Qué pasa después",
+      steps: [
+        { title: "Leemos tu mensaje", text: "Te respondemos en menos de 24 horas." },
+        {
+          title: "Te decimos cómo armaríamos la búsqueda",
+          text: "Y qué forma de contratar te conviene: que el developer se sume a tu equipo y facturemos por mes, o que lo contrates directo y cobremos la búsqueda.",
+        },
+        { title: "Decidís vos", text: "Sin compromiso. Si te sirve, empezamos la búsqueda." },
+      ],
+    },
+    devs: { text: "Sos developer?", link: "Entrá a la lista" },
+  },
+  en: {
+    seo: {
+      title: "Book a Free 20-Minute Call | OpenGateHub",
+      description:
+        "Book a free 20-minute call with Candelaria Sanchez, founder of OpenGateHub, or send us a message about the developer you need.",
+    },
+    hero: {
+      eyebrow: "Contact",
+      title: "Let's talk about your search",
+      lead: "Book a free 20-minute call or send us a message.",
+    },
+    call: {
+      eyebrow: "The call",
+      title: "20 minutes, free",
+      who: "You talk to Candelaria Sanchez, founder of OpenGateHub.",
+      what: "You tell us what you're building and we work out how to set up the search for your developer.",
+      cta: "Book your call",
+      note: "No commitment. The calendar opens in a new tab.",
+    },
+    form: {
+      eyebrow: "In writing",
+      title: "Prefer to write?",
+    },
+    next: {
+      eyebrow: "If you write to us",
+      title: "What happens next",
+      steps: [
+        { title: "We read your message", text: "We reply within 24 hours." },
+        {
+          title: "We tell you how we'd run the search",
+          text: "And which way of hiring suits you: the developer joins your team and we bill monthly, or you hire them directly and we charge for the search.",
+        },
+        { title: "You decide", text: "No commitment. If it works for you, we start the search." },
+      ],
+    },
+    devs: { text: "Are you a developer?", link: "Join the list" },
+  },
 };
 
-export default ContactUs;
+export default function ContactPage() {
+  const copy = COPY[useLang()];
+
+  return (
+    <Page>
+      <SEO title={copy.seo.title} description={copy.seo.description} />
+
+      {/* Titular y los dos caminos */}
+      <Hero>
+        <Wrap>
+          <Eyebrow>{copy.hero.eyebrow}</Eyebrow>
+          <Display>{copy.hero.title}</Display>
+          <HeroLead>{copy.hero.lead}</HeroLead>
+
+          <Columns>
+            {/* La llamada: opción principal */}
+            <CallPanel>
+              <Eyebrow $onInk>{copy.call.eyebrow}</Eyebrow>
+              <CallTitle>{copy.call.title}</CallTitle>
+              <Who>{copy.call.who}</Who>
+              <Body $onInk>{copy.call.what}</Body>
+              <CallButton href={BOOKING_URL} target="_blank" rel="noopener noreferrer" $variant="onInk" $block>
+                {copy.call.cta}
+              </CallButton>
+              <Small $onInk>{copy.call.note}</Small>
+            </CallPanel>
+
+            {/* El formulario: para quien prefiere escribir */}
+            <FormColumn>
+              <Eyebrow>{copy.form.eyebrow}</Eyebrow>
+              <FormTitle>{copy.form.title}</FormTitle>
+              <EstimateForm />
+            </FormColumn>
+          </Columns>
+        </Wrap>
+      </Hero>
+
+      {/* Qué pasa después */}
+      <Section $tone="alt" $tight>
+        <Wrap>
+          <Reveal>
+            <Eyebrow>{copy.next.eyebrow}</Eyebrow>
+            <H2>{copy.next.title}</H2>
+          </Reveal>
+          <Reveal>
+            <Steps>
+              {copy.next.steps.map((step, i) => (
+                <li key={step.title}>
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                  <H3>{step.title}</H3>
+                  <Body>{step.text}</Body>
+                </li>
+              ))}
+            </Steps>
+          </Reveal>
+        </Wrap>
+      </Section>
+
+      {/* Línea para developers. Esta página no lleva el cierre con la llamada: ya es la página de la llamada. */}
+      <DevLine>
+        <Wrap>
+          <Small>
+            {copy.devs.text}{" "}
+            <TextLink as={Link} href="/devs" locale={false} style={{ fontSize: "inherit" }}>
+              {copy.devs.link}
+            </TextLink>
+          </Small>
+        </Wrap>
+      </DevLine>
+    </Page>
+  );
+}
+
+/* ───────── Estilos propios de la página ───────── */
+
+const Hero = styled.section`
+  padding: clamp(48px, 6vw, 88px) 0 clamp(72px, 9vw, 128px);
+`;
+
+const HeroLead = styled(Lead)`
+  margin-top: 24px;
+`;
+
+const Columns = styled.div`
+  margin-top: clamp(40px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+
+  ${mq.tablet} {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
+  }
+`;
+
+const CallPanel = styled.div`
+  position: sticky;
+  top: 96px;
+  padding: clamp(28px, 3.5vw, 44px);
+  border-radius: 4px;
+  --accent: ${color.accentBrand};
+  background: ${color.ink};
+  color: ${color.onInk};
+
+  ${Small} {
+    margin-top: 14px;
+  }
+
+  ${mq.tablet} {
+    position: static;
+  }
+`;
+
+const CallTitle = styled(H2)`
+  font-size: clamp(1.9rem, 3.1vw, 2.5rem);
+`;
+
+const Who = styled.p`
+  margin: 24px 0 12px;
+  font-family: ${font.serif};
+  font-size: clamp(1.1875rem, 1.6vw, 1.3125rem);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: ${color.onInk};
+`;
+
+const CallButton = styled(Button)`
+  width: 100%;
+  max-width: 420px;
+  min-height: 60px;
+  margin-top: 32px;
+  font-size: 1.0625rem;
+`;
+
+const FormColumn = styled.div`
+  padding-top: clamp(28px, 3.5vw, 44px);
+  border-top: 1px solid ${color.ink};
+`;
+
+const FormTitle = styled(H2)`
+  margin-bottom: 32px;
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+`;
+
+const Steps = styled.ol`
+  list-style: none;
+  padding: 0;
+  margin: 48px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid ${color.ink};
+
+  li {
+    padding: 28px 32px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  li + li {
+    padding-left: 32px;
+    border-left: 1px solid ${color.line};
+  }
+
+  li > span {
+    font-family: ${font.brand};
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: ${color.accent};
+  }
+
+  ${mq.tablet} {
+    grid-template-columns: minmax(0, 1fr);
+
+    li,
+    li + li {
+      padding: 24px 0;
+      border-left: 0;
+      border-bottom: 1px solid ${color.line};
+    }
+  }
+`;
+
+const DevLine = styled.section`
+  padding: 28px 0;
+  border-top: 1px solid ${color.line};
+`;

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://opengatehub.com/sitemap.xml
+Sitemap: https://www.opengatehub.com/sitemap.xml

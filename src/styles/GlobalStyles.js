@@ -77,6 +77,16 @@ const GlobalStyles = createGlobalStyle`
     background: rgba(0, 0, 0, 0.25);
   }
 
+  /* Entrada suave de los bloques (ver Reveal en src/styles/kit.js) */
+  [data-reveal] {
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-reveal="hidden"] {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;

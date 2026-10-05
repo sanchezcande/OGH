@@ -16,8 +16,10 @@ const theme = {
     muted: "#E4E4E7",
   },
   fonts: {
-    main: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    heading: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    // Texto en Inter, títulos en serif. Space Grotesk queda para el logo y las etiquetas chicas (ver src/styles/kit.js).
+    main: "Inter, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif",
+    heading: "Newsreader, 'Source Serif 4', Charter, 'Iowan Old Style', Georgia, serif",
+    brand: "'Space Grotesk', Inter, -apple-system, sans-serif",
     code: "'JetBrains Mono', 'Fira Code', monospace",
   },
   fontWeights: {

@@ -12,14 +12,22 @@ const SEO = ({
   twitterHandle = "@opengatehub",
   canonical,
   robots = "index, follow",
+  alternates,
   children,
 }) => {
   const router = useRouter();
-  const siteUrl = "https://opengatehub.com";
-  const fullCanonical = canonical || `${siteUrl}${router.asPath.split("?")[0]}`;
-  const defaultTitle = "Workflow Automation & Staff Augmentation in Latin America | OpenGateHub";
-  const defaultDescription = "OpenGateHub helps companies eliminate manual work through workflow automation, AI integration, and nearshore engineering teams from Latin America. Kickoff in 7.3 days. 9.7/10 CSAT.";
-  const defaultOgImage = "https://opengatehub.com/og-image.png";
+  const siteUrl = "https://www.opengatehub.com";
+  // Cada idioma tiene su dirección: español en la raíz, inglés en /en.
+  const isEnglish = router.locale === "en";
+  const path = router.asPath.split("?")[0].split("#")[0];
+  const pathNoSlash = path === "/" ? "" : path;
+  // "alternates" lo pasan las páginas cuya dirección cambia según el idioma (artículos del blog).
+  const urlEs = alternates ? alternates.es && `${siteUrl}${alternates.es}` : `${siteUrl}${path}`;
+  const urlEn = alternates ? alternates.en && `${siteUrl}${alternates.en}` : `${siteUrl}/en${pathNoSlash}`;
+  const fullCanonical = canonical || (isEnglish ? urlEn : urlEs) || `${siteUrl}${isEnglish ? "/en" : ""}${pathNoSlash || "/"}`;
+  const defaultTitle = "Staff Augmentation: Hire Senior Developers | OpenGateHub";
+  const defaultDescription = "OpenGateHub finds, interviews and places senior remote developers in your team.";
+  const defaultOgImage = "https://www.opengatehub.com/og-image.png";
 
   const displayTitle = title || defaultTitle;
   const displayDescription = description || defaultDescription;
@@ -38,13 +46,9 @@ const SEO = ({
       <link rel="canonical" href={fullCanonical} />
 
       {/* Hreflang - Bilingual support */}
-      <link rel="alternate" hrefLang="en" href={fullCanonical} />
-      <link rel="alternate" hrefLang="es" href={fullCanonical} />
-      <link rel="alternate" hrefLang="x-default" href={fullCanonical} />
-
-      {/* Geo targeting */}
-      <meta name="geo.region" content="LATAM" />
-      <meta name="geo.placename" content="Latin America" />
+      {urlEs && <link rel="alternate" hrefLang="es" href={urlEs} />}
+      {urlEn && <link rel="alternate" hrefLang="en" href={urlEn} />}
+      <link rel="alternate" hrefLang="x-default" href={urlEs || urlEn} />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
@@ -53,8 +57,8 @@ const SEO = ({
       <meta property="og:description" content={ogDescription || displayDescription} />
       <meta property="og:image" content={ogImage || defaultOgImage} />
       <meta property="og:site_name" content="OpenGateHub" />
-      <meta property="og:locale" content="en_US" />
-      <meta property="og:locale:alternate" content="es_LA" />
+      <meta property="og:locale" content={isEnglish ? "en_US" : "es_AR"} />
+      <meta property="og:locale:alternate" content={isEnglish ? "es_AR" : "en_US"} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />

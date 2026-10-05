@@ -123,7 +123,7 @@ export default function Preguntas() {
 
             <Firma>
               <b>Candelaria Sanchez</b>
-              <span>Founder &amp; CTO, OpenGateHub</span>
+              <span>Founder, OpenGateHub</span>
             </Firma>
           </Texto>
 

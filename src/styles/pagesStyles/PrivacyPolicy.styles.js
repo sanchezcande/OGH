@@ -1,47 +1,66 @@
 import styled from "styled-components";
+import { color, font, mq } from "../kit";
 
+// Páginas legales (privacidad y términos): una columna de lectura, sin tarjeta.
 export const PrivacyPolicyContainer = styled.section`
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
-  padding: 3rem 2rem;
-  margin: 2rem auto;
-  max-width: 1200px;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(56px, 8vw, 104px) 32px clamp(72px, 9vw, 120px);
+  font-family: ${font.sans};
+  color: ${color.inkSoft};
+
+  ${mq.mobile} {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 `;
 
 export const PrivacyPolicyTitle = styled.h1`
-  font-size: 1.6rem;
-  font-weight: 500;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${font.serif};
+  font-weight: 400;
+  font-size: clamp(2.25rem, 4.4vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: ${color.ink};
+  margin-bottom: 32px;
 `;
 
 export const PrivacyPolicySection = styled.div`
-  margin-bottom: 2rem;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid ${color.line};
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: 1.2rem;
+  font-family: ${font.serif};
   font-weight: 500;
-  margin-bottom: 1rem;
-  color: ${({ theme }) => theme.colors.primary};
+  font-size: 1.375rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: ${color.ink};
+  margin-bottom: 14px;
 `;
 
 export const SectionContent = styled.p`
-  font-size: 0.9rem;
-  line-height: 1.8;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: ${color.inkSoft};
+  margin-bottom: 14px;
 `;
 
 export const List = styled.ul`
-  margin-left: 20px;
+  margin: 0;
+  padding-left: 20px;
   list-style-type: disc;
+  font-size: 1rem;
+  line-height: 1.7;
 
   li {
-    margin-bottom: 0.5rem;
-    color: ${({ theme }) => theme.colors.text};
+    margin-bottom: 8px;
+    color: ${color.inkSoft};
+  }
+
+  li::marker {
+    color: ${color.accent};
   }
 `;

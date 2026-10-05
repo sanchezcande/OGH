@@ -14,7 +14,7 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: "en", // Idioma por defecto
+  lng: "es", // Idioma por defecto
   fallbackLng: "en",
   interpolation: {
     escapeValue: false, // react already safes from xss
