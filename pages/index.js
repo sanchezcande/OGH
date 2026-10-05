@@ -304,20 +304,21 @@ const TEAM = [
   { name: "Ilia", src: "/team/Ilia.jpeg" },
 ];
 
-// Logos de las empresas y productos con los que trabajó el equipo.
+// Logos de las empresas y productos con los que trabajó el equipo, todos en una sola tinta
+// (public/logos) para que la fila se lea como un conjunto y no como un collage de colores.
 const LOGOS = [
-  { name: "Vantage", src: "/vantage.svg", href: "https://vantageinc.ai/" },
-  { name: "Valthor CRM", src: "/valthor-logo.e3b5a398.png", href: "https://www.valthorcrm.com/" },
-  { name: "Smarters City", src: "/smarters-card.png", href: "https://smarters.city/" },
-  { name: "Hot Date Kitchen", src: "/HotDate.png", href: "https://hotdatekitchen.com/" },
-  { name: "Skylar", src: "/Skylar.png", href: "https://skylar.ar/" },
-  { name: "Cicero", src: "/Cicero.png", href: "https://www.linkedin.com/company/cicerolearn/" },
-  { name: "Vivabots", src: "/vivabots_azul.png", href: "https://vivabots.com/" },
-  { name: "Estudio Sab", src: "/estudio-sab.png", href: "https://estudiosab.com/" },
-  { name: "KD Abogados", src: "/kdabogados.png", href: "https://kdabogados.com.ar/" },
-  { name: "GBS Abogados", src: "/GBS.png", href: null },
-  { name: "Sistema Manu Gil", src: "/sistema-manu-gil-logo.png", href: null },
-  { name: "PropBot", src: "/propbot-logo.svg", href: "https://propbot.cc" },
+  { name: "Vantage", src: "/logos/vantage.png", href: "https://vantageinc.ai/" },
+  { name: "Valthor CRM", src: "/logos/valthor.png", href: "https://www.valthorcrm.com/" },
+  { name: "Smarters City", src: "/logos/smarters.png", href: "https://smarters.city/" },
+  { name: "Hot Date Kitchen", src: "/logos/hotdate.png", href: "https://hotdatekitchen.com/" },
+  { name: "Skylar", src: "/logos/skylar.png", href: "https://skylar.ar/" },
+  { name: "Cicero", src: "/logos/cicero.png", href: "https://www.linkedin.com/company/cicerolearn/" },
+  { name: "Vivabots", src: "/logos/vivabots.png", href: "https://vivabots.com/" },
+  { name: "Estudio Sab", src: "/logos/sab.png", href: "https://estudiosab.com/" },
+  { name: "KD Abogados", src: "/logos/kd.png", href: "https://kdabogados.com.ar/" },
+  { name: "GBS Abogados", src: "/logos/gbs.png", href: null },
+  { name: "Sistema Manu Gil", src: "/logos/manugil.png", href: null },
+  { name: "PropBot", src: "/logos/propbot.png", href: "https://propbot.cc" },
 ];
 
 // Todos los casos juntos. Cada tarjeta dice qué fue: staff augmentation, un proyecto o un producto propio.
@@ -1115,36 +1116,36 @@ const Quotes = styled.div`
 `;
 
 const LogoWall = styled.div`
-  margin-top: 48px;
+  margin-top: 56px;
+  padding: 44px 0;
+  border-top: 1px solid ${color.line};
+  border-bottom: 1px solid ${color.line};
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  border-top: 1px solid ${color.line};
-  border-left: 1px solid ${color.line};
+  align-items: center;
+  justify-items: center;
+  gap: 44px 32px;
 
   a,
   span {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 112px;
-    padding: 20px;
-    background: ${color.paper};
-    border-right: 1px solid ${color.line};
-    border-bottom: 1px solid ${color.line};
+    height: 44px;
   }
 
   img {
-    max-width: 100%;
-    max-height: 52px;
+    max-width: 132px;
+    max-height: 40px;
     width: auto;
     height: auto;
     object-fit: contain;
-    border-radius: 2px;
-    transition: transform 0.2s ease;
+    opacity: 0.62;
+    transition: opacity 0.2s ease;
   }
 
   a:hover img {
-    transform: scale(1.04);
+    opacity: 1;
   }
 
   ${mq.tablet} {
@@ -1153,21 +1154,18 @@ const LogoWall = styled.div`
 
   ${mq.mobile} {
     grid-template-columns: repeat(3, 1fr);
-
-    a,
-    span {
-      height: 88px;
-      padding: 14px;
-    }
+    gap: 32px 20px;
+    padding: 32px 0;
 
     img {
-      max-height: 40px;
+      max-width: 92px;
+      max-height: 28px;
     }
   }
 `;
 
 const CaseGrid = styled.div`
-  margin-top: 24px;
+  margin-top: 48px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 24px;

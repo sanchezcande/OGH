@@ -5,15 +5,6 @@ import { Resend } from "resend";
 // Solo por variable de entorno (ver nota en leads.js).
 const apiKey = process.env.RESEND_API_KEY;
 
-// Debug: verificar si la key se está leyendo
-console.log("=== RESEND API KEY DEBUG ===");
-console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
-console.log("RESEND_API_KEY value:", process.env.RESEND_API_KEY ? `${process.env.RESEND_API_KEY.substring(0, 10)}...` : "undefined");
-console.log("apiKey variable:", apiKey ? `${apiKey.substring(0, 10)}...` : "undefined");
-console.log("Full apiKey length:", apiKey ? apiKey.length : 0);
-console.log("===========================");
-
 // Inicializar Resend con la API key
 let resend;
 try {
@@ -28,6 +19,10 @@ try {
   resend = null;
 }
 
+// Lo que escribe la persona va dentro de un mail en HTML: se escapa para que no pueda meter etiquetas.
+const esc = (texto) =>
+  String(texto ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 export default async function handler(req, res) {
   // Solo permitir POST
   if (req.method !== "POST") {
@@ -36,7 +31,7 @@ export default async function handler(req, res) {
 
   // Verificar que Resend esté configurado
   if (!resend) {
-    console.error("RESEND_API_KEY missing:", process.env.RESEND_API_KEY ? "Key exists but Resend not initialized" : "Key not found in env");
+    console.error("RESEND_API_KEY missing");
     return res.status(500).json({ error: "Email service not configured. Please check RESEND_API_KEY." });
   }
 
@@ -55,7 +50,6 @@ export default async function handler(req, res) {
     }
 
     console.log("=== SENDING CONTACT EMAIL ===");
-    console.log("Form data:", { name, email, company, message: message.substring(0, 50) });
 
     // Enviar email con Resend
     const { data, error } = await resend.emails.send({
@@ -69,14 +63,14 @@ export default async function handler(req, res) {
           </h2>
 
           <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-            ${company ? `<p><strong>Company:</strong> ${company}</p>` : ""}
+            <p><strong>Name:</strong> ${esc(name)}</p>
+            <p><strong>Email:</strong> <a href="mailto:${esc(email)}">${esc(email)}</a></p>
+            ${company ? `<p><strong>Company:</strong> ${esc(company)}</p>` : ""}
           </div>
 
           <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #1e293b; margin-top: 0;">What they're dealing with</h3>
-            <p style="white-space: pre-wrap; line-height: 1.6;">${message}</p>
+            <p style="white-space: pre-wrap; line-height: 1.6;">${esc(message)}</p>
           </div>
 
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #64748b; font-size: 12px;">
