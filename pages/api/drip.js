@@ -20,7 +20,9 @@ const REPLY_TO = process.env.DEVS_MAIL_REPLYTO || "cv@in.opengatehub.com";
 // El link de cada mail pasa por opengatehub.com/api/ir, que anota el click y redirige
 // a Gumroad. Así se mide el CTR por mail sin el click tracking de Resend, que reescribe
 // los links con un dominio suyo y castiga la entregabilidad (ver pages/api/ir.js).
-const SITIO = process.env.NEXT_PUBLIC_SITE_URL || "https://opengatehub.com";
+// Va con www a propósito: opengatehub.com sin www contesta 308 y manda a www, o sea un
+// salto de más en cada click. Un link del mail tiene que llegar derecho.
+const SITIO = "https://www.opengatehub.com";
 const GUIA = (col) => `${SITIO}/api/ir?a=guia&m=${col.replace("drip_", "")}`;
 
 // El mail sale en texto Y en HTML. El HTML está por una sola razón: sin él no hay

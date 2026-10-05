@@ -12,7 +12,9 @@ const FROM = process.env.DEVS_MAIL_FROM || "OpenGateHub <onboarding@resend.dev>"
 const REPLY_TO = process.env.PREGUNTAS_MAIL_REPLYTO || "candelaria@opengatehub.com";
 // Igual que en la cadena de devs: el link pasa por opengatehub.com/api/ir, que anota el
 // click y redirige. Mide el CTR por mail sin el click tracking de Resend (ver ir.js).
-const SITIO = process.env.NEXT_PUBLIC_SITE_URL || "https://opengatehub.com";
+// Va con www a propósito: opengatehub.com sin www contesta 308 y manda a www, o sea un
+// salto de más en cada click. Un link del mail tiene que llegar derecho.
+const SITIO = "https://www.opengatehub.com";
 const LLAMADA = (col) => `${SITIO}/api/ir?a=llamada&m=${col.replace("drip_", "")}`;
 
 const TOQUES = [
