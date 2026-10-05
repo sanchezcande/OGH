@@ -1,369 +1,4 @@
 {
-  "OpenGateHub": "OpenGateHub - Automatización de Procesos y Flujos para Empresas",
-  "pageDescription": "OpenGateHub ayuda a empresas a automatizar procesos y flujos de trabajo con IA, integraciones y soluciones digitales escalables.",
-  "home": "Inicio",
-  "services": "Servicios",
-  "aboutUs": "Nosotros",
-  "contactUs": "Contacto",
-  "english": "Inglés",
-  "spanish": "Español",
-  "name": "Nombre",
-  "ctaButton": "Reservá tu auditoría de automatización",
-  "email": "Correo electrónico",
-  "phoneNumber": "Número de teléfono (opcional)",
-  "subject": "Asunto (opcional)",
-  "message": "Mensaje",
-  "send": "Enviar",
-  "pleaseEnterValidName": "Por favor ingrese un nombre válido",
-  "pleaseEnterValidEmail": "Por favor ingrese una dirección de correo electrónico válida",
-  "pleaseEnterValidMessage": "Por favor ingrese un mensaje con más de 10 caractsos",
-  "pleaseCompleteCaptcha": "Por favor completa la verificación del captcha",
-  "messageSentSuccessfully": "Mensaje enviado con éxito",
-  "errorSendingMessage": "Error al enviar el mensaje",
-  "modalSendTitle": "¡Enviado!",
-  "modalCloseButtonText": "Cerrar",
-  "joinOurCommunity": "Unite a Nuestra Comunidad",
-  "privacyPolicy": "Política de Privacidad",
-  "faq": "Preguntas Frecuentes",
-  "FAQs": "Preguntas Frecuentes",
-  "Blog": "Blog",
-  "seoTitle": "Construí con personas que lo entienden | OpenGateHub",
-  "articleNotFound": "Artículo no encontrado. Por favor, visita el índice de nuestro blog para ver las publicaciones recientes.",
-  "seoDescription": "Ayudamos a empresas a escalar su operación con automatización de flujos y staff augmentation con impacto medible en negocio.",
-  "heroAnimatedText": {
-    "part1": "Automatizá los ",
-    "highlight1": "flujos",
-    "part2": " y procesos de tu ",
-    "highlight2": "empresa"
-  },
-  "heroSubtitle": "Tu equipo pierde 8+ horas/semana en tareas que la automatización resuelve en minutos. Te ayudamos a recuperar ese tiempo.",
-  "heroSecondaryCTA": "Calculá cuánto te está costando →",
-  "heroTrustChip1": "9.7/10 CSAT",
-  "heroTrustChip2": "Kickoff en 7.3 días",
-  "heroTrustChip3": "50+ sprints entregados",
-  "heroAlt": "Ilustración de equipo tech - OpenGateHub",
-  "problemTitle": "Las operaciones manuales son <highlight>costosas</highlight>.",
-  "problemText": "Cuando los equipos dependen de planillas, tareas repetitivas y herramientas desconectadas, la ejecución se vuelve lenta, aumentan los errores y se pierde visibilidad sobre procesos críticos.",
-  "weGetYouTitle": "Tu equipo <highlight>no debería estar haciendo esto</highlight>.",
-  "weGetYouText": "Cada hora que tu equipo pasa copiando datos entre herramientas, persiguiendo aprobaciones o generando reportes a mano es una hora que no va a trabajo real. Eliminamos esas tareas de forma permanente — y le devolvemos a tu equipo la capacidad de moverse más rápido.",
-  "servicesTitle": "Nuestros Servicios",
-  "servicesText": "Trabajamos con personas que se preocupan por el cómo, no solo por el qué. Soluciones personalizadas para fundadores que quieren escalar con fluidez, confianza y cultura.",
-  "planTitle": "Cómo trabajamos:",
-  "planSteps": {
-    "step1": "Discovery operativo: mapeamos tu proceso actual, cuellos de botella y prioridades.",
-    "step2": "Plan de ejecución: definimos el modelo ideal (Automatización, Staff Augmentation o ambos).",
-    "step3": "Implementar y optimizar: ejecutamos, medimos impacto y mejoramos de forma continua."
-  },
-  "connectWithUs": "Conectate con Nosotros",
-  "aboutUsTitle_part1": "Construimos tecnología poniendo a las ",
-  "aboutUsTitle_highlight": "personas",
-  "aboutUsTitle_part2": " primero",
-  "aboutUsSubtitle": "— porque los productos fuertes empiezan con equipos fuertes.",
-  "aboutUsText": "No somos otra agencia de desarrollo. Formamos alianzas a largo plazo con equipos que valoran el match cultural tanto como la excelencia técnica.\nEn OpenGateHub, ser human-first significa reducir fricción, no agregar procesos. Construimos con claridad, intención y cuidado — para que el trabajo complejo se sienta más liviano y el progreso se mantenga sostenible.",
-  "aboutUsLastLine": "",
-  "aboutUsTextBold": "",
-  "aboutUsFounder": "Candelaria Sanchez",
-  "aboutUsFounderRole": "Fundadora y CTO, OpenGateHub",
-  "aboutUsFounderBio": "Candelaria Sanchez es ingeniera de software, cineasta reconvertida en founder, basada en Bali. Empezó OpenGateHub porque veía el mismo problema en todos lados: empresas contratando ingenieros excelentes que simplemente no hacían fit con el equipo. Gente inteligente en el contexto equivocado, generando fricción en vez de flow.\n\nAsí que construyó una empresa donde el cultural fit no es un nice-to-have — es el primer filtro. Cada ingeniero se matchea por cómo se comunica, cómo trabaja, y si realmente le va a importar lo que está construyendo. De la Patagonia a Buenos Aires a armar un equipo global en varios continentes, su camino fue todo menos lineal. Pero el hilo conductor es siempre el mismo: las personas primero, todo lo demás viene después.",
-  "contactUsTitle": "¡Ponete en contacto!",
-  "contactUsSubtitle": "¡Gracias por contactarnos! Por favor, completá el formulario a continuación y nos pondremos en contacto con vos en breve.",
-  "weAre": "Somos",
-  "companyName": "OpenGateHub",
-  "specializedIn": "Enfocados en tu éxito. Te ayudamos a",
-  "webAndMobileApp": "dar vida a tus ideas",
-  "crafting": " con soluciones digitales a medida. Desde sitios web intuitivos hasta aplicaciones móviles innovadoras, ",
-  "innovativeSolution": "nuestro equipo trabaja para hacer realidad tu visión mientras apoya el",
-  "forBusiness": "crecimiento de tu negocio.",
-  "contactPage": {
-    "getIn": "Ponte en",
-    "touch": "Contacto",
-    "getInTouchSubtitleNew": "¡Conectemos! Estamos aquí para entender tu visión y explorar cómo podemos crear soluciones impactantes juntos.",
-    "phoneNumberLabel": "Número de Teléfono",
-    "emailLabel": "Correo Electrónico",
-    "phone": "+54 9 11 2348-5638",
-    "email": "info@opengatehub.com",
-    "comeAnd": "Ven y",
-    "joinUs": "Únete a Nosotros",
-    "heroTitle": "Optimicemos tu operación",
-    "heroSubtitle": "Elegí el camino más rápido: auditoría de automatización o estimado de ejecución.",
-    "bookCallTitle": "Reservá una auditoría de automatización",
-    "bookCallDescription": "Para equipos que quieren reducir trabajo manual y acelerar la operación.",
-    "bookCallButton": "Reservar auditoría de 15 min",
-    "getEstimateTitle": "Solicitá un estimado de ejecución",
-    "getEstimateDescription": "Contanos tus necesidades y te recomendamos el modelo ideal: Automatización, Staff Augmentation o ambos.",
-    "whatHappensNext": "Qué sucede después",
-    "step1Title": "Revisamos tu solicitud en 24 horas",
-    "step2Title": "Te recomendamos el mejor modelo de engagement",
-    "step3Title": "Recibes un próximo paso claro — llamada o propuesta.",
-    "bookCallDisclaimer": "Sin compromiso. Te llevás próximos pasos claros y acciones priorizadas.",
-    "footerCTAText": "¿Prefieres hablar primero?",
-    "footerCTALink": "Reservar llamada"
-  },
-  "contactForm": {
-    "company": "Empresa",
-    "engagementType": "Necesidad principal de engagement",
-    "optionWorkflow": "Automatización de Flujos",
-    "optionStaff": "Staff Augmentation",
-    "optionBoth": "Ambos: Automatización + Staff Augmentation",
-    "budget": "Presupuesto estimado",
-    "timeline": "Plazo / urgencia",
-    "bottleneck": "Principal cuello de botella operativo (opcional)",
-    "notSureYet": "Todavía no lo sé",
-    "pleaseEnterCompany": "Por favor ingresa el nombre de tu empresa",
-    "pleaseSelectEngagement": "Por favor selecciona un tipo de engagement",
-    "pleaseSelectBudget": "Por favor selecciona un rango de presupuesto",
-    "pleaseSelectTimeline": "Por favor selecciona un plazo",
-    "requestEstimate": "Quiero mi plan de ejecución",
-    "submitting": "Enviando...",
-    "estimateRequestSent": "Solicitud recibida con éxito. La revisaremos en menos de 24 horas y te enviaremos próximos pasos.",
-    "successNextStep": "Próximo paso: recibirás recomendación de Automatización, Staff Augmentation o ambos.",
-    "successQuickAction": "¿Urgente? Reservá una auditoría de 15 min"
-  },
-  "homeCallToAction": {
-    "title": "Cada semana que esperás, te cuesta.",
-    "description": "Reservá una llamada gratuita de 30 minutos. Identificamos tus 3 principales oportunidades de automatización y te damos una estimación honesta del ahorro — sin pitch, solo valor.",
-    "buttonText": "Reservá una llamada gratis",
-    "noCommitment": "Llamada gratuita · Sin compromiso · Sin pitch"
-  },
-  "faqsCallToAction": {
-    "title": "¿Todavía tenés preguntas?",
-    "description": "Programa una consulta gratuita con nuestros expertos.",
-    "buttonText": "Consultar con Expertos"
-  },
-  "servicesCallToAction": {
-    "title": "¿Listo para innovar?",
-    "description": "Reservá una sesión estratégica gratuita para discutir tus necesidades.",
-    "buttonText": "Reservar Sesión Gratis"
-  },
-  "staffAugmentation": {
-    "metaDescription": "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar.",
-    "heroSubtitle": "Ampliamos tu equipo priorizando el match cultural y la calidad humana",
-    "whatIsTitle": "¿Qué es Staff Augmentation?",
-    "whatIsDescription": "Staff Augmentation es nuestro servicio estrella. Nosotros priorizamos el match cultural y la calidad humana por encima de todo. No solo buscamos desarrolladores expertos, sino personas que se alineen con tus valores, tu forma de trabajar y tu visión. Trabajamos como parte de tu equipo para entregar resultados de calidad y acelerar tu roadmap sin la complejidad de contrataciones tradicionales.",
-    "whyChooseTitle": "¿Por qué elegir Staff Augmentation?",
-    "benefits": {
-      "accelerateTitle": "Acelerá tu roadmap",
-      "accelerateDescription": "Agregá talento experto rápidamente sin los tiempos de contratación tradicionales.",
-      "integrationTitle": "Integración perfecta",
-      "integrationDescription": "Nuestros desarrolladores se integran como parte de tu equipo, alineados con tu cultura.",
-      "techExpertsTitle": "Expertos en tecnología",
-      "techExpertsDescription": "Accedé a desarrolladores senior con experiencia en las tecnologías que necesitás.",
-      "commitment": "Para nosotros, el match cultural y la calidad humana son la prioridad. Trabajamos como parte de tu equipo, no como un proveedor externo. Nuestro compromiso es con tu éxito."
-    },
-    "keyBenefitsTitle": "Beneficios clave",
-    "keyBenefits": {
-      "extendedTeamTitle": "Equipo Extendido",
-      "extendedTeamDescription": "Desarrolladores que trabajan como parte de tu equipo, no como contratistas externos",
-      "quickStartTitle": "Tiempo de Respuesta",
-      "quickStartDescription": "Integración rápida, sin procesos largos de contratación",
-      "scalabilityTitle": "Escalabilidad",
-      "scalabilityDescription": "Ajustá el tamaño de tu equipo según tus necesidades del proyecto",
-      "guaranteedQualityTitle": "Calidad Garantizada",
-      "guaranteedQualityDescription": "Desarrolladores senior con experiencia comprobada en proyectos complejos",
-      "flexibilityTitle": "Flexibilidad",
-      "flexibilityDescription": "Adaptación rápida a cambios en requerimientos y prioridades",
-      "culturalFitTitle": "Alineación Cultural",
-      "culturalFitDescription": "Desarrolladores que comparten tus valores y forma de trabajar"
-    },
-    "howWeWorkTitle": "¿Cómo trabajamos con vos?",
-    "howWeWork": {
-      "step1Title": "Entendemos tu cultura",
-      "step1Description": "Priorizamos entender tus valores, tu forma de trabajar y tu visión. El match cultural es nuestra prioridad número uno.",
-      "step2Title": "Seleccionamos por match cultural",
-      "step2Description": "Nosotros evaluamos y seleccionamos desarrolladores priorizando el match cultural y la calidad humana, no solo las habilidades técnicas.",
-      "step3Title": "Integración rápida",
-      "step3Description": "Nuestros desarrolladores se integran a tu equipo y procesos desde el día uno.",
-      "step4Title": "Trabajamos juntos",
-      "step4Description": "Colaboramos de cerca, entregamos resultados y aceleramos tu roadmap."
-    },
-    "useCasesTitle": "Casos de uso ideales",
-    "useCases": {
-      "growingStartupsTitle": "Startups en crecimiento",
-      "growingStartupsDescription": "Escalá tu equipo rápidamente para cumplir con deadlines y objetivos ambiciosos",
-      "specificProjectsTitle": "Proyectos específicos",
-      "specificProjectsDescription": "Agregá expertise en tecnologías específicas para proyectos puntuales",
-      "distributedTeamsTitle": "Equipos distribuidos",
-      "distributedTeamsDescription": "Ampliá tu equipo remoto con desarrolladores que trabajan en tu timezone"
-    },
-    "ctaTitle": "¿Listo para ampliar tu equipo?",
-    "ctaHighlightWord": "ampliar"
-  },
-  "softwareFactory": {
-    "metaDescription": "Automatiza los procesos y flujos clave de tu empresa con una solución end-to-end pensada para escalar.",
-    "heroSubtitle": "Automatizá operaciones repetitivas y conectá tus herramientas con flujos confiables",
-    "whatIsTitle": "¿Qué es la Automatización de Flujos?",
-    "whatIsDescription": "Nuestro modelo de automatización de flujos ayuda a tu empresa a eliminar tareas manuales, conectar sistemas y estandarizar operaciones. Diseñamos, implementamos y desplegamos automatizaciones que reducen errores, aceleran la ejecución y liberan tiempo de tu equipo para trabajo de mayor valor.",
-    "whenToUseTitle": "¿Cuándo usar Automatización de Flujos?",
-    "whenToUse": {
-      "newProductTitle": "Cuellos de Botella Manuales",
-      "newProductDescription": "Cuando tus equipos pierden tiempo en tareas repetitivas, seguimientos y traspasos desconectados",
-      "completeSolutionTitle": "Herramientas y Datos Desconectados",
-      "completeSolutionDescription": "Cuando tu CRM, ERP, finanzas, soporte o marketing no se sincronizan de forma confiable",
-      "tightDeadlineTitle": "Necesidad de Operar Más Rápido",
-      "tightDeadlineDescription": "Cuando necesitás mejorar velocidad, consistencia y reporting sin aumentar headcount"
-    },
-    "processTitle": "Nuestro Proceso",
-    "process": {
-      "step1Title": "Auditoría de Procesos",
-      "step1Description": "Mapeamos tus procesos actuales, detectamos cuellos de botella y priorizamos automatizaciones de alto ROI",
-      "step2Title": "Blueprint de Automatización",
-      "step2Description": "Diseñamos la lógica de flujos, arquitectura de integración, reglas de datos y manejo de excepciones",
-      "step3Title": "Implementación e Integración",
-      "step3Description": "Construimos automatizaciones, conectamos tus herramientas y validamos escenarios de punta a punta",
-      "step4Title": "Despliegue y Adopción",
-      "step4Description": "Lanzamos de forma segura, capacitamos a tu equipo y definimos playbooks operativos",
-      "step5Title": "Optimización y Escalado",
-      "step5Description": "Monitoreamos resultados, mejoramos flujos y expandimos la automatización a nuevas áreas"
-    },
-    "outcomesTitle": "Qué Recibes",
-    "outcomes": {
-      "fullyFunctionalTitle": "Flujos Automatizados",
-      "fullyFunctionalDescription": "Procesos críticos corriendo automáticamente con lógica clara y controles definidos",
-      "productionReadyTitle": "Operación Confiable",
-      "productionReadyDescription": "Menos errores manuales, tiempos de ciclo más rápidos y ejecución consistente",
-      "scalableArchitectureTitle": "Sistemas Conectados",
-      "scalableArchitectureDescription": "Herramientas e información integradas para crecer con tu empresa",
-      "completeDocumentationTitle": "Visibilidad Operativa",
-      "completeDocumentationDescription": "Dashboards, alertas y documentación para gestionar con confianza"
-    },
-    "ctaTitle": "¿Listo para automatizar tu operación?",
-    "ctaDescription": "Recibí un plan de automatización personalizado para tus flujos, sistemas y objetivos de negocio.",
-    "ctaButtonText": "Obtener Estimado de Automatización",
-    "ctaHighlightWord": "automatizar"
-  },
-  "aboutUsCallToAction": {
-    "title": "Creemos algo increíble juntos",
-    "description": "Programa una consulta gratuita e inicia tu transformación digital.",
-    "buttonText": "Reservar Consulta Gratis"
-  },
-  "contactUsCallToAction": {
-    "title": "¿Listo para hablar soluciones?",
-    "description": "Programa una llamada gratuita con nuestro equipo para discutir tu proyecto.",
-    "buttonText": "Reservar Llamada Ahora"
-  },
-  "contactUsMetaTitle": "Contacto - OpenGateHub",
-  "contactUsMetaDescription": "Elegí el camino más rápido para mejorar tu operación: auditoría de automatización o estimado de ejecución.",
-  "companyHistoryTitle": "Nuestro Camino",
-  "companyHistoryDescription": "Nuestra historia comenzó con una simple creencia: que la tecnología debe servir a un propósito superior. Desde nuestras raíces en Argentina hasta nuestro alcance global actual, hemos tenido el privilegio de trabajar con líderes que se atreven a pensar diferente sobre el éxito.",
-  "companyHistoryExpandableDescription1": "Iniciamos OpenGateHub con la visión de cerrar la brecha entre la innovación tecnológica y el impacto significativo. Nuestra experiencia trabajando con empresas estadounidenses nos enseñó que las mejores soluciones surgen cuando el beneficio se encuentra con el propósito.",
-  "companyHistoryExpandableDescription2": "Nuestros fundadores han pasado años tanto en el ecosistema de startups como en el espacio de inversión de impacto, dándonos una perspectiva única sobre cómo escalar de manera sostenible mientras maximizamos el impacto positivo.",
-  "companyHistoryExpandableDescription3": "Nos enfocamos en soluciones que abordan desafíos del mundo real mientras crean beneficios sociales y ambientales medibles.",
-  "companyHistoryExpandableDescription4": "Cada proyecto que asumimos es evaluado no solo por su mérito técnico, sino por su potencial para crear un cambio positivo duradero.",
-  "missionAndCoreValuesTitle_part1": "Nuestra Misión y ",
-  "missionAndCoreValuesTitle_highlight": "Valores",
-  "missionAndCoreValuesDescription": "Creemos que las empresas más exitosas del mañana serán aquellas que creen valor para todos los stakeholders - inversores, usuarios, sociedad y nuestro planeta. Nuestra misión es empoderar a líderes visionarios para construir estas empresas hoy.",
-  "missionAndCoreValuesExpandableDescription1": "Nos asociamos con fundadores e inversores que ven más allá de las métricas tradicionales de éxito, ayudándoles a aprovechar la tecnología para crear tanto retornos como impacto.",
-  "missionAndCoreValuesExpandableDescription2": "La transparencia y la confianza son innegociables. Creemos en construir relaciones a largo plazo basadas en valores compartidos y un compromiso con el cambio positivo.",
-  "missionAndCoreValuesExpandableDescription3": "Nuestro enfoque combina experiencia técnica rigurosa con marcos de medición de impacto, asegurando que tus soluciones creen valor sostenible.",
-  "missionAndCoreValuesExpandableDescription4": "Estamos comprometidos con el aprendizaje y la adaptación continua, manteniéndonos a la vanguardia tanto de las tendencias tecnológicas como de los estándares de impacto en evolución.",
-  "technologiesTitle_part1": "Nuestra ",
-  "technologiesTitle_highlight": "Gente",
-  "technologiesDescription": "Detrás de cada venture de impacto exitosa hay un equipo que realmente lo entiende. Nuestra gente no son solo desarrolladores calificados - son individuos impulsados por una misión que entienden los desafíos únicos de construir para el impacto.",
-  "technologiesExpandableDescription1": "Hemos construido un equipo que combina excelencia técnica con una profunda comprensión de métricas de impacto y principios ESG.",
-  "technologiesExpandableDescription2": "Nuestra cultura está construida sobre la empatía, la innovación y un compromiso compartido de usar la tecnología como una fuerza para el bien.",
-  "technologiesExpandableDescription3": "Invertimos en el crecimiento de nuestro equipo, fomentando un ambiente donde tanto las habilidades técnicas como la comprensión del impacto pueden florecer.",
-  "technologiesExpandableDescription4": "Cada miembro del equipo aporta su perspectiva única, enriqueciendo nuestra capacidad para resolver desafíos complejos mientras creamos cambios positivos.",
-  "commitmentToInnovationTitle_part1": "Innovación con ",
-  "commitmentToInnovationTitle_highlight": "Propósito",
-  "commitmentToInnovationDescription": "En un mundo que enfrenta desafíos sin precedentes, la innovación no se trata solo de construir algo nuevo - se trata de construir algo mejor. Te ayudamos a aprovechar la tecnología de punta para crear soluciones que importan.",
-  "commitmentToInnovationExpandableDescription1": "Creemos que las innovaciones más impactantes ocurren en la intersección del beneficio y el propósito, donde el éxito empresarial impulsa el cambio positivo.",
-  "commitmentToInnovationExpandableDescription2": "Nuestro enfoque de la innovación es holístico, considerando no solo la viabilidad técnica sino también el impacto social y la sostenibilidad ambiental.",
-  "commitmentToInnovationExpandableDescription3": "Nos mantenemos a la vanguardia tanto de los avances tecnológicos como de las metodologías de medición de impacto, asegurando que tus soluciones sean tanto innovadoras como significativas.",
-  "commitmentToInnovationExpandableDescription4": "Nuestro objetivo es ayudarte a construir soluciones que no solo resuelvan los problemas de hoy sino que ayuden a crear un mejor mañana.",
-  "learnMoreButtonText": "Saber Más",
-  "faqsTitle": "Preguntas Frecuentes",
-  "faqs": {
-    "softwareFactory": {
-      "title": "Automatización de Flujos",
-      "questions": [
-        {
-          "question": "¿Qué servicios ofrece OpenGateHub?",
-          "answer": "Ofrecemos desarrollo web, diseño UX/UI, diseño gráfico, soluciones backend, consultoría tecnológica y soluciones a medida para tu negocio."
-        },
-        {
-          "question": "¿Cómo puedo empezar a trabajar con OpenGateHub?",
-          "answer": "podés contactarnos a través de nuestro formulario de contacto, enviarnos un correo o programar una reunión inicial."
-        },
-        {
-          "question": "¿Proveen soporte técnico después de entregar el proyecto?",
-          "answer": "Sí, contamos con paquetes de mantenimiento y soporte técnico para garantizar que tu solución funcione sin problemas."
-        },
-        {
-          "question": "¿Cuánto tiempo toma completar un proyecto?",
-          "answer": "La duración depende de la complejidad y el alcance del proyecto, pero trabajamos con vos para establecer un cronograma claro."
-        },
-        {
-          "question": "¿Qué tecnologías utilizan en los proyectos?",
-          "answer": "Trabajamos con React, Next.js, Node.js, Prisma, Tailwind CSS y otras tecnologías modernas para frontend y backend."
-        },
-        {
-          "question": "¿Pueden trabajar con empresas internacionales?",
-          "answer": "Sí, somos una empresa global y estamos acostumbrados a colaborar con clientes de diferentes zonas horarias y países."
-        },
-        {
-          "question": "¿Tienen experiencia integrando APIs de terceros?",
-          "answer": "Sí, hemos trabajado con APIs como Stripe, AWS, Firebase y más para ofrecer soluciones completas e integradas."
-        },
-        {
-          "question": "¿Qué hace único a OpenGateHub frente a otras empresas?",
-          "answer": "Nos enfocamos en crear soluciones escalables y personalizadas mientras mantenemos una comunicación clara y cercana con nuestros clientes."
-        },
-        {
-          "question": "¿Cuáles son los costos de sus servicios?",
-          "answer": "Nuestros costos dependen del tipo de proyecto. Contactanos para recibir una cotización personalizada sin compromiso."
-        },
-        {
-          "question": "¿Pueden ayudarme a migrar mi proyecto actual a tecnologías modernas?",
-          "answer": "¡Por supuesto! Evaluaremos tu proyecto y te ayudaremos a actualizarlo utilizando herramientas y frameworks actuales."
-        }
-      ]
-    },
-    "staffOutsourcing": {
-      "title": "Outsourcing de Staff",
-      "questions": [
-        {
-          "question": "¿Qué tipo de perfiles tecnológicos ofrecen para outsourcing?",
-          "answer": "Ofrecemos desarrolladores frontend, backend, full stack, diseñadores UX/UI, testers QA y especialistas en DevOps, entre otros."
-        },
-        {
-          "question": "¿Puedo contratar desarrolladores a tiempo parcial o para proyectos específicos?",
-          "answer": "Sí, ofrecemos opciones flexibles de contratación, ya sea a tiempo completo, parcial o para proyectos específicos."
-        },
-        {
-          "question": "¿Cómo manejan las diferencias de zona horaria?",
-          "answer": "Nos adaptamos a la zona horaria del cliente y organizamos reuniones y entregas según sus necesidades para garantizar una colaboración eficiente."
-        },
-        {
-          "question": "¿El talento está preparado para integrarse en equipos existentes?",
-          "answer": "Sí, nuestro talento está capacitado para adaptarse rápidamente a equipos y metodologías de trabajo como Scrum, Kanban o el flujo que prefieras."
-        },
-        {
-          "question": "¿Qué nivel de experiencia tienen los talentos que ofrecen?",
-          "answer": "Contamos con programadores desde nivel junior hasta senior, seleccionados según los requerimientos específicos de tu proyecto."
-        },
-        {
-          "question": "¿Cómo seleccionan al talento ideal para mi proyecto?",
-          "answer": "Realizamos un análisis de tus necesidades y seleccionamos candidatos a través de un riguroso proceso de evaluación técnica y cultural."
-        },
-        {
-          "question": "¿Pueden asignar un equipo completo en lugar de perfiles individuales?",
-          "answer": "¡Claro! Podemos asignar equipos multidisciplinarios completos con lídsos técnicos si tu proyecto lo requiere."
-        },
-        {
-          "question": "¿Qué pasa si el programador asignado no cumple con mis expectativas?",
-          "answer": "Si no estás satisfecho, te ofrecemos una rápida sustitución del talento, asegurándonos de que tu proyecto siga avanzando sin problemas."
-        },
-        {
-          "question": "¿El staff trabaja bajo mi supervisión o la de OpenGateHub?",
-          "answer": "Vos decidís: el equipo puede trabajar directamente bajo tu supervisión o podemos gestionarlo nosotros según tus necesidades."
-        },
-        {
-          "question": "¿Por qué debería elegir OpenGateHub para outsourcing de IT?",
-          "answer": "Entendemos que cada proyecto es único. Por eso nos enfocamos en ofrecerte talento confiable, adaptarnos a tus necesidades y mantener una comunicación clara en cada paso del camino. Nuestro objetivo es convertirnos en un socio estratégico que haga crecer tu negocio."
-        }
-      ]
-    }
-  },
   "privacyPolicy1": {
     "title": "Política de Privacidad",
     "introduction": "En OpenGateHub, tu privacidad es nuestra prioridad. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información personal cuando interacvosas con nuestro sitio web, servicios o productos. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.",
@@ -390,7 +25,7 @@
       },
       {
         "title": "Tus Derechos",
-        "content": "Tenés derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, Contactanos en [insertar dirección de correo electrónico]."
+        "content": "Tenés derecho a:\n- Acceder a los datos personales que tenemos sobre ti.\n- Solicitar correcciones o actualizaciones a tu información.\n- Solicitar la eliminación de tus datos personales, sujeto a las leyes aplicables.\n- Optar por no recibir comunicaciones de marketing en cualquier momento.\nPara ejercer estos derechos, Contactanos en info@opengatehub.com."
       },
       {
         "title": "Enlaces a Terceros",
@@ -406,16 +41,22 @@
       }
     ]
   },
-  "searchPlaceholder": "Buscar artículos...",
-  "readMore": "Leer más",
   "articles": [
+    {
+      "title": "Cómo contratar a tu primer developer",
+      "slug": "hiring-your-first-developer",
+      "summary": "El problema no es encontrar candidatos: es saber cuál puede hacer el trabajo. Un orden simple para contratar bien.",
+      "image": "/images/article10-es.jpg",
+      "thumbnail": "/images/article10-es.jpg",
+      "content": "Cuando contratás a tu primer developer, todos los candidatos suenan bien. El problema aparece después, cuando ya le estás pagando.\n\n## El problema no es encontrar candidatos\n\nLa mayoría de los founders piensa que contratar un buen developer es un problema de encontrar candidatos. No lo es.\n\nEl problema aparece cuando tenés tres candidatos que parecen buenos y tenés que decidir cuál puede hacer el trabajo de verdad. Un buen CV, buen inglés y cinco años de React no necesariamente significan que esa persona sea la correcta para tu producto.\n\n## Lo que cuesta equivocarse\n\nEl costo de un mal developer no es solamente lo que le pagás. Es lo que pasa si dos meses después descubrís que no puede trabajar de forma autónoma:\n\n- Perdés tiempo.\n- El producto se demora.\n- Terminás haciendo management técnico.\n- Y al final tenés que volver a contratar.\n\nPor eso conviene dedicarle más tiempo al filtro antes de contratar, no después.\n\n## El orden que casi nadie sigue\n\nLo habitual es esto: primero se empieza a entrevistar, después se conocen candidatos, después se comparan impresiones, y recién al final se intenta decidir qué significa \"buen developer\".\n\nNosotros lo hacemos al revés:\n\n- Primero definimos qué tiene que demostrar la persona.\n- Después armamos el proceso para medirlo.\n- Y recién ahí empezamos a buscar.\n\nParece una diferencia chica, pero cambia bastante la contratación. Cuando llegás a la entrevista ya sabés qué estás buscando, y dejás de elegir por quién te cayó mejor.\n\n## Lo que no se ve en un CV\n\nSe suele entrevistar demasiado para comprobar si alguien sabe programar. Eso es solo una parte. Hay otras cosas que pesan igual o más:\n\n- Puede trabajar sin que alguien le diga qué hacer cada hora?\n- Sabe comunicar un problema antes de que se convierta en un desastre?\n- Puede entrar a un código que no conoce y orientarse?\n- Entiende el producto o solamente ejecuta tareas?\n- Lo dejarías trabajando directamente con un cliente?\n\nPara responderlas hay que escuchar cómo piensa la persona y cómo habla de su trabajo anterior.\n\n## Por dónde empezar\n\nSi vas a entrevistar vos, armamos una guía gratis con 9 de las preguntas que hacemos en una entrevista. Cada una viene con qué mide, qué señales buenas y malas escuchar en la respuesta, y la repregunta que separa al que lo vivió del que preparó la entrevista. Está en opengatehub.com/preguntas.\n\nY si preferís no hacerlo solo, eso es lo que hacemos: buscamos, entrevistamos y te presentamos developers senior."
+    },
     {
       "title": "El impuesto oculto: lo que el trabajo manual realmente le cuesta a tu empresa",
       "slug": "impuesto-oculto-trabajo-manual-costo-empresa",
       "summary": "Cada tarea repetitiva que tu equipo hace a mano tiene un costo que no aparece en ningún balance. Desglosamos las tres capas del trabajo manual — y cómo salir.",
       "image": "/images/article9.jpg",
       "thumbnail": "/images/article9.jpg",
-      "content": "Hay un número que probablemente no aparece en ningún P&L de tu empresa. No es una línea de gasto. No es un cargo por servicio. Es el costo acumulado de todo el trabajo manual que tu equipo sigue haciendo — día a día, semana a semana — porque \"así siempre se hizo\".\n\nY probablemente es mucho más alto de lo que pensás.\n\nSegún McKinsey, el trabajador promedio de conocimiento pasa casi el 60% de su jornada en \"trabajo sobre el trabajo\": buscar información, mover datos entre sistemas, dar seguimiento, actualizar hojas de cálculo, enviar los mismos correos. No es trabajo estratégico. No mueve la aguja. Pero consume la mayor parte de la energía de tus mejores personas.\n\nEn OpenGateHub llamamos a esto el impuesto oculto. Y si estás liderando una startup, una scaleup o un equipo de operaciones, lo estás pagando ahora mismo — lo sepas o no.\n\n## La primera capa: el costo directo\n\nEste es el más fácil de calcular, pero el que menos gente calcula.\n\nPensá en tu equipo. ¿Cuántas horas por semana se van en tareas repetitivas? Copiar datos de un formulario a un CRM. Generar reportes manualmente cada lunes. Mandar seguimientos uno por uno. Actualizar estados en tres herramientas distintas porque no están conectadas.\n\nAhora multiplicá esas horas por el costo hora de tu equipo. Para la mayoría de las empresas con las que trabajamos, el número está entre USD 2.000 y USD 8.000 por mes — solo en tiempo desperdiciado en tareas que una automatización podría resolver en minutos.\n\nEso no es un gasto menor. Es un sueldo completo. A veces dos.\n\n## La segunda capa: el costo de oportunidad\n\nAcá es donde la cosa se pone más seria.\n\nCada hora que tu equipo gasta en trabajo operativo repetitivo es una hora que no está dedicando a:\n\n- Cerrar deals\n- Mejorar el producto\n- Hablar con clientes\n- Pensar en estrategia\n- Resolver problemas reales\n\nForrester estima que las empresas que automatizan procesos operativos core liberan entre 15 y 25 horas por persona por mes. No estamos hablando de eficiencia marginal. Estamos hablando de recuperar semanas enteras de capacidad productiva.\n\nY lo más importante: esas horas recuperadas se reinvierten en trabajo de alto valor — el tipo de trabajo que realmente hace crecer una empresa.\n\n## La tercera capa: el costo invisible\n\nEsta es la que nadie pone en un dashboard, pero la que más daño hace a largo plazo.\n\nEl trabajo manual repetitivo quema a la gente. No es dramático — no hay una explosión. Es un goteo constante. Menos motivación. Menos creatividad. Más errores. Más rotación.\n\nCal Newport lo dice muy bien en \"A World Without Email\": el switching constante entre tareas operativas y trabajo de concentración destruye la capacidad cognitiva de los equipos. No es que la gente sea menos capaz. Es que el sistema en el que trabajan los hace menos capaces.\n\nCuando alguien renuncia, el costo de reemplazo es entre 50% y 200% de su salario anual. Y muchas veces, la causa no es el sueldo ni el jefe — es que están cansados de hacer trabajo que una máquina debería hacer.\n\n## La salida: automatizar con estrategia, no con hype\n\nAcá es donde tenemos que ser honestos: automatizar por automatizar no sirve.\n\nHemos visto empresas que compran herramientas caras, configuran flujos complejos y terminan con más problemas de los que tenían antes. La automatización funciona cuando se hace con intención:\n\n1. **Mapeá antes de automatizar.** Entendé el proceso real (no el que está documentado, el real). Dónde hay fricción. Dónde hay handoffs manuales. Dónde se pierden cosas.\n\n2. **Priorizá por impacto, no por facilidad.** El primer proceso a automatizar debería ser el que más tiempo consume Y más errores genera. No el más fácil de implementar.\n\n3. **Medí antes y después.** Si no podés medir el impacto, no podés justificar la inversión ni escalar lo que funciona.\n\n4. **Empezá chico, escalá rápido.** Un piloto de dos semanas con resultados claros vale más que un roadmap de seis meses.\n\nEn OpenGateHub, esto es exactamente lo que hacemos. Trabajamos con equipos de operaciones, ventas y producto para identificar dónde está el impuesto oculto — y eliminarlo. No con soluciones genéricas. Con automatizaciones diseñadas para tu proceso, tu stack y tu equipo.\n\n## El turno es tuyo\n\nCada día que tu equipo sigue haciendo manualmente lo que una máquina podría hacer, estás pagando un impuesto que no elegiste. La buena noticia: salir es más fácil y más rápido de lo que pensás.\n\nNo necesitás una transformación digital de 18 meses. Necesitás un primer paso bien dado.\n\nY ese primer paso puede ser una conversación."
+      "content": "Hay un número que probablemente no aparece en ningún P&L de tu empresa. No es una línea de gasto. No es un cargo por servicio. Es el costo acumulado de todo el trabajo manual que tu equipo sigue haciendo — día a día, semana a semana — porque \"así siempre se hizo\".\n\nY probablemente es mucho más alto de lo que pensás.\n\nSegún McKinsey, el trabajador promedio de conocimiento pasa casi el 60% de su jornada en \"trabajo sobre el trabajo\": buscar información, mover datos entre sistemas, dar seguimiento, actualizar hojas de cálculo, enviar los mismos correos. No es trabajo estratégico. No mueve la aguja. Pero consume la mayor parte de la energía de tus mejores personas.\n\nEn OpenGateHub llamamos a esto el impuesto oculto. Y si estás liderando una startup, una scaleup o un equipo de operaciones, lo estás pagando ahora mismo — lo sepas o no.\n\n## La primera capa: el costo directo\n\nEste es el más fácil de calcular, pero el que menos gente calcula.\n\nPensá en tu equipo. ¿Cuántas horas por semana se van en tareas repetitivas? Copiar datos de un formulario a un CRM. Generar reportes manualmente cada lunes. Mandar seguimientos uno por uno. Actualizar estados en tres herramientas distintas porque no están conectadas.\n\nAhora multiplicá esas horas por el costo hora de tu equipo.\n\n## La segunda capa: el costo de oportunidad\n\nAcá es donde la cosa se pone más seria.\n\nCada hora que tu equipo gasta en trabajo operativo repetitivo es una hora que no está dedicando a:\n\n- Cerrar deals\n- Mejorar el producto\n- Hablar con clientes\n- Pensar en estrategia\n- Resolver problemas reales\n\nForrester estima que las empresas que automatizan procesos operativos core liberan entre 15 y 25 horas por persona por mes. No estamos hablando de eficiencia marginal. Estamos hablando de recuperar semanas enteras de capacidad productiva.\n\nY lo más importante: esas horas recuperadas se reinvierten en trabajo de alto valor — el tipo de trabajo que realmente hace crecer una empresa.\n\n## La tercera capa: el costo invisible\n\nEsta es la que nadie pone en un dashboard, pero la que más daño hace a largo plazo.\n\nEl trabajo manual repetitivo quema a la gente. No es dramático — no hay una explosión. Es un goteo constante. Menos motivación. Menos creatividad. Más errores. Más rotación.\n\nCal Newport lo dice muy bien en \"A World Without Email\": el switching constante entre tareas operativas y trabajo de concentración destruye la capacidad cognitiva de los equipos. No es que la gente sea menos capaz. Es que el sistema en el que trabajan los hace menos capaces.\n\nCuando alguien renuncia, el costo de reemplazo es entre 50% y 200% de su salario anual. Y muchas veces, la causa no es el sueldo ni el jefe — es que están cansados de hacer trabajo que una máquina debería hacer.\n\n## La salida: automatizar con estrategia, no con hype\n\nAcá es donde tenemos que ser honestos: automatizar por automatizar no sirve.\n\nHay empresas que compran herramientas caras, configuran flujos complejos y terminan con más problemas de los que tenían antes. La automatización funciona cuando se hace con intención:\n\n1. **Mapeá antes de automatizar.** Entendé el proceso real (no el que está documentado, el real). Dónde hay fricción. Dónde hay handoffs manuales. Dónde se pierden cosas.\n\n2. **Priorizá por impacto, no por facilidad.** El primer proceso a automatizar debería ser el que más tiempo consume Y más errores genera. No el más fácil de implementar.\n\n3. **Medí antes y después.** Si no podés medir el impacto, no podés justificar la inversión ni escalar lo que funciona.\n\n4. **Empezá chico, escalá rápido.** Un piloto de dos semanas con resultados claros vale más que un roadmap de seis meses.\n\n## El turno es tuyo\n\nCada día que tu equipo sigue haciendo manualmente lo que una máquina podría hacer, estás pagando un impuesto que no elegiste. La buena noticia: salir es más fácil y más rápido de lo que pensás.\n\nSi estás por contratar a tu developer, agendá una llamada gratis de 20 minutos."
     },
     {
       "title": "Noticia de enero 2026: la automatización agentic entra en fase empresarial",
@@ -431,7 +72,7 @@
       "summary": "No es un problema de habilidades. Es un problema de encaje. Por qué la alineación cultural gana a los checkboxes técnicos — y qué hacemos distinto en OpenGateHub.",
       "image": "/images/article6.jpg",
       "thumbnail": "/images/article6.jpg",
-      "content": "Ya te pasó. Publicás un trabajo en Toptal, Upwork o contactás a una agencia de desarrollo. Te llega una lista de CVs, portfolios impresionantes y evaluaciones técnicas que marcan todas las casillas. Contratás a alguien. Y a los tres meses estás agotado: persiguiendo actualizaciones, reescribiendo requisitos por quinta vez, preguntándote por qué la comunicación cuesta tanto.\n\nNo es un problema de habilidades. Es un problema de encaje.\n\nY sin embargo, casi todas las agencias de software del mercado siguen resolviendo el problema equivocado.\n\n## La industria está obsesionada con las métricas equivocadas\n\nCuando las startups buscan desarrolladores o un partner de software, la conversación estándar es esta: \"¿Cuál es tu stack? ¿Sabés React? ¿AWS? ¿Hiciste algo así antes?\"\n\nSon preguntas válidas. Pero son el piso, no el diferenciador. Cualquier desarrollador decente sabe React. Un montón de agencias tienen certificaciones AWS. Las habilidades técnicas son el requisito mínimo viable, no lo que hace que una partnership funcione.\n\nLo que hace que una partnership funcione de verdad es mucho más difícil de evaluar en una prueba técnica: cómo piensa alguien, cómo se comunica, cómo maneja la ambigüedad y cómo aparece cuando las cosas se complican.\n\nY las cosas siempre se complican.\n\n## El fit cultural no es \"ideal\" — es una variable de riesgo de negocio\n\nEn OpenGateHub tomamos una decisión deliberada desde el principio: el fit cultural va primero. No después de la entrevista técnica. No como una casilla al final. Primero.\n\n¿Por qué? Porque vimos qué pasa cuando falta.\n\nUn desarrollador técnicamente excelente que se comunica de forma reactiva en lugar de proactiva te va a costar más tiempo que uno un poco menos senior pero que se hace cargo de los problemas. Un equipo que no entiende la visión de tu producto va a construir lo correcto de la manera equivocada, siempre. Un desarrollador que trabaja asincrónicamente de una forma que no encaja con el ritmo de tu equipo genera cuellos de botella invisibles que solo aparecen en el peor momento — justo antes del launch, justo antes del demo para inversores.\n\nEsto no son casos raros. Es la norma cuando la alineación cultural no forma parte del proceso de selección.\n\n## Qué significa \"human-first\" en la práctica\n\nCuando un cliente llega a nosotros, la primera conversación no es sobre tecnología. Es sobre cómo trabaja su equipo. ¿Cómo es su comunicación? ¿Son muy async o prefieren standups? ¿Cómo manejan los cambios de alcance? ¿Qué cultura de feedback tienen? ¿Qué salió mal con el último desarrollador que contrataron?\n\nRecién cuando entendemos eso empezamos a pensar en quién encajaría.\n\nEso implica que a veces le decimos a un candidato técnicamente excelente — con portfolio sólido y buenas referencias — que no es el match correcto para un cliente específico. No porque no sea bueno. Porque el encaje no está.\n\nTambién implica que nuestros clientes no reciben solo un cuerpo para llenar una silla. Reciben a alguien que se integra al equipo, se comunica de forma proactiva, señala problemas antes de que se conviertan en bloqueos y se preocupa de verdad por el resultado del producto que está construyendo.\n\nEso es lo que refleja nuestro 9.7/10 en CSAT. No que seamos la opción más barata ni que nuestros desarrolladores tengan más certificaciones. Sino que cuando los clientes trabajan con nosotros, la experiencia se siente distinta — más humana, más alineada, menos fricción.\n\n## El costo real del desalineamiento\n\nHablemos un momento de números, porque esto no es solo una postura filosófica: es financiera.\n\nUna mala contratación de desarrollador en una startup no te cuesta solo el salario. Te cuesta el tiempo que tu CTO invierte gestionándolo, los sprints perdidos en retrabajo, el impacto en la moral del resto del equipo y el costo de oportunidad de las features que no salen mientras estás ocupado con las consecuencias. Estimaciones conservadoras ponen el costo real de una mala contratación técnica en 1.5x a 3x su salario anual.\n\nEl staff augmentation con la agencia equivocada tiene una dinámica similar — con la diferencia de que los problemas se acumulan más rápido porque suelen estar yendo rápido y la apuesta por sprint es más alta.\n\nCuando el encaje es correcto desde el inicio, ese costo desaparece. El desarrollador se incorpora más rápido. La comunicación es más fácil. Menos cosas se caen entre grietas. El trabajo simplemente fluye.\n\n## Por qué importa más que nunca en 2025\n\nEl mercado de desarrolladores cambió mucho. Hay más talento disponible a nivel global que hace tres años. Las herramientas de IA subieron el piso de lo que cualquier desarrollador puede producir. Eso hace que la barra técnica base sea más fácil de superar — y que los factores humanos sean cada vez más diferenciadores, no menos.\n\nLas startups y fundadores que van a ganar en este entorno son los que arman equipos donde los humanos trabajan bien juntos. Donde la confianza se construye rápido, la comunicación es clara y todos reman para el mismo lado.\n\nEso es lo que estamos construyendo en OpenGateHub. Una partnership a la vez."
+      "content": "Ya te pasó. Publicás un trabajo en Toptal, Upwork o contactás a una agencia de desarrollo. Te llega una lista de CVs, portfolios impresionantes y evaluaciones técnicas que marcan todas las casillas. Contratás a alguien. Y a los tres meses estás agotado: persiguiendo actualizaciones, reescribiendo requisitos por quinta vez, preguntándote por qué la comunicación cuesta tanto.\n\nNo es un problema de habilidades. Es un problema de encaje.\n\nY sin embargo, casi todas las agencias de software del mercado siguen resolviendo el problema equivocado.\n\n## La industria está obsesionada con las métricas equivocadas\n\nCuando las startups buscan desarrolladores o un partner de software, la conversación estándar es esta: \"¿Cuál es tu stack? ¿Sabés React? ¿AWS? ¿Hiciste algo así antes?\"\n\nSon preguntas válidas. Pero son el piso, no el diferenciador. Cualquier desarrollador decente sabe React. Un montón de agencias tienen certificaciones AWS. Las habilidades técnicas son el requisito mínimo viable, no lo que hace que una partnership funcione.\n\nLo que hace que una partnership funcione de verdad es mucho más difícil de evaluar en una prueba técnica: cómo piensa alguien, cómo se comunica, cómo maneja la ambigüedad y cómo aparece cuando las cosas se complican.\n\nY las cosas siempre se complican.\n\n## El fit cultural no es \"ideal\" — es una variable de riesgo de negocio\n\nEn OpenGateHub tomamos una decisión deliberada desde el principio: el fit cultural va primero. No después de la entrevista técnica. No como una casilla al final. Primero.\n\n¿Por qué? Porque vimos qué pasa cuando falta.\n\nUn desarrollador técnicamente excelente que se comunica de forma reactiva en lugar de proactiva te va a costar más tiempo que uno un poco menos senior pero que se hace cargo de los problemas. Un equipo que no entiende la visión de tu producto va a construir lo correcto de la manera equivocada, siempre. Un desarrollador que trabaja asincrónicamente de una forma que no encaja con el ritmo de tu equipo genera cuellos de botella invisibles que solo aparecen en el peor momento — justo antes del launch, justo antes del demo para inversores.\n\nEsto no son casos raros. Es la norma cuando la alineación cultural no forma parte del proceso de selección.\n\n## Qué significa \"human-first\" en la práctica\n\nCuando un cliente llega a nosotros, la primera conversación no es sobre tecnología. Es sobre cómo trabaja su equipo. ¿Cómo es su comunicación? ¿Son muy async o prefieren standups? ¿Cómo manejan los cambios de alcance? ¿Qué cultura de feedback tienen? ¿Qué salió mal con el último desarrollador que contrataron?\n\nRecién cuando entendemos eso empezamos a pensar en quién encajaría.\n\nEso implica que a veces le decimos a un candidato técnicamente excelente — con portfolio sólido y buenas referencias — que no es el match correcto para un cliente específico. No porque no sea bueno. Porque el encaje no está.\n\nTambién implica que nuestros clientes no reciben solo un cuerpo para llenar una silla. Reciben a alguien que se integra al equipo, se comunica de forma proactiva, señala problemas antes de que se conviertan en bloqueos y se preocupa de verdad por el resultado del producto que está construyendo.\n\n## El costo real del desalineamiento\n\nHablemos un momento de números, porque esto no es solo una postura filosófica: es financiera.\n\nUna mala contratación de desarrollador en una startup no te cuesta solo el salario. Te cuesta el tiempo que tu CTO invierte gestionándolo, los sprints perdidos en retrabajo, el impacto en la moral del resto del equipo y el costo de oportunidad de las features que no salen mientras estás ocupado con las consecuencias. Estimaciones conservadoras ponen el costo real de una mala contratación técnica en 1.5x a 3x su salario anual.\n\nEl staff augmentation con la agencia equivocada tiene una dinámica similar — con la diferencia de que los problemas se acumulan más rápido porque suelen estar yendo rápido y la apuesta por sprint es más alta.\n\nCuando el encaje es correcto desde el inicio, ese costo desaparece. El desarrollador se incorpora más rápido. La comunicación es más fácil. Menos cosas se caen entre grietas. El trabajo simplemente fluye.\n\n## Por qué importa más que nunca en 2025\n\nEl mercado de desarrolladores cambió mucho. Hay más talento disponible a nivel global que hace tres años. Las herramientas de IA subieron el piso de lo que cualquier desarrollador puede producir. Eso hace que la barra técnica base sea más fácil de superar — y que los factores humanos sean cada vez más diferenciadores, no menos.\n\nLas startups y fundadores que van a ganar en este entorno son los que arman equipos donde los humanos trabajan bien juntos. Donde la confianza se construye rápido, la comunicación es clara y todos reman para el mismo lado.\n\nEso es lo que estamos construyendo en OpenGateHub. Una partnership a la vez."
     },
     {
       "title": "Por qué LATAM se está convirtiendo en la opción más inteligente para Staff Augmentation",
@@ -471,7 +112,7 @@
       "summary": "Descubre cómo la IA y la automatización están transformando las empresas y creando nuevas oportunidades de crecimiento e innovación.",
       "image": "/images/article4.jpg",
       "thumbnail": "/images/article4.jpg",
-      "content": "En un mundo donde la tecnología avanza a un ritmo sin precedentes, la inteligencia artificial (IA) y la automatización están revolucionando la forma en que las empresas operan y crecen. Desde la optimización de procesos internos hasta la mejora de las experiencias de los clientes, estas tecnologías son la clave para mantener la competitividad en el mercado actual.\n\n¿Por qué invertir en IA y automatización? Las empresas que adoptan estas herramientas no solo reducen costos y tiempos operativos, sino que también liberan recursos para enfocarse en la innovación y el desarrollo estratégico. Según Gartner, el 70% de las organizaciones utilizarán tecnologías de IA en al menos una función clave para 2025.\n\nAplicaciones Prácticas en las Empresas\n\nOptimización de Procesos: Automatización de tareas repetitivas como la gestión de inventario, seguimiento de pedidos o servicio al cliente a través de chatbots.\nAnálisis Predictivo: La IA permite analizar grandes volúmenes de datos para anticipar tendencias, identificar riesgos y tomar decisiones informadas.\nPersonalización del Cliente: Los algoritmos avanzados hacen posible ofrecer experiencias únicas y relevantes que mejoran la fidelidad del cliente.\nCiberseguridad Avanzada: Los sistemas basados en IA detectan amenazas en tiempo real, protegiendo los datos sensibles de ciberataques.\n\nEl Impacto en el Crecimiento Empresarial\n\nLa IA y la automatización no solo mejoran la eficiencia, sino que también abren el camino a nuevas oportunidades de negocio. Las empresas que han adoptado estas tecnologías reportan aumentos significativos en la productividad y la satisfacción del cliente, lo que conduce a un crecimiento sostenible.\n\nOpenGateHub: Tu Socio en IA y Automatización\n\nEn OpenGateHub, entendemos que cada empresa enfrenta desafíos únicos. Por eso, entregamos soluciones personalizadas de IA y automatización adaptadas a tus necesidades, asegurando resultados reales y tangibles.\n\nEl futuro es ahora, y con la IA y la automatización, el éxito está al alcance de tu empresa."
+      "content": "En un mundo donde la tecnología avanza a un ritmo sin precedentes, la inteligencia artificial (IA) y la automatización están revolucionando la forma en que las empresas operan y crecen. Desde la optimización de procesos internos hasta la mejora de las experiencias de los clientes, estas tecnologías son la clave para mantener la competitividad en el mercado actual.\n\n¿Por qué invertir en IA y automatización? Las empresas que adoptan estas herramientas no solo reducen costos y tiempos operativos, sino que también liberan recursos para enfocarse en la innovación y el desarrollo estratégico. Según Gartner, el 70% de las organizaciones utilizarán tecnologías de IA en al menos una función clave para 2025.\n\nAplicaciones Prácticas en las Empresas\n\nOptimización de Procesos: Automatización de tareas repetitivas como la gestión de inventario, seguimiento de pedidos o servicio al cliente a través de chatbots.\nAnálisis Predictivo: La IA permite analizar grandes volúmenes de datos para anticipar tendencias, identificar riesgos y tomar decisiones informadas.\nPersonalización del Cliente: Los algoritmos avanzados hacen posible ofrecer experiencias únicas y relevantes que mejoran la fidelidad del cliente.\nCiberseguridad Avanzada: Los sistemas basados en IA detectan amenazas en tiempo real, protegiendo los datos sensibles de ciberataques.\n\nEl Impacto en el Crecimiento Empresarial\n\nLa IA y la automatización no solo mejoran la eficiencia, sino que también abren el camino a nuevas oportunidades de negocio. Las empresas que han adoptado estas tecnologías reportan aumentos significativos en la productividad y la satisfacción del cliente, lo que conduce a un crecimiento sostenible.\n\nEl futuro es ahora, y con la IA y la automatización, el éxito está al alcance de tu empresa.\n\nSi estás por contratar a tu developer, agendá una llamada gratis de 20 minutos."
     },
     {
       "title": "Las mejores empresas de Staff Augmentation en Latinoamérica [Guía 2026]",
@@ -479,16 +120,14 @@
       "summary": "Una comparación completa y honesta de las mejores empresas de staff augmentation en LATAM para 2026. Quiénes son, qué ofrecen y cómo elegir el socio nearshore ideal para tu equipo de ingeniería.",
       "image": "/images/article8.jpg",
       "thumbnail": "/images/article8.jpg",
-      "content": "Si estás buscando escalar tu equipo de ingeniería en 2026, Latinoamérica ya no es una alternativa — es la opción estratégica por defecto para staff augmentation nearshore. Alineación de zonas horarias, talento técnico sólido, compatibilidad cultural con equipos de Norteamérica y Europa, y tarifas competitivas han convertido a LATAM en la región elegida por empresas que van desde startups hasta Fortune 500.\n\nPero no todos los proveedores de staff augmentation son iguales. La diferencia entre una gran experiencia y una dolorosa suele depender de cómo una empresa busca talento, cómo maneja el fit cultural y cuán responsable se mantiene después de firmar el contrato.\n\nEsta guía desglosa las principales empresas de staff augmentation en Latinoamérica en 2026, qué hace diferente a cada una y cómo evaluar cuál es el socio adecuado para tus necesidades específicas.\n\n## ¿Qué es Staff Augmentation y por qué importa?\n\nStaff augmentation es un modelo donde ingenieros externos se integran directamente en tu equipo existente. A diferencia del outsourcing tradicional, los ingenieros augmentados trabajan dentro de tu código, asisten a tus standups, siguen tu cadencia de sprints y se alinean con la visión de tu producto.\n\nLos beneficios clave incluyen:\n\n- Velocidad: llenar roles críticos en días, no meses\n- Flexibilidad: escalar hacia arriba o abajo según las necesidades del proyecto\n- Eficiencia de costos: acceder a talento senior por una fracción del costo local\n- Menor riesgo: sin compromisos de empleo a largo plazo ni overhead\n\nEl staff augmentation es especialmente valioso para empresas orientadas a producto que se preocupan por la calidad del código, la cohesión del equipo y la mantenibilidad a largo plazo.\n\n## ¿Por qué Latinoamérica para Staff Augmentation en 2026?\n\nVarios factores estructurales hacen que LATAM sea ideal para staff augmentation:\n\n### Alineación de zona horaria\n\nLos ingenieros latinoamericanos trabajan en las mismas zonas horarias o adyacentes a los equipos de EE.UU. y Canadá. Esto permite colaboración en tiempo real, ciclos de feedback el mismo día y standups síncronos — algo extremadamente difícil de lograr con equipos en Europa del Este o Asia.\n\n### Talento técnico profundo\n\nPaíses como Argentina, Colombia, Brasil, México, Uruguay y Chile han invertido fuertemente en educación en ciencias de la computación y tienen ecosistemas tecnológicos prósperos. Los ingenieros de LATAM están familiarizados con stacks modernos: React, Node.js, Python, Go, AWS, Kubernetes y más.\n\n### Compatibilidad cultural\n\nLos profesionales de LATAM comparten patrones de cultura laboral con equipos occidentales: comunicación proactiva, feedback directo, resolución colaborativa de problemas y fuerte ética de trabajo.\n\n### Tarifas competitivas sin comprometer calidad\n\nLos ingenieros senior en Latinoamérica cuestan típicamente 40-60% menos que talento equivalente en EE.UU., manteniendo calidad comparable o superior.\n\n## Mejores empresas de Staff Augmentation en LATAM [2026]\n\nAcá va nuestra evaluación honesta de los principales proveedores.\n\n### 1. OpenGateHub\n\n- Foco: Staff augmentation, automatización de workflows, integración de IA\n- Sede: Latinoamérica\n- Diferenciador clave: Enfoque human-first con screening de fit cultural antes de la evaluación técnica\n- Métricas: 9.7/10 CSAT, kickoff en 7.3 días promedio, 87% entrega a tiempo\n- Stack: React, Next.js, Node.js, Python, Go, n8n, AWS, Google Cloud\n\nOpenGateHub toma un enfoque fundamentalmente diferente al staff augmentation. En lugar de liderar con evaluaciones técnicas y CVs, la empresa filtra primero por fit cultural — cómo los candidatos se comunican, manejan la ambigüedad, dan y reciben feedback, y colaboran de forma asíncrona.\n\nEste enfoque aborda directamente el punto de falla más común en staff augmentation: ingenieros técnicamente capaces que generan fricción en la colaboración diaria.\n\nLa empresa también trae una capacidad dual única: además de staff augmentation, ofrece automatización de workflows e integración de IA. Esto significa que los clientes pueden escalar su equipo de ingeniería y optimizar sus operaciones simultáneamente.\n\nCon un score de satisfacción de 9.7/10 en 66 encuestas y un tiempo promedio de kickoff de 7.3 días, OpenGateHub entrega velocidad y calidad.\n\nMejor para: Empresas orientadas a producto que priorizan el fit cultural y quieren un socio, no solo un vendor.\n\n### 2. BairesDev\n\n- Foco: Desarrollo nearshore y staff augmentation\n- Sede: San Francisco (operaciones en LATAM)\n- Escala: 4,000+ desarrolladores\n- Diferenciador: Pool de talento masivo con procesos enterprise\n\nBairesDev es uno de los mayores proveedores nearshore en Latinoamérica. La empresa tiene procesos de reclutamiento y gestión de grado enterprise que pueden manejar engagements a gran escala.\n\nEl trade-off es que la escala de BairesDev a veces puede sentirse impersonal. Para empresas que necesitan llenar múltiples roles rápidamente, es una opción sólida.\n\nMejor para: Empresas enterprise que necesitan staffear múltiples roles rápidamente.\n\n### 3. BEON.tech\n\n- Foco: Staff augmentation y contract-to-hire\n- Sede: Argentina\n- Diferenciador: Proceso de vetting profundo con 59,600+ candidatos evaluados\n- Notable: Premio Clutch 2025 Mejor Staff Augmentation\n\nBEON.tech construyó una reputación por su riguroso vetting técnico. También ofrece un modelo contract-to-hire que da la opción de convertir ingenieros augmentados en empleados full-time.\n\nMejor para: Empresas que quieren vetting técnico riguroso y la opción de convertir contractors a full-time.\n\n### 4. Tecla\n\n- Foco: Staff augmentation nearshore y desarrollo de software\n- Sede: San Francisco\n- Diferenciador: Precios transparentes por nivel de seniority, período sin riesgo de 90 días\n- Notable: Reconocimiento Inc. 5000, 4.9/5 (62 reviews)\n\nTecla se destaca por la transparencia en precios — algo inusual en una industria donde la mayoría de proveedores requieren una llamada de ventas antes de compartir tarifas.\n\nMejor para: Empresas que valoran la transparencia de precios y quieren un punto de entrada de bajo riesgo.\n\n### 5. Near (HireWithNear)\n\n- Foco: Staffing, contratación directa, servicios de payroll\n- Sede: Nueva York\n- Diferenciador: Infraestructura HR completa incluyendo payroll, beneficios y compliance\n- Métricas: 2,700+ profesionales colocados, $70M+ ahorrados\n\nNear ofrece más que solo colocación de talento — provee infraestructura HR completa que incluye procesamiento de payroll, beneficios de salud y gestión de compliance.\n\nMejor para: Empresas que necesitan soporte HR end-to-end junto con colocación de talento.\n\n### 6. Softtek\n\n- Foco: Servicios IT enterprise y desarrollo nearshore\n- Sede: Monterrey, México (fundada en 1982)\n- Escala: 16,000+ empleados\n- Diferenciador: 40+ años de trayectoria, reconocimiento Gartner Magic Quadrant\n\nSofttek es el pionero del modelo nearshore. Con más de cuatro décadas de experiencia, trae credibilidad enterprise que pocos competidores pueden igualar.\n\nMejor para: Grandes empresas que necesitan un socio nearshore probado con larga trayectoria.\n\n## Cómo evaluar un socio de Staff Augmentation\n\nElegir el socio correcto no es solo comparar features. Estas son las preguntas clave:\n\n### 1. ¿Cómo filtran por fit cultural?\n\nLas habilidades técnicas son lo básico. El verdadero diferenciador es si los ingenieros augmentados pueden integrarse al estilo de comunicación y cadencia de trabajo de tu equipo.\n\n### 2. ¿Cuál es su tiempo promedio al primer sprint productivo?\n\nUn buen socio debería tener ingenieros listos para contribuir en una a dos semanas — no meses.\n\n### 3. ¿Qué pasa cuando una colocación no funciona?\n\nPreguntá por garantías de reemplazo, períodos de prueba y cómo manejan el bajo rendimiento.\n\n### 4. ¿Ofrecen más que solo personas?\n\nLas mejores empresas traen valor estratégico más allá de la colocación de talento.\n\n### 5. ¿Pueden mostrar datos reales de clientes?\n\nPedí resultados específicos y medibles: scores CSAT, tasas de retención, porcentajes de entrega a tiempo.\n\n## Staff Augmentation vs. Outsourcing vs. Equipos Gestionados\n\n### Staff Augmentation\n\n- Los ingenieros se unen a tu equipo y trabajan dentro de tus procesos\n- Mantenés control total sobre prioridades y workflow\n- Mejor para: extender tu equipo de ingeniería existente\n\n### Outsourcing\n\n- Delegás un proyecto o función a un equipo externo\n- El vendor gestiona la ejecución, vos revisás outputs\n- Mejor para: proyectos no-core con requerimientos bien definidos\n\n### Equipos Gestionados\n\n- Un modelo híbrido donde el vendor provee un equipo dedicado con PM\n- Vos definís la dirección, ellos gestionan la ejecución diaria\n- Mejor para: empresas sin liderazgo de ingeniería interno\n\n## El costo real del Staff Augmentation Nearshore en LATAM\n\nDesglose realista para 2026:\n\n- Desarrolladores junior (1-3 años): $3,000-$5,000/mes\n- Desarrolladores mid-level (3-5 años): $5,000-$7,500/mes\n- Desarrolladores senior (5+ años): $7,500-$10,000/mes\n- Tech leads y arquitectos: $10,000-$14,000/mes\n\nComparado con tarifas de EE.UU.:\n\n- Desarrolladores senior: $12,000-$18,000/mes (salario + beneficios + overhead)\n- Tech leads: $18,000-$25,000/mes\n\nEl ahorro es significativo — típicamente 40-60% — sin comprometer calidad.\n\n## Errores comunes a evitar\n\n### 1. Elegir solo por precio\n\nLa opción más barata rara vez es el mejor valor. Invertí en calidad — el costo de una mala contratación supera con creces los ahorros de una tarifa menor.\n\n### 2. No invertir en onboarding\n\nLos ingenieros augmentados necesitan la misma inversión de onboarding que las contrataciones internas.\n\n### 3. Tratar augmentation como outsourcing\n\nSi mandás requerimientos y esperás entregables, estás haciendo outsourcing — no augmentation.\n\n### 4. Ignorar el fit cultural\n\nUn ingeniero técnicamente brillante que no se comunica proactivamente va a crear más problemas de los que resuelve.\n\n## Conclusión: El panorama de Staff Augmentation LATAM en 2026\n\nEl mercado de staff augmentation en Latinoamérica ha madurado significativamente. Empresas como OpenGateHub, BEON.tech, Tecla, Near y otras están subiendo la vara en calidad de talento, alineamiento cultural y transparencia operativa.\n\nPara empresas que buscan escalar en 2026, la pregunta ya no es si considerar Latinoamérica — sino qué socio se alinea mejor con la cultura de tu equipo, las necesidades de tu producto y tu trayectoria de crecimiento.\n\nEl socio correcto no te va a dar solo ingenieros. Te va a dar compañeros de equipo que hacen tu producto mejor, tus sprints más fluidos y tu equipo más fuerte.\n\nElegí en consecuencia."
+      "content": "Si estás buscando escalar tu equipo de ingeniería en 2026, Latinoamérica ya no es una alternativa — es la opción estratégica por defecto para staff augmentation nearshore. Alineación de zonas horarias, talento técnico sólido, compatibilidad cultural con equipos de Norteamérica y Europa, y tarifas competitivas han convertido a LATAM en la región elegida por empresas que van desde startups hasta Fortune 500.\n\nPero no todos los proveedores de staff augmentation son iguales. La diferencia entre una gran experiencia y una dolorosa suele depender de cómo una empresa busca talento, cómo maneja el fit cultural y cuán responsable se mantiene después de firmar el contrato.\n\nEsta guía desglosa las principales empresas de staff augmentation en Latinoamérica en 2026, qué hace diferente a cada una y cómo evaluar cuál es el socio adecuado para tus necesidades específicas.\n\n## ¿Qué es Staff Augmentation y por qué importa?\n\nStaff augmentation es un modelo donde ingenieros externos se integran directamente en tu equipo existente. A diferencia del outsourcing tradicional, los ingenieros augmentados trabajan dentro de tu código, asisten a tus standups, siguen tu cadencia de sprints y se alinean con la visión de tu producto.\n\nLos beneficios clave incluyen:\n\n- Velocidad: llenar roles críticos en días, no meses\n- Flexibilidad: escalar hacia arriba o abajo según las necesidades del proyecto\n- Eficiencia de costos: acceder a talento senior por una fracción del costo local\n- Menor riesgo: sin compromisos de empleo a largo plazo ni overhead\n\nEl staff augmentation es especialmente valioso para empresas orientadas a producto que se preocupan por la calidad del código, la cohesión del equipo y la mantenibilidad a largo plazo.\n\n## ¿Por qué Latinoamérica para Staff Augmentation en 2026?\n\nVarios factores estructurales hacen que LATAM sea ideal para staff augmentation:\n\n### Alineación de zona horaria\n\nLos ingenieros latinoamericanos trabajan en las mismas zonas horarias o adyacentes a los equipos de EE.UU. y Canadá. Esto permite colaboración en tiempo real, ciclos de feedback el mismo día y standups síncronos — algo extremadamente difícil de lograr con equipos en Europa del Este o Asia.\n\n### Talento técnico profundo\n\nPaíses como Argentina, Colombia, Brasil, México, Uruguay y Chile han invertido fuertemente en educación en ciencias de la computación y tienen ecosistemas tecnológicos prósperos. Los ingenieros de LATAM están familiarizados con stacks modernos: React, Node.js, Python, Go, AWS, Kubernetes y más.\n\n### Compatibilidad cultural\n\nLos profesionales de LATAM comparten patrones de cultura laboral con equipos occidentales: comunicación proactiva, feedback directo, resolución colaborativa de problemas y fuerte ética de trabajo.\n\n### Tarifas competitivas sin comprometer calidad\n\nLos ingenieros senior en Latinoamérica cuestan típicamente 40-60% menos que talento equivalente en EE.UU., manteniendo calidad comparable o superior.\n\n## Mejores empresas de Staff Augmentation en LATAM [2026]\n\nAcá va nuestra evaluación honesta de los principales proveedores.\n\n### 1. OpenGateHub\n\n- Foco: Staff augmentation\n- Developers: Solo senior, 100% remotos\n- Selección: Entrevista a cada developer antes de presentarlo\n- Llamada: Gratis, de 20 minutos, con la founder\n\nOpenGateHub trabaja con dos modelos. En uno, el developer se suma al equipo del cliente y OpenGateHub factura por mes. En el otro, se cobra la búsqueda y el cliente contrata directo.\n\nSi el developer no funciona, OpenGateHub lo reemplaza sin costo.\n\nMejor para: Empresas que buscan developers senior, para sumarlos a su equipo o para contratarlos directo.\n\n### 2. BairesDev\n\n- Foco: Desarrollo nearshore y staff augmentation\n- Sede: San Francisco (operaciones en LATAM)\n- Escala: 4,000+ desarrolladores\n- Diferenciador: Pool de talento masivo con procesos enterprise\n\nBairesDev es uno de los mayores proveedores nearshore en Latinoamérica. La empresa tiene procesos de reclutamiento y gestión de grado enterprise que pueden manejar engagements a gran escala.\n\nEl trade-off es que la escala de BairesDev a veces puede sentirse impersonal. Para empresas que necesitan llenar múltiples roles rápidamente, es una opción sólida.\n\nMejor para: Empresas enterprise que necesitan staffear múltiples roles rápidamente.\n\n### 3. BEON.tech\n\n- Foco: Staff augmentation y contract-to-hire\n- Sede: Argentina\n- Diferenciador: Proceso de vetting profundo con 59,600+ candidatos evaluados\n- Notable: Premio Clutch 2025 Mejor Staff Augmentation\n\nBEON.tech construyó una reputación por su riguroso vetting técnico. También ofrece un modelo contract-to-hire que da la opción de convertir ingenieros augmentados en empleados full-time.\n\nMejor para: Empresas que quieren vetting técnico riguroso y la opción de convertir contractors a full-time.\n\n### 4. Tecla\n\n- Foco: Staff augmentation nearshore y desarrollo de software\n- Sede: San Francisco\n- Diferenciador: Precios transparentes por nivel de seniority, período sin riesgo de 90 días\n- Notable: Reconocimiento Inc. 5000, 4.9/5 (62 reviews)\n\nTecla se destaca por la transparencia en precios — algo inusual en una industria donde la mayoría de proveedores requieren una llamada de ventas antes de compartir tarifas.\n\nMejor para: Empresas que valoran la transparencia de precios y quieren un punto de entrada de bajo riesgo.\n\n### 5. Near (HireWithNear)\n\n- Foco: Staffing, contratación directa, servicios de payroll\n- Sede: Nueva York\n- Diferenciador: Infraestructura HR completa incluyendo payroll, beneficios y compliance\n- Métricas: 2,700+ profesionales colocados, $70M+ ahorrados\n\nNear ofrece más que solo colocación de talento — provee infraestructura HR completa que incluye procesamiento de payroll, beneficios de salud y gestión de compliance.\n\nMejor para: Empresas que necesitan soporte HR end-to-end junto con colocación de talento.\n\n### 6. Softtek\n\n- Foco: Servicios IT enterprise y desarrollo nearshore\n- Sede: Monterrey, México (fundada en 1982)\n- Escala: 16,000+ empleados\n- Diferenciador: 40+ años de trayectoria, reconocimiento Gartner Magic Quadrant\n\nSofttek es el pionero del modelo nearshore. Con más de cuatro décadas de experiencia, trae credibilidad enterprise que pocos competidores pueden igualar.\n\nMejor para: Grandes empresas que necesitan un socio nearshore probado con larga trayectoria.\n\n## Cómo evaluar un socio de Staff Augmentation\n\nElegir el socio correcto no es solo comparar features. Estas son las preguntas clave:\n\n### 1. ¿Cómo filtran por fit cultural?\n\nLas habilidades técnicas son lo básico. El verdadero diferenciador es si los ingenieros augmentados pueden integrarse al estilo de comunicación y cadencia de trabajo de tu equipo.\n\n### 2. ¿Cuál es su tiempo promedio al primer sprint productivo?\n\nUn buen socio debería tener ingenieros listos para contribuir en una a dos semanas — no meses.\n\n### 3. ¿Qué pasa cuando una colocación no funciona?\n\nPreguntá por garantías de reemplazo, períodos de prueba y cómo manejan el bajo rendimiento.\n\n### 4. ¿Ofrecen más que solo personas?\n\nLas mejores empresas traen valor estratégico más allá de la colocación de talento.\n\n### 5. ¿Pueden mostrar datos reales de clientes?\n\nPedí resultados específicos y medibles: scores CSAT, tasas de retención, porcentajes de entrega a tiempo.\n\n## Staff Augmentation vs. Outsourcing vs. Equipos Gestionados\n\n### Staff Augmentation\n\n- Los ingenieros se unen a tu equipo y trabajan dentro de tus procesos\n- Mantenés control total sobre prioridades y workflow\n- Mejor para: extender tu equipo de ingeniería existente\n\n### Outsourcing\n\n- Delegás un proyecto o función a un equipo externo\n- El vendor gestiona la ejecución, vos revisás outputs\n- Mejor para: proyectos no-core con requerimientos bien definidos\n\n### Equipos Gestionados\n\n- Un modelo híbrido donde el vendor provee un equipo dedicado con PM\n- Vos definís la dirección, ellos gestionan la ejecución diaria\n- Mejor para: empresas sin liderazgo de ingeniería interno\n\n## Errores comunes a evitar\n\n### 1. Elegir solo por precio\n\nLa opción más barata rara vez es el mejor valor. Invertí en calidad — el costo de una mala contratación supera con creces los ahorros de una tarifa menor.\n\n### 2. No invertir en onboarding\n\nLos ingenieros augmentados necesitan la misma inversión de onboarding que las contrataciones internas.\n\n### 3. Tratar augmentation como outsourcing\n\nSi mandás requerimientos y esperás entregables, estás haciendo outsourcing — no augmentation.\n\n### 4. Ignorar el fit cultural\n\nUn ingeniero técnicamente brillante que no se comunica proactivamente va a crear más problemas de los que resuelve.\n\n## Conclusión: El panorama de Staff Augmentation LATAM en 2026\n\nEl mercado de staff augmentation en Latinoamérica ha madurado significativamente. Empresas como OpenGateHub, BEON.tech, Tecla, Near y otras están subiendo la vara en calidad de talento, alineamiento cultural y transparencia operativa.\n\nPara empresas que buscan escalar en 2026, la pregunta ya no es si considerar Latinoamérica — sino qué socio se alinea mejor con la cultura de tu equipo, las necesidades de tu producto y tu trayectoria de crecimiento.\n\nEl socio correcto no te va a dar solo ingenieros. Te va a dar compañeros de equipo que hacen tu producto mejor, tus sprints más fluidos y tu equipo más fuerte.\n\nElegí en consecuencia."
     }
   ],
-  "reviewsTitle": "Lo que dicen nuestros socios",
-  "reviewsSubtitle": "9.7/10 en satisfacción en 66 encuestas de clientes. Esto es lo que dicen.",
   "reviews": {
     "farzad": {
-      "text": "Trabajamos con OpenGateHub en dos proyectos distintos: un sitio de e-commerce y un producto de IA en etapa temprana.\n\nLo que más valoré fue lo sencillo que se sintió todo el proceso. Hicieron las preguntas correctas desde el inicio, mantuvieron la comunicación clara y cumplieron sin idas y vueltas innecesarias. El sitio de e-commerce se entregó listo para lanzar, exactamente como lo necesitábamos.\n\nEn el producto de IA, también nos ayudaron a pensar la dirección desde el principio — no solo construyendo features, sino enfocándose en qué tenía sentido construir primero.\n\nSi buscan un equipo confiable, proactivo y con el que sea genuinamente fácil trabajar, recomiendo OpenGateHub sin dudar.",
+      "text": "Trabajamos con OpenGateHub en dos proyectos distintos: un sitio de e-commerce y un producto de IA en etapa temprana.\n\nLo que más valoré fue lo sencillo que se sintió todo el proceso. Hicieron las preguntas correctas desde el inicio, mantuvieron la comunicación clara y cumplieron sin idas y vueltas innecesarias. El sitio de e-commerce se entregó listo para lanzar, exactamente como lo necesitábamos.\n\nEn el producto de IA, también nos ayudaron a pensar la dirección desde el principio: no solo construyendo features, sino enfocándose en qué tenía sentido construir primero.\n\nSi buscan un equipo confiable, proactivo y con el que sea genuinamente fácil trabajar, recomiendo OpenGateHub sin dudar.",
       "company": "Farzad Khosravi",
-      "role": "Founder — Hot Date Kitchen · Chief Product Officer — Cicero (early-stage)"
+      "role": "Founder de Hot Date Kitchen · Chief Product Officer de Cicero (early-stage)"
     },
     "skylar": {
       "text": "Estamos realmente muy contentos con el trabajo que hizo OpenGateHub para nuestro emprendimiento. Supieron captar desde el primer momento lo que queríamos transmitir y lo plasmaron en una página web moderna, intuitiva y visualmente impecable. Además, su atención fue excelente: siempre disponibles, rápidos para responder y con mucha predisposición para resolver cada duda o necesidad que surgía. Se nota que trabajan con compromiso, profesionalismo y experiencia. Los recomendamos sin dudar.",
@@ -516,200 +155,31 @@
       "role": "Brenda Alarcón, CEO"
     }
   },
-  "homeServicesSection": {
-    "title": "Nuestros Servicios",
-    "subtitle": "Ofrecemos soluciones personalizadas que ayudan a fundadores y VCs visionarios a escalar con impacto",
-    "startJourneyButton": "Comienza tu viaje",
-    "cards": {
-      "staffAugmentation": {
-        "title": "Staff Augmentation",
-        "description": "Ampliamos tu equipo priorizando el match cultural y la calidad humana. Nosotros seleccionamos desarrolladores que se alinean con tus valores y forma de trabajar, no solo habilidades técnicas."
-      },
-      "softwareDevelopment": {
-        "title": "Desarrollo de Software",
-        "description": "Aplicaciones web, plataformas y sistemas que escalan. Construimos la base sobre la que corre tu negocio — código limpio, arquitectura sólida y entrega confiable."
-      },
-      "uxUiDesign": {
-        "title": "Diseño UX/UI",
-        "description": "Interfaces atractivas que conectan con los usuarios y aumentan las conversiones mediante diseño basado en investigación."
-      },
-      "aiAndAutomation": {
-        "title": "IA y Automatización",
-        "description": "Aprovecha el poder de la inteligencia artificial y automatiza flujos de trabajo sin código. Conectamos tus herramientas y construimos integraciones poderosas que hacen que tu negocio funcione más suavemente."
-      },
-      "dataAnalytics": {
-        "title": "Analítica de Datos",
-        "description": "Dashboards, reportes y pipelines de datos que tienen sentido. Te ayudamos a entender qué pasa en tu negocio — y qué hacer al respecto."
-      },
-      "mobileDevelopment": {
-        "title": "Desarrollo Móvil",
-        "description": "Crea experiencias nativas potentes para iOS y Android que capten a tus usuarios en cualquier dispositivo."
-      }
-    }
-  },
-  "homeCapabilitiesSection": {
-    "title": "Dónde generamos más impacto",
-    "subtitle": "Desde eliminar tareas manuales hasta escalar tu equipo de ingeniería — así es como empresas como la tuya dejan de perder tiempo y empiezan a moverse más rápido.",
-    "ctaText": "Ver cómo trabajamos",
-    "mostPopular": "Más Popular",
-    "cards": {
-      "softwareDevelopment": {
-        "title": "Staff Augmentation",
-        "description": "Sumá ingenieros senior y QA a tu equipo para aumentar capacidad de entrega sin incrementar la carga de management."
-      },
-      "mobileDevelopment": {
-        "title": "Automatización de Flujos",
-        "description": "Automatizá tareas repetitivas, aprobaciones y handoffs entre equipos para reducir tiempos de ciclo y errores manuales."
-      },
-      "dataAutomation": {
-        "title": "IA + Operaciones Automatizadas",
-        "description": "Conectá sistemas, orquestá procesos con IA y ganá visibilidad operativa en tiempo real con dashboards y alertas."
-      }
-    }
-  },
   "caseStudiesSection": {
-    "eyebrow": "Casos de Estudio",
-    "title": "Resultados reales, empresas reales",
-    "subtitle": "Resultados medibles en automatización, IA y entrega de ingeniería.",
-    "benchmarksCTA": "Calculá el ahorro potencial de tu equipo →",
-    "valthorCategory": "IA · CRM",
+    "eyebrow": "Casos",
+    "title": "Equipos y productos reales",
+    "subtitle": "Equipos a los que sumamos developers y productos que construyó nuestro equipo.",
+    "valthorCategory": "Staff Augmentation",
     "valthorTitle": "Valthor CRM",
-    "valthorDesc": "Embebimos un squad senior para construir su CRM con IA. Automatización conversacional, dashboards en tiempo real e integración directa en sus rituales de ingeniería.",
-    "valthorStat": "reducción en tareas manuales",
+    "valthorDesc": "Sumamos un equipo senior al suyo para construir su CRM con IA: dashboards en tiempo real e integración directa en sus rituales de ingeniería.",
     "hotdateCategory": "E-commerce",
     "hotdateTitle": "Hot Date Kitchen",
     "hotdateDesc": "E-commerce de marca gourmet con identidad visual personalizada, carrito y pasarela de pago integrados, optimización mobile y SEO técnico.",
-    "hotdateStat": "lanzamiento optimizado para conversión",
     "smartersCategory": "Smart Cities",
     "smartersTitle": "Smarters City",
-    "smartersDesc": "Plataforma de gestión urbana que centraliza datos de movilidad, infraestructura y servicios municipales — análisis en tiempo real con dashboards interactivos.",
-    "smartersStat": "mejora en velocidad de carga",
-    "vantageCategory": "IA · Generativa",
+    "smartersDesc": "Plataforma de gestión urbana que centraliza datos de movilidad, infraestructura y servicios municipales, con análisis en tiempo real y dashboards interactivos.",
+    "vantageCategory": "Staff Augmentation",
     "vantageTitle": "Vantage Inc.",
     "vantageDesc": "Equipo de IA embebido para construir una plataforma de imágenes generativas con edición por lenguaje natural y una API lista para integrarse en cualquier flujo creativo.",
-    "vantageStat": "aceleración del roadmap",
-    "propbotCategory": "IA · Automatización",
+    "propbotCategory": "Producto propio",
     "propbotTitle": "PropBot",
-    "propbotDesc": "Chatbot con IA para inmobiliarias que responde consultas en 5 segundos, filtra propiedades por lenguaje natural y agenda visitas automáticamente — 24/7 en WhatsApp, Instagram y Facebook.",
-    "propbotStat": "consultas recuperadas",
+    "propbotDesc": "Chatbot con IA para inmobiliarias que responde consultas en 5 segundos, filtra propiedades por lenguaje natural y agenda visitas, 24/7 en WhatsApp, Instagram y Facebook.",
     "mangilCategory": "CRM · Coaching",
     "mangilTitle": "Sistema Manu Gil",
-    "mangilDesc": "CRM a medida para un negocio de coaching de salud y distribución de péptidos — pipeline de clientes, seguimiento de entregas, catálogo de péptidos con análisis de márgenes, membresías y dashboards financieros, todo en un solo sistema.",
-    "labsmailCategory": "IA · Outreach",
+    "mangilDesc": "CRM a medida para un negocio de coaching de salud y distribución de péptidos: pipeline de clientes, seguimiento de entregas, catálogo con análisis de márgenes, membresías y dashboards financieros, todo en un solo sistema.",
+    "labsmailCategory": "Producto propio",
     "labsmailTitle": "LabsMail",
-    "labsmailDesc": "Motor de cold email con IA que investiga cada prospecto individualmente, escribe emails hiperpersonalizados y gestiona campañas multicanal con tracking completo del pipeline. Disponible como servicio llave en mano.",
-    "labsmailStat": "tasa de respuesta promedio"
-  },
-  "featuredWorkSection": {
-    "title": "Trabajos Destacados",
-    "subtitle": "Proyectos reales que muestran nuestra experiencia e impacto",
-    "smartersCity": {
-      "title": "Smarters City",
-      "description": "SaaS de gestión de activos urbanos para mapeo y mantenimiento en tiempo real de semáforos, luces de tráfico y más.",
-      "metrics": [
-        "35% carga más rápida",
-        "0 bugs críticos",
-        "1er contrato municipal"
-      ]
-    },
-    "estudioSab": {
-      "title": "Estudio Sab",
-      "description": "Desarrollo web full-stack para un estudio de diseño creativo.",
-      "metrics": [
-        "Desarrollo completo",
-        "Diseño moderno",
-        "Sitio web en vivo"
-      ]
-    },
-    "skylar": {
-      "title": "Skylar",
-      "description": "Plataforma de e-commerce para una marca líder de útiles escolares en Argentina.",
-      "metrics": [
-        "≤2s TTI",
-        "+28% conversiones",
-        "Catálogo en vivo"
-      ]
-    },
-    "vantage": {
-      "title": "Vantage",
-      "description": "Staff augmentation — ingenieros y QA embebidos en su equipo, acelerando la entrega del roadmap y mejorando la velocidad de desarrollo.",
-      "metrics": [
-        "Staff Augmentation",
-        "Roadmap acelerado",
-        "QA embebido"
-      ]
-    },
-    "hotDateKitchen": {
-      "title": "Hot Date Kitchen",
-      "description": "Landing y e-commerce para una marca premium de snacks veganos. Dátiles artesanales, tienda Shopify y narrativa enfocada en sustentabilidad.",
-      "metrics": [
-        "Landing + E-commerce",
-        "Shopify",
-        "Marca carbono neutral"
-      ]
-    },
-    "cicero": {
-      "title": "Cicero",
-      "description": "Bibliotecario personal con IA (etapa temprana).",
-      "metrics": [
-        "Dirección de producto",
-        "Desarrollo temprano",
-        "Ver en LinkedIn"
-      ]
-    },
-    "propbot": {
-      "title": "PropBot",
-      "description": "Chatbot con IA para inmobiliarias que responde en 5 segundos, filtra propiedades y agenda visitas automáticamente en WhatsApp, Instagram y Facebook.",
-      "metrics": [
-        "Respuesta <5s",
-        "+23 visitas/mes",
-        "24/7 multicanal"
-      ]
-    }
-  },
-  "metricsSection": {
-    "title": "Resultados Comprobados",
-    "subtitle": "Rendimiento basado en datos que habla por sí mismo",
-    "howWeMeasure": "Cómo medimos",
-    "metrics": {
-      "avgKickoff": {
-        "value": "7.3",
-        "unit": "días",
-        "label": "Tiempo Promedio de Inicio",
-        "description": "Desde firma de SOW hasta primer PR mergeado (n=6 proyectos, actualizado: ene 2026)"
-      },
-      "onTimeDelivery": {
-        "value": "87",
-        "unit": "%",
-        "label": "Entrega a Tiempo",
-        "description": "Hitos/sprints entregados en fecha (n=9 meses, actualizado: ene 2026)"
-      },
-      "npsScore": {
-        "value": "9.7",
-        "unit": "/10",
-        "label": "Puntuación CSAT",
-        "description": "Customer Satisfaction Score del feedback de clientes (n=66 encuestas, actualizado: ene 2026)"
-      },
-      "sprintsShipped": {
-        "value": "50+",
-        "unit": "",
-        "label": "Sprints Entregados",
-        "description": "Entregas exitosas de sprints en múltiples proyectos de clientes (n=6 proyectos, actualizado: ene 2026)"
-      },
-      "cycleTimeReduction": {
-        "value": "28",
-        "unit": "%",
-        "label": "Reducción del Tiempo del Ciclo",
-        "description": "vs. baseline inicial del cliente (n=4 proyectos, promedio 18-28%, actualizado: ene 2026)"
-      }
-    },
-    "measurementDetails": {
-      "avgKickoff": "Medimos desde la firma del Statement of Work (SOW) hasta el primer Pull Request mergeado en el repositorio del cliente. Esto incluye setup del entorno, configuración inicial y primer código funcional.",
-      "onTimeDelivery": "Calculamos el porcentaje de milestones y sprints que se entregaron en la fecha acordada o antes. Consideramos 'a tiempo' si se cumple dentro de ±2 días de la fecha objetivo.",
-      "npsScore": "Utilizamos encuestas de satisfacción post-proyecto con escala del 1-10. Los clientes evalúan calidad del código, comunicación, cumplimiento de deadlines y valor entregado.",
-      "sprintsShipped": "Contamos sprints completados exitosamente que incluyen features funcionales, testing aprobado y deployment a producción. Solo contamos sprints con aceptación del cliente.",
-      "cycleTimeReduction": "Comparamos el tiempo promedio de desarrollo por feature antes y después de nuestra implementación. Incluye tiempo de coding, testing y deployment."
-    }
+    "labsmailDesc": "Motor de cold email con IA que investiga cada prospecto individualmente, escribe emails hiperpersonalizados y gestiona campañas multicanal con tracking completo del pipeline."
   },
   "teamSection": {
     "title": "Los Rostros Detrás del Código",
@@ -752,80 +222,5 @@
       }
     }
   },
-  "calculator": {
-    "metaTitle": "Calculadora de ROI en Automatización — ¿Cuánto te cuesta el trabajo manual? | OpenGateHub",
-    "metaDescription": "Descubrí exactamente cuánto le cuesta a tu equipo el trabajo manual cada mes — y cuánto podrías ahorrar con automatización. Gratis, resultados en 2 minutos.",
-    "badge": "⚡ Calculá en menos de 2 minutos",
-    "headline": "¿Cuánto le cuesta a tu empresa el trabajo manual?",
-    "subheadline": "Respondé 4 preguntas y descubrí tu ahorro potencial con automatización.",
-    "stepOf": "Paso {{step}} de {{total}}",
-    "trustLine": "🔒 Tus datos están seguros. No hacemos spam.",
-    "step1Title": "¿Cuántas personas hay en tu equipo?",
-    "step1Sub": "Contá a todos los que participan en operaciones del día a día.",
-    "team1to5": "1 – 5 personas",
-    "team6to15": "6 – 15 personas",
-    "team16to50": "16 – 50 personas",
-    "team50plus": "Más de 50 personas",
-    "step2Title": "¿Cuál es el salario mensual promedio del equipo?",
-    "step2Sub": "En dólares. Se usa para estimar el costo real del trabajo manual.",
-    "salaryUnder500": "Menos de $500",
-    "salary500to1500": "$500 – $1.500",
-    "salary1500to4000": "$1.500 – $4.000",
-    "salaryOver4000": "Más de $4.000",
-    "step3Title": "¿Qué tareas hacen manualmente?",
-    "step3Sub": "Seleccioná todas las que apliquen.",
-    "taskDataTransfer": "Pasar datos entre sistemas",
-    "taskFollowUpEmails": "Enviar emails de seguimiento",
-    "taskReports": "Generar reportes",
-    "taskCoordination": "Coordinar tareas",
-    "taskOrdersInvoices": "Procesar pedidos/facturas",
-    "taskCRM": "Actualizar CRM",
-    "taskOnboarding": "Onboarding de clientes",
-    "tasksSelectedOne": "1 tarea seleccionada",
-    "tasksSelectedMany": "{{count}} tareas seleccionadas",
-    "step4Title": "¿En qué industria opera tu empresa?",
-    "step4Sub": "Para comparar con empresas similares de tu industria.",
-    "industryEcommerce": "E-commerce",
-    "industrySaaS": "SaaS / Tech",
-    "industryProfessional": "Servicios profesionales",
-    "industryHealthEdu": "Salud / Educación",
-    "industryOther": "Otro",
-    "nextBtn": "Siguiente →",
-    "seeResultBtn": "Ver mi resultado →",
-    "backBtn": "← Atrás",
-    "resultLabel": "Tus resultados",
-    "resultTitle": "Este es el costo real del trabajo manual de tu equipo",
-    "hoursLost": "Horas perdidas / mes",
-    "hoursRecovered": "Horas de vuelta para trabajo que importa",
-    "monthlyCost": "Costo mensual del trabajo manual",
-    "savingsHeadline": "Tu equipo podría recuperar cada mes",
-    "perMonth": "/mes",
-    "annualSavings": "{{amount}} por año en ahorros potenciales",
-    "benchmarkNote": "Basado en datos de ROI promedio de RPA que muestran 60% de reducción de costos con automatización (Flobotics 2024, McKinsey, Deloitte). Los resultados reales pueden variar.",
-    "socialProofLabel": "Resultados reales",
-    "socialProofQuote": "Valthor CRM redujo sus tareas manuales un 40% y triplicó la velocidad de follow-up al automatizar con nosotros.",
-    "socialProofStat1": "menos tareas manuales",
-    "socialProofStat2": "más velocidad de follow-up",
-    "leadTitle": "Recibí tu plan de automatización",
-    "leadSub": "Ya hiciste la parte difícil. Nosotros convertimos tus números en un plan concreto — gratis, sin compromiso.",
-    "namePlaceholder": "Tu nombre",
-    "emailPlaceholder": "Tu email de trabajo",
-    "submitBtn": "Ver mi plan de automatización →",
-    "submitting": "Enviando...",
-    "privacyNote": "🔒 Sin spam. Solo información útil para tu equipo.",
-    "editAnswers": "← Volver a editar respuestas",
-    "nameError": "Ingresá tu nombre",
-    "emailError": "Ingresá un email válido",
-    "successTitle": "¡Listo! Ya te contactamos.",
-    "successBody": "Vamos a revisar tus números y nos contactamos en menos de 24 horas con un plan de automatización personalizado para tu equipo.",
-    "bookCallBtn": "Agendá una llamada de 15 min →",
-    "footerLink": "Calculadora de Costos",
-    "bannerEyebrow": "Herramienta gratuita",
-    "bannerTitle": "¿Cuánto le cuesta a tu equipo el trabajo manual?",
-    "bannerSub": "Respondé 4 preguntas rápidas. Calculamos tu pérdida mensual y tu potencial de ahorro con automatización.",
-    "bannerStat1Label": "perdidas por persona / semana",
-    "bannerStat2Label": "ahorro promedio con automatización",
-    "bannerStat3Label": "entre interrupciones promedio en el trabajo",
-    "bannerCTA": "Ver cuánto te está costando →"
-  }
+  "homeHeroQuote": "“Gracias a OpenGateHub pudimos incorporar excelentes desarrolladores y ingenieros de QA que fortalecieron significativamente el proyecto.”"
 }

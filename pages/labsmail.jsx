@@ -334,6 +334,7 @@ const LabsMail = () => (
   <>
     <Head>
       <title>LabsMail — AI-Powered Personalized Cold Email Outreach</title>
+      <meta name="robots" content="noindex" />
       <meta name="description" content="We find your ideal prospects, research them individually, and write hyper-personalized emails that get replies. 11.4% reply rate. Zero templates. Full pipeline management." />
       <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23059669'/><text x='50' y='64' text-anchor='middle' font-family='system-ui' font-weight='800' font-size='38' fill='%23fff'>LM</text></svg>" />
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />

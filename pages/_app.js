@@ -1,20 +1,14 @@
 import { ThemeProvider } from "styled-components";
 import GlobalStyles from "../src/styles/GlobalStyles";
 import theme from "../src/styles/theme";
-import "../src/i18n";
+import i18n from "../src/i18n";
 import Head from "next/head";
 import NavBar from "../src/components/NavBar/NavBar";
 import Footer from "../src/components/Footer/Footer";
-import ScrollToTopButton from "../src/components/Button/ScrollToTopButton";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import gsap from "gsap";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 // import { FaWhatsapp  } from "react-icons/fa";
 
 const Layout = styled.div`
@@ -81,13 +75,14 @@ export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  // El idioma sale de la dirección (/ es español, /en es inglés). Se fija antes de dibujar
+  // para que el servidor y el navegador muestren lo mismo.
+  const locale = router.locale === "en" ? "en" : "es";
+  if (i18n.language !== locale) i18n.changeLanguage(locale);
+
   useEffect(() => {
     const handleStart = () => {
       setLoading(true);
-      // Kill all ScrollTrigger instances before React unmounts the page.
-      // ScrollTrigger pin wraps elements in new parents; if React tries
-      // removeChild on the original tree it crashes.
-      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
     const handleComplete = () => setLoading(false);
 
@@ -126,13 +121,12 @@ export default function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
       <Layout>
-        {!sinChrome && <NavBar />}
+        {!sinChrome && <NavBar alternates={pageProps.alternates} />}
         {loading && <Loader />}
         <Main>
           <Component {...pageProps} />
         </Main>
         {!sinChrome && <Footer />}
-        {!sinChrome && <ScrollToTopButton />}
         {/* <FloatingWhatsAppButton
           href="https://wa.me/+5491123485638"
           target="_blank"

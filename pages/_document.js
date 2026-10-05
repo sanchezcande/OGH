@@ -30,12 +30,12 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="en">
+      <Html>
         <Head>
-          {/* Modern Font - Space Grotesk */}
+          {/* Tipografías: Newsreader (títulos), Inter (texto), Space Grotesk (logo y etiquetas) */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
           {/* Organization Schema - Global */}
           <script
             type="application/ld+json"
@@ -44,39 +44,21 @@ export default class MyDocument extends Document {
                 "@context": "https://schema.org",
                 "@type": "Organization",
                 "name": "OpenGateHub",
-                "url": "https://opengatehub.com",
-                "logo": "https://opengatehub.com/og-image.png",
-                "description": "OpenGateHub is a workflow automation and staff augmentation company from Latin America. We help companies eliminate manual work through AI integration, n8n automation, and embedded nearshore engineering teams.",
+                "url": "https://www.opengatehub.com",
+                "logo": "https://www.opengatehub.com/og-image.png",
+                "description": "OpenGateHub is a staff augmentation company. We find, interview and place senior remote developers in your team.",
                 "sameAs": [
                   "https://www.linkedin.com/company/opengatehub"
                 ],
-                "areaServed": [
-                  { "@type": "Place", "name": "Latin America" },
-                  { "@type": "Place", "name": "United States" },
-                  { "@type": "Place", "name": "North America" }
-                ],
                 "serviceType": [
-                  "Workflow Automation",
                   "Staff Augmentation",
-                  "AI Automation",
-                  "n8n Automation",
-                  "Nearshore Software Development"
+                  "Developer Hiring"
                 ],
                 "knowsAbout": [
-                  "Workflow Automation",
                   "Staff Augmentation",
-                  "AI Integration",
-                  "n8n",
-                  "Nearshore Development",
-                  "Process Automation",
-                  "Business Process Optimization"
-                ],
-                "aggregateRating": {
-                  "@type": "AggregateRating",
-                  "ratingValue": "9.7",
-                  "bestRating": "10",
-                  "ratingCount": "50"
-                }
+                  "Hiring Developers",
+                  "Technical Interviews"
+                ]
               }),
             }}
           />
@@ -87,17 +69,9 @@ export default class MyDocument extends Document {
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "url": "https://opengatehub.com",
+                "url": "https://www.opengatehub.com",
                 "name": "OpenGateHub",
-                "description": "Workflow Automation & Staff Augmentation from Latin America",
-                "potentialAction": {
-                  "@type": "SearchAction",
-                  "target": {
-                    "@type": "EntryPoint",
-                    "urlTemplate": "https://opengatehub.com/blog?q={search_term_string}"
-                  },
-                  "query-input": "required name=search_term_string"
-                }
+                "description": "Staff augmentation and hiring of senior developers"
               }),
             }}
           />

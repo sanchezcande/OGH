@@ -19,7 +19,7 @@ const SECCIONES = [
   {
     title: "1. Who we are",
     content:
-      "OpenGateHub is a software company that builds automation and provides nearshore development teams. These terms cover this website (opengatehub.com), its forms and downloadable resources, and the internal tools we run under the OpenGateHub name. You can reach us at candelaria@opengatehub.com.",
+      "OpenGateHub is a staff augmentation company: we find, interview and place developers in our clients' teams. These terms cover this website (opengatehub.com), its forms and downloadable resources, and the internal tools we run under the OpenGateHub name. You can reach us at candelaria@opengatehub.com.",
   },
   {
     title: "2. Using this site",

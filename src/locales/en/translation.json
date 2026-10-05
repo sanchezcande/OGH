@@ -1,385 +1,4 @@
 {
-  "OpenGateHub": "OpenGateHub - Process & Workflow Automation for Companies",
-  "pageDescription": "OpenGateHub helps companies automate business processes and workflows through AI, integrations, and scalable digital solutions.",
-  "home": "Home",
-  "services": "Services",
-  "aboutUs": "About Us",
-  "ctaButton": "Book a Workflow Automation Audit",
-  "contactUs": "Contact",
-  "english": "English",
-  "spanish": "Spanish",
-  "name": "Name",
-  "email": "Email",
-  "phoneNumber": "Phone number (optional)",
-  "subject": "Subject (optional)",
-  "message": "Message",
-  "send": "Send",
-  "pleaseEnterValidName": "Please enter a valid name",
-  "pleaseEnterValidEmail": "Please enter a valid email address",
-  "pleaseEnterValidMessage": "Please enter a message with more than 10 characters",
-  "pleaseCompleteCaptcha": "Please complete the captcha verification",
-  "messageSentSuccessfully": "Message sent successfully",
-  "errorSendingMessage": "Error sending message",
-  "modalSendTitle": "Message Status",
-  "modalCloseButtonText": "Close",
-  "joinOurCommunity": "Join Our Community",
-  "privacyPolicy": "Privacy Policy",
-  "faq": "FAQ",
-  "FAQs": "FAQs",
-  "Blog": "Blog",
-  "connectWithUs": "Connect With Us",
-  "aboutUsTitle_part1": "We build technology by putting ",
-  "aboutUsTitle_highlight": "people",
-  "aboutUsTitle_part2": " first",
-  "aboutUsSubtitle": "— because strong products start with strong teams.",
-  "aboutUsText": "We're not another dev agency. We form long-term partnerships with teams that value cultural fit as much as technical excellence.\nAt OpenGateHub, being human-first means reducing friction, not adding process. We build with clarity, intention, and care — so complex work feels lighter and progress stays sustainable.",
-  "aboutUsLastLine": "",
-  "aboutUsTextBold": "",
-  "aboutUsFounder": "Candelaria Sanchez",
-  "aboutUsFounderRole": "Founder & CTO, OpenGateHub",
-  "aboutUsFounderBio": "Candelaria Sanchez is a software engineer, filmmaker turned founder, based in Bali. She started OpenGateHub because she kept seeing the same problem everywhere: companies hiring great engineers who just didn't fit the team. Smart people in the wrong context, producing friction instead of flow.\n\nSo she built a company where cultural fit isn't a nice-to-have — it's the first filter. Every engineer is matched for how they communicate, how they work, and whether they'll genuinely care about what they're building. From Patagonia to Buenos Aires to building a global team across continents, her path has been anything but linear. But the through line is always the same: people first, everything else follows.",
-  "contactUsTitle": "Reach Out!",
-  "contactUsSubtitle": "Thank you for contacting us! Please fill out the form below and we'll get back to you shortly.",
-  "weAre": "We are",
-  "specializedIn": "Focused on your success. We help",
-  "webAndMobileApp": "bring your ideas to life",
-  "crafting": " with tailored digital solutions. From intuitive websites to innovative mobile apps,",
-  "innovativeSolution": "our team works to make your vision a reality while supporting your",
-  "seoTitle": "Build with People Who Get It | OpenGateHub",
-  "articleNotFound": "We couldn't find this article. Please visit our blog's homepage to browse our latest posts.",
-  "seoDescription": "We help companies scale operations through workflow automation and staff augmentation with measurable business impact.",
-  "heroAnimatedText": {
-    "part1": "Automate your company's ",
-    "highlight1": "workflows",
-    "part2": " and ",
-    "highlight2": "operations"
-  },
-  "heroSubtitle": "Your team loses 8+ hours/week to tasks automation handles in minutes. We help you take that time back.",
-  "heroSecondaryCTA": "See what it's costing you →",
-  "heroTrustChip1": "9.7/10 CSAT",
-  "heroTrustChip2": "7.3-day kickoff",
-  "heroTrustChip3": "50+ sprints shipped",
-  "heroAlt": "Tech team illustration - OpenGateHub",
-  "problemTitle": "Manual operations are <highlight>expensive</highlight>.",
-  "problemText": "When teams depend on spreadsheets, repetitive tasks, and disconnected tools, execution slows down, errors increase, and leadership loses visibility over critical workflows.",
-  "weGetYouTitle": "Your team <highlight>shouldn't be doing this</highlight>.",
-  "weGetYouText": "Every hour spent copying data between tools, chasing approvals, or generating reports manually is an hour that could go toward real work. We permanently eliminate those tasks — and give your team the capacity to actually move faster.",
-  "servicesTitle": "Our Services",
-  "servicesText": "We work with people who care about the how, not just the what. Custom solutions for founders who want to scale with flow, trust, and culture.",
-  "planTitle": "How we engage:",
-  "planSteps": {
-    "step1": "Operational Discovery: We map your current process, bottlenecks, and priorities.",
-    "step2": "Execution Plan: We define the right model (Workflow Automation, Staff Augmentation, or both).",
-    "step3": "Launch & Optimize: We implement, measure impact, and improve continuously."
-  },
-  "forBusiness": "business growth.",
-  "contactPage": {
-    "heroTitle": "Let's talk about your operations",
-    "heroSubtitle": "Book a free audit call, or just send us a message and we'll figure out the best next step together.",
-    "bookCallTitle": "Book a free audit call",
-    "bookCallDescription": "15 minutes. We'll map your biggest operational bottleneck and tell you honestly whether we can help.",
-    "bookCallButton": "Book a 15-min call",
-    "bookCallDisclaimer": "No commitment. You'll leave with a clear next step.",
-    "getEstimateTitle": "Or send us a message",
-    "getEstimateDescription": "Not ready for a call? Tell us what's going on and we'll come back with a specific recommendation — usually within 24 hours.",
-    "whatHappensNext": "What happens after you reach out",
-    "step1Title": "We read your message carefully",
-    "step2Title": "We send you a specific recommendation",
-    "step3Title": "You decide what to do next — no pressure",
-    "footerCTAText": "Prefer to talk first?",
-    "footerCTALink": "Book a 15-min call"
-  },
-  "contactForm": {
-    "companyOptional": "Company (optional)",
-    "messagePlaceholder": "What's going on? Tell us what you're dealing with — the more context, the better.",
-    "pleaseDescribeProblem": "Tell us a bit more (at least 10 characters)",
-    "sendBtn": "Send →",
-    "submitting": "Sending...",
-    "trustNote": "We reply within 24h — no pitch, just a clear next step.",
-    "successMessage": "We got your message and will reply within 24 hours.",
-    "successQuickAction": "Urgent? Book a 15-min call"
-  },
-  "homeCallToAction": {
-    "title": "Every week you wait, it costs you.",
-    "description": "Book a free 30-minute call. We'll identify your top 3 automation opportunities and give you an honest savings estimate — no pitch, just value.",
-    "buttonText": "Book a Free Audit Call",
-    "noCommitment": "Free call · No commitment · No pitch"
-  },
-  "faqsCallToAction": {
-    "title": "Still Have Questions?",
-    "description": "Schedule a free consultation with our experts.",
-    "buttonText": "Get Expert Advice"
-  },
-  "servicesCallToAction": {
-    "title": "Ready to Innovate?",
-    "description": "Book a free strategy session to discuss your project needs.",
-    "buttonText": "Book Free Strategy Call"
-  },
-  "staffAugmentation": {
-    "metaDescription": "We scale your team prioritizing cultural fit and human quality. We select developers who align with your values and way of working.",
-    "heroSubtitle": "We scale your team prioritizing cultural fit and human quality",
-    "whatIsTitle": "What is Staff Augmentation?",
-    "whatIsDescription": "Staff Augmentation is our flagship service. We prioritize cultural fit and human quality above all else. We don't just find expert developers—we find people who align with your values, your way of working, and your vision. We work as part of your team to deliver quality results and accelerate your roadmap without the complexity of traditional hiring.",
-    "whyChooseTitle": "Why choose Staff Augmentation?",
-    "benefits": {
-      "accelerateTitle": "Accelerate your roadmap",
-      "accelerateDescription": "Add expert talent quickly without traditional hiring timelines.",
-      "integrationTitle": "Perfect integration",
-      "integrationDescription": "Our developers integrate as part of your team, aligned with your culture.",
-      "techExpertsTitle": "Tech experts",
-      "techExpertsDescription": "Access senior developers with experience in the technologies you need.",
-      "commitment": "For us, cultural fit and human quality are the priority. We work as part of your team, not as an external vendor. Our commitment is to your success."
-    },
-    "keyBenefitsTitle": "Key Benefits",
-    "keyBenefits": {
-      "extendedTeamTitle": "Extended Team",
-      "extendedTeamDescription": "Developers who work as part of your team, not as external contractors",
-      "quickStartTitle": "Quick Start",
-      "quickStartDescription": "Quick integration, without long hiring processes",
-      "scalabilityTitle": "Scalability",
-      "scalabilityDescription": "Adjust your team size based on your project needs",
-      "guaranteedQualityTitle": "Guaranteed Quality",
-      "guaranteedQualityDescription": "Senior developers with proven experience in complex projects",
-      "flexibilityTitle": "Flexibility",
-      "flexibilityDescription": "Quick adaptation to changes in requirements and priorities",
-      "culturalFitTitle": "Cultural Fit",
-      "culturalFitDescription": "Developers who share your values and way of working"
-    },
-    "howWeWorkTitle": "How do we work with you?",
-    "howWeWork": {
-      "step1Title": "Understand your culture",
-      "step1Description": "We prioritize understanding your values, your way of working, and your vision. Cultural fit is our number one priority.",
-      "step2Title": "Select for cultural fit",
-      "step2Description": "We evaluate and select developers prioritizing cultural fit and human quality, not just technical skills.",
-      "step3Title": "Quick integration",
-      "step3Description": "Our developers integrate into your team and processes from day one.",
-      "step4Title": "Work together",
-      "step4Description": "We collaborate closely, deliver results and accelerate your roadmap."
-    },
-    "useCasesTitle": "Ideal use cases",
-    "useCases": {
-      "growingStartupsTitle": "Growing startups",
-      "growingStartupsDescription": "Scale your team quickly to meet deadlines and ambitious goals",
-      "specificProjectsTitle": "Specific projects",
-      "specificProjectsDescription": "Add expertise in specific technologies for targeted projects",
-      "distributedTeamsTitle": "Distributed teams",
-      "distributedTeamsDescription": "Expand your remote team with developers who work in your timezone"
-    },
-    "ctaTitle": "Ready to scale your team?",
-    "ctaHighlightWord": "scale"
-  },
-  "softwareFactory": {
-    "metaDescription": "Automate your company's core workflows and operations with end-to-end process automation built for scale.",
-    "heroSubtitle": "Automate repetitive operations and connect your tools with reliable workflows",
-    "whatIsTitle": "What is Workflow Automation?",
-    "whatIsDescription": "Our workflow automation model helps your company remove manual work, connect systems, and standardize operations. We design, build, and deploy automations that reduce errors, accelerate execution, and free your team for higher-value work.",
-    "whenToUseTitle": "When to use Workflow Automation?",
-    "whenToUse": {
-      "newProductTitle": "Manual Process Bottlenecks",
-      "newProductDescription": "When teams waste time on repetitive tasks, follow-ups, and disconnected handoffs",
-      "completeSolutionTitle": "Disconnected Tools & Data",
-      "completeSolutionDescription": "When your CRM, ERP, finance, support, or marketing tools don't sync reliably",
-      "tightDeadlineTitle": "Need Faster Operations",
-      "tightDeadlineDescription": "When you need to improve speed, consistency, and reporting without increasing headcount"
-    },
-    "processTitle": "Our Process",
-    "process": {
-      "step1Title": "Workflow Audit",
-      "step1Description": "We map your current processes, identify bottlenecks, and prioritize high-ROI automations",
-      "step2Title": "Automation Blueprint",
-      "step2Description": "We design the workflow logic, integration architecture, data rules, and exception handling",
-      "step3Title": "Build & Integrate",
-      "step3Description": "We implement automations, connect your tools, and validate each scenario end to end",
-      "step4Title": "Deploy & Enable",
-      "step4Description": "We launch safely, train your team, and define operating playbooks and ownership",
-      "step5Title": "Optimize & Scale",
-      "step5Description": "We monitor results, improve workflows, and expand automation to new business areas"
-    },
-    "outcomesTitle": "What You Get",
-    "outcomes": {
-      "fullyFunctionalTitle": "Automated Workflows",
-      "fullyFunctionalDescription": "Business-critical processes running automatically with clear logic and controls",
-      "productionReadyTitle": "Reliable Operations",
-      "productionReadyDescription": "Fewer manual errors, faster cycle times, and consistent execution across teams",
-      "scalableArchitectureTitle": "Connected Systems",
-      "scalableArchitectureDescription": "Integrated tools and data flows that scale as your company grows",
-      "completeDocumentationTitle": "Operational Visibility",
-      "completeDocumentationDescription": "Dashboards, alerts, and documentation so your team can manage confidently"
-    },
-    "ctaTitle": "Ready to automate your operations?",
-    "ctaDescription": "Get a custom automation plan for your workflows, systems, and business goals.",
-    "ctaButtonText": "Get an Automation Estimate",
-    "ctaHighlightWord": "automate"
-  },
-  "aboutUsCallToAction": {
-    "title": "Let's Build Something That Feels Right",
-    "description": "Start with a free call — we'll listen, understand what you need, and see if we're a good fit.",
-    "buttonText": "Book a Free Call"
-  },
-
-  "contactUsCallToAction": {
-    "title": "Ready to Talk Solutions?",
-    "description": "Schedule a free call with our team to discuss your project.",
-    "buttonText": "Book Free Call Now"
-  },
-  "contactUsMetaTitle": "Contact Us - OpenGateHub",
-  "contactUsMetaDescription": "Choose the fastest path to better operations: automation audit or execution estimate.",
-  "contactPage": {
-    "getIn": "Get in",
-    "touch": "Touch",
-    "getInTouchSubtitleNew": "Let's connect! We're here to understand your vision and explore how we can create impactful solutions together.",
-    "phoneNumberLabel": "Phone Number",
-    "emailLabel": "Email",
-    "phone": "+54 9 11 2348-5638",
-    "email": "info@opengatehub.com",
-    "comeAnd": "Come and",
-    "joinUs": "Join Us",
-    "heroTitle": "Let's optimize your operations",
-    "heroSubtitle": "Choose the fastest path forward: book an automation audit or request an execution estimate.",
-    "bookCallTitle": "Book an automation audit",
-    "bookCallDescription": "For teams that want to reduce manual work and improve operational speed.",
-    "bookCallButton": "Book a 15-min automation audit",
-    "getEstimateTitle": "Request an execution estimate",
-    "getEstimateDescription": "Share your needs and we'll recommend the best model: Workflow Automation, Staff Augmentation, or both.",
-    "whatHappensNext": "What happens next",
-    "step1Title": "We review your request within 24 hours",
-    "step2Title": "We recommend the best engagement model",
-    "step3Title": "You get a clear next step — call or proposal.",
-    "bookCallDisclaimer": "No commitment. You'll leave with a clear next step and priority actions.",
-    "footerCTAText": "Prefer to talk first?",
-    "footerCTALink": "Book a call"
-  },
-  "contactForm": {
-    "company": "Company",
-    "engagementType": "Primary engagement need",
-    "optionWorkflow": "Workflow Automation",
-    "optionStaff": "Staff Augmentation",
-    "optionBoth": "Both: Workflow Automation + Staff Augmentation",
-    "budget": "Estimated budget",
-    "timeline": "Timeline / urgency",
-    "bottleneck": "Biggest operational bottleneck (optional)",
-    "notSureYet": "Not sure yet",
-    "pleaseEnterCompany": "Please enter your company name",
-    "pleaseSelectEngagement": "Please select an engagement type",
-    "pleaseSelectBudget": "Please select a budget range",
-    "pleaseSelectTimeline": "Please select a timeline",
-    "requestEstimate": "Get my execution plan",
-    "submitting": "Submitting...",
-    "estimateRequestSent": "Request received successfully. We'll review it within 24 hours and send you next steps.",
-    "successNextStep": "Next step: you'll receive a recommendation for Workflow Automation, Staff Augmentation, or both.",
-    "successQuickAction": "Urgent? Book a 15-min automation audit"
-  },
-  "companyHistoryTitle": "Our Journey",
-  "companyHistoryDescription": "OpenGateHub was born from a simple idea: that technology should make life easier — and more meaningful. What started in Argentina has grown into a global team working with people who care about how things are built, not just what gets built.",
-
-  "missionAndCoreValuesTitle_part1": "Our Mission & ",
-  "missionAndCoreValuesTitle_highlight": "Values",
-  "missionAndCoreValuesDescription": "We believe in doing meaningful work — with people who care. Our mission is to support founders and teams who want to create value with integrity, for their users, their investors, and the world they're part of.",
-
-  "technologiesTitle_part1": "Our ",
-  "technologiesTitle_highlight": "People",
-  "technologiesDescription": "The strength of what we build comes from who we build it with. Our team isn't just talented — they're thoughtful, reliable, and genuinely committed to creating products with purpose.",
-
-  "commitmentToInnovationTitle_part1": "Innovation with ",
-  "commitmentToInnovationTitle_highlight": "Purpose",
-  "commitmentToInnovationDescription": "We don't chase trends — we build what matters. In a world full of noise, we help you use technology in ways that feel grounded, intentional, and built to last.",
-
-  "learnMoreButtonText": "Learn More",
-  "modalSendTitle": "Send!",
-  "modalCloseButtonText": "Close",
-  "faqsTitle": "Frequently Asked Questions",
-  "faqs": {
-    "softwareFactory": {
-      "title": "Workflow Automation FAQs",
-      "questions": [
-        {
-          "question": "What services does OpenGateHub offer?",
-          "answer": "We offer web development, UX/UI design, graphic design, backend solutions, tech consulting, and tailored business solutions."
-        },
-        {
-          "question": "How can I start working with OpenGateHub?",
-          "answer": "You can reach out via our contact form, email us, or schedule an initial meeting."
-        },
-        {
-          "question": "Do you provide technical support after project delivery?",
-          "answer": "Yes, we offer maintenance and support packages to ensure your solution runs smoothly."
-        },
-        {
-          "question": "How long does it take to complete a project?",
-          "answer": "The timeline depends on the project's complexity and scope, but we work with you to set a clear schedule."
-        },
-        {
-          "question": "What technologies do you use in your projects?",
-          "answer": "We work with React, Next.js, Node.js, Prisma, Tailwind CSS, and other modern technologies for both frontend and backend."
-        },
-        {
-          "question": "Can you work with international companies?",
-          "answer": "Yes, we are a global company accustomed to collaborating with clients across different time zones and countries."
-        },
-        {
-          "question": "Do you have experience integrating third-party APIs?",
-          "answer": "Yes, we have worked with APIs like Stripe, AWS, Firebase, and more to provide complete and integrated solutions."
-        },
-        {
-          "question": "What makes OpenGateHub unique compared to other companies?",
-          "answer": "We focus on creating scalable and customized solutions while maintaining clear and close communication with our clients."
-        },
-        {
-          "question": "What are the costs of your services?",
-          "answer": "Our costs depend on the type of project. Contact us for a personalized, no-obligation quote."
-        },
-        {
-          "question": "Can you help me migrate my current project to modern technologies?",
-          "answer": "Absolutely! We will evaluate your project and help you update it with current tools and frameworks."
-        }
-      ]
-    },
-    "staffOutsourcing": {
-      "title": "Staff Outsourcing FAQs",
-      "questions": [
-        {
-          "question": "What type of tech profiles do you offer for outsourcing?",
-          "answer": "We provide frontend, backend, full-stack developers, UX/UI designers, QA testers, and DevOps specialists, among others."
-        },
-        {
-          "question": "Can I hire developers part-time or for specific projects?",
-          "answer": "Yes, we offer flexible hiring options, whether full-time, part-time, or for specific projects."
-        },
-        {
-          "question": "How do you handle time zone differences?",
-          "answer": "We adapt to the client's time zone and organize meetings and deliverables according to their needs to ensure efficient collaboration."
-        },
-        {
-          "question": "Are the talents prepared to integrate with existing teams?",
-          "answer": "Yes, our talents are trained to quickly adapt to teams and workflows, such as Scrum, Kanban, or your preferred method."
-        },
-        {
-          "question": "What level of experience do the talents have?",
-          "answer": "We provide developers from junior to senior levels, selected based on the specific requirements of your project."
-        },
-        {
-          "question": "How do you select the ideal talent for my project?",
-          "answer": "We analyze your needs and select candidates through a rigorous technical and cultural evaluation process."
-        },
-        {
-          "question": "Can you assign a full team instead of individual profiles?",
-          "answer": "Of course! We can assign multidisciplinary teams, including technical leads, if your project requires it."
-        },
-        {
-          "question": "What happens if the assigned developer doesn't meet my expectations?",
-          "answer": "If you're not satisfied, we provide a quick replacement to ensure your project continues without delays."
-        },
-        {
-          "question": "Does the staff work under my supervision or OpenGateHub's?",
-          "answer": "You decide: the team can work directly under your supervision, or we can manage it according to your needs."
-        },
-        {
-          "question": "Why should I choose OpenGateHub for IT outsourcing?",
-          "answer": "We understand that every project is unique. That's why we focus on providing reliable talent, adapting to your needs, and maintaining clear communication every step of the way. Our goal is to become a strategic partner that helps your business grow."
-        }
-      ]
-    }
-  },
   "privacyPolicy1": {
     "title": "Privacy Policy",
     "introduction": "At OpenGateHub, your privacy is our priority. This Privacy Policy outlines how we collect, use, and protect your personal information when you interact with our website, services, or products. By using our services, you agree to the practices described in this policy.",
@@ -406,7 +25,7 @@
       },
       {
         "title": "Your Rights",
-        "content": "You have the right to:\n- Access the personal data we hold about you.\n- Request corrections or updates to your information.\n- Request deletion of your personal data, subject to applicable laws.\n- Opt out of marketing communications at any time.\nTo exercise these rights, contact us at [insert email address]."
+        "content": "You have the right to:\n- Access the personal data we hold about you.\n- Request corrections or updates to your information.\n- Request deletion of your personal data, subject to applicable laws.\n- Opt out of marketing communications at any time.\nTo exercise these rights, contact us at info@opengatehub.com."
       },
       {
         "title": "Third-Party Links",
@@ -422,16 +41,22 @@
       }
     ]
   },
-  "searchPlaceholder": "Search articles...",
-  "readMore": "Read more",
   "articles": [
+    {
+      "title": "How to hire your first developer",
+      "slug": "hiring-your-first-developer",
+      "summary": "The problem isn't finding candidates. It's knowing which one can do the job. A simple order for hiring well.",
+      "image": "/images/article10-en.jpg",
+      "thumbnail": "/images/article10-en.jpg",
+      "content": "When you hire your first developer, every candidate sounds good. The problem shows up later, once you're already paying them.\n\n## The problem isn't finding candidates\n\nMost founders think hiring a good developer is a problem of finding candidates. It isn't.\n\nThe problem shows up when you have three candidates who all look good and you have to decide which one can actually do the job. A good CV, good English and five years of React don't necessarily mean that person is the right one for your product.\n\n## What getting it wrong costs\n\nThe cost of a bad developer isn't just the salary. It's what happens when, two months in, you find out they can't work autonomously:\n\n- You lose time.\n- The product slips.\n- You end up doing technical management.\n- And eventually you have to hire again.\n\nThat's why it pays to spend more time on the filter before hiring, not after.\n\n## The order almost nobody follows\n\nThe usual way goes like this: first you start interviewing, then you meet candidates, then you compare impressions, and only at the end do you try to decide what \"a good developer\" means.\n\nWe do it the other way around:\n\n- First we define what the person has to prove.\n- Then we build the process to measure it.\n- Only then do we start searching.\n\nIt looks like a small difference, but it changes the hire. By the time you get to the interview you already know what you're looking for, and you stop choosing whoever you liked best.\n\n## What a CV doesn't show\n\nPeople interview too much to check whether someone can code. That's only one part. Other things matter just as much:\n\n- Can they work without someone telling them what to do every hour?\n- Do they flag a problem before it turns into a disaster?\n- Can they walk into a codebase they don't know and find their way?\n- Do they understand the product, or only execute tasks?\n- Would you leave them working directly with a client?\n\nTo answer them, you have to listen to how the person thinks and how they talk about their previous work.\n\n## Where to start\n\nIf you'd rather not do it alone, that's what we do: we find, interview and present senior developers. Book a free 20-minute call and tell us what you're building."
+    },
     {
       "title": "The Hidden Tax: What Manual Work Is Really Costing Your Company",
       "slug": "hidden-tax-manual-work-costing-your-company",
       "summary": "Your team isn't slow. They're drowning in invisible busywork. Here's how to calculate the real cost — and what to do about it.",
       "image": "/images/article9.jpg",
       "thumbnail": "/images/article9.jpg",
-      "content": "Let me paint a picture you probably recognize.\n\nYour ops person spends 45 minutes every morning copying data from one tool to another. Your sales team manually updates the CRM after every call. Someone on your finance team downloads a CSV, cleans it in Excel, and uploads it somewhere else — every single week. Your developers spend hours on deploy checklists that could be a script.\n\nNone of this is anyone's fault. It's just how things evolved.\n\nBut here's what nobody tells you: that invisible busywork is one of the most expensive line items in your company. And it doesn't show up on any balance sheet.\n\n## The Math Nobody Does\n\nLet's get specific. Say you have a team of 15 people. Each person wastes — conservatively — 6 hours per week on tasks that could be automated. That's 90 hours per week. Over a year, that's 4,680 hours.\n\nAt an average fully-loaded cost of $45/hour, that's $210,600 per year. Gone. Not on building product. Not on closing deals. Not on thinking strategically. On copying, pasting, formatting, and clicking through the same workflows day after day.\n\nAnd that's the conservative estimate. McKinsey's research suggests knowledge workers spend up to 28% of their week on email management alone, and another 20% searching for internal information or tracking down colleagues. Forrester found that companies lose between $5,000 and $25,000 per employee per year to inefficient manual processes.\n\nThe real number at your company is probably worse than you think.\n\n## Why It Gets Worse, Not Better\n\nHere's the thing about manual work: it compounds.\n\nWhen you're a team of 5, those manual processes feel manageable. Someone owns them, they take 20 minutes, and it's fine. But when you grow to 15, 30, 50 people, those same processes don't scale linearly — they scale exponentially.\n\nMore people means more handoffs. More handoffs mean more errors. More errors mean more time fixing things. More fixing means more frustration. More frustration means your best people start looking for jobs elsewhere because they didn't sign up to be a human API.\n\nWe've seen this pattern at dozens of companies. The ones that automate early grow faster — not because automation is magic, but because it removes the friction that slows everything else down.\n\n## The Three Layers of Hidden Cost\n\nWhen we audit a company's operations at OpenGateHub, we look at three layers:\n\n### 1. Direct Time Cost\n\nThis is the obvious one. Hours spent on repetitive tasks multiplied by hourly cost. Most companies underestimate this by 40-60% because they only count the task itself, not the context-switching overhead around it.\n\nA developer who stops coding to manually update a status in Jira, write a message in Slack, and log time in a spreadsheet doesn't just lose the 5 minutes those tasks take. They lose 20+ minutes of deep work because of the cognitive interruption. Cal Newport's research on deep work shows it takes an average of 23 minutes to regain full focus after a context switch.\n\n### 2. Error and Rework Cost\n\nManual processes have error rates between 1% and 5%, depending on complexity. That sounds low until you realize that one wrong data entry in a financial report can trigger hours of investigation, a customer-facing error can damage trust, and a missed follow-up can lose a deal.\n\nWe worked with a SaaS company that was manually onboarding enterprise clients. The process involved 14 steps across 5 different tools. Their error rate was around 3%, which meant roughly 1 in 30 clients had a broken onboarding experience. They didn't know this was happening until churn data told the story three months later.\n\nAfter automating the workflow with n8n, errors dropped to near zero and onboarding time went from 3 days to 4 hours.\n\n### 3. Opportunity Cost\n\nThis is the biggest one and the hardest to measure. Every hour your team spends on busywork is an hour they're not spending on the thing you actually hired them to do.\n\nYour marketing person should be thinking about positioning, not reformatting reports. Your engineer should be shipping features, not doing manual QA checklists. Your ops lead should be optimizing processes, not being the process.\n\nOpportunity cost doesn't show up in your P&L, but it shows up in your growth rate. The companies that outpace their competitors aren't working harder. They're working on the right things because they've eliminated the noise.\n\n## What Actually Works\n\nAfter automating over 300 processes across 50+ companies, here's what we've learned about what actually moves the needle:\n\n### Start with the annoying stuff\n\nDon't start with your most complex process. Start with the one that annoys your team the most. It's usually something small — a daily report, a data sync, a notification workflow. Automate that first. The psychological impact of removing a daily annoyance is massive. It builds momentum and trust in the automation approach.\n\n### Map before you build\n\nThe biggest mistake companies make with automation is jumping straight to tools. Before you touch n8n, Make, Zapier, or any platform, sit down and map the actual process. Who does what? When? What triggers the next step? Where do things break?\n\nYou'd be surprised how often this exercise alone reveals unnecessary steps that can simply be eliminated — no automation needed.\n\n### Measure the before\n\nYou can't prove ROI if you don't measure the current state. Track how long the manual process takes, how often errors occur, and how many people are involved. Then measure the same things after automation. The numbers will speak for themselves — and they'll help you build the case for automating the next process.\n\n### Think in workflows, not tasks\n\nAutomating individual tasks is fine, but the real power comes from automating entire workflows end-to-end. Instead of automating just the data entry part, automate the trigger, the data entry, the notification, the follow-up, and the reporting. That's where the 10x gains live.\n\n## The 8-Hour Reality Check\n\nHere's a question we ask every company we work with: if you could give every person on your team 8 extra hours per week, what would they do with it?\n\nThe answers are always the same. Ship faster. Talk to more customers. Think more strategically. Build the thing they've been putting off for months.\n\nThose 8 hours exist. They're just trapped inside spreadsheets, manual copy-paste workflows, and processes that should have been automated two years ago.\n\nThe companies that free those hours aren't the ones with the biggest budgets or the fanciest tools. They're the ones that decided to stop treating manual work as \"just how things are\" and started treating it as a problem worth solving.\n\nThat's what we do at OpenGateHub. We find the hidden tax, we eliminate it, and we give your team their time back.\n\nThe question isn't whether you can afford to automate. It's whether you can afford not to."
+      "content": "Let me paint a picture you probably recognize.\n\nYour ops person spends 45 minutes every morning copying data from one tool to another. Your sales team manually updates the CRM after every call. Someone on your finance team downloads a CSV, cleans it in Excel, and uploads it somewhere else — every single week. Your developers spend hours on deploy checklists that could be a script.\n\nNone of this is anyone's fault. It's just how things evolved.\n\nBut here's what nobody tells you: that invisible busywork is one of the most expensive line items in your company. And it doesn't show up on any balance sheet.\n\n## The Math Nobody Does\n\nLet's get specific. Say you have a team of 15 people. Each person wastes — conservatively — 6 hours per week on tasks that could be automated. That's 90 hours per week. Over a year, that's 4,680 hours.\n\nAt an average fully-loaded cost of $45/hour, that's $210,600 per year. Gone. Not on building product. Not on closing deals. Not on thinking strategically. On copying, pasting, formatting, and clicking through the same workflows day after day.\n\nAnd that's the conservative estimate. McKinsey's research suggests knowledge workers spend up to 28% of their week on email management alone, and another 20% searching for internal information or tracking down colleagues. Forrester found that companies lose between $5,000 and $25,000 per employee per year to inefficient manual processes.\n\nThe real number at your company is probably worse than you think.\n\n## Why It Gets Worse, Not Better\n\nHere's the thing about manual work: it compounds.\n\nWhen you're a team of 5, those manual processes feel manageable. Someone owns them, they take 20 minutes, and it's fine. But when you grow to 15, 30, 50 people, those same processes don't scale linearly — they scale exponentially.\n\nMore people means more handoffs. More handoffs mean more errors. More errors mean more time fixing things. More fixing means more frustration. More frustration means your best people start looking for jobs elsewhere because they didn't sign up to be a human API.\n\nThe companies that automate early grow faster — not because automation is magic, but because it removes the friction that slows everything else down.\n\n## The Three Layers of Hidden Cost\n\n### 1. Direct Time Cost\n\nThis is the obvious one. Hours spent on repetitive tasks multiplied by hourly cost. Most companies underestimate this by 40-60% because they only count the task itself, not the context-switching overhead around it.\n\nA developer who stops coding to manually update a status in Jira, write a message in Slack, and log time in a spreadsheet doesn't just lose the 5 minutes those tasks take. They lose 20+ minutes of deep work because of the cognitive interruption. Cal Newport's research on deep work shows it takes an average of 23 minutes to regain full focus after a context switch.\n\n### 2. Error and Rework Cost\n\nManual processes have error rates between 1% and 5%, depending on complexity. That sounds low until you realize that one wrong data entry in a financial report can trigger hours of investigation, a customer-facing error can damage trust, and a missed follow-up can lose a deal.\n\n### 3. Opportunity Cost\n\nThis is the biggest one and the hardest to measure. Every hour your team spends on busywork is an hour they're not spending on the thing you actually hired them to do.\n\nYour marketing person should be thinking about positioning, not reformatting reports. Your engineer should be shipping features, not doing manual QA checklists. Your ops lead should be optimizing processes, not being the process.\n\nOpportunity cost doesn't show up in your P&L, but it shows up in your growth rate. The companies that outpace their competitors aren't working harder. They're working on the right things because they've eliminated the noise.\n\n## What Actually Works\n\n### Start with the annoying stuff\n\nDon't start with your most complex process. Start with the one that annoys your team the most. It's usually something small — a daily report, a data sync, a notification workflow. Automate that first. The psychological impact of removing a daily annoyance is massive. It builds momentum and trust in the automation approach.\n\n### Map before you build\n\nThe biggest mistake companies make with automation is jumping straight to tools. Before you touch n8n, Make, Zapier, or any platform, sit down and map the actual process. Who does what? When? What triggers the next step? Where do things break?\n\nYou'd be surprised how often this exercise alone reveals unnecessary steps that can simply be eliminated — no automation needed.\n\n### Measure the before\n\nYou can't prove ROI if you don't measure the current state. Track how long the manual process takes, how often errors occur, and how many people are involved. Then measure the same things after automation. The numbers will speak for themselves — and they'll help you build the case for automating the next process.\n\n### Think in workflows, not tasks\n\nAutomating individual tasks is fine, but the real power comes from automating entire workflows end-to-end. Instead of automating just the data entry part, automate the trigger, the data entry, the notification, the follow-up, and the reporting. That's where the 10x gains live.\n\n## The 8-Hour Reality Check\n\nHere's a question: if you could give every person on your team 8 extra hours per week, what would they do with it?\n\nThe answers are always the same. Ship faster. Talk to more customers. Think more strategically. Build the thing they've been putting off for months.\n\nThose 8 hours exist. They're just trapped inside spreadsheets, manual copy-paste workflows, and processes that should have been automated two years ago.\n\nThe companies that free those hours aren't the ones with the biggest budgets or the fanciest tools. They're the ones that decided to stop treating manual work as \"just how things are\" and started treating it as a problem worth solving.\n\nIf you're about to hire a developer, book a free 20-minute call."
     },
     {
       "title": "January 2026 automation news: agentic operations go enterprise-grade",
@@ -447,7 +72,7 @@
       "summary": "It's not a skills problem. It's a fit problem. Why cultural alignment beats technical checkboxes—and what we do differently at OpenGateHub.",
       "image": "/images/article6.jpg",
       "thumbnail": "/images/article6.jpg",
-      "content": "You've been there. You post a job on Toptal, Upwork, or reach out to a dev agency. You get a list of CVs, impressive portfolios, and technical assessments that check every box. You hire someone. And three months later, you're exhausted — chasing updates, rewriting requirements for the fifth time, wondering why the communication feels like pulling teeth.\n\nIt's not a skills problem. It's a fit problem.\n\nAnd yet, almost every software agency in the market is still solving the wrong problem.\n\n## The Industry Is Obsessed With the Wrong Metrics\n\nWhen startups look for developers or a software partner, the standard conversation goes like this: \"What's your tech stack? Do you know React? AWS? Have you done this before?\"\n\nThese are valid questions. But they're table stakes — not differentiators. Any decent developer knows React. Plenty of agencies have AWS certifications. Technical skills are the minimum viable requirement, not the thing that makes a partnership work.\n\nWhat makes a partnership actually work is something much harder to screen for in a technical assessment: how someone thinks, communicates, handles ambiguity, and shows up when things get complicated.\n\nAnd things always get complicated.\n\n## Cultural Fit Isn't a \"Nice to Have\" — It's a Business Risk Variable\n\nAt OpenGateHub, we made a deliberate decision early on: cultural fit comes first. Not after the technical interview. Not as a last checkbox. First.\n\nWhy? Because we've seen what happens when it's missing.\n\nA developer who is technically excellent but communicates reactively instead of proactively will cost you more time than a developer who is slightly less senior but owns problems. A team that doesn't understand your product vision will build the right thing the wrong way, every single time. A developer who works asynchronously in a way that doesn't match your team's rhythm will create invisible bottlenecks that only surface at the worst possible moments — right before a launch, right before a fundraising demo.\n\nThese aren't edge cases. They're the norm when cultural alignment isn't part of the screening process.\n\n## What \"Human-First\" Actually Means in Practice\n\nWhen a client comes to us, our first conversation isn't about technology. It's about how their team works. What does their communication look like? Are they async-heavy or do they prefer standups? How do they handle scope changes? What kind of feedback culture do they have? What went wrong with the last developer they hired?\n\nOnly once we understand that do we start thinking about who would fit.\n\nThis means we sometimes tell a technically excellent candidate — someone with a strong portfolio and great references — that they're not the right match for a specific client. Not because they aren't good. Because the fit isn't there.\n\nIt also means our clients aren't just getting a warm body to fill a seat. They're getting someone who will integrate into their team, communicate proactively, flag problems before they become blockers, and actually care about the outcome of the product they're building.\n\nThat's what our 9.7/10 CSAT score reflects. Not that we're the cheapest option or that our developers have the most certifications. But that when clients work with us, the experience feels different — more human, more aligned, less friction.\n\n## The Real Cost of Misalignment\n\nLet's talk numbers for a second, because this isn't just a philosophical stance — it's a financial one.\n\nA bad developer hire in a startup context doesn't just cost you their salary. It costs you the time your CTO spends managing them, the sprint cycles lost to rework, the morale impact on the rest of the team, and the opportunity cost of features not shipped while you're dealing with the fallout. Conservative estimates put the true cost of a bad technical hire at 1.5x to 3x their annual salary.\n\nStaff augmentation with the wrong agency has a similar dynamic — except the problems compound faster because you're often moving quickly and the stakes per sprint are higher.\n\nWhen you get the fit right from the start, that cost disappears. The developer ramps up faster. Communication is easier. Fewer things fall through the cracks. The work just flows.\n\n## Why This Matters More Than Ever in 2025\n\nThe market for developers has shifted significantly. There's more talent available globally than there was three years ago. AI tools have raised the floor on what any developer can produce. This means the baseline technical bar is getting easier to clear — and the human factors are becoming more differentiating, not less.\n\nThe startups and founders who will win in this environment are the ones building teams where the humans actually work well together. Where trust is built fast, communication is clear, and everyone is rowing in the same direction.\n\nThat's what we're building at OpenGateHub. One partnership at a time."
+      "content": "You've been there. You post a job on Toptal, Upwork, or reach out to a dev agency. You get a list of CVs, impressive portfolios, and technical assessments that check every box. You hire someone. And three months later, you're exhausted — chasing updates, rewriting requirements for the fifth time, wondering why the communication feels like pulling teeth.\n\nIt's not a skills problem. It's a fit problem.\n\nAnd yet, almost every software agency in the market is still solving the wrong problem.\n\n## The Industry Is Obsessed With the Wrong Metrics\n\nWhen startups look for developers or a software partner, the standard conversation goes like this: \"What's your tech stack? Do you know React? AWS? Have you done this before?\"\n\nThese are valid questions. But they're table stakes — not differentiators. Any decent developer knows React. Plenty of agencies have AWS certifications. Technical skills are the minimum viable requirement, not the thing that makes a partnership work.\n\nWhat makes a partnership actually work is something much harder to screen for in a technical assessment: how someone thinks, communicates, handles ambiguity, and shows up when things get complicated.\n\nAnd things always get complicated.\n\n## Cultural Fit Isn't a \"Nice to Have\" — It's a Business Risk Variable\n\nAt OpenGateHub, we made a deliberate decision early on: cultural fit comes first. Not after the technical interview. Not as a last checkbox. First.\n\nWhy? Because we've seen what happens when it's missing.\n\nA developer who is technically excellent but communicates reactively instead of proactively will cost you more time than a developer who is slightly less senior but owns problems. A team that doesn't understand your product vision will build the right thing the wrong way, every single time. A developer who works asynchronously in a way that doesn't match your team's rhythm will create invisible bottlenecks that only surface at the worst possible moments — right before a launch, right before a fundraising demo.\n\nThese aren't edge cases. They're the norm when cultural alignment isn't part of the screening process.\n\n## What \"Human-First\" Actually Means in Practice\n\nWhen a client comes to us, our first conversation isn't about technology. It's about how their team works. What does their communication look like? Are they async-heavy or do they prefer standups? How do they handle scope changes? What kind of feedback culture do they have? What went wrong with the last developer they hired?\n\nOnly once we understand that do we start thinking about who would fit.\n\nThis means we sometimes tell a technically excellent candidate — someone with a strong portfolio and great references — that they're not the right match for a specific client. Not because they aren't good. Because the fit isn't there.\n\nIt also means our clients aren't just getting a warm body to fill a seat. They're getting someone who will integrate into their team, communicate proactively, flag problems before they become blockers, and actually care about the outcome of the product they're building.\n\n## The Real Cost of Misalignment\n\nLet's talk numbers for a second, because this isn't just a philosophical stance — it's a financial one.\n\nA bad developer hire in a startup context doesn't just cost you their salary. It costs you the time your CTO spends managing them, the sprint cycles lost to rework, the morale impact on the rest of the team, and the opportunity cost of features not shipped while you're dealing with the fallout. Conservative estimates put the true cost of a bad technical hire at 1.5x to 3x their annual salary.\n\nStaff augmentation with the wrong agency has a similar dynamic — except the problems compound faster because you're often moving quickly and the stakes per sprint are higher.\n\nWhen you get the fit right from the start, that cost disappears. The developer ramps up faster. Communication is easier. Fewer things fall through the cracks. The work just flows.\n\n## Why This Matters More Than Ever in 2025\n\nThe market for developers has shifted significantly. There's more talent available globally than there was three years ago. AI tools have raised the floor on what any developer can produce. This means the baseline technical bar is getting easier to clear — and the human factors are becoming more differentiating, not less.\n\nThe startups and founders who will win in this environment are the ones building teams where the humans actually work well together. Where trust is built fast, communication is clear, and everyone is rowing in the same direction.\n\nThat's what we're building at OpenGateHub. One partnership at a time."
     },
     {
       "title": "Why LATAM Is Becoming the Smartest Choice for Staff Augmentation",
@@ -487,7 +112,7 @@
       "summary": "Learn how AI and automation are transforming businesses and creating new opportunities for growth and innovation.",
       "image": "/images/article4.jpg",
       "thumbnail": "/images/article4.jpg",
-      "content": "In a world where technology is advancing at an unprecedented pace, artificial intelligence (AI) and automation are revolutionizing the way businesses operate and grow. From streamlining internal processes to enhancing customer experiences, these technologies are the key to staying competitive in today's market.\n\nWhy invest in AI and automation? Companies that embrace these tools not only reduce costs and operational times but also free up resources to focus on innovation and strategic development. According to Gartner, 70% of organizations will be using AI technologies in at least one key function by 2025.\n\nPractical Applications in Businesses\n\nProcess Optimization: Automating repetitive tasks such as inventory management, order tracking, or customer service through chatbots.\nPredictive Analysis: AI enables the analysis of large volumes of data to anticipate trends, identify risks, and make informed decisions.\nCustomer Personalization: Advanced algorithms make it possible to deliver unique and relevant experiences that enhance customer loyalty.\nAdvanced Cybersecurity: AI-based systems detect threats in real time, protecting sensitive data from cyberattacks.\n\nThe Impact on Business Growth\n\nAI and automation not only enhance efficiency but also pave the way for new business opportunities. Companies that have adopted these technologies report significant increases in productivity and customer satisfaction, leading to sustainable growth.\n\nOpenGateHub: Your Partner in AI and Automation\n\nAt OpenGateHub, we understand that every business faces unique challenges. That's why we deliver customized AI and automation solutions tailored to your needs, ensuring real and tangible results.\n\nThe future is now, and with AI and automation, success is within your business's reach."
+      "content": "In a world where technology is advancing at an unprecedented pace, artificial intelligence (AI) and automation are revolutionizing the way businesses operate and grow. From streamlining internal processes to enhancing customer experiences, these technologies are the key to staying competitive in today's market.\n\nWhy invest in AI and automation? Companies that embrace these tools not only reduce costs and operational times but also free up resources to focus on innovation and strategic development. According to Gartner, 70% of organizations will be using AI technologies in at least one key function by 2025.\n\nPractical Applications in Businesses\n\nProcess Optimization: Automating repetitive tasks such as inventory management, order tracking, or customer service through chatbots.\nPredictive Analysis: AI enables the analysis of large volumes of data to anticipate trends, identify risks, and make informed decisions.\nCustomer Personalization: Advanced algorithms make it possible to deliver unique and relevant experiences that enhance customer loyalty.\nAdvanced Cybersecurity: AI-based systems detect threats in real time, protecting sensitive data from cyberattacks.\n\nThe Impact on Business Growth\n\nAI and automation not only enhance efficiency but also pave the way for new business opportunities. Companies that have adopted these technologies report significant increases in productivity and customer satisfaction, leading to sustainable growth.\n\nThe future is now, and with AI and automation, success is within your business's reach.\n\nIf you're about to hire a developer, book a free 20-minute call."
     },
     {
       "title": "Top Staff Augmentation Companies in Latin America [2026 Guide]",
@@ -495,16 +120,14 @@
       "summary": "A comprehensive, honest comparison of the best staff augmentation companies in LATAM for 2026. Who they are, what they offer, and how to choose the right nearshore partner for your engineering team.",
       "image": "/images/article8.jpg",
       "thumbnail": "/images/article8.jpg",
-      "content": "If you are looking to scale your engineering team in 2026, Latin America is no longer an alternative — it is the strategic default for nearshore staff augmentation. Time zone alignment, strong technical talent, cultural compatibility with North American and European teams, and competitive rates have made LATAM the region of choice for companies ranging from early-stage startups to Fortune 500 enterprises.\n\nBut not all staff augmentation providers are created equal. The difference between a great experience and a painful one often comes down to how a company sources talent, how it handles cultural fit, and how accountable it stays after the contract is signed.\n\nThis guide breaks down the top staff augmentation companies operating in Latin America in 2026, what makes each one different, and how to evaluate which partner is the right fit for your specific needs.\n\n## What Is Staff Augmentation and Why Does It Matter?\n\nStaff augmentation is a model where external engineers are embedded directly into your existing team. Unlike traditional outsourcing, augmented engineers work within your codebase, attend your standups, follow your sprint cadence, and align with your product vision.\n\nThe key benefits include:\n\n- Speed: fill critical roles in days, not months\n- Flexibility: scale up or down based on project needs\n- Cost efficiency: access senior-level talent at a fraction of local hiring costs\n- Reduced risk: no long-term employment commitments or overhead\n\nStaff augmentation is especially valuable for product-driven companies that care about code quality, team cohesion, and long-term maintainability — not just output.\n\n## Why Latin America for Staff Augmentation in 2026?\n\nSeveral structural factors make LATAM uniquely suited for staff augmentation:\n\n### Time Zone Alignment\n\nLatin American engineers work in the same or adjacent time zones as U.S. and Canadian teams. This enables real-time collaboration, same-day feedback loops, and synchronous standups — something that is extremely difficult to achieve with teams in Eastern Europe or Asia.\n\n### Deep Technical Talent Pool\n\nCountries like Argentina, Colombia, Brazil, Mexico, Uruguay, and Chile have invested heavily in computer science education and have thriving tech ecosystems. LATAM engineers are deeply familiar with modern stacks: React, Node.js, Python, Go, AWS, Kubernetes, and more.\n\n### Cultural Compatibility\n\nLATAM professionals share work culture patterns with Western teams: proactive communication, direct feedback, collaborative problem-solving, and strong work ethic. This reduces onboarding friction and helps augmented engineers feel like true team members rather than external resources.\n\n### Competitive Rates Without Compromising Quality\n\nSenior engineers in Latin America typically cost 40-60% less than equivalent talent in the U.S., while delivering comparable or superior quality. This is not about cheap labor — it is about accessing a market where the cost of living is lower but the talent bar is equally high.\n\n## Top Staff Augmentation Companies in Latin America [2026]\n\nHere is our honest assessment of the leading providers in the space. We have evaluated each company based on talent quality, vetting process, cultural fit approach, client transparency, and overall value.\n\n### 1. OpenGateHub\n\n- Focus: Staff augmentation, workflow automation, AI integration\n- Headquarters: Latin America\n- Key differentiator: Human-first approach with cultural fit screening before technical evaluation\n- Notable metrics: 9.7/10 CSAT, 7.3-day average kickoff, 87% on-time delivery\n- Tech stack: React, Next.js, Node.js, Python, Go, n8n, AWS, Google Cloud\n\nOpenGateHub takes a fundamentally different approach to staff augmentation. Instead of leading with technical assessments and CVs, the company screens for cultural fit first — how candidates communicate, handle ambiguity, give and receive feedback, and collaborate asynchronously.\n\nThis approach directly addresses the most common failure point in staff augmentation: engineers who are technically capable but create friction in day-to-day collaboration. OpenGateHub's model ensures that every embedded engineer integrates smoothly into the client's workflow from day one.\n\nThe company also brings a unique dual capability: in addition to staff augmentation, OpenGateHub offers workflow automation and AI integration services. This means clients can scale their engineering team and optimize their operations simultaneously — a combination that few competitors offer.\n\nWith a 9.7/10 client satisfaction score across 66 surveys and an average kickoff time of just 7.3 days, OpenGateHub delivers both speed and quality. The company works primarily with startups and mid-market companies that value partnership over transactional staffing.\n\nBest for: Product-driven companies that prioritize cultural fit and want a partner, not just a vendor. Teams that also need automation or AI capabilities alongside engineering talent.\n\n### 2. BairesDev\n\n- Focus: Nearshore software development and staff augmentation\n- Headquarters: San Francisco (operations across LATAM)\n- Scale: 4,000+ developers\n- Key differentiator: Massive talent pool with enterprise-grade processes\n\nBairesDev is one of the largest nearshore providers in Latin America, with a deep bench of engineers across virtually every technology stack. The company has built enterprise-grade recruitment and management processes that can handle large-scale engagements.\n\nThe trade-off is that BairesDev's scale can sometimes feel impersonal. Client feedback occasionally mentions that the experience feels more like working with a large staffing agency than a boutique partner. For companies that need to fill multiple roles quickly and prioritize process consistency over individual cultural fit, BairesDev is a strong choice.\n\nBest for: Enterprise companies needing to staff multiple roles quickly with standardized processes.\n\n### 3. BEON.tech\n\n- Focus: Staff augmentation and contract-to-hire\n- Headquarters: Argentina\n- Key differentiator: Deep vetting process with 59,600+ candidates evaluated\n- Notable: Clutch 2025 Best Staff Augmentation award\n\nBEON.tech has built a reputation for rigorous technical vetting. With nearly 60,000 candidates evaluated, the company has a data-driven approach to talent selection that emphasizes both technical skill and retention potential.\n\nThe company also offers a contract-to-hire model, which gives clients the option to convert augmented engineers into full-time employees after a trial period. This flexibility is valuable for companies that want to test cultural fit before making a permanent commitment.\n\nBest for: Companies that want rigorous technical vetting and the option to convert contractors to full-time hires.\n\n### 4. Tecla\n\n- Focus: Nearshore staff augmentation and software development\n- Headquarters: San Francisco\n- Key differentiator: Transparent pricing by seniority level, 90-day risk-free period\n- Notable: Inc. 5000 recognition, 4.9/5 rating (62 reviews)\n\nTecla stands out for pricing transparency — something unusual in an industry where most providers require a sales call before sharing rates. The company publishes pricing by seniority level and offers a 90-day risk-free period, which significantly reduces the risk for first-time clients.\n\nTecla also provides comprehensive comparison data (LATAM vs. Eastern Europe vs. Asia), helping potential clients make informed decisions about their nearshore strategy.\n\nBest for: Companies that value pricing transparency and want a low-risk entry point into nearshore staff augmentation.\n\n### 5. Near (HireWithNear)\n\n- Focus: Staffing, direct hire, payroll services\n- Headquarters: New York\n- Key differentiator: Full-service HR infrastructure including payroll, benefits, and compliance\n- Notable metrics: 2,700+ professionals placed, $70M+ saved for clients\n\nNear offers more than just talent placement — the company provides a complete HR infrastructure that includes payroll processing, healthcare benefits, compliance management, and on-the-ground support in LATAM countries.\n\nThis makes Near particularly attractive for companies that want to build a dedicated nearshore team but do not want to deal with the administrative complexity of hiring across borders.\n\nBest for: Companies that need end-to-end HR support alongside talent placement. Organizations building dedicated nearshore teams with payroll and compliance handled.\n\n### 6. Softtek\n\n- Focus: Enterprise IT services and nearshore development\n- Headquarters: Monterrey, Mexico (founded 1982)\n- Scale: 16,000+ employees\n- Key differentiator: 40+ year track record, Gartner Magic Quadrant recognition\n\nSofttek is the pioneer of the nearshore model, having coined the concept in the early 1990s. With over four decades of experience and Gartner Magic Quadrant recognition, the company brings enterprise-grade credibility that few competitors can match.\n\nThe trade-off is that Softtek primarily serves large enterprises and may not be the best fit for startups or mid-market companies looking for agility and a boutique experience.\n\nBest for: Large enterprises that need a proven, established nearshore partner with a long track record.\n\n### 7. Howdy\n\n- Focus: Developer staffing with dedicated performance coaches\n- Headquarters: Austin, TX (10 physical offices in LATAM)\n- Key differentiator: 98% retention rate, physical offices providing in-person support\n- Notable: Performance coaching model for each developer\n\nHowdy takes a unique approach by providing performance coaches to each developer and maintaining physical offices across Latin America. This infrastructure supports developer retention and career growth, which translates into better long-term outcomes for clients.\n\nBest for: Companies looking for long-term engagements where developer retention and career development are priorities.\n\n## How to Evaluate a Staff Augmentation Partner\n\nChoosing the right partner is not just about comparing features. Here are the key questions you should ask:\n\n### 1. How do they screen for cultural fit?\n\nTechnical skills are table stakes. The real differentiator is whether augmented engineers can integrate into your team's communication style, work cadence, and problem-solving approach. Ask specifically what the company does beyond technical interviews to assess fit.\n\n### 2. What is their average time to first productive sprint?\n\nA good staff augmentation partner should have engineers ready to contribute within one to two weeks — not months. Ask for specific data on average onboarding time.\n\n### 3. What happens when a placement does not work out?\n\nEvery provider will tell you their engineers are great. The real test is what happens when something goes wrong. Ask about replacement guarantees, trial periods, and how they handle underperformance.\n\n### 4. Do they offer more than bodies?\n\nThe best staff augmentation companies bring strategic value beyond just talent placement. Whether it is process optimization, technical architecture guidance, or workflow automation, look for partners that make your team better — not just bigger.\n\n### 5. Can they show you real client data?\n\nBeware of providers that rely only on case studies and testimonials. Ask for specific, measurable outcomes: CSAT scores, retention rates, average engagement length, on-time delivery percentages. Data tells the real story.\n\n## Staff Augmentation vs. Outsourcing vs. Managed Teams: Which Model Is Right?\n\nUnderstanding the differences between these models is crucial for making the right decision:\n\n### Staff Augmentation\n\n- Engineers join your team and work within your processes\n- You maintain full control over priorities and workflow\n- Best for: extending your existing engineering team\n\n### Outsourcing\n\n- You hand off a project or function to an external team\n- The vendor manages execution, you review outputs\n- Best for: non-core projects with well-defined requirements\n\n### Managed Teams\n\n- A hybrid model where the vendor provides a dedicated team with a project manager\n- You set the direction, they manage day-to-day execution\n- Best for: companies without internal engineering leadership\n\nFor most product-driven companies in 2026, staff augmentation offers the best balance of control, flexibility, and cost efficiency. It keeps your team cohesive while giving you access to senior talent that would be difficult or expensive to hire locally.\n\n## The True Cost of Nearshore Staff Augmentation in LATAM\n\nOne of the most common questions companies ask is about cost. Here is a realistic breakdown for 2026:\n\n- Junior developers (1-3 years experience): $3,000-$5,000/month\n- Mid-level developers (3-5 years): $5,000-$7,500/month\n- Senior developers (5+ years): $7,500-$10,000/month\n- Tech leads and architects: $10,000-$14,000/month\n\nCompare this to U.S. market rates for equivalent talent:\n\n- Senior developers: $12,000-$18,000/month (salary + benefits + overhead)\n- Tech leads: $18,000-$25,000/month\n\nThe savings are significant — typically 40-60% — without compromising on quality. And because staff augmentation avoids the overhead of full-time employment (benefits, office space, equipment, HR administration), the effective savings can be even higher.\n\n## Common Mistakes to Avoid\n\nBased on working with dozens of companies that have tried staff augmentation, here are the most common pitfalls:\n\n### 1. Choosing on price alone\n\nThe cheapest option is rarely the best value. Engineers priced significantly below market rates are either junior, poorly vetted, or working for a company that cuts corners on support and management. Invest in quality — the cost of a bad hire far exceeds the savings from a lower rate.\n\n### 2. Not investing in onboarding\n\nAugmented engineers need the same onboarding investment as internal hires. Share context, grant access to documentation, introduce them to the team, and set clear expectations. Companies that treat augmented engineers as plug-and-play resources get plug-and-play results.\n\n### 3. Treating augmentation as outsourcing\n\nIf you send requirements and wait for deliverables, you are outsourcing — not augmenting. For staff augmentation to work, augmented engineers need to be part of your team: included in planning, given autonomy, and trusted with ownership.\n\n### 4. Ignoring cultural fit\n\nA technically brilliant engineer who does not communicate proactively, misaligns on feedback cadence, or works on a completely different schedule will create more problems than they solve. Cultural fit is not optional.\n\n## Final Thoughts: The LATAM Staff Augmentation Landscape in 2026\n\nThe staff augmentation market in Latin America has matured significantly. Companies like OpenGateHub, BEON.tech, Tecla, Near, and others are raising the bar on talent quality, cultural alignment, and operational transparency.\n\nFor companies looking to scale in 2026, the question is no longer whether to consider Latin America — it is which partner aligns best with your team's culture, your product's needs, and your growth trajectory.\n\nThe right partner will not just give you engineers. They will give you teammates who make your product better, your sprints smoother, and your team stronger.\n\nChoose accordingly."
+      "content": "If you are looking to scale your engineering team in 2026, Latin America is no longer an alternative — it is the strategic default for nearshore staff augmentation. Time zone alignment, strong technical talent, cultural compatibility with North American and European teams, and competitive rates have made LATAM the region of choice for companies ranging from early-stage startups to Fortune 500 enterprises.\n\nBut not all staff augmentation providers are created equal. The difference between a great experience and a painful one often comes down to how a company sources talent, how it handles cultural fit, and how accountable it stays after the contract is signed.\n\nThis guide breaks down the top staff augmentation companies operating in Latin America in 2026, what makes each one different, and how to evaluate which partner is the right fit for your specific needs.\n\n## What Is Staff Augmentation and Why Does It Matter?\n\nStaff augmentation is a model where external engineers are embedded directly into your existing team. Unlike traditional outsourcing, augmented engineers work within your codebase, attend your standups, follow your sprint cadence, and align with your product vision.\n\nThe key benefits include:\n\n- Speed: fill critical roles in days, not months\n- Flexibility: scale up or down based on project needs\n- Cost efficiency: access senior-level talent at a fraction of local hiring costs\n- Reduced risk: no long-term employment commitments or overhead\n\nStaff augmentation is especially valuable for product-driven companies that care about code quality, team cohesion, and long-term maintainability — not just output.\n\n## Why Latin America for Staff Augmentation in 2026?\n\nSeveral structural factors make LATAM uniquely suited for staff augmentation:\n\n### Time Zone Alignment\n\nLatin American engineers work in the same or adjacent time zones as U.S. and Canadian teams. This enables real-time collaboration, same-day feedback loops, and synchronous standups — something that is extremely difficult to achieve with teams in Eastern Europe or Asia.\n\n### Deep Technical Talent Pool\n\nCountries like Argentina, Colombia, Brazil, Mexico, Uruguay, and Chile have invested heavily in computer science education and have thriving tech ecosystems. LATAM engineers are deeply familiar with modern stacks: React, Node.js, Python, Go, AWS, Kubernetes, and more.\n\n### Cultural Compatibility\n\nLATAM professionals share work culture patterns with Western teams: proactive communication, direct feedback, collaborative problem-solving, and strong work ethic. This reduces onboarding friction and helps augmented engineers feel like true team members rather than external resources.\n\n### Competitive Rates Without Compromising Quality\n\nSenior engineers in Latin America typically cost 40-60% less than equivalent talent in the U.S., while delivering comparable or superior quality. This is not about cheap labor — it is about accessing a market where the cost of living is lower but the talent bar is equally high.\n\n## Top Staff Augmentation Companies in Latin America [2026]\n\nHere is our honest assessment of the leading providers in the space. We have evaluated each company based on talent quality, vetting process, cultural fit approach, client transparency, and overall value.\n\n### 1. OpenGateHub\n\n- Focus: Staff augmentation\n- Developers: Senior only, fully remote\n- Screening: Interviews every developer before presenting them\n- Call: Free, 20 minutes, with the founder\n\nOpenGateHub works with two models. In one, the developer joins the client's team and OpenGateHub bills monthly. In the other, OpenGateHub charges for the search and the client hires directly.\n\nIf the developer does not work out, OpenGateHub replaces them at no cost.\n\nBest for: Companies looking for senior developers, either to add to their team or to hire directly.\n\n### 2. BairesDev\n\n- Focus: Nearshore software development and staff augmentation\n- Headquarters: San Francisco (operations across LATAM)\n- Scale: 4,000+ developers\n- Key differentiator: Massive talent pool with enterprise-grade processes\n\nBairesDev is one of the largest nearshore providers in Latin America, with a deep bench of engineers across virtually every technology stack. The company has built enterprise-grade recruitment and management processes that can handle large-scale engagements.\n\nThe trade-off is that BairesDev's scale can sometimes feel impersonal. Client feedback occasionally mentions that the experience feels more like working with a large staffing agency than a boutique partner. For companies that need to fill multiple roles quickly and prioritize process consistency over individual cultural fit, BairesDev is a strong choice.\n\nBest for: Enterprise companies needing to staff multiple roles quickly with standardized processes.\n\n### 3. BEON.tech\n\n- Focus: Staff augmentation and contract-to-hire\n- Headquarters: Argentina\n- Key differentiator: Deep vetting process with 59,600+ candidates evaluated\n- Notable: Clutch 2025 Best Staff Augmentation award\n\nBEON.tech has built a reputation for rigorous technical vetting. With nearly 60,000 candidates evaluated, the company has a data-driven approach to talent selection that emphasizes both technical skill and retention potential.\n\nThe company also offers a contract-to-hire model, which gives clients the option to convert augmented engineers into full-time employees after a trial period. This flexibility is valuable for companies that want to test cultural fit before making a permanent commitment.\n\nBest for: Companies that want rigorous technical vetting and the option to convert contractors to full-time hires.\n\n### 4. Tecla\n\n- Focus: Nearshore staff augmentation and software development\n- Headquarters: San Francisco\n- Key differentiator: Transparent pricing by seniority level, 90-day risk-free period\n- Notable: Inc. 5000 recognition, 4.9/5 rating (62 reviews)\n\nTecla stands out for pricing transparency — something unusual in an industry where most providers require a sales call before sharing rates. The company publishes pricing by seniority level and offers a 90-day risk-free period, which significantly reduces the risk for first-time clients.\n\nTecla also provides comprehensive comparison data (LATAM vs. Eastern Europe vs. Asia), helping potential clients make informed decisions about their nearshore strategy.\n\nBest for: Companies that value pricing transparency and want a low-risk entry point into nearshore staff augmentation.\n\n### 5. Near (HireWithNear)\n\n- Focus: Staffing, direct hire, payroll services\n- Headquarters: New York\n- Key differentiator: Full-service HR infrastructure including payroll, benefits, and compliance\n- Notable metrics: 2,700+ professionals placed, $70M+ saved for clients\n\nNear offers more than just talent placement — the company provides a complete HR infrastructure that includes payroll processing, healthcare benefits, compliance management, and on-the-ground support in LATAM countries.\n\nThis makes Near particularly attractive for companies that want to build a dedicated nearshore team but do not want to deal with the administrative complexity of hiring across borders.\n\nBest for: Companies that need end-to-end HR support alongside talent placement. Organizations building dedicated nearshore teams with payroll and compliance handled.\n\n### 6. Softtek\n\n- Focus: Enterprise IT services and nearshore development\n- Headquarters: Monterrey, Mexico (founded 1982)\n- Scale: 16,000+ employees\n- Key differentiator: 40+ year track record, Gartner Magic Quadrant recognition\n\nSofttek is the pioneer of the nearshore model, having coined the concept in the early 1990s. With over four decades of experience and Gartner Magic Quadrant recognition, the company brings enterprise-grade credibility that few competitors can match.\n\nThe trade-off is that Softtek primarily serves large enterprises and may not be the best fit for startups or mid-market companies looking for agility and a boutique experience.\n\nBest for: Large enterprises that need a proven, established nearshore partner with a long track record.\n\n### 7. Howdy\n\n- Focus: Developer staffing with dedicated performance coaches\n- Headquarters: Austin, TX (10 physical offices in LATAM)\n- Key differentiator: 98% retention rate, physical offices providing in-person support\n- Notable: Performance coaching model for each developer\n\nHowdy takes a unique approach by providing performance coaches to each developer and maintaining physical offices across Latin America. This infrastructure supports developer retention and career growth, which translates into better long-term outcomes for clients.\n\nBest for: Companies looking for long-term engagements where developer retention and career development are priorities.\n\n## How to Evaluate a Staff Augmentation Partner\n\nChoosing the right partner is not just about comparing features. Here are the key questions you should ask:\n\n### 1. How do they screen for cultural fit?\n\nTechnical skills are table stakes. The real differentiator is whether augmented engineers can integrate into your team's communication style, work cadence, and problem-solving approach. Ask specifically what the company does beyond technical interviews to assess fit.\n\n### 2. What is their average time to first productive sprint?\n\nA good staff augmentation partner should have engineers ready to contribute within one to two weeks — not months. Ask for specific data on average onboarding time.\n\n### 3. What happens when a placement does not work out?\n\nEvery provider will tell you their engineers are great. The real test is what happens when something goes wrong. Ask about replacement guarantees, trial periods, and how they handle underperformance.\n\n### 4. Do they offer more than bodies?\n\nThe best staff augmentation companies bring strategic value beyond just talent placement. Whether it is process optimization, technical architecture guidance, or workflow automation, look for partners that make your team better — not just bigger.\n\n### 5. Can they show you real client data?\n\nBeware of providers that rely only on case studies and testimonials. Ask for specific, measurable outcomes: CSAT scores, retention rates, average engagement length, on-time delivery percentages. Data tells the real story.\n\n## Staff Augmentation vs. Outsourcing vs. Managed Teams: Which Model Is Right?\n\nUnderstanding the differences between these models is crucial for making the right decision:\n\n### Staff Augmentation\n\n- Engineers join your team and work within your processes\n- You maintain full control over priorities and workflow\n- Best for: extending your existing engineering team\n\n### Outsourcing\n\n- You hand off a project or function to an external team\n- The vendor manages execution, you review outputs\n- Best for: non-core projects with well-defined requirements\n\n### Managed Teams\n\n- A hybrid model where the vendor provides a dedicated team with a project manager\n- You set the direction, they manage day-to-day execution\n- Best for: companies without internal engineering leadership\n\nFor most product-driven companies in 2026, staff augmentation offers the best balance of control, flexibility, and cost efficiency. It keeps your team cohesive while giving you access to senior talent that would be difficult or expensive to hire locally.\n\n## Common Mistakes to Avoid\n\nBased on working with dozens of companies that have tried staff augmentation, here are the most common pitfalls:\n\n### 1. Choosing on price alone\n\nThe cheapest option is rarely the best value. Engineers priced significantly below market rates are either junior, poorly vetted, or working for a company that cuts corners on support and management. Invest in quality — the cost of a bad hire far exceeds the savings from a lower rate.\n\n### 2. Not investing in onboarding\n\nAugmented engineers need the same onboarding investment as internal hires. Share context, grant access to documentation, introduce them to the team, and set clear expectations. Companies that treat augmented engineers as plug-and-play resources get plug-and-play results.\n\n### 3. Treating augmentation as outsourcing\n\nIf you send requirements and wait for deliverables, you are outsourcing — not augmenting. For staff augmentation to work, augmented engineers need to be part of your team: included in planning, given autonomy, and trusted with ownership.\n\n### 4. Ignoring cultural fit\n\nA technically brilliant engineer who does not communicate proactively, misaligns on feedback cadence, or works on a completely different schedule will create more problems than they solve. Cultural fit is not optional.\n\n## Final Thoughts: The LATAM Staff Augmentation Landscape in 2026\n\nThe staff augmentation market in Latin America has matured significantly. Companies like OpenGateHub, BEON.tech, Tecla, Near, and others are raising the bar on talent quality, cultural alignment, and operational transparency.\n\nFor companies looking to scale in 2026, the question is no longer whether to consider Latin America — it is which partner aligns best with your team's culture, your product's needs, and your growth trajectory.\n\nThe right partner will not just give you engineers. They will give you teammates who make your product better, your sprints smoother, and your team stronger.\n\nChoose accordingly."
     }
   ],
-  "reviewsTitle": "What our partners say",
-  "reviewsSubtitle": "9.7/10 satisfaction score across 66 client surveys. Here's what they say.",
   "reviews": {
     "farzad": {
       "text": "We worked with OpenGateHub on two different projects: an e-commerce site and an early-stage AI product.\n\nWhat I valued most was how straightforward the whole process felt. They asked the right questions from the start, kept communication clear, and delivered without unnecessary back and forth. The e-commerce site was delivered ready to launch, exactly as we needed it.\n\nOn the AI product, they also helped us think through the direction from the beginning — not just building features, but focusing on what made sense to build first.\n\nIf you're looking for a reliable, proactive team that's genuinely easy to work with, I recommend OpenGateHub without hesitation.",
       "company": "Farzad Khosravi",
-      "role": "Founder — Hot Date Kitchen · Chief Product Officer — Cicero (early-stage)"
+      "role": "Founder, Hot Date Kitchen · Chief Product Officer, Cicero (early-stage)"
     },
     "skylar": {
       "text": "We are truly delighted with the work OpenGateHub did for our venture. They understood from the very beginning what we wanted to convey and translated it into a modern, intuitive, and visually flawless website. Moreover, their service was excellent: always available, quick to respond, and very willing to resolve any doubts or needs that arose. It's evident that they work with commitment, professionalism, and experience. We recommend them without hesitation.",
@@ -532,179 +155,31 @@
       "role": "Brenda Alarcón, CEO"
     }
   },
-  "missionAndCoreValuesTitle": "Our Mission & Values",
-  "technologiesTitle": "Our People",
-  "commitmentToInnovationTitle": "Innovation with Purpose",
-  "homeServicesSection": {
-    "title": "Our Services",
-    "subtitle": "We work with people who care about the how, not just the what.   \nCustom solutions for founders who want to scale with flow, trust, and culture.",
-    "startJourneyButton": "Start Your Journey",
-    "cards": {
-      "staffAugmentation": {
-        "title": "Staff Augmentation",
-        "description": "We scale your team prioritizing cultural fit and human quality. We select developers who align with your values and way of working, not just technical skills."
-      },
-      "softwareDevelopment": {
-        "title": "Software Development",
-        "description": "Web apps, platforms, and systems that scale. We build the foundation your business runs on — clean code, solid architecture, and reliable delivery."
-      },
-      "uxUiDesign": {
-        "title": "UX/UI Design",
-        "description": "Design that feels good — and works. We create thoughtful, intuitive interfaces your users will actually want to use."
-      },
-      "aiAndAutomation": {
-        "title": "AI & Automation",
-        "description": "Let tech take weight off your plate. We bring AI into your product and automate workflows without code. We connect your tools and build powerful integrations that make your business run smoother."
-      },
-      "dataAnalytics": {
-        "title": "Data Analytics",
-        "description": "Dashboards, reports, and data pipelines that make sense. We help you understand what's happening in your business — and what to do about it."
-      },
-      "mobileDevelopment": {
-        "title": "Mobile Development",
-        "description": "From your idea to their pocket. We create native apps that feel intuitive, responsive and on brand — every time."
-      }
-    }
-  },
-  "homeCapabilitiesSection": {
-    "title": "Where we create the most impact",
-    "subtitle": "From eliminating manual tasks to scaling your engineering team — here's how companies like yours stop losing time and start shipping faster.",
-    "ctaText": "See how we work",
-    "mostPopular": "Most Popular",
-    "cards": {
-      "softwareDevelopment": {
-        "title": "Staff Augmentation",
-        "description": "Embed senior engineers and QA into your team to increase delivery capacity without increasing management overhead."
-      },
-      "mobileDevelopment": {
-        "title": "Workflow Automation",
-        "description": "Automate repetitive workflows, approvals, and cross-team handoffs to reduce cycle time and manual errors."
-      },
-      "dataAutomation": {
-        "title": "AI & Automation Ops",
-        "description": "Connect systems, orchestrate AI-powered processes, and gain real-time operational visibility with dashboards and alerts."
-      }
-    }
-  },
   "caseStudiesSection": {
-    "eyebrow": "Case Studies",
-    "title": "Real results, real companies",
-    "subtitle": "Measurable outcomes across automation, AI, and engineering delivery.",
-    "benchmarksCTA": "Calculate your team's potential savings →",
-    "valthorCategory": "AI · CRM",
+    "eyebrow": "Cases",
+    "title": "Real teams, real products",
+    "subtitle": "Teams we added developers to, and products our team built.",
+    "valthorCategory": "Staff Augmentation",
     "valthorTitle": "Valthor CRM",
-    "valthorDesc": "We embedded a senior squad to build their AI-powered CRM. Conversational automation, real-time dashboards, and seamless integration into their engineering rituals.",
-    "valthorStat": "reduction in manual tasks",
+    "valthorDesc": "We added a senior team to theirs to build their AI-powered CRM: real-time dashboards and direct integration into their engineering rituals.",
     "hotdateCategory": "E-commerce",
     "hotdateTitle": "Hot Date Kitchen",
     "hotdateDesc": "Gourmet brand e-commerce with custom visual identity, integrated cart and payment gateway, mobile optimization, and technical SEO.",
-    "hotdateStat": "conversion-optimized launch",
     "smartersCategory": "Smart Cities",
     "smartersTitle": "Smarters City",
-    "smartersDesc": "Urban management platform centralizing data on mobility, infrastructure, and municipal services — real-time analysis with interactive dashboards for city managers.",
-    "smartersStat": "faster page load",
-    "vantageCategory": "AI · Generative",
+    "smartersDesc": "Urban management platform centralizing data on mobility, infrastructure and municipal services, with real-time analysis and interactive dashboards for city managers.",
+    "vantageCategory": "Staff Augmentation",
     "vantageTitle": "Vantage Inc.",
     "vantageDesc": "Embedded AI engineering team to build a generative image platform with natural language editing and an integration-ready API for any creative workflow.",
-    "vantageStat": "roadmap acceleration",
-    "propbotCategory": "AI · Automation",
+    "propbotCategory": "Our own product",
     "propbotTitle": "PropBot",
-    "propbotDesc": "AI-powered chatbot for real estate agencies that responds to inquiries in 5 seconds, filters properties via natural language, and auto-schedules viewings — 24/7 on WhatsApp, Instagram, and Facebook.",
-    "propbotStat": "recovered inquiries",
+    "propbotDesc": "AI-powered chatbot for real estate agencies that responds to inquiries in 5 seconds, filters properties via natural language and schedules viewings, 24/7 on WhatsApp, Instagram and Facebook.",
     "mangilCategory": "CRM · Coaching",
     "mangilTitle": "Sistema Manu Gil",
-    "mangilDesc": "Custom CRM for a health coaching and peptide distribution business — client pipeline, delivery tracking, peptide catalog with margin analysis, memberships, and financial dashboards, all in one system.",
-    "labsmailCategory": "AI · Outreach",
+    "mangilDesc": "Custom CRM for a health coaching and peptide distribution business: client pipeline, delivery tracking, catalog with margin analysis, memberships and financial dashboards, all in one system.",
+    "labsmailCategory": "Our own product",
     "labsmailTitle": "LabsMail",
-    "labsmailDesc": "AI-powered cold email engine that researches each prospect individually, writes hyper-personalized emails, and manages multi-channel campaigns with full pipeline tracking. Available as a done-for-you service.",
-    "labsmailStat": "avg reply rate"
-  },
-  "featuredWorkSection": {
-    "title": "Featured Work",
-    "subtitle": "Real projects that showcase our expertise and impact",
-    "smartersCity": {
-      "title": "Smarters City",
-      "description": "Urban Asset-Management SaaS for real-time mapping & maintenance of streetlights, traffic lights and more.",
-      "metrics": [
-        "35% faster load",
-        "0 critical bugs",
-        "1st municipal contract"
-      ]
-    },
-    "estudioSab": {
-      "title": "Estudio Sab",
-      "description": "Full-stack web development for a creative design studio.",
-      "metrics": ["Full development", "Modern design", "Live website"]
-    },
-    "skylar": {
-      "title": "Skylar",
-      "description": "E-commerce platform for a leading school supplies brand in Argentina.",
-      "metrics": ["≤2s TTI", "+28% conversions", "Live catalog"]
-    },
-    "vantage": {
-      "title": "Vantage",
-      "description": "Staff augmentation — embedded engineers and QA into their team, accelerating roadmap delivery and boosting development velocity.",
-      "metrics": ["Staff Augmentation", "Faster roadmap", "QA embedded"]
-    },
-    "hotDateKitchen": {
-      "title": "Hot Date Kitchen",
-      "description": "Landing page and e-commerce for a premium vegan snack brand.",
-      "metrics": ["Landing + E-commerce", "Shopify", "Carbon neutral brand"]
-    },
-    "cicero": {
-      "title": "Cicero",
-      "description": "AI-powered personal librarian (early-stage).",
-      "metrics": ["Product direction", "Early development", "View on LinkedIn"]
-    },
-    "propbot": {
-      "title": "PropBot",
-      "description": "AI-powered chatbot for real estate agencies — responds in 5 seconds, filters properties via natural language, and auto-schedules viewings on WhatsApp, Instagram, and Facebook.",
-      "metrics": ["<5s response", "+23 viewings/mo", "24/7 multi-channel"]
-    }
-  },
-  "metricsSection": {
-    "title": "Proven Results",
-    "subtitle": "Data-driven performance that speaks for itself",
-    "howWeMeasure": "How we measure",
-    "metrics": {
-      "avgKickoff": {
-        "value": "7.3",
-        "unit": "days",
-        "label": "Average Kickoff Time",
-        "description": "From signed SOW to first merged PR (n=6 projects, updated: Jan 2026)"
-      },
-      "onTimeDelivery": {
-        "value": "87",
-        "unit": "%",
-        "label": "On-Time Delivery",
-        "description": "Milestones/sprints delivered on time (n=9 months, updated: Jan 2026)"
-      },
-      "npsScore": {
-        "value": "9.7",
-        "unit": "/10",
-        "label": "CSAT Score",
-        "description": "Customer Satisfaction Score from client feedback (n=66 surveys, updated: Jan 2026)"
-      },
-      "sprintsShipped": {
-        "value": "50+",
-        "unit": "",
-        "label": "Sprints Shipped",
-        "description": "Successful sprint deliveries across multiple client projects (n=6 projects, updated: Jan 2026)"
-      },
-      "cycleTimeReduction": {
-        "value": "28",
-        "unit": "%",
-        "label": "Cycle Time Reduction",
-        "description": "vs. client's initial baseline (n=4 projects, average 18-28%, updated: Jan 2026)"
-      }
-    },
-    "measurementDetails": {
-      "avgKickoff": "We measure from signed Statement of Work (SOW) to first merged Pull Request in the client's repository. This includes environment setup, initial configuration, and first functional code.",
-      "onTimeDelivery": "We calculate the percentage of milestones and sprints delivered on or before the agreed date. We consider 'on time' if delivered within ±2 days of the target date.",
-      "npsScore": "We use post-project satisfaction surveys with a 1-10 scale. Clients evaluate code quality, communication, deadline compliance, and value delivered.",
-      "sprintsShipped": "We count successfully completed sprints that include functional features, approved testing, and production deployment. We only count sprints with client acceptance.",
-      "cycleTimeReduction": "We compare average development time per feature before and after our implementation. This includes coding, testing, and deployment time."
-    }
+    "labsmailDesc": "AI-powered cold email engine that researches each prospect individually, writes hyper-personalized emails and manages multi-channel campaigns with full pipeline tracking."
   },
   "teamSection": {
     "title": "The Faces Behind the Code",
@@ -747,80 +222,5 @@
       }
     }
   },
-  "calculator": {
-    "metaTitle": "Automation ROI Calculator — How Much Is Manual Work Costing You? | OpenGateHub",
-    "metaDescription": "Find out exactly how much manual work costs your team every month — and how much you could save with automation. Free calculator, results in 2 minutes.",
-    "badge": "⚡ Calculate in under 2 minutes",
-    "headline": "How much is manual work costing your company?",
-    "subheadline": "Answer 4 questions and discover your savings potential with automation.",
-    "stepOf": "Step {{step}} of {{total}}",
-    "trustLine": "🔒 Your data is safe. No spam.",
-    "step1Title": "How many people are on your team?",
-    "step1Sub": "Count everyone involved in day-to-day operations.",
-    "team1to5": "1 – 5 people",
-    "team6to15": "6 – 15 people",
-    "team16to50": "16 – 50 people",
-    "team50plus": "More than 50 people",
-    "step2Title": "What is the team's average monthly salary?",
-    "step2Sub": "In USD. Used to estimate the real cost of manual work.",
-    "salaryUnder500": "Less than $500",
-    "salary500to1500": "$500 – $1,500",
-    "salary1500to4000": "$1,500 – $4,000",
-    "salaryOver4000": "More than $4,000",
-    "step3Title": "What tasks do you do manually?",
-    "step3Sub": "Select all that apply.",
-    "taskDataTransfer": "Transfer data between systems",
-    "taskFollowUpEmails": "Send follow-up emails",
-    "taskReports": "Generate reports",
-    "taskCoordination": "Coordinate tasks",
-    "taskOrdersInvoices": "Process orders/invoices",
-    "taskCRM": "Update CRM",
-    "taskOnboarding": "Client onboarding",
-    "tasksSelectedOne": "1 task selected",
-    "tasksSelectedMany": "{{count}} tasks selected",
-    "step4Title": "What industry does your company operate in?",
-    "step4Sub": "To benchmark against similar companies in your industry.",
-    "industryEcommerce": "E-commerce",
-    "industrySaaS": "SaaS / Tech",
-    "industryProfessional": "Professional services",
-    "industryHealthEdu": "Health / Education",
-    "industryOther": "Other",
-    "nextBtn": "Next →",
-    "seeResultBtn": "See my result →",
-    "backBtn": "← Back",
-    "resultLabel": "Your results",
-    "resultTitle": "Here's the real cost of your manual work",
-    "hoursLost": "Hours lost / month",
-    "hoursRecovered": "Hours back for work that matters",
-    "monthlyCost": "Monthly cost of manual work",
-    "savingsHeadline": "Your team could reclaim every month",
-    "perMonth": "/month",
-    "annualSavings": "{{amount}} per year in potential savings",
-    "benchmarkNote": "Based on average RPA ROI data showing 60% cost reduction through automation (Flobotics 2024, McKinsey, Deloitte). Actual results may vary.",
-    "socialProofLabel": "Real results",
-    "socialProofQuote": "Valthor CRM reduced manual tasks by 40% and tripled their follow-up speed after automating with us.",
-    "socialProofStat1": "fewer manual tasks",
-    "socialProofStat2": "faster follow-up",
-    "leadTitle": "Get your automation plan",
-    "leadSub": "You've already done the hard part. Let us turn your numbers into a concrete plan — free, no commitment.",
-    "namePlaceholder": "Your name",
-    "emailPlaceholder": "Your work email",
-    "submitBtn": "See my automation plan →",
-    "submitting": "Sending...",
-    "privacyNote": "🔒 No spam. Only useful info for your team.",
-    "editAnswers": "← Edit answers",
-    "nameError": "Please enter your name",
-    "emailError": "Please enter a valid email",
-    "successTitle": "Done! We'll be in touch.",
-    "successBody": "We'll review your numbers and reach out within 24 hours with a personalized automation plan for your team.",
-    "bookCallBtn": "Book a 15-min call →",
-    "footerLink": "Cost Calculator",
-    "bannerEyebrow": "Free tool",
-    "bannerTitle": "How much is manual work costing your team?",
-    "bannerSub": "Answer 4 quick questions. We'll calculate your monthly loss and your savings potential with automation.",
-    "bannerStat1Label": "wasted per person / week",
-    "bannerStat2Label": "avg savings with automation",
-    "bannerStat3Label": "between average interruptions at work",
-    "bannerCTA": "See what it's costing you →"
-  }
+  "homeHeroQuote": "“Through OpenGateHub we were able to hire excellent developers and QA engineers who significantly strengthened our project.”"
 }

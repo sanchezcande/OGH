@@ -1,58 +1,65 @@
 const fs = require("fs");
 const path = require("path");
 
-const DOMAIN = "https://opengatehub.com";
+// El dominio sin www redirige a www: las direcciones del mapa van con www.
+const DOMAIN = "https://www.opengatehub.com";
 
-// Rutas estáticas
-const staticPaths = [
+// Páginas del sitio en los dos idiomas: español en la raíz, inglés en /en.
+const bilingualPaths = [
   "/",
-  "/about-us",
+  "/services/staff-augmentation",
   "/contact-us",
-  "/calculator",
+  "/about-us",
   "/faqs",
-  "/privacy-policy",
   "/blog",
-  "/services/workflow-automation",
-  "/services/staff-augmentation"
+  "/privacy-policy",
 ];
 
-const generateSitemap = () => {
-  let allPaths = [...staticPaths];
+// Páginas que existen en un solo idioma.
+const singlePaths = ["/preguntas", "/devs"];
 
-  // Intentar leer los slugs de los artículos para incluirlos en el sitemap
+const articleSlugs = (lang) => {
   try {
-    const translationPath = path.join(__dirname, "src", "locales", "en", "translation.json");
-    if (fs.existsSync(translationPath)) {
-      const translations = JSON.parse(fs.readFileSync(translationPath, "utf8"));
-      if (translations.articles && Array.isArray(translations.articles)) {
-        const articlePaths = translations.articles.map(article => `/blog/${article.slug}`);
-        allPaths = [...allPaths, ...articlePaths];
-      }
-    }
+    const file = path.join(__dirname, "src", "locales", lang, "translation.json");
+    const { articles } = JSON.parse(fs.readFileSync(file, "utf8"));
+    return Array.isArray(articles) ? articles.map((a) => a.slug) : [];
   } catch (error) {
     console.error("Error reading articles for sitemap:", error);
+    return [];
   }
+};
+
+const generateSitemap = () => {
+  const urls = [
+    ...bilingualPaths.map((p) => p),
+    ...bilingualPaths.map((p) => `/en${p === "/" ? "" : p}`),
+    ...singlePaths,
+    ...articleSlugs("es").map((slug) => `/blog/${slug}`),
+    ...articleSlugs("en").map((slug) => `/en/blog/${slug}`),
+  ];
+
+  const priority = (p) => {
+    if (p === "/" || p === "/en") return "1.0";
+    if (p.includes("/services/")) return "0.9";
+    return "0.7";
+  };
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${allPaths
-      .map((p) => {
-        const priority = p === "/" ? "1.0" : (p.startsWith("/services") ? "0.9" : "0.7");
-        return `  <url>
-    <loc>${DOMAIN}${p}</loc>
+${urls
+  .map(
+    (p) => `  <url>
+    <loc>${DOMAIN}${p === "/" ? "/" : p}</loc>
     <changefreq>monthly</changefreq>
-    <priority>${priority}</priority>
-  </url>`;
-      })
-      .join("\n")}
-</urlset>`;
+    <priority>${priority(p)}</priority>
+  </url>`,
+  )
+  .join("\n")}
+</urlset>
+`;
 
-  fs.writeFileSync(
-    path.join(__dirname, "public", "sitemap.xml"),
-    sitemap,
-    "utf8"
-  );
-  console.log(`Sitemap generated with ${allPaths.length} URLs.`);
+  fs.writeFileSync(path.join(__dirname, "public", "sitemap.xml"), sitemap);
+  console.log(`Sitemap generated: ${urls.length} URLs`);
 };
 
 generateSitemap();

@@ -78,7 +78,7 @@ Son pocos lugares. ${cupos}. Reservá el tuyo: ${LLAMADA}
 Y si tenés una duda sobre alguna pregunta, respondeme este mail.
 
 Cande
-Candelaria Sanchez, Founder & CTO, OpenGateHub`;
+Candelaria Sanchez, Founder, OpenGateHub`;
 
   const html = `<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;color:#111111;font-size:15px;line-height:1.6">
   <p>Hola${esc(pila)}!</p>
@@ -91,7 +91,7 @@ Candelaria Sanchez, Founder & CTO, OpenGateHub`;
   <p style="font-size:13px;color:#CC5A50;font-weight:600">Son pocos lugares. ${cupos}. Reservá el tuyo.</p>
   <p style="margin:14px 0"><a href="${LLAMADA}" style="background:#CC5A50;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:4px;font-weight:600;display:inline-block">Agendá tu llamada gratis</a></p>
   <p>Y si tenés una duda sobre alguna pregunta, respondeme este mail.</p>
-  <p style="margin-top:28px">Cande<br><span style="color:#71717A;font-size:13px">Candelaria Sanchez, Founder &amp; CTO, OpenGateHub</span></p>
+  <p style="margin-top:28px">Cande<br><span style="color:#71717A;font-size:13px">Candelaria Sanchez, Founder, OpenGateHub</span></p>
 </div>`;
   return { texto, html };
 }

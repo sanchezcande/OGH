@@ -1,927 +1,875 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React from "react";
+import Link from "next/link";
 import styled from "styled-components";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import SEO from "../../src/components/SEO/SEO";
-import CallToActionBlock from "../../src/components/CallToAction/CallToAction";
-import ScrollRevealText from "../../src/components/TypewriterText/TypewriterText";
+import ClosingCall from "../../src/components/ClosingCall/ClosingCall";
+import {
+  Body,
+  Button,
+  Display,
+  Eyebrow,
+  H2,
+  H3,
+  Lead,
+  Page,
+  Reveal,
+  Section,
+  Small,
+  TextLink,
+  Wrap,
+  color,
+  font,
+  mq,
+  useLang,
+} from "../../src/styles/kit";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+// La página de la oferta: qué se vende, quién evalúa y cómo se cobra.
+// Todo lo que se afirma acá está confirmado en docs/afirmaciones.md. Sin cifras, precios ni plazos.
+// Los ids "primer-developer" y "sumar-equipo" no se cambian: la home enlaza a ellos.
+// En español va primero el camino del founder; en inglés, el de la empresa que ya tiene equipo.
+const COPY = {
+  es: {
+    seo: {
+      title: "Staff augmentation: developers senior para tu equipo | OpenGateHub",
+      description:
+        "Buscamos, entrevistamos y te presentamos developers senior, 100% remotos. Se suman a tu equipo o los contratás directo.",
+    },
+    hero: {
+      eyebrow: "Staff augmentation",
+      title: "Buscamos, filtramos y te presentamos developers senior.",
+      lead: "Definimos con vos qué tiene que demostrar la persona, la buscamos y la entrevistamos. Vos conocés solo a quienes pasaron esa entrevista.",
+      cta: "Agendá tu llamada gratis",
+      note: "Gratis, 20 minutos. Tomamos pocas búsquedas a la vez.",
+      facts: [
+        { label: "Quién entrevista", text: "Nosotros, antes de presentarte a nadie." },
+        { label: "Cómo trabajan", text: "100% remoto. Solo developers senior." },
+        { label: "Cómo se cobra", text: "Por mes si se suma a tu equipo. Por la búsqueda si lo contratás directo." },
+        { label: "Cuántas tomamos", text: "Pocas búsquedas a la vez." },
+      ],
+    },
+    paths: [
+      {
+        id: "primer-developer",
+        eyebrow: "Para founders",
+        title: "Es tu primer developer",
+        rows: [
+          {
+            label: "Lo difícil",
+            text: "Entrevistar a alguien que te cae bien y sabe hablar de tecnología es fácil. Saber si va a funcionar en tu producto, cuando no sos vos quien escribe el código, es otra cosa.",
+          },
+          {
+            label: "Lo que cuesta equivocarse",
+            text: "No es solo lo que le pagás. Es descubrir tarde que no puede trabajar de forma autónoma: perdés tiempo, el producto se demora, terminás haciendo management técnico y hay que volver a contratar.",
+          },
+          {
+            label: "Lo que hacemos",
+            text: "Trabajamos en otro orden. Primero definimos con vos qué tiene que demostrar esa persona. Después armamos el proceso para medirlo. Recién ahí empezamos a buscar.",
+          },
+          {
+            label: "Lo que te toca a vos",
+            text: "Contarnos qué estás construyendo y elegir entre los candidatos que te presentamos. Lo técnico lo evaluamos nosotros.",
+          },
+        ],
+        cta: "Agendá tu llamada gratis",
+      },
+      {
+        id: "sumar-equipo",
+        eyebrow: "Para equipos",
+        title: "Ya tenés equipo y necesitás sumar gente",
+        rows: [
+          {
+            label: "Lo difícil",
+            text: "Tu equipo puede evaluar a un developer. Lo que no tiene es tiempo para leer CVs y entrevistar a todos los que parecen buenos.",
+          },
+          {
+            label: "Lo que un CV no dice",
+            text: "Saber programar es solo una parte. Un buen CV y años de experiencia no dicen si esa persona es la correcta para tu producto.",
+          },
+          {
+            label: "Lo que hacemos",
+            text: "Definimos con vos qué tiene que demostrar la persona y armamos el proceso para medirlo. Después buscamos y entrevistamos a cada developer.",
+          },
+          {
+            label: "Lo que te llega",
+            text: "Solo developers senior que pasaron esa entrevista. La decisión es tuya. El que elijas se suma a tu equipo y a tu forma de trabajar.",
+          },
+        ],
+        cta: "Agendá tu llamada gratis",
+      },
+    ],
+    evaluate: {
+      eyebrow: "Nuestro filtro",
+      title: "Primero lo técnico. Después, cinco cosas más.",
+      intro: "Comprobamos que domina la tecnología que tu proyecto necesita. Y después miramos lo que no se ve en un CV:",
+      items: [
+        { name: "Autonomía", text: "Si avanza sin que alguien le marque cada paso." },
+        { name: "Comunicación", text: "Si avisa de un problema a tiempo." },
+        { name: "Código ajeno", text: "Si se orienta en un código que no escribió." },
+        { name: "Producto", text: "Si entiende para qué sirve lo que construye." },
+        { name: "Clientes", text: "Si puede trabajar directo con un cliente." },
+      ],
+      outro: "Ningún developer llega a vos sin pasar las dos partes. Es un estándar que no se negocia.",
+      links: [
+        { label: "Ver cómo evaluamos", href: "/#como-evaluamos" },
+        { label: "Guía gratis: 9 de las preguntas que hacemos", href: "/preguntas" },
+      ],
+    },
+    models: {
+      eyebrow: "Dos formas de contratar",
+      title: "El mismo proceso, dos formas de contratar",
+      intro: "La búsqueda y la entrevista son las mismas. Cambia quién contrata al developer y cómo se cobra.",
+      labels: { who: "Quién lo contrata", how: "Cómo se cobra", fit: "Para quién suele servir" },
+      items: [
+        {
+          tag: "Por mes",
+          name: "Se suma a tu equipo",
+          who: "OpenGateHub. El developer trabaja en tu equipo y vos nos contratás a nosotros.",
+          how: "Facturamos por mes.",
+          fit: "Para quien quiere sumar a alguien al equipo sin ocuparse de la contratación.",
+        },
+        {
+          tag: "Por búsqueda",
+          name: "Lo contratás directo",
+          who: "Vos. El developer queda contratado por tu empresa.",
+          how: "Cobramos la búsqueda.",
+          fit: "Para quien quiere al developer como parte de su empresa y necesita ayuda para encontrarlo y evaluarlo.",
+        },
+      ],
+      note: "No publicamos precios porque dependen del perfil. El número lo vemos en la llamada.",
+    },
+    process: {
+      eyebrow: "Cómo funciona",
+      title: "El proceso, paso a paso",
+      steps: [
+        { title: "La llamada", text: "20 minutos, gratis. Nos contás qué estás construyendo y qué necesitás." },
+        { title: "Definimos qué buscar", text: "Definimos qué tiene que demostrar la persona y cómo lo vamos a medir. Recién ahí empezamos a buscar." },
+        { title: "Buscamos y entrevistamos", text: "Buscamos developers senior y entrevistamos a cada uno." },
+        { title: "Te presentamos candidatos", text: "Conocés solo a los que pasaron la entrevista. La decisión es tuya." },
+        { title: "Empieza a trabajar", text: "Se suma a tu equipo y facturamos por mes, o lo contratás directo y cobramos la búsqueda." },
+      ],
+    },
+    faq: {
+      eyebrow: "Preguntas",
+      title: "Preguntas sobre el servicio",
+      items: [
+        {
+          q: "En qué se diferencian los dos modelos?",
+          a: "En quién contrata al developer y en cómo se cobra. En uno, el developer se suma a tu equipo y facturamos por mes. En el otro, cobramos la búsqueda y lo contratás directo.",
+        },
+        { q: "Cuánto sale?", a: "Depende del perfil. No publicamos precios: el número lo vemos en la llamada." },
+        { q: "Qué pasa si el developer no funciona?", a: "Lo reemplazamos sin costo." },
+        {
+          q: "Quién entrevista a los developers?",
+          a: "Nosotros: la founder o alguien del equipo. Ningún developer te llega sin esa entrevista.",
+        },
+        { q: "Dónde trabajan y qué experiencia tienen?", a: "Trabajan en remoto. Trabajamos solo con developers senior." },
+        { q: "Quién elige al developer?", a: "Vos. Te presentamos solo a los que pasaron la entrevista y la decisión es tuya." },
+        {
+          q: "Con quién hablo en la llamada?",
+          a: "Con Candelaria Sanchez, founder de OpenGateHub. La llamada dura 20 minutos y es gratis.",
+        },
+        {
+          q: "Soy developer. Cómo me sumo?",
+          a: "Tenemos una lista donde buscamos cuando entra una búsqueda. Anotarte es gratis.",
+          link: { label: "Entrá a la lista", href: "/devs" },
+        },
+      ],
+      link: "Ver todas las preguntas",
+    },
+  },
+  en: {
+    seo: {
+      title: "Staff Augmentation: Senior Developers for Your Team | OpenGateHub",
+      description:
+        "We find, interview and present senior remote developers. They join your team or you hire them directly.",
+    },
+    hero: {
+      eyebrow: "Staff augmentation",
+      title: "We find, filter and present senior developers.",
+      lead: "We define with you what the person has to prove, then we search and interview. You only meet the ones who passed that interview.",
+      cta: "Book your free call",
+      note: "Free, 20 minutes. We take on few searches at a time.",
+      facts: [
+        { label: "Who interviews", text: "We do, before anyone is presented to you." },
+        { label: "How they work", text: "Fully remote. Senior developers only." },
+        { label: "How we charge", text: "Monthly if they join your team. For the search if you hire them directly." },
+        { label: "How many we take", text: "Few searches at a time." },
+      ],
+    },
+    paths: [
+      {
+        id: "sumar-equipo",
+        eyebrow: "For teams",
+        title: "You have a team and need to add people",
+        rows: [
+          {
+            label: "The hard part",
+            text: "Your team can evaluate a developer. What it doesn't have is time to read CVs and interview everyone who looks good.",
+          },
+          {
+            label: "What a CV doesn't say",
+            text: "Knowing how to code is only one part. A good CV and years of experience don't tell you whether that person is right for your product.",
+          },
+          {
+            label: "What we do",
+            text: "We define with you what the person has to prove and build the process to measure it. Then we search and interview each developer.",
+          },
+          {
+            label: "What reaches you",
+            text: "Only senior developers who passed that interview. The decision is yours. Whoever you choose joins your team and the way you work.",
+          },
+        ],
+        cta: "Book your free call",
+      },
+      {
+        id: "primer-developer",
+        eyebrow: "For founders",
+        title: "It's your first developer",
+        rows: [
+          {
+            label: "The hard part",
+            text: "Interviewing someone you like who talks well about technology is easy. Knowing whether they'll work out in your product, when you're not the one writing the code, is something else.",
+          },
+          {
+            label: "The cost of getting it wrong",
+            text: "It isn't just what you pay them. It's finding out late that they can't work autonomously: you lose time, the product slips, you end up doing technical management, and you have to hire again.",
+          },
+          {
+            label: "What we do",
+            text: "We work in a different order. First we define with you what that person has to prove. Then we build the process to measure it. Only then do we start searching.",
+          },
+          {
+            label: "What's left for you",
+            text: "Telling us what you're building and choosing among the candidates we present. We handle the technical evaluation.",
+          },
+        ],
+        cta: "Book your free call",
+      },
+    ],
+    evaluate: {
+      eyebrow: "Our filter",
+      title: "Technical first. Then, five more things.",
+      intro: "We verify that they master the technology your project needs. Then we look at what a CV doesn't show:",
+      items: [
+        { name: "Autonomy", text: "Whether they move forward without someone mapping out every step." },
+        { name: "Communication", text: "Whether they flag a problem in time." },
+        { name: "Unfamiliar code", text: "Whether they find their way in code they didn't write." },
+        { name: "Product", text: "Whether they understand what the thing they're building is for." },
+        { name: "Clients", text: "Whether they can work directly with a client." },
+      ],
+      outro: "No developer reaches you without passing both parts. It's a standard we don't negotiate.",
+      links: [{ label: "See how we evaluate", href: "/#como-evaluamos" }],
+    },
+    models: {
+      eyebrow: "Two ways to hire",
+      title: "Same process, two ways to hire",
+      intro: "The search and the interview are the same. What changes is who hires the developer and how we charge.",
+      labels: { who: "Who hires them", how: "How we charge", fit: "Who it usually suits" },
+      items: [
+        {
+          tag: "Monthly",
+          name: "They join your team",
+          who: "OpenGateHub. The developer works in your team, and your contract is with us.",
+          how: "We bill monthly.",
+          fit: "Companies that want to add someone to the team without handling the hiring themselves.",
+        },
+        {
+          tag: "Per search",
+          name: "You hire them directly",
+          who: "You. The developer is hired by your company.",
+          how: "We charge for the search.",
+          fit: "Companies that want the developer as part of their own company and need help finding and evaluating them.",
+        },
+      ],
+      note: "We don't publish prices because they depend on the profile. We go over the number on the call.",
+    },
+    process: {
+      eyebrow: "How it works",
+      title: "The process, step by step",
+      steps: [
+        { title: "The call", text: "20 minutes, free. You tell us what you're building and what you need." },
+        { title: "We define what to look for", text: "We define what the person has to prove and how we'll measure it. Only then do we start searching." },
+        { title: "We search and interview", text: "We look for senior developers and interview each one." },
+        { title: "We present candidates", text: "You only meet the ones who passed the interview. The decision is yours." },
+        { title: "They start working", text: "They join your team and we bill monthly, or you hire them directly and we charge for the search." },
+      ],
+    },
+    faq: {
+      eyebrow: "Questions",
+      title: "Questions about the service",
+      items: [
+        {
+          q: "What's the difference between the two models?",
+          a: "Who hires the developer and how we charge. In one, the developer joins your team and we bill monthly. In the other, we charge for the search and you hire them directly.",
+        },
+        { q: "How much does it cost?", a: "It depends on the profile. We don't publish prices: we go over the number on the call." },
+        { q: "What if the developer doesn't work out?", a: "We replace them at no cost." },
+        {
+          q: "Who interviews the developers?",
+          a: "We do: the founder or someone else on the team. No developer reaches you without that interview.",
+        },
+        { q: "Where do they work and how experienced are they?", a: "They work remotely. We only work with senior developers." },
+        { q: "Who chooses the developer?", a: "You do. We only present the ones who passed the interview, and the decision is yours." },
+        {
+          q: "Who will I talk to on the call?",
+          a: "Candelaria Sanchez, founder of OpenGateHub. The call is 20 minutes and free.",
+        },
+        {
+          q: "I'm a developer. How do I join?",
+          a: "We keep a list we search when a new role comes in. Signing up is free.",
+          link: { label: "Join the list", href: "/devs" },
+        },
+      ],
+      link: "See all questions",
+    },
+  },
+};
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Staff Augmentation",
+  serviceType: "Staff Augmentation",
+  description:
+    "Senior remote developers, interviewed by us before you meet them. They join your team, or you hire them directly.",
+  provider: {
+    "@type": "Organization",
+    name: "OpenGateHub",
+    url: "https://www.opengatehub.com",
+  },
+};
+
+const pad = (i) => String(i + 1).padStart(2, "0");
+
+export default function StaffAugmentationPage() {
+  const copy = COPY[useLang()];
+
+  return (
+    <Page>
+      <SEO title={copy.seo.title} description={copy.seo.description}>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      </SEO>
+
+      {/* Titular */}
+      <Hero>
+        <Wrap>
+          <Eyebrow>{copy.hero.eyebrow}</Eyebrow>
+          <HeroTitle>{copy.hero.title}</HeroTitle>
+          <HeroGrid>
+            <div>
+              <Lead>{copy.hero.lead}</Lead>
+              <Actions>
+                <Button as={Link} href="/contact-us" $block>
+                  {copy.hero.cta}
+                </Button>
+                <Small>{copy.hero.note}</Small>
+              </Actions>
+            </div>
+            <Facts>
+              {copy.hero.facts.map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.text}</dd>
+                </div>
+              ))}
+            </Facts>
+          </HeroGrid>
+        </Wrap>
+      </Hero>
+
+      {/* Dos caminos: el orden cambia según el idioma, los ids no */}
+      {copy.paths.map((path, i) => (
+        <Section key={path.id} id={path.id} $tone={i % 2 === 0 ? "alt" : "paper"}>
+          <Wrap>
+            <Split $align="stretch">
+              <Reveal>
+                <Sticky>
+                  <Eyebrow>{path.eyebrow}</Eyebrow>
+                  <H2>{path.title}</H2>
+                  <TextLink as={Link} href="/contact-us" style={{ marginTop: 28 }}>
+                    {path.cta} <span aria-hidden="true">→</span>
+                  </TextLink>
+                </Sticky>
+              </Reveal>
+              <PathRows as={Reveal}>
+                {path.rows.map((row) => (
+                  <div key={row.label}>
+                    <RowLabel as="h3">{row.label}</RowLabel>
+                    <p>{row.text}</p>
+                  </div>
+                ))}
+              </PathRows>
+            </Split>
+          </Wrap>
+        </Section>
+      ))}
+
+      {/* Cómo evaluamos */}
+      <Section $tone="ink">
+        <Wrap>
+          <Split as={Reveal}>
+            <div>
+              <Eyebrow $onInk>{copy.evaluate.eyebrow}</Eyebrow>
+              <H2>{copy.evaluate.title}</H2>
+              <Lead $onInk style={{ marginTop: 24 }}>
+                {copy.evaluate.intro}
+              </Lead>
+            </div>
+            <div>
+              <Criteria>
+                {copy.evaluate.items.map((item, i) => (
+                  <li key={item.name}>
+                    <span>{pad(i)}</span>
+                    <strong>{item.name}</strong>
+                    <p>{item.text}</p>
+                  </li>
+                ))}
+              </Criteria>
+              <Body $onInk style={{ marginTop: 28 }}>
+                {copy.evaluate.outro}
+              </Body>
+              <LinkRow>
+                {copy.evaluate.links.map((link) => (
+                  <TextLink as={Link} key={link.href} href={link.href} $onInk>
+                    {link.label} <span aria-hidden="true">→</span>
+                  </TextLink>
+                ))}
+              </LinkRow>
+            </div>
+          </Split>
+        </Wrap>
+      </Section>
+
+      {/* Dos formas de contratar */}
+      <Section>
+        <Wrap>
+          <Reveal>
+            <Eyebrow>{copy.models.eyebrow}</Eyebrow>
+            <H2>{copy.models.title}</H2>
+            <Lead style={{ marginTop: 24 }}>{copy.models.intro}</Lead>
+          </Reveal>
+          <ModelGrid as={Reveal}>
+            {copy.models.items.map((model) => (
+              <Model key={model.name}>
+                <ModelHead>
+                  <Tag>{model.tag}</Tag>
+                  <H3>{model.name}</H3>
+                </ModelHead>
+                {["who", "how", "fit"].map((field) => (
+                  <ModelRow key={field}>
+                    <RowLabel as="h4">{copy.models.labels[field]}</RowLabel>
+                    <Body>{model[field]}</Body>
+                  </ModelRow>
+                ))}
+              </Model>
+            ))}
+          </ModelGrid>
+          <Small style={{ marginTop: 28 }}>{copy.models.note}</Small>
+        </Wrap>
+      </Section>
+
+      {/* Cómo funciona */}
+      <Section>
+        <Wrap>
+          <Reveal>
+            <Eyebrow>{copy.process.eyebrow}</Eyebrow>
+            <H2>{copy.process.title}</H2>
+          </Reveal>
+          <Steps>
+            {copy.process.steps.map((step, i) => (
+              <Reveal as="li" key={step.title}>
+                <div>
+                  <span>{pad(i)}</span>
+                  <H3>{step.title}</H3>
+                </div>
+                <Body>{step.text}</Body>
+              </Reveal>
+            ))}
+          </Steps>
+        </Wrap>
+      </Section>
+
+      {/* Preguntas de esta página */}
+      <Section $tone="alt">
+        <Wrap>
+          <Split $align="stretch">
+            <Reveal>
+              <Sticky>
+                <Eyebrow>{copy.faq.eyebrow}</Eyebrow>
+                <H2>{copy.faq.title}</H2>
+                <TextLink as={Link} href="/faqs" style={{ marginTop: 28 }}>
+                  {copy.faq.link} <span aria-hidden="true">→</span>
+                </TextLink>
+              </Sticky>
+            </Reveal>
+            <Faq as={Reveal}>
+              {copy.faq.items.map((item) => (
+                <details key={item.q}>
+                  <summary>{item.q}</summary>
+                  <div>
+                    <Body>{item.a}</Body>
+                    {item.link && (
+                      <TextLink as={Link} href={item.link.href} locale={item.link.href === "/devs" ? false : undefined}>
+                        {item.link.label} <span aria-hidden="true">→</span>
+                      </TextLink>
+                    )}
+                  </div>
+                </details>
+              ))}
+            </Faq>
+          </Split>
+        </Wrap>
+      </Section>
+
+      <ClosingCall />
+    </Page>
+  );
 }
 
-/* ===================================================================
-   STYLED COMPONENTS
-   =================================================================== */
+/* ───────── Estilos propios de la página ───────── */
 
-const PageWrapper = styled.div`
-  overflow-x: hidden;
-  background: #fff;
+const Hero = styled.section`
+  padding: clamp(56px, 9vw, 120px) 0 clamp(64px, 8vw, 112px);
 `;
 
-/* ---------- HERO ---------- */
-const HeroSection = styled.section`
-  position: relative;
-  height: 80vh;
-  min-height: 480px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #0a0a0a;
-  overflow: hidden;
+const HeroTitle = styled(Display)`
+  max-width: 24ch;
 `;
 
 const HeroGrid = styled.div`
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+  margin-top: clamp(36px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: 5fr 6fr;
+  gap: clamp(40px, 7vw, 104px);
+  align-items: start;
+
+  ${mq.tablet} {
+    grid-template-columns: 1fr;
+    gap: 56px;
+  }
 `;
 
-const HeroContent = styled.div`
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  padding: 0 2rem;
-  max-width: 640px;
-`;
+const Actions = styled.div`
+  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
 
-const HeroTitle = styled.h1`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.5rem, 3.2vw, 2.2rem);
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-  margin: 0 0 1.25rem;
-
-  .word {
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: top;
-    padding-bottom: 0.08em;
-
-    .word-inner {
-      display: inline-block;
-      transform: translateY(120%);
-      will-change: transform;
+  ${mq.mobile} {
+    ${Small} {
+      width: 100%;
+      text-align: center;
     }
   }
-
-  .highlight {
-    color: #fff;
-  }
 `;
 
-const HeroSubtitle = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.7;
-  max-width: 460px;
-  margin: 0 auto;
-`;
-
-const HeroLine = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.06),
-    transparent
-  );
-`;
-
-/* ---------- TEXT REVEAL ---------- */
-const TextRevealSection = styled.section`
-  position: relative;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  padding: 0 2rem;
-`;
-
-const TextRevealInner = styled.div`
-  max-width: 900px;
-  width: 100%;
-`;
-
-const RevealText = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+// Etiqueta chica en mayúsculas para filas de datos. Va en gris: el acento queda para las etiquetas de sección.
+const RowLabel = styled.span`
+  display: block;
+  margin: 0;
+  font-family: ${font.brand};
+  font-size: 0.6875rem;
   font-weight: 500;
-  line-height: 1.65;
-  color: #111;
-  letter-spacing: -0.005em;
-`;
-
-const RevealWord = styled.span`
-  opacity: 0.12;
-  transition: opacity 0.1s;
-  display: inline-block;
-  margin-right: 0.3em;
-`;
-
-/* ---------- FEATURES / BENEFITS ---------- */
-const FeaturesSection = styled.section`
-  position: relative;
-  padding: 8rem 2rem;
-  background: #fafafa;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-`;
-
-const SectionContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const SectionLabel = styled.span`
-  display: inline-block;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
+  line-height: 1.5;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #CC5A50;
-  margin-bottom: 1rem;
+  color: ${color.muted};
 `;
 
-const SectionHeading = styled.h2`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-  font-weight: 500;
-  color: #111;
-  letter-spacing: -0.015em;
-  margin: 0 0 0.85rem;
-`;
+const Facts = styled.dl`
+  margin: 0;
+  border-top: 1px solid ${color.ink};
 
-const SectionSubtext = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.92rem;
-  color: #777;
-  line-height: 1.6;
-  max-width: 560px;
-  margin: 0 0 3.5rem;
-`;
-
-const FeaturesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
+  div {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 6px 24px;
+    align-items: baseline;
+    padding: 18px 0;
+    border-bottom: 1px solid ${color.line};
   }
 
-  @media (max-width: 600px) {
+  dt {
+    font-family: ${font.brand};
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: ${color.muted};
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: ${color.ink};
+  }
+
+  ${mq.mobile} {
+    div {
+      grid-template-columns: 1fr;
+    }
+  }
+`;
+
+const Split = styled.div`
+  display: grid;
+  grid-template-columns: 5fr 6fr;
+  gap: clamp(40px, 7vw, 104px);
+  align-items: ${({ $align = "start" }) => $align};
+
+  ${mq.tablet} {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+`;
+
+// Para que el título acompañe la lectura, el Split que lo contiene va con $align="stretch".
+const Sticky = styled.div`
+  position: sticky;
+  top: 112px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  ${mq.tablet} {
+    position: static;
+  }
+`;
+
+const PathRows = styled.div`
+  border-top: 1px solid ${color.ink};
+
+  > div {
+    padding: 26px 0 28px;
+    border-bottom: 1px solid ${color.line};
+  }
+
+  p {
+    margin: 10px 0 0;
+    max-width: 58ch;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: ${color.inkSoft};
+  }
+`;
+
+const Criteria = styled.ol`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid ${color.lineDark};
+
+  li {
+    display: grid;
+    grid-template-columns: 40px 10.5rem 1fr;
+    gap: 4px 16px;
+    align-items: baseline;
+    padding: 22px 0;
+    border-bottom: 1px solid ${color.lineDark};
+  }
+
+  span {
+    font-family: ${font.brand};
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: ${color.accent};
+  }
+
+  strong {
+    font-family: ${font.serif};
+    font-weight: 400;
+    font-size: clamp(1.1875rem, 1.7vw, 1.4375rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: ${color.onInkSoft};
+  }
+
+  ${mq.mobile} {
+    li {
+      grid-template-columns: 40px 1fr;
+    }
+
+    p {
+      grid-column: 2;
+    }
+  }
+`;
+
+const LinkRow = styled.div`
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 32px;
+`;
+
+// Las dos columnas comparten las filas (subgrid) para que cada dato quede a la misma altura que su par.
+const ModelGrid = styled.div`
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid ${color.ink};
+  border-bottom: 1px solid ${color.line};
+
+  ${mq.mobile} {
     grid-template-columns: 1fr;
   }
 `;
 
-const FeatureCard = styled.div`
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  padding: 2rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
+const Model = styled.div`
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  padding-right: clamp(24px, 4vw, 56px);
 
-  &:hover {
-    border-color: #ccc;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  & + & {
+    padding-right: 0;
+    padding-left: clamp(24px, 4vw, 56px);
+    border-left: 1px solid ${color.line};
+  }
+
+  ${mq.mobile} {
+    padding-right: 0;
+
+    & + & {
+      padding-left: 0;
+      border-left: 0;
+      border-top: 1px solid ${color.ink};
+    }
   }
 `;
 
-const FeatureNumber = styled.span`
-  display: inline-block;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: rgba(204, 90, 80, 0.45);
-  letter-spacing: 0.06em;
-  margin-bottom: 1.2rem;
-`;
-
-const FeatureTitle = styled.h3`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.02rem;
-  font-weight: 500;
-  color: #111;
-  margin: 0 0 0.6rem;
-`;
-
-const FeatureDesc = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.85rem;
-  color: #888;
-  line-height: 1.6;
-  margin: 0;
-`;
-
-/* ---------- HORIZONTAL SCROLL (How We Work) ---------- */
-const HorizontalSection = styled.section`
-  position: relative;
-  background: #0a0a0a;
-  overflow: hidden;
-
-  @media (max-width: 768px) {
-    overflow: visible;
-  }
-`;
-
-const HorizontalWrapper = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-const HorizontalHeader = styled.div`
-  padding: 5rem 2rem 3rem;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const HorizontalHeaderTitle = styled.h2`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.3rem, 2.5vw, 1.7rem);
-  font-weight: 500;
-  color: #fff;
-  letter-spacing: -0.02em;
-  margin: 0;
-`;
-
-const HorizontalTrack = styled.div`
+const ModelHead = styled.div`
+  padding: 32px 0 28px;
   display: flex;
-  gap: 2rem;
-  padding: 0 4rem 5rem;
-  will-change: transform;
+  flex-direction: column;
+  gap: 12px;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    padding: 0 1.5rem 4rem;
-    gap: 1.5rem;
+  ${H3} {
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
   }
 `;
 
-const StepCard = styled.div`
-  flex-shrink: 0;
-  width: min(75vw, 800px);
-  min-height: 240px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  padding: 3rem 3.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 3rem;
-  transition: border-color 0.3s;
+const ModelRow = styled.div`
+  padding: 20px 0 22px;
+  border-top: 1px solid ${color.line};
 
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    flex-shrink: 1;
-    min-height: auto;
-    padding: 2rem;
-    gap: 1.5rem;
+  ${Body} {
+    margin-top: 8px;
   }
 `;
 
-const StepNumber = styled.span`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 4rem;
+const Tag = styled.span`
+  font-family: ${font.brand};
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: rgba(204, 90, 80, 0.12);
-  line-height: 1;
-  flex-shrink: 0;
-  min-width: 100px;
-  text-align: center;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${color.accent};
 `;
 
-const StepTitle = styled.h3`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.15rem;
-  font-weight: 500;
-  color: #fff;
-  margin: 0 0 1rem;
-`;
+const Steps = styled.ol`
+  list-style: none;
+  padding: 0;
+  margin: 48px 0 0;
+  border-top: 1px solid ${color.ink};
 
-const StepDesc = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.7;
-  margin: 0;
-  max-width: 480px;
-`;
+  li {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    gap: 10px clamp(40px, 7vw, 104px);
+    align-items: baseline;
+    padding: 28px 0;
+    border-bottom: 1px solid ${color.line};
+  }
 
-/* ---------- USE CASES ---------- */
-const UseCasesSection = styled.section`
-  position: relative;
-  padding: 8rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-`;
+  li > div {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: baseline;
+  }
 
-const UseCasesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  li > div > span {
+    font-family: ${font.brand};
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: ${color.accent};
+  }
 
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
+  ${mq.tablet} {
+    li {
+      grid-template-columns: 1fr;
+    }
+
+    li > ${Body} {
+      padding-left: 56px;
+    }
   }
 `;
 
-const UseCaseCard = styled.div`
-  background: #fafafa;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  padding: 2.5rem;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+const Faq = styled.div`
+  border-top: 1px solid ${color.ink};
 
-  &:hover {
-    border-color: #ccc;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
-    transform: translateY(-4px);
+  details {
+    border-bottom: 1px solid ${color.line};
+  }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    padding: 24px 0;
+    font-family: ${font.serif};
+    font-size: clamp(1.125rem, 1.6vw, 1.3125rem);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: "+";
+    flex-shrink: 0;
+    font-family: ${font.sans};
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: ${color.accent};
+    transition: transform 0.2s ease;
+  }
+
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  summary:hover {
+    color: ${color.accent};
+  }
+
+  details > div {
+    padding: 0 40px 26px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  ${mq.mobile} {
+    details > div {
+      padding-right: 0;
+    }
   }
 `;
-
-const UseCaseIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 4px;
-  background: #CC5A50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-
-  & svg {
-    width: 20px;
-    height: 20px;
-  }
-`;
-
-const UseCaseTitle = styled.h3`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.02rem;
-  font-weight: 500;
-  color: #111;
-  margin: 0 0 0.6rem;
-`;
-
-const UseCaseDesc = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 0.85rem;
-  color: #888;
-  line-height: 1.6;
-  margin: 0;
-`;
-
-/* ---------- WHY CHOOSE (commitment banner) ---------- */
-const CommitmentSection = styled.section`
-  position: relative;
-  padding: 6rem 2rem;
-  background: #0a0a0a;
-  text-align: center;
-`;
-
-const CommitmentText = styled.p`
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(0.92rem, 1.6vw, 1.15rem);
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.7;
-  max-width: 700px;
-  margin: 0 auto;
-`;
-
-/* ---------- CTA WRAPPER ---------- */
-const CTAWrapper = styled.div`
-  position: relative;
-`;
-
-const splitHeroWords = (text, highlights = []) =>
-  text.split(" ").map((word, i) => {
-    const clean = word.toLowerCase().replace(/[^a-záéíóúñ]/gi, "");
-    const isHl = highlights.some((h) => clean === h.toLowerCase());
-    return (
-      <span className="word" key={i}>
-        <span className={`word-inner${isHl ? " highlight" : ""}`}>{word}&nbsp;</span>
-      </span>
-    );
-  });
-
-/* ===================================================================
-   PAGE COMPONENT
-   =================================================================== */
-const StaffAugmentation = () => {
-  const { t, i18n } = useTranslation();
-  const isSpanish = i18n.language === "es";
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Refs
-  const heroRef = useRef(null);
-  const heroTitleRef = useRef(null);
-  const heroSubRef = useRef(null);
-  const revealSectionRef = useRef(null);
-  const revealTextRef = useRef(null);
-  const featuresSectionRef = useRef(null);
-  const featuresCardsRef = useRef([]);
-  const horizontalWrapperRef = useRef(null);
-  const horizontalTrackRef = useRef(null);
-  const useCasesSectionRef = useRef(null);
-  const useCasesCardsRef = useRef([]);
-  const commitmentRef = useRef(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setIsMobile(window.innerWidth <= 768);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let ctx;
-
-    const timer = setTimeout(() => {
-      ctx = gsap.context(() => {
-
-        /* ---------- 1. CINEMATIC HERO ---------- */
-        // Word-by-word reveal entrance
-        const heroWords = heroTitleRef.current?.querySelectorAll(".word-inner");
-        if (heroWords?.length) {
-          gsap.to(heroWords, {
-            y: 0,
-            duration: 1,
-            stagger: 0.08,
-            ease: "power4.out",
-            delay: 0.3,
-          });
-        }
-        gsap.fromTo(heroSubRef.current,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.9 }
-        );
-
-        // Exit/return on scroll (scrub = bidirectional)
-        const heroTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.5,
-          },
-        });
-        heroTl
-          .fromTo(heroTitleRef.current, { scale: 1, opacity: 1, y: 0 }, { scale: 0.85, opacity: 0, y: -40 })
-          .fromTo(heroSubRef.current, { opacity: 1, y: 0 }, { opacity: 0, y: -30 }, 0.1);
-
-        /* ---------- 2. SCROLL TEXT REVEAL (pinned) ---------- */
-        if (revealTextRef.current) {
-          const words = revealTextRef.current.querySelectorAll(".reveal-word");
-          if (words.length > 0) {
-            gsap.to(words, {
-              opacity: 1,
-              stagger: 0.05,
-              scrollTrigger: {
-                trigger: revealSectionRef.current,
-                start: "top top",
-                end: "+=150%",
-                pin: true,
-                scrub: 0.3,
-                anticipatePin: 1,
-              },
-            });
-          }
-        }
-
-        /* ---------- 3. FEATURES STAGGER ---------- */
-        const featureCards = featuresCardsRef.current.filter(Boolean);
-        if (featureCards.length > 0) {
-          gsap.from(featureCards, {
-            opacity: 0,
-            y: 60,
-            filter: "blur(6px)",
-            duration: 0.8,
-            stagger: 0.12,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: featuresSectionRef.current,
-              start: "top 75%",
-              toggleActions: "play none none none",
-            },
-          });
-        }
-
-        /* ---------- 4. HORIZONTAL SCROLL TIMELINE ---------- */
-        if (
-          horizontalWrapperRef.current &&
-          horizontalTrackRef.current &&
-          !isMobile
-        ) {
-          const track = horizontalTrackRef.current;
-          if (track.children.length > 0) {
-            const getScrollAmount = () =>
-              track.scrollWidth - window.innerWidth + 100;
-
-            gsap.to(track, {
-              x: () => -getScrollAmount(),
-              ease: "none",
-              scrollTrigger: {
-                trigger: horizontalWrapperRef.current,
-                start: "top top",
-                end: () => `+=${getScrollAmount()}`,
-                pin: true,
-                scrub: 0.5,
-                anticipatePin: 1,
-                invalidateOnRefresh: true,
-              },
-            });
-          }
-        }
-
-        /* ---------- 5. USE CASES SCALE REVEAL ---------- */
-        const useCaseCards = useCasesCardsRef.current.filter(Boolean);
-        if (useCaseCards.length > 0) {
-          gsap.from(useCaseCards, {
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.7,
-            stagger: 0.15,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: useCasesSectionRef.current,
-              start: "top 75%",
-              toggleActions: "play none none none",
-            },
-          });
-        }
-
-        /* COMMITMENT section — manual scroll reveal (after pins settle) */
-        if (commitmentRef.current) {
-          const srWords = commitmentRef.current.querySelectorAll(".sr-word");
-          if (srWords.length) {
-            ScrollTrigger.create({
-              trigger: commitmentRef.current,
-              start: "top 65%",
-              end: "top 15%",
-              scrub: true,
-              invalidateOnRefresh: true,
-              onUpdate: (self) => {
-                const p = self.progress;
-                const total = srWords.length;
-                for (let i = 0; i < total; i++) {
-                  const ws = i / total;
-                  const we = (i + 1) / total;
-                  let wp = (p - ws) / (we - ws);
-                  wp = Math.max(0, Math.min(1, wp));
-                  srWords[i].style.opacity = String(0.12 + wp * 0.78);
-                }
-              },
-            });
-          }
-        }
-
-        ScrollTrigger.refresh();
-      });
-    }, 150);
-
-    return () => {
-      clearTimeout(timer);
-      if (ctx) ctx.revert();
-    };
-  }, [isMobile]);
-
-  /* ---------- Helpers ---------- */
-  const whatIsText = t("staffAugmentation.whatIsDescription");
-  const revealWords = whatIsText ? whatIsText.split(" ") : [];
-
-  const benefits = [
-    {
-      key: "01",
-      title: t("staffAugmentation.keyBenefits.extendedTeamTitle"),
-      desc: t("staffAugmentation.keyBenefits.extendedTeamDescription"),
-    },
-    {
-      key: "02",
-      title: t("staffAugmentation.keyBenefits.quickStartTitle"),
-      desc: t("staffAugmentation.keyBenefits.quickStartDescription"),
-    },
-    {
-      key: "03",
-      title: t("staffAugmentation.keyBenefits.scalabilityTitle"),
-      desc: t("staffAugmentation.keyBenefits.scalabilityDescription"),
-    },
-    {
-      key: "04",
-      title: t("staffAugmentation.keyBenefits.guaranteedQualityTitle"),
-      desc: t("staffAugmentation.keyBenefits.guaranteedQualityDescription"),
-    },
-    {
-      key: "05",
-      title: t("staffAugmentation.keyBenefits.flexibilityTitle"),
-      desc: t("staffAugmentation.keyBenefits.flexibilityDescription"),
-    },
-    {
-      key: "06",
-      title: t("staffAugmentation.keyBenefits.culturalFitTitle"),
-      desc: t("staffAugmentation.keyBenefits.culturalFitDescription"),
-    },
-  ];
-
-  const steps = [
-    {
-      num: "01",
-      title: t("staffAugmentation.howWeWork.step1Title"),
-      desc: t("staffAugmentation.howWeWork.step1Description"),
-    },
-    {
-      num: "02",
-      title: t("staffAugmentation.howWeWork.step2Title"),
-      desc: t("staffAugmentation.howWeWork.step2Description"),
-    },
-    {
-      num: "03",
-      title: t("staffAugmentation.howWeWork.step3Title"),
-      desc: t("staffAugmentation.howWeWork.step3Description"),
-    },
-    {
-      num: "04",
-      title: t("staffAugmentation.howWeWork.step4Title"),
-      desc: t("staffAugmentation.howWeWork.step4Description"),
-    },
-  ];
-
-  const useCases = [
-    {
-      title: t("staffAugmentation.useCases.growingStartupsTitle"),
-      desc: t("staffAugmentation.useCases.growingStartupsDescription"),
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-          <polyline points="17 6 23 6 23 12" />
-        </svg>
-      ),
-    },
-    {
-      title: t("staffAugmentation.useCases.specificProjectsTitle"),
-      desc: t("staffAugmentation.useCases.specificProjectsDescription"),
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
-      ),
-    },
-    {
-      title: t("staffAugmentation.useCases.distributedTeamsTitle"),
-      desc: t("staffAugmentation.useCases.distributedTeamsDescription"),
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
-      ),
-    },
-  ];
-
-  return (
-    <>
-      <SEO
-        title="Staff Augmentation in Latin America — Nearshore Senior Engineers | OpenGateHub"
-        description="Scale your engineering team in 7.3 days with nearshore developers from Latin America. We embed senior developers and QA engineers who join your standups, ship in your sprints, and match your culture — 9.7/10 CSAT, 87% on-time delivery."
-        keywords="staff augmentation LATAM, nearshore staff augmentation, staff augmentation Latin America, hire developers Latin America, nearshore development, embedded engineering team, remote developers LATAM, senior developers for hire, nearshore software development, QA engineers Latin America"
-      >
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Service",
-              name: "Staff Augmentation in Latin America",
-              description:
-                "Scale your engineering team in 7.3 days with nearshore senior developers from Latin America. Cultural fit, timezone alignment, 87% on-time delivery.",
-              provider: {
-                "@type": "Organization",
-                name: "OpenGateHub",
-                url: "https://opengatehub.com",
-              },
-              areaServed: [
-                "Latin America",
-                "United States",
-                "North America",
-                "Europe",
-              ],
-              serviceType: "Staff Augmentation",
-              offers: {
-                "@type": "Offer",
-                availability: "https://schema.org/InStock",
-                priceSpecification: {
-                  "@type": "PriceSpecification",
-                  priceCurrency: "USD",
-                },
-              },
-            }),
-          }}
-        />
-      </SEO>
-
-      <PageWrapper>
-        {/* ============================================================
-            1. CINEMATIC HERO
-            ============================================================ */}
-        <HeroSection ref={heroRef}>
-          <HeroGrid />
-          <HeroContent>
-            <div ref={heroTitleRef}>
-              <HeroTitle>
-                {splitHeroWords(
-                  isSpanish ? "Staff Augmentation" : "Staff Augmentation",
-                  ["Staff"]
-                )}
-              </HeroTitle>
-            </div>
-            <div ref={heroSubRef}>
-              <HeroSubtitle>
-                {t("staffAugmentation.heroSubtitle")}
-              </HeroSubtitle>
-            </div>
-          </HeroContent>
-          <HeroLine />
-        </HeroSection>
-
-        {/* ============================================================
-            2. SCROLL TEXT REVEAL
-            ============================================================ */}
-        <div style={{ height: "6rem", background: "#fff" }} />
-        <TextRevealSection ref={revealSectionRef}>
-          <TextRevealInner>
-            <SectionLabel>{t("staffAugmentation.whatIsTitle")}</SectionLabel>
-            <RevealText ref={revealTextRef}>
-              {revealWords.map((word, i) => (
-                <RevealWord key={i} className="reveal-word">
-                  {word}
-                </RevealWord>
-              ))}
-            </RevealText>
-          </TextRevealInner>
-        </TextRevealSection>
-
-        {/* ============================================================
-            3. FEATURES / KEY BENEFITS
-            ============================================================ */}
-        <FeaturesSection ref={featuresSectionRef}>
-          <SectionContainer>
-            <SectionLabel>
-              {t("staffAugmentation.keyBenefitsTitle")}
-            </SectionLabel>
-            <SectionHeading>
-              {t("staffAugmentation.whyChooseTitle")}
-            </SectionHeading>
-            <SectionSubtext>
-              {t("staffAugmentation.benefits.commitment")}
-            </SectionSubtext>
-
-            <FeaturesGrid>
-              {benefits.map((b, i) => (
-                <FeatureCard
-                  key={b.key}
-                  ref={(el) => (featuresCardsRef.current[i] = el)}
-                >
-                  <FeatureNumber>{b.key}</FeatureNumber>
-                  <FeatureTitle>{b.title}</FeatureTitle>
-                  <FeatureDesc>{b.desc}</FeatureDesc>
-                </FeatureCard>
-              ))}
-            </FeaturesGrid>
-          </SectionContainer>
-        </FeaturesSection>
-
-        {/* ============================================================
-            4. HORIZONTAL SCROLL — HOW WE WORK
-            ============================================================ */}
-        <HorizontalSection>
-          <HorizontalWrapper ref={horizontalWrapperRef}>
-            <HorizontalHeader>
-              <SectionLabel style={{ color: "#666" }}>Process</SectionLabel>
-              <HorizontalHeaderTitle>
-                {t("staffAugmentation.howWeWorkTitle")}
-              </HorizontalHeaderTitle>
-            </HorizontalHeader>
-            <HorizontalTrack ref={horizontalTrackRef}>
-              {steps.map((step) => (
-                <StepCard key={step.num}>
-                  <StepNumber>{step.num}</StepNumber>
-                  <div>
-                    <StepTitle>{step.title}</StepTitle>
-                    <StepDesc>{step.desc}</StepDesc>
-                  </div>
-                </StepCard>
-              ))}
-            </HorizontalTrack>
-          </HorizontalWrapper>
-        </HorizontalSection>
-
-        {/* ============================================================
-            5. USE CASES — SCALE REVEAL
-            ============================================================ */}
-        <UseCasesSection ref={useCasesSectionRef}>
-          <SectionContainer>
-            <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
-              <SectionLabel>
-                {t("staffAugmentation.useCasesTitle")}
-              </SectionLabel>
-              <SectionHeading
-                style={{ maxWidth: 600, margin: "0 auto" }}
-              >
-                {t("staffAugmentation.useCasesTitle")}
-              </SectionHeading>
-            </div>
-            <UseCasesGrid>
-              {useCases.map((uc, i) => (
-                <UseCaseCard
-                  key={i}
-                  ref={(el) => (useCasesCardsRef.current[i] = el)}
-                >
-                  <UseCaseIcon>{uc.icon}</UseCaseIcon>
-                  <UseCaseTitle>{uc.title}</UseCaseTitle>
-                  <UseCaseDesc>{uc.desc}</UseCaseDesc>
-                </UseCaseCard>
-              ))}
-            </UseCasesGrid>
-          </SectionContainer>
-        </UseCasesSection>
-
-        {/* ============================================================
-            COMMITMENT BANNER (Why Choose benefits)
-            ============================================================ */}
-        <CommitmentSection ref={commitmentRef}>
-          <SectionContainer>
-            <SectionLabel style={{ color: "#666" }}>
-              {t("staffAugmentation.whyChooseTitle")}
-            </SectionLabel>
-            <ScrollRevealText
-              text={t("staffAugmentation.benefits.commitment")}
-              className=""
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
-                lineHeight: 1.7,
-                maxWidth: "700px",
-                margin: "0 auto",
-                minHeight: "6em",
-              }}
-            />
-          </SectionContainer>
-        </CommitmentSection>
-
-        {/* ============================================================
-            6. CTA
-            ============================================================ */}
-        <CTAWrapper>
-          <CallToActionBlock
-            title={t("staffAugmentation.ctaTitle")}
-            description={t("servicesCallToAction.description")}
-            buttonText={t("servicesCallToAction.buttonText")}
-            highlightWord={t("staffAugmentation.ctaHighlightWord")}
-          />
-        </CTAWrapper>
-      </PageWrapper>
-    </>
-  );
-};
-
-export default StaffAugmentation;
