@@ -17,7 +17,11 @@ import { Resend } from "resend";
 const KEY = process.env.RESEND_API_KEY;
 const FROM = process.env.DEVS_MAIL_FROM || "OpenGateHub <onboarding@resend.dev>";
 const REPLY_TO = process.env.DEVS_MAIL_REPLYTO || "cv@in.opengatehub.com";
-const GUIA = "https://get.opengatehub.com/l/acelerador-de-carrera";
+// El link de cada mail pasa por opengatehub.com/api/ir, que anota el click y redirige
+// a Gumroad. Así se mide el CTR por mail sin el click tracking de Resend, que reescribe
+// los links con un dominio suyo y castiga la entregabilidad (ver pages/api/ir.js).
+const SITIO = process.env.NEXT_PUBLIC_SITE_URL || "https://opengatehub.com";
+const GUIA = (col) => `${SITIO}/api/ir?a=guia&m=${col.replace("drip_", "")}`;
 
 // El mail sale en texto Y en HTML. El HTML está por una sola razón: sin él no hay
 // forma de medir nada. Las aperturas se cuentan con un pixel que va adentro del
@@ -63,7 +67,7 @@ const TOQUES = [
   {
     col: "drip_d1", dias: 1,
     asunto: (pila) => _conNombre(pila, "pará antes de mandar otro CV"),
-    cuerpo: (pila) => `Hola${pila},
+    cuerpo: (pila, guia) => `Hola${pila},
 
 Siete segundos y medio. Eso es lo que mira una persona un CV antes de decidir si sigue leyendo. Está medido.
 
@@ -71,14 +75,14 @@ Lo que más me hace descartar a alguien no es el stack, es cómo está escrito.
 
 Te armé una guía con lo que miro yo, y con un CV entero corregido adentro. 27 dólares.
 
-La quiero: ${GUIA}
+La quiero: ${guia}
 
 Cande`,
   },
   {
     col: "drip_d2", dias: 2,
     asunto: (pila) => _conNombre(pila, "si no te contestan no es tu perfil"),
-    cuerpo: (pila) => `Hola${pila},
+    cuerpo: (pila, guia) => `Hola${pila},
 
 Mandás CVs y no te contesta nadie, y pensás que sos vos.
 
@@ -86,53 +90,53 @@ Casi nunca sos vos. Es dónde estás aplicando y cómo estás llegando.
 
 Las dos cosas están adentro.
 
-Verla: ${GUIA}
+Verla: ${guia}
 
 Cande`,
   },
   {
     col: "drip_d3", dias: 3,
     asunto: (pila) => _conNombre(pila, "te lo digo antes de tu próxima entrevista"),
-    cuerpo: (pila) => `Hola${pila},
+    cuerpo: (pila, guia) => `Hola${pila},
 
 Un montón de entrevistas ya están perdidas antes de que te pregunten nada. No por saber poco, sino por llegar sin saber qué contar.
 
 Eso se entrena, y es la mitad de la guía.
 
-Quiero prepararme: ${GUIA}
+Quiero prepararme: ${guia}
 
 Cande`,
   },
   {
     col: "drip_d7", dias: 7,
     asunto: (pila) => _conNombre(pila, "qué hacen distinto los que quedan"),
-    cuerpo: (pila) => `Hola${pila},
+    cuerpo: (pila, guia) => `Hola${pila},
 
 Los que quedan no contestan mejor que vos. Cuentan cosas que nadie les preguntó.
 
 Cuáles, y en qué momento, está adentro.
 
-Quiero verlo: ${GUIA}
+Quiero verlo: ${guia}
 
 Cande`,
   },
   {
     col: "drip_d12", dias: 12,
     asunto: (pila) => _conNombre(pila, "preparate antes de que te llamen"),
-    cuerpo: (pila) => `Hola${pila},
+    cuerpo: (pila, guia) => `Hola${pila},
 
 El día que te llaman ya estás corriendo: adaptar el CV, mirar la empresa, pensar ejemplos.
 
 Todo eso es muchísimo más fácil antes.
 
-La quiero: ${GUIA}
+La quiero: ${guia}
 
 Cande`,
   },
   {
     col: "drip_d17", dias: 17,
     asunto: (pila) => _conNombre(pila, "último mail sobre esto"),
-    cuerpo: (pila) => `Hola${pila},
+    cuerpo: (pila, guia) => `Hola${pila},
 
 Último mail que te mando sobre esto, prometido.
 
@@ -140,7 +144,7 @@ No te puedo prometer que una guía te consiga trabajo. Lo que sí te puedo dar e
 
 Y si nos cruzamos en una búsqueda, quiero que llegues preparado.
 
-Acceder: ${GUIA}
+Acceder: ${guia}
 
 Cande`,
   },
@@ -178,10 +182,11 @@ export default async function handler(req, res) {
     for (const r of rows) {
       if (yaLeMande.has(r.id)) continue;
       const pila = r.nombre ? " " + r.nombre.trim().split(/\s+/)[0] : "";
+      const cuerpo = t.cuerpo(pila, GUIA(t.col));   // una sola vez: va igual en texto y en HTML
       try {
         await resend.emails.send({
           from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto(pila), text: t.cuerpo(pila), html: aHtml(t.cuerpo(pila)),
+          subject: t.asunto(pila), text: cuerpo, html: aHtml(cuerpo),
         });
         await sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
         enviados[t.col]++;
