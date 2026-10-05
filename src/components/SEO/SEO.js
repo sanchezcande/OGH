@@ -19,6 +19,8 @@ const SEO = ({
   const siteUrl = "https://www.opengatehub.com";
   // Cada idioma tiene su dirección: español en la raíz, inglés en /en.
   const isEnglish = router.locale === "en";
+  // La imagen al compartir un link lleva el titular en el idioma de la página.
+  const defaultOgImage = `${siteUrl}/og-image${isEnglish ? "-en" : ""}.png`;
   const path = router.asPath.split("?")[0].split("#")[0];
   const pathNoSlash = path === "/" ? "" : path;
   // "alternates" lo pasan las páginas cuya dirección cambia según el idioma (artículos del blog).
@@ -27,7 +29,7 @@ const SEO = ({
   const fullCanonical = canonical || (isEnglish ? urlEn : urlEs) || `${siteUrl}${isEnglish ? "/en" : ""}${pathNoSlash || "/"}`;
   const defaultTitle = "Staff Augmentation: Hire Senior Developers | OpenGateHub";
   const defaultDescription = "OpenGateHub finds, interviews and places senior remote developers in your team.";
-  const defaultOgImage = "https://www.opengatehub.com/og-image.png";
+
 
   const displayTitle = title || defaultTitle;
   const displayDescription = description || defaultDescription;

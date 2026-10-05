@@ -5,6 +5,7 @@ import i18n from "../src/i18n";
 import Head from "next/head";
 import NavBar from "../src/components/NavBar/NavBar";
 import Footer from "../src/components/Footer/Footer";
+import ScrollTop from "../src/components/ScrollTop/ScrollTop";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
@@ -127,6 +128,7 @@ export default function MyApp({ Component, pageProps }) {
           <Component {...pageProps} />
         </Main>
         {!sinChrome && <Footer />}
+        {!sinChrome && <ScrollTop />}
         {/* <FloatingWhatsAppButton
           href="https://wa.me/+5491123485638"
           target="_blank"
