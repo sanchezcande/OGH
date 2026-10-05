@@ -36,13 +36,13 @@ const COPY = {
     hero: {
       eyebrow: "Staff augmentation · Contratación de developers",
       title: "Te conseguimos el developer que tu proyecto necesita.",
-      lead: "Solo senior, 100% remotos. Comprobamos que dominan la tecnología y que saben trabajar en equipo. Te presentamos únicamente al top 5%.",
+      lead: "Vos no leés CVs ni entrevistás a ciegas. Nuestros ingenieros evalúan lo técnico y cómo trabaja cada persona, y te presentamos únicamente al top 5%.",
       primary: "Agendá tu llamada gratis",
       secondary: { text: "Guía gratis:", label: "9 preguntas para entrevistar a un developer", href: "/preguntas" },
       note: "Gratis, 20 minutos. Tomamos pocas búsquedas a la vez.",
       assurances: [
-        { title: "Solo senior", text: "Es el único perfil con el que trabajamos." },
-        { title: "Doble filtro: técnico y humano", text: "Que sepa, y que sepa trabajar en equipo." },
+        { title: "Evaluados por ingenieros", text: "No por reclutadores: por gente que programa." },
+        { title: "Solo senior, 100% remoto", text: "Es el único perfil con el que trabajamos." },
         { title: "Calidad garantizada", text: "Solo te presentamos a quien contrataríamos nosotros." },
       ],
     },
@@ -172,13 +172,13 @@ const COPY = {
     hero: {
       eyebrow: "Staff augmentation · Developer hiring",
       title: "Hire senior developers who fit your team.",
-      lead: "Senior only, fully remote. We verify that they master the technology and that they know how to work in a team. We only present the top 5%.",
+      lead: "You don't read CVs or interview blind. Our engineers evaluate the technical side and how each person works, and we only present the top 5%.",
       primary: "Book your free call",
       secondary: null,
       note: "Free, 20 minutes. We take on few searches at a time.",
       assurances: [
-        { title: "Senior only", text: "It's the only profile we work with." },
-        { title: "Two filters: technical and human", text: "They know the craft, and they know how to work in a team." },
+        { title: "Vetted by engineers", text: "Not by recruiters: by people who code." },
+        { title: "Senior only, fully remote", text: "It's the only profile we work with." },
         { title: "Guaranteed quality", text: "We only present people we'd hire ourselves." },
       ],
     },
