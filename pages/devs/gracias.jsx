@@ -67,14 +67,12 @@ export default function Gracias() {
       <Fondo>
         <Caja>
           <Kicker>✓ Tenemos tu perfil</Kicker>
-          <H1>Te falta una cosa, y después otra</H1>
-          <Bajada>
-            <b>Mandame tu CV respondiendo el mail que te acaba de llegar.</b> Sin CV no te puedo
-            presentar a nadie, y la lista la miro cuando me entra un proyecto.
-            <br /><br />
-            Y ahora sí, el video de abajo: 2 minutos sobre qué hace que alguien de esa lista
-            termine quedando adentro.
-          </Bajada>
+          <H1>Ahora mirá esto, son 2 minutos</H1>
+          <Bajada>Qué hace que alguien de esa lista termine quedando adentro.</Bajada>
+          {/* El CV va chico y abajo del título: solo 65 de 247 lo mandan, pero pedirlo acá
+              arriba le saca el lugar al video, que es lo que mueve la venta (Cande, 07/10:
+              "para el funnel no suma, que quede chiquito"). */}
+          <Chico>Ah, y mandame tu CV respondiendo el mail que te llegó.</Chico>
 
           <VideoMarco>
             <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
@@ -115,6 +113,9 @@ const Kicker = styled.p`
 `;
 const H1 = styled.h1` font-size: clamp(30px, 5.5vw, 42px); line-height: 1.12; margin: 0 0 14px; font-weight: 700; letter-spacing: -.01em; `;
 const Bajada = styled.p` font-size: 18px; line-height: 1.55; color: #c9bcc2; margin: 0 0 34px; font-weight: 600; `;
+const Chico = styled.p`
+  font-size: 13px; color: #a99ba1; margin: 6px 0 0;
+`;
 const VideoMarco = styled.div`
   position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
   background: #000; box-shadow: 0 18px 50px rgba(26,21,24,.18);
