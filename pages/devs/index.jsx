@@ -188,7 +188,7 @@ export default function RedDeDevs() {
   return (
     <>
       <Head>
-        <title>{en ? "We will place you at a high paying tech job" : "Te consigo un trabajo tech bien pago, en la era de la IA"}</title>
+        <title>{en ? "A hundred people apply. I take one." : "Me llegan cien aplicaciones por puesto y contrato a una"}</title>
         <meta name="description" content={en
           ? "We have the highest placement rate for tech roles. Under a minute, no CV needed."
           : "Tenemos la tasa de colocación más alta en roles tech. Menos de un minuto, sin CV."} />
@@ -203,11 +203,11 @@ export default function RedDeDevs() {
       </Head>
       <Fondo>
         <Caja>
-          <H1>{en ? "We will place you at a high paying tech job" : "Te consigo un trabajo tech bien pago, en la era de la IA"}</H1>
+          <H1>{en ? "A hundred people apply for each role. I take one." : "Me llegan cien aplicaciones por puesto y contrato a una."}</H1>
           <Bajada>
-            {en ? "We have the highest placement rate for tech roles." : "Tenemos la tasa de colocación más alta en roles tech."}
+            {en ? "Join the list I search first when a project comes in." : "Entrá a la lista donde busco cuando me entra un proyecto."}
           </Bajada>
-          <Aplica>{en ? "Apply below:" : "Aplicá acá abajo:"}</Aplica>
+          <Aplica>{en ? "Leave your profile below:" : "Dejá tu perfil acá abajo:"}</Aplica>
 
           <Progreso>
             <ProgresoTxt>
@@ -326,7 +326,7 @@ export default function RedDeDevs() {
                 <Boton type="submit" disabled={enviando}>
                   {enviando
                     ? (en ? "One second…" : "Un segundo…")
-                    : (en ? "Find me a high paying job" : "Encontrame un trabajo bien pago")}
+                    : (en ? "I want in" : "Quiero entrar a la lista")}
                 </Boton>
               )}
             </Botonera>

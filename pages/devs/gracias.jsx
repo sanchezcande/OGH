@@ -60,13 +60,13 @@ export default function Gracias() {
   return (
     <>
       <Head>
-        <title>Recibimos tu aplicación</title>
+        <title>Ya estás en la lista</title>
         <meta name="robots" content="noindex" />
         <style>{`wistia-player[media-id='${WISTIA_ID}']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/${WISTIA_ID}/swatch');display:block;filter:blur(5px);padding-top:56.25%;}`}</style>
       </Head>
       <Fondo>
         <Caja>
-          <Kicker>✓ Recibimos tu aplicación</Kicker>
+          <Kicker>✓ Ya estás en la lista</Kicker>
           <H1>Una cosa SÚPER importante</H1>
           <Bajada>Mirá este video muy importante acá abajo 👇</Bajada>
 
