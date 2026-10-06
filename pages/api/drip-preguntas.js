@@ -1,6 +1,8 @@
 import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { aHtml } from "./drip";
+import { avisar } from "../../lib/notificar";
+import { correrGoteo } from "../../lib/mandarMail";
 
 // Cadena de nurture para founders que bajaron "9 de las preguntas" (leads_preguntas).
 // Versión de Cande + su mentor (18/09), reemplaza la anterior: progresión
@@ -185,6 +187,8 @@ export default async function handler(req, res) {
   if (s && req.headers.authorization !== `Bearer ${s}`) return res.status(401).json({ error: "no" });
   if (!KEY) return res.status(200).json({ ok: false, error: "sin RESEND_API_KEY" });
   const resend = new Resend(KEY);
+  // Pasada esta hora no arranca ningún envío más (igual que en el goteo de devs).
+  const limite = Date.now() + (config.maxDuration - 20) * 1000;
 
   try {
     await sql`SELECT 1 FROM leads_preguntas LIMIT 1`;
@@ -196,32 +200,29 @@ export default async function handler(req, res) {
   }
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
 
-  const enviados = {};
-  // Máximo UN mail por persona por corrida, igual que en el goteo de devs.
-  const yaLeMande = new Set();
-  for (const t of TOQUES) {
-    enviados[t.col] = 0;
-    const { rows } = await sql.query(
+  // La corrida (un mail por persona, qué se anota, cuándo se corta) vive en
+  // lib/mandarMail.js, igual que en el goteo de devs.
+  const corrida = await correrGoteo({
+    cadena: "founders", toques: TOQUES, resend, avisar, limite,
+    // Primero los que más esperan: si la corrida se corta, no quedan siempre los mismos afuera.
+    buscar: async (t) => (await sql.query(
       `SELECT id, nombre, email FROM leads_preguntas
        WHERE email IS NOT NULL AND NOT drip_off AND ${t.col} IS NULL
          AND creado < NOW() - make_interval(days => $1)
-       LIMIT 40`, [t.dias]);
-    for (const r of rows) {
-      if (yaLeMande.has(r.id)) continue;
+       ORDER BY creado ASC, id ASC
+       LIMIT 40`, [t.dias])).rows,
+    armar: (t, r) => {
       const pila = r.nombre ? " " + r.nombre.trim().split(/\s+/)[0] : "";
       const cuerpo = t.cuerpo(pila, LLAMADA(t.col));   // una sola vez: va igual en texto y en HTML
-      try {
-        await resend.emails.send({
-          from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto, text: cuerpo, html: aHtml(cuerpo),
-        });
-        await sql.query(`UPDATE leads_preguntas SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
-        enviados[t.col]++;
-        yaLeMande.add(r.id);
-      } catch (e) {
-        console.error(`drip-preguntas ${t.col} → ${r.email}:`, e.message);
-      }
-    }
-  }
-  return res.status(200).json({ ok: true, enviados });
+      return {
+        from: FROM, to: r.email, replyTo: REPLY_TO,
+        subject: t.asunto, text: cuerpo, html: aHtml(cuerpo),
+      };
+    },
+    anotar: (t, r) => sql.query(`UPDATE leads_preguntas SET ${t.col} = NOW() WHERE id = $1`, [r.id]),
+  });
+  return res.status(200).json({ ok: true, ...corrida });
 }
+
+// Mismo tope que el goteo de devs (ver pages/api/drip.js).
+export const config = { maxDuration: 300 };

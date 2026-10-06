@@ -1,5 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
+import { avisar } from "../../lib/notificar";
+import { correrGoteo } from "../../lib/mandarMail";
 
 // Campaña de goteo para la red de devs. La llama el cron de Vercel una vez por
 // día (ver vercel.json). Cadencia (decisión Cande 17/09):
@@ -161,42 +163,44 @@ export default async function handler(req, res) {
   if (s && req.headers.authorization !== `Bearer ${s}`) return res.status(401).json({ error: "no" });
   if (!KEY) return res.status(200).json({ ok: false, error: "sin RESEND_API_KEY" });
   const resend = new Resend(KEY);
+  // Pasada esta hora no arranca ningún envío más: quedan 20 segundos para terminar el
+  // que esté en curso, avisar y contestar antes de que Vercel corte la función.
+  const limite = Date.now() + (config.maxDuration - 20) * 1000;
 
   for (const c of COLS) {
     await sql.query(`ALTER TABLE red_devs ADD COLUMN IF NOT EXISTS ${c} TIMESTAMPTZ`);
   }
   await sql`ALTER TABLE red_devs ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
 
-  const enviados = {};
-  // Máximo UN mail por persona por corrida: si alguien entró con días acumulados,
-  // recibe la escalera de a un escalón por día, nunca todos juntos.
-  const yaLeMande = new Set();
-  for (const t of TOQUES) {
-    enviados[t.col] = 0;
+  // La corrida (un mail por persona, qué se anota, cuándo se corta) vive en
+  // lib/mandarMail.js, igual para las dos cadenas. Acá va solo lo propio de esta.
+  const corrida = await correrGoteo({
+    cadena: "developers", toques: TOQUES, resend, avisar, limite,
     // Solo aplicantes del formulario (tienen email), que no estén silenciados,
     // que no hayan recibido ESTE toque, con la antigüedad que corresponde.
-    const { rows } = await sql.query(
+    // Primero los que más esperan: si la corrida se corta, no quedan siempre los mismos afuera.
+    buscar: async (t) => (await sql.query(
       `SELECT id, nombre, email FROM red_devs
        WHERE email IS NOT NULL AND NOT drip_off AND ${t.col} IS NULL
          AND origen = 'formulario'
          AND creado < NOW() - make_interval(days => $1)
-       LIMIT 40`, [t.dias]);
-    for (const r of rows) {
-      if (yaLeMande.has(r.id)) continue;
+       ORDER BY creado ASC, id ASC
+       LIMIT 40`, [t.dias])).rows,
+    armar: (t, r) => {
       const pila = r.nombre ? " " + r.nombre.trim().split(/\s+/)[0] : "";
       const cuerpo = t.cuerpo(pila, GUIA(t.col));   // una sola vez: va igual en texto y en HTML
-      try {
-        await resend.emails.send({
-          from: FROM, to: r.email, replyTo: REPLY_TO,
-          subject: t.asunto(pila), text: cuerpo, html: aHtml(cuerpo),
-        });
-        await sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]);
-        enviados[t.col]++;
-        yaLeMande.add(r.id);
-      } catch (e) {
-        console.error(`drip ${t.col} → ${r.email}:`, e.message);
-      }
-    }
-  }
-  return res.status(200).json({ ok: true, enviados });
+      return {
+        from: FROM, to: r.email, replyTo: REPLY_TO,
+        subject: t.asunto(pila), text: cuerpo, html: aHtml(cuerpo),
+      };
+    },
+    anotar: (t, r) => sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]),
+  });
+  return res.status(200).json({ ok: true, ...corrida });
 }
+
+// Hasta 240 mails por corrida (6 toques de 40) con una pausa entre cada uno: unos 50
+// segundos si Resend contesta rápido, bastante más si anda lento. Sin esto la función
+// corre con el tope por defecto de Vercel y puede quedar cortada a mitad de camino.
+// Mismo tope que la cola de publicación (plan Pro).
+export const config = { maxDuration: 300 };
