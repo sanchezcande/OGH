@@ -189,9 +189,11 @@ export default function RedDeDevs() {
     <>
       <Head>
         <title>{en ? "A hundred people apply. I take one." : "Me llegan cien aplicaciones por puesto y contrato a una"}</title>
+        {/* La descripción que ve Google y la que aparece al compartir el link. Decía "tenemos la
+            tasa de colocación más alta en roles tech", que no se puede sostener con ningún dato. */}
         <meta name="description" content={en
-          ? "We have the highest placement rate for tech roles. Under a minute, no CV needed."
-          : "Tenemos la tasa de colocación más alta en roles tech. Menos de un minuto, sin CV."} />
+          ? "Join the list I search first when a project comes in. Under a minute."
+          : "Entrá a la lista donde busco cuando me entra un proyecto. Menos de un minuto."} />
         {/* Inter para el cuerpo: la Space Grotesk del sitio queda bien en un título
             grande, pero en texto chico se lee poco seria. Misma decisión que /hola. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
