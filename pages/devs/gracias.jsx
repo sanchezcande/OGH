@@ -60,15 +60,21 @@ export default function Gracias() {
   return (
     <>
       <Head>
-        <title>Ya estás en la lista</title>
+        <title>Tenemos tu perfil</title>
         <meta name="robots" content="noindex" />
         <style>{`wistia-player[media-id='${WISTIA_ID}']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/${WISTIA_ID}/swatch');display:block;filter:blur(5px);padding-top:56.25%;}`}</style>
       </Head>
       <Fondo>
         <Caja>
-          <Kicker>✓ Ya estás en la lista</Kicker>
-          <H1>Una cosa SÚPER importante</H1>
-          <Bajada>Mirá este video muy importante acá abajo 👇</Bajada>
+          <Kicker>✓ Tenemos tu perfil</Kicker>
+          <H1>Te falta una cosa, y después otra</H1>
+          <Bajada>
+            <b>Mandame tu CV respondiendo el mail que te acaba de llegar.</b> Sin CV no te puedo
+            presentar a nadie, y la lista la miro cuando me entra un proyecto.
+            <br /><br />
+            Y ahora sí, el video de abajo: 2 minutos sobre qué hace que alguien de esa lista
+            termine quedando adentro.
+          </Bajada>
 
           <VideoMarco>
             <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
