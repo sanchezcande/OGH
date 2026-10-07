@@ -180,7 +180,7 @@ export default async function handler(req, res) {
     // que no hayan recibido ESTE toque, con la antigüedad que corresponde.
     // Primero los que más esperan: si la corrida se corta, no quedan siempre los mismos afuera.
     buscar: async (t) => (await sql.query(
-      `SELECT id, nombre, email FROM red_devs
+      `SELECT id, nombre, email, creado FROM red_devs
        WHERE email IS NOT NULL AND NOT drip_off AND ${t.col} IS NULL
          AND origen = 'formulario'
          AND creado < NOW() - make_interval(days => $1)
