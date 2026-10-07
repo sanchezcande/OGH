@@ -21,7 +21,7 @@ async function query(texto, params = []) {
     return { rows: [] };
   }
 
-  let m = t.match(/^SELECT id, nombre, email FROM (\w+) WHERE email IS NOT NULL AND NOT drip_off AND (drip_d\d+) IS NULL (.*)$/);
+  let m = t.match(/^SELECT id, nombre, email, creado FROM (\w+) WHERE email IS NOT NULL AND NOT drip_off AND (drip_d\d+) IS NULL (.*)$/);
   if (m) {
     const [, tabla, col, resto] = m;
     let filas = (base.tablas[tabla] || []).filter((f) =>
@@ -35,7 +35,7 @@ async function query(texto, params = []) {
     }
     const tope = resto.match(/LIMIT (\d+)$/);
     if (tope) filas = filas.slice(0, Number(tope[1]));
-    return { rows: filas.map(({ id, nombre, email }) => ({ id, nombre, email })) };
+    return { rows: filas.map(({ id, nombre, email, creado }) => ({ id, nombre, email, creado })) };
   }
 
   m = t.match(/^UPDATE (\w+) SET (drip_d\d+) = NOW\(\) WHERE id = \$1$/);

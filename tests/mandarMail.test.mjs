@@ -204,7 +204,7 @@ test("si salió al menos uno y no se cortó, no hay aviso", async () => {
   assert.equal(c.avisos.length, 0);
 });
 
-test("el aviso por cupo no promete un orden que el código no cumple", async () => {
+test("el aviso por cupo dice lo que el código hace: mañana salen primero los que más esperan", async () => {
   const c = corrida({
     pendientes: { drip_d1: gente(1, 3) },
     responder: (_m, n) => (n === 2 ? rechazo("daily_quota_exceeded", 429) : aceptado(n)),
@@ -213,7 +213,84 @@ test("el aviso por cupo no promete un orden que el código no cumple", async () 
 
   assert.equal(c.avisos.length, 1);
   const sigue = c.avisos[0].campos["Qué sigue"];
-  assert.doesNotMatch(sigue, /primero los que más esperan/);
   assert.match(sigue, /sin anotar/);
+  assert.match(sigue, /primero los que más esperan/);
   assert.ok(!/[\u2014\u00bf\u00a1]/.test(JSON.stringify(c.avisos[0])), "el aviso rompe las reglas de escritura");
+});
+
+test("la fila va por atraso: el alta más los días del toque, el más atrasado adelante", async () => {
+  const DIA = 86400000, ahora = Date.UTC(2026, 9, 7, 13);
+  const alta = (dias) => new Date(ahora - dias * DIA);
+  const pedidos = [];
+  const r = await correrGoteo({
+    cadena: "prueba",
+    toques: [{ col: "drip_d1", dias: 1 }, { col: "drip_d7", dias: 7 }, { col: "drip_d12", dias: 12 }],
+    buscar: async (t) => ({
+      drip_d1: [{ id: 1, creado: alta(1.5) }, { id: 2, creado: alta(1.1) }],   // les toca desde hace 0,5 y 0,1 días
+      drip_d7: [{ id: 3, creado: alta(8) }],                                   // desde hace 1 día
+      drip_d12: [{ id: 4, creado: alta(15) }, { id: 1, creado: alta(1.5) }],   // desde hace 3 días (y un repetido)
+    })[t.col],
+    armar: (t, f) => ({ to: `p${f.id}`, subject: t.col }),
+    anotar: async () => {},
+    resend: { emails: { send: async (m) => { pedidos.push(`${m.subject}:${m.to}`); return aceptado(pedidos.length); } } },
+    avisar: async () => true, esperar: async () => {}, ahora: () => 0, limite: 1,
+  });
+
+  assert.deepEqual(pedidos, ["drip_d12:p4", "drip_d7:p3", "drip_d1:p1", "drip_d1:p2"]);
+  assert.equal(r.salieron, 4, "una persona, un mail: el repetido no sale dos veces");
+});
+
+test("la regla del orden es el alta más los días del toque, no el alta sola ni el toque solo", async () => {
+  const DIA = 86400000, ahora = Date.UTC(2026, 9, 7, 13);
+  const alta = (dias) => new Date(ahora - dias * DIA);
+  const pedidos = [];
+  await correrGoteo({
+    cadena: "prueba",
+    toques: [{ col: "drip_d1", dias: 1 }, { col: "drip_d17", dias: 17 }],
+    buscar: async (t) => ({
+      drip_d1: [{ id: 3, creado: alta(1.5) }, { id: 1, creado: alta(6) }],   // 0,5 y 5 días de atraso
+      drip_d17: [{ id: 2, creado: alta(20) }],                               // 3 días de atraso, el alta más vieja
+    })[t.col],
+    armar: (t, f) => ({ to: `p${f.id}`, subject: t.col }),
+    anotar: async () => {},
+    resend: { emails: { send: async (x) => { pedidos.push(`${x.subject}:${x.to}`); return aceptado(pedidos.length); } } },
+    avisar: async () => true, esperar: async () => {}, ahora: () => 0, limite: 1,
+  });
+
+  assert.deepEqual(pedidos, ["drip_d1:p1", "drip_d17:p2", "drip_d1:p3"]);
+});
+
+test("una fila sin fecha de alta (nula, vacía o inválida) va al final, detrás de las que tienen fecha", async () => {
+  const ahora = Date.UTC(2026, 9, 7, 13);
+  const pedidos = [];
+  await correrGoteo({
+    cadena: "prueba",
+    toques: [{ col: "drip_d1", dias: 1 }],
+    buscar: async () => [{ id: 1, creado: null }, { id: 2 }, { id: 3, creado: "no es una fecha" },
+                         { id: 4, creado: new Date(ahora - 2 * 86400000) }, { id: 5, creado: new Date(ahora - 3 * 86400000).toISOString() }],
+    armar: (t, f) => ({ to: `p${f.id}`, subject: t.col }),
+    anotar: async () => {},
+    resend: { emails: { send: async (x) => { pedidos.push(x.to); return aceptado(pedidos.length); } } },
+    avisar: async () => true, esperar: async () => {}, ahora: () => 0, limite: 1,
+  });
+
+  assert.deepEqual(pedidos, ["p5", "p4", "p1", "p2", "p3"]);
+});
+
+test("si el cupo ya estaba gastado cuando arrancó la cadena, el aviso no promete ningún orden", async () => {
+  const c = corrida({ pendientes: { drip_d1: gente(1, 2) }, responder: () => rechazo("daily_quota_exceeded", 429) });
+  const r = await c.correr();
+
+  assert.equal(r.salieron, 0);
+  assert.equal(c.avisos.length, 1);
+  assert.match(c.avisos[0].campos["Qué sigue"], /No quedaba cupo cuando arrancó esta cadena/);
+  assert.doesNotMatch(c.avisos[0].campos["Qué sigue"], /primero los que más esperan/);
+});
+
+test("si una fila viene sin fecha de alta, no rompe: queda al final y en el orden en que llegó", async () => {
+  const c = corrida({ pendientes: { drip_d1: gente(1, 3) } });
+  const r = await c.correr();
+
+  assert.equal(r.salieron, 3);
+  assert.deepEqual(c.pedidos, ["drip_d1:p1@example.com", "drip_d1:p2@example.com", "drip_d1:p3@example.com"]);
 });
