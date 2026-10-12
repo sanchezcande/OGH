@@ -1,0 +1,1037 @@
+// El agente de DM: los frenos (lib/dm/frenos.js) y lo que hace con cada mensaje
+// (lib/dm/agente.js), con una base, un modelo, un ManyChat y un Telegram de mentira.
+// Carga el código real del sitio. Ninguna prueba sale a la red.
+//
+// Todos los textos de este archivo son inventados para la prueba. Este repo es público: acá no
+// va ninguna frase de una charla real ni del prompt del agente (que vive en la base).
+//
+// Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js. El doble de Postgres de
+// tests/dobles solo conoce las del goteo, así que tomar, soltar, anotarLead, sembrar,
+// retirarSalida, reclamarToque, sinContestar y borrarViejas (y lo que hacen con ellas
+// /api/dm/config y /api/dm/toques) se prueban a mano contra un Postgres de verdad antes de
+// subir un cambio.
+//
+// Correr:  node --test tests/*.test.mjs
+import { respuesta } from "./dobles/preparar.mjs";
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+const {
+  revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano,
+} = await import("../lib/dm/frenos.js");
+const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
+const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO } = await import("../lib/dm/base.js");
+
+const HORA = 3600000;
+const AHORA = new Date("2026-10-12T15:00:00Z"); // las 12 del mediodía en Argentina
+const AVISO = "Va un mensaje automático de prueba";
+
+const estadoDev = { quien: "dev", busca: "si", dolor: "de prueba", etapa: "puente", link_formulario_enviado: false, precio_dicho: false };
+const salida = (mensajes, extra = {}) => ({
+  accion: "responder", mensajes, estado: estadoDev, aviso_para_cande: "", seguimiento_en_horas: null, motivo: "", ...extra,
+});
+const como = (quien) => ({ estado: { ...estadoDev, quien } });
+const frena = (r, que) => assert.equal(r.ok, false, `tenía que frenar: ${que}`);
+const pasa = (r, que) => assert.deepEqual(r, { ok: true }, `tenía que pasar: ${que}`);
+
+/* ---------- frenos: lo que no sale nunca ---------- */
+
+test("una respuesta normal a un dev pasa", () => {
+  pasa(revisar(salida(["Pregunta de prueba?"])), "una pregunta");
+});
+
+test("no sale nada que diga que es una persona, prometa o apure", () => {
+  const malas = [
+    "Lo antes posible", "Soy Cande", "Sii soy yo", "No soy un bot", "No es automático", "Recién lo veo",
+    "Lo resolvés enseguida", "Te contesto pronto",
+    "Cualquier novedad te aviso", "Te voy a avisar", "Mañana te escribo", "Después te paso el link", "Quedás adentro",
+    "Te consigo trabajo", "Vas a conseguir trabajo", "Te van a llamar", "Trabajo garantizado",
+    "Quedan pocos lugares", "Solo por hoy", "Va a subir", "Hay un descuento", "Por ahora no sé",
+    "Pasame el CVV", "Mandame el comprobante",
+  ];
+  for (const m of malas) frena(revisar(salida([m])), m);
+});
+
+test("las frases prohibidas se frenan igual con tildes, sin tildes y en mayúsculas", () => {
+  for (const m of ["Recién lo veo", "Quedás adentro", "Últimos cupos", "Mañana te escribo"]) {
+    for (const variante of [m, plano(m), m.toUpperCase(), m.normalize("NFD")]) frena(revisar(salida([variante])), variante);
+  }
+  assert.equal(plano("  ÚLTIMOS\n cupos "), "ultimos cupos");
+});
+
+test("prometer para después no sale aunque haya algo entre el verbo y el cuándo", () => {
+  for (const m of ["Te paso el dato mañana", "Te mando algo más a la noche", "Te escribo por acá mañana", "Te cuento mejor el lunes"]) {
+    assert.equal(revisar(salida([m])).motivo, "promete avisar o escribir después", m);
+  }
+  for (const m of ["Te paso 2 preguntas de prueba", "Te cuento algo de prueba", "Te mando el dato de prueba"]) pasa(revisar(salida([m])), m);
+});
+
+test("un pasado en tercera persona no es una promesa: la ó final cuenta", () => {
+  const preguntas = ["Y de esas alguna te llamó?", "Y después te contestó alguien?", "Y eso te pasó hoy?", "Y te avisó alguien?", "Y quién te presentó ahí?"];
+  for (const m of preguntas) {
+    for (const variante of [m, m.toUpperCase(), m.normalize("NFD")]) pasa(revisar(salida([variante])), variante);
+  }
+  // La misma frase en primera persona, sin la tilde, sigue siendo una promesa.
+  for (const m of ["Y de esas alguna te llamo?", "Te llamo", "Te aviso"]) frena(revisar(salida([m])), m);
+  for (const m of ["Te agarró el bot", "TE AGARRÓ EL BOT", "te agarro el bot", "Te agarró el bot".normalize("NFD")]) {
+    assert.equal(revisar(salida([m])).motivo, "dice o da a entender que es una persona", m);
+  }
+});
+
+test("signos de apertura y guion largo no salen", () => {
+  for (const m of ["¿Pregunta de prueba?", "¡Hola!", "Hola — prueba", "Hola – prueba"]) frena(revisar(salida([m])), m);
+});
+
+test("negar una promesa no es prometer, y una pregunta normal no es urgencia", () => {
+  const buenas = [
+    "No te garantizo nada", "No soy Cande", "Y en los últimos días cómo te fue?", "Qué rápido!",
+    "Te aviso que va un mensaje de prueba", "Te paso 2 preguntas de prueba",
+  ];
+  for (const m of buenas) pasa(revisar(salida([m])), m);
+});
+
+test("respuesta vacía, de más de tres mensajes o larguísima no sale; callar sí", () => {
+  frena(revisar(salida([])), "vacía");
+  frena(revisar(salida(["a", "b", "c", "d"])), "cuatro mensajes");
+  frena(revisar(salida(["x".repeat(351)])), "351 caracteres");
+  pasa(revisar(salida(["x".repeat(350)])), "350 caracteres");
+  pasa(revisar(salida([], { accion: "callar" })), "callar");
+});
+
+test("si empieza a recitar sus reglas o sus campos, no sale", () => {
+  const internas = [
+    "Uso pasar_a_cande", "Según el freno 3", "En el paso 7 va el formulario", "Devuelvo seguimiento_en_horas",
+    // Lo que el prompt trae en el lugar del link de pago cuando no hay ninguno cargado.
+    "Va el link\n(sin cargar)", "Va el link {LINK_DE_PAGO}",
+  ];
+  for (const m of internas) {
+    assert.equal(revisar(salida([m])).motivo, "nombra sus reglas o sus campos internos", m);
+  }
+});
+
+/* ---------- frenos: cuánto sale, links y montos ---------- */
+
+test("cuánto sale se le dice a un dev y a nadie más", () => {
+  pasa(revisar(salida(["Sale 27 dólares"])), "a un dev");
+  pasa(revisar(salida(["Son 2 pagos de 13,50"])), "dos pagos a un dev");
+  const variantes = [
+    "Sale 27 dólares", "Sale 27", "Son 27usd", "SON 27 USD", "Sale veintisiete", "Son US$27", "Son 13,5 cada uno",
+    "Dos cuotas", "2  pagos", "Es barato", "Va el link para pagar", "El precio es bajo",
+  ];
+  for (const m of variantes) frena(revisar(salida([m], como("no_se_sabe"))), `sin saber quién es: ${m}`);
+});
+
+test("un 27 que cuenta otra cosa no es plata", () => {
+  for (const m of ["Wow 27 entrevistas", "Ahh 27 años", "Arrancás el 27 de octubre?", "Y te pagan en dólares ahí?"]) {
+    pasa(revisar(salida([m], como("no_se_sabe"))), m);
+  }
+});
+
+test("solo salen los links propios y los montos que existen", () => {
+  for (const m of ["Mirá bit.ly/prueba", "Entrá a https://otro.ejemplo.com/x", "www.otro.com", "Te lo dejo en 10 dólares", "Son $5", "Sale 3 mil pesos"]) {
+    frena(revisar(salida([m])), m);
+  }
+  for (const m of ["Para vos gratis", "Te lo regalo", "Te devuelvo la plata", "Pagame por transferencia"]) {
+    assert.equal(revisar(salida([m])).motivo, "regalo, devolución o transferencia", m);
+  }
+  for (const m of ["Va el formulario\nopengatehub.com/devs", "https://www.opengatehub.com/devs/", "Wow Node.js y ASP.NET", "Es gratis"]) {
+    pasa(revisar(salida([m])), m);
+  }
+});
+
+test("el link de pago cargado cuenta como venta, lo escriba con https o sin", () => {
+  const linkDePago = "https://pagos.ejemplo.com/prueba";
+  pasa(revisar(salida(["Va el link\npagos.ejemplo.com/prueba"]), { linkDePago }), "sin https, a un dev");
+  pasa(revisar(salida(["Va el link\nhttps://pagos.ejemplo.com/prueba."]), { linkDePago }), "con https y punto final");
+  frena(revisar(salida(["Va el link\npagos.ejemplo.com/prueba"], como("empresa")), { linkDePago }), "a una empresa");
+  frena(revisar(salida(["Va el link\npagos.ejemplo.com/prueba"], como("no_se_sabe")), { linkDePago }), "sin saber quién es");
+  frena(revisar(salida(["Va el link\npagos.ejemplo.com/otra"]), { linkDePago }), "otra página del mismo dominio");
+});
+
+/* ---------- frenos: a quién no se le vende ---------- */
+
+test("a quien construye o tiene empresa no le llega la lista, el programa, la llamada ni cuánto sale", () => {
+  for (const quien of ["construye", "empresa"]) {
+    for (const m of ["Va la lista: opengatehub.com/devs", "opengatehub .com/devs", "Sale 27 dólares", "Sale veintisiete", "Lo cuento en mi programa", "Tengo un curso", "Agendemos una llamada", "Mirá el video"]) {
+      frena(revisar(salida([m], como(quien))), `${quien}: ${m}`);
+    }
+    pasa(revisar(salida(["Pregunta de prueba?"], como(quien))), `${quien}: una pregunta`);
+  }
+});
+
+test("que el modelo diga dev no alcanza si antes dijo empresa o si el lead dio una señal de empresa", () => {
+  frena(revisar(salida(["Sale 27 dólares"]), { estadoPrevio: { quien: "empresa" } }), "estado anterior empresa");
+  frena(revisar(salida(["Va la lista\nopengatehub.com/devs"]), { textosDelLead: ["dale"], charlaDelLead: ["soy founder de una startup", "dale"] }), "señal en un turno anterior");
+  pasa(revisar(salida(["Va la lista\nopengatehub.com/devs"]), { textosDelLead: ["dale"], charlaDelLead: ["soy dev backend", "dale"] }), "un dev");
+});
+
+test("del programa no se habla sin saber que es dev", () => {
+  frena(revisar(salida(["Lo cuento en mi programa"], como("no_dev"))), "a quien no es dev");
+  pasa(revisar(salida(["Lo cuento en mi programa"])), "a un dev");
+});
+
+test("quien contó una crisis o que no tiene plata lo sigue contando tres turnos después", () => {
+  const charlaDelLead = ["no tengo plata, estoy sin trabajo", "bueno", "y cuánto sale?"];
+  frena(revisar(salida(["Sale 27 dólares"]), { textosDelLead: ["y cuánto sale?"], charlaDelLead }), "sin plata en un turno anterior");
+  frena(revisar(salida(["Sale 27 dólares"]), { textosDelLead: [], charlaDelLead }), "en un seguimiento, con el turno vacío");
+  pasa(revisar(salida(["Va la lista, es gratis\nopengatehub.com/devs"]), { textosDelLead: ["bueno"], charlaDelLead }), "la lista gratis sí");
+  frena(revisar(salida(["Mirá el video"]), { charlaDelLead: ["falleció un familiar"] }), "crisis y video");
+  frena(revisar(salida(["Va la lista\nopengatehub.com/devs"]), { charlaDelLead: ["estoy con depresión"] }), "crisis y lista");
+  pasa(revisar(salida(["Mensaje de prueba sin venta"]), { charlaDelLead: ["estoy con depresión"] }), "crisis y una línea sin venta");
+  frena(revisar(salida(["Sale 27 dólares"]), { textosDelLead: ["me echaron ayer"] }), "sin trabajo en este turno");
+});
+
+test("a quien pidió que no le escriban solo le sale la disculpa, al pasarle la charla a Cande", () => {
+  const charlaDelLead = ["no me escribas más"];
+  assert.equal(revisar(salida(["Pregunta de prueba?"]), { charlaDelLead }).motivo, "pidió que no le escriban");
+  pasa(revisar(salida(["Disculpa de prueba"], { accion: "pasar_a_cande" }), { charlaDelLead }), "la disculpa");
+});
+
+test("si todavía no se avisó que es automático, el mensaje tiene que decirlo", () => {
+  assert.equal(revisar(salida(["Pregunta de prueba?"]), { exigirAviso: true }).motivo, "primer mensaje sin avisar que es automático");
+  pasa(revisar(salida([AVISO, "Pregunta de prueba?"]), { exigirAviso: true }), "con el aviso");
+  pasa(revisar(salida(["Responde una IA", "Pregunta de prueba?"]), { exigirAviso: true }), "dicho de otra forma");
+  pasa(revisar(salida([], { accion: "pasar_a_cande" }), { exigirAviso: true }), "pasar sin escribir");
+  frena(revisar(salida(["No es automático", "Pregunta de prueba?"]), { exigirAviso: true }), "negarlo no es avisar");
+  // Si además rompe otra regla, el motivo que llega es el de esa regla.
+  assert.match(revisar(salida(["Sale 27 dólares"], como("empresa")), { exigirAviso: true }).motivo, /construye o contrata/);
+  assert.equal(avisaQueEsAutomatico("MENSAJE AUTOMÁTICO"), true);
+  assert.equal(avisaQueEsAutomatico("mensaje de prueba"), false);
+});
+
+/* ---------- frenos: lo que cuenta el lead ---------- */
+
+test("lo que cuenta el lead se entiende con tildes, sin tildes, en mayúsculas y con signos", () => {
+  const cuenta = (t) => Object.entries(senales([t])).filter(([, v]) => v).map(([k]) => k).join(",");
+  for (const t of ["falleció mi abuelo", "FALLECIO MI ABUELO", "se murió mi perro", "no doy más", "No Doy Mas", "estoy en una crisis"]) {
+    assert.equal(cuenta(t), "crisis", t);
+  }
+  for (const t of ["no tengo $", "No tengo PLATA", "tengo deudas", "no tengo un mango", "estoy apurado", "no me alcanza"]) {
+    assert.equal(cuenta(t), "sinPlata", t);
+  }
+  for (const t of ["estoy desempleada", "ME ECHARON", "me quedé sin laburo"]) assert.equal(cuenta(t), "sinTrabajo", t);
+  for (const t of ["no me escribas más", "dejá de escribirme", "esto es spam"]) assert.equal(cuenta(t), "baja", t);
+  for (const t of ["no me interesa", "No, gracias", "para más adelante"]) assert.equal(cuenta(t), "dijoQueNo", t);
+  for (const t of ["tengo una agencia", "Soy CEO", "busco contratar un dev", "necesito un presupuesto", "ambas"]) {
+    assert.equal(cuenta(t), "empresa", t);
+  }
+});
+
+test("lo que parece una crisis o falta de plata y no lo es", () => {
+  const nada = ["hay mucha deuda técnica", "es por la crisis del sector", "me da ansiedad la entrevista técnica", "no estoy apurado", "no me alcanza el tiempo", "trabajo en una empresa grande", "soy dev backend"];
+  for (const t of nada) assert.deepEqual(Object.values(senales([t])).filter(Boolean), [], t);
+});
+
+/* ---------- frenos: seguimientos ---------- */
+
+test("no hay seguimiento para quien ya contestó que no, no tiene plata, no busca o cerró la charla", () => {
+  const conLink = { ...estadoDev, link_formulario_enviado: true };
+  const sigue = (o) => sinSeguimiento({ estado: conLink, ...o });
+  assert.equal(sigue({ charlaDelLead: ["mensaje de prueba"], ultimoTurnoDelLead: ["mensaje de prueba"] }), false);
+  assert.equal(sigue({ charlaDelLead: ["no me interesa"], ultimoTurnoDelLead: ["no me interesa"] }), true);
+  assert.equal(sigue({ charlaDelLead: ["no me interesa", "bueno, contame"], ultimoTurnoDelLead: ["bueno, contame"] }), false);
+  assert.equal(sigue({ charlaDelLead: ["tengo deudas", "dale"], ultimoTurnoDelLead: ["dale"] }), true);
+  assert.equal(sigue({ charlaDelLead: ["no me escribas más", "hola"], ultimoTurnoDelLead: ["hola"] }), true);
+  assert.equal(sinSeguimiento({ estado: { ...conLink, etapa: "cerrada" } }), true);
+  assert.equal(sinSeguimiento({ estado: { ...conLink, busca: "no" } }), true);
+  assert.equal(sinSeguimiento({ estado: { ...estadoDev, busca: "no_se_sabe" } }), true); // sin link y sin decir que busca
+  assert.equal(sinSeguimiento({ estado: {} }), true);
+  assert.equal(sinSeguimiento({ estado: null }), true);
+});
+
+test("el seguimiento se cuenta desde el último mensaje del lead y solo dentro de sus 24 horas", () => {
+  const ultimoLead = new Date(AHORA - 2 * HORA);
+  const en = (o) => proximoToque({ ahora: AHORA, ultimoLead, toquesHechos: 0, ...o });
+  assert.equal(en({ horas: 6 }).getTime(), ultimoLead.getTime() + 6 * HORA);
+  assert.equal(en({ horas: 0.2 }).getTime(), ultimoLead.getTime() + 4 * HORA);   // nunca antes de las 4 horas
+  assert.equal(en({ horas: 6, toquesHechos: 2 }), null);                            // ya hizo los dos
+  assert.equal(en({ horas: 6, toquesHechos: 1, maxToques: 1 }), null);              // antes del link va uno solo
+  assert.equal(en({ horas: null }), null);
+  assert.equal(proximoToque({ ahora: AHORA, ultimoLead: new Date(AHORA - 6 * HORA), horas: 4, toquesHechos: 0 }), null); // esa hora ya pasó
+  // El segundo toque, pedido a las 21 horas de su mensaje, cuando el primero salió a las 6.
+  const tarde = new Date("2026-10-12T20:00:00Z");
+  assert.equal(
+    proximoToque({ ahora: new Date(tarde.getTime() + 6 * HORA), ultimoLead: tarde, horas: 21, toquesHechos: 1 }).getTime(),
+    tarde.getTime() + 21 * HORA);
+  assert.equal(ventanaAbierta(AHORA, new Date(AHORA - 23 * HORA)), true);
+  assert.equal(ventanaAbierta(AHORA, new Date(AHORA - 24 * HORA)), false);
+  assert.equal(ventanaAbierta(AHORA, null), false);
+});
+
+test("un seguimiento que cae de noche se corre a las 9, y si con eso pasa las 24 horas no sale", () => {
+  const toque = (ultimoLead, horas) =>
+    proximoToque({ ahora: new Date(ultimoLead), ultimoLead: new Date(ultimoLead), horas, toquesHechos: 0 })?.toISOString() ?? null;
+  assert.equal(toque("2026-10-13T02:00:00Z", 6), "2026-10-13T12:00:00.000Z");   // 05:00 de Argentina → 09:00
+  assert.equal(toque("2026-10-12T21:30:00Z", 4), "2026-10-13T12:00:00.000Z");   // 22:30 → 09:00 del otro día
+  assert.equal(toque("2026-10-12T15:00:00Z", 5), "2026-10-12T20:00:00.000Z");   // 17:00: sale a su hora
+  assert.equal(toque("2026-10-12T09:00:00Z", 21), null);                        // a las 9 ya cerró la ventana
+});
+
+test("una salida rota del modelo se convierte en pasarle la charla a Cande", () => {
+  assert.equal(normalizar(null).accion, "pasar_a_cande");
+  assert.equal(normalizar({ accion: "bailar" }).accion, "pasar_a_cande");
+  assert.deepEqual(normalizar({ accion: "responder", mensajes: [" hola ", "", null] }).mensajes, ["hola"]);
+  const larga = normalizar({ accion: "callar", aviso_para_cande: "a".repeat(5000), motivo: "m".repeat(5000) });
+  assert.equal(larga.aviso_para_cande.length, 600); // Telegram rechaza un aviso de más de 4.096
+  assert.equal(larga.motivo.length, 300);
+});
+
+/* ---------- el turno ---------- */
+
+test("el turno son los mensajes del lead que faltan atender; lo del agente figura como de Cande", () => {
+  const mensajes = [
+    { id: 1, quien: "lead", texto: "uno" }, { id: 2, quien: "agente", texto: "Respuesta al uno?" },
+    { id: 3, quien: "lead", texto: "dos" }, { id: 4, quien: "lead", texto: "tres" },
+  ];
+  const t = armarTurno(mensajes, { desde: 1 });
+  assert.deepEqual(t.mensajes_del_lead, ["dos", "tres"]);
+  assert.deepEqual(t.historial, [{ quien: "lead", texto: "uno" }, { quien: "cande", texto: "Respuesta al uno?" }]);
+  assert.equal(t.contexto, null);
+});
+
+test("un mensaje que entró mientras salía la respuesta anterior sigue siendo del turno", () => {
+  // El 11 llegó antes de que se anotara la respuesta al 10: en el orden queda antes que ella.
+  const mensajes = [{ id: 10, quien: "lead", texto: "uno" }, { id: 11, quien: "lead", texto: "dos" }, { id: 12, quien: "agente", texto: "Respuesta al uno?" }];
+  const t = armarTurno(mensajes, { desde: 10 });
+  assert.deepEqual(t.mensajes_del_lead, ["dos"]);
+  assert.equal(t.historial.length, 2);
+});
+
+test("en un seguimiento no hay mensajes nuevos, y el contexto de una charla cargada a mano va siempre", () => {
+  const mensajes = [{ id: 1, quien: "lead", texto: "uno" }];
+  const toque = armarTurno(mensajes, { evento: "seguimiento", ahora: AHORA, ultimoLead: new Date(AHORA - 6 * HORA), toque: 1, contexto: "contexto de prueba" });
+  assert.deepEqual(toque.mensajes_del_lead, []);
+  assert.equal(toque.historial.length, 1);
+  assert.match(toque.contexto, /^SEGUIMIENTO.*hace 6 horas.*toque 2 de 2.*contexto de prueba$/);
+  assert.equal(armarTurno(mensajes, { contexto: "contexto de prueba" }).contexto, "contexto de prueba");
+});
+
+/* ---------- el agente, con dobles ---------- */
+
+const diferida = () => { let resolver; const promesa = new Promise((r) => { resolver = r; }); return { promesa, resolver }; };
+const tick = async () => { for (let i = 0; i < 6; i++) await new Promise((r) => setImmediate(r)); };
+const hasta = async (listo) => { for (let i = 0; i < 500 && !listo(); i++) await tick(); assert.ok(listo(), "no llegó a pasar lo que la prueba esperaba"); };
+
+/**
+ * Un agente con todo de mentira. `m` es el mundo: lo que hay guardado y lo que el agente hizo.
+ * La charla arranca con el aviso ya dado (salvo conAviso: false) y un mensaje del lead, m.disparo.
+ */
+function armar({
+  modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
+  prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
+  ahora = AHORA, alEsperar,
+} = {}) {
+  const m = {
+    ajustes: { modo, envio, espera_ms: 0, tope_por_dia: tope, toques, link_de_pago: "", ...(avisoIa === undefined ? {} : { aviso_ia: avisoIa }) },
+    contacto: {
+      id: "77", nombre: "Lead de prueba", dueno, toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: null,
+      estado: {}, ultimo_lead: new Date(ahora - ultimoLeadHace * HORA),
+    },
+    mensajes: [...(conAviso ? [{ id: 1, quien: "agente", texto: AVISO }] : []), { id: 2, quien: "lead", texto: "mensaje de prueba" }],
+    disparo: 2, tomado: null, proximo: undefined,
+    salidas: [], enviados: [], campos: [], avisos: [], pedidos: [], fallaAnotar: false, fallaSumarToque: false,
+  };
+  const delLead = () => m.mensajes.filter((x) => x.quien === "lead");
+  const base = {
+    tablas: async () => {},
+    ajustes: async () => m.ajustes,
+    prompt: async () => prompt,
+    contacto: async () => ({ ...m.contacto }),
+    ultimoIdLead: async () => delLead().at(-1)?.id ?? null,
+    historial: async (id, tope = 80) => m.mensajes.slice(-tope),
+    corridasEnUnDia: async () => m.salidas.filter((s) => s.estado !== "aviso_fallido").length,
+    tomar: async (id, marca) => {
+      if (m.tomado || m.contacto.dueno !== "agente") return null;
+      m.tomado = marca;
+      return { ...m.contacto };
+    },
+    soltar: async (id, marca) => { if (m.tomado === marca) m.tomado = null; },
+    ponerDueno: async (id, d) => { m.contacto.dueno = d; m.contacto.proximo_toque = null; },
+    guardarSalida: async (s) => { m.salidas.push({ ...s }); return m.salidas.length; },
+    marcarSalida: async (idSalida, estado, detalle) => { Object.assign(m.salidas[idSalida - 1], { estado, detalle }); },
+    anotar: async (id, quien, texto) => {
+      if (m.fallaAnotar) throw new Error("base caída al anotar");
+      m.mensajes.push({ id: m.mensajes.length + 1, quien, texto });
+    },
+    guardarEstado: async (id, e, p) => { m.contacto.estado = e; m.contacto.proximo_toque = p; m.proximo = p; },
+    sumarToque: async () => {
+      if (m.fallaSumarToque) throw new Error("base caída al contar el toque");
+      m.contacto.toques++; m.contacto.proximo_toque = null;
+    },
+    cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
+  };
+  const pedir = async (p) => {
+    m.pedidos.push(p);
+    return responde ? responde(p, m) : salida(["Respuesta de prueba?"]);
+  };
+  const manychat = {
+    mandarTextos: mandar || (async (id, textos) => { m.enviados.push(...textos); return { ok: true }; }),
+    ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return { ok: pausaManyChat }; },
+  };
+  const avisar = async (titulo, campos) => { m.avisos.push({ titulo, campos }); return avisoSale; };
+  // Lo que hace un mensaje de verdad al entrar: se guarda, abre la ventana y pone los toques en cero.
+  m.entraLead = (texto) => {
+    const id = m.mensajes.length + 1;
+    m.mensajes.push({ id, quien: "lead", texto });
+    Object.assign(m.contacto, { ultimo_lead: ahora, toques: 0, proximo_toque: null });
+    return id;
+  };
+  const esperar = async () => { await tick(); alEsperar?.(m); };
+  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora });
+  return { agente, m };
+}
+
+/** Un toque de seguimiento listo para salir: el lead calló hace 6 horas y ya recibió el link. */
+function armarToque(opciones = {}) {
+  const mundo = armar({ toques: true, ultimoLeadHace: 6, responde: () => salida(["Mensaje de seguimiento?"]), ...opciones });
+  mundo.m.contacto.estado = { ...estadoDev, link_formulario_enviado: true };
+  mundo.m.contacto.respondido_hasta = mundo.m.disparo;
+  return mundo;
+}
+const toque = (agente) => agente.procesar("77", null, { evento: "seguimiento" });
+
+test("contesta: manda, anota lo que mandó, guarda el estado, cierra el turno y suelta la traba", async () => {
+  const { agente, m } = armar();
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(m.mensajes.at(-1).quien, "agente");
+  assert.equal(m.salidas.length, 1);
+  assert.equal(m.salidas[0].estado, "enviada");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.deepEqual(m.contacto.estado, estadoDev);
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.equal(m.pedidos[0].prompt, "PROMPT (sin cargar)");
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["mensaje de prueba"]);
+  assert.equal(m.tomado, null);
+});
+
+test("apagado no hace nada", async () => {
+  const { agente, m } = armar({ modo: "apagado" });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "apagado");
+  assert.equal(m.pedidos.length, 0);
+});
+
+test("si lo apagan mientras espera la ráfaga, no llega ni a pedirle la respuesta al modelo", async () => {
+  const { agente, m } = armar({ alEsperar: (mundo) => { mundo.ajustes = { ...mundo.ajustes, modo: "apagado" }; } });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "apagado");
+  assert.equal(m.pedidos.length + m.salidas.length, 0);
+});
+
+test("un modo que no es auto ni sombra es apagado: nada raro guardado hace que mande", async () => {
+  for (const modo of [null, "", 0, false, "pausado", "AUTO"]) {
+    const { agente, m } = armar({ modo });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "apagado", JSON.stringify(modo));
+    assert.equal(m.pedidos.length + m.enviados.length, 0);
+  }
+});
+
+test("una charla de Cande no se toca", async () => {
+  const { agente, m } = armar({ dueno: "cande" });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "no es del agente");
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+});
+
+test("si llegó otro mensaje durante la espera, esta corrida no contesta", async () => {
+  const { agente, m } = armar();
+  m.entraLead("otro mensaje de prueba");
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "llegó otro mensaje");
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+});
+
+test("con la ventana de 24 horas cerrada no escribe", async () => {
+  const { agente, m } = armar({ ultimoLeadHace: 25 });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "ventana de 24 horas cerrada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.tomado, null);
+});
+
+test("lo que rompe un freno no sale: la charla pasa a Cande con el motivo y con el aviso del modelo", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Mañana te escribo"], { aviso_para_cande: "HOY: aviso de prueba" }) });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "frenada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.salidas[0].estado, "frenada");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "DM URGENTE: te paso una charla");
+  assert.equal(m.avisos[0].campos["Aviso del agente"], "HOY: aviso de prueba");
+  assert.match(m.avisos[0].campos.Quién, /Lead de prueba \(77\)/);
+  assert.deepEqual(m.campos, [["dm_dueno", "cande"]]);
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+});
+
+test("si el modelo falla, al lead no le llega nada y Cande se entera", async () => {
+  const { agente, m } = armar({ responde: () => { throw new Error("Anthropic contestó 529"); } });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "error del modelo");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.salidas[0].estado, "error");
+  assert.match(m.avisos[0].campos.Motivo, /529/);
+  assert.equal(m.tomado, null);
+});
+
+test("cualquier otra falla termina igual: sin prompt cargado, la charla pasa a Cande con aviso", async () => {
+  const { agente, m } = armar({ prompt: "" });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "error");
+  assert.match(r.error, /no hay prompt/);
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.tomado, null);
+});
+
+test("si ManyChat no manda, la charla pasa a Cande con el código del error", async () => {
+  const { agente, m } = armar({ mandar: async () => ({ ok: false, error: "código 3011 | ventana cerrada" }) });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "error al mandar");
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.salidas[0].estado, "error");
+  assert.match(m.avisos[0].campos.Motivo, /3011/);
+  assert.equal(m.mensajes.filter((x) => x.quien === "agente").length, 1); // solo el aviso que ya estaba
+});
+
+test("si ManyChat tarda y no se sabe si salió, queda anotado y Cande lo mira antes de reenviar", async () => {
+  const { agente, m } = armar({ mandar: async () => ({ ok: false, incierto: true, error: "tardó más de 8 segundos" }) });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "envío incierto");
+  assert.equal(m.salidas[0].estado, "incierta");
+  assert.equal(m.mensajes.at(-1).quien, "agente");
+  assert.equal(m.contacto.dueno, "cande");
+  assert.match(m.avisos[0].campos.Aviso, /No sé si salió/);
+});
+
+test("sombra: no manda, deja el borrador, cierra el turno y le avisa a Cande con lo que mandaría", async () => {
+  const { agente, m } = armar({ modo: "sombra" });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "borrador");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.salidas[0].estado, "borrador");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.match(m.avisos[0].campos["Mandaría"], /Respuesta de prueba/);
+});
+
+test("pasar a Cande: manda su única pregunta, cambia el dueño y avisa con lo que mandó", async () => {
+  const responde = () => salida(["Pregunta de prueba?"], { accion: "pasar_a_cande", ...como("construye"), aviso_para_cande: "aviso de prueba" });
+  const { agente, m } = armar({ responde });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "pasada a Cande");
+  assert.deepEqual(m.enviados, ["Pregunta de prueba?"]);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos[0].titulo, "DM: te paso una charla");
+  assert.equal(m.avisos[0].campos.Aviso, "aviso de prueba");
+  assert.equal(m.avisos[0].campos["El agente le mandó"], "Pregunta de prueba?");
+  assert.equal(m.proximo, null);
+});
+
+test("pasar a Cande: cuando el mensaje sale, en la base la charla ya figura como de Cande", async () => {
+  // Si la función muere justo después de mandar, la charla no puede quedar como del agente.
+  let mundo = null;
+  let alMandar = null;
+  const mandar = async () => { alMandar = { dueno: mundo.m.contacto.dueno, salidas: mundo.m.salidas.map((s) => s.estado) }; return { ok: true }; };
+  mundo = armar({ mandar, responde: () => salida(["Pregunta de prueba?"], { accion: "pasar_a_cande", ...como("construye") }) });
+  await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.deepEqual(alMandar, { dueno: "cande", salidas: ["enviando"] });
+  assert.equal(mundo.m.salidas[0].estado, "enviada");
+});
+
+test("callar: no manda ni avisa, pero el turno queda atendido", async () => {
+  const { agente, m } = armar({ responde: () => salida([], { accion: "callar" }) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "calló");
+  assert.equal(m.enviados.length + m.avisos.length, 0);
+  assert.equal(m.salidas[0].estado, "callo");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+});
+
+test("el tope del día cuenta turnos (también borradores y silencios), no globos", async () => {
+  const { agente, m } = armar({ tope: 2, modo: "sombra" });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "borrador");
+  assert.equal((await agente.procesar("77", m.entraLead("segundo"))).hecho, "borrador");
+  const r = await agente.procesar("77", m.entraLead("tercero"));
+  assert.equal(r.hecho, "tope del día");
+  assert.equal(m.pedidos.length, 2);
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+test("quien escribe sin parar mientras se genera también llega al tope del día", async () => {
+  // Cada respuesta queda pisada por un mensaje nuevo: no sale ninguna, pero cada una costó un pedido.
+  const { agente, m } = armar({ tope: 3, responde: (p, mundo) => { mundo.entraLead("otro mensaje de prueba"); return salida(["Respuesta de prueba?"]); } });
+  for (let n = 0; n < 3; n++) {
+    assert.equal((await agente.procesar("77", m.mensajes.at(-1).id)).hecho, "llegó otro mensaje durante la generación");
+  }
+  assert.deepEqual(m.salidas.map((x) => x.estado), ["descartada", "descartada", "descartada"]);
+  const r = await agente.procesar("77", m.mensajes.at(-1).id);
+  assert.equal(r.hecho, "tope del día");
+  assert.equal(m.pedidos.length, 3);
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+});
+
+test("envío por campo: queda lista para que ManyChat la retire, el servidor no manda ni la anota todavía", async () => {
+  const { agente, m } = armar({ envio: "campo" });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "lista para retirar");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.salidas[0].estado, "pendiente");
+  assert.equal(m.mensajes.filter((x) => x.quien === "agente").length, 1); // la anota /api/dm/recoger al retirarla
+  // El turno lo cierra el retiro: si el lead escribe antes, la corrida nueva recibe los dos mensajes.
+  assert.equal(m.contacto.respondido_hasta, 0);
+  assert.equal((await agente.procesar("77", m.entraLead("otro mensaje de prueba"))).hecho, "lista para retirar");
+  assert.deepEqual(m.pedidos[1].turno.mensajes_del_lead, ["mensaje de prueba", "otro mensaje de prueba"]);
+});
+
+/* ---------- el aviso de que es automático ---------- */
+
+test("el primer mensaje sin el aviso de que es automático no sale", async () => {
+  const { agente, m } = armar({ conAviso: false });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "frenada");
+  assert.equal(r.motivo, "primer mensaje sin avisar que es automático");
+  assert.equal(m.enviados.length, 0);
+});
+
+test("con el aviso en el mensaje sale, y también si el aviso ya lo había mandado Cande a mano", async () => {
+  const conAviso = armar({ conAviso: false, responde: () => salida([AVISO, "Pregunta de prueba?"]) });
+  assert.equal((await conAviso.agente.procesar("77", conAviso.m.disparo)).hecho, "enviada");
+  const deCande = armar({ conAviso: false });
+  deCande.m.mensajes.unshift({ id: 1, quien: "cande", texto: AVISO });
+  assert.equal((await deCande.agente.procesar("77", deCande.m.disparo)).hecho, "enviada");
+});
+
+test("con el ajuste aviso_ia en false el aviso no se exige", async () => {
+  const { agente, m } = armar({ conAviso: false, avisoIa: false });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+});
+
+/* ---------- dos cosas a la vez ---------- */
+
+test("ráfaga durante la generación: la corrida vieja no manda y la nueva contesta una vez el turno entero", async () => {
+  const generando = diferida();
+  let n = 0;
+  const { agente, m } = armar({ responde: () => (++n === 1 ? generando.promesa : salida(["Respuesta al turno entero?"])) });
+  const vieja = agente.procesar("77", m.disparo);
+  await hasta(() => m.pedidos.length === 1);
+  const nueva = agente.procesar("77", m.entraLead("otro mensaje de prueba"));
+  await tick(); await tick(); // la nueva ya está esperando la traba
+  generando.resolver(salida(["Respuesta vieja?"]));
+  const [r1, r2] = await Promise.all([vieja, nueva]);
+  assert.equal(r1.hecho, "llegó otro mensaje durante la generación");
+  assert.equal(r2.hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Respuesta al turno entero?"]);
+  assert.deepEqual(m.pedidos[1].turno.mensajes_del_lead, ["mensaje de prueba", "otro mensaje de prueba"]);
+  assert.equal(m.tomado, null);
+});
+
+test("si la traba no se libera nunca, el mensaje no se pierde callado: pasa a Cande con aviso", async () => {
+  const { agente, m } = armar();
+  m.tomado = "una corrida que murió";
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "otra corrida lo tiene");
+  assert.equal(m.pedidos.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.match(m.avisos[0].campos.Aviso, /sin contestar/);
+  assert.equal(m.tomado, "una corrida que murió"); // la traba ajena no se toca
+});
+
+test("si llega otro mensaje mientras espera la traba, cede el lugar a la corrida de ese mensaje", async () => {
+  const { agente, m } = armar();
+  m.tomado = "otra corrida";
+  const corrida = agente.procesar("77", m.disparo);
+  await tick(); await tick();
+  m.entraLead("otro mensaje de prueba");
+  assert.equal((await corrida).hecho, "llegó otro mensaje");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.contacto.dueno, "agente");
+});
+
+test("si Cande toma la charla mientras se genera, la respuesta se descarta", async () => {
+  const generando = diferida();
+  const { agente, m } = armar({ responde: () => generando.promesa });
+  const corrida = agente.procesar("77", m.disparo);
+  await hasta(() => m.pedidos.length === 1);
+  m.contacto.dueno = "cande";
+  generando.resolver(salida(["Respuesta de prueba?"]));
+  assert.equal((await corrida).hecho, "descartada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.salidas[0].estado, "descartada");
+});
+
+test("si Cande anota que ya contestó mientras la corrida espera, no se le pide nada al modelo", async () => {
+  // Lo que hace anotarAMano: guarda lo suyo y da por atendido lo que el lead había escrito.
+  const anota = (mundo) => {
+    mundo.mensajes.push({ id: mundo.mensajes.length + 1, quien: "cande", texto: "respuesta a mano de prueba" });
+    mundo.contacto.respondido_hasta = mundo.disparo;
+  };
+  for (const modo of ["auto", "sombra"]) {
+    const { agente, m } = armar({ modo, alEsperar: anota });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "ya estaba atendido", modo);
+    assert.equal(m.pedidos.length + m.enviados.length + m.salidas.length + m.avisos.length, 0, modo);
+    assert.equal(m.contacto.dueno, "agente");
+    assert.equal(m.tomado, null);
+  }
+});
+
+test("si Cande anota que ya contestó mientras se genera, la respuesta no sale detrás de la suya", async () => {
+  const generando = diferida();
+  const { agente, m } = armar({ responde: () => generando.promesa });
+  const corrida = agente.procesar("77", m.disparo);
+  await hasta(() => m.pedidos.length === 1);
+  m.mensajes.push({ id: 3, quien: "cande", texto: "respuesta a mano de prueba" });
+  m.contacto.respondido_hasta = m.disparo;
+  generando.resolver(salida(["Respuesta de prueba?"]));
+  assert.equal((await corrida).hecho, "descartada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.salidas[0].estado, "descartada");
+  assert.equal(m.contacto.dueno, "agente");
+});
+
+test("si apagan todo mientras se genera, la respuesta se descarta", async () => {
+  for (const modo of ["apagado", "sombra", null]) {
+    const generando = diferida();
+    const { agente, m } = armar({ responde: () => generando.promesa });
+    const corrida = agente.procesar("77", m.disparo);
+    await hasta(() => m.pedidos.length === 1);
+    m.ajustes = { ...m.ajustes, modo };
+    generando.resolver(salida(["Respuesta de prueba?"]));
+    assert.equal((await corrida).hecho, "descartada", JSON.stringify(modo));
+    assert.equal(m.enviados.length, 0);
+  }
+});
+
+test("pasar a Cande: aunque falle una escritura después de mandar, la charla pasa y ella se entera", async () => {
+  const responde = () => salida(["Pregunta de prueba?"], { accion: "pasar_a_cande", ...como("construye"), aviso_para_cande: "HOY: aviso de prueba" });
+  const { agente, m } = armar({ responde });
+  m.fallaAnotar = true;
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "enviada sin guardar");
+  assert.deepEqual(m.enviados, ["Pregunta de prueba?"]);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].campos["El agente le mandó"], "Pregunta de prueba?");
+});
+
+/* ---------- los avisos a Cande ---------- */
+
+test("el aviso del modelo llega también cuando el agente sigue con la charla o calla", async () => {
+  const sigue = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "aviso de prueba" }) });
+  assert.equal((await sigue.agente.procesar("77", sigue.m.disparo)).hecho, "enviada");
+  assert.equal(sigue.m.avisos.length, 1);
+  assert.equal(sigue.m.avisos[0].titulo, "DM: aviso del agente");
+  assert.equal(sigue.m.avisos[0].campos.Aviso, "aviso de prueba");
+  assert.equal(sigue.m.avisos[0].campos["El agente le mandó"], "Respuesta de prueba?");
+  assert.equal(sigue.m.contacto.dueno, "agente");
+  const calla = armar({ responde: () => salida([], { accion: "callar", aviso_para_cande: "YA: aviso de prueba" }) });
+  assert.equal((await calla.agente.procesar("77", calla.m.disparo)).hecho, "calló");
+  assert.equal(calla.m.avisos.length, 1);
+  assert.equal(calla.m.avisos[0].titulo, "DM URGENTE: aviso del agente");
+  assert.equal(calla.m.salidas[0].aviso, "YA: aviso de prueba");
+  assert.equal(calla.m.contacto.dueno, "agente");
+  const sinAviso = armar();
+  await sinAviso.agente.procesar("77", sinAviso.m.disparo);
+  assert.equal(sinAviso.m.avisos.length, 0);
+});
+
+test("si el aviso a Cande no sale, queda anotado para que se vea en el estado", async () => {
+  const { agente, m } = armar({ avisoSale: false, responde: () => salida(["Mañana te escribo"]) });
+  await agente.procesar("77", m.disparo);
+  assert.deepEqual(m.salidas.map((s) => s.estado), ["frenada", "aviso_fallido"]);
+  assert.match(m.salidas[1].detalle, /te paso una charla/);
+});
+
+test("si ManyChat no pudo pausar sus automáticos, el aviso lo dice", async () => {
+  const { agente, m } = armar({ pausaManyChat: false, responde: () => salida(["Mañana te escribo"]) });
+  await agente.procesar("77", m.disparo);
+  assert.match(m.avisos[0].campos.Ojo, /no pude pausar los automáticos/);
+});
+
+/* ---------- seguimientos ---------- */
+
+test("el seguimiento se agenda solo con los toques prendidos y a quien dijo que busca", async () => {
+  const responde = () => salida(["Pregunta de prueba?"], { seguimiento_en_horas: 6 });
+  const apagados = armar({ responde });
+  await apagados.agente.procesar("77", apagados.m.disparo);
+  assert.equal(apagados.m.proximo, null);
+  const prendidos = armar({ toques: true, responde });
+  await prendidos.agente.procesar("77", prendidos.m.disparo);
+  assert.equal(prendidos.m.proximo.getTime(), prendidos.m.contacto.ultimo_lead.getTime() + 6 * HORA);
+  const noBusca = armar({ toques: true, responde: () => salida(["Pregunta de prueba?"], { seguimiento_en_horas: 6, estado: { ...estadoDev, busca: "no_se_sabe" } }) });
+  await noBusca.agente.procesar("77", noBusca.m.disparo);
+  assert.equal(noBusca.m.proximo, null);
+});
+
+test("un texto que no es true no prende los seguimientos", async () => {
+  const { agente, m } = armar({ toques: "off", responde: () => salida(["Pregunta de prueba?"], { seguimiento_en_horas: 6 }) });
+  await agente.procesar("77", m.disparo);
+  assert.equal(m.proximo, null);
+  assert.equal((await toque(agente)).hecho, "toques apagados");
+});
+
+test("después de un no, no queda ningún seguimiento agendado", async () => {
+  const { agente, m } = armar({ toques: true, responde: () => salida(["Respuesta de prueba"], { seguimiento_en_horas: 20 }) });
+  m.mensajes.at(-1).texto = "no me interesa";
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.equal(m.proximo, null);
+});
+
+test("a quien pidió que no le escriban no le sale nada y la charla pasa a Cande", async () => {
+  const { agente, m } = armar({ toques: true, responde: () => salida(["Pregunta de prueba?"], { seguimiento_en_horas: 20 }) });
+  m.mensajes.at(-1).texto = "no me escribas más";
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "frenada");
+  assert.equal(r.motivo, "pidió que no le escriban");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+test("callar ante un mensaje puede dejar un seguimiento agendado", async () => {
+  const { agente, m } = armar({ toques: true, responde: () => salida([], { accion: "callar", seguimiento_en_horas: 4 }) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "calló");
+  assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 4 * HORA);
+});
+
+test("un toque de seguimiento va con su contexto, se cuenta y agenda el segundo", async () => {
+  // El lead escribió a las 12 de Argentina y el primer toque sale a las 18: el segundo, a las 21
+  // horas de su mensaje, cae a las 9 del otro día.
+  const { agente, m } = armarToque({
+    ahora: new Date("2026-10-12T21:00:00Z"),
+    responde: () => salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 21, estado: { ...estadoDev, link_formulario_enviado: true } }),
+  });
+  const r = await toque(agente);
+  assert.equal(r.hecho, "enviada");
+  assert.match(m.pedidos[0].turno.contexto, /SEGUIMIENTO.*toque 1 de 2/);
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, []);
+  assert.deepEqual(m.enviados, ["Mensaje de seguimiento?"]);
+  assert.equal(m.contacto.toques, 1);
+  assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 21 * HORA);
+});
+
+test("un toque no sale si ya tuvo los dos, si el lead recién escribió o si el envío es por campo", async () => {
+  const dos = armarToque();
+  dos.m.contacto.toques = 2;
+  assert.equal((await toque(dos.agente)).hecho, "ya tuvo sus dos toques");
+  const reciente = armarToque({ ultimoLeadHace: 0.1 });
+  assert.equal((await toque(reciente.agente)).hecho, "todavía no toca");
+  const porCampo = armarToque({ envio: "campo" });
+  assert.equal((await toque(porCampo.agente)).hecho, "sin toques con envío por campo");
+  for (const mundo of [dos, reciente, porCampo]) assert.equal(mundo.m.pedidos.length + mundo.m.enviados.length, 0);
+});
+
+test("un toque a quien no busca, dijo que no o frenó por plata se cancela sin pedirle nada al modelo", async () => {
+  const noBusca = armarToque();
+  noBusca.m.contacto.estado = { ...estadoDev, busca: "no" };
+  const sinPlata = armarToque();
+  sinPlata.m.mensajes.at(-1).texto = "no tengo plata";
+  for (const { agente, m } of [noBusca, sinPlata]) {
+    assert.equal((await toque(agente)).hecho, "toque cancelado");
+    assert.equal(m.pedidos.length + m.enviados.length, 0);
+    assert.equal(m.proximo, null);
+  }
+});
+
+test("si el lead escribe mientras se genera el toque, el toque no sale ni se cuenta", async () => {
+  const generando = diferida();
+  const { agente, m } = armarToque({ responde: () => generando.promesa });
+  const corrida = toque(agente);
+  await hasta(() => m.pedidos.length === 1);
+  m.entraLead("ya está, gracias");
+  generando.resolver(salida(["Mensaje de seguimiento?"]));
+  assert.equal((await corrida).hecho, "llegó otro mensaje durante la generación");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.toques, 0);
+});
+
+test("un toque que salió no se repite aunque la base falle después de mandar", async () => {
+  const { agente, m } = armarToque();
+  m.fallaAnotar = true;
+  assert.equal((await toque(agente)).hecho, "enviada sin guardar");
+  assert.equal((await toque(agente)).hecho, "no es del agente");
+  assert.deepEqual(m.enviados, ["Mensaje de seguimiento?"]);
+  assert.equal(m.contacto.toques, 1);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+});
+
+test("si falla la constancia antes de mandar, no sale nada y la salida queda marcada con el error", async () => {
+  const { agente, m } = armarToque();
+  m.fallaSumarToque = true;
+  const r = await toque(agente);
+  assert.equal(r.hecho, "error");
+  assert.equal(m.enviados.length, 0);
+  assert.deepEqual(m.salidas.map((s) => s.estado), ["error"]);
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+/* ---------- lo que el modelo dice no alcanza ---------- */
+
+test("sin plata en un turno anterior: el precio no sale aunque ahora pregunte cuánto es", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Sale 27 dólares"]) });
+  m.mensajes = [
+    { id: 1, quien: "agente", texto: AVISO }, { id: 2, quien: "lead", texto: "no tengo plata, tengo deudas" },
+    { id: 3, quien: "agente", texto: "Respuesta de prueba" }, { id: 4, quien: "lead", texto: "y cuánto sale?" },
+  ];
+  m.contacto.respondido_hasta = 2;
+  const r = await agente.procesar("77", 4);
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /no tiene plata/);
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["y cuánto sale?"]);
+});
+
+test("si el estado guardado dice empresa, el precio no sale aunque el modelo ahora diga dev", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Sale 27 dólares"]) });
+  m.contacto.estado = { quien: "empresa" };
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /construye o contrata/);
+});
+
+test("una charla cargada a mano: el agente la sigue desde donde quedó, con su contexto", async () => {
+  const { agente, m } = armar({ conAviso: false, responde: () => salida([AVISO, "Pregunta de prueba?"]) });
+  m.mensajes = [
+    { id: 1, quien: "lead", texto: "primer mensaje viejo" }, { id: 2, quien: "automatico", texto: "mensaje fijo" },
+    { id: 3, quien: "cande", texto: "lo que mandó Cande a mano" }, { id: 4, quien: "lead", texto: "la respuesta nueva" },
+  ];
+  Object.assign(m.contacto, { respondido_hasta: 1, contexto: "contexto de prueba" });
+  const r = await agente.procesar("77", 4);
+  const { turno } = m.pedidos[0];
+  assert.equal(r.hecho, "enviada");
+  assert.equal(turno.contexto, "contexto de prueba");
+  assert.deepEqual(turno.historial.map((x) => x.quien), ["lead", "automatico", "cande"]);
+  assert.deepEqual(turno.mensajes_del_lead, ["la respuesta nueva"]);
+});
+
+test("en una charla larga los frenos miran todo lo que escribió el lead, no solo los últimos 80 mensajes", async () => {
+  const larga = (primero) => [
+    { id: 1, quien: "lead", texto: primero }, { id: 2, quien: "cande", texto: AVISO },
+    ...Array.from({ length: 88 }, (_, i) => ({ id: i + 3, quien: i % 2 ? "cande" : "lead", texto: `mensaje viejo ${i}` })),
+    { id: 91, quien: "lead", texto: "dale" },
+  ];
+  const responde = () => salida(["Va la lista\nopengatehub.com/devs"]);
+  const empresa = armar({ responde });
+  empresa.m.mensajes = larga("tengo una agencia y busco contratar");
+  empresa.m.contacto.respondido_hasta = 89;
+  const r = await empresa.agente.procesar("77", 91);
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /señal de empresa/);
+  // Al modelo le van los últimos 80 mensajes, con el nuevo incluido.
+  const { turno } = empresa.m.pedidos[0];
+  assert.equal(turno.historial.length + turno.mensajes_del_lead.length, 80);
+  assert.deepEqual(turno.mensajes_del_lead, ["dale"]);
+  // Y el aviso de que es automático, dado hace más de 80 mensajes, no se exige de nuevo.
+  const dev = armar({ responde });
+  dev.m.mensajes = larga("soy dev backend");
+  dev.m.contacto.respondido_hasta = 89;
+  assert.equal((await dev.agente.procesar("77", 91)).hecho, "enviada");
+});
+
+/* ---------- los ajustes ---------- */
+
+test("un ajuste con un valor que no es de su tipo no se guarda", () => {
+  for (const modo of [null, "", 0, false, "pausado", "AUTO"]) assert.equal(validarAjustes({ modo }).ok, false, JSON.stringify(modo));
+  for (const malo of [{ toques: "off" }, { toques: "false" }, { toques: 1 }, { aviso_ia: "no" }, { espera_ms: "18000" }, { espera_ms: 100 }, { tope_por_dia: 0 }, { tope_por_dia: 2.5 }, { envio: "mail" }, { link_de_pago: "pagos.ejemplo.com" }, { link_de_pago: null }]) {
+    assert.match(validarAjustes(malo).error, /valor inválido/, JSON.stringify(malo));
+  }
+  for (const ajeno of [{ otra: 1 }, { toString: "x" }, { constructor: 1 }]) assert.match(validarAjustes(ajeno).error, /ajuste desconocido/);
+  for (const nada of [null, undefined, "modo", []]) assert.equal(validarAjustes(nada).ok, false);
+  const bueno = { modo: "sombra", envio: "campo", espera_ms: 20000, tope_por_dia: 15, toques: true, aviso_ia: false, link_de_pago: "https://pagos.ejemplo.com/prueba" };
+  assert.deepEqual(validarAjustes(bueno), { ok: true, ajustes: bueno });
+  assert.deepEqual(validarAjustes({ link_de_pago: "" }), { ok: true, ajustes: { link_de_pago: "" } });
+});
+
+test("lo guardado que no es válido se ignora: un modo roto es apagado y un toques roto es sin toques", () => {
+  assert.deepEqual(ajustesDesde(null), AJUSTES_POR_DEFECTO);
+  const leidos = ajustesDesde({ modo: null, toques: "off", aviso_ia: 0, espera_ms: 20000, de_mas: 1 });
+  assert.deepEqual(leidos, { ...AJUSTES_POR_DEFECTO, espera_ms: 20000 });
+  assert.equal(AJUSTES_POR_DEFECTO.modo, "apagado");
+  assert.equal(AJUSTES_POR_DEFECTO.aviso_ia, true);
+});
+
+/* ---------- los endpoints: quién entra ---------- */
+
+const pedido = (extra = {}) => ({ method: "POST", headers: {}, body: {}, ...extra });
+const llamar = async (ruta, req) => {
+  const { default: handler } = await import(`../pages/api/dm/${ruta}.js`);
+  const res = respuesta();
+  await handler(req, res);
+  return res;
+};
+
+test("el cron de los seguimientos no entra sin CRON_SECRET, esté o no cargado", async () => {
+  delete process.env.CRON_SECRET;
+  assert.equal((await llamar("toques", pedido({ method: "GET" }))).codigo, 401);
+  assert.equal((await llamar("toques", pedido({ method: "GET", headers: { authorization: "Bearer undefined" } }))).codigo, 401);
+  process.env.CRON_SECRET = "secreto-de-prueba";
+  try {
+    assert.equal((await llamar("toques", pedido({ method: "GET" }))).codigo, 401);
+    assert.equal((await llamar("toques", pedido({ method: "GET", headers: { authorization: "Bearer otro" } }))).codigo, 401);
+    const bien = await llamar("toques", pedido({ method: "GET", headers: { authorization: "Bearer secreto-de-prueba" } }));
+    assert.equal(bien.codigo, 200);
+    assert.deepEqual(bien.cuerpo, { ok: true, hechos: 0 }); // sin base no hay nada que hacer, y no devuelve ids
+  } finally {
+    delete process.env.CRON_SECRET;
+  }
+});
+
+test("los demás endpoints tampoco entran sin su secreto, y solo por POST", async () => {
+  for (const [ruta, variable] of [["entrada", "DM_SECRETO"], ["recoger", "DM_SECRETO"], ["config", "COLA_SECRET"], ["probar", "COLA_SECRET"]]) {
+    delete process.env[variable];
+    assert.equal((await llamar(ruta, pedido())).codigo, 401, `${ruta} sin secreto cargado`);
+    assert.equal((await llamar(ruta, pedido({ headers: { "x-dm-secreto": "" } }))).codigo, 401, `${ruta} con secreto vacío`);
+    process.env[variable] = "secreto-de-prueba";
+    try {
+      assert.equal((await llamar(ruta, pedido({ headers: { authorization: "Bearer otro-secreto-mas" } }))).codigo, 401, `${ruta} con otro secreto`);
+      assert.equal((await llamar(ruta, pedido({ method: "GET", headers: { authorization: "Bearer secreto-de-prueba" } }))).codigo, 405, `${ruta} por GET`);
+      const entra = await llamar(ruta, pedido({ headers: { authorization: "Bearer secreto-de-prueba" }, body: { contacto: "77" } }));
+      assert.notEqual(entra.codigo, 401, `${ruta} con su secreto`);
+    } finally {
+      delete process.env[variable];
+    }
+  }
+});
+
+/* ---------- el cerebro local (lib/dm/cola.js), con las consultas de mentira ---------- */
+
+const { crearCerebroLocal } = await import("../lib/dm/cola.js");
+
+function cerebroDePrueba({ resultadoEn = 2, resultado, nunca = false } = {}) {
+  const m = { creados: [], lecturas: 0, vencidos: [], vaciados: [] };
+  const pedirLocal = crearCerebroLocal({
+    crear: async (turno, link) => { m.creados.push({ turno, link }); return 7; },
+    leer: async () => (++m.lecturas >= resultadoEn && !nunca ? { estado: "hecho", resultado } : { estado: "tomado", resultado: null }),
+    vencer: async (id) => { m.vencidos.push(id); },
+    vaciar: async (id) => { m.vaciados.push(id); },
+    esperar: async () => {}, tope_ms: 10000, cada_ms: 2000,
+  });
+  return { m, pedirLocal };
+}
+
+const salidaValida = {
+  accion: "responder", mensajes: ["Mensaje de prueba?"],
+  estado: { quien: "dev", busca: "si", dolor: "", etapa: "como_va", link_formulario_enviado: false, precio_dicho: false },
+  aviso_para_cande: "", seguimiento_en_horas: null, motivo: "prueba",
+};
+
+test("cerebro local: deja el turno, espera a la Mac y devuelve su salida sin dejar nada guardado", async () => {
+  const { m, pedirLocal } = cerebroDePrueba({ resultado: salidaValida });
+  const r = await pedirLocal({ turno: { mensajes_del_lead: ["hola"] }, linkDePago: "" });
+  assert.equal(r.accion, "responder");
+  assert.equal(m.creados.length, 1);
+  assert.deepEqual(m.vaciados, [7]);
+  assert.deepEqual(m.vencidos, []);
+});
+
+test("cerebro local: si la Mac no contesta a tiempo, vence el trabajo y avisa por qué", async () => {
+  const { m, pedirLocal } = cerebroDePrueba({ nunca: true });
+  await assert.rejects(pedirLocal({ turno: {} }), /la Mac de Cande no contestó a tiempo/);
+  assert.deepEqual(m.vencidos, [7]);
+  assert.equal(m.lecturas, 5);
+});
+
+test("cerebro local: una salida que no cumple el formato o un error de la Mac no pasan", async () => {
+  const mala = cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } });
+  await assert.rejects(mala.pedirLocal({ turno: {} }), /no cumple el formato: accion/);
+  const rota = cerebroDePrueba({ resultado: { error: "Claude no pudo" } });
+  await assert.rejects(rota.pedirLocal({ turno: {} }), /el Claude de la Mac falló: Claude no pudo/);
+});
