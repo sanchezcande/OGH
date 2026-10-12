@@ -27,6 +27,13 @@ const persona = (id, dias) => ({
 });
 const mail = (id) => `persona${id}@example.com`;
 
+/** Alguien que se anotó hace `dias` días, ya recibió los toques anteriores y tiene pendiente el del día `toque`. */
+const conToquesHasta = (id, dias, toque) => {
+  const p = persona(id, dias);
+  for (const d of [1, 2, 3, 7, 12, 17]) if (d < toque) p[`drip_d${d}`] = hace(dias - d);
+  return p;
+};
+
 /** Llama al endpoint como lo llama el cron y devuelve el JSON que contestó. */
 async function correr(handler) {
   const res = respuesta();
@@ -84,7 +91,7 @@ for (const { cadena, handler, tabla } of CADENAS) {
     assert.match(avisos[0], new RegExp(`mails a ${cadena}`));
     assert.match(avisos[0], /cupo de mails del día/);
     assert.match(avisos[0], /Salieron:<\/b> 2/);
-    assert.match(avisos[0], /Quedaron sin salir:<\/b> 3/);
+    assert.match(avisos[0], /Quedaron sin salir de la fila de hoy:<\/b> 3/);
     assert.doesNotMatch(avisos[0], /[—¿¡]/);
   });
 
@@ -136,6 +143,35 @@ for (const { cadena, handler, tabla } of CADENAS) {
     await correr(handler);
 
     assert.deepEqual(resendFalso.pedidos.map((m) => m.to), [mail(3), mail(4), mail(1), mail(2)]);
+  });
+
+  test(`${cadena}: los pendientes salen antes que los nuevos, sea el toque que sea`, async () => {
+    // 1 y 2 son nuevos: el primer mail les toca desde hace unas horas.
+    // 3 espera el mail del día 12 desde hace dos días y 4 el del día 7 desde hace uno: ya quedaron afuera antes.
+    base.reiniciar({ [tabla]: [persona(1, 1.2), persona(2, 1.1), conToquesHasta(3, 14, 12), conToquesHasta(4, 8, 7)] });
+    resendFalso.responder = (m, n) => (n <= 2 ? aceptado(n) : rechazo("daily_quota_exceeded"));
+    const r = await correr(handler);
+
+    assert.deepEqual(resendFalso.aceptados, [mail(3), mail(4)], "con cupo para dos, salen los dos que más esperaban");
+    assert.deepEqual(anotados(tabla, "drip_d12"), [mail(3)]);
+    assert.ok(anotados(tabla, "drip_d7").includes(mail(4)), "al 4 le quedó anotado el mail del día 7");
+    assert.deepEqual(anotados(tabla, "drip_d1").filter((e) => e === mail(1) || e === mail(2)), []);
+    assert.equal(r.cortado, "cupo");
+    assert.match(avisos[0], /primero los que más esperan/);
+  });
+
+  test(`${cadena}: al otro día salen primero los que más esperan, antes que el que entra nuevo`, async () => {
+    base.reiniciar({ [tabla]: [persona(1, 1.9), persona(2, 1.8), persona(3, 1.7)] });
+    resendFalso.responder = (m, n) => (n <= 1 ? aceptado(n) : rechazo("daily_quota_exceeded"));
+    await correr(handler);                        // hoy hay cupo para uno solo: sale el 1
+
+    base.tablas[tabla].push(persona(9, 1.05));    // al otro día ya le toca a alguien nuevo
+    resendFalso.reiniciar();
+    resendFalso.responder = (m, n) => (n <= 2 ? aceptado(n) : rechazo("daily_quota_exceeded"));
+    await correr(handler);
+
+    assert.deepEqual(resendFalso.aceptados, [mail(2), mail(3)], "los dos que quedaron ayer, antes que el nuevo");
+    assert.deepEqual(anotados(tabla), [mail(1), mail(2), mail(3)]);
   });
 
   test(`${cadena}: sigue siendo un solo mail por persona por corrida`, async () => {

@@ -206,7 +206,7 @@ export default async function handler(req, res) {
     cadena: "founders", toques: TOQUES, resend, avisar, limite,
     // Primero los que más esperan: si la corrida se corta, no quedan siempre los mismos afuera.
     buscar: async (t) => (await sql.query(
-      `SELECT id, nombre, email FROM leads_preguntas
+      `SELECT id, nombre, email, creado FROM leads_preguntas
        WHERE email IS NOT NULL AND NOT drip_off AND ${t.col} IS NULL
          AND creado < NOW() - make_interval(days => $1)
        ORDER BY creado ASC, id ASC

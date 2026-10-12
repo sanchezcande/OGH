@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/drip-preguntas",
-      "schedule": "15 13 * * *"
+      "schedule": "45 12 * * *"
     },
     {
       "path": "/api/cola-publicar",
