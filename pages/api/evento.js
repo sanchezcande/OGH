@@ -16,11 +16,16 @@ const FASES = new Set([
 // Sin esto, cualquiera podría escribir basura en funnel_eventos.
 const CON_ORIGEN = /^hola_(vista|contrata|dev)_[a-z0-9]{1,16}$/;
 
+// Prueba A/B del video de la página de gracias (12/10/2026): el mismo embudo pero con el sufijo
+// de la versión que le tocó a esa persona, para poder partirlo en dos sin tocar la base.
+// Acotado igual que el de arriba: solo estas fases y solo _a o _b.
+const CON_VERSION = /^(gracias_vista|video_play|video_25|video_50|video_75|video_fin|click_gumroad)_[ab]$/;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   try {
     const { fase, sid } = req.body || {};
-    if (!FASES.has(fase) && !CON_ORIGEN.test(fase)) return res.status(400).json({ ok: false });
+    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !CON_VERSION.test(fase)) return res.status(400).json({ ok: false });
     if (hayBase()) await guardarEvento(fase, String(sid || "").slice(0, 40));
   } catch (e) {
     console.error("evento:", e.message);

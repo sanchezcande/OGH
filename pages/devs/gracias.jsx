@@ -8,7 +8,27 @@ import { evento } from "../../lib/embudo";
 // El video está en Wistia. Su player es un web component: hay que cargar dos
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
-const WISTIA_ID = "4a5ghftho0";
+const WISTIA_A = "4a5ghftho0";                               // el de 2 min 06, el que viene corriendo
+// Prueba A/B del 12/10/2026. El B es el guion nuevo (el de Hooman con los agregados de Cande),
+// que dura 5 min 44. Mientras la variable esté vacía NO hay prueba: todos ven el A, que es lo
+// que pasa hoy. El día que el video nuevo esté en Wistia se pone su ID en Vercel
+// (NEXT_PUBLIC_DEVS_VIDEO_B) y la prueba arranca sola, sin tocar el código.
+const WISTIA_B = process.env.NEXT_PUBLIC_DEVS_VIDEO_B || "";
+
+// A qué versión le toca cada persona. Queda guardada: si vuelve a entrar ve la MISMA, porque si
+// no, una sola persona cuenta en las dos columnas y el embudo no cierra.
+function versionDelVisitante() {
+  if (!WISTIA_B) return "a";
+  try {
+    const guardada = localStorage.getItem("devs_video_ab");
+    if (guardada === "a" || guardada === "b") return guardada;
+    const nueva = Math.random() < 0.5 ? "a" : "b";
+    localStorage.setItem("devs_video_ab", nueva);
+    return nueva;
+  } catch (e) {
+    return "a";   // sin localStorage (modo privado) no se sortea: va el que ya conocemos
+  }
+}
 // Link de compra. Cuando el video termina aparece el botón; si está vacío, no
 // aparece nada (mejor eso que un botón que no lleva a ningún lado).
 // Mientras no esté el link de Gumroad el botón igual aparece, pero no navega:
@@ -17,10 +37,18 @@ const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.
 
 export default function Gracias() {
   const [termino, setTermino] = useState(false);
+  // El sorteo pasa en el navegador, no en el render del servidor: si no, Next devuelve la misma
+  // versión cacheada a todo el mundo y la prueba no reparte.
+  const [ver, setVer] = useState("a");
+  const WISTIA_ID = ver === "b" ? WISTIA_B : WISTIA_A;   // lo usa el <wistia-player> de abajo
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    evento("gracias_vista");
+    const v = versionDelVisitante();
+    setVer(v);
+    const ev = f => evento(WISTIA_B ? f + "_" + v : f);   // sin prueba, los eventos van como siempre
+    const id = v === "b" ? WISTIA_B : WISTIA_A;
+    ev("gracias_vista");
 
     // Los dos scripts de Wistia, a mano. Con next/script el del media (type=module)
     // no llegaba nunca al DOM y el <wistia-player> se quedaba sin definir.
@@ -33,7 +61,7 @@ export default function Gracias() {
       document.head.appendChild(el);
     };
     cargar("https://fast.wistia.com/player.js");
-    cargar(`https://fast.wistia.com/embed/${WISTIA_ID}.js`, "module");
+    cargar(`https://fast.wistia.com/embed/${id}.js`, "module");
 
     // Wistia cambió de API con el web component y sus eventos ('end', 'ended') no
     // disparan parejo. Miramos el reloj del player, que sí es confiable y además
@@ -42,15 +70,15 @@ export default function Gracias() {
       const p = document.querySelector("wistia-player");
       if (!p || !p.duration) return;
       const frac = p.currentTime / p.duration;
-      if (p.currentTime > 0.5) evento("video_play");
-      if (frac >= 0.25) evento("video_25");
-      if (frac >= 0.5) evento("video_50");
-      if (frac >= 0.75) evento("video_75");
+      if (p.currentTime > 0.5) ev("video_play");
+      if (frac >= 0.25) ev("video_25");
+      if (frac >= 0.5) ev("video_50");
+      if (frac >= 0.75) ev("video_75");
       // El botón de compra aparece a la MITAD del video (decisión Cande 17/09:
       // su primer candidato vio 65% y se fue sin haber visto nunca el botón).
       if (frac >= 0.5) setTermino(true);
       if (p.currentTime >= p.duration - 1.5) {
-        evento("video_fin");
+        ev("video_fin");
         clearInterval(reloj);
       }
     }, 500);
@@ -85,7 +113,7 @@ export default function Gracias() {
                 target={GUMROAD ? "_blank" : undefined}
                 rel={GUMROAD ? "noopener noreferrer" : undefined}
                 $listo={!!GUMROAD}
-                onClick={e => { evento("click_gumroad"); if (!GUMROAD) e.preventDefault(); }}
+                onClick={e => { evento(WISTIA_B ? "click_gumroad_" + ver : "click_gumroad"); if (!GUMROAD) e.preventDefault(); }}
               >
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>
