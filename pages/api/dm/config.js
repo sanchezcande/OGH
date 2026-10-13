@@ -7,6 +7,8 @@
 //   { accion: "sembrar", contacto, nombre, contexto, mensajes: [{ quien, texto }] }
 //                                                  → carga una charla que ya existía y se la da al agente
 //   { accion: "anotar", contacto, quien, texto }   → deja constancia de lo que Cande mandó a mano
+//   { accion: "reservar", contactos: [id, ...] }   → deja como de Cande, en tanda, a quienes todavía no figuran
+//                                                  (se corre antes de prender las altas, con los contactos que ya existen)
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
@@ -18,7 +20,7 @@ import { mismoSecreto, secretoDe, guardarSecretoDm } from "../../../lib/dm/armad
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
-  hayBase, historial, leerConfig, ponerDueno, prompt, resumen, sembrar, tablas, ultimoIdLead, validarAjustes,
+  hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, sembrar, tablas, ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
 import { avisar, hayTelegram } from "../../../lib/notificar";
@@ -28,6 +30,7 @@ const QUIEN_SEMBRADO = ["lead", "cande", "automatico", "sistema"];
 const QUIEN_A_MANO = ["cande", "automatico"];
 const TOPE_TEXTO = 4000;
 const TOPE_SIEMBRA = 300;
+const TOPE_RESERVA = 5000;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -58,6 +61,8 @@ export default async function handler(req, res) {
     const prende = pedido.ajustes.modo === "auto" || pedido.ajustes.modo === "sombra";
     // Sin prompt el agente no puede contestar nada: cada mensaje terminaría en error y aviso.
     if (prende && !(await prompt())) return res.status(409).json({ error: "no hay prompt cargado: primero subí el prompt" });
+    // Un alta entra solo si el aviso a Cande sale: sin Telegram no entraría nadie y nadie sabría por qué.
+    if (pedido.ajustes.altas === true && !hayTelegram()) return res.status(409).json({ error: "sin Telegram no hay altas: el aviso a Cande no saldría" });
     await guardarConfig("ajustes", { ...((await leerConfig("ajustes")) || {}), ...pedido.ajustes });
     const ahora = await ajustes();
     if (ahora.modo !== antes.modo) await avisar("DM: cambió el modo del agente", { Ahora: ahora.modo, Antes: antes.modo });
@@ -68,6 +73,14 @@ export default async function handler(req, res) {
       await avisar("DM: cambiaron ajustes del agente", Object.fromEntries(otros.map((k) => [k, `${ver(antes[k])} → ${ver(ahora[k])}`])));
     }
     return res.status(200).json({ ok: true, ajustes: ahora });
+  }
+
+  if (b.accion === "reservar") {
+    const ids = Array.isArray(b.contactos) ? [...new Set(b.contactos.map((x) => String(x ?? "").trim()))] : [];
+    if (!ids.length || ids.length > TOPE_RESERVA || ids.some((x) => !/^[0-9A-Za-z_-]{1,40}$/.test(x))) {
+      return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RESERVA} ids` });
+    }
+    return res.status(200).json({ ok: true, recibidos: ids.length, reservados: await reservar(ids) });
   }
 
   if (b.accion === "dueno") {
