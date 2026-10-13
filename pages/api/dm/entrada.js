@@ -14,8 +14,12 @@
 //
 // Si la base falla contesta 200 igual, con ok en false, y le avisa a Cande: con un 500 el
 // mensaje se pierde y nadie se entera.
+//
+// El cuerpo se lee crudo y no con el lector de Next: ManyChat no escapa el texto del mensaje, y
+// un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
 import { waitUntil } from "@vercel/functions";
 import { agente, colaDe, secretoDmValido } from "../../../lib/dm/armado";
+import { cuerpoDeManyChat, leerCrudo } from "../../../lib/dm/cuerpo";
 import { contacto, hayBase, tablas } from "../../../lib/dm/base";
 import { avisar } from "../../../lib/notificar";
 
@@ -29,7 +33,13 @@ export default async function handler(req, res) {
   }
   if (!hayBase()) return res.status(503).json({ error: "sin base" });
 
-  const b = req.body || {};
+  // Con bodyParser en false Next no arma req.body: se lee del pedido. Las pruebas lo pasan ya armado.
+  let b;
+  try {
+    b = req.body !== undefined ? req.body || {} : cuerpoDeManyChat(await leerCrudo(req));
+  } catch {
+    return res.status(400).json({ error: "cuerpo ilegible" });
+  }
   const id = String(b.contacto ?? b.subscriber_id ?? "").trim();
   if (!id) return res.status(400).json({ error: "falta contacto" });
   const texto = String(b.texto ?? b.last_input_text ?? "").trim() || "[adjunto o mensaje sin texto]";
@@ -64,4 +74,4 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, dueno: "agente" });
 }
 
-export const config = { maxDuration: 300 };
+export const config = { api: { bodyParser: false }, maxDuration: 300 };

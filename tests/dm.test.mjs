@@ -24,6 +24,7 @@ const {
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO } = await import("../lib/dm/base.js");
+const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
 const HORA = 3600000;
 const AHORA = new Date("2026-10-12T15:00:00Z"); // las 12 del mediodía en Argentina
@@ -1046,6 +1047,38 @@ test("los ajustes de las altas: prendido o apagado, un tope entre 1 y 200 y un c
   assert.deepEqual(validarAjustes(bueno), { ok: true, ajustes: bueno });
   assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas, false);
   assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas_por_dia, 25);
+});
+
+/* ---------- el cuerpo que manda ManyChat ---------- */
+
+test("un cuerpo bien armado se lee tal cual", () => {
+  assert.deepEqual(cuerpoDeManyChat('{"contacto":"77","nombre":"Lead de prueba","texto":"hola de prueba"}'), {
+    contacto: "77", nombre: "Lead de prueba", texto: "hola de prueba",
+  });
+  assert.deepEqual(cuerpoDeManyChat('{"contacto":77}'), { contacto: 77 });
+});
+
+test("un mensaje con salto de línea o con comillas rompe el JSON de ManyChat y se rescata igual", () => {
+  const conSalto = '{"contacto":"77","nombre":"Lead de prueba","texto":"primera línea\nsegunda línea"}';
+  assert.throws(() => JSON.parse(conSalto));
+  assert.deepEqual(cuerpoDeManyChat(conSalto), { contacto: "77", nombre: "Lead de prueba", texto: "primera línea\nsegunda línea" });
+  const conComillas = '{ "contacto": "77", "nombre": "Lead de prueba", "texto": "me dijo "probá" y probé" }';
+  assert.throws(() => JSON.parse(conComillas));
+  assert.equal(cuerpoDeManyChat(conComillas).texto, 'me dijo "probá" y probé');
+  const conTodo = '{"contacto": 77, "nombre": "De "prueba"", "texto": "uno\n"dos" } tres\n"}';
+  assert.deepEqual(cuerpoDeManyChat(conTodo), { contacto: "77", nombre: 'De "prueba"', texto: 'uno\n"dos" } tres\n' });
+});
+
+test("lo que no se puede rescatar queda vacío, y el endpoint lo rechaza por falta de contacto", () => {
+  for (const malo of ["", "   ", "hola", "[1,2]", '"texto"', '{"nombre":"x","texto":"sin contacto\n"}', '{"contacto":"77","texto":"sin cerrar']) {
+    assert.deepEqual(cuerpoDeManyChat(malo), {}, JSON.stringify(malo));
+  }
+});
+
+test("el cuerpo crudo se lee entero y tiene tope", async () => {
+  async function* trozos(lista) { for (const t of lista) yield Buffer.from(t); }
+  assert.equal(await leerCrudo(trozos(['{"contacto":"77",', '"texto":"hola"}'])), '{"contacto":"77","texto":"hola"}');
+  await assert.rejects(leerCrudo(trozos(["x".repeat(40000), "x".repeat(40000)])), /demasiado grande/);
 });
 
 /* ---------- los ajustes ---------- */
