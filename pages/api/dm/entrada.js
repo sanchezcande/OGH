@@ -18,10 +18,9 @@
 // El cuerpo se lee crudo y no con el lector de Next: ManyChat no escapa el texto del mensaje, y
 // un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
 import { waitUntil } from "@vercel/functions";
-import { agente, colaDe, secretoDmValido } from "../../../lib/dm/armado";
+import { agente, avisarDm, colaDe, secretoDmValido } from "../../../lib/dm/armado";
 import { cuerpoDeManyChat, leerCrudo } from "../../../lib/dm/cuerpo";
 import { contacto, hayBase, tablas } from "../../../lib/dm/base";
-import { avisar } from "../../../lib/notificar";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -58,7 +57,7 @@ export default async function handler(req, res) {
     }
   } catch (e) {
     console.error("dm: falló la entrada", colaDe(id), e.message);
-    await avisar("DM: falló la entrada de un mensaje", { Quién: quien, Motivo: e.message });
+    await avisarDm("DM: falló la entrada de un mensaje", { Quién: quien, Motivo: e.message });
     return res.status(200).json({ ok: false });
   }
 
@@ -68,7 +67,7 @@ export default async function handler(req, res) {
     // (/api/dm/toques) la encuentra sin contestar y se la pasa.
     agente.procesar(id, idMensaje).catch(async (e) => {
       console.error("dm: falló procesar", colaDe(id), e.message);
-      await avisar("DM: el agente falló antes de contestar", { Quién: quien, Motivo: e.message });
+      await avisarDm("DM: el agente falló antes de contestar", { Quién: quien, Motivo: e.message });
     }),
   );
   return res.status(200).json({ ok: true, dueno: "agente" });
