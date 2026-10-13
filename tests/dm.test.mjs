@@ -7,9 +7,12 @@
 //
 // Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js. El doble de Postgres de
 // tests/dobles solo conoce las del goteo, así que tomar, soltar, anotarLead, sembrar,
-// retirarSalida, reclamarToque, sinContestar y borrarViejas (y lo que hacen con ellas
-// /api/dm/config y /api/dm/toques) se prueban a mano contra un Postgres de verdad antes de
-// subir un cambio.
+// retirarSalida, reclamarToque, sinContestar, borrarViejas, borrarCharla, lugarParaAlta, darDeAlta
+// y reservar (y lo que hacen con ellas /api/dm/config, /api/dm/toques y /api/dm/entrada con las
+// altas prendidas) se prueban a mano contra un Postgres de verdad antes de subir un cambio.
+// De las altas hay que mirar siempre lo mismo: que quien ya figura como de Cande no cambia de
+// dueño, que el tope corta, que el alta deja el mensaje y la ventana abierta en la misma
+// sentencia, y que borrar o reservar a quien no figuraba le deja la fila que frena el alta.
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -319,24 +322,42 @@ const hasta = async (listo) => { for (let i = 0; i < 500 && !listo(); i++) await
 function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
-  ahora = AHORA, alEsperar,
+  ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
 } = {}) {
   const m = {
-    ajustes: { modo, envio, espera_ms: 0, tope_por_dia: tope, toques, link_de_pago: "", ...(avisoIa === undefined ? {} : { aviso_ia: avisoIa }) },
+    ajustes: {
+      modo, envio, espera_ms: 0, tope_por_dia: tope, toques, link_de_pago: "", altas, altas_por_dia: topeAltas, contexto_alta: contextoAlta,
+      ...(avisoIa === undefined ? {} : { aviso_ia: avisoIa }),
+    },
     contacto: {
       id: "77", nombre: "Lead de prueba", dueno, toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: null,
       estado: {}, ultimo_lead: new Date(ahora - ultimoLeadHace * HORA),
     },
     mensajes: [...(conAviso ? [{ id: 1, quien: "agente", texto: AVISO }] : []), { id: 2, quien: "lead", texto: "mensaje de prueba" }],
-    disparo: 2, tomado: null, proximo: undefined,
+    disparo: 2, tomado: null, proximo: undefined, altasHoy: 0,
     salidas: [], enviados: [], campos: [], avisos: [], pedidos: [], fallaAnotar: false, fallaSumarToque: false,
   };
+  // Alguien que nunca pasó por la base: ni contacto ni mensajes.
+  if (sinContacto) Object.assign(m, { contacto: null, mensajes: [], disparo: null });
   const delLead = () => m.mensajes.filter((x) => x.quien === "lead");
   const base = {
     tablas: async () => {},
     ajustes: async () => m.ajustes,
     prompt: async () => prompt,
-    contacto: async () => ({ ...m.contacto }),
+    contacto: async () => (m.contacto ? { ...m.contacto } : null),
+    anotarLead: async (id, texto) => (m.contacto?.dueno === "agente" ? m.entraLead(texto) : null),
+    lugarParaAlta: async (id, tope) => (m.contacto || m.altasHoy >= tope ? null : m.altasHoy),
+    darDeAlta: async (id, { nombre, texto, contexto, tope }) => {
+      if (m.contacto || m.altasHoy >= tope) return null;
+      m.contacto = {
+        id, nombre, dueno: "agente", toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: contexto || null,
+        estado: {}, ultimo_lead: ahora,
+      };
+      if (altaAjena) return null; // la dio de alta el mensaje de al lado: a este pedido la base le dice que no fue él
+      m.altasHoy++;
+      m.mensajes.push({ id: m.mensajes.length + 1, quien: "lead", texto });
+      return m.mensajes.length;
+    },
     ultimoIdLead: async () => delLead().at(-1)?.id ?? null,
     historial: async (id, tope = 80) => m.mensajes.slice(-tope),
     corridasEnUnDia: async () => m.salidas.filter((s) => s.estado !== "aviso_fallido").length,
@@ -924,6 +945,107 @@ test("en una charla larga los frenos miran todo lo que escribió el lead, no sol
   dev.m.mensajes = larga("soy dev backend");
   dev.m.contacto.respondido_hasta = 89;
   assert.equal((await dev.agente.procesar("77", 91)).hecho, "enviada");
+});
+
+/* ---------- altas: quien entra solo por la entrada ---------- */
+
+test("alguien nuevo entra solo con las altas prendidas: queda del agente con su contexto y Cande se entera", async () => {
+  const { agente, m } = armar({
+    sinContacto: true, altas: true, contextoAlta: "contexto de alta de prueba", responde: () => salida([AVISO, "Pregunta de prueba?"]),
+  });
+  const id = await agente.recibir("88", "hola de prueba", "Nuevo de prueba");
+  assert.equal(id, 1);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.contacto.nombre, "Nuevo de prueba");
+  assert.deepEqual(m.mensajes, [{ id: 1, quien: "lead", texto: "hola de prueba" }]);
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo al agente");
+  assert.equal(m.avisos[0].campos.Quién, "Nuevo de prueba (88)");
+  assert.equal(m.avisos[0].campos["Van en 24 horas"], "1 de 25");
+  // De ahí en más es una charla como cualquiera: el modelo recibe el contexto de alta y, como
+  // todavía nadie le avisó que es automático, la primera respuesta tiene que decirlo.
+  assert.equal((await agente.procesar("88", id)).hecho, "enviada");
+  assert.equal(m.pedidos[0].turno.contexto, "contexto de alta de prueba");
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["hola de prueba"]);
+});
+
+test("con las altas apagadas, como vienen de fábrica, alguien nuevo no entra ni queda nada guardado", async () => {
+  assert.equal(AJUSTES_POR_DEFECTO.altas, false);
+  const { agente, m } = armar({ sinContacto: true });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.mensajes, []);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("un texto que no es true no prende las altas", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: "si" });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
+  assert.equal(m.contacto, null);
+});
+
+test("con el agente apagado no entra nadie, aunque las altas estén prendidas", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, modo: "apagado" });
+  assert.equal(await agente.recibir("88", "hola de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("si el aviso a Cande no sale, no hay alta: no queda del agente ni se guarda el mensaje", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, avisoSale: false });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.mensajes, []);
+  assert.equal(m.altasHoy, 0);
+  assert.equal(m.salidas.length, 1); // el aviso que no salió queda anotado
+  assert.equal(m.salidas[0].estado, "aviso_fallido");
+});
+
+test("una charla de Cande no vuelve sola al agente aunque las altas estén prendidas", async () => {
+  const { agente, m } = armar({ dueno: "cande", altas: true });
+  const antes = m.mensajes.length;
+  assert.equal(await agente.recibir("77", "otro mensaje de prueba"), null);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.mensajes.length, antes);
+  assert.equal(m.altasHoy, 0);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("el mensaje de quien ya es del agente entra como siempre, sin alta ni aviso", async () => {
+  const { agente, m } = armar({ altas: true });
+  assert.equal(await agente.recibir("77", "otro mensaje de prueba"), 3);
+  assert.equal(m.altasHoy, 0);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("el tope de altas: la que lo llena le avisa a Cande y el siguiente no entra", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, topeAltas: 1 });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), 1);
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo y se llenó el tope de altas");
+  assert.match(m.avisos[0].campos.Aviso, /filtrando por la etiqueta/);
+  Object.assign(m, { contacto: null, mensajes: [] }); // llega otro que tampoco pasó nunca por la base
+  assert.equal(await agente.recibir("89", "hola de prueba", "Otro de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.mensajes, []);
+  assert.equal(m.avisos.length, 1);
+});
+
+test("dos mensajes juntos de alguien nuevo: el que no hizo el alta también queda guardado", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, altaAjena: true });
+  assert.equal(await agente.recibir("88", "segundo mensaje de prueba"), 1);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.deepEqual(m.mensajes.map((x) => x.texto), ["segundo mensaje de prueba"]);
+});
+
+test("los ajustes de las altas: prendido o apagado, un tope entre 1 y 200 y un contexto de hasta mil caracteres", () => {
+  for (const malo of [{ altas: "si" }, { altas: 1 }, { altas_por_dia: 0 }, { altas_por_dia: 201 }, { altas_por_dia: "25" }, { contexto_alta: 5 }, { contexto_alta: "x".repeat(1001) }]) {
+    assert.match(validarAjustes(malo).error, /valor inválido/, JSON.stringify(malo).slice(0, 60));
+  }
+  const bueno = { altas: true, altas_por_dia: 10, contexto_alta: "contexto de prueba" };
+  assert.deepEqual(validarAjustes(bueno), { ok: true, ajustes: bueno });
+  assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas, false);
+  assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas_por_dia, 25);
 });
 
 /* ---------- los ajustes ---------- */

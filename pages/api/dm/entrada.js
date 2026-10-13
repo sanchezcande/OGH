@@ -8,13 +8,15 @@
 // ráfaga, le pide la respuesta al modelo y la manda. Ver lib/dm/agente.js.
 //
 // Solo guarda mensajes de contactos que son del agente. De cualquier otro no guarda nada:
-// las charlas de Cande no pasan por esta base.
+// las charlas de Cande no pasan por esta base. Con el ajuste "altas" prendido, quien nunca
+// pasó por acá entra como contacto del agente (ver recibir en lib/dm/agente.js): por eso en
+// ManyChat el flujo que llama acá tiene que arrancar filtrando por la etiqueta.
 //
 // Si la base falla contesta 200 igual, con ok en false, y le avisa a Cande: con un 500 el
 // mensaje se pierde y nadie se entera.
 import { waitUntil } from "@vercel/functions";
 import { agente, colaDe, secretoDmValido } from "../../../lib/dm/armado";
-import { anotarLead, contacto, hayBase, tablas } from "../../../lib/dm/base";
+import { contacto, hayBase, tablas } from "../../../lib/dm/base";
 import { avisar } from "../../../lib/notificar";
 
 export default async function handler(req, res) {
@@ -39,7 +41,7 @@ export default async function handler(req, res) {
   try {
     await tablas();
     // Devuelve null si el contacto no es del agente o si es un reintento del mismo mensaje.
-    idMensaje = await anotarLead(id, texto.slice(0, 4000), nombre);
+    idMensaje = await agente.recibir(id, texto.slice(0, 4000), nombre);
     if (!idMensaje) {
       const c = await contacto(id);
       return res.status(200).json({ ok: true, dueno: c?.dueno === "agente" ? "agente" : "cande" });
