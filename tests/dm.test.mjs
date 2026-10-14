@@ -1063,15 +1063,34 @@ test("el repaso pide respuestas desde una fecha válida de la última semana, nu
 const { crearAvisoDm } = await import("../lib/dm/armado.js");
 const { grupoConNombre } = await import("../lib/notificar.js");
 
-function avisosDePrueba({ chat = null, llegaAlGrupo = true, fallaLeer = false } = {}) {
+function avisosDePrueba({ chat = null, llegaAlGrupo = true, fallaLeer = false, bot = null, llegaPorBot = true } = {}) {
   const mandados = [];
   const mandar = async (titulo, campos, opciones = {}) => {
-    mandados.push({ titulo, campos, chat: opciones.chat ?? "el de siempre" });
+    mandados.push({ titulo, campos, chat: opciones.token ? "bot del agente" : opciones.chat ?? "el de siempre" });
+    if (opciones.token) return opciones.token === bot && llegaPorBot;
     return opciones.chat ? llegaAlGrupo : true;
   };
   const leerChat = async () => { if (fallaLeer) throw new Error("base caída"); return chat; };
-  return { mandados, avisarDm: crearAvisoDm({ avisar: mandar, leerChat }) };
+  return { mandados, avisarDm: crearAvisoDm({ avisar: mandar, leerChat, tokenBot: () => bot }) };
 }
+
+test("con el bot aparte del agente, sus avisos van solo por ese bot", async () => {
+  const { mandados, avisarDm } = avisosDePrueba({ bot: "bot-de-prueba", chat: "-100123" });
+  assert.equal(await avisarDm("DM: aviso de prueba", { Quién: "Lead de prueba" }), true);
+  assert.deepEqual(mandados.map((x) => x.chat), ["bot del agente"]);
+  assert.equal(mandados[0].campos.Ojo, undefined);
+});
+
+test("si el bot aparte no llega (no le dio Iniciar), va al grupo o al de siempre y lo dice", async () => {
+  const conGrupo = avisosDePrueba({ bot: "bot-de-prueba", llegaPorBot: false, chat: "-100123" });
+  assert.equal(await conGrupo.avisarDm("DM: aviso de prueba", { Quién: "Lead de prueba" }), true);
+  assert.deepEqual(conGrupo.mandados.map((x) => x.chat), ["bot del agente", "-100123"]);
+  assert.equal(conGrupo.mandados[1].campos.Ojo, "no pude avisar por el bot del agente");
+  const sinGrupo = avisosDePrueba({ bot: "bot-de-prueba", llegaPorBot: false });
+  assert.equal(await sinGrupo.avisarDm("DM: aviso de prueba", { Ojo: "otra cosa" }), true);
+  assert.deepEqual(sinGrupo.mandados.map((x) => x.chat), ["bot del agente", "el de siempre"]);
+  assert.equal(sinGrupo.mandados[1].campos.Ojo, "otra cosa; no pude avisar por el bot del agente");
+});
 
 test("sin grupo conectado, los avisos del agente van al chat de siempre", async () => {
   const { mandados, avisarDm } = avisosDePrueba();

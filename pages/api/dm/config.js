@@ -28,7 +28,7 @@ import {
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
-import { avisar, buscarGrupo, hayTelegram } from "../../../lib/notificar";
+import { avisar, buscarGrupo, hayBotDm, hayTelegram } from "../../../lib/notificar";
 
 // Quién puede figurar en una charla cargada a mano. "agente" no: lo que mandó el agente lo anota él.
 const QUIEN_SEMBRADO = ["lead", "cande", "automatico", "sistema"];
@@ -203,7 +203,7 @@ export default async function handler(req, res) {
       claves: {
         anthropic: Boolean(process.env.ANTHROPIC_API_KEY), manychat: hayManyChat(),
         dm_secreto: Boolean(process.env.DM_SECRETO) || Boolean((await leerConfig("secreto_dm"))?.huella),
-        telegram: hayTelegram(), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
+        telegram: hayTelegram(), bot_del_agente: hayBotDm(), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
         cron_secret: Boolean(process.env.CRON_SECRET),
       },
       cerebro_local_hace_segundos: await segundosDesdeElLatido(),
