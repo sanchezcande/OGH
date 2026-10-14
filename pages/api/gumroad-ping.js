@@ -8,13 +8,14 @@
 // https://opengatehub.com/api/gumroad-ping y manda un POST form-encoded por cada venta.
 //
 // Config en Vercel:
+//   TELEGRAM_BOT_VENTAS   → el token de @oghventas_bot (si falta, usa el bot de los leads)
 //   TELEGRAM_CHAT_VENTAS  → el chat SOLO de ventas (si falta, usa TELEGRAM_CHAT_ID)
 //   GUMROAD_PING_SECRET   → opcional; si está, la URL tiene que llevar ?k=<secret>
 //
 // El aviso nunca puede fallar la respuesta: Gumroad reintenta si no le contestamos 200, y
 // un reintento sería un segundo mensaje por la misma venta. Se contesta 200 siempre.
 import { sql } from "@vercel/postgres";
-import { avisarA } from "../../lib/notificar";
+import { avisarPor } from "../../lib/notificar";
 
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
@@ -62,7 +63,8 @@ export default async function handler(req, res) {
     : limpiar(b.referrer, 120) || "no está en la red de devs";
 
   const titulo = baja ? "Devolución en Gumroad" : prueba ? "Compra de PRUEBA" : "COMPRA NUEVA 🖤";
-  const ok = await avisarA(process.env.TELEGRAM_CHAT_VENTAS, titulo, {
+  const ok = await avisarPor(
+    { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS }, titulo, {
     Quién: nombre || f?.nombre || email || "—",
     WhatsApp: f?.whatsapp || "no tengo",
     Email: email || "—",
@@ -73,7 +75,7 @@ export default async function handler(req, res) {
     "Entró a la red hace": dias === null ? "—" : dias === 0 ? "hoy" : `${dias} días`,
     CV: f?.cv_url ? "sí, lo tengo" : "no me lo pasó",
     Producto: limpiar(b.product_name, 120),
-  });
+    });
   if (!ok) console.error("gumroad-ping: el aviso no salió", { email });
 
   // 200 siempre: un error acá le dice a Gumroad que reintente y la venta se avisaría dos veces.
