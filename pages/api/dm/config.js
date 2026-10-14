@@ -7,27 +7,36 @@
 //   { accion: "sembrar", contacto, nombre, contexto, mensajes: [{ quien, texto }] }
 //                                                  → carga una charla que ya existía y se la da al agente
 //   { accion: "anotar", contacto, quien, texto }   → deja constancia de lo que Cande mandó a mano
+//   { accion: "reservar", contactos: [id, ...] }   → deja como de Cande, en tanda, a quienes todavía no figuran
+//                                                  (se corre antes de prender las altas, con los contactos que ya existen)
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
+//   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
+//                                                  tiene que estar adentro); con quitar: true vuelven al chat de siempre
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
+//   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
+//   { accion: "aviso", texto }                     → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
 //
 // Cada cambio de prompt, de modo o de cualquier otro ajuste le llega a Cande por Telegram: si
 // alguien más consigue el secreto y toca algo (el link de pago, por ejemplo), ella se entera en
 // el momento. El prompt anterior queda guardado.
-import { mismoSecreto, secretoDe, guardarSecretoDm } from "../../../lib/dm/armado";
+import { avisarDm, mismoSecreto, olvidarChatDm, secretoDe, guardarSecretoDm } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
-  hayBase, historial, leerConfig, ponerDueno, prompt, resumen, sembrar, tablas, ultimoIdLead, validarAjustes,
+  desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
+  ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
-import { avisar, hayTelegram } from "../../../lib/notificar";
+import { avisar, buscarGrupo, hayTelegram } from "../../../lib/notificar";
 
 // Quién puede figurar en una charla cargada a mano. "agente" no: lo que mandó el agente lo anota él.
 const QUIEN_SEMBRADO = ["lead", "cande", "automatico", "sistema"];
 const QUIEN_A_MANO = ["cande", "automatico"];
 const TOPE_TEXTO = 4000;
 const TOPE_SIEMBRA = 300;
+const TOPE_RESERVA = 5000;
+const TOPE_AVISO = 3000;   // Telegram corta a los 4096
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -44,7 +53,7 @@ export default async function handler(req, res) {
     const antes = await prompt();
     await guardarPrompt(texto);
     if (antes !== texto) {
-      await avisar("DM: cambió el prompt del agente", {
+      await avisarDm("DM: cambió el prompt del agente", {
         Caracteres: texto.length, "El anterior": antes ? `${antes.length} caracteres, quedó guardado` : "no había",
       });
     }
@@ -58,16 +67,26 @@ export default async function handler(req, res) {
     const prende = pedido.ajustes.modo === "auto" || pedido.ajustes.modo === "sombra";
     // Sin prompt el agente no puede contestar nada: cada mensaje terminaría en error y aviso.
     if (prende && !(await prompt())) return res.status(409).json({ error: "no hay prompt cargado: primero subí el prompt" });
+    // Un alta entra solo si el aviso a Cande sale: sin Telegram no entraría nadie y nadie sabría por qué.
+    if (pedido.ajustes.altas === true && !hayTelegram()) return res.status(409).json({ error: "sin Telegram no hay altas: el aviso a Cande no saldría" });
     await guardarConfig("ajustes", { ...((await leerConfig("ajustes")) || {}), ...pedido.ajustes });
     const ahora = await ajustes();
-    if (ahora.modo !== antes.modo) await avisar("DM: cambió el modo del agente", { Ahora: ahora.modo, Antes: antes.modo });
+    if (ahora.modo !== antes.modo) await avisarDm("DM: cambió el modo del agente", { Ahora: ahora.modo, Antes: antes.modo });
     // El link de pago es el único link ajeno que los frenos dejan pasar: un cambio no puede ser callado.
     const otros = Object.keys(pedido.ajustes).filter((k) => k !== "modo" && ahora[k] !== antes[k]);
     if (otros.length) {
       const ver = (v) => (v === "" ? "(vacío)" : v);
-      await avisar("DM: cambiaron ajustes del agente", Object.fromEntries(otros.map((k) => [k, `${ver(antes[k])} → ${ver(ahora[k])}`])));
+      await avisarDm("DM: cambiaron ajustes del agente", Object.fromEntries(otros.map((k) => [k, `${ver(antes[k])} → ${ver(ahora[k])}`])));
     }
     return res.status(200).json({ ok: true, ajustes: ahora });
+  }
+
+  if (b.accion === "reservar") {
+    const ids = Array.isArray(b.contactos) ? [...new Set(b.contactos.map((x) => String(x ?? "").trim()))] : [];
+    if (!ids.length || ids.length > TOPE_RESERVA || ids.some((x) => !/^[0-9A-Za-z_-]{1,40}$/.test(x))) {
+      return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RESERVA} ids` });
+    }
+    return res.status(200).json({ ok: true, recibidos: ids.length, reservados: await reservar(ids) });
   }
 
   if (b.accion === "dueno") {
@@ -131,8 +150,49 @@ export default async function handler(req, res) {
     const valor = String(b.valor || "");
     if (valor.length < 24) return res.status(400).json({ error: "el secreto tiene que tener 24 caracteres o más" });
     await guardarSecretoDm(valor);
-    await avisar("DM: cambió el secreto de ManyChat", { Nota: "si no fuiste vos, apagá el agente" });
+    await avisarDm("DM: cambió el secreto de ManyChat", { Nota: "si no fuiste vos, apagá el agente" });
     return res.status(200).json({ ok: true });
+  }
+
+  if (b.accion === "telegram") {
+    // El cambio de chat se avisa siempre en el de siempre (TELEGRAM_CHAT_ID, que no se toca con este
+    // secreto): quien consiga el secreto no puede llevarse los avisos a otro lado sin que Cande lo vea.
+    if (b.quitar === true) {
+      await guardarConfig("telegram_dm", {});
+      olvidarChatDm();
+      await avisar("DM: los avisos del agente volvieron a este chat", { Nota: "si no fuiste vos, apagá el agente" });
+      return res.status(200).json({ ok: true, grupo: null });
+    }
+    const nombre = String(b.grupo || "").trim().slice(0, 80);
+    if (!nombre) return res.status(400).json({ error: "falta el nombre del grupo" });
+    const grupo = await buscarGrupo(nombre);
+    if (grupo?.varios) return res.status(409).json({ error: "hay más de un grupo con ese nombre: ponele un nombre único y probá de nuevo" });
+    if (!grupo) {
+      return res.status(404).json({ error: "no veo ese grupo: tiene que llamarse igual y tenés que haber sumado vos al bot hace menos de un día. Sacá el bot del grupo, volvé a sumarlo y probá de nuevo" });
+    }
+    // Primero las dos pruebas: si alguno de los dos mensajes no llega, no se guarda y todo sigue como estaba.
+    const llego = await avisar("DM: este es el chat del agente", {
+      Nota: "acá te van a llegar las charlas que te pasa, los devs nuevos que entran y las fallas",
+    }, { chat: grupo.id });
+    if (!llego) return res.status(502).json({ error: "encontré el grupo pero el mensaje de prueba no llegó: nada cambió" });
+    const supo = await avisar("DM: los avisos del agente cambiaron de chat", { Grupo: grupo.nombre, Nota: "si no fuiste vos, apagá el agente" });
+    if (!supo) return res.status(502).json({ error: "no pude avisar del cambio en el chat de siempre: nada cambió" });
+    await guardarConfig("telegram_dm", grupo);
+    olvidarChatDm();
+    return res.status(200).json({ ok: true, grupo: grupo.nombre });
+  }
+
+  if (b.accion === "salidas") {
+    const desde = desdeValido(b.desde);
+    if (!desde) return res.status(400).json({ error: "desde: una fecha de la última semana" });
+    return res.status(200).json({ salidas: await salidasDesde(desde) });
+  }
+
+  if (b.accion === "aviso") {
+    const texto = String(b.texto || "").trim().slice(0, TOPE_AVISO);
+    if (!texto) return res.status(400).json({ error: "falta el texto" });
+    const llego = await avisarDm("DM: repaso de las charlas", { Repaso: texto });
+    return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
   }
 
   if (b.accion === "estado") {
@@ -143,7 +203,7 @@ export default async function handler(req, res) {
       claves: {
         anthropic: Boolean(process.env.ANTHROPIC_API_KEY), manychat: hayManyChat(),
         dm_secreto: Boolean(process.env.DM_SECRETO) || Boolean((await leerConfig("secreto_dm"))?.huella),
-        telegram: hayTelegram(),
+        telegram: hayTelegram(), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
         cron_secret: Boolean(process.env.CRON_SECRET),
       },
       cerebro_local_hace_segundos: await segundosDesdeElLatido(),

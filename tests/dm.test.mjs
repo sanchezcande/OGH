@@ -7,9 +7,12 @@
 //
 // Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js. El doble de Postgres de
 // tests/dobles solo conoce las del goteo, así que tomar, soltar, anotarLead, sembrar,
-// retirarSalida, reclamarToque, sinContestar y borrarViejas (y lo que hacen con ellas
-// /api/dm/config y /api/dm/toques) se prueban a mano contra un Postgres de verdad antes de
-// subir un cambio.
+// retirarSalida, reclamarToque, sinContestar, borrarViejas, borrarCharla, lugarParaAlta, darDeAlta
+// y reservar (y lo que hacen con ellas /api/dm/config, /api/dm/toques y /api/dm/entrada con las
+// altas prendidas) se prueban a mano contra un Postgres de verdad antes de subir un cambio.
+// De las altas hay que mirar siempre lo mismo: que quien ya figura como de Cande no cambia de
+// dueño, que el tope corta, que el alta deja el mensaje y la ventana abierta en la misma
+// sentencia, y que borrar o reservar a quien no figuraba le deja la fila que frena el alta.
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -20,7 +23,8 @@ const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano,
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
-const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO } = await import("../lib/dm/base.js");
+const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
+const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
 const HORA = 3600000;
 const AHORA = new Date("2026-10-12T15:00:00Z"); // las 12 del mediodía en Argentina
@@ -319,24 +323,42 @@ const hasta = async (listo) => { for (let i = 0; i < 500 && !listo(); i++) await
 function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
-  ahora = AHORA, alEsperar,
+  ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
 } = {}) {
   const m = {
-    ajustes: { modo, envio, espera_ms: 0, tope_por_dia: tope, toques, link_de_pago: "", ...(avisoIa === undefined ? {} : { aviso_ia: avisoIa }) },
+    ajustes: {
+      modo, envio, espera_ms: 0, tope_por_dia: tope, toques, link_de_pago: "", altas, altas_por_dia: topeAltas, contexto_alta: contextoAlta,
+      ...(avisoIa === undefined ? {} : { aviso_ia: avisoIa }),
+    },
     contacto: {
       id: "77", nombre: "Lead de prueba", dueno, toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: null,
       estado: {}, ultimo_lead: new Date(ahora - ultimoLeadHace * HORA),
     },
     mensajes: [...(conAviso ? [{ id: 1, quien: "agente", texto: AVISO }] : []), { id: 2, quien: "lead", texto: "mensaje de prueba" }],
-    disparo: 2, tomado: null, proximo: undefined,
+    disparo: 2, tomado: null, proximo: undefined, altasHoy: 0,
     salidas: [], enviados: [], campos: [], avisos: [], pedidos: [], fallaAnotar: false, fallaSumarToque: false,
   };
+  // Alguien que nunca pasó por la base: ni contacto ni mensajes.
+  if (sinContacto) Object.assign(m, { contacto: null, mensajes: [], disparo: null });
   const delLead = () => m.mensajes.filter((x) => x.quien === "lead");
   const base = {
     tablas: async () => {},
     ajustes: async () => m.ajustes,
     prompt: async () => prompt,
-    contacto: async () => ({ ...m.contacto }),
+    contacto: async () => (m.contacto ? { ...m.contacto } : null),
+    anotarLead: async (id, texto) => (m.contacto?.dueno === "agente" ? m.entraLead(texto) : null),
+    lugarParaAlta: async (id, tope) => (m.contacto || m.altasHoy >= tope ? null : m.altasHoy),
+    darDeAlta: async (id, { nombre, texto, contexto, tope }) => {
+      if (m.contacto || m.altasHoy >= tope) return null;
+      m.contacto = {
+        id, nombre, dueno: "agente", toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: contexto || null,
+        estado: {}, ultimo_lead: ahora,
+      };
+      if (altaAjena) return null; // la dio de alta el mensaje de al lado: a este pedido la base le dice que no fue él
+      m.altasHoy++;
+      m.mensajes.push({ id: m.mensajes.length + 1, quien: "lead", texto });
+      return m.mensajes.length;
+    },
     ultimoIdLead: async () => delLead().at(-1)?.id ?? null,
     historial: async (id, tope = 80) => m.mensajes.slice(-tope),
     corridasEnUnDia: async () => m.salidas.filter((s) => s.estado !== "aviso_fallido").length,
@@ -924,6 +946,261 @@ test("en una charla larga los frenos miran todo lo que escribió el lead, no sol
   dev.m.mensajes = larga("soy dev backend");
   dev.m.contacto.respondido_hasta = 89;
   assert.equal((await dev.agente.procesar("77", 91)).hecho, "enviada");
+});
+
+/* ---------- altas: quien entra solo por la entrada ---------- */
+
+test("alguien nuevo entra solo con las altas prendidas: queda del agente con su contexto y Cande se entera", async () => {
+  const { agente, m } = armar({
+    sinContacto: true, altas: true, contextoAlta: "contexto de alta de prueba", responde: () => salida([AVISO, "Pregunta de prueba?"]),
+  });
+  const id = await agente.recibir("88", "hola de prueba", "Nuevo de prueba");
+  assert.equal(id, 1);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.contacto.nombre, "Nuevo de prueba");
+  assert.deepEqual(m.mensajes, [{ id: 1, quien: "lead", texto: "hola de prueba" }]);
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo al agente");
+  assert.equal(m.avisos[0].campos.Quién, "Nuevo de prueba (88)");
+  assert.equal(m.avisos[0].campos["Van en 24 horas"], "1 de 25");
+  // De ahí en más es una charla como cualquiera: el modelo recibe el contexto de alta y, como
+  // todavía nadie le avisó que es automático, la primera respuesta tiene que decirlo.
+  assert.equal((await agente.procesar("88", id)).hecho, "enviada");
+  assert.equal(m.pedidos[0].turno.contexto, "contexto de alta de prueba");
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["hola de prueba"]);
+});
+
+test("con las altas apagadas, como vienen de fábrica, alguien nuevo no entra ni queda nada guardado", async () => {
+  assert.equal(AJUSTES_POR_DEFECTO.altas, false);
+  const { agente, m } = armar({ sinContacto: true });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.mensajes, []);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("un texto que no es true no prende las altas", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: "si" });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
+  assert.equal(m.contacto, null);
+});
+
+test("con el agente apagado no entra nadie, aunque las altas estén prendidas", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, modo: "apagado" });
+  assert.equal(await agente.recibir("88", "hola de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("si el aviso a Cande no sale, no hay alta: no queda del agente ni se guarda el mensaje", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, avisoSale: false });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.mensajes, []);
+  assert.equal(m.altasHoy, 0);
+  assert.equal(m.salidas.length, 1); // el aviso que no salió queda anotado
+  assert.equal(m.salidas[0].estado, "aviso_fallido");
+});
+
+test("una charla de Cande no vuelve sola al agente aunque las altas estén prendidas", async () => {
+  const { agente, m } = armar({ dueno: "cande", altas: true });
+  const antes = m.mensajes.length;
+  assert.equal(await agente.recibir("77", "otro mensaje de prueba"), null);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.mensajes.length, antes);
+  assert.equal(m.altasHoy, 0);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("el mensaje de quien ya es del agente entra como siempre, sin alta ni aviso", async () => {
+  const { agente, m } = armar({ altas: true });
+  assert.equal(await agente.recibir("77", "otro mensaje de prueba"), 3);
+  assert.equal(m.altasHoy, 0);
+  assert.deepEqual(m.avisos, []);
+});
+
+test("el tope de altas: la que lo llena le avisa a Cande y el siguiente no entra", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, topeAltas: 1 });
+  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), 1);
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo y se llenó el tope de altas");
+  assert.match(m.avisos[0].campos.Aviso, /filtrando por la etiqueta/);
+  Object.assign(m, { contacto: null, mensajes: [] }); // llega otro que tampoco pasó nunca por la base
+  assert.equal(await agente.recibir("89", "hola de prueba", "Otro de prueba"), null);
+  assert.equal(m.contacto, null);
+  assert.deepEqual(m.mensajes, []);
+  assert.equal(m.avisos.length, 1);
+});
+
+test("dos mensajes juntos de alguien nuevo: el que no hizo el alta también queda guardado", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, altaAjena: true });
+  assert.equal(await agente.recibir("88", "segundo mensaje de prueba"), 1);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.deepEqual(m.mensajes.map((x) => x.texto), ["segundo mensaje de prueba"]);
+});
+
+test("los ajustes de las altas: prendido o apagado, un tope entre 1 y 200 y un contexto de hasta mil caracteres", () => {
+  for (const malo of [{ altas: "si" }, { altas: 1 }, { altas_por_dia: 0 }, { altas_por_dia: 201 }, { altas_por_dia: "25" }, { contexto_alta: 5 }, { contexto_alta: "x".repeat(1001) }]) {
+    assert.match(validarAjustes(malo).error, /valor inválido/, JSON.stringify(malo).slice(0, 60));
+  }
+  const bueno = { altas: true, altas_por_dia: 10, contexto_alta: "contexto de prueba" };
+  assert.deepEqual(validarAjustes(bueno), { ok: true, ajustes: bueno });
+  assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas, false);
+  assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas_por_dia, 25);
+});
+
+test("el repaso pide respuestas desde una fecha válida de la última semana, nunca futura", () => {
+  const ahora = new Date("2026-10-14T12:00:00Z");
+  assert.equal(desdeValido("2026-10-14T11:00:00Z", ahora).toISOString(), "2026-10-14T11:00:00.000Z");
+  assert.equal(desdeValido("2026-10-08T12:00:01Z", ahora).toISOString(), "2026-10-08T12:00:01.000Z");
+  for (const malo of ["", null, undefined, "ayer", "2026-10-14T12:00:01Z", "2026-10-07T11:59:59Z", "   "]) {
+    assert.equal(desdeValido(malo, ahora), null, String(malo));
+  }
+});
+
+/* ---------- a qué chat de Telegram van los avisos del agente ---------- */
+
+const { crearAvisoDm } = await import("../lib/dm/armado.js");
+const { grupoConNombre } = await import("../lib/notificar.js");
+
+function avisosDePrueba({ chat = null, llegaAlGrupo = true, fallaLeer = false } = {}) {
+  const mandados = [];
+  const mandar = async (titulo, campos, opciones = {}) => {
+    mandados.push({ titulo, campos, chat: opciones.chat ?? "el de siempre" });
+    return opciones.chat ? llegaAlGrupo : true;
+  };
+  const leerChat = async () => { if (fallaLeer) throw new Error("base caída"); return chat; };
+  return { mandados, avisarDm: crearAvisoDm({ avisar: mandar, leerChat }) };
+}
+
+test("sin grupo conectado, los avisos del agente van al chat de siempre", async () => {
+  const { mandados, avisarDm } = avisosDePrueba();
+  assert.equal(await avisarDm("DM: aviso de prueba", { Quién: "Lead de prueba" }), true);
+  assert.deepEqual(mandados.map((x) => x.chat), ["el de siempre"]);
+});
+
+test("con grupo conectado van solo al grupo del agente", async () => {
+  const { mandados, avisarDm } = avisosDePrueba({ chat: "-100123" });
+  assert.equal(await avisarDm("DM: aviso de prueba", { Quién: "Lead de prueba" }), true);
+  assert.deepEqual(mandados.map((x) => x.chat), ["-100123"]);
+});
+
+test("si el aviso no llega al grupo (o no se puede leer cuál es), no se pierde: va al chat de siempre", async () => {
+  const caido = avisosDePrueba({ chat: "-100123", llegaAlGrupo: false });
+  assert.equal(await caido.avisarDm("DM: aviso de prueba", { Quién: "Lead de prueba", Ojo: "otra cosa" }), true);
+  assert.deepEqual(caido.mandados.map((x) => x.chat), ["-100123", "el de siempre"]);
+  assert.equal(caido.mandados[1].campos.Ojo, "otra cosa; no pude avisar en el grupo del agente");
+  const sinBase = avisosDePrueba({ chat: "-100123", fallaLeer: true });
+  assert.equal(await sinBase.avisarDm("DM: aviso de prueba", {}), true);
+  assert.deepEqual(sinBase.mandados.map((x) => x.chat), ["el de siempre"]);
+});
+
+test("el grupo se busca por nombre: uno solo, sumado por la dueña y del que al bot no lo sacaron", () => {
+  const grupo = (id, title, de, extra = {}) => ({ my_chat_member: { chat: { id, type: "supergroup", title }, from: { id: de }, new_chat_member: { status: "member" }, ...extra } });
+  const visto = [
+    { message: { chat: { id: 55, type: "private", first_name: "Agente DM" }, from: { id: 55 }, text: "hola" } },
+    grupo(-100111, "Otro grupo", 1),
+    grupo(-100222, " agente dm ", 1),
+    { message: { chat: { id: -100222, type: "supergroup", title: "Agente DM" }, from: { id: 1 }, text: "/start" } },
+    null, {},
+  ];
+  assert.deepEqual(grupoConNombre(visto, "Agente DM", { soloDe: "1" }), { id: "-100222", nombre: "Agente DM" });
+  assert.deepEqual(grupoConNombre(visto, "otro GRUPO"), { id: "-100111", nombre: "Otro grupo" });
+  for (const nada of ["no existe", "", null]) assert.equal(grupoConNombre(visto, nada), null);
+  assert.equal(grupoConNombre(null, "Agente DM"), null);
+  // Un extraño arma un grupo con el mismo nombre y suma al bot: no cuenta si se sabe quién es la dueña...
+  const conAjeno = [...visto, grupo(-100999, "Agente DM", 666)];
+  assert.deepEqual(grupoConNombre(conAjeno, "Agente DM", { soloDe: "1" }), { id: "-100222", nombre: "Agente DM" });
+  // ...y si no se sabe, con dos grupos iguales no se elige ninguno.
+  assert.deepEqual(grupoConNombre(conAjeno, "Agente DM"), { varios: true });
+  // Si al bot lo sacaron del grupo, ese grupo ya no sirve.
+  const sacado = [...visto, { my_chat_member: { chat: { id: -100222, type: "supergroup", title: "Agente DM" }, from: { id: 1 }, new_chat_member: { status: "left" } } }];
+  assert.equal(grupoConNombre(sacado, "Agente DM", { soloDe: "1" }), null);
+});
+
+/* ---------- el cuerpo que manda ManyChat ---------- */
+
+test("un cuerpo bien armado se lee tal cual", () => {
+  assert.deepEqual(cuerpoDeManyChat('{"contacto":"77","nombre":"Lead de prueba","texto":"hola de prueba"}'), {
+    contacto: "77", nombre: "Lead de prueba", texto: "hola de prueba",
+  });
+  assert.deepEqual(cuerpoDeManyChat('{"contacto":77}'), { contacto: 77 });
+});
+
+test("un mensaje con salto de línea o con comillas rompe el JSON de ManyChat y se rescata igual", () => {
+  const conSalto = '{"contacto":"77","nombre":"Lead de prueba","texto":"primera línea\nsegunda línea"}';
+  assert.throws(() => JSON.parse(conSalto));
+  assert.deepEqual(cuerpoDeManyChat(conSalto), { contacto: "77", nombre: "Lead de prueba", texto: "primera línea\nsegunda línea" });
+  const conComillas = '{ "contacto": "77", "nombre": "Lead de prueba", "texto": "me dijo "probá" y probé" }';
+  assert.throws(() => JSON.parse(conComillas));
+  assert.equal(cuerpoDeManyChat(conComillas).texto, 'me dijo "probá" y probé');
+  const conTodo = '{"contacto": 77, "nombre": "De "prueba"", "texto": "uno\n"dos" } tres\n"}';
+  assert.deepEqual(cuerpoDeManyChat(conTodo), { contacto: "77", nombre: 'De "prueba"', texto: 'uno\n"dos" } tres\n' });
+});
+
+test("lo que no se puede rescatar queda vacío, y el endpoint lo rechaza por falta de contacto", () => {
+  for (const malo of ["", "   ", "hola", "[1,2]", '"texto"', '{"nombre":"x","texto":"sin contacto\n"}', '{"contacto":"77","texto":"sin cerrar']) {
+    assert.deepEqual(cuerpoDeManyChat(malo), {}, JSON.stringify(malo));
+  }
+});
+
+test("el contacto es el que pone ManyChat al principio: el lead no puede pisarlo desde su texto ni su nombre", () => {
+  const desdeElTexto = '{ "contacto": "77", "nombre": "Lead de prueba", "texto": "hola", "contacto": "999" }';
+  assert.equal(JSON.parse(desdeElTexto).contacto, "999"); // lo que daba antes: el JSON es válido y gana el último
+  assert.equal(cuerpoDeManyChat(desdeElTexto).contacto, "77");
+  const desdeElNombre = '{ "contacto": "77", "nombre": "X", "contacto": "999", "texto": "hola" }';
+  assert.equal(cuerpoDeManyChat(desdeElNombre).contacto, "77");
+  // En el rescate tampoco sirve un contacto que no esté al principio.
+  assert.deepEqual(cuerpoDeManyChat('{ "nombre": "X", "texto": "uno\n", "contacto": "999" }'), {});
+});
+
+test("el rescate no se confunde si el mensaje trae los nombres de los campos adentro", () => {
+  const con = (texto) => cuerpoDeManyChat(`{ "contacto": "77", "nombre": "Lead de prueba", "texto": "${texto}" }`);
+  for (const texto of ['mirá {"texto": "x"}\nlisto', 'va {"nombre": "x", "texto": "y"}\nfin', 'probando "contacto": "999",\notra']) {
+    assert.deepEqual(con(texto), { contacto: "77", nombre: "Lead de prueba", texto }, texto);
+  }
+});
+
+test("un cuerpo enorme armado para trabar el rescate se resuelve al toque", () => {
+  const trampa = '{"contacto":"1",' + '"texto":"'.repeat(7000);
+  const inicio = performance.now();
+  assert.deepEqual(cuerpoDeManyChat(trampa), {});
+  assert.ok(performance.now() - inicio < 200, "el rescate tardó demasiado");
+});
+
+test("la entrada lee el cuerpo crudo del pedido y rescata el JSON roto de ManyChat", async () => {
+  const { default: handler, config } = await import("../pages/api/dm/entrada.js");
+  assert.equal(config.api.bodyParser, false, "con el lector de Next prendido el JSON roto vuelve a dar 400");
+  const { avisos } = await import("./dobles/preparar.mjs");
+  process.env.DM_SECRETO = "secreto-de-prueba";
+  process.env.POSTGRES_URL = "postgres://de-prueba";
+  try {
+    const llega = async (crudo) => {
+      async function* trozos() { yield Buffer.from(crudo); }
+      const req = Object.assign(trozos(), { method: "POST", headers: { "x-dm-secreto": "secreto-de-prueba" } });
+      const res = respuesta();
+      await handler(req, res);
+      return res;
+    };
+    // Sin contacto no pasa, y no llega a tocar la base.
+    assert.deepEqual((await llega('{"nombre":"x","texto":"sin contacto\n"}')).cuerpo, { error: "falta contacto" });
+    // Con el JSON roto pasa de la lectura: el doble de la base no conoce estas consultas, así que
+    // la entrada falla ahí y el aviso sale con el nombre y el contacto rescatados.
+    const antes = avisos.length;
+    const res = await llega('{ "contacto": "77", "nombre": "Lead de prueba", "texto": "uno\n"dos"" }');
+    assert.equal(res.codigo, 200);
+    assert.deepEqual(res.cuerpo, { ok: false });
+    assert.match(avisos.slice(antes).join("\n"), /Lead de prueba \(77\)/);
+  } finally {
+    delete process.env.DM_SECRETO;
+    delete process.env.POSTGRES_URL;
+  }
+});
+
+test("el cuerpo crudo se lee entero y tiene tope", async () => {
+  async function* trozos(lista) { for (const t of lista) yield Buffer.from(t); }
+  assert.equal(await leerCrudo(trozos(['{"contacto":"77",', '"texto":"hola"}'])), '{"contacto":"77","texto":"hola"}');
+  await assert.rejects(leerCrudo(trozos(["x".repeat(40000), "x".repeat(40000)])), /demasiado grande/);
 });
 
 /* ---------- los ajustes ---------- */

@@ -8,14 +8,19 @@
 // ráfaga, le pide la respuesta al modelo y la manda. Ver lib/dm/agente.js.
 //
 // Solo guarda mensajes de contactos que son del agente. De cualquier otro no guarda nada:
-// las charlas de Cande no pasan por esta base.
+// las charlas de Cande no pasan por esta base. Con el ajuste "altas" prendido, quien nunca
+// pasó por acá entra como contacto del agente (ver recibir en lib/dm/agente.js): por eso en
+// ManyChat el flujo que llama acá tiene que arrancar filtrando por la etiqueta.
 //
 // Si la base falla contesta 200 igual, con ok en false, y le avisa a Cande: con un 500 el
 // mensaje se pierde y nadie se entera.
+//
+// El cuerpo se lee crudo y no con el lector de Next: ManyChat no escapa el texto del mensaje, y
+// un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
 import { waitUntil } from "@vercel/functions";
-import { agente, colaDe, secretoDmValido } from "../../../lib/dm/armado";
-import { anotarLead, contacto, hayBase, tablas } from "../../../lib/dm/base";
-import { avisar } from "../../../lib/notificar";
+import { agente, avisarDm, colaDe, secretoDmValido } from "../../../lib/dm/armado";
+import { cuerpoDeManyChat, leerCrudo } from "../../../lib/dm/cuerpo";
+import { contacto, hayBase, tablas } from "../../../lib/dm/base";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -27,7 +32,13 @@ export default async function handler(req, res) {
   }
   if (!hayBase()) return res.status(503).json({ error: "sin base" });
 
-  const b = req.body || {};
+  // Con bodyParser en false Next no arma req.body: se lee del pedido. Las pruebas lo pasan ya armado.
+  let b;
+  try {
+    b = req.body !== undefined ? req.body || {} : cuerpoDeManyChat(await leerCrudo(req));
+  } catch {
+    return res.status(400).json({ error: "cuerpo ilegible" });
+  }
   const id = String(b.contacto ?? b.subscriber_id ?? "").trim();
   if (!id) return res.status(400).json({ error: "falta contacto" });
   const texto = String(b.texto ?? b.last_input_text ?? "").trim() || "[adjunto o mensaje sin texto]";
@@ -39,14 +50,14 @@ export default async function handler(req, res) {
   try {
     await tablas();
     // Devuelve null si el contacto no es del agente o si es un reintento del mismo mensaje.
-    idMensaje = await anotarLead(id, texto.slice(0, 4000), nombre);
+    idMensaje = await agente.recibir(id, texto.slice(0, 4000), nombre);
     if (!idMensaje) {
       const c = await contacto(id);
       return res.status(200).json({ ok: true, dueno: c?.dueno === "agente" ? "agente" : "cande" });
     }
   } catch (e) {
     console.error("dm: falló la entrada", colaDe(id), e.message);
-    await avisar("DM: falló la entrada de un mensaje", { Quién: quien, Motivo: e.message });
+    await avisarDm("DM: falló la entrada de un mensaje", { Quién: quien, Motivo: e.message });
     return res.status(200).json({ ok: false });
   }
 
@@ -56,10 +67,10 @@ export default async function handler(req, res) {
     // (/api/dm/toques) la encuentra sin contestar y se la pasa.
     agente.procesar(id, idMensaje).catch(async (e) => {
       console.error("dm: falló procesar", colaDe(id), e.message);
-      await avisar("DM: el agente falló antes de contestar", { Quién: quien, Motivo: e.message });
+      await avisarDm("DM: el agente falló antes de contestar", { Quién: quien, Motivo: e.message });
     }),
   );
   return res.status(200).json({ ok: true, dueno: "agente" });
 }
 
-export const config = { maxDuration: 300 };
+export const config = { api: { bodyParser: false }, maxDuration: 300 };

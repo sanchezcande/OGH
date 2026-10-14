@@ -2,7 +2,9 @@
 // entrega la respuesta. La llama tracker/dm_cerebro.py con el secreto del dashboard (COLA_SECRET).
 // Ver lib/dm/cola.js.
 //
-//   { accion: "tomar" }                    → { trabajo: { id, turno, link_de_pago } } o { trabajo: null }
+//   { accion: "tomar" }                    → { trabajo: { id, turno, link_de_pago, edad } } o { trabajo: null }
+//                                            (edad: segundos desde que se armó el turno; la Mac descuenta eso
+//                                            del tiempo que tiene antes de que ManyChat retire la respuesta)
 //   { accion: "resultado", id, salida }    → entrega la salida del modelo
 //   { accion: "resultado", id, error }     → avisa que no pudo: la charla pasa a ser de Cande
 import { mismoSecreto, secretoDe } from "../../../lib/dm/armado";
