@@ -14,6 +14,8 @@
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
 //                                                  tiene que estar adentro); con quitar: true vuelven al chat de siempre
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
+//   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
+//   { accion: "aviso", texto }                     → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
 //
 // Cada cambio de prompt, de modo o de cualquier otro ajuste le llega a Cande por Telegram: si
 // alguien más consigue el secreto y toca algo (el link de pago, por ejemplo), ella se entera en
@@ -22,7 +24,8 @@ import { avisarDm, mismoSecreto, olvidarChatDm, secretoDe, guardarSecretoDm } fr
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
-  hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, sembrar, tablas, ultimoIdLead, validarAjustes,
+  desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
+  ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
 import { avisar, buscarGrupo, hayTelegram } from "../../../lib/notificar";
@@ -33,6 +36,7 @@ const QUIEN_A_MANO = ["cande", "automatico"];
 const TOPE_TEXTO = 4000;
 const TOPE_SIEMBRA = 300;
 const TOPE_RESERVA = 5000;
+const TOPE_AVISO = 3000;   // Telegram corta a los 4096
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -176,6 +180,19 @@ export default async function handler(req, res) {
     await guardarConfig("telegram_dm", grupo);
     olvidarChatDm();
     return res.status(200).json({ ok: true, grupo: grupo.nombre });
+  }
+
+  if (b.accion === "salidas") {
+    const desde = desdeValido(b.desde);
+    if (!desde) return res.status(400).json({ error: "desde: una fecha de la última semana" });
+    return res.status(200).json({ salidas: await salidasDesde(desde) });
+  }
+
+  if (b.accion === "aviso") {
+    const texto = String(b.texto || "").trim().slice(0, TOPE_AVISO);
+    if (!texto) return res.status(400).json({ error: "falta el texto" });
+    const llego = await avisarDm("DM: repaso de las charlas", { Repaso: texto });
+    return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
   }
 
   if (b.accion === "estado") {

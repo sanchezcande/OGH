@@ -23,7 +23,7 @@ const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano,
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
-const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO } = await import("../lib/dm/base.js");
+const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
 const HORA = 3600000;
@@ -1047,6 +1047,15 @@ test("los ajustes de las altas: prendido o apagado, un tope entre 1 y 200 y un c
   assert.deepEqual(validarAjustes(bueno), { ok: true, ajustes: bueno });
   assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas, false);
   assert.equal(ajustesDesde({ altas: "si", altas_por_dia: 0 }).altas_por_dia, 25);
+});
+
+test("el repaso pide respuestas desde una fecha válida de la última semana, nunca futura", () => {
+  const ahora = new Date("2026-10-14T12:00:00Z");
+  assert.equal(desdeValido("2026-10-14T11:00:00Z", ahora).toISOString(), "2026-10-14T11:00:00.000Z");
+  assert.equal(desdeValido("2026-10-08T12:00:01Z", ahora).toISOString(), "2026-10-08T12:00:01.000Z");
+  for (const malo of ["", null, undefined, "ayer", "2026-10-14T12:00:01Z", "2026-10-07T11:59:59Z", "   "]) {
+    assert.equal(desdeValido(malo, ahora), null, String(malo));
+  }
 });
 
 /* ---------- a qué chat de Telegram van los avisos del agente ---------- */
