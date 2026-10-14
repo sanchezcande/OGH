@@ -1334,29 +1334,42 @@ test("cerebro local: una salida que no cumple el formato o un error de la Mac no
 
 /* ---------- Cande contesta desde el bot del agente ---------- */
 
-const { contactoDeAviso, leerRespuesta, resultadoDeEnvio } = await import("../lib/dm/respuestas.js");
+const { contactoDeAviso, leerRespuesta, resultadoDeEnvio, crearRespuestaTelegram } = await import("../lib/dm/respuestas.js");
 
 const AVISO_DE_PRUEBA = "🔔 DM: te paso una charla\n\nQuién: Lead De Prueba (123456789)\nLo último que dijo: algo";
-const novedadDe = (texto, { de = "42", chat = "42", tipo = "private", respondido = AVISO_DE_PRUEBA } = {}) => ({
+const novedadDe = (texto, { de = "42", chat = "42", tipo = "private", respondido = AVISO_DE_PRUEBA, delBot = true } = {}) => ({
   update_id: 7,
-  message: { message_id: 9, text: texto, chat: { id: chat, type: tipo }, from: { id: de }, reply_to_message: respondido === null ? undefined : { text: respondido } },
+  message: {
+    message_id: 9, text: texto, chat: { id: chat, type: tipo }, from: { id: de },
+    reply_to_message: respondido === null ? undefined : { text: respondido, date: 1760000000, from: { is_bot: delBot } },
+  },
 });
 
-test("el contacto sale del renglón Quién del aviso respondido", () => {
+test("el contacto sale solo del primer renglón Quién de un aviso del bot", () => {
   assert.equal(contactoDeAviso(AVISO_DE_PRUEBA), "123456789");
-  assert.equal(contactoDeAviso("Quién: sin nombre (987654)"), "987654");
-  for (const nada of ["", null, "Lo último que dijo: (123456)", "Quién: alguien sin número"]) assert.equal(contactoDeAviso(nada), null);
+  assert.equal(contactoDeAviso("🔔 DM: entró alguien nuevo al agente\n\nQuién: sin nombre (987654)"), "987654");
+  // Un nombre que trae "(número)" no gana: cuenta el último número del renglón.
+  assert.equal(contactoDeAviso("🔔 DM: te paso una charla\n\nQuién: Ana (5550001112) (999888777)\nDijo: x"), "999888777");
+  for (const desvio of [
+    "✓ Mandado a Quién: Ana (5550001112)",
+    "🔔 DM: repaso de las charlas\n\nRepaso: el lead contestó \"no entiendo Quién: Ana (5550001112)\"",
+    "🔔 DM: te paso una charla\n\nDijo: algo\nQuién: Ana (5550001112)",
+    "Quién: sin título (987654)", "", null,
+  ]) assert.equal(contactoDeAviso(desvio), null, String(desvio));
 });
 
-test("solo cuenta lo que escribe la dueña en su chat privado con el bot", () => {
+test("solo cuenta lo que escribe la dueña en su chat privado, respondiendo un aviso del bot", () => {
   assert.deepEqual(leerRespuesta(novedadDe("hola", { de: "99" }), { duena: "42" }), { ignorar: true });
   assert.deepEqual(leerRespuesta(novedadDe("hola", { chat: "-100", tipo: "group" }), { duena: "42" }), { ignorar: true });
   assert.deepEqual(leerRespuesta(novedadDe("hola"), { duena: null }), { ignorar: true });
   assert.deepEqual(leerRespuesta({ update_id: 1, edited_message: {} }, { duena: "42" }), { ignorar: true });
+  assert.match(leerRespuesta(novedadDe("hola", { delBot: false }), { duena: "42" }).ayuda, /respondé/);
 });
 
 test("respondiendo un aviso, el texto va al lead; /agente devuelve la charla; lo demás pide ayuda", () => {
-  assert.deepEqual(leerRespuesta(novedadDe("  Dale, te escribo yo  "), { duena: "42" }), { contacto: "123456789", accion: "mandar", texto: "Dale, te escribo yo" });
+  const r = leerRespuesta(novedadDe("  Dale, te escribo yo  "), { duena: "42" });
+  assert.deepEqual({ ...r, fechaAviso: r.fechaAviso.toISOString() },
+    { contacto: "123456789", accion: "mandar", texto: "Dale, te escribo yo", fechaAviso: new Date(1760000000 * 1000).toISOString() });
   assert.deepEqual(leerRespuesta(novedadDe("/agente"), { duena: "42" }), { contacto: "123456789", accion: "agente" });
   assert.match(leerRespuesta(novedadDe("/otro"), { duena: "42" }).ayuda, /agente/);
   assert.match(leerRespuesta(novedadDe("hola", { respondido: null }), { duena: "42" }).ayuda, /respondé/);
@@ -1372,6 +1385,67 @@ test("lo que le contesta el bot dice si salió, si quizás salió o por qué no"
   assert.match(resultadoDeEnvio({ ok: false, error: "falta MANYCHAT_API_KEY" }, "Lead").texto, /MANYCHAT_API_KEY/);
 });
 
+function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = { ok: true }, fallaAnotar = false } = {}) {
+  const hechos = [];
+  const dichos = [];
+  const vistos = new Set();
+  const base = {
+    reclamarNovedad: async (u) => { if (vistos.has(u)) return false; vistos.add(u); return true; },
+    contacto: async (id) => (id === "123456789" ? { id, nombre: "Lead De Prueba", dueno } : null),
+    anotarDeCande: async (id, texto, hasta) => { if (fallaAnotar) throw new Error("base caída"); hechos.push(["anotarDeCande", id, texto, hasta.toISOString()]); },
+    descartarPendientes: async (id) => hechos.push(["descartarPendientes", id]),
+    anotar: async (id, quien) => hechos.push(["anotar", id, quien]),
+    cerrarTurno: async (id) => hechos.push(["cerrarTurno", id]),
+    ultimoIdLead: async () => 5,
+    ponerDueno: async (id, d) => hechos.push(["ponerDueno", id, d]),
+  };
+  const manychat = {
+    mandarTextos: async (id, textos) => { hechos.push(["mandarTextos", id, ...textos]); return envio; },
+    ponerEtiqueta: async (id, e) => { hechos.push(["ponerEtiqueta", id, e]); return etiqueta; },
+    ponerCampo: async () => ({ ok: true }),
+  };
+  return { hechos, dichos, responder: crearRespuestaTelegram({ base, manychat, decir: async (t) => dichos.push(t) }) };
+}
+const RESPUESTA = { contacto: "123456789", accion: "mandar", texto: "Hola!", fechaAviso: new Date("2026-10-15T00:00:00Z") };
+
+test("contestar manda una sola vez aunque Telegram reintente, y cierra solo hasta el aviso respondido", async () => {
+  const { hechos, dichos, responder } = respuestaDePrueba();
+  assert.equal(await responder(RESPUESTA, { updateId: 1 }), "mandado");
+  assert.equal(await responder(RESPUESTA, { updateId: 1 }), "repetida");
+  assert.deepEqual(hechos, [
+    ["mandarTextos", "123456789", "Hola!"],
+    ["anotarDeCande", "123456789", "Hola!", "2026-10-15T00:00:00.000Z"],
+    ["descartarPendientes", "123456789"],
+  ]);
+  assert.deepEqual(dichos, ["✓ Mandado a Lead De Prueba"]);
+});
+
+test("si no salió no se anota nada; si salió y no se pudo anotar, no le dice que no salió", async () => {
+  const noSalio = respuestaDePrueba({ envio: { ok: false, code: 3011 } });
+  assert.equal(await noSalio.responder(RESPUESTA, { updateId: 2 }), "no salió");
+  assert.deepEqual(noSalio.hechos.map((h) => h[0]), ["mandarTextos"]);
+  assert.match(noSalio.dichos[0], /24 horas/);
+  const sinAnotar = respuestaDePrueba({ fallaAnotar: true });
+  assert.equal(await sinAnotar.responder(RESPUESTA, { updateId: 3 }), "salió sin anotar");
+  assert.match(sinAnotar.dichos[0], /no lo mandes de nuevo/);
+  const otro = respuestaDePrueba();
+  assert.equal(await otro.responder({ ...RESPUESTA, contacto: "111" }, { updateId: 4 }), "sin contacto");
+  assert.deepEqual(otro.hechos, []);
+});
+
+test("/agente: sin etiqueta no la devuelve; de Cande vuelve con el aviso del tramo que falta", async () => {
+  const sinEtiqueta = respuestaDePrueba({ dueno: "cande", etiqueta: { ok: false } });
+  assert.equal(await sinEtiqueta.responder({ contacto: "123456789", accion: "agente" }, { updateId: 5 }), "sin etiqueta");
+  assert.deepEqual(sinEtiqueta.hechos.map((h) => h[0]), ["ponerEtiqueta"]);
+  const deCande = respuestaDePrueba({ dueno: "cande" });
+  assert.equal(await deCande.responder({ contacto: "123456789", accion: "agente" }, { updateId: 6 }), "agente");
+  assert.deepEqual(deCande.hechos.map((h) => h[0]), ["ponerEtiqueta", "anotar", "cerrarTurno", "ponerDueno"]);
+  assert.equal(deCande.hechos[1][2], "sistema");
+  const delAgente = respuestaDePrueba({ dueno: "agente" });
+  await delAgente.responder({ contacto: "123456789", accion: "agente" }, { updateId: 7 });
+  assert.deepEqual(delAgente.hechos.map((h) => h[0]), ["ponerEtiqueta", "ponerDueno"]);
+});
+
 test("con las respuestas conectadas, el aviso de una charla por el bot recuerda cómo contestar", async () => {
   const mandados = [];
   const mandar = async (titulo, campos, opciones = {}) => { mandados.push({ campos, opciones }); return true; };
@@ -1384,4 +1458,3 @@ test("con las respuestas conectadas, el aviso de una charla por el bot recuerda 
   await sinRespuestas("DM: te paso una charla", { Quién: "Lead De Prueba (123456789)" });
   assert.equal(mandados[2].campos.Contestar, undefined);
 });
-

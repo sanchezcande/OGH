@@ -43,7 +43,8 @@ export default async function handler(req, res) {
   if (!id) return res.status(400).json({ error: "falta contacto" });
   const texto = String(b.texto ?? b.last_input_text ?? "").trim() || "[adjunto o mensaje sin texto]";
   // El nombre es para que el aviso a Cande diga quién es y no un número de ManyChat.
-  const nombre = String(b.nombre ?? "").trim().slice(0, 80) || null;
+  // Sin saltos de línea: el aviso a Cande lleva el nombre en el renglón "Quién", y de ahí sale a quién va su respuesta.
+  const nombre = String(b.nombre ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || null;
   const quien = `${nombre || "sin nombre"} (${id})`;
 
   let idMensaje;
