@@ -1331,3 +1331,57 @@ test("cerebro local: una salida que no cumple el formato o un error de la Mac no
   const rota = cerebroDePrueba({ resultado: { error: "Claude no pudo" } });
   await assert.rejects(rota.pedirLocal({ turno: {} }), /el Claude de la Mac falló: Claude no pudo/);
 });
+
+/* ---------- Cande contesta desde el bot del agente ---------- */
+
+const { contactoDeAviso, leerRespuesta, resultadoDeEnvio } = await import("../lib/dm/respuestas.js");
+
+const AVISO_DE_PRUEBA = "🔔 DM: te paso una charla\n\nQuién: Lead De Prueba (123456789)\nLo último que dijo: algo";
+const novedadDe = (texto, { de = "42", chat = "42", tipo = "private", respondido = AVISO_DE_PRUEBA } = {}) => ({
+  update_id: 7,
+  message: { message_id: 9, text: texto, chat: { id: chat, type: tipo }, from: { id: de }, reply_to_message: respondido === null ? undefined : { text: respondido } },
+});
+
+test("el contacto sale del renglón Quién del aviso respondido", () => {
+  assert.equal(contactoDeAviso(AVISO_DE_PRUEBA), "123456789");
+  assert.equal(contactoDeAviso("Quién: sin nombre (987654)"), "987654");
+  for (const nada of ["", null, "Lo último que dijo: (123456)", "Quién: alguien sin número"]) assert.equal(contactoDeAviso(nada), null);
+});
+
+test("solo cuenta lo que escribe la dueña en su chat privado con el bot", () => {
+  assert.deepEqual(leerRespuesta(novedadDe("hola", { de: "99" }), { duena: "42" }), { ignorar: true });
+  assert.deepEqual(leerRespuesta(novedadDe("hola", { chat: "-100", tipo: "group" }), { duena: "42" }), { ignorar: true });
+  assert.deepEqual(leerRespuesta(novedadDe("hola"), { duena: null }), { ignorar: true });
+  assert.deepEqual(leerRespuesta({ update_id: 1, edited_message: {} }, { duena: "42" }), { ignorar: true });
+});
+
+test("respondiendo un aviso, el texto va al lead; /agente devuelve la charla; lo demás pide ayuda", () => {
+  assert.deepEqual(leerRespuesta(novedadDe("  Dale, te escribo yo  "), { duena: "42" }), { contacto: "123456789", accion: "mandar", texto: "Dale, te escribo yo" });
+  assert.deepEqual(leerRespuesta(novedadDe("/agente"), { duena: "42" }), { contacto: "123456789", accion: "agente" });
+  assert.match(leerRespuesta(novedadDe("/otro"), { duena: "42" }).ayuda, /agente/);
+  assert.match(leerRespuesta(novedadDe("hola", { respondido: null }), { duena: "42" }).ayuda, /respondé/);
+  assert.match(leerRespuesta(novedadDe("hola", { respondido: "un mensaje cualquiera" }), { duena: "42" }).ayuda, /respondé/);
+  assert.match(leerRespuesta(novedadDe(""), { duena: "42" }).ayuda, /texto/);
+  assert.match(leerRespuesta(novedadDe("x".repeat(1001)), { duena: "42" }).ayuda, /1000/);
+});
+
+test("lo que le contesta el bot dice si salió, si quizás salió o por qué no", () => {
+  assert.deepEqual(resultadoDeEnvio({ ok: true }, "Lead"), { ok: true, texto: "Mandado a Lead" });
+  assert.match(resultadoDeEnvio({ ok: false, incierto: true }, "Lead").texto, /puede haber salido/);
+  assert.match(resultadoDeEnvio({ ok: false, code: 3011 }, "Lead").texto, /24 horas/);
+  assert.match(resultadoDeEnvio({ ok: false, error: "falta MANYCHAT_API_KEY" }, "Lead").texto, /MANYCHAT_API_KEY/);
+});
+
+test("con las respuestas conectadas, el aviso de una charla por el bot recuerda cómo contestar", async () => {
+  const mandados = [];
+  const mandar = async (titulo, campos, opciones = {}) => { mandados.push({ campos, opciones }); return true; };
+  const conRespuestas = crearAvisoDm({ avisar: mandar, leerChat: async () => null, tokenBot: () => "bot-de-prueba", respuestas: async () => true });
+  await conRespuestas("DM: te paso una charla", { Quién: "Lead De Prueba (123456789)" });
+  assert.match(mandados[0].campos.Contestar, /respondé/);
+  await conRespuestas("DM: cambió el modo", { Ahora: "auto" });
+  assert.equal(mandados[1].campos.Contestar, undefined);
+  const sinRespuestas = crearAvisoDm({ avisar: mandar, leerChat: async () => null, tokenBot: () => "bot-de-prueba", respuestas: async () => { throw new Error("base caída"); } });
+  await sinRespuestas("DM: te paso una charla", { Quién: "Lead De Prueba (123456789)" });
+  assert.equal(mandados[2].campos.Contestar, undefined);
+});
+

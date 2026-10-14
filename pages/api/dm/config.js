@@ -16,11 +16,14 @@
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto }                     → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
+//   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
+//                                                  con quitar: true se desconecta
 //
 // Cada cambio de prompt, de modo o de cualquier otro ajuste le llega a Cande por Telegram: si
 // alguien más consigue el secreto y toca algo (el link de pago, por ejemplo), ella se entera en
 // el momento. El prompt anterior queda guardado.
-import { avisarDm, mismoSecreto, olvidarChatDm, secretoDe, guardarSecretoDm } from "../../../lib/dm/armado";
+import { randomBytes } from "node:crypto";
+import { avisarDm, mismoSecreto, olvidarChatDm, olvidarRespuestas, secretoDe, guardarSecretoDm } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
@@ -28,7 +31,7 @@ import {
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
-import { avisar, buscarGrupo, hayBotDm, hayTelegram } from "../../../lib/notificar";
+import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
 // Quién puede figurar en una charla cargada a mano. "agente" no: lo que mandó el agente lo anota él.
 const QUIEN_SEMBRADO = ["lead", "cande", "automatico", "sistema"];
@@ -37,6 +40,7 @@ const TOPE_TEXTO = 4000;
 const TOPE_SIEMBRA = 300;
 const TOPE_RESERVA = 5000;
 const TOPE_AVISO = 3000;   // Telegram corta a los 4096
+const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Telegram no sigue la redirección
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -195,6 +199,34 @@ export default async function handler(req, res) {
     return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
   }
 
+  if (b.accion === "telegram_respuestas") {
+    const token = tokenBotDm();
+    if (!token) return res.status(409).json({ error: "falta el bot del agente: TELEGRAM_DM_BOT_TOKEN, con TELEGRAM_CHAT_ID de tu chat privado" });
+    if (b.quitar === true) {
+      const r = await llamarTelegram(token, "deleteWebhook", {});
+      await guardarConfig("telegram_respuestas", {});
+      olvidarRespuestas();
+      return res.status(r.ok ? 200 : 502).json(r.ok ? { ok: true } : { error: r.description });
+    }
+    // El secreto se guarda antes de conectar: si no, la primera novedad llegaría sin con qué compararlo.
+    const secreto = randomBytes(24).toString("hex");
+    await guardarConfig("telegram_respuestas", { secreto, vistos: [] });
+    const r = await llamarTelegram(token, "setWebhook", {
+      url: `${SITIO}/api/dm/telegram`, secret_token: secreto, allowed_updates: ["message"], drop_pending_updates: true,
+    });
+    if (!r.ok) {
+      await guardarConfig("telegram_respuestas", {});
+      return res.status(502).json({ error: `Telegram no aceptó la conexión: ${r.description}` });
+    }
+    olvidarRespuestas();
+    await llamarTelegram(token, "sendMessage", {
+      chat_id: chatDuena(),
+      text: "Ya podés contestar desde acá: respondé (deslizá) el aviso de una charla y se lo mando al lead por Instagram. " +
+        "Respondiendo un aviso con /agente, esa charla vuelve al agente.",
+    });
+    return res.status(200).json({ ok: true, manychat: hayManyChat() });
+  }
+
   if (b.accion === "estado") {
     return res.status(200).json({
       ajustes: await ajustes(),
@@ -203,7 +235,7 @@ export default async function handler(req, res) {
       claves: {
         anthropic: Boolean(process.env.ANTHROPIC_API_KEY), manychat: hayManyChat(),
         dm_secreto: Boolean(process.env.DM_SECRETO) || Boolean((await leerConfig("secreto_dm"))?.huella),
-        telegram: hayTelegram(), bot_del_agente: hayBotDm(), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
+        telegram: hayTelegram(), bot_del_agente: hayBotDm(), respuestas_por_telegram: Boolean((await leerConfig("telegram_respuestas"))?.secreto), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
         cron_secret: Boolean(process.env.CRON_SECRET),
       },
       cerebro_local_hace_segundos: await segundosDesdeElLatido(),
