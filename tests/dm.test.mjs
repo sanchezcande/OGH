@@ -513,7 +513,9 @@ test("el reintento tarde contesta sin esperar, sale por la API aunque el envío 
   assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
   assert.equal(m.salidas.at(-1).estado, "enviada");
   assert.equal(m.contacto.respondido_hasta, m.disparo);
-  assert.match(m.pedidos[0].turno.contexto, /Contestás tarde: el lead escribió hace 120 minutos.*Sorry la demora/);
+  assert.match(m.pedidos[0].turno.contexto, /Contestás tarde: el lead escribió hace 120 minutos/);
+  // Disculparse por la demora lo frena el freno de "parece una persona": la nota no lo pide.
+  assert.doesNotMatch(m.pedidos[0].turno.contexto, /Sorry la demora/i);
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["mensaje de prueba"]);
 });
 
@@ -665,6 +667,10 @@ test("la red del cron: si el modelo no está, corta y avisa que cayó; si la fal
   const una = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return id === "1" ? { hecho: "error del modelo", transitorio: false, general: false } : { hecho: "enviada" }; } });
   assert.deepEqual(llamados, ["1", "2"]);
   assert.equal(una.cayo, false);
+  llamados.length = 0;
+  const sinUso = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return { hecho: "error del modelo", transitorio: false, general: true }; } });
+  assert.deepEqual(llamados, ["1", "2"]);
+  assert.equal(sinUso.cayo, true);
   const sinMac = await atenderSinContestar({ ...base, macViva: false, procesar: async () => { throw new Error("no tenía que llamar"); } });
   assert.deepEqual(sinMac, { pasadas: 0, reintentos: 0, cayo: false });
 });
