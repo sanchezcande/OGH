@@ -1,10 +1,10 @@
 // El cron del agente de DM. Lo llama Vercel cada 10 minutos (ver vercel.json). Hace tres cosas:
 //
 //   1. Red de seguridad, siempre, esté el agente prendido o apagado: las respuestas que ManyChat
-//      no vino a retirar y las charlas del agente que quedaron con un mensaje sin atender (una
-//      función que murió a mitad de camino, o un mensaje que entró con el agente apagado) pasan
-//      a Cande con aviso. Apagado, lo que escribe un lead del agente no puede quedar sin que
-//      ella se entere.
+//      no vino a retirar pasan a Cande. Las charlas del agente con un mensaje sin atender (casi
+//      siempre la Mac sin red cuando escribió el lead) se reintentan cuando la Mac contesta, y la
+//      respuesta sale tarde por la API; pasan a Cande solo si el agente está apagado, si una
+//      respuesta pudo haber salido, tras 3 reintentos o si pasó una hora sin poder contestar.
 //   2. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
 //      Mac está contestando y es de día en Argentina (de 9 a 21).
 //      Cada toque vencido se reclama de a uno y pasa por el agente con el evento "seguimiento":
@@ -16,21 +16,15 @@
 import { agente, colaDe } from "../../../lib/dm/armado";
 import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
 import { horaDeToques } from "../../../lib/dm/frenos";
-import { correrToques } from "../../../lib/dm/seguimientos";
+import { atenderSinContestar, correrToques } from "../../../lib/dm/seguimientos";
 import {
   ajustes, borrarViejas, hayBase, reclamarToque, sinContestar, tablas, vencerPendientes,
 } from "../../../lib/dm/base";
 
 const TOQUES_POR_CORRIDA = 10;
 const MAC_VIVA_SEGUNDOS = 180; // la Mac pregunta cada pocos segundos y el latido se guarda una vez por minuto
-
-/** Qué se le dice a Cande de una charla que quedó con un mensaje sin atender. */
-function avisoDe(c, prendido) {
-  // La respuesta llegó a anotarse para mandar: si ella contesta sin mirar, puede salir dos veces.
-  if (c.quizas_salio) return { aviso: "No sé si la respuesta salió: mirá la charla antes de contestar", motivo: "envío sin confirmar" };
-  if (!prendido) return { aviso: "escribió y el agente está apagado: la charla vuelve a vos", motivo: "agente apagado" };
-  return { aviso: "quedó un mensaje sin contestar: el agente no llegó a atenderlo", motivo: "sin respuesta" };
-}
+const REINTENTO_MAX_MINUTOS = 60; // un mensaje que el agente no pudo contestar en una hora pasa a Cande
+const REINTENTO_MAX_FALLOS = 3; // o tras 3 reintentos del cron que fallaron
 
 export default async function handler(req, res) {
   const inicio = Date.now();
@@ -51,18 +45,28 @@ export default async function handler(req, res) {
     await agente.pasarACande(c, { aviso: "una respuesta quedó sin salir: ManyChat no la vino a retirar", motivo: "retiro vencido" });
     sinAtender++;
   }
-  for (const c of await sinContestar()) {
-    await agente.pasarACande(c, avisoDe(c, prendido));
-    sinAtender++;
-  }
-
-  // Los toques los redacta la Mac de Cande (salvo cerebro "api"). Si no está contestando, o es de
-  // noche en Argentina, no se reclama ninguno: siguen en la fila y salen en una corrida de después
-  // (los que se pasan de las 24 horas los limpia reclamarToque). Reclamar uno con la Mac dormida lo
-  // perdería: el modelo no contesta y el toque no se reintenta.
+  // Los toques y los reintentos los redacta la Mac de Cande (salvo cerebro "api").
   const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();
   const macViva = latido !== null && latido < MAC_VIVA_SEGUNDOS;
-  if (prendido && aj.toques === true && macViva && horaDeToques(new Date())) {
+  const limite = inicio + (config.maxDuration - 130) * 1000;
+
+  // Un mensaje que el agente no llegó a contestar (casi siempre la Mac sin red): se reintenta
+  // cuando la Mac está, y sale tarde por la API. A Cande pasa solo lo que no tiene arreglo.
+  const red = await atenderSinContestar({
+    filas: await sinContestar(), prendido, macViva,
+    maxMinutos: REINTENTO_MAX_MINUTOS, maxFallos: REINTENTO_MAX_FALLOS,
+    pasar: (c, aviso) => agente.pasarACande(c, aviso),
+    procesar: (id, idLead) => agente.procesar(id, idLead, { tarde: true }),
+    hasta: limite, tope: TOQUES_POR_CORRIDA,
+    registrar: (id, e) => console.error("dm: falló el reintento", colaDe(id), e.message),
+  });
+  sinAtender += red.pasadas;
+  const reintentos = red.reintentos;
+
+  // Toques: si la Mac no está contestando, o es de noche en Argentina, no se reclama ninguno:
+  // siguen en la fila y salen en una corrida de después (los que se pasan de las 24 horas los
+  // limpia reclamarToque). Reclamar uno con la Mac dormida lo perdería: el toque no se reintenta.
+  if (prendido && aj.toques === true && macViva && !red.cayo && horaDeToques(new Date())) {
     // Cada toque puede tardar lo que tarda el modelo (91 segundos como mucho) más el envío: no
     // se arranca uno si no queda ese margen antes de que Vercel corte la función. El margen se
     // cuenta desde que arrancó: la red de arriba puede tardar (una llamada a ManyChat y un aviso
@@ -70,7 +74,7 @@ export default async function handler(req, res) {
     hechos += await correrToques({
       reclamar: reclamarToque,
       procesar: (id) => agente.procesar(id, null, { evento: "seguimiento" }),
-      hasta: inicio + (config.maxDuration - 130) * 1000,
+      hasta: limite,
       tope: TOQUES_POR_CORRIDA,
       registrar: (id, e) => console.error("dm: falló el toque", colaDe(id), e.message),
     });
@@ -82,7 +86,7 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("dm: no se pudo borrar lo viejo", e.message);
   }
-  return res.status(200).json({ ok: true, hechos, sin_atender: sinAtender, ...(prendido ? {} : { motivo: "apagado" }) });
+  return res.status(200).json({ ok: true, hechos, reintentos, sin_atender: sinAtender, ...(prendido ? {} : { motivo: "apagado" }) });
 }
 
 export const config = { maxDuration: 300 };

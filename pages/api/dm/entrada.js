@@ -63,12 +63,15 @@ export default async function handler(req, res) {
   }
 
   waitUntil(
-    // procesar ya le pasa la charla a Cande si algo falla con la traba tomada. Acá llega lo que
-    // falla antes (leer los ajustes o el contacto): la charla sigue siendo del agente, y el cron
-    // (/api/dm/toques) la encuentra sin contestar y se la pasa.
+    // procesar resuelve sus fallas con la traba tomada (reintenta lo transitorio, pasa lo demás).
+    // Acá llega lo que falla antes (leer los ajustes o el contacto, la base caída): la charla sigue
+    // del agente y el cron (/api/dm/toques) la reintenta o se la pasa. El aviso es solo para que
+    // Cande sepa: no le pide contestar, así no le contestan dos.
     agente.procesar(id, idMensaje).catch(async (e) => {
       console.error("dm: falló procesar", colaDe(id), e.message);
-      await avisarDm("DM: el agente falló antes de contestar", { Quién: quien, Motivo: e.message });
+      // Sin el renglón "Quién": así el aviso no ofrece contestar desde Telegram (lib/dm/armado.js,
+      // lib/dm/respuestas.js) y no le contestan dos, ella y el reintento.
+      await avisarDm("DM: el agente falló antes de contestar (lo reintenta solo)", { Lead: nombre || "sin nombre", Motivo: e.message });
     }),
   );
   return res.status(200).json({ ok: true, dueno: "agente" });
