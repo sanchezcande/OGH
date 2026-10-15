@@ -13,6 +13,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { FASES_A_TRAER, contarEmbudo, marcarLeads } from "./crm_embudo.mjs";
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const OGH = join(AQUI, "..");
@@ -39,41 +40,15 @@ async function main() {
            cv_url, estado, creado
     FROM red_devs ORDER BY creado DESC`;
 
-  // Quién de estos llegó a clickear "comprar" en la página de gracias: se cruza por
-  // el evento "enviado" del funnel (mismo sid), que cae a los pocos ms de creado en
-  // red_devs. Son los de más alta intención: van primero en la lista para llamar.
-  const { rows: clicks } = await sql`
-    SELECT DISTINCT ft.sid, ft.creado
-    FROM funnel_eventos ft
-    WHERE ft.fase = 'enviado'
-      AND ft.sid IN (SELECT sid FROM funnel_eventos WHERE fase = 'click_gumroad')`.catch(() => ({ rows: [] }));
-  for (const d of devs) {
-    const creadoMs = new Date(d.creado).getTime();
-    d.clickeo_comprar = clicks.some((c) => Math.abs(new Date(c.creado).getTime() - creadoMs) <= 5000);
-  }
-
-  // Números del embudo, por día (hora Argentina): cuánta gente llegó a cada paso.
-  // Es lo mismo que muestra /api/funnel pero desglosado por fecha, para ver la tendencia.
-  const { rows: embudoDias } = await sql`
-    SELECT to_char(creado AT TIME ZONE 'America/Argentina/Buenos_Aires', 'YYYY-MM-DD') AS dia,
-           count(DISTINCT sid) FILTER (WHERE fase = 'form_visto')    AS vieron,
-           count(DISTINCT sid) FILTER (WHERE fase = 'enviado')       AS enviaron,
-           count(DISTINCT sid) FILTER (WHERE fase = 'gracias_vista') AS video_pagina,
-           count(DISTINCT sid) FILTER (WHERE fase = 'video_play')    AS play,
-           count(DISTINCT sid) FILTER (WHERE fase = 'video_fin')     AS terminaron,
-           count(DISTINCT sid) FILTER (WHERE fase = 'click_gumroad') AS clicks
-    FROM funnel_eventos
-    WHERE creado > NOW() - INTERVAL '21 days'
-    GROUP BY 1 ORDER BY 1 DESC`.catch(() => ({ rows: [] }));
-
-  const { rows: embudoTotal } = await sql`
-    SELECT count(DISTINCT sid) FILTER (WHERE fase = 'form_visto')    AS vieron,
-           count(DISTINCT sid) FILTER (WHERE fase = 'enviado')       AS enviaron,
-           count(DISTINCT sid) FILTER (WHERE fase = 'gracias_vista') AS video_pagina,
-           count(DISTINCT sid) FILTER (WHERE fase = 'video_play')    AS play,
-           count(DISTINCT sid) FILTER (WHERE fase = 'video_fin')     AS terminaron,
-           count(DISTINCT sid) FILTER (WHERE fase = 'click_gumroad') AS clicks
-    FROM funnel_eventos`.catch(() => ({ rows: [{}] }));
+  // Los eventos del embudo, crudos. Quién tocó comprar, qué versión del video le tocó y los
+  // números por día se cuentan en crm_embudo.mjs (ahí está por qué no alcanza con el SQL).
+  // Sin catch: si la consulta falla, mejor no escribir nada que dejar a todos sin "tocó comprar".
+  const { rows: eventos } = await sql`
+    SELECT fase, sid, creado FROM funnel_eventos
+    WHERE fase = ANY(${FASES_A_TRAER}) AND sid IS NOT NULL`;
+  // Los que tocaron comprar son los de más alta intención: van primero en la lista para llamar.
+  marcarLeads(devs, eventos);
+  const embudo = contarEmbudo(eventos);
 
   const { rows: founders } = await sql`
     SELECT id, nombre, email, origen, creado
@@ -81,7 +56,7 @@ async function main() {
 
   await writeFile(join(TRACKER, "crm_devs.json"),
     JSON.stringify({ actualizado: new Date().toISOString(), leads: devs,
-                     embudo: { dias: embudoDias, total: embudoTotal[0] || {} } }, null, 1));
+                     embudo }, null, 1));
   await writeFile(join(TRACKER, "crm_founders.json"),
     JSON.stringify({ actualizado: new Date().toISOString(), leads: founders }, null, 1));
 
