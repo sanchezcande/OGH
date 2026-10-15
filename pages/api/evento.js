@@ -17,6 +17,12 @@ const FASES = new Set([
 // Sin esto, cualquiera podría escribir basura en funnel_eventos.
 const CON_ORIGEN = /^hola_(vista|contrata|dev)_[a-z0-9]{1,16}$/;
 
+// El formulario de /devs hace lo mismo con ?de=: form_visto_cv-dm, form_visto_bienvenida...
+// Hace falta porque el 91% de las visitas al formulario NO pasa por /hola (medido el 15/10:
+// 871 form_visto contra 76 hola_dev en 30 dias), asi que hoy no se sabe que puerta trae los
+// leads. Se acepta el guion ademas de letras y numeros, para nombres como "cv-comentario".
+const CON_ORIGEN_FORM = /^form_visto_[a-z0-9-]{1,24}$/;
+
 // Prueba A/B del video de la página de gracias (12/10/2026): el mismo embudo pero con el sufijo
 // de la versión que le tocó a esa persona, para poder partirlo en dos sin tocar la base.
 // Acotado igual que el de arriba: solo las fases del video y solo _a o _b. La lista vive en
@@ -26,7 +32,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   try {
     const { fase, sid } = req.body || {};
-    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !CON_VERSION.test(fase)) return res.status(400).json({ ok: false });
+    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !CON_ORIGEN_FORM.test(fase) && !CON_VERSION.test(fase)) return res.status(400).json({ ok: false });
     if (hayBase()) await guardarEvento(fase, String(sid || "").slice(0, 40));
   } catch (e) {
     console.error("evento:", e.message);

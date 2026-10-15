@@ -107,7 +107,18 @@ export default function RedDeDevs() {
   const opVista = (c, i) => (en && c.opsEn ? c.opsEn[i] : c.ops[i]);
 
   const [paso, setPaso] = useState(0);
-  React.useEffect(() => { evento("form_visto"); }, []);
+  // Ademas de form_visto, si el link trae ?de= manda form_visto_<de>, para saber que puerta
+  // trajo a la persona (el DM de ManyChat por comentario, por mensaje, la bienvenida, la bio).
+  // Se manda APARTE y no en lugar de form_visto: asi las cuentas de siempre no cambian.
+  // El valor se limpia aca tambien, no solo en la API, para no mandar basura ni pasadas de largo.
+  React.useEffect(() => {
+    evento("form_visto");
+    try {
+      const de = new URLSearchParams(window.location.search).get("de");
+      const limpio = (de || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 24);
+      if (limpio) evento("form_visto_" + limpio);
+    } catch (e) { /* medir nunca rompe la pagina */ }
+  }, []);
   const [f, setF] = useState(inicial);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
