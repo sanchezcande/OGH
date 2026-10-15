@@ -23,7 +23,7 @@ const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano, horaDeToques,
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
-const { correrToques } = await import("../lib/dm/seguimientos.js");
+const { correrToques, decidirSinContestar } = await import("../lib/dm/seguimientos.js");
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
@@ -488,15 +488,48 @@ test("lo que rompe un freno no sale: la charla pasa a Cande con el motivo y con 
   assert.equal(m.contacto.respondido_hasta, m.disparo);
 });
 
-test("si el modelo falla, al lead no le llega nada y Cande se entera", async () => {
+test("si el modelo falla, al lead no le llega nada, la charla sigue del agente y el turno queda abierto para reintentar", async () => {
+  // 16/10: la Mac sin red por unos minutos le pasaba a Cande charlas sanas. Ahora el cron reintenta.
   const { agente, m } = armar({ responde: () => { throw new Error("Anthropic contestó 529"); } });
   const r = await agente.procesar("77", m.disparo);
   assert.equal(r.hecho, "error del modelo");
+  assert.equal(r.reintento, true);
   assert.equal(m.enviados.length, 0);
-  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
   assert.equal(m.salidas[0].estado, "error");
-  assert.match(m.avisos[0].campos.Motivo, /529/);
+  assert.ok(m.contacto.respondido_hasta < m.disparo);
   assert.equal(m.tomado, null);
+});
+
+test("el reintento tarde contesta sin esperar, sale por la API aunque el envío sea por campo y cierra el turno", async () => {
+  let esperas = 0;
+  const { agente, m } = armar({ envio: "campo", ultimoLeadHace: 2, alEsperar: () => { esperas++; } });
+  const r = await agente.procesar("77", m.disparo, { tarde: true });
+  assert.equal(r.hecho, "enviada");
+  assert.equal(esperas, 0);
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(m.salidas.at(-1).estado, "enviada");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.match(m.pedidos[0].turno.contexto, /Contestás tarde: el lead escribió hace 2 horas/);
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["mensaje de prueba"]);
+});
+
+test("un reintento que vuelve a fallar tampoco pasa la charla: el cron decide después", async () => {
+  const { agente, m } = armar({ envio: "campo", responde: () => { throw new Error("la Mac no contestó"); } });
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "error del modelo");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+});
+
+test("qué hace el cron con un mensaje sin atender", () => {
+  const ops = { prendido: true, macViva: true, maxMinutos: 360 };
+  assert.equal(decidirSinContestar({ minutos: 12 }, ops).que, "reintentar");
+  assert.equal(decidirSinContestar({ minutos: 12 }, { ...ops, macViva: false }).que, "esperar");
+  assert.equal(decidirSinContestar({ minutos: "400" }, ops).que, "pasar");
+  assert.match(decidirSinContestar({ minutos: 400 }, ops).aviso, /6 horas/);
+  assert.equal(decidirSinContestar({ minutos: 12 }, { ...ops, prendido: false }).que, "pasar");
+  assert.equal(decidirSinContestar({ minutos: 12, quizas_salio: true }, ops).que, "pasar");
 });
 
 test("cualquier otra falla termina igual: sin prompt cargado, la charla pasa a Cande con aviso", async () => {
