@@ -29,7 +29,14 @@ export const FASES_A_TRAER = [...new Set([
   ...FASES_VIDEO.flatMap((f) => [f, ...VERSIONES.map((v) => `${f}_${v}`)]),
 ])];
 
-const DIA_AR = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+const PARTES_AR = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Argentina/Buenos_Aires", year: "numeric", month: "2-digit", day: "2-digit",
+});
+/** "2026-10-12": el día en hora Argentina, armado por partes para no depender del formato del idioma. */
+const diaAR = (fecha) => {
+  const p = Object.fromEntries(PARTES_AR.formatToParts(new Date(fecha)).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+};
 const ms = (fecha) => new Date(fecha).getTime();
 
 /** Personas únicas (sid) por columna, en total y por versión. */
@@ -60,7 +67,7 @@ export function contarEmbudo(eventos, { ahora = Date.now(), dias = 21 } = {}) {
   const porDia = new Map();
   for (const e of eventos) {
     if (ms(e.creado) <= desde) continue;
-    const dia = DIA_AR.format(new Date(e.creado));
+    const dia = diaAR(e.creado);
     if (!porDia.has(dia)) porDia.set(dia, []);
     porDia.get(dia).push(e);
   }
