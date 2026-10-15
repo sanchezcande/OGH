@@ -36,3 +36,12 @@ test("una puerta nueva mal escrita se ve como otro, no como silencio", () => {
   // El caso que justifica el fallback: alguien pone ?de=linkedin y nadie lo agrego a la lista.
   assert.equal(normalizarOrigen("linkedin"), OTRO);
 });
+
+test("la bifurcacion /hola manda la puerta, si no bio da 0 para siempre", async () => {
+  const fs = await import("node:fs/promises");
+  const src = await fs.readFile(new URL("../pages/hola.jsx", import.meta.url), "utf8");
+  const m = /dev:\s*"([^"]+)"/.exec(src);
+  assert.ok(m, "no encontre el destino dev en pages/hola.jsx");
+  const de = new URL(m[1], "https://x.test").searchParams.get("de");
+  assert.equal(normalizarOrigen(de), "bio");
+});
