@@ -23,7 +23,11 @@ import { evento } from "../lib/embudo";
 
 const DESTINOS = {
   contrata: "https://strategy.opengatehub.com",
-  dev: "/devs",
+  // El ?de=bio es lo que hace que esta puerta se cuente del lado del formulario. Sin esto,
+  // la unica puerta que NO pasa por ManyChat seria la unica que no se registra, y el numero
+  // iba a dar 0 para siempre (lo marco la revision del PR 60). La red de donde vino ya queda
+  // registrada aca arriba con hola_vista_ig / hola_dev_ig, asi que aca alcanza con "bio".
+  dev: "/devs?de=bio",
 };
 
 // Solo letras, números y guiones, hasta 16 (lo que acepta /api/evento).
