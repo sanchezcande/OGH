@@ -24,7 +24,7 @@ import {
 const TOQUES_POR_CORRIDA = 10;
 const MAC_VIVA_SEGUNDOS = 180; // la Mac pregunta cada pocos segundos y el latido se guarda una vez por minuto
 const REINTENTO_MAX_MINUTOS = 6 * 60; // un mensaje que el agente no pudo contestar en 6 horas pasa a Cande
-const REINTENTO_MAX_FALLOS = 4; // o tras 4 intentos fallidos (el primero y tres reintentos)
+const REINTENTO_MAX_FALLOS = 3; // o tras 3 reintentos del cron que fallaron
 
 export default async function handler(req, res) {
   const inicio = Date.now();

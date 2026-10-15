@@ -556,6 +556,59 @@ test("el reintento tarde no contesta si Cande ya le contestó después de su men
   assert.equal(m.contacto.respondido_hasta, m.disparo);
 });
 
+test("si el lead le escribió después de la respuesta de Cande, el reintento contesta solo eso", async () => {
+  const { agente, m } = armar({ envio: "campo", ultimoLeadHace: 1 });
+  m.mensajes.push({ id: 3, quien: "cande", texto: "una respuesta de Cande" });
+  m.mensajes.push({ id: 4, quien: "lead", texto: "otro mensaje del lead" });
+  const r = await agente.procesar("77", 4, { tarde: true });
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["otro mensaje del lead"]);
+  assert.equal(m.contacto.respondido_hasta, 4);
+});
+
+test("los fallos del reintento quedan marcados como reintento; los de un mensaje, como error", async () => {
+  const { agente, m } = armar({ envio: "campo", responde: () => { throw transitoria("la Mac no contestó"); } });
+  await agente.procesar("77", m.disparo);
+  await agente.procesar("77", m.disparo, { tarde: true });
+  assert.deepEqual(m.salidas.map((x) => x.accion), ["error", "reintento"]);
+});
+
+test("después de una respuesta tarde, el seguimiento nunca sale antes de 4 horas", async () => {
+  const { agente, m } = armar({
+    envio: "campo", toques: true, ultimoLeadHace: 5.6,
+    responde: () => salida(["Respuesta de prueba?"], { seguimiento_en_horas: 6, estado: { ...estadoDev, link_formulario_enviado: true } }),
+  });
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "enviada");
+  assert.ok(m.proximo === null || m.proximo.getTime() >= AHORA.getTime() + 4 * HORA);
+});
+
+test("si el reintento falla sin arreglo pero el lead ya escribió de nuevo, no pasa la charla: es de la corrida nueva", async () => {
+  const generando = diferida();
+  const { agente, m } = armar({ envio: "campo", responde: () => generando.promesa });
+  const corrida = agente.procesar("77", m.disparo, { tarde: true });
+  await hasta(() => m.pedidos.length === 1);
+  m.entraLead("hola?");
+  generando.promesa.catch(() => {});
+  const falla = new Error("el modelo no quiso contestar este turno");
+  generando.resolver(Promise.reject(falla));
+  const r = await corrida;
+  assert.equal(r.hecho, "error del modelo");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.salidas.at(-1).accion, "reintento");
+});
+
+test("si Cande contesta mientras se genera el reintento, no sale", async () => {
+  const generando = diferida();
+  const { agente, m } = armar({ envio: "campo", responde: () => generando.promesa });
+  const corrida = agente.procesar("77", m.disparo, { tarde: true });
+  await hasta(() => m.pedidos.length === 1);
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" });
+  generando.resolver(salida(["Respuesta vieja?"]));
+  assert.equal((await corrida).hecho, "la charla cambió durante la generación");
+  assert.equal(m.enviados.length, 0);
+});
+
 test("los intentos fallidos no cuentan para el tope del día", async () => {
   let falla = true;
   const { agente, m } = armar({ envio: "campo", tope: 2, responde: () => { if (falla) throw transitoria("la Mac no contestó"); return salida(["Respuesta de prueba?"]); } });
