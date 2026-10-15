@@ -352,7 +352,7 @@ function armar({
       if (m.contacto || m.altasHoy >= tope) return null;
       m.contacto = {
         id, nombre, dueno: "agente", toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: contexto || null,
-        estado: {}, ultimo_lead: ahora,
+        estado: {}, ultimo_lead: ahora, alta_en: ahora, alta_avisada: false,
       };
       if (altaAjena) return null; // la dio de alta el mensaje de al lado: a este pedido la base le dice que no fue él
       m.altasHoy++;
@@ -381,6 +381,8 @@ function armar({
       m.contacto.toques++; m.contacto.proximo_toque = null;
     },
     cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
+    marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
+    borrarCharla: async () => { m.contacto = { ...m.contacto, dueno: "cande", nombre: null, estado: {} }; m.mensajes = []; m.salidas = []; m.borrada = true; },
   };
   const pedir = async (p) => {
     m.pedidos.push(p);
@@ -950,7 +952,7 @@ test("en una charla larga los frenos miran todo lo que escribió el lead, no sol
 
 /* ---------- altas: quien entra solo por la entrada ---------- */
 
-test("alguien nuevo entra solo con las altas prendidas: queda del agente con su contexto y Cande se entera", async () => {
+test("alguien nuevo entra solo con las altas prendidas: queda del agente, y si es un lead Cande se entera en su primer turno", async () => {
   const { agente, m } = armar({
     sinContacto: true, altas: true, contextoAlta: "contexto de alta de prueba", responde: () => salida([AVISO, "Pregunta de prueba?"]),
   });
@@ -959,15 +961,27 @@ test("alguien nuevo entra solo con las altas prendidas: queda del agente con su 
   assert.equal(m.contacto.dueno, "agente");
   assert.equal(m.contacto.nombre, "Nuevo de prueba");
   assert.deepEqual(m.mensajes, [{ id: 1, quien: "lead", texto: "hola de prueba" }]);
-  assert.equal(m.avisos.length, 1);
-  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo al agente");
-  assert.equal(m.avisos[0].campos.Quién, "Nuevo de prueba (88)");
-  assert.equal(m.avisos[0].campos["Van en 24 horas"], "1 de 25");
+  assert.deepEqual(m.avisos, []); // todavía no se sabe si es un lead o una charla personal
   // De ahí en más es una charla como cualquiera: el modelo recibe el contexto de alta y, como
   // todavía nadie le avisó que es automático, la primera respuesta tiene que decirlo.
   assert.equal((await agente.procesar("88", id)).hecho, "enviada");
   assert.equal(m.pedidos[0].turno.contexto, "contexto de alta de prueba");
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["hola de prueba"]);
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo al agente");
+  assert.equal(m.avisos[0].campos.Quién, "Nuevo de prueba (88)");
+  assert.equal(m.contacto.alta_avisada, true);
+});
+
+test("una charla personal que entra sola no le llega a Cande: se borra y queda de ella, sin aviso", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, responde: () => ({ ...salida([]), accion: "callar", estado: { ...salida([]).estado, quien: "no_dev", etapa: "cerrada" } }) });
+  const id = await agente.recibir("88", "mensaje personal de prueba", "Amigo de prueba");
+  assert.equal((await agente.procesar("88", id)).hecho, "charla personal: queda de Cande, sin aviso");
+  assert.equal(m.borrada, true);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.deepEqual(m.mensajes, []);
+  assert.deepEqual(m.avisos, []);
+  assert.deepEqual(m.enviados, []);
 });
 
 test("con las altas apagadas, como vienen de fábrica, alguien nuevo no entra ni queda nada guardado", async () => {
@@ -992,14 +1006,12 @@ test("con el agente apagado no entra nadie, aunque las altas estén prendidas", 
   assert.deepEqual(m.avisos, []);
 });
 
-test("si el aviso a Cande no sale, no hay alta: no queda del agente ni se guarda el mensaje", async () => {
-  const { agente, m } = armar({ sinContacto: true, altas: true, avisoSale: false });
-  assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), null);
-  assert.equal(m.contacto, null);
-  assert.deepEqual(m.mensajes, []);
-  assert.equal(m.altasHoy, 0);
-  assert.equal(m.salidas.length, 1); // el aviso que no salió queda anotado
-  assert.equal(m.salidas[0].estado, "aviso_fallido");
+test("si el aviso de un lead nuevo no sale, el lead igual se atiende y el aviso fallido queda anotado", async () => {
+  const { agente, m } = armar({ sinContacto: true, altas: true, avisoSale: false, responde: () => salida([AVISO, "Pregunta de prueba?"]) });
+  const id = await agente.recibir("88", "hola de prueba", "Nuevo de prueba");
+  assert.equal(id, 1);
+  assert.equal((await agente.procesar("88", id)).hecho, "enviada");
+  assert.ok(m.salidas.some((x) => x.estado === "aviso_fallido"));
 });
 
 test("una charla de Cande no vuelve sola al agente aunque las altas estén prendidas", async () => {
@@ -1023,8 +1035,9 @@ test("el tope de altas: la que lo llena le avisa a Cande y el siguiente no entra
   const { agente, m } = armar({ sinContacto: true, altas: true, topeAltas: 1 });
   assert.equal(await agente.recibir("88", "hola de prueba", "Nuevo de prueba"), 1);
   assert.equal(m.avisos.length, 1);
-  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo y se llenó el tope de altas");
-  assert.match(m.avisos[0].campos.Aviso, /filtrando por la etiqueta/);
+  assert.equal(m.avisos[0].titulo, "DM: se llenó el tope de altas");
+  assert.equal(m.avisos[0].campos.Quién, undefined); // el aviso del tope no dice quién es: puede ser una charla personal
+  assert.match(m.avisos[0].campos.Aviso, /filtrando bien/);
   Object.assign(m, { contacto: null, mensajes: [] }); // llega otro que tampoco pasó nunca por la base
   assert.equal(await agente.recibir("89", "hola de prueba", "Otro de prueba"), null);
   assert.equal(m.contacto, null);
