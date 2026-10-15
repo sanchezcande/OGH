@@ -944,11 +944,72 @@ test("si otra corrida tiene la charla cuando termina de generarse el toque, el t
   assert.equal(m.tomado, "otra corrida");
 });
 
-test("los toques salen solo de 9 a 21 de Argentina", () => {
+test("los toques salen de 9 a 21 de Argentina, con una vuelta del cron de margen", () => {
   assert.equal(horaDeToques(new Date("2026-10-12T12:00:00Z")), true); // 9 en Argentina
   assert.equal(horaDeToques(new Date("2026-10-12T23:59:00Z")), true); // 20:59
-  assert.equal(horaDeToques(new Date("2026-10-13T00:00:00Z")), false); // 21
+  assert.equal(horaDeToques(new Date("2026-10-13T00:05:00Z")), true); // 21:05: el agendado a las 20:55
+  assert.equal(horaDeToques(new Date("2026-10-13T00:10:00Z")), false); // 21:10
   assert.equal(horaDeToques(new Date("2026-10-12T11:59:00Z")), false); // 8:59
+});
+
+test("un toque que llega al tope del día no sale y la charla sigue del agente", async () => {
+  const { agente, m } = armarToque({ tope: 0 });
+  assert.equal((await toque(agente)).hecho, "tope del día");
+  sigueDelAgente(m);
+  assert.equal(m.pedidos.length, 0);
+});
+
+test("la corrida de un mensaje del lead tiene la traba mientras se genera", async () => {
+  const generando = diferida();
+  const { agente, m } = armar({ responde: () => generando.promesa });
+  const corrida = agente.procesar("77", m.disparo);
+  await hasta(() => m.pedidos.length === 1);
+  assert.notEqual(m.tomado, null);
+  generando.resolver(salida(["Respuesta de prueba?"]));
+  assert.equal((await corrida).hecho, "enviada");
+  assert.equal(m.tomado, null);
+});
+
+test("si Cande contesta mientras se genera el toque, el toque no sale ni agenda otro", async () => {
+  const generando = diferida();
+  const { agente, m } = armarToque({ envio: "campo", responde: () => generando.promesa });
+  const corrida = toque(agente);
+  await hasta(() => m.pedidos.length === 1);
+  // Lo que hacen anotarDeCande y anotarAMano: queda su mensaje y se cancela el toque agendado.
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" });
+  m.contacto.proximo_toque = null;
+  generando.resolver(salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 20, estado: { ...estadoDev, link_formulario_enviado: true } }));
+  assert.equal((await corrida).hecho, "la charla cambió durante la generación");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.proximo_toque, null);
+  assert.equal(m.contacto.toques, 0);
+});
+
+test("un toque no sale si hay un mensaje del lead sin atender", async () => {
+  const { agente, m } = armarToque();
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "lead", texto: "otro mensaje de prueba" });
+  assert.equal((await toque(agente)).hecho, "hay un mensaje del lead sin atender");
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+});
+
+test("el segundo toque sale como mínimo 4 horas después del primero", async () => {
+  // El lead escribió hace 6 horas y el modelo pide el próximo a las 7 de su mensaje: sería en una
+  // hora, pegado al toque que acaba de salir. Se corre a 4 horas de ahora.
+  const { agente, m } = armarToque({
+    responde: () => salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 7, estado: { ...estadoDev, link_formulario_enviado: true } }),
+  });
+  assert.equal((await toque(agente)).hecho, "enviada");
+  assert.equal(m.proximo.getTime(), AHORA.getTime() + 4 * HORA);
+});
+
+test("proximoToque con noAntesDe corre la hora hacia adelante y respeta la noche y las 24 horas", () => {
+  const ultimoLead = new Date("2026-10-12T12:00:00Z"); // 9 en Argentina
+  const ahora = new Date("2026-10-12T19:00:00Z"); // 16
+  const base = { ahora, ultimoLead, horas: 8, toquesHechos: 1, maxToques: 2 };
+  assert.equal(proximoToque({ ...base, noAntesDe: new Date("2026-10-12T23:00:00Z") }).toISOString(), "2026-10-12T23:00:00.000Z");
+  // Cae a las 22 de Argentina: pasaría a las 9 del otro día, 24 horas después del lead. No sale.
+  assert.equal(proximoToque({ ...base, noAntesDe: new Date("2026-10-13T01:00:00Z") }), null);
+  assert.equal(proximoToque({ ...base, noAntesDe: null }).toISOString(), "2026-10-12T20:00:00.000Z");
 });
 
 test("un toque a quien no busca, dijo que no o frenó por plata se cancela sin pedirle nada al modelo", async () => {

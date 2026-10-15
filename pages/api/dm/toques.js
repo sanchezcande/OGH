@@ -71,8 +71,11 @@ export default async function handler(req, res) {
       const id = await reclamarToque();
       if (!id) break;
       try {
-        await agente.procesar(id, null, { evento: "seguimiento" });
+        const r = await agente.procesar(id, null, { evento: "seguimiento" });
         hechos++;
+        // Si el modelo no contestó (la Mac se durmió en el medio, o su Claude falla), no se reclaman
+        // más en esta corrida: se perderían igual. Siguen en la fila para la próxima.
+        if (r?.hecho === "error del modelo") break;
       } catch (e) {
         console.error("dm: falló el toque", colaDe(id), e.message);
       }
