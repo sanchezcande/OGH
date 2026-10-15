@@ -16,6 +16,7 @@
 import { agente, colaDe } from "../../../lib/dm/armado";
 import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
 import { horaDeToques } from "../../../lib/dm/frenos";
+import { correrToques } from "../../../lib/dm/seguimientos";
 import {
   ajustes, borrarViejas, hayBase, reclamarToque, sinContestar, tablas, vencerPendientes,
 } from "../../../lib/dm/base";
@@ -66,20 +67,13 @@ export default async function handler(req, res) {
     // se arranca uno si no queda ese margen antes de que Vercel corte la función. El margen se
     // cuenta desde que arrancó: la red de arriba puede tardar (una llamada a ManyChat y un aviso
     // por charla).
-    const limite = inicio + (config.maxDuration - 130) * 1000;
-    for (let n = 0; n < TOQUES_POR_CORRIDA && Date.now() < limite; n++) {
-      const id = await reclamarToque();
-      if (!id) break;
-      try {
-        const r = await agente.procesar(id, null, { evento: "seguimiento" });
-        hechos++;
-        // Si el modelo no contestó (la Mac se durmió en el medio, o su Claude falla), no se reclaman
-        // más en esta corrida: se perderían igual. Siguen en la fila para la próxima.
-        if (r?.hecho === "error del modelo") break;
-      } catch (e) {
-        console.error("dm: falló el toque", colaDe(id), e.message);
-      }
-    }
+    hechos += await correrToques({
+      reclamar: reclamarToque,
+      procesar: (id) => agente.procesar(id, null, { evento: "seguimiento" }),
+      hasta: inicio + (config.maxDuration - 130) * 1000,
+      tope: TOQUES_POR_CORRIDA,
+      registrar: (id, e) => console.error("dm: falló el toque", colaDe(id), e.message),
+    });
   }
 
   try {

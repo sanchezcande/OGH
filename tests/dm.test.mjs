@@ -23,6 +23,7 @@ const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano, horaDeToques,
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
+const { correrToques } = await import("../lib/dm/seguimientos.js");
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
@@ -983,6 +984,58 @@ test("si Cande contesta mientras se genera el toque, el toque no sale ni agenda 
   assert.equal(m.enviados.length, 0);
   assert.equal(m.contacto.proximo_toque, null);
   assert.equal(m.contacto.toques, 0);
+});
+
+/** Lo que pasa en la lectura número `cual` de los ajustes: la última es la mirada final antes de mandar. */
+const enLaLectura = (m, cual, hacer) => {
+  const aj = m.ajustes;
+  let lecturas = 0;
+  Object.defineProperty(m, "ajustes", { get() { if (++lecturas === cual) hacer(); return aj; } });
+};
+
+test("si Cande contesta justo antes de que salga el toque, en la mirada final, el toque no sale", async () => {
+  const { agente, m } = armarToque({ envio: "campo" });
+  // Un toque lee los ajustes al arrancar y en la mirada final.
+  enLaLectura(m, 2, () => m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" }));
+  assert.equal((await toque(agente)).hecho, "descartada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.toques, 0);
+  assert.equal(m.proximo, undefined);
+});
+
+test("a la respuesta de un mensaje no la frena un mensaje fijo que entra en la mirada final", async () => {
+  const { agente, m } = armar();
+  // La corrida de un mensaje lee los ajustes al arrancar, después de la espera y en la mirada final.
+  enLaLectura(m, 3, () => m.mensajes.push({ id: m.mensajes.length + 1, quien: "automatico", texto: "un mensaje fijo" }));
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+});
+
+test("el cron deja de reclamar toques en cuanto el modelo no contesta", async () => {
+  const fila = ["1", "2", "3"];
+  const reclamados = [];
+  const hechos = await correrToques({
+    reclamar: async () => { const id = fila.shift() ?? null; if (id) reclamados.push(id); return id; },
+    procesar: async () => ({ hecho: "error del modelo" }),
+    hasta: Infinity, tope: 10,
+  });
+  assert.equal(hechos, 1);
+  assert.deepEqual(reclamados, ["1"]);
+  assert.deepEqual(fila, ["2", "3"]);
+});
+
+test("el cron reclama toques hasta vaciar la fila, el tope o la hora límite, y sigue si uno tira", async () => {
+  const correr = (fila, extra = {}) => correrToques({
+    reclamar: async () => fila.shift() ?? null,
+    procesar: async (id) => { if (id === "tira") throw new Error("falló"); return { hecho: "enviada" }; },
+    hasta: Infinity, tope: 10, ...extra,
+  });
+  assert.equal(await correr(["1", "2"]), 2);
+  assert.equal(await correr(["1", "2", "3"], { tope: 2 }), 2);
+  assert.equal(await correr(["1", "2"], { hasta: 0 }), 0);
+  const registrados = [];
+  assert.equal(await correr(["tira", "2"], { registrar: (id) => registrados.push(id) }), 1);
+  assert.deepEqual(registrados, ["tira"]);
 });
 
 test("un toque no sale si hay un mensaje del lead sin atender", async () => {
