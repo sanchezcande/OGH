@@ -4,7 +4,7 @@
 //      no vino a retirar pasan a Cande. Las charlas del agente con un mensaje sin atender (casi
 //      siempre la Mac sin red cuando escribió el lead) se reintentan cuando la Mac contesta, y la
 //      respuesta sale tarde por la API; pasan a Cande solo si el agente está apagado, si una
-//      respuesta pudo haber salido o si pasaron 6 horas sin poder contestar (decidirSinContestar).
+//      respuesta pudo haber salido, tras 3 reintentos o si pasó una hora sin poder contestar.
 //   2. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
 //      Mac está contestando y es de día en Argentina (de 9 a 21).
 //      Cada toque vencido se reclama de a uno y pasa por el agente con el evento "seguimiento":
@@ -23,7 +23,7 @@ import {
 
 const TOQUES_POR_CORRIDA = 10;
 const MAC_VIVA_SEGUNDOS = 180; // la Mac pregunta cada pocos segundos y el latido se guarda una vez por minuto
-const REINTENTO_MAX_MINUTOS = 6 * 60; // un mensaje que el agente no pudo contestar en 6 horas pasa a Cande
+const REINTENTO_MAX_MINUTOS = 60; // un mensaje que el agente no pudo contestar en una hora pasa a Cande
 const REINTENTO_MAX_FALLOS = 3; // o tras 3 reintentos del cron que fallaron
 
 export default async function handler(req, res) {

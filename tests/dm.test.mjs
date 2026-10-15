@@ -548,22 +548,22 @@ test("el reintento tarde no tiene la traba mientras se genera: el mensaje nuevo 
   assert.equal(m.enviados.length, 0);
 });
 
-test("el reintento tarde no contesta si Cande ya le contestó después de su mensaje", async () => {
+test("si Cande escribió en la charla mientras el agente no podía, el reintento no contesta encima: se la pasa", async () => {
   const { agente, m } = armar({ envio: "campo" });
   m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" });
-  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "ya le contestaron");
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "pasada a Cande");
   assert.equal(m.pedidos.length + m.enviados.length, 0);
-  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+  assert.match(m.avisos[0].campos["Lo último que dijo"], /mensaje de prueba/);
 });
 
-test("si el lead le escribió después de la respuesta de Cande, el reintento contesta solo eso", async () => {
-  const { agente, m } = armar({ envio: "campo", ultimoLeadHace: 1 });
-  m.mensajes.push({ id: 3, quien: "cande", texto: "una respuesta de Cande" });
-  m.mensajes.push({ id: 4, quien: "lead", texto: "otro mensaje del lead" });
-  const r = await agente.procesar("77", 4, { tarde: true });
+test("un mensaje del agente después del mensaje sin atender no lo da por contestado (el orden de los ids no dice eso)", async () => {
+  const { agente, m } = armar({ envio: "campo" });
+  m.mensajes.push({ id: 3, quien: "agente", texto: "una respuesta anotada tarde" });
+  const r = await agente.procesar("77", m.disparo, { tarde: true });
   assert.equal(r.hecho, "enviada");
-  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["otro mensaje del lead"]);
-  assert.equal(m.contacto.respondido_hasta, 4);
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["mensaje de prueba"]);
 });
 
 test("los fallos del reintento quedan marcados como reintento; los de un mensaje, como error", async () => {
@@ -631,6 +631,7 @@ test("qué hace el cron con un mensaje sin atender", () => {
   assert.equal(decidirSinContestar({ minutos: 12, fallos: 3 }, { ...ops, maxFallos: 4 }).que, "reintentar");
   assert.equal(decidirSinContestar({ minutos: 360 }, ops).que, "pasar");
   assert.equal(decidirSinContestar({ minutos: 359.9 }, ops).que, "reintentar");
+  assert.match(decidirSinContestar({ minutos: 61 }, { ...ops, maxMinutos: 60 }).aviso, /una hora/);
 });
 
 test("la red del cron pasa lo que corresponde y reintenta lo demás tarde, con el mensaje de cada uno", async () => {
@@ -1736,6 +1737,15 @@ test("cerebro local: una salida que no cumple el formato o un error de la Mac no
   await assert.rejects(mala.pedirLocal({ turno: {} }), /no cumple el formato: accion/);
   const rota = cerebroDePrueba({ resultado: { error: "Claude no pudo" } });
   await assert.rejects(rota.pedirLocal({ turno: {} }), /el Claude de la Mac falló: Claude no pudo/);
+});
+
+test("cerebro local: qué falla se reintenta (la Mac no contestó o tardó) y cuál pasa a Cande (sin uso, sin JSON)", async () => {
+  const transitorio = async (p) => { try { await p; } catch (e) { return e.transitorio; } return "no falló"; };
+  assert.equal(await transitorio(cerebroDePrueba({ nunca: true }).pedirLocal({ turno: {} })), true);
+  assert.equal(await transitorio(cerebroDePrueba({ resultado: { error: "Claude tardó más de 70 segundos" } }).pedirLocal({ turno: {} })), true);
+  assert.equal(await transitorio(cerebroDePrueba({ resultado: { error: "Claude no pudo: límite de uso" } }).pedirLocal({ turno: {} })), false);
+  assert.equal(await transitorio(cerebroDePrueba({ resultado: { error: "Claude no devolvió JSON: algo" } }).pedirLocal({ turno: {} })), false);
+  assert.equal(await transitorio(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), false);
 });
 
 /* ---------- Cande contesta desde el bot del agente ---------- */
