@@ -513,7 +513,7 @@ test("el reintento tarde contesta sin esperar, sale por la API aunque el envío 
   assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
   assert.equal(m.salidas.at(-1).estado, "enviada");
   assert.equal(m.contacto.respondido_hasta, m.disparo);
-  assert.match(m.pedidos[0].turno.contexto, /Contestás tarde: el lead escribió hace 2 horas/);
+  assert.match(m.pedidos[0].turno.contexto, /Contestás tarde: el lead escribió hace 120 minutos.*Sorry la demora/);
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["mensaje de prueba"]);
 });
 
@@ -662,7 +662,7 @@ test("la red del cron: si el modelo no está, corta y avisa que cayó; si la fal
   assert.deepEqual(llamados, ["1"]);
   assert.equal(caida.cayo, true);
   llamados.length = 0;
-  const una = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return id === "1" ? { hecho: "error del modelo", transitorio: false } : { hecho: "enviada" }; } });
+  const una = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return id === "1" ? { hecho: "error del modelo", transitorio: false, general: false } : { hecho: "enviada" }; } });
   assert.deepEqual(llamados, ["1", "2"]);
   assert.equal(una.cayo, false);
   const sinMac = await atenderSinContestar({ ...base, macViva: false, procesar: async () => { throw new Error("no tenía que llamar"); } });
@@ -1192,6 +1192,24 @@ test("el cron deja de reclamar toques en cuanto el modelo no contesta", async ()
   assert.equal(hechos, 1);
   assert.deepEqual(reclamados, ["1"]);
   assert.deepEqual(fila, ["2", "3"]);
+});
+
+test("el cron corta si el modelo falla para todos (la Mac sin uso) y sigue si la falla fue de una charla", async () => {
+  const correr = async (r) => {
+    const fila = ["1", "2", "3"];
+    await correrToques({ reclamar: async () => fila.shift() ?? null, procesar: async () => r, hasta: Infinity, tope: 10 });
+    return fila.length;
+  };
+  assert.equal(await correr({ hecho: "error del modelo", transitorio: false, general: true }), 2);
+  assert.equal(await correr({ hecho: "error del modelo", transitorio: false, general: false }), 0);
+});
+
+test("un toque que falla porque la Mac se quedó sin uso avisa que es general: el cron no sigue gastando toques", async () => {
+  const sinUso = Object.assign(new Error("el Claude de la Mac falló: Claude no pudo: límite de uso"), { transitorio: false, general: true });
+  const { agente } = armarToque({ responde: () => { throw sinUso; } });
+  const r = await toque(agente);
+  assert.equal(r.hecho, "error del modelo");
+  assert.equal(r.general, true);
 });
 
 test("el cron reclama toques hasta vaciar la fila, el tope o la hora límite, y sigue si uno tira", async () => {
@@ -1746,6 +1764,10 @@ test("cerebro local: qué falla se reintenta (la Mac no contestó o tardó) y cu
   assert.equal(await transitorio(cerebroDePrueba({ resultado: { error: "Claude no pudo: límite de uso" } }).pedirLocal({ turno: {} })), false);
   assert.equal(await transitorio(cerebroDePrueba({ resultado: { error: "Claude no devolvió JSON: algo" } }).pedirLocal({ turno: {} })), false);
   assert.equal(await transitorio(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), false);
+  const general = async (p) => { try { await p; } catch (e) { return e.general; } return "no falló"; };
+  assert.equal(await general(cerebroDePrueba({ resultado: { error: "Claude no pudo: límite de uso" } }).pedirLocal({ turno: {} })), true);
+  assert.equal(await general(cerebroDePrueba({ nunca: true }).pedirLocal({ turno: {} })), true);
+  assert.equal(await general(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), false);
 });
 
 /* ---------- Cande contesta desde el bot del agente ---------- */
