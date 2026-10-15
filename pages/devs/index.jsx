@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { evento } from "../../lib/embudo";
+import { normalizarOrigen } from "../../lib/origenForm";
 
 // Red de devs de OpenGateHub — versión corta en PASOS.
 // Decisiones (Cande, sept 2026):
@@ -110,13 +111,12 @@ export default function RedDeDevs() {
   // Ademas de form_visto, si el link trae ?de= manda form_visto_<de>, para saber que puerta
   // trajo a la persona (el DM de ManyChat por comentario, por mensaje, la bienvenida, la bio).
   // Se manda APARTE y no en lugar de form_visto: asi las cuentas de siempre no cambian.
-  // El valor se limpia aca tambien, no solo en la API, para no mandar basura ni pasadas de largo.
+  // La puerta que no este en la lista entra como "otro", no se pierde (ver lib/origenForm.js).
   React.useEffect(() => {
     evento("form_visto");
     try {
-      const de = new URLSearchParams(window.location.search).get("de");
-      const limpio = (de || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 24);
-      if (limpio) evento("form_visto_" + limpio);
+      const de = normalizarOrigen(new URLSearchParams(window.location.search).get("de"));
+      if (de) evento("form_visto_" + de);
     } catch (e) { /* medir nunca rompe la pagina */ }
   }, []);
   const [f, setF] = useState(inicial);
