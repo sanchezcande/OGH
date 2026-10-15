@@ -15,7 +15,8 @@
 //                                                  tiene que estar adentro); con quitar: true vuelven al chat de siempre
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
-//   { accion: "aviso", texto }                     → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
+//   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
+//                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
 //                                                  con quitar: true se desconecta
 //
@@ -195,6 +196,14 @@ export default async function handler(req, res) {
   if (b.accion === "aviso") {
     const texto = String(b.texto || "").trim().slice(0, TOPE_AVISO);
     if (!texto) return res.status(400).json({ error: "falta el texto" });
+    // Con contacto, el aviso es de una charla: lleva su renglón Quién y Cande lo puede responder desde el bot.
+    if (id) {
+      const c = await contacto(id);
+      if (!c) return res.status(404).json({ error: "ese contacto no está en la base del agente" });
+      const nombre = String(c.nombre || "sin nombre").replace(/\s+/g, " ");
+      const llego = await avisarDm("DM: charla para mirar", { Quién: `${nombre} (${id})`, Aviso: texto });
+      return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
+    }
     const llego = await avisarDm("DM: repaso de las charlas", { Repaso: texto });
     return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
   }
