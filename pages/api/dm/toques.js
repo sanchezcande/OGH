@@ -16,7 +16,7 @@
 import { agente, colaDe } from "../../../lib/dm/armado";
 import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
 import { horaDeToques } from "../../../lib/dm/frenos";
-import { correrToques, decidirSinContestar } from "../../../lib/dm/seguimientos";
+import { atenderSinContestar, correrToques } from "../../../lib/dm/seguimientos";
 import {
   ajustes, borrarViejas, hayBase, reclamarToque, sinContestar, tablas, vencerPendientes,
 } from "../../../lib/dm/base";
@@ -24,6 +24,7 @@ import {
 const TOQUES_POR_CORRIDA = 10;
 const MAC_VIVA_SEGUNDOS = 180; // la Mac pregunta cada pocos segundos y el latido se guarda una vez por minuto
 const REINTENTO_MAX_MINUTOS = 6 * 60; // un mensaje que el agente no pudo contestar en 6 horas pasa a Cande
+const REINTENTO_MAX_FALLOS = 4; // o tras 4 intentos fallidos (el primero y tres reintentos)
 
 export default async function handler(req, res) {
   const inicio = Date.now();
@@ -51,30 +52,21 @@ export default async function handler(req, res) {
 
   // Un mensaje que el agente no llegó a contestar (casi siempre la Mac sin red): se reintenta
   // cuando la Mac está, y sale tarde por la API. A Cande pasa solo lo que no tiene arreglo.
-  const aReintentar = [];
-  const idLead = new Map();
-  for (const c of await sinContestar()) {
-    const d = decidirSinContestar(c, { prendido, macViva, maxMinutos: REINTENTO_MAX_MINUTOS });
-    if (d.que === "pasar") {
-      await agente.pasarACande(c, { aviso: d.aviso, motivo: d.motivo });
-      sinAtender++;
-    } else if (d.que === "reintentar") {
-      aReintentar.push(c);
-      idLead.set(String(c.id), Number(c.ultimo_id_lead));
-    }
-  }
-  const reintentos = await correrToques({
-    reclamar: async () => aReintentar.shift()?.id ?? null,
-    procesar: (id) => agente.procesar(id, idLead.get(String(id)), { tarde: true }),
-    hasta: limite,
-    tope: TOQUES_POR_CORRIDA,
+  const red = await atenderSinContestar({
+    filas: await sinContestar(), prendido, macViva,
+    maxMinutos: REINTENTO_MAX_MINUTOS, maxFallos: REINTENTO_MAX_FALLOS,
+    pasar: (c, aviso) => agente.pasarACande(c, aviso),
+    procesar: (id, idLead) => agente.procesar(id, idLead, { tarde: true }),
+    hasta: limite, tope: TOQUES_POR_CORRIDA,
     registrar: (id, e) => console.error("dm: falló el reintento", colaDe(id), e.message),
   });
+  sinAtender += red.pasadas;
+  const reintentos = red.reintentos;
 
   // Toques: si la Mac no está contestando, o es de noche en Argentina, no se reclama ninguno:
   // siguen en la fila y salen en una corrida de después (los que se pasan de las 24 horas los
   // limpia reclamarToque). Reclamar uno con la Mac dormida lo perdería: el toque no se reintenta.
-  if (prendido && aj.toques === true && macViva && horaDeToques(new Date())) {
+  if (prendido && aj.toques === true && macViva && !red.cayo && horaDeToques(new Date())) {
     // Cada toque puede tardar lo que tarda el modelo (91 segundos como mucho) más el envío: no
     // se arranca uno si no queda ese margen antes de que Vercel corte la función. El margen se
     // cuenta desde que arrancó: la red de arriba puede tardar (una llamada a ManyChat y un aviso
