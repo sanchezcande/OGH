@@ -324,6 +324,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
+  hayManyChat = true,
 } = {}) {
   const m = {
     ajustes: {
@@ -389,6 +390,7 @@ function armar({
     return responde ? responde(p, m) : salida(["Respuesta de prueba?"]);
   };
   const manychat = {
+    hayManyChat: () => hayManyChat,
     mandarTextos: mandar || (async (id, textos) => { m.enviados.push(...textos); return { ok: true }; }),
     ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return { ok: pausaManyChat }; },
   };
@@ -832,15 +834,33 @@ test("un toque de seguimiento va con su contexto, se cuenta y agenda el segundo"
   assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 21 * HORA);
 });
 
-test("un toque no sale si ya tuvo los dos, si el lead recién escribió o si el envío es por campo", async () => {
+test("un toque no sale si ya tuvo los dos, si el lead recién escribió o si no hay clave de ManyChat", async () => {
   const dos = armarToque();
   dos.m.contacto.toques = 2;
   assert.equal((await toque(dos.agente)).hecho, "ya tuvo sus dos toques");
   const reciente = armarToque({ ultimoLeadHace: 0.1 });
   assert.equal((await toque(reciente.agente)).hecho, "todavía no toca");
-  const porCampo = armarToque({ envio: "campo" });
-  assert.equal((await toque(porCampo.agente)).hecho, "sin toques con envío por campo");
-  for (const mundo of [dos, reciente, porCampo]) assert.equal(mundo.m.pedidos.length + mundo.m.enviados.length, 0);
+  const sinClave = armarToque({ envio: "campo", hayManyChat: false });
+  assert.equal((await toque(sinClave.agente)).hecho, "sin toques: falta la clave de ManyChat");
+  for (const mundo of [dos, reciente, sinClave]) assert.equal(mundo.m.pedidos.length + mundo.m.enviados.length, 0);
+});
+
+test("con envío por campo el toque sale por la API de ManyChat: nadie lo vendría a retirar", async () => {
+  // Pedido del 15/10: los seguimientos no corrían porque con el envío por campo una respuesta solo
+  // sale cuando el lead escribe, y a un toque lo dispara el silencio.
+  const { agente, m } = armarToque({ envio: "campo" });
+  const r = await toque(agente);
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Mensaje de seguimiento?"]);
+  assert.equal(m.salidas.at(-1).estado, "enviada");
+  assert.equal(m.mensajes.at(-1).quien, "agente");
+  assert.equal(m.contacto.toques, 1);
+});
+
+test("con envío por campo, la respuesta a un mensaje sigue quedando para que ManyChat la retire", async () => {
+  const { agente, m } = armar({ envio: "campo" });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "lista para retirar");
+  assert.equal(m.enviados.length, 0);
 });
 
 test("un toque a quien no busca, dijo que no o frenó por plata se cancela sin pedirle nada al modelo", async () => {
