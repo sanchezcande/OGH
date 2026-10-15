@@ -20,9 +20,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 const {
-  revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano,
+  revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano, horaDeToques,
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
+const { correrToques } = await import("../lib/dm/seguimientos.js");
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
@@ -324,6 +325,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
+  hayManyChat = true,
 } = {}) {
   const m = {
     ajustes: {
@@ -389,6 +391,7 @@ function armar({
     return responde ? responde(p, m) : salida(["Respuesta de prueba?"]);
   };
   const manychat = {
+    hayManyChat: () => hayManyChat,
     mandarTextos: mandar || (async (id, textos) => { m.enviados.push(...textos); return { ok: true }; }),
     ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return { ok: pausaManyChat }; },
   };
@@ -832,15 +835,234 @@ test("un toque de seguimiento va con su contexto, se cuenta y agenda el segundo"
   assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 21 * HORA);
 });
 
-test("un toque no sale si ya tuvo los dos, si el lead recién escribió o si el envío es por campo", async () => {
+test("un toque no sale si ya tuvo los dos, si el lead recién escribió o si no hay clave de ManyChat", async () => {
   const dos = armarToque();
   dos.m.contacto.toques = 2;
   assert.equal((await toque(dos.agente)).hecho, "ya tuvo sus dos toques");
   const reciente = armarToque({ ultimoLeadHace: 0.1 });
   assert.equal((await toque(reciente.agente)).hecho, "todavía no toca");
-  const porCampo = armarToque({ envio: "campo" });
-  assert.equal((await toque(porCampo.agente)).hecho, "sin toques con envío por campo");
-  for (const mundo of [dos, reciente, porCampo]) assert.equal(mundo.m.pedidos.length + mundo.m.enviados.length, 0);
+  const sinClave = armarToque({ envio: "campo", hayManyChat: false });
+  assert.equal((await toque(sinClave.agente)).hecho, "sin toques: falta la clave de ManyChat");
+  for (const mundo of [dos, reciente, sinClave]) assert.equal(mundo.m.pedidos.length + mundo.m.enviados.length, 0);
+});
+
+test("con envío por campo el toque sale por la API de ManyChat: nadie lo vendría a retirar", async () => {
+  // Pedido del 15/10: los seguimientos no corrían porque con el envío por campo una respuesta solo
+  // sale cuando el lead escribe, y a un toque lo dispara el silencio.
+  const { agente, m } = armarToque({ envio: "campo" });
+  const r = await toque(agente);
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Mensaje de seguimiento?"]);
+  assert.equal(m.salidas.at(-1).estado, "enviada");
+  assert.equal(m.mensajes.at(-1).quien, "agente");
+  assert.equal(m.contacto.toques, 1);
+});
+
+test("con envío por campo, la respuesta a un mensaje sigue quedando para que ManyChat la retire, con clave o sin ella", async () => {
+  for (const hayManyChat of [true, false]) {
+    const { agente, m } = armar({ envio: "campo", hayManyChat });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "lista para retirar");
+    assert.equal(m.enviados.length, 0);
+    assert.equal(m.salidas.at(-1).estado, "pendiente");
+  }
+});
+
+// Un toque que no sale no deja a nadie esperando: la charla sigue del agente y a Cande no le llega
+// nada. Pasarla le sacaba al agente un lead sano y le mandaba a ella un aviso falso (revisión del 15/10).
+const sigueDelAgente = (m) => {
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.enviados.length, 0);
+};
+
+test("un toque que falla en el modelo (la Mac dormida) no pasa la charla a Cande", async () => {
+  const { agente, m } = armarToque({ envio: "campo", responde: () => { throw new Error("la Mac no contestó"); } });
+  assert.equal((await toque(agente)).hecho, "error del modelo");
+  sigueDelAgente(m);
+  assert.equal(m.salidas.at(-1).estado, "error");
+});
+
+test("un toque que ManyChat no deja mandar no pasa la charla a Cande", async () => {
+  const { agente, m } = armarToque({ envio: "campo", mandar: async () => ({ ok: false, error: "código 3011" }) });
+  assert.equal((await toque(agente)).hecho, "error al mandar");
+  sigueDelAgente(m);
+  assert.equal(m.salidas.at(-1).estado, "error");
+});
+
+test("un toque incierto queda anotado como salido y no pasa la charla a Cande", async () => {
+  const { agente, m } = armarToque({ envio: "campo", mandar: async () => ({ ok: false, incierto: true, error: "tardó" }) });
+  assert.equal((await toque(agente)).hecho, "envío incierto");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.salidas.at(-1).estado, "incierta");
+});
+
+test("un toque que el modelo o la revisión prefieren pasar no sale y la charla sigue del agente", async () => {
+  const { agente, m } = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { accion: "pasar_a_cande", aviso_para_cande: "una nota" }) });
+  assert.equal((await toque(agente)).hecho, "calló");
+  sigueDelAgente(m);
+});
+
+test("un toque frenado no sale y la charla sigue del agente", async () => {
+  const { agente, m } = armarToque({ responde: () => salida(["x".repeat(400) + "?"]) });
+  const r = await toque(agente);
+  assert.equal(r.hecho, "frenada");
+  sigueDelAgente(m);
+});
+
+test("en un toque, a Cande solo le llega el aviso del modelo si es urgente", async () => {
+  const comun = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { aviso_para_cande: "una nota" }) });
+  assert.equal((await toque(comun.agente)).hecho, "enviada");
+  assert.equal(comun.m.avisos.length, 0);
+  const urgente = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { aviso_para_cande: "HOY: algo para mirar" }) });
+  assert.equal((await toque(urgente.agente)).hecho, "enviada");
+  assert.equal(urgente.m.avisos.length, 1);
+});
+
+test("un toque no tiene la traba mientras se genera: el mensaje que entra en ese rato arranca enseguida", async () => {
+  const generando = diferida();
+  const { agente, m } = armarToque({ responde: (p) => (p.turno.mensajes_del_lead.length ? salida(["Respuesta de prueba?"]) : generando.promesa) });
+  const corrida = toque(agente);
+  await hasta(() => m.pedidos.length === 1);
+  assert.equal(m.tomado, null);
+  const id = m.entraLead("una respuesta del lead");
+  assert.equal((await agente.procesar("77", id)).hecho, "enviada");
+  generando.resolver(salida(["Mensaje de seguimiento?"]));
+  assert.equal((await corrida).hecho, "llegó otro mensaje durante la generación");
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(m.contacto.toques, 0);
+});
+
+test("si otra corrida tiene la charla cuando termina de generarse el toque, el toque no sale", async () => {
+  const generando = diferida();
+  const { agente, m } = armarToque({ responde: () => generando.promesa });
+  const corrida = toque(agente);
+  await hasta(() => m.pedidos.length === 1);
+  m.tomado = "otra corrida";
+  generando.resolver(salida(["Mensaje de seguimiento?"]));
+  assert.equal((await corrida).hecho, "otra corrida lo tiene");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.tomado, "otra corrida");
+});
+
+test("los toques salen de 9 a 21 de Argentina, con una vuelta del cron de margen", () => {
+  assert.equal(horaDeToques(new Date("2026-10-12T12:00:00Z")), true); // 9 en Argentina
+  assert.equal(horaDeToques(new Date("2026-10-12T23:59:00Z")), true); // 20:59
+  assert.equal(horaDeToques(new Date("2026-10-13T00:05:00Z")), true); // 21:05: el agendado a las 20:55
+  assert.equal(horaDeToques(new Date("2026-10-13T00:10:00Z")), false); // 21:10
+  assert.equal(horaDeToques(new Date("2026-10-12T11:59:00Z")), false); // 8:59
+});
+
+test("un toque que llega al tope del día no sale y la charla sigue del agente", async () => {
+  const { agente, m } = armarToque({ tope: 0 });
+  assert.equal((await toque(agente)).hecho, "tope del día");
+  sigueDelAgente(m);
+  assert.equal(m.pedidos.length, 0);
+});
+
+test("la corrida de un mensaje del lead tiene la traba mientras se genera", async () => {
+  const generando = diferida();
+  const { agente, m } = armar({ responde: () => generando.promesa });
+  const corrida = agente.procesar("77", m.disparo);
+  await hasta(() => m.pedidos.length === 1);
+  assert.notEqual(m.tomado, null);
+  generando.resolver(salida(["Respuesta de prueba?"]));
+  assert.equal((await corrida).hecho, "enviada");
+  assert.equal(m.tomado, null);
+});
+
+test("si Cande contesta mientras se genera el toque, el toque no sale ni agenda otro", async () => {
+  const generando = diferida();
+  const { agente, m } = armarToque({ envio: "campo", responde: () => generando.promesa });
+  const corrida = toque(agente);
+  await hasta(() => m.pedidos.length === 1);
+  // Lo que hacen anotarDeCande y anotarAMano: queda su mensaje y se cancela el toque agendado.
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" });
+  m.contacto.proximo_toque = null;
+  generando.resolver(salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 20, estado: { ...estadoDev, link_formulario_enviado: true } }));
+  assert.equal((await corrida).hecho, "la charla cambió durante la generación");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.proximo_toque, null);
+  assert.equal(m.contacto.toques, 0);
+});
+
+/** Lo que pasa en la lectura número `cual` de los ajustes: la última es la mirada final antes de mandar. */
+const enLaLectura = (m, cual, hacer) => {
+  const aj = m.ajustes;
+  let lecturas = 0;
+  Object.defineProperty(m, "ajustes", { get() { if (++lecturas === cual) hacer(); return aj; } });
+};
+
+test("si Cande contesta justo antes de que salga el toque, en la mirada final, el toque no sale", async () => {
+  const { agente, m } = armarToque({ envio: "campo" });
+  // Un toque lee los ajustes al arrancar y en la mirada final.
+  enLaLectura(m, 2, () => m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" }));
+  assert.equal((await toque(agente)).hecho, "descartada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.toques, 0);
+  assert.equal(m.proximo, undefined);
+});
+
+test("a la respuesta de un mensaje no la frena un mensaje fijo que entra en la mirada final", async () => {
+  const { agente, m } = armar();
+  // La corrida de un mensaje lee los ajustes al arrancar, después de la espera y en la mirada final.
+  enLaLectura(m, 3, () => m.mensajes.push({ id: m.mensajes.length + 1, quien: "automatico", texto: "un mensaje fijo" }));
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+});
+
+test("el cron deja de reclamar toques en cuanto el modelo no contesta", async () => {
+  const fila = ["1", "2", "3"];
+  const reclamados = [];
+  const hechos = await correrToques({
+    reclamar: async () => { const id = fila.shift() ?? null; if (id) reclamados.push(id); return id; },
+    procesar: async () => ({ hecho: "error del modelo" }),
+    hasta: Infinity, tope: 10,
+  });
+  assert.equal(hechos, 1);
+  assert.deepEqual(reclamados, ["1"]);
+  assert.deepEqual(fila, ["2", "3"]);
+});
+
+test("el cron reclama toques hasta vaciar la fila, el tope o la hora límite, y sigue si uno tira", async () => {
+  const correr = (fila, extra = {}) => correrToques({
+    reclamar: async () => fila.shift() ?? null,
+    procesar: async (id) => { if (id === "tira") throw new Error("falló"); return { hecho: "enviada" }; },
+    hasta: Infinity, tope: 10, ...extra,
+  });
+  assert.equal(await correr(["1", "2"]), 2);
+  assert.equal(await correr(["1", "2", "3"], { tope: 2 }), 2);
+  assert.equal(await correr(["1", "2"], { hasta: 0 }), 0);
+  const registrados = [];
+  assert.equal(await correr(["tira", "2"], { registrar: (id) => registrados.push(id) }), 1);
+  assert.deepEqual(registrados, ["tira"]);
+});
+
+test("un toque no sale si hay un mensaje del lead sin atender", async () => {
+  const { agente, m } = armarToque();
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "lead", texto: "otro mensaje de prueba" });
+  assert.equal((await toque(agente)).hecho, "hay un mensaje del lead sin atender");
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+});
+
+test("el segundo toque sale como mínimo 4 horas después del primero", async () => {
+  // El lead escribió hace 6 horas y el modelo pide el próximo a las 7 de su mensaje: sería en una
+  // hora, pegado al toque que acaba de salir. Se corre a 4 horas de ahora.
+  const { agente, m } = armarToque({
+    responde: () => salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 7, estado: { ...estadoDev, link_formulario_enviado: true } }),
+  });
+  assert.equal((await toque(agente)).hecho, "enviada");
+  assert.equal(m.proximo.getTime(), AHORA.getTime() + 4 * HORA);
+});
+
+test("proximoToque con noAntesDe corre la hora hacia adelante y respeta la noche y las 24 horas", () => {
+  const ultimoLead = new Date("2026-10-12T12:00:00Z"); // 9 en Argentina
+  const ahora = new Date("2026-10-12T19:00:00Z"); // 16
+  const base = { ahora, ultimoLead, horas: 8, toquesHechos: 1, maxToques: 2 };
+  assert.equal(proximoToque({ ...base, noAntesDe: new Date("2026-10-12T23:00:00Z") }).toISOString(), "2026-10-12T23:00:00.000Z");
+  // Cae a las 22 de Argentina: pasaría a las 9 del otro día, 24 horas después del lead. No sale.
+  assert.equal(proximoToque({ ...base, noAntesDe: new Date("2026-10-13T01:00:00Z") }), null);
+  assert.equal(proximoToque({ ...base, noAntesDe: null }).toISOString(), "2026-10-12T20:00:00.000Z");
 });
 
 test("un toque a quien no busca, dijo que no o frenó por plata se cancela sin pedirle nada al modelo", async () => {
@@ -885,7 +1107,9 @@ test("si falla la constancia antes de mandar, no sale nada y la salida queda mar
   assert.equal(r.hecho, "error");
   assert.equal(m.enviados.length, 0);
   assert.deepEqual(m.salidas.map((s) => s.estado), ["error"]);
-  assert.equal(m.contacto.dueno, "cande");
+  // Es un toque: nadie espera respuesta, así que la charla sigue del agente y a Cande no le llega nada.
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
 });
 
 /* ---------- lo que el modelo dice no alcanza ---------- */
