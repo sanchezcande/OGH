@@ -1,4 +1,5 @@
 import { guardarEvento, hayBase } from "../../lib/db";
+import { CON_VERSION } from "../../lib/videoAB";
 
 // Recibe un evento anónimo del embudo de devs (form_visto, paso_2, enviado,
 // video_50, click_gumroad...). Dispará-y-olvidate: nunca rompe la página.
@@ -18,8 +19,8 @@ const CON_ORIGEN = /^hola_(vista|contrata|dev)_[a-z0-9]{1,16}$/;
 
 // Prueba A/B del video de la página de gracias (12/10/2026): el mismo embudo pero con el sufijo
 // de la versión que le tocó a esa persona, para poder partirlo en dos sin tocar la base.
-// Acotado igual que el de arriba: solo estas fases y solo _a o _b.
-const CON_VERSION = /^(gracias_vista|video_play|video_25|video_50|video_75|video_fin|click_gumroad)_[ab]$/;
+// Acotado igual que el de arriba: solo las fases del video y solo _a o _b. La lista vive en
+// lib/videoAB.js porque el sync del CRM tiene que contar exactamente las mismas.
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
