@@ -5,7 +5,8 @@
 //      función que murió a mitad de camino, o un mensaje que entró con el agente apagado) pasan
 //      a Cande con aviso. Apagado, lo que escribe un lead del agente no puede quedar sin que
 //      ella se entere.
-//   2. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes.
+//   2. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
+//      Mac está contestando y es de día en Argentina (de 9 a 21).
 //      Cada toque vencido se reclama de a uno y pasa por el agente con el evento "seguimiento":
 //      el agente vuelve a mirar que la charla siga siendo suya, que el lead no haya escrito y
 //      que la ventana de 24 horas de Instagram siga abierta.
@@ -13,12 +14,14 @@
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
 import { agente, colaDe } from "../../../lib/dm/armado";
-import { borrarTrabajosViejos } from "../../../lib/dm/cola";
+import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
+import { horaDeToques } from "../../../lib/dm/frenos";
 import {
   ajustes, borrarViejas, hayBase, reclamarToque, sinContestar, tablas, vencerPendientes,
 } from "../../../lib/dm/base";
 
 const TOQUES_POR_CORRIDA = 10;
+const MAC_VIVA_SEGUNDOS = 180; // la Mac pregunta cada pocos segundos y el latido se guarda una vez por minuto
 
 /** Qué se le dice a Cande de una charla que quedó con un mensaje sin atender. */
 function avisoDe(c, prendido) {
@@ -52,7 +55,13 @@ export default async function handler(req, res) {
     sinAtender++;
   }
 
-  if (prendido && aj.toques === true) {
+  // Los toques los redacta la Mac de Cande (salvo cerebro "api"). Si no está contestando, o es de
+  // noche en Argentina, no se reclama ninguno: siguen en la fila y salen en una corrida de después
+  // (los que se pasan de las 24 horas los limpia reclamarToque). Reclamar uno con la Mac dormida lo
+  // perdería: el modelo no contesta y el toque no se reintenta.
+  const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();
+  const macViva = latido !== null && latido < MAC_VIVA_SEGUNDOS;
+  if (prendido && aj.toques === true && macViva && horaDeToques(new Date())) {
     // Cada toque puede tardar lo que tarda el modelo (91 segundos como mucho) más el envío: no
     // se arranca uno si no queda ese margen antes de que Vercel corte la función. El margen se
     // cuenta desde que arrancó: la red de arriba puede tardar (una llamada a ManyChat y un aviso
