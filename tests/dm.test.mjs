@@ -1822,6 +1822,8 @@ test("respondiendo un aviso, lo que escribe es una indicación para el agente; /
   assert.match(leerRespuesta(novedadDe("/textual"), { duena: "42" }).ayuda, /después de \/textual/);
   assert.deepEqual(leerRespuesta(novedadDe("/agente"), { duena: "42" }), { contacto: "123456789", accion: "agente" });
   assert.match(leerRespuesta(novedadDe("/otro"), { duena: "42" }).ayuda, /textual/);
+  for (const codigo of ["--", " --- ", "/yo", "—"]) assert.deepEqual(leerRespuesta(novedadDe(codigo), { duena: "42" }), { contacto: "123456789", accion: "cande" });
+  assert.equal(leerRespuesta(novedadDe("-- decile hola"), { duena: "42" }).accion, "indicacion");
   assert.match(leerRespuesta(novedadDe("hola", { respondido: null }), { duena: "42" }).ayuda, /respondé/);
   assert.match(leerRespuesta(novedadDe("hola", { respondido: "un mensaje cualquiera" }), { duena: "42" }).ayuda, /respondé/);
   assert.match(leerRespuesta(novedadDe(""), { duena: "42" }).ayuda, /texto/);
@@ -1858,6 +1860,15 @@ function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = 
   return { hechos, dichos, responder: crearRespuestaTelegram({ base, manychat, decir: async (t) => dichos.push(t), agente }) };
 }
 const INDICACION = { contacto: "123456789", accion: "indicacion", texto: "decile que si entra antes del lunes me avise", fechaAviso: new Date("2026-10-15T00:00:00Z") };
+
+test("con -- Cande saca al agente de la charla: queda de ella, no sale nada y lo pendiente se descarta", async () => {
+  // 16/10, con Ramiro: "me dijo que está construyendo algo, tenés que salir de ahí, pongamos un código".
+  const { hechos, dichos, responder } = respuestaDePrueba();
+  assert.equal(await responder({ contacto: "123456789", accion: "cande" }, { updateId: 40 }), "cande");
+  assert.deepEqual(hechos.map((h) => h[0]), ["ponerDueno", "descartarPendientes"]);
+  assert.deepEqual(hechos[0], ["ponerDueno", "123456789", "cande"]);
+  assert.match(dichos[0], /queda tuyo/);
+});
 
 test("una indicación de Cande la escribe el agente y a ella le cuenta qué mandó", async () => {
   const { hechos, dichos, responder } = respuestaDePrueba();
