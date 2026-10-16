@@ -68,10 +68,8 @@ export default async function handler(req, res) {
     // del agente y el cron (/api/dm/toques) la reintenta o se la pasa. El aviso es solo para que
     // Cande sepa: no le pide contestar, así no le contestan dos.
     agente.procesar(id, idMensaje).catch(async (e) => {
+      // Sin aviso: el cron lo reintenta y, si no se puede, se lo pasa a Cande con su aviso.
       console.error("dm: falló procesar", colaDe(id), e.message);
-      // Sin el renglón "Quién": así el aviso no ofrece contestar desde Telegram (lib/dm/armado.js,
-      // lib/dm/respuestas.js) y no le contestan dos, ella y el reintento.
-      await avisarDm("DM: el agente falló antes de contestar (lo reintenta solo)", { Lead: nombre || "sin nombre", Motivo: e.message });
     }),
   );
   return res.status(200).json({ ok: true, dueno: "agente" });

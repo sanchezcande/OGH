@@ -919,14 +919,17 @@ test("pasar a Cande: aunque falle una escritura después de mandar, la charla pa
 
 /* ---------- los avisos a Cande ---------- */
 
-test("el aviso del modelo llega también cuando el agente sigue con la charla o calla", async () => {
+test("del aviso del modelo, cuando el agente sigue con la charla o calla, a Cande le llega solo lo urgente", async () => {
+  // 16/10: "los avisos tienen que ser solo de los que el bot no sabe qué hacer o si es relevante".
   const sigue = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "aviso de prueba" }) });
   assert.equal((await sigue.agente.procesar("77", sigue.m.disparo)).hecho, "enviada");
-  assert.equal(sigue.m.avisos.length, 1);
-  assert.equal(sigue.m.avisos[0].titulo, "Lead de prueba · DM: aviso del agente");
-  assert.equal(sigue.m.avisos[0].campos.Aviso, "aviso de prueba");
-  assert.equal(sigue.m.avisos[0].campos["El agente le mandó"], "Respuesta de prueba?");
+  assert.equal(sigue.m.avisos.length, 0);
+  assert.equal(sigue.m.salidas[0].aviso, "aviso de prueba");
   assert.equal(sigue.m.contacto.dueno, "agente");
+  const urgente = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "HOY: aviso de prueba" }) });
+  await urgente.agente.procesar("77", urgente.m.disparo);
+  assert.equal(urgente.m.avisos.length, 1);
+  assert.equal(urgente.m.avisos[0].campos["El agente le mandó"], "Respuesta de prueba?");
   const calla = armar({ responde: () => salida([], { accion: "callar", aviso_para_cande: "YA: aviso de prueba" }) });
   assert.equal((await calla.agente.procesar("77", calla.m.disparo)).hecho, "calló");
   assert.equal(calla.m.avisos.length, 1);
@@ -1371,7 +1374,7 @@ test("en una charla larga los frenos miran todo lo que escribió el lead, no sol
 
 /* ---------- altas: quien entra solo por la entrada ---------- */
 
-test("alguien nuevo entra solo con las altas prendidas: queda del agente, y si es un lead Cande se entera en su primer turno", async () => {
+test("alguien nuevo entra solo con las altas prendidas: queda del agente y no le llega ningún aviso a Cande", async () => {
   const { agente, m } = armar({
     sinContacto: true, altas: true, contextoAlta: "contexto de alta de prueba", responde: () => salida([AVISO, "Pregunta de prueba?"]),
   });
@@ -1386,9 +1389,7 @@ test("alguien nuevo entra solo con las altas prendidas: queda del agente, y si e
   assert.equal((await agente.procesar("88", id)).hecho, "enviada");
   assert.equal(m.pedidos[0].turno.contexto, "contexto de alta de prueba");
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["hola de prueba"]);
-  assert.equal(m.avisos.length, 1);
-  assert.equal(m.avisos[0].titulo, "Nuevo de prueba · DM: entró alguien nuevo al agente");
-  assert.equal(m.avisos[0].campos.Quién, "Nuevo de prueba (88)");
+  assert.equal(m.avisos.length, 0);
   assert.equal(m.contacto.alta_avisada, true);
 });
 
@@ -1425,12 +1426,12 @@ test("con el agente apagado no entra nadie, aunque las altas estén prendidas", 
   assert.deepEqual(m.avisos, []);
 });
 
-test("si el aviso de un lead nuevo no sale, el lead igual se atiende y el aviso fallido queda anotado", async () => {
+test("con Telegram caído, un lead nuevo igual se atiende", async () => {
   const { agente, m } = armar({ sinContacto: true, altas: true, avisoSale: false, responde: () => salida([AVISO, "Pregunta de prueba?"]) });
   const id = await agente.recibir("88", "hola de prueba", "Nuevo de prueba");
   assert.equal(id, 1);
   assert.equal((await agente.procesar("88", id)).hecho, "enviada");
-  assert.ok(m.salidas.some((x) => x.estado === "aviso_fallido"));
+  assert.ok(!m.salidas.some((x) => x.estado === "aviso_fallido"));
 });
 
 test("una charla de Cande no vuelve sola al agente aunque las altas estén prendidas", async () => {
