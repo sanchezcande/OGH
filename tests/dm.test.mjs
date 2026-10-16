@@ -366,12 +366,13 @@ function armar({
     ultimoIdLead: async () => delLead().at(-1)?.id ?? null,
     historial: async (id, tope = 80) => m.mensajes.slice(-tope),
     corridasEnUnDia: async () => m.salidas.filter((s) => !["aviso_fallido", "error"].includes(s.estado)).length,
-    tomar: async (id, marca) => {
-      if (m.tomado || m.contacto.dueno !== "agente") return null;
+    tomar: async (id, marca, { cualquierDueno = false } = {}) => {
+      if (m.tomado || (m.contacto.dueno !== "agente" && !cualquierDueno)) return null;
       m.tomado = marca;
       return { ...m.contacto };
     },
     soltar: async (id, marca) => { if (m.tomado === marca) m.tomado = null; },
+    descartarPendientes: async () => { m.descartados = (m.descartados || 0) + 1; },
     ponerDueno: async (id, d) => { m.contacto.dueno = d; m.contacto.proximo_toque = null; },
     guardarSalida: async (s) => { m.salidas.push({ ...s }); return m.salidas.length; },
     marcarSalida: async (idSalida, estado, detalle) => { Object.assign(m.salidas[idSalida - 1], { estado, detalle }); },
@@ -1866,10 +1867,19 @@ test("una indicación de Cande la escribe el agente y a ella le cuenta qué mand
   assert.equal(hechos.filter((h) => h[0] === "mandarTextos").length, 0);
 });
 
-test("una indicación sobre una charla que era de Cande se la devuelve al agente antes de escribir", async () => {
-  const { hechos, responder } = respuestaDePrueba({ dueno: "cande" });
+test("una indicación sobre una charla de Cande no se la saca: el agente escribe y la charla sigue de ella", async () => {
+  // 16/10, con Alain: "salí de la charla con ese tipo, ya estoy yo".
+  const { hechos, dichos, responder } = respuestaDePrueba({ dueno: "cande" });
   assert.equal(await responder(INDICACION, { updateId: 31 }), "indicacion enviada");
-  assert.deepEqual(hechos.map((h) => h[0]), ["ponerEtiqueta", "anotar", "cerrarTurno", "ponerDueno", "procesar"]);
+  assert.deepEqual(hechos.map((h) => h[0]), ["procesar"]);
+  assert.match(dichos[0], /sigue siendo tuya/);
+});
+
+test("si lo que pidió Cande salió pero no se pudo anotar, el bot no le dice que no salió", async () => {
+  const { dichos, responder } = respuestaDePrueba({ procesado: { hecho: "enviada sin guardar", mando: 1 } });
+  assert.equal(await responder(INDICACION, { updateId: 34 }), "indicacion enviada sin anotar");
+  assert.match(dichos[0], /no lo repitas/);
+  assert.doesNotMatch(dichos[0], /textual/);
 });
 
 test("si el agente no pudo escribir lo que pidió Cande, el bot le dice por qué y no sale nada", async () => {
@@ -1953,6 +1963,32 @@ test("una indicación de Cande: el agente le escribe al lead siguiéndola, aunqu
   assert.deepEqual(m.enviados, ["Te llamo el lunes y lo vemos"]);
   assert.match(m.pedidos[0].turno.contexto, /INDICACIÓN DE CANDE.*decile que lo llamo el lunes/);
   assert.equal(m.contacto.toques, 0);
+});
+
+test("una indicación en una charla de Cande sale sin cambiarle el dueño", async () => {
+  const { agente, m } = armar({ envio: "campo", dueno: "cande", responde: () => salida(["Mensaje de prueba"]) });
+  const r = await agente.procesar("77", null, { evento: "indicacion", indicacion: "decile hola" });
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Mensaje de prueba"]);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.descartados, 1);
+});
+
+test("con una indicación no sale una respuesta vacía, ni la indicación copiada, ni nada si el agente prefiere no escribir", async () => {
+  const vacia = armar({ responde: () => salida([]) });
+  vacia.m.contacto.respondido_hasta = vacia.m.disparo;
+  assert.equal((await vacia.agente.procesar("77", null, { evento: "indicacion", indicacion: "decile algo" })).hecho, "frenada");
+  const copiada = armar({ responde: () => salida(["A este decile que si entra antes del lunes me avise"]) });
+  copiada.m.contacto.respondido_hasta = copiada.m.disparo;
+  const r = await copiada.agente.procesar("77", null, { evento: "indicacion", indicacion: "a este decile que..." });
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /copiada/);
+  const pasa = armar({ responde: () => salida([], { accion: "pasar_a_cande", aviso_para_cande: "es una empresa" }) });
+  const p = await pasa.agente.procesar("77", null, { evento: "indicacion", indicacion: "decile algo" });
+  assert.equal(p.hecho, "el agente prefirió no escribir");
+  assert.equal(p.aviso, "es una empresa");
+  for (const w of [vacia, copiada, pasa]) assert.equal(w.m.enviados.length, 0);
+  assert.equal(pasa.m.contacto.dueno, "agente");
 });
 
 test("una indicación contesta también lo que el lead había dejado sin respuesta, y cierra el turno", async () => {
