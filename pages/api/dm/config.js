@@ -19,18 +19,24 @@
 //                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
 //                                                  con quitar: true se desconecta
+//   { accion: "instagram", contacto? }             → prueba la lectura directa de Instagram sin cambiar nada: la cuenta,
+//                                                  si lee la bandeja y, con contacto, si encuentra su charla, si Cande
+//                                                  la sigue y si hay un "--" que cuente (lib/dm/instagram.js)
 //
 // Cada cambio de prompt, de modo o de cualquier otro ajuste le llega a Cande por Telegram: si
 // alguien más consigue el secreto y toca algo (el link de pago, por ejemplo), ella se entera en
 // el momento. El prompt anterior queda guardado.
 import { randomBytes } from "node:crypto";
-import { avisarDm, mismoSecreto, olvidarChatDm, olvidarRespuestas, secretoDe, guardarSecretoDm } from "../../../lib/dm/armado";
+import {
+  avisarDm, guardarSecretoDm, instagram, mismoSecreto, olvidarChatDm, olvidarRespuestas, reglasInstagram, secretoDe,
+} from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
+import { codigoEnHilo, desdeDe, explicarError, hayInstagram } from "../../../lib/dm/instagram";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -233,6 +239,49 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, manychat: hayManyChat() });
   }
 
+  if (b.accion === "instagram") {
+    // Para probar la conexión el día que se carga el token. Solo lee: lo único que guarda es el
+    // usuario y el id de Instagram del contacto, si los encuentra. No devuelve textos ni usuarios.
+    if (!hayInstagram()) return res.status(409).json({ error: "falta INSTAGRAM_TOKEN en Vercel" });
+    const out = { reglas: (await ajustes()).instagram === true, dias_de_token: await instagram.diasQueQuedan() };
+    let yo;
+    try {
+      yo = await instagram.cuenta();
+      out.cuenta = yo.username;
+    } catch (e) {
+      return res.status(502).json({ ...out, error: explicarError(e), code: e.code ?? null });
+    }
+    try {
+      const hs = await instagram.hilos({ limite: 5 });
+      const conTexto = await Promise.all(hs.slice(0, 2).map((h) => instagram.completo(h)));
+      out.bandeja = {
+        charlas: hs.length, con_la_otra_persona: hs.filter((h) => h.otro).length,
+        anidado: hs.every((h) => (h.crudo?.messages?.data || []).every((m) => m.from)),
+        mensajes_con_texto: conTexto.reduce((n, h) => n + h.mensajes.filter((m) => m.texto != null).length, 0),
+      };
+    } catch (e) {
+      out.bandeja = { error: explicarError(e), code: e.code ?? null };
+    }
+    if (id) {
+      const c = await contacto(id);
+      if (!c) return res.status(404).json({ ...out, error: "ese contacto no está en la base del agente" });
+      try {
+        const igsid = await reglasInstagram.resolver(c);
+        out.contacto = { dueno: c.dueno, encontrado: Boolean(igsid) };
+        if (igsid) {
+          const [hilo, p] = await Promise.all([instagram.hiloDe(igsid), instagram.perfil(igsid)]);
+          Object.assign(out.contacto, {
+            la_seguis: p.laSigue, mensajes_con_texto: hilo ? hilo.mensajes.filter((m) => m.texto != null).length : 0,
+            hay_codigo: Boolean(hilo && codigoEnHilo(hilo, yo, desdeDe(c))),
+          });
+        }
+      } catch (e) {
+        out.contacto = { error: explicarError(e), code: e.code ?? null };
+      }
+    }
+    return res.status(200).json(out);
+  }
+
   if (b.accion === "estado") {
     return res.status(200).json({
       ajustes: await ajustes(),
@@ -242,7 +291,7 @@ export default async function handler(req, res) {
         anthropic: Boolean(process.env.ANTHROPIC_API_KEY), manychat: hayManyChat(),
         dm_secreto: Boolean(process.env.DM_SECRETO) || Boolean((await leerConfig("secreto_dm"))?.huella),
         telegram: hayTelegram(), bot_del_agente: hayBotDm(), respuestas_por_telegram: Boolean((await leerConfig("telegram_respuestas"))?.secreto), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
-        cron_secret: Boolean(process.env.CRON_SECRET),
+        cron_secret: Boolean(process.env.CRON_SECRET), instagram: hayInstagram(),
       },
       cerebro_local_hace_segundos: await segundosDesdeElLatido(),
       ...(await resumen()),
