@@ -483,7 +483,7 @@ test("lo que rompe un freno no sale: la charla pasa a Cande con el motivo y con 
   assert.equal(m.contacto.dueno, "cande");
   assert.equal(m.salidas[0].estado, "frenada");
   assert.equal(m.avisos.length, 1);
-  assert.equal(m.avisos[0].titulo, "DM URGENTE: te paso una charla");
+  assert.equal(m.avisos[0].titulo, "Lead de prueba · DM URGENTE: te paso una charla");
   assert.equal(m.avisos[0].campos["Aviso del agente"], "HOY: aviso de prueba");
   assert.match(m.avisos[0].campos.Quién, /Lead de prueba \(77\)/);
   assert.deepEqual(m.campos, [["dm_dueno", "cande"]]);
@@ -724,7 +724,7 @@ test("pasar a Cande: manda su única pregunta, cambia el dueño y avisa con lo q
   assert.equal(r.hecho, "pasada a Cande");
   assert.deepEqual(m.enviados, ["Pregunta de prueba?"]);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos[0].titulo, "DM: te paso una charla");
+  assert.equal(m.avisos[0].titulo, "Lead de prueba · DM: te paso una charla");
   assert.equal(m.avisos[0].campos.Aviso, "aviso de prueba");
   assert.equal(m.avisos[0].campos["El agente le mandó"], "Pregunta de prueba?");
   assert.equal(m.proximo, null);
@@ -922,14 +922,14 @@ test("el aviso del modelo llega también cuando el agente sigue con la charla o 
   const sigue = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "aviso de prueba" }) });
   assert.equal((await sigue.agente.procesar("77", sigue.m.disparo)).hecho, "enviada");
   assert.equal(sigue.m.avisos.length, 1);
-  assert.equal(sigue.m.avisos[0].titulo, "DM: aviso del agente");
+  assert.equal(sigue.m.avisos[0].titulo, "Lead de prueba · DM: aviso del agente");
   assert.equal(sigue.m.avisos[0].campos.Aviso, "aviso de prueba");
   assert.equal(sigue.m.avisos[0].campos["El agente le mandó"], "Respuesta de prueba?");
   assert.equal(sigue.m.contacto.dueno, "agente");
   const calla = armar({ responde: () => salida([], { accion: "callar", aviso_para_cande: "YA: aviso de prueba" }) });
   assert.equal((await calla.agente.procesar("77", calla.m.disparo)).hecho, "calló");
   assert.equal(calla.m.avisos.length, 1);
-  assert.equal(calla.m.avisos[0].titulo, "DM URGENTE: aviso del agente");
+  assert.equal(calla.m.avisos[0].titulo, "Lead de prueba · DM URGENTE: aviso del agente");
   assert.equal(calla.m.salidas[0].aviso, "YA: aviso de prueba");
   assert.equal(calla.m.contacto.dueno, "agente");
   const sinAviso = armar();
@@ -1386,7 +1386,7 @@ test("alguien nuevo entra solo con las altas prendidas: queda del agente, y si e
   assert.equal(m.pedidos[0].turno.contexto, "contexto de alta de prueba");
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["hola de prueba"]);
   assert.equal(m.avisos.length, 1);
-  assert.equal(m.avisos[0].titulo, "DM: entró alguien nuevo al agente");
+  assert.equal(m.avisos[0].titulo, "Nuevo de prueba · DM: entró alguien nuevo al agente");
   assert.equal(m.avisos[0].campos.Quién, "Nuevo de prueba (88)");
   assert.equal(m.contacto.alta_avisada, true);
 });
@@ -1810,12 +1810,17 @@ test("solo cuenta lo que escribe la dueña en su chat privado, respondiendo un a
   assert.match(leerRespuesta(novedadDe("hola", { delBot: false }), { duena: "42" }).ayuda, /respondé/);
 });
 
-test("respondiendo un aviso, el texto va al lead; /agente devuelve la charla; lo demás pide ayuda", () => {
-  const r = leerRespuesta(novedadDe("  Dale, te escribo yo  "), { duena: "42" });
+test("respondiendo un aviso, lo que escribe es una indicación para el agente; /textual va tal cual; /agente devuelve la charla", () => {
+  // 16/10: "yo le estaba hablando al agente y copió y pegó sin sentido eso".
+  const r = leerRespuesta(novedadDe("  A este decile que si entra antes del lunes me avise  "), { duena: "42" });
   assert.deepEqual({ ...r, fechaAviso: r.fechaAviso.toISOString() },
-    { contacto: "123456789", accion: "mandar", texto: "Dale, te escribo yo", fechaAviso: new Date(1760000000 * 1000).toISOString() });
+    { contacto: "123456789", accion: "indicacion", texto: "A este decile que si entra antes del lunes me avise", fechaAviso: new Date(1760000000 * 1000).toISOString() });
+  const t = leerRespuesta(novedadDe("/textual  Dale, te escribo yo "), { duena: "42" });
+  assert.equal(t.accion, "mandar");
+  assert.equal(t.texto, "Dale, te escribo yo");
+  assert.match(leerRespuesta(novedadDe("/textual"), { duena: "42" }).ayuda, /después de \/textual/);
   assert.deepEqual(leerRespuesta(novedadDe("/agente"), { duena: "42" }), { contacto: "123456789", accion: "agente" });
-  assert.match(leerRespuesta(novedadDe("/otro"), { duena: "42" }).ayuda, /agente/);
+  assert.match(leerRespuesta(novedadDe("/otro"), { duena: "42" }).ayuda, /textual/);
   assert.match(leerRespuesta(novedadDe("hola", { respondido: null }), { duena: "42" }).ayuda, /respondé/);
   assert.match(leerRespuesta(novedadDe("hola", { respondido: "un mensaje cualquiera" }), { duena: "42" }).ayuda, /respondé/);
   assert.match(leerRespuesta(novedadDe(""), { duena: "42" }).ayuda, /texto/);
@@ -1829,7 +1834,7 @@ test("lo que le contesta el bot dice si salió, si quizás salió o por qué no"
   assert.match(resultadoDeEnvio({ ok: false, error: "falta MANYCHAT_API_KEY" }, "Lead").texto, /MANYCHAT_API_KEY/);
 });
 
-function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = { ok: true }, fallaAnotar = false } = {}) {
+function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = { ok: true }, fallaAnotar = false, procesado = { hecho: "enviada", enviado: ["Mensaje de prueba"] } } = {}) {
   const hechos = [];
   const dichos = [];
   const vistos = new Set();
@@ -1848,8 +1853,34 @@ function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = 
     ponerEtiqueta: async (id, e) => { hechos.push(["ponerEtiqueta", id, e]); return etiqueta; },
     ponerCampo: async () => ({ ok: true }),
   };
-  return { hechos, dichos, responder: crearRespuestaTelegram({ base, manychat, decir: async (t) => dichos.push(t) }) };
+  const agente = { procesar: async (id, idDisparo, opciones) => { hechos.push(["procesar", id, idDisparo, opciones.evento, opciones.indicacion]); return procesado; } };
+  return { hechos, dichos, responder: crearRespuestaTelegram({ base, manychat, decir: async (t) => dichos.push(t), agente }) };
 }
+const INDICACION = { contacto: "123456789", accion: "indicacion", texto: "decile que si entra antes del lunes me avise", fechaAviso: new Date("2026-10-15T00:00:00Z") };
+
+test("una indicación de Cande la escribe el agente y a ella le cuenta qué mandó", async () => {
+  const { hechos, dichos, responder } = respuestaDePrueba();
+  assert.equal(await responder(INDICACION, { updateId: 30 }), "indicacion enviada");
+  assert.deepEqual(hechos, [["procesar", "123456789", null, "indicacion", "decile que si entra antes del lunes me avise"]]);
+  assert.deepEqual(dichos, ["✓ Le mandé a Lead De Prueba: «Mensaje de prueba»"]);
+  assert.equal(hechos.filter((h) => h[0] === "mandarTextos").length, 0);
+});
+
+test("una indicación sobre una charla que era de Cande se la devuelve al agente antes de escribir", async () => {
+  const { hechos, responder } = respuestaDePrueba({ dueno: "cande" });
+  assert.equal(await responder(INDICACION, { updateId: 31 }), "indicacion enviada");
+  assert.deepEqual(hechos.map((h) => h[0]), ["ponerEtiqueta", "anotar", "cerrarTurno", "ponerDueno", "procesar"]);
+});
+
+test("si el agente no pudo escribir lo que pidió Cande, el bot le dice por qué y no sale nada", async () => {
+  const sinMac = respuestaDePrueba({ procesado: { hecho: "error del modelo" } });
+  assert.equal(await sinMac.responder(INDICACION, { updateId: 32 }), "indicacion sin salir");
+  assert.match(sinMac.dichos[0], /la Mac/);
+  const vieja = respuestaDePrueba({ procesado: { hecho: "ventana de 24 horas cerrada" } });
+  await vieja.responder(INDICACION, { updateId: 33 });
+  assert.match(vieja.dichos[0], /más de un día/);
+  assert.match(vieja.dichos[0], /\/textual/);
+});
 const RESPUESTA = { contacto: "123456789", accion: "mandar", texto: "Hola!", fechaAviso: new Date("2026-10-15T00:00:00Z") };
 
 test("contestar manda una sola vez aunque Telegram reintente, y cierra solo hasta el aviso respondido", async () => {
@@ -1901,4 +1932,32 @@ test("con las respuestas conectadas, el aviso de una charla por el bot recuerda 
   const sinRespuestas = crearAvisoDm({ avisar: mandar, leerChat: async () => null, tokenBot: () => "bot-de-prueba", respuestas: async () => { throw new Error("base caída"); } });
   await sinRespuestas("DM: te paso una charla", { Quién: "Lead De Prueba (123456789)" });
   assert.equal(mandados[2].campos.Contestar, undefined);
+});
+
+test("el aviso de alguien nuevo no ofrece contestar: lo atiende el agente", async () => {
+  const mandados = [];
+  const mandar = async (titulo, campos) => { mandados.push(campos); return true; };
+  const avisar = crearAvisoDm({ avisar: mandar, leerChat: async () => null, tokenBot: () => "bot-de-prueba", respuestas: async () => true });
+  await avisar("DM: entró alguien nuevo al agente", { Quién: "Lead (123456789)" }, { contestable: false });
+  await avisar("DM: te paso una charla", { Quién: "Lead (123456789)" });
+  assert.equal(mandados[0].Contestar, undefined);
+  assert.match(mandados[1].Contestar, /el agente se lo escribe/);
+});
+
+test("una indicación de Cande: el agente le escribe al lead siguiéndola, aunque los toques estén apagados y el envío sea por campo", async () => {
+  const { agente, m } = armar({ envio: "campo", toques: false, responde: () => salida(["Te llamo el lunes y lo vemos"]) });
+  m.contacto.respondido_hasta = m.disparo;
+  const r = await agente.procesar("77", null, { evento: "indicacion", indicacion: "decile que lo llamo el lunes" });
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(r.enviado, ["Te llamo el lunes y lo vemos"]);
+  assert.deepEqual(m.enviados, ["Te llamo el lunes y lo vemos"]);
+  assert.match(m.pedidos[0].turno.contexto, /INDICACIÓN DE CANDE.*decile que lo llamo el lunes/);
+  assert.equal(m.contacto.toques, 0);
+});
+
+test("una indicación contesta también lo que el lead había dejado sin respuesta, y cierra el turno", async () => {
+  const { agente, m } = armar({ envio: "campo" });
+  const r = await agente.procesar("77", null, { evento: "indicacion", indicacion: "contestale que sí" });
+  assert.equal(r.hecho, "enviada");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
 });
