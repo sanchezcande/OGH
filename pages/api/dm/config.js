@@ -57,11 +57,8 @@ export default async function handler(req, res) {
     if (texto.length < 2000) return res.status(400).json({ error: "el prompt es demasiado corto para ser el real" });
     const antes = await prompt();
     await guardarPrompt(texto);
-    if (antes !== texto) {
-      await avisarDm("DM: cambió el prompt del agente", {
-        Caracteres: texto.length, "El anterior": antes ? `${antes.length} caracteres, quedó guardado` : "no había",
-      });
-    }
+    // Sin aviso: el anterior queda guardado, y a Cande solo le llega lo que necesita que haga algo
+    // (16/10: "los avisos tienen que ser solo de los que el bot no sabe qué hacer o si es relevante").
     return res.status(200).json({ ok: true, caracteres: texto.length, cambio: antes !== texto });
   }
 
@@ -78,10 +75,10 @@ export default async function handler(req, res) {
     const ahora = await ajustes();
     if (ahora.modo !== antes.modo) await avisarDm("DM: cambió el modo del agente", { Ahora: ahora.modo, Antes: antes.modo });
     // El link de pago es el único link ajeno que los frenos dejan pasar: un cambio no puede ser callado.
-    const otros = Object.keys(pedido.ajustes).filter((k) => k !== "modo" && ahora[k] !== antes[k]);
-    if (otros.length) {
+    // Los demás ajustes cambian sin aviso.
+    if (ahora.link_de_pago !== antes.link_de_pago) {
       const ver = (v) => (v === "" ? "(vacío)" : v);
-      await avisarDm("DM: cambiaron ajustes del agente", Object.fromEntries(otros.map((k) => [k, `${ver(antes[k])} → ${ver(ahora[k])}`])));
+      await avisarDm("DM: cambió el link de pago del agente", { Antes: ver(antes.link_de_pago), Ahora: ver(ahora.link_de_pago) });
     }
     return res.status(200).json({ ok: true, ajustes: ahora });
   }
