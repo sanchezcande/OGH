@@ -1,6 +1,7 @@
 // Webhook del bot del agente (TELEGRAM_DM_BOT_TOKEN). Cande responde en Telegram el aviso de una
-// charla y acá se le manda al lead por Instagram, por la API de ManyChat. "/agente" respondiendo
-// un aviso le devuelve esa charla al agente. La lógica está en lib/dm/respuestas.js.
+// charla con lo que quiere que le diga, y el agente le escribe al lead por Instagram (API de
+// ManyChat). "/textual texto" lo manda tal cual; "/agente" le devuelve la charla al agente. La
+// lógica está en lib/dm/respuestas.js.
 //
 // Lo conecta config { accion: "telegram_respuestas" }: llama a setWebhook con un secreto propio
 // que Telegram manda en cada novedad (x-telegram-bot-api-secret-token). Sin ese secreto, no entra.
@@ -8,7 +9,8 @@
 //
 // Contesta 200 aunque algo falle: con otro código Telegram reintenta. Igual cada novedad se
 // reclama una sola vez (base.reclamarNovedad), así un reintento no manda dos veces.
-import { mismoSecreto } from "../../../lib/dm/armado";
+import { waitUntil } from "@vercel/functions";
+import { agente, mismoSecreto } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
 import * as manychat from "../../../lib/dm/manychat";
 import { crearRespuestaTelegram, leerRespuesta } from "../../../lib/dm/respuestas";
@@ -34,12 +36,16 @@ export default async function handler(req, res) {
     await decir(r.ayuda);
     return res.status(200).json({ ok: true });
   }
-  try {
-    await crearRespuestaTelegram({ base, manychat, decir })(r, { updateId: novedad.update_id });
-  } catch (e) {
-    // Si el mensaje ya había salido, crearRespuestaTelegram lo dice antes: acá solo llega lo que falló antes de mandar.
-    console.error("dm telegram:", e.message);
-    await decir(`No salió: algo falló del lado del sitio (${String(e.message).slice(0, 150)})`);
-  }
+  // Una indicación espera a que el agente la redacte (hasta un minuto y pico con la Mac): Telegram
+  // recibe el 200 enseguida y el trabajo sigue aparte. La novedad igual se reclama una sola vez.
+  waitUntil(
+    crearRespuestaTelegram({ base, manychat, decir, agente })(r, { updateId: novedad.update_id }).catch(async (e) => {
+      // Si el mensaje ya había salido, crearRespuestaTelegram lo dice antes: acá solo llega lo que falló antes de mandar.
+      console.error("dm telegram:", e.message);
+      await decir(`No salió: algo falló del lado del sitio (${String(e.message).slice(0, 150)})`);
+    }),
+  );
   return res.status(200).json({ ok: true });
 }
+
+export const config = { maxDuration: 300 };
