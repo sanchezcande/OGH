@@ -19,6 +19,8 @@
 //                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
 //                                                  con quitar: true se desconecta
+//   { accion: "seguidos", usuarios: [...], reemplazar? } → carga la lista de cuentas que sigue Cande (la baja ella de
+//                                                  Instagram); con el ajuste "seguidos", el agente no le escribe a esa gente
 //   { accion: "instagram", contacto? }             → prueba la lectura directa de Instagram sin cambiar nada: la cuenta,
 //                                                  si lee la bandeja y, con contacto, si encuentra su charla, si Cande
 //                                                  la sigue y si hay un "--" que cuente (lib/dm/instagram.js)
@@ -32,11 +34,11 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
-import { codigoEnHilo, desdeDe, explicarError, hayInstagram } from "../../../lib/dm/instagram";
+import { codigoEnHilo, desdeDe, explicarError, hayInstagram, usuarioIg } from "../../../lib/dm/instagram";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -237,6 +239,14 @@ export default async function handler(req, res) {
         "Respondiendo un aviso con /agente, esa charla vuelve al agente.",
     });
     return res.status(200).json({ ok: true, manychat: hayManyChat() });
+  }
+
+  if (b.accion === "seguidos") {
+    const usuarios = Array.isArray(b.usuarios) ? [...new Set(b.usuarios.map((u) => usuarioIg(u)))].filter(Boolean) : [];
+    if (!usuarios.length || usuarios.length > 20000 || usuarios.some((u) => !/^[a-z0-9._]{1,30}$/.test(u))) {
+      return res.status(400).json({ error: "usuarios: una lista de usuarios de Instagram" });
+    }
+    return res.status(200).json({ ok: true, recibidos: usuarios.length, en_la_lista: await anotarSeguidos(usuarios, { reemplazar: b.reemplazar === true }) });
   }
 
   if (b.accion === "instagram") {

@@ -2112,3 +2112,17 @@ test("si Cande toma la charla mientras se mira Instagram antes de mandar, la res
 test("el código para sacar al agente nunca sale de la cuenta", () => {
   for (const m of ["--", "—", "/yo"]) frena(revisar(salida([m])), m);
 });
+
+test("con solo el ajuste de seguidos (sin token), el agente mira la lista", async () => {
+  let mundo;
+  const ig = reglasFalsas(["la seguís en Instagram"], () => mundo.m);
+  ig.conApi = false;
+  const vistas = [];
+  const porQue = ig.porQueSale;
+  ig.porQueSale = async (c, op) => { vistas.push(op); return porQue(c, op); };
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.seguidos = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "de Cande por Instagram");
+  assert.deepEqual(vistas[0], { lista: true, api: false });
+});

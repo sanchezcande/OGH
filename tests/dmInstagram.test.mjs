@@ -223,6 +223,9 @@ function mundoReglas({ contacto = {}, manychat = { ok: true, ig_username: "Lead.
     contactoDeIg: async ({ igId, usuario }) =>
       (m.contacto.ig_id && m.contacto.ig_id === igId) || (!m.contacto.ig_id && m.contacto.ig_usuario && m.contacto.ig_usuario === usuario)
         ? { ...m.contacto } : null,
+    seguidos: new Set(),
+    loSigue: async (u) => base.seguidos.has(u),
+    anotarSeguidos: async (us) => { us.forEach((u) => base.seguidos.add(u)); return base.seguidos.size; },
     tomar: async (id, marca) => (m.tomado || m.contacto.dueno !== "agente" ? null : ((m.tomado = marca), { ...m.contacto })),
     soltar: async (id, marca) => { if (m.tomado === marca) m.tomado = null; },
     descartarPendientes: async () => { m.descartados++; },
@@ -408,4 +411,25 @@ test("el id que dio ManyChat se guarda y se prueba sin volver a preguntarle; si 
   } });
   await assert.rejects(corte.reglas.resolver(corte.m.contacto));
   assert.equal(corte.m.contacto.ig_id_mc, "333", "un corte no dice que el id no sirva");
+});
+
+test("la lista de seguidos: sin token, con el usuario que da ManyChat, el agente sale si Cande lo sigue", async () => {
+  const { m, base, reglas } = mundoReglas();
+  const sinToken = crearReglasInstagram({ ig: null, base, manychat: { datosDe: async () => { m.pedidosManyChat++; return { ok: true, ig_username: "@Lead.Prueba", ig_id: null }; } }, avisar: async () => true });
+  assert.equal(await sinToken.porQueSale(m.contacto, { lista: true, api: true }), null, "todavía no está en la lista");
+  base.seguidos.add("lead.prueba");
+  assert.equal(await sinToken.porQueSale(m.contacto, { lista: true, api: true }), "la seguís en Instagram");
+  assert.equal(m.pedidosManyChat, 1, "el usuario se pide una sola vez");
+  assert.equal(await sinToken.porQueSale({ ...m.contacto, entregada: true }, { lista: true }), null, "si Cande se la dio al agente, no sale");
+  assert.equal(await sinToken.porQueSale(m.contacto, { lista: false }), null, "sin el ajuste no se mira");
+  assert.equal(sinToken.conApi, false);
+  assert.equal(reglas.conApi, true);
+});
+
+test("lo que Instagram dice que Cande sigue se suma a la lista", async () => {
+  const { m, base, reglas } = mundoReglas({ contacto: { ig_id: "501", entregada: true }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(1, "hola")])), "/501": perfilDe(true),
+  } });
+  assert.equal(await reglas.porQueSale(m.contacto), null);
+  assert.ok(base.seguidos.has("lead.prueba"));
 });
