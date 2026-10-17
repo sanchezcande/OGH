@@ -441,10 +441,10 @@ test("lo que Instagram dice que Cande sigue se suma a la lista", async () => {
 test("un mensaje de la cuenta que no mandó el agente ni un automático, después de que la charla es del agente, es Cande a mano", () => {
   const h = (mensajes) => leerHilo(hiloCrudo(1, mensajes), CUENTA);
   const desde = hace(60);
-  const conocidos = ["Qué piolaaa! Y estás buscando trabajo?", "Holiii gracias por seguirme! :) tenemos alguien en común o te aparecí en el feed?"];
+  const conocidos = ["Mensaje de prueba del agente, con pregunta?", "Saludo fijo de prueba que manda un automático"];
   assert.ok(manualEnHilo(h([msj(2, "Uy si ahí vi, ya te contesto yo", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde));
-  assert.equal(manualEnHilo(h([msj(2, "Qué piolaaa!\nY estás buscando trabajo?", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "lo mandó el agente");
-  assert.equal(manualEnHilo(h([msj(2, "Holiii gracias por seguirme! :) tenemos alguien en común o te aparecí en el feed?", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "es el automático");
+  assert.equal(manualEnHilo(h([msj(2, "Mensaje de prueba del agente,\ncon pregunta?", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "lo mandó el agente");
+  assert.equal(manualEnHilo(h([msj(2, "Saludo fijo de prueba que manda un automático", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "es el automático");
   assert.equal(manualEnHilo(h([msj(2, "Te escribo yo esto a mano", { deCuenta: true, min: 120 })]), CUENTA, conocidos, desde), null, "es de antes de que la charla fuera del agente");
   assert.equal(manualEnHilo(h([msj(2, "Te escribo yo esto a mano", { min: 5 })]), CUENTA, conocidos, desde), null, "lo escribió el lead");
   assert.equal(manualEnHilo(h([msj(2, "❤️", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "un emoji no dice nada");
