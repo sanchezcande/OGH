@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     const desde = ultimo ? new Date(ultimo.getTime() - SOLAPE_MS) : null;
     // La primera vez mira solo las 10 últimas: los "--" viejos los ve el agente al contestar.
     const r = await buscarCodigos({
-      ig: instagram, base: { contactoDeIg, guardarIg, tomar, soltar, textosDeLaCuenta }, reglas: reglasInstagram, desde, limite: ultimo ? 50 : 10,
+      ig: instagram, base: { contactoDeIg, guardarIg, tomar, soltar, textosDeLaCuenta }, reglas: reglasInstagram, desde, limite: ultimo ? 20 : 10,
     });
     ({ miradas, sacadas } = r);
     if (r.hasta && (!ultimo || r.hasta > ultimo)) await guardarConfig("instagram_visto", { hasta: r.hasta.toISOString() });
