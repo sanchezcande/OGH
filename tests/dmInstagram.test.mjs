@@ -498,3 +498,11 @@ test("con el permiso del sitio (Facebook), lee las charlas por la página de la 
   const sin = crearInstagram({ pedir, ...configFalso(), credencialFb: async () => null });
   await assert.rejects(sin.cuenta(), /falta el permiso/);
 });
+
+test("\"Cande aquí\" al principio es Cande presentándose, aunque un automático arranque igual; el automático tal cual, no", () => {
+  const h = (texto) => leerHilo(hiloCrudo(1, [msj(2, texto, { deCuenta: true, min: 5 })]), CUENTA);
+  const auto = "Cande aquí, mensaje fijo de prueba?";
+  assert.ok(manualEnHilo(h("Cande aquí"), CUENTA, [auto], hace(60)));
+  assert.ok(manualEnHilo(h("Cande aquí! cómo va eso?"), CUENTA, [auto], hace(60)));
+  assert.equal(manualEnHilo(h(auto), CUENTA, [auto], hace(60)), null);
+});
