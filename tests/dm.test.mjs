@@ -2153,3 +2153,15 @@ test("respondiendo un aviso con \"salí\" o \"yo\", la charla queda de Cande; /t
   for (const t of ["Salí", "yo", "yo agarro la charla"]) assert.deepEqual(leerRespuesta(novedadDe(t), { duena: "42" }), { contacto: "123456789", accion: "cande" }, t);
   assert.equal(leerRespuesta(novedadDe("/textual Dale, te escribo yo"), { duena: "42" }).accion, "mandar");
 });
+
+test("el aviso de una charla trae el link que la abre en Instagram; sin usuario, sale sin link", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Una sola pregunta?"], { accion: "pasar_a_cande", aviso_para_cande: "HOY: algo" }) });
+  m.contacto.ig_usuario = "lead.prueba";
+  await agente.procesar("77", m.disparo);
+  assert.equal(m.avisos.at(-1).campos.Instagram, "https://ig.me/m/lead.prueba");
+  assert.ok(Object.keys(m.avisos.at(-1).campos)[0] === "Quién", "el renglón Quién sigue primero");
+  const sin = armar({ responde: () => salida(["Una sola pregunta?"], { accion: "pasar_a_cande", aviso_para_cande: "HOY: algo" }) });
+  sin.m.contacto.ig_usuario = "";
+  await sin.agente.procesar("77", sin.m.disparo);
+  assert.equal(sin.m.avisos.at(-1).campos.Instagram, undefined);
+});
