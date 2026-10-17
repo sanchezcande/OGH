@@ -506,3 +506,12 @@ test("\"Cande aquí\" al principio es Cande presentándose, aunque un automátic
   assert.ok(manualEnHilo(h("Cande aquí! cómo va eso?"), CUENTA, [auto], hace(60)));
   assert.equal(manualEnHilo(h(auto), CUENTA, [auto], hace(60)), null);
 });
+
+test("una demora o el límite de pedidos de Instagram no le llegan a Cande como aviso; un permiso vencido sí", async () => {
+  const demora = mundoReglas({ contacto: { ig_id: "501" }, rutas: { "/me/conversations": () => ({ error: { message: "despacio", code: 4 } }), "/501": () => ({ error: { message: "despacio", code: 4 } }) } });
+  assert.equal(await demora.reglas.porQueSale(demora.m.contacto), null);
+  await demora.reglas.fallo(new ErrorInstagram("Instagram tardó más de 12 segundos", { demora: true }));
+  assert.equal(demora.m.avisos.length, 0);
+  await demora.reglas.fallo(new ErrorInstagram("Error validating access token", { code: 190 }));
+  assert.equal(demora.m.avisos.length, 1);
+});
