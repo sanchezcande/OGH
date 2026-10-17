@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 
 const {
   fechaDe, leerHilo, esDeLaCuenta, codigoEnHilo, desdeDe, crearInstagram, crearReglasInstagram, buscarCodigos, explicarError,
-  ErrorInstagram, usuarioIg,
+  ErrorInstagram, usuarioIg, manualEnHilo, desdeManual,
 } = await import("../lib/dm/instagram.js");
 
 const AHORA = new Date("2026-10-18T15:00:00Z");
@@ -224,6 +224,8 @@ function mundoReglas({ contacto = {}, manychat = { ok: true, ig_username: "Lead.
       (m.contacto.ig_id && m.contacto.ig_id === igId) || (!m.contacto.ig_id && m.contacto.ig_usuario && m.contacto.ig_usuario === usuario)
         ? { ...m.contacto } : null,
     seguidos: new Set(),
+    conocidos: [],
+    textosDeLaCuenta: async () => base.conocidos,
     loSigue: async (u) => base.seguidos.has(u),
     anotarSeguidos: async (us) => { us.forEach((u) => base.seguidos.add(u)); return base.seguidos.size; },
     tomar: async (id, marca) => (m.tomado || m.contacto.dueno !== "agente" ? null : ((m.tomado = marca), { ...m.contacto })),
@@ -432,4 +434,67 @@ test("lo que Instagram dice que Cande sigue se suma a la lista", async () => {
   } });
   assert.equal(await reglas.porQueSale(m.contacto), null);
   assert.ok(base.seguidos.has("lead.prueba"));
+});
+
+/* ---------- Cande escribiendo a mano, y el permiso con el que publica el sitio ---------- */
+
+test("un mensaje de la cuenta que no mandó el agente ni un automático, después de que la charla es del agente, es Cande a mano", () => {
+  const h = (mensajes) => leerHilo(hiloCrudo(1, mensajes), CUENTA);
+  const desde = hace(60);
+  const conocidos = ["Mensaje de prueba del agente, con pregunta?", "Saludo fijo de prueba que manda un automático"];
+  assert.ok(manualEnHilo(h([msj(2, "Uy si ahí vi, ya te contesto yo", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde));
+  assert.equal(manualEnHilo(h([msj(2, "Mensaje de prueba del agente,\ncon pregunta?", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "lo mandó el agente");
+  assert.equal(manualEnHilo(h([msj(2, "Saludo fijo de prueba que manda un automático", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "es el automático");
+  assert.equal(manualEnHilo(h([msj(2, "Te escribo yo esto a mano", { deCuenta: true, min: 120 })]), CUENTA, conocidos, desde), null, "es de antes de que la charla fuera del agente");
+  assert.equal(manualEnHilo(h([msj(2, "Te escribo yo esto a mano", { min: 5 })]), CUENTA, conocidos, desde), null, "lo escribió el lead");
+  assert.equal(manualEnHilo(h([msj(2, "❤️", { deCuenta: true, min: 5 })]), CUENTA, conocidos, desde), null, "un emoji no dice nada");
+  assert.equal(manualEnHilo(h([msj(2, "algo", { deCuenta: true, min: 5 })]), CUENTA, conocidos, null), null, "sin fecha de inicio no se mira");
+  assert.deepEqual(desdeManual({ dueno_desde: hace(60), alta_en: hace(30) }), hace(30));
+});
+
+test("porQueSale: si Cande le escribió a mano, el agente sale", async () => {
+  const { m, base, reglas } = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, "Uy si, ya te contesto yo", { deCuenta: true, min: 2 }), msj(2, "hola", { min: 3 })])),
+    "/501": perfilDe(false),
+  } });
+  assert.equal(await reglas.porQueSale(m.contacto), "le escribiste vos");
+  base.conocidos = ["Uy si, ya te contesto yo"];
+  assert.equal(await reglas.porQueSale(m.contacto), null, "si ya está anotado, no");
+});
+
+test("la vuelta del cron: un texto que salió igual en dos charlas es un automático, no Cande", async () => {
+  const otro2 = { id: "502", username: "lead.dos" };
+  const auto = "Hola! Este es un mensaje fijo que sale solo";
+  const { m, ig, base, reglas } = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(
+      hiloCrudo(1, [msj(2, auto, { deCuenta: true, min: 2 }), msj(1, "hola", { min: 3 })], 1),
+      hiloCrudo(2, [msj(3, auto, { deCuenta: true, min: 2, otro: otro2 })], 2),
+    ),
+  } });
+  assert.equal((await buscarCodigos({ ig, base, reglas, desde: null })).sacadas, 0);
+  assert.equal(m.contacto.dueno, "agente");
+});
+
+test("con el permiso del sitio (Facebook), lee las charlas por la página de la cuenta, sin otro token", async () => {
+  const pedidos = [];
+  const pedir = async (url) => {
+    const u = new URL(url);
+    pedidos.push({ host: u.host, ruta: u.pathname, tok: u.searchParams.get("access_token") });
+    const p = u.pathname.replace(/^\/v\d+\.\d+/, "");
+    const r = p === "/me/accounts" ? { data: [{ id: "77001", access_token: "tok-pagina", instagram_business_account: { id: "900" } }] }
+      : p === "/900" ? { username: "cuenta.prueba" }
+      : p === "/77001/conversations" ? { data: [hiloCrudo(1, [msj(1, "--", { deCuenta: true }), msj(2, "hola")])] }
+      : { error: { message: "ruta " + p, code: 100 } };
+    return { ok: !r.error, status: r.error ? 400 : 200, json: async () => r };
+  };
+  const ig = crearInstagram({ pedir, ...configFalso(), tokenEnv: () => "", credencialFb: async () => ({ id: "900", token: "tok-usuario" }) });
+  assert.deepEqual(await ig.cuenta(), { user_id: "900", username: "cuenta.prueba" });
+  const h = await ig.hiloDe("501");
+  assert.ok(codigoEnHilo(h, await ig.cuenta(), null));
+  assert.ok(pedidos.every((p) => p.host === "graph.facebook.com"));
+  assert.equal(pedidos.find((p) => p.ruta.endsWith("/me/accounts")).tok, "tok-usuario");
+  assert.ok(pedidos.filter((p) => p.ruta.endsWith("/conversations")).every((p) => p.tok === "tok-pagina"));
+  assert.equal((await ig.renovar()).hecho, "lo renueva el dashboard");
+  const sin = crearInstagram({ pedir, ...configFalso(), credencialFb: async () => null });
+  await assert.rejects(sin.cuenta(), /falta el permiso/);
 });

@@ -34,11 +34,11 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, textosDeLaCuenta, tokenRed, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
-import { codigoEnHilo, desdeDe, explicarError, hayInstagram, usuarioIg } from "../../../lib/dm/instagram";
+import { codigoEnHilo, desdeDe, desdeManual, explicarError, manualEnHilo, usuarioIg } from "../../../lib/dm/instagram";
 import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -245,6 +245,14 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, manychat: hayManyChat() });
   }
 
+  if (b.accion === "automaticos") {
+    // Los textos de los automáticos de ManyChat: salen de la cuenta pero no los escribió Cande a mano.
+    const textos = Array.isArray(b.textos) ? b.textos.map((t) => String(t || "").trim()).filter(Boolean).slice(0, 200) : [];
+    if (!textos.length) return res.status(400).json({ error: "textos: una lista" });
+    await guardarConfig("automaticos", { textos });
+    return res.status(200).json({ ok: true, textos: textos.length });
+  }
+
   if (b.accion === "seguidos") {
     const usuarios = Array.isArray(b.usuarios) ? [...new Set(b.usuarios.map((u) => usuarioIg(u)))].filter(Boolean) : [];
     if (!usuarios.length || usuarios.length > 20000 || usuarios.some((u) => !/^[a-z0-9._]{1,30}$/.test(u))) {
@@ -256,7 +264,6 @@ export default async function handler(req, res) {
   if (b.accion === "instagram") {
     // Para probar la conexión el día que se carga el token. Solo lee: lo único que guarda es el
     // usuario y el id de Instagram del contacto, si los encuentra. No devuelve textos ni usuarios.
-    if (!hayInstagram()) return res.status(409).json({ error: "falta INSTAGRAM_TOKEN en Vercel" });
     const out = { reglas: (await ajustes()).instagram === true, dias_de_token: await instagram.diasQueQuedan() };
     let yo;
     try {
@@ -287,6 +294,7 @@ export default async function handler(req, res) {
           Object.assign(out.contacto, {
             la_seguis: p.laSigue, mensajes_con_texto: hilo ? hilo.mensajes.filter((m) => m.texto != null).length : 0,
             hay_codigo: Boolean(hilo && codigoEnHilo(hilo, yo, desdeDe(c))),
+            escribio_cande: Boolean(hilo && manualEnHilo(hilo, yo, await textosDeLaCuenta(id), desdeManual(c))),
           });
         }
       } catch (e) {
@@ -305,7 +313,7 @@ export default async function handler(req, res) {
         anthropic: Boolean(process.env.ANTHROPIC_API_KEY), manychat: hayManyChat(),
         dm_secreto: Boolean(process.env.DM_SECRETO) || Boolean((await leerConfig("secreto_dm"))?.huella),
         telegram: hayTelegram(), bot_del_agente: hayBotDm(), respuestas_por_telegram: Boolean((await leerConfig("telegram_respuestas"))?.secreto), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
-        cron_secret: Boolean(process.env.CRON_SECRET), instagram: hayInstagram(),
+        cron_secret: Boolean(process.env.CRON_SECRET), instagram: Boolean(await tokenRed("ig")),
       },
       cerebro_local_hace_segundos: await segundosDesdeElLatido(),
       ...(await resumen()),
