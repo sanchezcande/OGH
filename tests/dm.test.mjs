@@ -1780,7 +1780,7 @@ test("cerebro local: qué falla se reintenta (la Mac no contestó o tardó) y cu
 
 /* ---------- Cande contesta desde el bot del agente ---------- */
 
-const { contactoDeAviso, leerRespuesta, resultadoDeEnvio, crearRespuestaTelegram } = await import("../lib/dm/respuestas.js");
+const { contactoDeAviso, leerRespuesta, resultadoDeEnvio, crearRespuestaTelegram, quiereLaCharla } = await import("../lib/dm/respuestas.js");
 
 const AVISO_DE_PRUEBA = "🔔 DM: te paso una charla\n\nQuién: Lead De Prueba (123456789)\nLo último que dijo: algo";
 const novedadDe = (texto, { de = "42", chat = "42", tipo = "private", respondido = AVISO_DE_PRUEBA, delBot = true } = {}) => ({
@@ -2136,4 +2136,20 @@ test("el link de MercadoPago cargado en los ajustes sale como un link de pago; u
   frena(revisar(texto, { ...dev, otrosPagos: [mp], estadoPrevio: { ...estadoDev, quien: "empresa" } }), "a una empresa no se le vende");
   assert.equal(validarAjustes({ link_mercadopago: mp }).ok, true);
   assert.equal(validarAjustes({ link_mercadopago: "pago.ejemplo.com" }).ok, false);
+});
+
+test("si Cande dice con sus palabras que la charla la agarra ella, el agente sale; un pedido para el lead sigue siendo una indicación", () => {
+  for (const t of ["Salí", "salí!", "Yo", "yo agarro la charla", "Yo la agarro", "la sigo yo", "salí de la charla", "Salite", "andate de acá", "me encargo yo",
+    "ya estoy yo", "dejamela", "yo le contesto", "no le escribas más", "no te metas", "esta es mía"]) {
+    assert.equal(quiereLaCharla(t), true, t);
+  }
+  for (const t of ["decile que yo le escribo mañana", "contestale que sí", "preguntale si sigue buscando", "hola",
+    "Que si entra antes del lunes le doy feedback", "decile que la charla la seguimos el lunes", "yo no sé qué decirle"]) {
+    assert.equal(quiereLaCharla(t), false, t);
+  }
+});
+
+test("respondiendo un aviso con \"salí\" o \"yo\", la charla queda de Cande; /textual sigue mandando tal cual", () => {
+  for (const t of ["Salí", "yo", "yo agarro la charla"]) assert.deepEqual(leerRespuesta(novedadDe(t), { duena: "42" }), { contacto: "123456789", accion: "cande" }, t);
+  assert.equal(leerRespuesta(novedadDe("/textual Dale, te escribo yo"), { duena: "42" }).accion, "mandar");
 });
