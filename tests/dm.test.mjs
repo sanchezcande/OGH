@@ -2009,3 +2009,14 @@ test("una indicación contesta también lo que el lead había dejado sin respues
   assert.equal(r.hecho, "enviada");
   assert.equal(m.contacto.respondido_hasta, m.disparo);
 });
+
+test("el link de MercadoPago cargado en los ajustes sale como un link de pago; uno que no está cargado, no", () => {
+  const mp = "https://pago.ejemplo.com/abc";
+  const texto = salida(["Si es eso, te dejo uno en pesos\npago.ejemplo.com/abc"]);
+  const dev = { textosDelLead: ["no manejo dolares"], charlaDelLead: ["soy dev y busco trabajo", "me cuesta el cv", "no manejo dolares"], estadoPrevio: { ...estadoDev, link_formulario_enviado: true } };
+  frena(revisar(texto, { ...dev, linkDePago: "https://pago.propio.com/x" }), "sin cargar no sale");
+  pasa(revisar(texto, { ...dev, linkDePago: "https://pago.propio.com/x", otrosPagos: [mp] }), "cargado sale");
+  frena(revisar(texto, { ...dev, otrosPagos: [mp], estadoPrevio: { ...estadoDev, quien: "empresa" } }), "a una empresa no se le vende");
+  assert.equal(validarAjustes({ link_mercadopago: mp }).ok, true);
+  assert.equal(validarAjustes({ link_mercadopago: "pago.ejemplo.com" }).ok, false);
+});
