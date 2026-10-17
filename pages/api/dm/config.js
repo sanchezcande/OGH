@@ -34,12 +34,14 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, textosDeLaCuenta, tokenRed, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, textosDeLaCuenta, tokenRed, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
-import { codigoEnHilo, desdeDe, desdeManual, explicarError, manualEnHilo, usuarioIg } from "../../../lib/dm/instagram";
-import { hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
+import {
+  codigoEnHilo, desdeDe, desdeManual, explicarError, linkCharlaIg, manualEnHilo, usuarioIg, usuarioParaAviso,
+} from "../../../lib/dm/instagram";
+import { datosDe, hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
 // Quién puede figurar en una charla cargada a mano. "agente" no: lo que mandó el agente lo anota él.
@@ -210,7 +212,8 @@ export default async function handler(req, res) {
       const c = await contacto(id);
       if (!c) return res.status(404).json({ error: "ese contacto no está en la base del agente" });
       const nombre = String(c.nombre || "sin nombre").replace(/\s+/g, " ");
-      const llego = await avisarDm("DM: charla para mirar", { Quién: `${nombre} (${id})`, Aviso: texto });
+      const link = linkCharlaIg(await usuarioParaAviso(c, { base: { guardarIg }, manychat: { datosDe } }));
+      const llego = await avisarDm("DM: charla para mirar", { Quién: `${nombre} (${id})`, Aviso: texto, ...(link ? { Instagram: link } : {}) });
       return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
     }
     const llego = await avisarDm("DM: repaso de las charlas", { Repaso: texto });
