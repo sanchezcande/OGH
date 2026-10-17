@@ -327,7 +327,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
-  hayManyChat = true,
+  hayManyChat = true, instagram = null,
 } = {}) {
   const m = {
     ajustes: {
@@ -407,7 +407,7 @@ function armar({
     return id;
   };
   const esperar = async () => { await tick(); alEsperar?.(m); };
-  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora });
+  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50 });
   return { agente, m };
 }
 
@@ -2008,6 +2008,123 @@ test("una indicación contesta también lo que el lead había dejado sin respues
   const r = await agente.procesar("77", null, { evento: "indicacion", indicacion: "contestale que sí" });
   assert.equal(r.hecho, "enviada");
   assert.equal(m.contacto.respondido_hasta, m.disparo);
+});
+
+/* ---------- la lectura directa de Instagram en cada turno (lib/dm/instagram.js) ---------- */
+
+/** Reglas de Instagram de mentira: `respuestas` es lo que contesta cada mirada, en orden. */
+function reglasFalsas(respuestas, m) {
+  const r = { miradas: 0, sacadas: [] };
+  r.porQueSale = async () => {
+    const x = respuestas[Math.min(r.miradas++, respuestas.length - 1)];
+    return typeof x === "function" ? x() : x;
+  };
+  r.sacar = async (c, motivo) => { r.sacadas.push(motivo); m().contacto.dueno = "cande"; };
+  return r;
+}
+
+test("si Cande sigue a la persona o escribió -- en Instagram, el agente sale sin pedirle nada al modelo y sin avisar", async () => {
+  let mundo;
+  const ig = reglasFalsas(["la seguís en Instagram"], () => mundo.m);
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "de Cande por Instagram");
+  assert.deepEqual(ig.sacadas, ["la seguís en Instagram"]);
+  assert.equal(mundo.m.pedidos.length, 0);
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.avisos.length, 0);
+  assert.equal(mundo.m.contacto.dueno, "cande");
+  assert.equal(mundo.m.tomado, null);
+});
+
+test("sin el ajuste de Instagram, o si Cande pidió el mensaje desde Telegram, no se mira Instagram", async () => {
+  let a;
+  const igA = reglasFalsas(["la seguís en Instagram"], () => a.m);
+  a = armar({ instagram: igA });
+  assert.equal((await a.agente.procesar("77", a.m.disparo)).hecho, "enviada");
+  assert.equal(igA.miradas, 0);
+  let b;
+  const igB = reglasFalsas(["la seguís en Instagram"], () => b.m);
+  b = armar({ instagram: igB });
+  b.m.ajustes.instagram = true;
+  b.m.contacto.respondido_hasta = b.m.disparo;
+  assert.equal((await b.agente.procesar("77", null, { evento: "indicacion", indicacion: "decile hola" })).hecho, "enviada");
+  assert.equal(igB.miradas, 0);
+});
+
+test("si Cande escribe -- mientras se genera la respuesta, la respuesta no sale", async () => {
+  let mundo;
+  const ig = reglasFalsas([null, "escribiste -- en Instagram"], () => mundo.m);
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "de Cande por Instagram");
+  assert.equal(ig.miradas, 2);
+  assert.equal(mundo.m.pedidos.length, 1);
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.salidas.at(-1).estado, "descartada");
+  assert.match(mundo.m.salidas.at(-1).detalle, /--/);
+});
+
+test("un toque a alguien que Cande sigue no sale", async () => {
+  let mundo;
+  const ig = reglasFalsas(["la seguís en Instagram"], () => mundo.m);
+  mundo = armarToque({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await toque(mundo.agente);
+  assert.equal(r.hecho, "de Cande por Instagram");
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.pedidos.length, 0);
+});
+
+test("si Instagram falla o tarda, el agente contesta igual", async () => {
+  let a;
+  const igA = reglasFalsas([() => { throw new Error("Instagram caído"); }], () => a.m);
+  a = armar({ instagram: igA });
+  a.m.ajustes.instagram = true;
+  assert.equal((await a.agente.procesar("77", a.m.disparo)).hecho, "enviada");
+  let b;
+  const igB = reglasFalsas([() => new Promise(() => {})], () => b.m); // nunca contesta
+  b = armar({ instagram: igB });
+  b.m.ajustes.instagram = true;
+  assert.equal((await b.agente.procesar("77", b.m.disparo)).hecho, "enviada");
+  assert.deepEqual(b.m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(b.m.contacto.dueno, "agente");
+});
+
+test("el ajuste instagram es un sí o un no, y arranca apagado", () => {
+  assert.equal(AJUSTES_POR_DEFECTO.instagram, false);
+  assert.equal(validarAjustes({ instagram: true }).ok, true);
+  assert.equal(validarAjustes({ instagram: "si" }).ok, false);
+});
+
+test("si Cande toma la charla mientras se mira Instagram antes de mandar, la respuesta no sale", async () => {
+  let mundo;
+  const ig = reglasFalsas([null, () => { mundo.m.contacto.dueno = "cande"; return null; }], () => mundo.m);
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "descartada");
+  assert.equal(mundo.m.enviados.length, 0);
+});
+
+test("el código para sacar al agente nunca sale de la cuenta", () => {
+  for (const m of ["--", "—", "/yo"]) frena(revisar(salida([m])), m);
+});
+
+test("con solo el ajuste de seguidos (sin token), el agente mira la lista", async () => {
+  let mundo;
+  const ig = reglasFalsas(["la seguís en Instagram"], () => mundo.m);
+  ig.conApi = false;
+  const vistas = [];
+  const porQue = ig.porQueSale;
+  ig.porQueSale = async (c, op) => { vistas.push(op); return porQue(c, op); };
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.seguidos = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "de Cande por Instagram");
+  assert.deepEqual(vistas[0], { lista: true, api: false });
 });
 
 test("el link de MercadoPago cargado en los ajustes sale como un link de pago; uno que no está cargado, no", () => {

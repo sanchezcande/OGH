@@ -15,6 +15,10 @@
     {
       "path": "/api/dm/toques",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/dm/instagram",
+      "schedule": "*/2 * * * *"
     }
   ]
 }
