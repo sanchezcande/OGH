@@ -84,6 +84,10 @@ export default async function handler(req, res) {
     if (ahora.modo !== antes.modo) await avisarDm("DM: cambió el modo del agente", { Ahora: ahora.modo, Antes: antes.modo });
     // El link de pago es el único link ajeno que los frenos dejan pasar: un cambio no puede ser callado.
     // Los demás ajustes cambian sin aviso.
+    if (ahora.link_mercadopago !== antes.link_mercadopago) {
+      const ver = (v) => (v === "" ? "(vacío)" : v);
+      await avisarDm("DM: cambió el link de MercadoPago del agente", { Antes: ver(antes.link_mercadopago), Ahora: ver(ahora.link_mercadopago) });
+    }
     if (ahora.link_de_pago !== antes.link_de_pago) {
       const ver = (v) => (v === "" ? "(vacío)" : v);
       await avisarDm("DM: cambió el link de pago del agente", { Antes: ver(antes.link_de_pago), Ahora: ver(ahora.link_de_pago) });
