@@ -92,15 +92,15 @@ test("si pidió la reunión ve la agenda en la página; si pidió la guía, la g
   assert.match(reunion, /<Agenda src=\{AGENDA\}/);
   assert.match(reunion, /Ahora elegí tu horario/);
   assert.match(reunion, /href=\{LLAMADA\} target="_blank"[^\n]*>\s*No te carga\? Abrí la agenda en otra pestaña →/);
-  // El respaldo va arriba de la agenda: si el iframe queda en blanco, abajo queda tapado por 720 px vacíos.
+  // El respaldo va arriba de la agenda: si el iframe queda en blanco, abajo queda tapado por un recuadro vacío.
   assert.ok(reunion.indexOf("No te carga?") < reunion.indexOf("<Agenda src={AGENDA}"), "el respaldo tiene que ir antes que la agenda");
   assert.match(reunion, /Si ningún horario te sirve, tranqui: te escribo por WhatsApp con dos opciones\./);
   assert.match(reunion, /href=\{PDF\}/, "el que pidió la reunión también tiene que poder bajar la guía");
 
-  // La agenda tiene que entrar en el celu: 720 de alto ahí y 600 en la compu.
+  // La agenda entera, sin recuadro con scroll adentro: a 375 px Google apila calendario y horarios (unos
+  // 1440 px). Con 720 los horarios quedaban escondidos abajo, adentro del iframe.
   const css = src.slice(src.indexOf("const Agenda = styled.iframe"));
-  assert.match(css.slice(0, 200), /width: 100%; height: 720px; border: 0;/);
-  assert.match(css.slice(0, 200), /min-width: 861px\) \{ height: 600px; \}/);
+  assert.match(css.slice(0, 400), /width: 100%; height: 1450px; border: 0;/);
 
   const i = src.indexOf(": deHola ? (", src.indexOf("</Reunion>"));
   const guia = src.slice(i, src.indexOf("</Listo>", i));

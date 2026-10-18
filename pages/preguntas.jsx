@@ -104,7 +104,9 @@ export default function Preguntas() {
       </Head>
       <Fondo>
         <Barra />
-        <Grid>
+        {/* La página es estática: en el HTML del servidor el ?o=hola todavía no se conoce y saldría un instante
+            la versión de LinkedIn. Hasta que el router lo lee, el contenido ocupa su lugar sin verse. */}
+        <Grid style={router.isReady ? undefined : { visibility: "hidden" }}>
           <Texto>
             {deHola ? (
               <>
@@ -360,8 +362,9 @@ const Respaldo = styled.a`
   &:hover { color: ${CORAL}; }
 `;
 const Agenda = styled.iframe`
-  display: block; width: 100%; height: 720px; border: 0; margin: 4px 0 4px;
-  @media (min-width: 861px) { height: 600px; }
+  /* Alto de la agenda entera (a 375 px Google apila calendario y horarios: unos 1440 px), así se baja con la
+     página y no adentro de un recuadro. */
+  display: block; width: 100%; height: 1450px; border: 0; margin: 4px 0 4px;
 `;
 const Check = styled.div`
   width: 36px; height: 36px; border-radius: 50%; background: #2E7D5B; color: #fff;
