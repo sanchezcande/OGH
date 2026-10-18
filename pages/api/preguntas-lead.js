@@ -23,6 +23,11 @@ export const PDF_PATH = "/guias/9-preguntas-entrevista-developer.pdf";
 const LLAMADA = "https://strategy.opengatehub.com";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Lo que eligió en /preguntas?o=hola el founder que tocó "quiero contratar": el botón grande pide la
+// reunión y el de texto, solo la guía. Va en el aviso porque cambia cómo les escribe Cande: al que
+// pidió la reunión y no reservó, en menos de una hora; al de la guía, ese mismo día.
+// Solo estos dos valores: cualquier otra cosa se descarta (Map.get compara exacto, ni arrays ni objetos).
+const QUIERE = new Map([["reunion", "reunión"], ["guia", "guía"]]);
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -79,7 +84,7 @@ Cada una tiene qué mide, las buenas y malas señales que escucho en la respuest
 
 Un consejo antes de usarlas: cuando termina de responder, contá hasta cinco antes de hablar. El que armó la respuesta sobre la marcha empieza a rellenar, y ese segundo intento es el que te sirve.
 
-¿Estás por contratar a tu developer?
+Estás por contratar a tu developer?
 
 Si querés contratar un programador del top 5%, de esos que te siguen el ritmo fácil, armo sesiones de planificación personalizadas, gratis. En 30 minutos te dejo un plan de acción concreto para encontrar y contratar al dev estrella de tu proyecto, sin que tengas que saber una línea de código ni ser técnico. No tiene costo.
 
@@ -96,7 +101,7 @@ Candelaria Sanchez, Founder, OpenGateHub`;
   <p style="margin:26px 0"><a href="${link}" style="background:#111111;color:#ffffff;text-decoration:none;padding:13px 22px;border-radius:4px;font-weight:600;display:inline-block">Descargar el PDF</a></p>
   <p>Cada una tiene qué mide, las buenas y malas señales que escucho en la respuesta y qué repreguntar.</p>
   <p>Un consejo antes de usarlas: cuando termina de responder, contá hasta cinco antes de hablar. El que armó la respuesta sobre la marcha empieza a rellenar, y ese segundo intento es el que te sirve.</p>
-  <p><b>¿Estás por contratar a tu developer?</b></p>
+  <p><b>Estás por contratar a tu developer?</b></p>
   <p>Si querés contratar un programador del top 5%, de esos que te siguen el ritmo fácil, armo sesiones de planificación personalizadas, gratis. En 30 minutos te dejo un plan de acción concreto para encontrar y contratar al dev estrella de tu proyecto, sin que tengas que saber una línea de código ni ser técnico. No tiene costo.</p>
   <p style="font-size:13px;color:#CC5A50;font-weight:600">Son pocos lugares. ${cupos}. Reservá el tuyo.</p>
   <p style="margin:14px 0"><a href="${LLAMADA}" style="background:#CC5A50;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:4px;font-weight:600;display:inline-block">Agendá tu llamada gratis</a></p>
@@ -116,6 +121,7 @@ export default async function handler(req, res) {
   // cualquier forma, y normalizarlos acá perdería más de lo que ordena. El CRM ya sabe armar
   // el número con el código de país cuando hay que llamar.
   const whatsapp = limpiar(req.body?.whatsapp, 40);
+  const quiere = QUIERE.get(req.body?.quiere);
   // Campo trampa: los humanos no lo ven, los bots lo llenan.
   if (limpiar(req.body?.web)) return res.status(200).json({ ok: true, pdf: PDF_PATH });
 
@@ -150,6 +156,7 @@ export default async function handler(req, res) {
 
   await avisar("Founder bajó las 9 preguntas", {
     Nombre: nombre, Email: email, WhatsApp: whatsapp || undefined, Origen: origen,
+    Quiere: quiere,
     Pedidos: pedidos > 1 ? `${pedidos} (ya lo había pedido)` : undefined,
     Guardado: guardado ? "sí" : "NO",
     "Mail enviado": mandado ? "sí" : "NO",

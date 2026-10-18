@@ -22,23 +22,31 @@ test("quiero contratar va a una pagina que captura, no a la agenda", async () =>
   assert.equal(u.searchParams.get("o"), "hola", "sin ?o=hola el lead entra sin saber de donde vino");
 });
 
-test("al que llega desde hola se le ofrece la guía primero y la reunión al lado del botón, antes de enviar", async () => {
-  // Cande, 19/10: "pondría primero la parte de las preguntas, tipo poné tus datos y descargá la guía, y el cta
-  // tiene que decir algo de la guía y después, o agendá directamente una reunión GRATIS conmigo".
+test("al que llega desde hola se le ofrece la reunión primero y la guía como salida chica, antes de enviar", async () => {
+  // 19/10/2026, después de investigar embudos: el que toca "quiero contratar" ya quiere hablar. La
+  // reunión va primero y la guía queda como un botón de texto chico para el que todavía no está listo.
+  // Reemplaza a la versión del mismo día con la guía primero (PR 79).
   const src = await leer("../pages/preguntas.jsx");
   assert.match(src, /const deHola = router\.query\.o === "hola"/);
   const iForm = src.indexOf("<Form onSubmit={enviar}");
-  const iPedido = src.indexOf("Poné tus datos y descargá la guía");
-  const iReunion = src.indexOf("O agendá directamente una reunión");
-  assert.ok(iPedido > iForm, "falta el pedido de la guía arriba del formulario");
-  assert.ok(iReunion > iForm, "falta la reunión como alternativa al lado del botón");
-  assert.match(src, /"Descargá la guía gratis →"/);
+  const iPedido = src.indexOf("Dejame tus datos y elegí tu horario");
+  const iReunion = src.indexOf('value="reunion"', iForm);
+  const iGuia = src.indexOf('value="guia"', iForm);
+  assert.ok(iPedido > iForm, "falta el pedido de la reunión arriba del formulario");
+  assert.ok(iReunion > iForm && iGuia > iReunion, "la reunión tiene que ser el primer botón y la guía el segundo");
+  assert.match(src, /"Quiero mi reunión gratis →"/);
 });
 test("la llamada no queda detras del mail", async () => {
   const src = await leer("../pages/preguntas.jsx");
-  // La reunión se ofrece dentro del formulario, antes de enviar: no solo en el estado "listo", el de después.
+  // La reunión se pide en el mismo formulario, antes de enviar: es el botón principal. Y al quedar
+  // "listo" la agenda aparece en la página, con el link de respaldo ARRIBA por si queda en blanco.
   const form = src.slice(src.indexOf("<Form onSubmit={enviar}"), src.indexOf("</Form>"));
-  assert.match(form, /Alterna href=\{LLAMADA\}/);
+  assert.match(form, /<BotonForm type="submit" name="quiere" value="reunion"/);
+  const despues = src.slice(src.indexOf("</Form>"));
+  assert.match(despues, /<Agenda src=\{AGENDA\}/);
+  assert.match(despues, /<Respaldo href=\{LLAMADA\}[^\n]*>\s*No te carga\? Abrí la agenda en otra pestaña →/);
+  assert.ok(despues.indexOf("<Respaldo href={LLAMADA}") < despues.indexOf("<Agenda src={AGENDA}"),
+    "el link de respaldo tiene que ir antes que la agenda: si queda en blanco, abajo no se ve");
 });
 test("ninguna pagina manda una fase que la API no acepte", async () => {
   const path = await import("node:path");
