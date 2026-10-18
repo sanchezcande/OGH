@@ -34,12 +34,20 @@ function versionDelVisitante() {
 // Mientras no esté el link de Gumroad el botón igual aparece, pero no navega:
 // sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
 const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
+// Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
+// que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, pagá en
+// pesos", para todos (así lo ven también los que entran por un link que les pasó Cande), y al tocarlo
+// se abre un cartelito: el link de MercadoPago y que le pase la captura por Instagram para el código.
+const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "https://mpago.li/1Ac31E4";
+const PRECIO_PESOS = process.env.NEXT_PUBLIC_DEVS_PRECIO_PESOS || "39.750";
+const IG_CANDE = "https://ig.me/m/candelaria.sanchezg";
 
 export default function Gracias() {
   const [termino, setTermino] = useState(false);
   // El sorteo pasa en el navegador, no en el render del servidor: si no, Next devuelve la misma
   // versión cacheada a todo el mundo y la prueba no reparte.
   const [ver, setVer] = useState("a");
+  const [cartel, setCartel] = useState(false);   // el cartelito del pago en pesos
   const WISTIA_ID = ver === "b" ? WISTIA_B : WISTIA_A;   // lo usa el <wistia-player> de abajo
 
   useEffect(() => {
@@ -85,6 +93,14 @@ export default function Gracias() {
     return () => clearInterval(reloj);
   }, []);
 
+  // El cartelito se cierra también con Escape.
+  useEffect(() => {
+    if (!cartel) return undefined;
+    const tecla = (e) => { if (e.key === "Escape") setCartel(false); };
+    window.addEventListener("keydown", tecla);
+    return () => window.removeEventListener("keydown", tecla);
+  }, [cartel]);
+
   return (
     <>
       <Head>
@@ -117,7 +133,34 @@ export default function Gracias() {
               >
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>
+              {MERCADOPAGO && (
+                <PesosBoton type="button" onClick={() => setCartel(true)}>
+                  Si sos de Argentina, pagá en pesos
+                </PesosBoton>
+              )}
             </Cierre>
+          )}
+
+          {cartel && (
+            <Velo onClick={() => setCartel(false)}>
+              <Cartel role="dialog" aria-modal="true" aria-labelledby="cartel-titulo" onClick={(e) => e.stopPropagation()}>
+                <Cerrar type="button" aria-label="Cerrar" onClick={() => setCartel(false)}>×</Cerrar>
+                <CartelTitulo id="cartel-titulo">Pagá en pesos por MercadoPago</CartelTitulo>
+                <CartelTexto>${PRECIO_PESOS}, pago único.</CartelTexto>
+                <CartelTexto>
+                  Pasame la captura del pago por{" "}
+                  <a href={IG_CANDE} target="_blank" rel="noopener noreferrer">Instagram</a> y te mando el código de ingreso.
+                </CartelTexto>
+                <PagarPesos
+                  href={MERCADOPAGO}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
+                >
+                  Ir a pagar con MercadoPago
+                </PagarPesos>
+              </Cartel>
+            </Velo>
           )}
 
         </Caja>
@@ -156,6 +199,40 @@ const Cierre = styled.div`
   animation: entrar .5s cubic-bezier(.32,.72,0,1) both;
   @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { animation: none; }
+`;
+const PesosBoton = styled.button`
+  display: block; margin: 16px auto 0; background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 15px; font-weight: 600; color: #c9bcc2; text-decoration: underline;
+  text-underline-offset: 3px;
+  &:hover { color: #f5f0f2; }
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
+`;
+const Velo = styled.div`
+  position: fixed; inset: 0; z-index: 50; background: rgba(10,8,10,.72);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+`;
+const Cartel = styled.div`
+  position: relative; width: 100%; max-width: 400px; background: #1d181c; color: #f5f0f2;
+  border: 1px solid rgba(245,240,242,.14); border-radius: 16px; padding: 28px 24px 24px; text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+`;
+const Cerrar = styled.button`
+  position: absolute; top: 8px; right: 12px; background: none; border: 0; cursor: pointer;
+  color: #a99ba1; font-size: 26px; line-height: 1; padding: 4px;
+  &:hover { color: #f5f0f2; }
+`;
+const CartelTitulo = styled.p` margin: 0 0 10px; font-size: 19px; font-weight: 700; `;
+const CartelTexto = styled.p`
+  margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: #c9bcc2;
+  a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; }
+`;
+const PagarPesos = styled.a`
+  display: inline-block; margin-top: 10px; background: #009ee3; color: #fff; text-decoration: none;
+  font-size: 16px; font-weight: 700; padding: 13px 24px; border-radius: 10px;
+  transition: transform .16s ease, background .16s ease;
+  &:hover, &:focus, &:active, &:visited { color: #fff; }
+  &:hover { background: #0087c2; transform: translateY(-2px); }
+  &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 `;
 const Pendiente = styled.p`
   margin: 12px 0 0; font-size: 13px; color: #8a7f84;
