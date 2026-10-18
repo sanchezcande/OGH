@@ -35,8 +35,8 @@ function versionDelVisitante() {
 // sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
 const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
 // Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
-// que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, pagá en
-// pesos", para todos (así lo ven también los que entran por un link que les pasó Cande), y al tocarlo
+// que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, apretá
+// acá" (Cande, 19/10: "no pagá en pesos"), para todos (así lo ven también los que entran por un link que les pasó Cande), y al tocarlo
 // se abre un cartelito: el link de MercadoPago y que le pase la captura por Instagram para el código.
 const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "https://mpago.li/1Ac31E4";
 const PRECIO_PESOS = process.env.NEXT_PUBLIC_DEVS_PRECIO_PESOS || "39.750";
@@ -135,7 +135,7 @@ export default function Gracias() {
               </Comprar>
               {MERCADOPAGO && (
                 <PesosBoton type="button" onClick={() => setCartel(true)}>
-                  Si sos de Argentina, pagá en pesos
+                  Si sos de Argentina, apretá acá
                 </PesosBoton>
               )}
             </Cierre>
