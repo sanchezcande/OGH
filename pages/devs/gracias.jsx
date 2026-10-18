@@ -34,6 +34,13 @@ function versionDelVisitante() {
 // Mientras no esté el link de Gumroad el botón igual aparece, pero no navega:
 // sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
 const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
+// Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
+// que pagó lo hizo en pesos por MercadoPago). Aparece con el botón, para todos ("si sos de Argentina"),
+// así lo ven también los que entran por un link que les pasó Cande. Con la captura del pago por
+// Instagram, Cande le manda el código de acceso.
+const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "https://mpago.li/1Ac31E4";
+const PRECIO_PESOS = process.env.NEXT_PUBLIC_DEVS_PRECIO_PESOS || "39.750";
+const IG_CANDE = "https://ig.me/m/candelaria.sanchezg";
 
 export default function Gracias() {
   const [termino, setTermino] = useState(false);
@@ -117,6 +124,23 @@ export default function Gracias() {
               >
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>
+              {MERCADOPAGO && (
+                <Pesos>
+                  <PesosTitulo>O si sos de Argentina, pagá en pesos acá</PesosTitulo>
+                  <PagarPesos
+                    href={MERCADOPAGO}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
+                  >
+                    Pagar ${PRECIO_PESOS} con MercadoPago
+                  </PagarPesos>
+                  <PesosNota>
+                    Pago único. Después pasame la captura del pago por{" "}
+                    <a href={IG_CANDE} target="_blank" rel="noopener noreferrer">Instagram</a> y te doy el código para entrar.
+                  </PesosNota>
+                </Pesos>
+              )}
             </Cierre>
           )}
 
@@ -156,6 +180,23 @@ const Cierre = styled.div`
   animation: entrar .5s cubic-bezier(.32,.72,0,1) both;
   @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { animation: none; }
+`;
+const Pesos = styled.div`
+  margin: 26px auto 0; max-width: 420px; padding: 18px 20px 16px;
+  border: 1px solid rgba(245,240,242,.14); border-radius: 14px; background: rgba(245,240,242,.04);
+`;
+const PesosTitulo = styled.p` margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #f5f0f2; `;
+const PagarPesos = styled.a`
+  display: inline-block; background: #009ee3; color: #fff; text-decoration: none;
+  font-size: 16px; font-weight: 700; padding: 13px 24px; border-radius: 10px;
+  transition: transform .16s ease, background .16s ease;
+  &:hover, &:focus, &:active, &:visited { color: #fff; }
+  &:hover { background: #0087c2; transform: translateY(-2px); }
+  &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+`;
+const PesosNota = styled.p`
+  margin: 10px 0 0; font-size: 13px; line-height: 1.45; color: #a99ba1;
+  a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; }
 `;
 const Pendiente = styled.p`
   margin: 12px 0 0; font-size: 13px; color: #8a7f84;

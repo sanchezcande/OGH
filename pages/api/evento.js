@@ -7,7 +7,7 @@ import { FASES_ORIGEN_FORM } from "../../lib/origenForm";
 const FASES = new Set([
   "form_visto", "paso_2", "paso_3", "enviado",
   "gracias_vista", "video_play", "video_25", "video_50", "video_75", "video_fin",
-  "click_gumroad",
+  "click_gumroad", "click_mp",
   "preguntas_vista", "preguntas_pdf_click", "preguntas_llamada_click",
   // preguntas_email_enviado la manda /preguntas desde el 18/09 y NUNCA estuvo en esta lista:
   // la API le contestaba 400 y el paso más importante del embudo de founders, el de completar
