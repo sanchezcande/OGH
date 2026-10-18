@@ -14,6 +14,7 @@ import { fraseCupos } from "../lib/cupos";
 
 const PDF = "/guias/9-preguntas-entrevista-developer.pdf";
 const LLAMADA = "https://strategy.opengatehub.com";
+const DIGITOS = (v) => (String(v || "").match(/\d/g) || []).length;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Preguntas() {
@@ -21,6 +22,7 @@ export default function Preguntas() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [web, setWeb] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [estado, setEstado] = useState("form"); // form | enviando | listo
   const [error, setError] = useState("");
   const [mandado, setMandado] = useState(true);
@@ -40,12 +42,15 @@ export default function Preguntas() {
     e.preventDefault();
     setError("");
     if (!EMAIL_RE.test(email.trim())) return setError("Revisá el email, parece que le falta algo.");
+    // Solo al que viene de "quiero contratar" se le pide el WhatsApp, porque a ese le escribe
+    // ella. Al que entra a bajar la guía desde LinkedIn no se le cambia nada.
+    if (deHola && DIGITOS(whatsapp) < 8) return setError("Dejame tu WhatsApp con el código de país, así te escribo.");
     setEstado("enviando");
     try {
       const r = await fetch("/api/preguntas-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, web, origen: router.query.o || "dm" }),
+        body: JSON.stringify({ nombre, email, web, whatsapp, origen: router.query.o || "dm" }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -110,14 +115,25 @@ export default function Preguntas() {
                   <input id="email" type="email" inputMode="email" autoComplete="email" required
                     value={email} onChange={(e) => setEmail(e.target.value)} placeholder="martin@tuempresa.com" />
                 </Campo>
+                {deHola && (
+                  <Campo>
+                    <label htmlFor="whatsapp">WhatsApp</label>
+                    <input id="whatsapp" type="tel" inputMode="tel" autoComplete="tel" required
+                      value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+                      placeholder="+54 9 11 1234 5678" />
+                    <Ayuda>Con el código de país. Te escribo yo por acá.</Ayuda>
+                  </Campo>
+                )}
                 <Trampa aria-hidden="true">
                   <input tabIndex={-1} autoComplete="off" value={web} onChange={(e) => setWeb(e.target.value)} />
                 </Trampa>
                 {error && <Error role="alert">{error}</Error>}
                 <BotonForm type="submit" disabled={estado === "enviando"}>
-                  {estado === "enviando" ? "Enviando…" : "Mandámelas por mail →"}
+                  {estado === "enviando" ? "Enviando…" : (deHola ? "Dejame tus datos y te escribo →" : "Mandámelas por mail →")}
                 </BotonForm>
-                <Chico>Te llega en un minuto. Si no lo ves, fijate en spam o promociones.</Chico>
+                <Chico>{deHola
+                  ? "Te escribo yo por WhatsApp. Y de paso te mando la guía por mail."
+                  : "Te llega en un minuto. Si no lo ves, fijate en spam o promociones."}</Chico>
               </Form>
             ) : (
               <Listo>
@@ -208,6 +224,7 @@ const BotonForm = styled.button`
   &:disabled { opacity: .6; cursor: default; }
   &:focus-visible { outline: 3px solid #111111; outline-offset: 2px; }
 `;
+const Ayuda = styled.p` margin: 6px 0 0; font-size: 12.5px; color: #71717A; `;
 const Chico = styled.p` margin: 0; font-size: 13px; color: #71717A; `;
 const Listo = styled.div`
   background: #FAFAFA; border: 1px solid #E4E4E7; border-radius: 4px; padding: 28px;
