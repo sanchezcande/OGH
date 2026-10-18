@@ -12,7 +12,8 @@
 //      del lead: la Mac apagada casi un día): UN aviso por vuelta con la lista, nombre y link de cada
 //      una, y el turno de cada una se cierra (no vuelve a salir en otro aviso).
 //   3. Las fotos del lead que se quedaron sin su aviso URGENTE (Telegram no anduvo, o la corrida se
-//      cortó antes de avisar): se avisan de nuevo, una vez cada una, esté la Mac o no.
+//      cortó antes de avisar): se avisan de nuevo, una vez cada una, esté la Mac o no. Lo mismo con el
+//      aviso YA del código de quien pagó en pesos: el borrador quedó guardado y su aviso no salió.
 //   4. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
 //      Mac está contestando, no hay charlas esperando respuesta (primero se contesta a quien escribió)
 //      y es de día en Argentina (de 9 a 21).
@@ -29,7 +30,7 @@ import {
   MAC_VIVA_SEGUNDOS, REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar,
 } from "../../../lib/dm/seguimientos";
 import {
-  ajustes, borrarViejas, fotosSinAviso, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas,
+  ajustes, borrarViejas, codigosSinAviso, fotosSinAviso, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas,
   vencerPendientes,
 } from "../../../lib/dm/base";
 
@@ -78,6 +79,14 @@ export default async function handler(req, res) {
     console.error("dm: no se pudo avisar de las charlas sin ventana", e.message);
   }
 
+  // Los avisos del código que no salieron: el lead ya tiene el acuse que le promete el código.
+  let codigos = 0;
+  try {
+    codigos = await agente.avisarCodigosPendientes(await codigosSinAviso());
+  } catch (e) {
+    console.error("dm: no se pudieron avisar los códigos pendientes", e.message);
+  }
+
   // Las fotos sin aviso: después de los pases (una charla que se acaba de pasar ya le llegó a Cande).
   let fotos = 0;
   try {
@@ -111,7 +120,7 @@ export default async function handler(req, res) {
     console.error("dm: no se pudo borrar lo viejo", e.message);
   }
   return res.status(200).json({
-    ok: true, hechos, sin_atender: sinAtender, sin_ventana: sinVentanaAvisadas, fotos, ...(prendido ? {} : { motivo: "apagado" }),
+    ok: true, hechos, sin_atender: sinAtender, sin_ventana: sinVentanaAvisadas, fotos, codigos, ...(prendido ? {} : { motivo: "apagado" }),
   });
 }
 
