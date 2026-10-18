@@ -8,7 +8,8 @@
 // texto del mensaje viven solo en la base.
 //
 // Lo que NO cubren: las consultas de lib/dm/base.js (codigoDe, tomarBorradorCodigo, guardarBorradorCodigo,
-// marcarAvisoCodigo, codigosSinAviso, reclamarAvisoFoto con soloVistas, la columna imagenes de dm_trabajos),
+// marcarAvisoCodigo, codigosSinAviso, reclamarAvisoFoto con soloVistas, fotosSinAviso sin mirar el dueño de la
+// charla, la columna imagenes de dm_trabajos),
 // que Instagram de verdad dé los adjuntos con attachments{image_data{url}} y que Telegram baje la foto de Meta
 // con sendPhoto. Eso se mira con la base y el bot reales antes de subir.
 //
@@ -18,11 +19,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 const { crearAgente, esFoto, urlDeFoto, SIN_TEXTO } = await import("../lib/dm/agente.js");
-const { revisar, normalizar, tieneCodigo } = await import("../lib/dm/frenos.js");
+const { revisar, normalizar, tieneCodigo, frenoDelCodigo } = await import("../lib/dm/frenos.js");
 const { validarAjustes } = await import("../lib/dm/base.js");
 const { crearCerebroLocal } = await import("../lib/dm/cola.js");
 const {
-  crearRespuestaTelegram, leerRespuesta, esOk, ofreceCodigo, MARCA_OK, TITULOS_CODIGO,
+  crearRespuestaTelegram, leerRespuesta, esOk, ofreceCodigo, esAvisoDeFoto, MARCA_OK, TITULOS_CODIGO, SIN_MENSAJE,
 } = await import("../lib/dm/respuestas.js");
 const { crearReglasInstagram, crearInstagram } = await import("../lib/dm/instagram.js");
 const { avisar: avisarTelegram } = await import("../lib/notificar.js");
@@ -358,9 +359,12 @@ test("sin la plantilla (o sin el código) cargados no hay borrador, y el aviso d
 
 test("el agente nunca escribe el código: suelto o en el link, lo frenan los frenos y la charla pasa a Cande", async () => {
   const dev = { textosDelLead: ["listo"], charlaDelLead: ["soy dev y busco", "listo"], estadoPrevio: estadoDev };
-  assert.equal(revisar(salida([`Genial! el código es ${CODIGO}`]), { ...dev, codigoMp: CODIGO }).motivo, "el código de acceso sale solo con el ok de Cande");
-  assert.equal(revisar(salida([`Acá va: ${LINK_PAGO}/${CODIGO.toLowerCase()}`]), { ...dev, linkDePago: LINK_PAGO, codigoMp: CODIGO }).ok, false);
-  assert.deepEqual(revisar(salida(["Acuse de prueba"]), { ...dev, codigoMp: CODIGO }), { ok: true });
+  // El freno del código está en un solo lugar (frenoDelCodigo), que el agente aplica antes que los demás frenos.
+  assert.equal(frenoDelCodigo(salida([`Genial! el código es ${CODIGO}`]), CODIGO).motivo, "el código de acceso sale solo con el ok de Cande");
+  assert.equal(frenoDelCodigo(salida([`Acá va: ${LINK_PAGO}/${CODIGO.toLowerCase()}`]), CODIGO).ok, false);
+  assert.equal(frenoDelCodigo(salida(["Acuse de prueba"]), CODIGO), null);
+  assert.equal(frenoDelCodigo(salida([`el código es ${CODIGO}`], { accion: "callar" }), CODIGO), null, "callar no manda nada");
+  assert.deepEqual(revisar(salida(["Acuse de prueba"]), dev), { ok: true });
   assert.equal(tieneCodigo(`x${CODIGO}x`, CODIGO), false, "pegado a otra palabra no es el código");
   assert.equal(tieneCodigo("cualquier cosa", ""), false);
   const { agente, m } = mundo({ responde: () => salida([`Genial! el código es ${CODIGO}`], { pago_pesos: "dice" }) });
@@ -738,4 +742,145 @@ test("el aviso con foto sale como foto con su epígrafe; si Telegram no la baja 
   } finally {
     globalThis.fetch = antes;
   }
+});
+
+/* ---------- el código solo con el ok, la foto que pasa a Cande y el aviso después de la respuesta ---------- */
+
+test("un ok solo a un aviso de foto sin borrador (dudoso o URGENTE) no va al agente ni manda nada: el bot le pregunta qué contestar", async () => {
+  const dudoso = mundo({ responde: () => vio(1, { pago_pesos: "dudoso", aviso_para_cande: "YA: pendiente de prueba" }) });
+  await dudoso.agente.procesar(ID, dudoso.m.entra(FOTO));
+  const sinMac = mundo({ macViva: false, responde: () => salida([`Listo! tu código es ${CODIGO}`]) });
+  await sinMac.agente.procesar(ID, sinMac.m.entra(FOTO));
+  for (const [{ m, responder, dichos }, aviso] of [[dudoso, dudoso.m.avisos[0]], [sinMac, urgentesDeFoto(sinMac.m)[0]]]) {
+    assert.ok(aviso && !aviso.campos.Borrador);
+    assert.equal(esAvisoDeFoto(comoLoVe(aviso)), true);
+    const enviados = [...m.enviados];
+    const pedidos = m.pedidos.length;
+    for (const t of ["ok", "dale", "Sí", "listo!"]) {
+      const novedad = respondeAviso(aviso, t);
+      const r = leerRespuesta(novedad, { duena: "42" });
+      assert.deepEqual(r, { ayuda: SIN_MENSAJE }, t);
+      // Si llegara al que contesta (el webhook ya lo frena antes), tampoco manda nada.
+      assert.equal(await responder(r, { updateId: novedad.update_id }), "ayuda", t);
+      assert.equal(dichos.at(-1), SIN_MENSAJE);
+    }
+    assert.equal(m.pedidos.length, pedidos, "no se le pide nada al agente");
+    assert.deepEqual(m.enviados, enviados, "al lead no le sale nada");
+    // Con más texto sigue siendo una indicación, como hoy.
+    assert.equal(leerRespuesta(respondeAviso(aviso, "decile que gracias"), { duena: "42" }).accion, "indicacion");
+  }
+  // Lo que no es /textual nunca sale tal cual.
+  assert.equal(await sinMac.responder({ contacto: ID, accion: "otra cosa", texto: "texto de prueba" }, { updateId: 7001 }), "sin accion");
+  assert.deepEqual(sinMac.m.enviados, []);
+});
+
+test("el código no sale en nada que escriba el agente: ni con lo que le pide Cande desde Telegram, ni en un toque, ni en una respuesta tarde", async () => {
+  const conCodigo = () => salida([`Listo! tu código es ${CODIGO}`]);
+  // Indicación: Cande le pide "pasale el código" respondiendo el URGENTE de la foto.
+  const ind = mundo({ macViva: false, responde: conCodigo });
+  await ind.agente.procesar(ID, ind.m.entra(FOTO));
+  const pedido = respondeAviso(urgentesDeFoto(ind.m)[0], "pasale el código");
+  const leida = leerRespuesta(pedido, { duena: "42" });
+  assert.equal(leida.accion, "indicacion");
+  assert.equal(await ind.responder(leida, { updateId: pedido.update_id }), "indicacion sin salir");
+  assert.equal(ind.m.pedidos.length, 1, "el agente redactó");
+  assert.deepEqual(ind.m.enviados, []);
+  assert.match(ind.dichos.at(-1), /lo frené: el código de acceso sale solo con el ok de Cande.*\/textual/);
+  assert.equal(ind.m.salidas.at(-1).estado, "frenada");
+  // También en el link de pago con el código, y aunque la charla sea de Cande.
+  const link = mundo({ responde: () => salida([`Acá va: ${LINK_PAGO}/${CODIGO.toLowerCase()}`]) });
+  link.m.contacto.dueno = "cande";
+  assert.equal((await link.agente.procesar(ID, null, { evento: "indicacion", indicacion: "pasale el link con el código" })).hecho, "frenada");
+  assert.deepEqual(link.m.enviados, []);
+
+  // Toque.
+  const toque = mundo({ ajustes: { toques: true }, responde: conCodigo });
+  toque.m.contacto.ultimo_lead = new Date(AHORA.getTime() - 5 * HORA);
+  const r = await toque.agente.procesar(ID, null, { evento: "seguimiento" });
+  assert.equal(r.hecho, "frenada");
+  assert.equal(r.motivo, "el código de acceso sale solo con el ok de Cande");
+  assert.deepEqual(toque.m.enviados, []);
+
+  // Respuesta tarde (la espera, con la Mac de vuelta).
+  const tarde = mundo({ responde: conCodigo });
+  const id = tarde.m.entra("ya pagué por la app de prueba", 900);
+  assert.equal((await tarde.agente.procesar(ID, id, { tarde: true })).hecho, "frenada");
+  assert.deepEqual(tarde.m.enviados, []);
+  assert.equal(tarde.m.contacto.dueno, "cande");
+});
+
+/** Telegram caído hasta que `anda()` diga que sí. */
+const conTelegram = (opciones) => {
+  const tg = { anda: false };
+  const w = mundo({ ...opciones, avisoSale: () => tg.anda });
+  return { ...w, tg };
+};
+
+test("la foto que el agente miró con Telegram caído queda sin aviso aunque la charla pase a Cande, y el cron la avisa cuando vuelve", async () => {
+  const casos = {
+    "el modelo pasa la charla": () => conTelegram({
+      responde: () => ({ ...salida([], { accion: "pasar_a_cande", aviso_para_cande: "YA: no sé qué es", pago_pesos: null }), _imagenes_vistas: 1 }),
+    }),
+    "el acuse cae en un freno": () => conTelegram({
+      responde: () => vio(1, { mensajes: ["Gracias! recibí tu comprobante"], pago_pesos: "dudoso", aviso_para_cande: "YA: otro monto" }),
+    }),
+    "el tope del día": () => {
+      const w = conTelegram({});
+      w.m.tope = 99;
+      return w;
+    },
+  };
+  for (const [caso, armarCaso] of Object.entries(casos)) {
+    const { agente, m, tg } = armarCaso();
+    const foto = m.entra(FOTO);
+    await agente.procesar(ID, foto);
+    assert.equal(m.contacto.dueno, "cande", caso);
+    assert.ok((m.contacto.foto_avisada_hasta || 0) < foto, `${caso}: sin aviso, la foto no queda resuelta`);
+    assert.equal(urgentesDeFoto(m).length, 1, `${caso}: se intentó una vez en la corrida, no dos`);
+    tg.anda = true;
+    assert.equal(await agente.avisarFotosPendientes([ID]), 1, `${caso}: el cron la avisa aunque la charla sea de Cande`);
+    assert.equal(urgentesDeFoto(m).at(-1).foto, FOTO);
+    assert.equal(urgentesDeFoto(m).at(-1).sale, true);
+    assert.equal(m.contacto.foto_avisada_hasta, foto);
+    assert.equal(await agente.avisarFotosPendientes([ID]), 0, `${caso}: una sola vez`);
+  }
+});
+
+test("el aviso de la foto y el pago sale después de dejar lista la respuesta, con el borrador ya guardado", async () => {
+  for (const envio of ["campo", "api"]) {
+    const momento = [];
+    let w = null;
+    w = mundo({
+      ajustes: { envio },
+      avisoSale: (titulo) => {
+        if (titulo.endsWith(TITULOS_CODIGO.comprobante)) {
+          momento.push({ salidas: w.m.salidas.map((s) => [s.accion, s.estado]), enviados: [...w.m.enviados] });
+        }
+        return true;
+      },
+    });
+    const foto = w.m.entra(FOTO);
+    const r = await w.agente.procesar(ID, foto);
+    assert.equal(r.hecho, envio === "campo" ? "lista para retirar" : "enviada");
+    assert.equal(momento.length, 1, envio);
+    // El borrador se guardó antes de la respuesta (constancia antes de mandar), y la respuesta ya estaba lista.
+    assert.deepEqual(momento[0].salidas, [["codigo_mp", "borrador"], ["responder", envio === "campo" ? "pendiente" : "enviada"]], envio);
+    assert.deepEqual(momento[0].enviados, envio === "campo" ? [] : ["Acuse de prueba"], envio);
+    assert.equal(w.m.contacto.foto_avisada_hasta, foto);
+    assert.equal(w.m.salidas[0].detalle, "aviso salió");
+  }
+});
+
+test("el cron de los toques no arranca avisos de códigos ni de fotos pasada su hora: quedan para la vuelta siguiente", async () => {
+  const { agente, m, base } = mundo({ avisoSale: () => false });
+  const foto = m.entra(FOTO);
+  await agente.procesar(ID, foto);
+  const fila = m.salidas.find((s) => s.accion === "codigo_mp");
+  assert.equal(fila.detalle, "aviso sin salir");
+  const avisos = m.avisos.length;
+  const tarde = { hasta: 1000, ahora: () => 2000 };
+  assert.equal(await agente.avisarCodigosPendientes(await base.codigosSinAviso(), tarde), 0);
+  assert.equal(await agente.avisarFotosPendientes([ID], tarde), 0);
+  assert.equal(m.avisos.length, avisos, "ni lo intenta");
+  assert.equal(fila.detalle, "aviso sin salir", "sigue para la vuelta siguiente");
 });

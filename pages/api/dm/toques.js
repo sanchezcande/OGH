@@ -12,8 +12,10 @@
 //      del lead: la Mac apagada casi un día): UN aviso por vuelta con la lista, nombre y link de cada
 //      una, y el turno de cada una se cierra (no vuelve a salir en otro aviso).
 //   3. Las fotos del lead que se quedaron sin su aviso URGENTE (Telegram no anduvo, o la corrida se
-//      cortó antes de avisar): se avisan de nuevo, una vez cada una, esté la Mac o no. Lo mismo con el
-//      aviso YA del código de quien pagó en pesos: el borrador quedó guardado y su aviso no salió.
+//      cortó antes de avisar): se avisan de nuevo, una vez cada una, esté la Mac o no y sea de quien sea
+//      la charla (en ese turno pudo pasar a Cande). Lo mismo con el aviso YA del código de quien pagó en
+//      pesos: el borrador quedó guardado y su aviso no salió. Los dos, con el mismo tope de tiempo que los
+//      toques: lo que no entra queda para la vuelta siguiente.
 //   4. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
 //      Mac está contestando, no hay charlas esperando respuesta (primero se contesta a quien escribió)
 //      y es de día en Argentina (de 9 a 21).
@@ -82,7 +84,7 @@ export default async function handler(req, res) {
   // Los avisos del código que no salieron: el lead ya tiene el acuse que le promete el código.
   let codigos = 0;
   try {
-    codigos = await agente.avisarCodigosPendientes(await codigosSinAviso());
+    codigos = await agente.avisarCodigosPendientes(await codigosSinAviso(), { hasta: limite });
   } catch (e) {
     console.error("dm: no se pudieron avisar los códigos pendientes", e.message);
   }
@@ -90,7 +92,7 @@ export default async function handler(req, res) {
   // Las fotos sin aviso: después de los pases (una charla que se acaba de pasar ya le llegó a Cande).
   let fotos = 0;
   try {
-    fotos = await agente.avisarFotosPendientes(await fotosSinAviso());
+    fotos = await agente.avisarFotosPendientes(await fotosSinAviso(), { hasta: limite });
   } catch (e) {
     console.error("dm: no se pudieron avisar las fotos pendientes", e.message);
   }
