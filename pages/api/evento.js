@@ -9,6 +9,15 @@ const FASES = new Set([
   "gracias_vista", "video_play", "video_25", "video_50", "video_75", "video_fin",
   "click_gumroad",
   "preguntas_vista", "preguntas_pdf_click", "preguntas_llamada_click",
+  // preguntas_email_enviado la manda /preguntas desde el 18/09 y NUNCA estuvo en esta lista:
+  // la API le contestaba 400 y el paso más importante del embudo de founders, el de completar
+  // el formulario, no se registró nunca. Encontrado el 18/10 por tests/foundersNoSePierden.
+  "preguntas_email_enviado",
+  // 18/10/2026: /preguntas es ahora también la bajada de "quiero contratar" de /hola, y estas
+  // dos fases son las de ESA puerta. Van por lista, que son dos y nada más. Si faltaran,
+  // /api/evento contestaría 400 y el dato se perdería en silencio, que es exactamente como
+  // se rompió el embudo del video el 12/10.
+  "preguntas_vista_hola", "preguntas_llamada_click_hola",
   "hola_vista", "hola_contrata", "hola_dev",
 ]);
 

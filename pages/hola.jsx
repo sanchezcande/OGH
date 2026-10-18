@@ -22,7 +22,13 @@ import { evento } from "../lib/embudo";
 // posteo puntual.
 
 const DESTINOS = {
-  contrata: "https://strategy.opengatehub.com",
+  // 18/10/2026: antes esto iba derecho a la agenda de Google (strategy.opengatehub.com).
+  // El que no reservaba en ese momento se perdía entero: ni nombre ni mail, y el embudo
+  // terminaba en el click. Nueve clicks de "quiero contratar" en 30 días dejaron CERO
+  // founders en leads_preguntas. Ahora pasa por /preguntas, que sí captura y mete a la
+  // persona en la cadena de founders, y que con ?o=hola muestra la llamada ARRIBA para
+  // no demorar al que ya quiere hablar. La llamada no se pierde: se gana el contacto.
+  contrata: "/preguntas?o=hola",
   // El ?de=bio es lo que hace que esta puerta se cuente del lado del formulario. Sin esto,
   // la unica puerta que NO pasa por ManyChat seria la unica que no se registra, y el numero
   // iba a dar 0 para siempre (lo marco la revision del PR 60). La red de donde vino ya queda
