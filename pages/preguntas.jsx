@@ -171,8 +171,10 @@ export default function Preguntas() {
                     <Chico>Después elegís el día y la hora. La guía te llega igual, reserves o no.</Chico>
                     <SoloGuia>
                       <p>Todavía no estás por contratar?</p>
+                      {/* Antes del botón se dice qué guía es (Cande, 19/10: "nunca introducís qué es la guía"). */}
+                      <QueGuia>Empezá por mi guía gratis: <b>9 de las preguntas que hago para entrevistar a un developer</b>, con lo que tenés que escuchar en cada respuesta.</QueGuia>
                       <BotonTexto type="submit" name="quiere" value="guia" disabled={enviando}>
-                        {enviando && quiere === "guia" ? "Enviando…" : "Por ahora solo la guía, y seguimos en contacto\u00a0→"}
+                        {enviando && quiere === "guia" ? "Enviando…" : "Descargá la guía y seguimos en contacto\u00a0→"}
                       </BotonTexto>
                     </SoloGuia>
                   </>
@@ -335,6 +337,10 @@ const CuposArriba = styled.p` margin: 0; font-size: 14px; font-weight: 600; colo
 const SoloGuia = styled.div`
   margin-top: 10px; padding-top: 18px; border-top: 1px solid #E4E4E7;
   p { margin: 0; font-size: 14.5px; color: #71717A; }
+`;
+const QueGuia = styled.p`
+  && { margin: 6px 0 0; font-size: 15.5px; line-height: 1.5; color: #3F3F46; }
+  b { color: #111111; }
 `;
 const BotonTexto = styled.button`
   font: inherit; font-size: 15.5px; line-height: 1.4; color: #111111; background: none; border: 0; cursor: pointer;
