@@ -18,6 +18,10 @@ const FASES = new Set([
   // /api/evento contestaría 400 y el dato se perdería en silencio, que es exactamente como
   // se rompió el embudo del video el 12/10.
   "preguntas_vista_hola", "preguntas_llamada_click_hola",
+  // 19/10/2026: en /preguntas?o=hola la reunión va primero. Las tres fases de esa puerta: el envío
+  // salió bien con el botón de la reunión, el envío salió bien con el de la guía, y la agenda de
+  // Google metida en la página terminó de cargar (onLoad del iframe).
+  "preguntas_reunion_pedida_hola", "preguntas_guia_pedida_hola", "preguntas_agenda_vista_hola",
   "hola_vista", "hola_contrata", "hola_dev",
 ]);
 

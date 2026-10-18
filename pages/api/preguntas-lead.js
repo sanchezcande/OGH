@@ -23,6 +23,11 @@ export const PDF_PATH = "/guias/9-preguntas-entrevista-developer.pdf";
 const LLAMADA = "https://strategy.opengatehub.com";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Lo que eligió en /preguntas?o=hola el founder que tocó "quiero contratar": el botón grande pide la
+// reunión y el de texto, solo la guía. Va en el aviso porque cambia cómo les escribe Cande: al que
+// pidió la reunión y no reservó, en menos de una hora; al de la guía, ese mismo día.
+// Solo estos dos valores: cualquier otra cosa se descarta (Map.get compara exacto, ni arrays ni objetos).
+const QUIERE = new Map([["reunion", "reunión"], ["guia", "guía"]]);
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -116,6 +121,7 @@ export default async function handler(req, res) {
   // cualquier forma, y normalizarlos acá perdería más de lo que ordena. El CRM ya sabe armar
   // el número con el código de país cuando hay que llamar.
   const whatsapp = limpiar(req.body?.whatsapp, 40);
+  const quiere = QUIERE.get(req.body?.quiere);
   // Campo trampa: los humanos no lo ven, los bots lo llenan.
   if (limpiar(req.body?.web)) return res.status(200).json({ ok: true, pdf: PDF_PATH });
 
@@ -150,6 +156,7 @@ export default async function handler(req, res) {
 
   await avisar("Founder bajó las 9 preguntas", {
     Nombre: nombre, Email: email, WhatsApp: whatsapp || undefined, Origen: origen,
+    Quiere: quiere,
     Pedidos: pedidos > 1 ? `${pedidos} (ya lo había pedido)` : undefined,
     Guardado: guardado ? "sí" : "NO",
     "Mail enviado": mandado ? "sí" : "NO",
