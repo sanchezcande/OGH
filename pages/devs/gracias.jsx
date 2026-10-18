@@ -212,6 +212,7 @@ const PesosBoton = styled.button`
   &:hover { color: #f5f0f2; }
   &:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
 `;
+const SERIA = `"Helvetica Neue", Helvetica, Arial, sans-serif`;
 const Velo = styled.div`
   position: fixed; inset: 0; z-index: 50; background: rgba(10,8,10,.72);
   display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -220,8 +221,8 @@ const Cartel = styled.div`
   position: relative; width: 100%; max-width: 420px; background: #131013; color: #f5f0f2;
   border: 1px solid rgba(204,90,80,.35); border-radius: 16px; padding: 30px 26px 24px; text-align: center;
   box-shadow: 0 24px 60px rgba(0,0,0,.55);
-  /* La misma letra que el resto de la página (Cande, 19/10: "usá las mismas typo que el resto de la page"). */
-  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  /* Todo con la letra seria, el título en negrita como los pasos (Cande, 19/10: la serif y la de la página en el título quedaban raras). */
+  font-family: ${SERIA};
 `;
 const CartelKicker = styled.p`
   display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em;
@@ -229,7 +230,7 @@ const CartelKicker = styled.p`
   border-radius: 999px; padding: 6px 14px; margin: 0 0 16px;
 `;
 const CartelPrecio = styled.p`
-  margin: 0 0 6px; font-size: 32px; font-weight: 700; letter-spacing: -.01em;
+  margin: 0 0 8px; font-size: 20px; font-weight: 700;
   span { font-size: 15px; font-weight: 600; color: #c9bcc2; letter-spacing: 0; margin-left: 6px; }
 `;
 const Pasos = styled.ol`
@@ -247,9 +248,9 @@ const Cerrar = styled.button`
   color: #a99ba1; font-size: 26px; line-height: 1; padding: 4px;
   &:hover { color: #f5f0f2; }
 `;
-const CartelTitulo = styled.p` margin: 0 0 12px; font-size: 24px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; `;
+const CartelTitulo = styled.p` margin: 0 0 10px; font-size: 22px; line-height: 1.25; font-weight: 700; text-wrap: balance; `;
 const CartelTexto = styled.p`
-  margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: #c9bcc2; font-weight: 600;
+  margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: #c9bcc2;
   a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; }
 `;
 const PagarPesos = styled.a`
