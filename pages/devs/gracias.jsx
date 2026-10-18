@@ -8,12 +8,13 @@ import { evento } from "../../lib/embudo";
 // El video está en Wistia. Su player es un web component: hay que cargar dos
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
-const WISTIA_A = "4a5ghftho0";                               // el de 2 min 06, el que viene corriendo
-// Prueba A/B del 12/10/2026. El B es el guion nuevo (el de Hooman con los agregados de Cande),
-// que dura 5 min 44. Mientras la variable esté vacía NO hay prueba: todos ven el A, que es lo
-// que pasa hoy. El día que el video nuevo esté en Wistia se pone su ID en Vercel
-// (NEXT_PUBLIC_DEVS_VIDEO_B) y la prueba arranca sola, sin tocar el código.
-const WISTIA_B = process.env.NEXT_PUBLIC_DEVS_VIDEO_B || "";
+// Video único desde el 19/10/2026 (4 min 23): el de 2 min de siempre + las respuestas a las objeciones
+// + los testimonios de alumnos. Cande decidió dejar un solo video y terminar la prueba A/B del 12/10
+// (al 18/10: A 52 llegaron y 10 tocaron comprar, B 46 y 17).
+const WISTIA_A = "2r0ut42goj";
+// Sin B no hay prueba: todos ven el A y los eventos vuelven a sus nombres de siempre. Se ignora a propósito
+// NEXT_PUBLIC_DEVS_VIDEO_B, que en Vercel apunta al video B, que ya no existe.
+const WISTIA_B = "";
 
 // A qué versión le toca cada persona. Queda guardada: si vuelve a entrar ve la MISMA, porque si
 // no, una sola persona cuenta en las dos columnas y el embudo no cierra.
