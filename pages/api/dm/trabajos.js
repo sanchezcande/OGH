@@ -2,10 +2,13 @@
 // entrega la respuesta. La llama tracker/dm_cerebro.py con el secreto del dashboard (COLA_SECRET).
 // Ver lib/dm/cola.js.
 //
-//   { accion: "tomar" }                    → { trabajo: { id, turno, link_de_pago, edad } } o { trabajo: null }
+//   { accion: "tomar" }                    → { trabajo: { id, turno, link_de_pago, imagenes, edad } } o { trabajo: null }
 //                                            (edad: segundos desde que se armó el turno; la Mac descuenta eso
-//                                            del tiempo que tiene antes de que ManyChat retire la respuesta)
-//   { accion: "resultado", id, salida }    → entrega la salida del modelo
+//                                            del tiempo que tiene antes de que ManyChat retire la respuesta.
+//                                            imagenes: los links de las fotos que mandó el lead en ese turno,
+//                                            casi siempre vacío; la Mac se las muestra a Claude)
+//   { accion: "resultado", id, salida }    → entrega la salida del modelo (con imagenes_vistas: cuántas de esas
+//                                            fotos pudo ver; sin el dato, el agente las da por no vistas)
 //   { accion: "resultado", id, error }     → avisa que no pudo: la charla pasa a ser de Cande
 import { mismoSecreto, secretoDe } from "../../../lib/dm/armado";
 import { hayBase } from "../../../lib/dm/base";

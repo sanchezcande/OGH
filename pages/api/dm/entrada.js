@@ -10,8 +10,10 @@
 // contesta el cron de la espera (/api/dm/espera) cuando la Mac vuelve.
 //
 // Un mensaje sin texto (una foto, un audio, un sticker) se guarda como "[adjunto o mensaje sin
-// texto]". Si es una foto, a Cande le llega enseguida un aviso URGENTE con el link de la charla (casi
-// siempre es el comprobante de quien pagó en pesos) y el agente no le escribe nada por la foto sola.
+// texto]". Una foto es casi siempre el comprobante de quien pagó en pesos: con la Mac contestando la mira
+// el agente y a Cande le llega un aviso YA con la foto y el borrador del código (lo manda el bot cuando
+// ella responde ok); sin la Mac, o si no la pudo ver, le llega enseguida el aviso URGENTE de siempre con
+// el link de la charla, y el agente no le escribe nada por la foto sola. Ver lib/dm/agente.js.
 //
 // Solo guarda mensajes de contactos que son del agente. De cualquier otro no guarda nada:
 // las charlas de Cande no pasan por esta base. Con el ajuste "altas" prendido, quien nunca
