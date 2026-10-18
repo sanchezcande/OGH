@@ -149,7 +149,7 @@ export default function Gracias() {
                 {/* Con la estética de la página y un mensaje que empuje a entrar (Cande, 19/10). */}
                 <CartelKicker>Para Argentina</CartelKicker>
                 <CartelTitulo id="cartel-titulo">Pagalo en pesos y entrás hoy</CartelTitulo>
-                <CartelPrecio>${PRECIO_PESOS} <span>un solo pago</span></CartelPrecio>
+                <CartelPrecio>${PRECIO_PESOS}</CartelPrecio>
                 <CartelTexto>Todo lo del video: dónde buscar, el CV comentado línea por línea y las preguntas que hago en cada entrevista.</CartelTexto>
                 <Pasos>
                   <li>Usás un link de MercadoPago</li>
@@ -232,7 +232,6 @@ const CartelKicker = styled.p`
 `;
 const CartelPrecio = styled.p`
   margin: 0 0 8px; font-size: 20px; font-weight: 700;
-  span { font-size: 15px; font-weight: 600; color: #c9bcc2; letter-spacing: 0; margin-left: 6px; }
 `;
 const Pasos = styled.ol`
   list-style: none; counter-reset: paso; text-align: left; margin: 18px auto 22px; padding: 0; max-width: 300px;
