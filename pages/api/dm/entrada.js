@@ -5,7 +5,13 @@
 //   { "contacto": "{{id del contacto}}", "nombre": "{{nombre}}", "texto": "{{último texto}}" }
 //
 // Contesta al toque (ManyChat corta a los 10 segundos) y sigue trabajando después: espera la
-// ráfaga, le pide la respuesta al modelo y la manda. Ver lib/dm/agente.js.
+// ráfaga, le pide la respuesta al modelo y la manda. Ver lib/dm/agente.js. Si el modelo no
+// contesta (la Mac apagada o dormida), la charla queda en espera, del agente y sin aviso: la
+// contesta el cron de la espera (/api/dm/espera) cuando la Mac vuelve.
+//
+// Un mensaje sin texto (una foto, un audio, un sticker) se guarda como "[adjunto o mensaje sin
+// texto]". Si es una foto, a Cande le llega enseguida un aviso URGENTE con el link de la charla (casi
+// siempre es el comprobante de quien pagó en pesos) y el agente no le escribe nada por la foto sola.
 //
 // Solo guarda mensajes de contactos que son del agente. De cualquier otro no guarda nada:
 // las charlas de Cande no pasan por esta base. Con el ajuste "altas" prendido, quien nunca
@@ -18,6 +24,7 @@
 // El cuerpo se lee crudo y no con el lector de Next: ManyChat no escapa el texto del mensaje, y
 // un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
 import { waitUntil } from "@vercel/functions";
+import { SIN_TEXTO } from "../../../lib/dm/agente";
 import { agente, avisarDm, colaDe, secretoDmValido } from "../../../lib/dm/armado";
 import { cuerpoDeManyChat, leerCrudo } from "../../../lib/dm/cuerpo";
 import { contacto, hayBase, tablas } from "../../../lib/dm/base";
@@ -41,7 +48,7 @@ export default async function handler(req, res) {
   }
   const id = String(b.contacto ?? b.subscriber_id ?? "").trim();
   if (!id) return res.status(400).json({ error: "falta contacto" });
-  const texto = String(b.texto ?? b.last_input_text ?? "").trim() || "[adjunto o mensaje sin texto]";
+  const texto = String(b.texto ?? b.last_input_text ?? "").trim() || SIN_TEXTO;
   // El nombre es para que el aviso a Cande diga quién es y no un número de ManyChat.
   // Sin saltos de línea: el aviso a Cande lleva el nombre en el renglón "Quién", y de ahí sale a quién va su respuesta.
   const nombre = String(b.nombre ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || null;
@@ -63,12 +70,11 @@ export default async function handler(req, res) {
   }
 
   waitUntil(
-    // procesar resuelve sus fallas con la traba tomada (reintenta lo transitorio, pasa lo demás).
-    // Acá llega lo que falla antes (leer los ajustes o el contacto, la base caída): la charla sigue
-    // del agente y el cron (/api/dm/toques) la reintenta o se la pasa. El aviso es solo para que
-    // Cande sepa: no le pide contestar, así no le contestan dos.
+    // procesar resuelve sus fallas con la traba tomada (si el modelo no contesta, la charla queda en
+    // espera; si falla otra cosa, pasa a Cande). Acá llega lo que falla antes (leer los ajustes o el
+    // contacto, la base caída): el turno sigue abierto, la charla del agente, y la contesta el cron de
+    // la espera (/api/dm/espera). Sin aviso.
     agente.procesar(id, idMensaje).catch(async (e) => {
-      // Sin aviso: el cron lo reintenta y, si no se puede, se lo pasa a Cande con su aviso.
       console.error("dm: falló procesar", colaDe(id), e.message);
     }),
   );

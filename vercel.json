@@ -19,6 +19,10 @@
     {
       "path": "/api/dm/instagram",
       "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/dm/espera",
+      "schedule": "*/2 * * * *"
     }
   ]
 }

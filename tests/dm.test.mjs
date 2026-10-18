@@ -7,9 +7,13 @@
 //
 // Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js. El doble de Postgres de
 // tests/dobles solo conoce las del goteo, así que tomar, soltar, anotarLead, sembrar,
-// retirarSalida, reclamarToque, sinContestar, borrarViejas, borrarCharla, lugarParaAlta, darDeAlta
-// y reservar (y lo que hacen con ellas /api/dm/config, /api/dm/toques y /api/dm/entrada con las
-// altas prendidas) se prueban a mano contra un Postgres de verdad antes de subir un cambio.
+// retirarSalida, reclamarToque, sinContestar, reclamarEspera, sinVentana, borrarViejas, borrarCharla,
+// lugarParaAlta, darDeAlta y reservar (y lo que hacen con ellas /api/dm/config, /api/dm/toques,
+// /api/dm/espera y /api/dm/entrada con las altas prendidas) se prueban a mano contra un Postgres de
+// verdad antes de subir un cambio. De la espera hay que mirar: que fallos cuente solo las fallas
+// propias del turno, que una charla apartada no la tome otra corrida ni la vea sinContestar, que no
+// se aparten más de `tope` para contestar, que no se aparte para contestar una con una respuesta que
+// pudo haber salido, y que sinVentana no devuelva una charla con el turno ya cerrado.
 // De las altas hay que mirar siempre lo mismo: que quien ya figura como de Cande no cambia de
 // dueño, que el tope corta, que el alta deja el mensaje y la ventana abierta en la misma
 // sentencia, y que borrar o reservar a quien no figuraba le deja la fila que frena el alta.
@@ -22,10 +26,16 @@ import assert from "node:assert/strict";
 const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano, horaDeToques,
 } = await import("../lib/dm/frenos.js");
-const { crearAgente, armarTurno } = await import("../lib/dm/agente.js");
-const { correrToques, decidirSinContestar, atenderSinContestar } = await import("../lib/dm/seguimientos.js");
-/** Una falla del modelo que se arregla sola (la Mac sin red): la que se reintenta. */
+const { crearAgente, armarTurno, esFoto, SIN_TEXTO } = await import("../lib/dm/agente.js");
+const {
+  correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, FALLA_GENERAL, FALLA_PROPIA, REINTENTO_MAX_FALLOS,
+} = await import("../lib/dm/seguimientos.js");
+/** Una falla del modelo que se arregla sola (la Mac sin red). */
 const transitoria = (texto) => Object.assign(new Error(texto), { transitorio: true });
+/** Una falla del modelo que le pasa a cualquier charla y no se arregla en minutos (la Mac sin uso, sin JSON). */
+const general = (texto) => Object.assign(new Error(texto), { transitorio: false, general: true });
+/** Una falla del modelo con esta charla en particular (se negó, devolvió algo ilegible). */
+const propia = (texto) => Object.assign(new Error(texto), { transitorio: false, general: false });
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
 
@@ -327,7 +337,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
-  hayManyChat = true, instagram = null,
+  hayManyChat = true, instagram = null, avisarCon = null,
 } = {}) {
   const m = {
     ajustes: {
@@ -398,7 +408,7 @@ function armar({
     mandarTextos: mandar || (async (id, textos) => { m.enviados.push(...textos); return { ok: true }; }),
     ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return { ok: pausaManyChat }; },
   };
-  const avisar = async (titulo, campos) => { m.avisos.push({ titulo, campos }); return avisoSale; };
+  const avisar = avisarCon || (async (titulo, campos) => { m.avisos.push({ titulo, campos }); return avisoSale; });
   // Lo que hace un mensaje de verdad al entrar: se guarda, abre la ventana y pone los toques en cero.
   m.entraLead = (texto) => {
     const id = m.mensajes.length + 1;
@@ -520,15 +530,18 @@ test("el reintento tarde contesta sin esperar, sale por la API aunque el envío 
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["mensaje de prueba"]);
 });
 
-test("si el modelo se niega o devuelve algo ilegible, al lead no le llega nada y la charla pasa a Cande", async () => {
-  const { agente, m } = armar({ responde: () => { throw new Error("el modelo no quiso contestar este turno"); } });
+test("si el modelo se niega o devuelve algo ilegible, al lead no le llega nada y la charla espera, anotada como falla de esa charla", async () => {
+  // Antes pasaba a Cande enseguida. 19/10: nada pasa por una sola falla; esta cuenta para el tope de la
+  // charla y el cron se la pasa recién a la tercera (decidirSinContestar).
+  const { agente, m } = armar({ responde: () => { throw propia("el modelo no quiso contestar este turno"); } });
   const r = await agente.procesar("77", m.disparo);
   assert.equal(r.hecho, "error del modelo");
-  assert.equal(r.transitorio, false);
+  assert.equal(r.general, false);
   assert.equal(m.enviados.length, 0);
-  assert.equal(m.contacto.dueno, "cande");
-  assert.match(m.avisos[0].campos.Motivo, /no quiso contestar/);
-  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+  assert.ok(m.contacto.respondido_hasta < m.disparo);
+  assert.deepEqual(m.salidas.map((x) => [x.accion, x.estado, x.motivo]), [["error", "error", FALLA_PROPIA]]);
 });
 
 test("un reintento que vuelve a fallar tampoco pasa la charla: el cron decide después", async () => {
@@ -621,59 +634,117 @@ test("los intentos fallidos no cuentan para el tope del día", async () => {
   assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
 });
 
-test("qué hace el cron con un mensaje sin atender", () => {
-  const ops = { prendido: true, macViva: true, maxMinutos: 360 };
+test("qué hace el cron con un mensaje sin atender: el tiempo solo no pasa nada a Cande", () => {
+  // Antes pasaba a la hora sin poder contestar ("me explota el teléfono cada vez que apago la compu").
+  const ops = { prendido: true, macViva: true, maxFallos: 3 };
   assert.equal(decidirSinContestar({ minutos: 12 }, ops).que, "reintentar");
   assert.equal(decidirSinContestar({ minutos: 12 }, { ...ops, macViva: false }).que, "esperar");
-  assert.equal(decidirSinContestar({ minutos: "400" }, ops).que, "pasar");
-  assert.match(decidirSinContestar({ minutos: 400 }, ops).aviso, /6 horas/);
+  assert.equal(decidirSinContestar({ minutos: "400" }, ops).que, "reintentar");
+  assert.equal(decidirSinContestar({ minutos: 1300 }, { ...ops, macViva: false }).que, "esperar");
   assert.equal(decidirSinContestar({ minutos: 12 }, { ...ops, prendido: false }).que, "pasar");
   assert.equal(decidirSinContestar({ minutos: 12, quizas_salio: true }, ops).que, "pasar");
+  assert.equal(decidirSinContestar({ minutos: 12, quizas_salio: true }, { ...ops, macViva: false }).que, "pasar");
   assert.equal(decidirSinContestar({ minutos: 12, fallos: 4 }, { ...ops, maxFallos: 4 }).que, "pasar");
-  assert.match(decidirSinContestar({ minutos: 12, fallos: 4 }, { ...ops, maxFallos: 4 }).aviso, /4 intentos/);
+  assert.match(decidirSinContestar({ minutos: 12, fallos: 4 }, { ...ops, maxFallos: 4 }).aviso, /falló 4 veces con esta charla/);
+  assert.equal(decidirSinContestar({ minutos: 12, fallos: "3" }, ops).que, "pasar");
   assert.equal(decidirSinContestar({ minutos: 12, fallos: 3 }, { ...ops, maxFallos: 4 }).que, "reintentar");
-  assert.equal(decidirSinContestar({ minutos: 360 }, ops).que, "pasar");
-  assert.equal(decidirSinContestar({ minutos: 359.9 }, ops).que, "reintentar");
-  assert.match(decidirSinContestar({ minutos: 61 }, { ...ops, maxMinutos: 60 }).aviso, /una hora/);
+  assert.equal(decidirSinContestar({ minutos: 12, fallos: 2 }, { prendido: true, macViva: true }).que, "reintentar", "el tope de fábrica es 3");
+  assert.equal(REINTENTO_MAX_FALLOS, 3);
+  for (const d of [decidirSinContestar({ quizas_salio: true }, ops), decidirSinContestar({ fallos: 3 }, ops), decidirSinContestar({}, { ...ops, prendido: false })]) {
+    assert.doesNotMatch(`${d.aviso} ${d.motivo}`, /[—¿¡]/, "sin guion largo ni signos de apertura");
+  }
 });
 
-test("la red del cron pasa lo que corresponde y reintenta lo demás tarde, con el mensaje de cada uno", async () => {
+/** Lo que hace base.reclamarEspera, en memoria: una charla apartada por una sola corrida, y no más de `tope` para contestar. */
+function apartadasDePrueba({ hechas = new Set() } = {}) {
+  const apartadas = new Set();
+  const reclamar = async (id, { tope = null, paraPasar = false } = {}) => {
+    const libre = !apartadas.has(id) && (paraPasar || !hechas.has(id));
+    const hayLugar = tope == null || apartadas.size < tope;
+    if (libre && hayLugar) {
+      apartadas.add(id);
+      return { tomada: true, lleno: false };
+    }
+    return { tomada: false, lleno: tope != null && apartadas.size >= tope };
+  };
+  return { apartadas, hechas, reclamar, soltar: async (id) => { apartadas.delete(id); } };
+}
+
+test("el cron de los toques pasa a Cande solo lo que no tiene arreglo, y apartado; lo demás queda en espera, sin aviso", async () => {
   const pasados = [];
-  const llamados = [];
   const filas = [
     { id: "1", ultimo_id_lead: "10", minutos: 12 },
     { id: "2", ultimo_id_lead: "20", minutos: 400 },
     { id: "3", ultimo_id_lead: "30", minutos: 15, quizas_salio: true },
-    { id: "4", ultimo_id_lead: "40", minutos: 20 },
+    { id: "4", ultimo_id_lead: "40", minutos: 20, fallos: 3 },
+    { id: "5", ultimo_id_lead: "50", minutos: 20, quizas_salio: true },
   ];
-  const r = await atenderSinContestar({
-    filas, prendido: true, macViva: true, maxMinutos: 360, maxFallos: 4,
-    pasar: async (c, aviso) => { pasados.push([c.id, aviso.motivo]); },
-    procesar: async (id, idLead) => { llamados.push([id, idLead]); return { hecho: "enviada" }; },
-    hasta: Infinity, tope: 10,
+  const a = apartadasDePrueba();
+  a.apartadas.add("5"); // la está contestando el cron de la espera: se decide en la vuelta siguiente
+  const pasadas = await pasarSinContestar({
+    filas, prendido: true, macViva: true, maxFallos: 3,
+    apartar: async (id) => (await a.reclamar(id, { paraPasar: true })).tomada, soltar: a.soltar,
+    pasar: async (c, aviso) => { assert.ok(a.apartadas.has(c.id), "se pasa apartada"); pasados.push([c.id, aviso.motivo]); },
   });
-  assert.deepEqual(pasados, [["2", "sin respuesta"], ["3", "envío sin confirmar"]]);
-  assert.deepEqual(llamados, [["1", 10], ["4", 40]]);
-  assert.deepEqual(r, { pasadas: 2, reintentos: 2, cayo: false });
+  assert.deepEqual(pasados, [["3", "envío sin confirmar"], ["4", "el modelo no pudo con esta charla"]]);
+  assert.equal(pasadas, 2);
+  assert.deepEqual([...a.apartadas], ["5"], "suelta las que pasó");
+  // Apagado sí pasa todo (es de Cande decidir), con la Mac o sin ella.
+  const apagado = [];
+  await pasarSinContestar({
+    filas: filas.slice(0, 2), prendido: false, macViva: false, maxFallos: 3,
+    apartar: async () => true, soltar: async () => {}, pasar: async (c, aviso) => { apagado.push([c.id, aviso.motivo]); },
+  });
+  assert.deepEqual(apagado, [["1", "agente apagado"], ["2", "agente apagado"]]);
 });
 
-test("la red del cron: si el modelo no está, corta y avisa que cayó; si la falla es de una charla, sigue con las otras", async () => {
-  const filas = [{ id: "1", ultimo_id_lead: 1, minutos: 12 }, { id: "2", ultimo_id_lead: 2, minutos: 12 }];
-  const base = { filas, prendido: true, macViva: true, maxMinutos: 360, maxFallos: 4, pasar: async () => {}, hasta: Infinity, tope: 10 };
+test("el cron de la espera contesta tarde lo que espera, de a una por charla, con el mensaje de cada una, y no toca lo que se pasa", async () => {
   const llamados = [];
-  const caida = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return { hecho: "error del modelo", transitorio: true }; } });
-  assert.deepEqual(llamados, ["1"]);
+  const filas = [
+    { id: "1", ultimo_id_lead: "10", minutos: 900 },
+    { id: "2", ultimo_id_lead: "20", minutos: 400, quizas_salio: true },
+    { id: "3", ultimo_id_lead: "30", minutos: 15, fallos: 3 },
+    { id: "4", ultimo_id_lead: "40", minutos: 20 },
+  ];
+  const a = apartadasDePrueba();
+  const r = await vaciarEspera({
+    filas, prendido: true, macViva: true, maxFallos: 3, reclamar: (id) => a.reclamar(id, { tope: 2 }), soltar: a.soltar,
+    procesar: async (id, idLead) => { assert.ok(a.apartadas.has(id)); llamados.push([id, idLead]); return { hecho: "enviada" }; },
+    hasta: Infinity,
+  });
+  assert.deepEqual(llamados, [["1", 10], ["4", 40]]);
+  assert.deepEqual(r, { reintentos: 2, cayo: false });
+  assert.equal(a.apartadas.size, 0);
+  assert.equal(hayEspera(filas, { prendido: true, macViva: true, maxFallos: 3 }), true);
+  assert.equal(hayEspera(filas, { prendido: true, macViva: false, maxFallos: 3 }), false);
+});
+
+test("la espera: si el modelo falla para todas (la Mac se fue, o sin uso) no arranca ninguna más; si la falla es de una charla, sigue", async () => {
+  const filas = [1, 2, 3].map((n) => ({ id: String(n), ultimo_id_lead: n, minutos: 12 }));
+  const correr = async (r, extra = {}) => {
+    const llamados = [];
+    const a = apartadasDePrueba();
+    const hecho = await vaciarEspera({
+      filas, prendido: true, macViva: true, maxFallos: 3, reclamar: (id) => a.reclamar(id), soltar: a.soltar, hasta: Infinity, enParalelo: 1,
+      procesar: async (id) => { llamados.push(id); return typeof r === "function" ? r(id) : r; }, ...extra,
+    });
+    return { llamados, ...hecho };
+  };
+  const caida = await correr({ hecho: "error del modelo", transitorio: true, general: true });
+  assert.deepEqual(caida.llamados, ["1"]);
   assert.equal(caida.cayo, true);
-  llamados.length = 0;
-  const una = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return id === "1" ? { hecho: "error del modelo", transitorio: false, general: false } : { hecho: "enviada" }; } });
-  assert.deepEqual(llamados, ["1", "2"]);
-  assert.equal(una.cayo, false);
-  llamados.length = 0;
-  const sinUso = await atenderSinContestar({ ...base, procesar: async (id) => { llamados.push(id); return { hecho: "error del modelo", transitorio: false, general: true }; } });
-  assert.deepEqual(llamados, ["1", "2"]);
+  // Antes la Mac sin uso seguía (cada charla pasaba a Cande): ahora también corta, nada pasa.
+  const sinUso = await correr({ hecho: "error del modelo", transitorio: false, general: true });
+  assert.deepEqual(sinUso.llamados, ["1"]);
   assert.equal(sinUso.cayo, true);
-  const sinMac = await atenderSinContestar({ ...base, macViva: false, procesar: async () => { throw new Error("no tenía que llamar"); } });
-  assert.deepEqual(sinMac, { pasadas: 0, reintentos: 0, cayo: false });
+  const una = await correr((id) => (id === "1" ? { hecho: "error del modelo", transitorio: false, general: false } : { hecho: "enviada" }));
+  assert.deepEqual(una.llamados, ["1", "2", "3"]);
+  assert.equal(una.cayo, false);
+  const sinMac = await correr({ hecho: "enviada" }, { macViva: false, procesar: async () => { throw new Error("no tenía que llamar"); } });
+  assert.deepEqual([sinMac.reintentos, sinMac.cayo], [0, false]);
+  const registrados = [];
+  const tira = await correr((id) => { if (id === "2") throw new Error("falló"); return { hecho: "enviada" }; }, { registrar: (id) => registrados.push(id) });
+  assert.deepEqual([tira.llamados, registrados], [["1", "2", "3"], ["2"]]);
 });
 
 test("cualquier otra falla termina igual: sin prompt cargado, la charla pasa a Cande con aviso", async () => {
@@ -1703,6 +1774,25 @@ test("el cron de los seguimientos no entra sin CRON_SECRET, esté o no cargado",
   }
 });
 
+test("el cron de la espera tampoco entra sin CRON_SECRET, y no devuelve ids", async () => {
+  delete process.env.CRON_SECRET;
+  assert.equal((await llamar("espera", pedido({ method: "GET" }))).codigo, 401);
+  process.env.CRON_SECRET = "secreto-de-prueba";
+  try {
+    assert.equal((await llamar("espera", pedido({ method: "GET", headers: { authorization: "Bearer otro" } }))).codigo, 401);
+    const bien = await llamar("espera", pedido({ method: "GET", headers: { authorization: "Bearer secreto-de-prueba" } }));
+    assert.equal(bien.codigo, 200);
+    assert.deepEqual(bien.cuerpo, { ok: true, reintentos: 0 });
+  } finally {
+    delete process.env.CRON_SECRET;
+  }
+  // Vercel la llama cada 2 minutos, y le da los 300 segundos para contestar lo que espera.
+  const { readFile } = await import("node:fs/promises");
+  const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/espera"), { path: "/api/dm/espera", schedule: "*/2 * * * *" });
+  assert.equal((await import("../pages/api/dm/espera.js")).config.maxDuration, 300);
+});
+
 test("los demás endpoints tampoco entran sin su secreto, y solo por POST", async () => {
   for (const [ruta, variable] of [["entrada", "DM_SECRETO"], ["recoger", "DM_SECRETO"], ["config", "COLA_SECRET"], ["probar", "COLA_SECRET"]]) {
     delete process.env[variable];
@@ -1765,7 +1855,7 @@ test("cerebro local: una salida que no cumple el formato o un error de la Mac no
   await assert.rejects(rota.pedirLocal({ turno: {} }), /el Claude de la Mac falló: Claude no pudo/);
 });
 
-test("cerebro local: qué falla se reintenta (la Mac no contestó o tardó) y cuál pasa a Cande (sin uso, sin JSON)", async () => {
+test("cerebro local: lo que falla la Mac (no contestó, tardó, sin uso, sin JSON) es general y la charla espera; solo un formato inválido es de esa charla", async () => {
   const transitorio = async (p) => { try { await p; } catch (e) { return e.transitorio; } return "no falló"; };
   assert.equal(await transitorio(cerebroDePrueba({ nunca: true }).pedirLocal({ turno: {} })), true);
   assert.equal(await transitorio(cerebroDePrueba({ resultado: { error: "Claude tardó más de 70 segundos" } }).pedirLocal({ turno: {} })), true);
@@ -1774,6 +1864,8 @@ test("cerebro local: qué falla se reintenta (la Mac no contestó o tardó) y cu
   assert.equal(await transitorio(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), false);
   const general = async (p) => { try { await p; } catch (e) { return e.general; } return "no falló"; };
   assert.equal(await general(cerebroDePrueba({ resultado: { error: "Claude no pudo: límite de uso" } }).pedirLocal({ turno: {} })), true);
+  assert.equal(await general(cerebroDePrueba({ resultado: { error: "Claude no devolvió JSON: algo" } }).pedirLocal({ turno: {} })), true);
+  assert.equal(await general(cerebroDePrueba({ resultado: { error: "Claude tardó más de 70 segundos" } }).pedirLocal({ turno: {} })), true);
   assert.equal(await general(cerebroDePrueba({ nunca: true }).pedirLocal({ turno: {} })), true);
   assert.equal(await general(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), false);
 });
@@ -2173,4 +2265,419 @@ test("el link de pago con el código de acceso cargado en los ajustes sale; con 
   frena(revisar(conCodigo("OTRO"), { ...dev, linkDePago: "https://get.opengatehub.com/l/programa-de-prueba", otrosPagos: ["https://get.opengatehub.com/l/programa-de-prueba/CODIGODEPRUEBA"] }), "uno inventado no");
   assert.equal(validarAjustes({ codigo_mercadopago: "CODIGO1" }).ok, true);
   assert.equal(validarAjustes({ codigo_mercadopago: "con espacios" }).ok, false);
+});
+
+/* ---------- la espera (19/10): con la Mac apagada nada pasa a Cande; cuando vuelve, se contesta todo ---------- */
+
+/** Lo que cuenta para el tope de una charla, como lo cuenta base.sinContestar: solo sus fallas propias. */
+const cuentaParaElTope = (s) => ["error", "reintento"].includes(s.accion) && s.estado === "error" && s.motivo === FALLA_PROPIA;
+
+test("con la Mac apagada, una charla sin contestar espera del agente, sin aviso, por más horas que pasen", async () => {
+  // Lo que le explotaba el teléfono: "Aviso: el agente no pudo contestarle en una hora: la charla vuelve a vos".
+  const { agente, m } = armar({ responde: () => { throw transitoria("la Mac de Cande no contestó a tiempo"); } });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "error del modelo");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.ok(m.contacto.respondido_hasta < m.disparo, "el turno sigue abierto");
+  const fila = { id: "77", ultimo_id_lead: m.disparo, quizas_salio: false, fallos: m.salidas.filter(cuentaParaElTope).length };
+  const pasados = [];
+  for (const minutos of [61, 180, 600, 1300]) {
+    assert.equal(decidirSinContestar({ ...fila, minutos }, { prendido: true, macViva: false, maxFallos: 3 }).que, "esperar", `${minutos} minutos`);
+    await pasarSinContestar({
+      filas: [{ ...fila, minutos }], prendido: true, macViva: false, maxFallos: 3,
+      apartar: async () => true, soltar: async () => {}, pasar: async (c) => { pasados.push(c.id); },
+    });
+    const r = await vaciarEspera({
+      filas: [{ ...fila, minutos }], prendido: true, macViva: false, maxFallos: 3,
+      reclamar: async () => { throw new Error("sin la Mac no se toma nada"); }, soltar: async () => {}, procesar: async () => { throw new Error("no"); }, hasta: Infinity,
+    });
+    assert.equal(r.reintentos, 0);
+  }
+  assert.deepEqual(pasados, []);
+  assert.equal(m.avisos.length, 0);
+});
+
+test("cuando la Mac vuelve, la charla que esperó horas se contesta tarde, y queda atendida", async () => {
+  const { agente, m } = armar({ envio: "campo", ultimoLeadHace: 9 });
+  const a = apartadasDePrueba();
+  const r = await vaciarEspera({
+    filas: [{ id: "77", ultimo_id_lead: m.disparo, minutos: 540, fallos: 0 }], prendido: true, macViva: true, maxFallos: 3,
+    reclamar: (id) => a.reclamar(id, { tope: 2 }), soltar: a.soltar,
+    procesar: (id, idLead) => agente.procesar(id, idLead, { tarde: true }), hasta: Infinity,
+  });
+  assert.deepEqual(r, { reintentos: 1, cayo: false });
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.match(m.pedidos[0].turno.contexto, /Contestás tarde: el lead escribió hace 540 minutos/);
+  assert.equal(m.avisos.length, 0);
+});
+
+test("una falla general del modelo (la Mac sin uso, sin JSON) no pasa la charla ni avisa: espera, en el mensaje y en el reintento", async () => {
+  for (const tarde of [false, true]) {
+    for (const e of [general("el Claude de la Mac falló: Claude no pudo: límite de uso"), general("el Claude de la Mac falló: Claude no devolvió JSON")]) {
+      const { agente, m } = armar({ responde: () => { throw e; } });
+      const r = await agente.procesar("77", m.disparo, { tarde });
+      assert.equal(r.hecho, "error del modelo");
+      assert.equal(r.general, true);
+      assert.equal(r.reintento, true);
+      assert.equal(m.contacto.dueno, "agente");
+      assert.equal(m.avisos.length, 0);
+      assert.equal(m.enviados.length, 0);
+      assert.ok(m.contacto.respondido_hasta < m.disparo);
+      assert.deepEqual(m.salidas.map((x) => [x.accion, x.motivo]), [[tarde ? "reintento" : "error", FALLA_GENERAL]]);
+      assert.equal(m.tomado, null);
+    }
+  }
+});
+
+test("solo las fallas propias de la charla cuentan para el tope: las generales no, y a la tercera propia la charla pasa", async () => {
+  let falla = general("la Mac de Cande no contestó a tiempo");
+  const { agente, m } = armar({ responde: () => { throw falla; } });
+  // Una noche de la Mac apagada: el mensaje y cinco reintentos fallan, y no cuenta ninguno.
+  await agente.procesar("77", m.disparo);
+  for (let i = 0; i < 5; i++) await agente.procesar("77", m.disparo, { tarde: true });
+  const fila = () => ({ id: "77", ultimo_id_lead: m.disparo, minutos: 600, fallos: m.salidas.filter(cuentaParaElTope).length });
+  assert.equal(fila().fallos, 0);
+  assert.equal(decidirSinContestar(fila(), { prendido: true, macViva: true, maxFallos: 3 }).que, "reintentar");
+  // El modelo se niega con esta charla: dos veces todavía no alcanza, la tercera sí.
+  falla = propia("el modelo no quiso contestar este turno");
+  for (let i = 0; i < 2; i++) await agente.procesar("77", m.disparo, { tarde: true });
+  assert.equal(fila().fallos, 2);
+  assert.equal(decidirSinContestar(fila(), { prendido: true, macViva: true, maxFallos: 3 }).que, "reintentar");
+  await agente.procesar("77", m.disparo, { tarde: true });
+  assert.equal(fila().fallos, 3);
+  assert.equal(m.contacto.dueno, "agente", "el agente no se la pasa solo: la pasa el cron");
+  assert.equal(m.avisos.length, 0);
+  const pasadas = await pasarSinContestar({
+    filas: [fila()], prendido: true, macViva: true, maxFallos: 3,
+    apartar: async () => true, soltar: async () => {}, pasar: (c, aviso) => agente.pasarACande({ ...m.contacto, id: c.id }, aviso),
+  });
+  assert.equal(pasadas, 1);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+  assert.match(m.avisos[0].campos.Aviso, /falló 3 veces con esta charla/);
+  // Un toque o una indicación que fallan no cuentan: no hay un mensaje del lead esperando.
+  const t = armarToque({ responde: () => { throw propia("el modelo no quiso contestar este turno"); } });
+  await toque(t.agente);
+  assert.equal(t.m.salidas.filter(cuentaParaElTope).length, 0);
+});
+
+/** Un reloj de mentira: dormir(ms) espera a que avanzar() lleve el reloj hasta ahí. */
+function relojDePrueba() {
+  let ahora = 0;
+  const dormidos = [];
+  const dormir = (ms) => new Promise((r) => { dormidos.push({ en: ahora + ms, r }); });
+  async function avanzar(hastaMs) {
+    for (;;) {
+      await tick();
+      dormidos.sort((a, b) => a.en - b.en);
+      if (!dormidos.length || dormidos[0].en > hastaMs) break;
+      const d = dormidos.shift();
+      ahora = d.en;
+      d.r();
+    }
+    ahora = Math.max(ahora, hastaMs);
+  }
+  return { ahora: () => ahora, dormir, avanzar };
+}
+
+/**
+ * Una noche con la Mac apagada deja `n` charlas esperando. La Mac vuelve en el minuto 0 y el cron de la
+ * espera corre cada 2 minutos, como en vercel.json, con la ventana de pages/api/dm/espera.js. Cada
+ * respuesta tarda `seg` segundos. Devuelve en qué minuto quedó contestada la última, en qué orden
+ * arrancaron, cuántas hubo a la vez como mucho y si alguna se contestó dos veces.
+ */
+async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalelo = 2 }) {
+  const reloj = relojDePrueba();
+  const ids = Array.from({ length: n }, (_, i) => `c${String(i + 1).padStart(2, "0")}`);
+  const a = apartadasDePrueba();
+  const arrancadas = [];
+  let aLaVez = 0;
+  let maximo = 0;
+  let dobles = 0;
+  let ultima = null;
+  const procesar = async (id) => {
+    if (a.hechas.has(id)) dobles++;
+    arrancadas.push(id);
+    maximo = Math.max(maximo, ++aLaVez);
+    await reloj.dormir(seg * 1000);
+    aLaVez--;
+    a.hechas.add(id);
+    if (a.hechas.size === n) ultima = reloj.ahora();
+    return { hecho: "enviada" };
+  };
+  const corridas = [];
+  for (let t = 0; ultima === null && t < 4 * 3600000; t += cada * 1000) {
+    await reloj.avanzar(t);
+    if (ultima !== null) break;
+    // Lo que devuelve base.sinContestar en ese momento: lo que falta, sin lo apartado, de la más vieja a la más nueva.
+    const filas = ids.filter((id) => !a.hechas.has(id) && !a.apartadas.has(id)).map((id) => ({ id, ultimo_id_lead: 1, minutos: 600, fallos: 0 }));
+    corridas.push(vaciarEspera({
+      filas, prendido: true, macViva: true, maxFallos: 3, reclamar: (id) => a.reclamar(id, { tope: enParalelo }), soltar: a.soltar,
+      procesar, hasta: t + ventana * 1000, enParalelo, ahora: reloj.ahora, esperar: reloj.dormir,
+    }));
+  }
+  await reloj.avanzar(ultima + 600000);
+  await Promise.all(corridas);
+  return { minutos: ultima / 60000, arrancadas, ids, maximo, dobles };
+}
+
+test("caudal: cuando vuelve la Mac, 50 charlas de una noche salen en menos de 45 minutos, de la más vieja a la más nueva, una vez cada una", async () => {
+  // Cada respuesta: la Mac la toma, la redacta y la revisa, y sale por ManyChat. Entre 45 y 90 segundos.
+  for (const seg of [45, 60, 90]) {
+    const r = await simularEspera({ seg });
+    assert.ok(r.minutos <= 45, `con ${seg} segundos por respuesta tardó ${r.minutos} minutos`);
+    assert.ok(r.minutos >= (50 * seg) / 2 / 60, "no hay más de dos a la vez");
+    assert.deepEqual(r.arrancadas, r.ids, "de la más vieja a la más nueva, y cada una una vez");
+    assert.equal(r.dobles, 0);
+    assert.equal(r.maximo, 2, "nunca más de dos a la vez, aunque las corridas del cron se pisen");
+  }
+  // Lo de antes, para comparar: una corrida cada 10 minutos, de a una, arrancando durante 170 segundos.
+  const antes = await simularEspera({ seg: 60, cada: 600, ventana: 170, enParalelo: 1 });
+  assert.ok(antes.minutos > 120, `antes tardaba ${antes.minutos} minutos`);
+});
+
+test("la espera no arranca respuestas pasada la hora límite, y si la Mac tiene sus lugares ocupados espera a que se libere uno", async () => {
+  const reloj = relojDePrueba();
+  const a = apartadasDePrueba();
+  a.apartadas.add("otra-1");
+  a.apartadas.add("otra-2"); // dos de otra corrida ocupan los lugares
+  const llamados = [];
+  const corrida = vaciarEspera({
+    filas: ["1", "2", "3"].map((id) => ({ id, ultimo_id_lead: 1, minutos: 30 })), prendido: true, macViva: true, maxFallos: 3,
+    reclamar: (id) => a.reclamar(id, { tope: 2 }), soltar: a.soltar, hasta: 60000, ahora: reloj.ahora, esperar: reloj.dormir,
+    procesar: async (id) => { llamados.push([id, reloj.ahora()]); await reloj.dormir(50000); return { hecho: "enviada" }; },
+  });
+  await reloj.avanzar(20000);
+  assert.deepEqual(llamados, [], "con los lugares ocupados no arranca");
+  a.apartadas.delete("otra-1");
+  await reloj.avanzar(400000);
+  const r = await corrida;
+  // Se libera un lugar a los 20 segundos: la 1 arranca en la vuelta siguiente (cada 5 segundos) y la 2,
+  // con la otra corrida ocupando el otro lugar, no tiene lugar antes de la hora límite (60): no arranca.
+  assert.deepEqual(llamados.map(([id]) => id), ["1"]);
+  assert.ok(llamados[0][1] >= 20000 && llamados[0][1] <= 25000);
+  assert.equal(r.reintentos, 1);
+});
+
+test("los toques esperan mientras hay charlas por contestar: primero se contesta a quien escribió", () => {
+  const ops = { prendido: true, macViva: true, maxFallos: 3 };
+  assert.equal(hayEspera([], ops), false);
+  assert.equal(hayEspera([{ id: "1", minutos: 30 }], ops), true);
+  assert.equal(hayEspera([{ id: "1", minutos: 30, quizas_salio: true }, { id: "2", fallos: 3 }], ops), false, "lo que se pasa no frena los toques");
+});
+
+/** Varias charlas que esperaron más de lo que deja Instagram, con lo que hace base con ellas. */
+function charlasSinVentana({ avisoSale = true } = {}) {
+  const m = {
+    contactos: [
+      { id: "71", nombre: "Lead uno", ig_usuario: "lead.uno", respondido_hasta: 0, ultimo_id_lead: 3 },
+      { id: "72", nombre: "Lead\ndos", ig_usuario: null, respondido_hasta: 0, ultimo_id_lead: 8 },
+      { id: "73", nombre: null, ig_usuario: "", respondido_hasta: 0, ultimo_id_lead: 9 },
+    ],
+    avisos: [], notas: [], preguntas: 0,
+  };
+  const base = {
+    cerrarTurno: async (id, hasta) => { const c = m.contactos.find((x) => x.id === id); c.respondido_hasta = Math.max(c.respondido_hasta, hasta); },
+    anotar: async (id, quien, texto) => { m.notas.push([id, quien, texto]); },
+    guardarIg: async (id, { usuario }) => { m.contactos.find((x) => x.id === id).ig_usuario = usuario; },
+  };
+  const manychat = { datosDe: async () => { m.preguntas++; return { ok: true, ig_username: "Lead.Dos" }; } };
+  const avisar = async (titulo, campos, opciones) => { m.avisos.push({ titulo, campos, opciones }); return avisoSale; };
+  // Lo que devuelve base.sinVentana: las que siguen con el turno abierto.
+  m.sinVentana = () => m.contactos.filter((c) => c.respondido_hasta < c.ultimo_id_lead).map((c) => ({ ...c }));
+  const agente = crearAgente({ base, pedir: async () => { throw new Error("no"); }, manychat, avisar });
+  return { agente, m };
+}
+
+test("las charlas que esperaron más de lo que deja Instagram van en UN aviso, con nombre y link de cada una, y una sola vez", async () => {
+  const { agente, m } = charlasSinVentana();
+  assert.equal(await agente.avisarSinVentana(m.sinVentana()), 3);
+  assert.equal(m.avisos.length, 1);
+  const { titulo, campos, opciones } = m.avisos[0];
+  assert.equal(titulo, "DM: charlas que el agente no llegó a contestar");
+  assert.equal(opciones.contestable, false, "no es de una charla: no ofrece contestar");
+  assert.equal(campos.Quién, undefined);
+  assert.deepEqual(campos.Charlas.trim().split("\n"), [
+    "Lead uno: https://ig.me/m/lead.uno",
+    "Lead dos: https://ig.me/m/lead.dos",
+    "sin nombre: sin link (no sé su usuario de Instagram)",
+  ]);
+  assert.match(campos.Aviso, /más de 23 horas/);
+  assert.doesNotMatch(JSON.stringify(m.avisos[0]), /[—¿¡]/);
+  // Cada turno queda cerrado hasta su último mensaje, con una nota para el modelo: no vuelve a salir.
+  assert.deepEqual(m.contactos.map((c) => c.respondido_hasta), [3, 8, 9]);
+  assert.deepEqual(m.notas.map(([id, quien]) => [id, quien]), [["71", "sistema"], ["72", "sistema"], ["73", "sistema"]]);
+  assert.equal(await agente.avisarSinVentana(m.sinVentana()), 0);
+  assert.equal(m.avisos.length, 1, "la vuelta siguiente no avisa de nuevo");
+});
+
+test("si el aviso de las charlas sin ventana no sale, no se cierra ninguna: sale en la vuelta siguiente", async () => {
+  const { agente, m } = charlasSinVentana({ avisoSale: false });
+  assert.equal(await agente.avisarSinVentana(m.sinVentana()), 0);
+  assert.equal(m.sinVentana().length, 3);
+  assert.equal(m.notas.length, 0);
+  // Pasada la hora límite no se le pregunta a ManyChat: sale el link de las que ya se sabe.
+  const tarde = charlasSinVentana();
+  await tarde.agente.avisarSinVentana(tarde.m.sinVentana(), { hasta: 0 });
+  assert.equal(tarde.m.preguntas, 0);
+  assert.match(tarde.m.avisos[0].campos.Charlas, /Lead dos: sin link/);
+});
+
+/* ---------- las fotos (19/10): "cuando recibamos foto así enseguida me lo pases como URGENTE" ---------- */
+
+const ADJUNTO_IG = "https://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id=1234567890&signature=prueba";
+
+test("qué es una foto: sin texto, el texto de la entrada para eso, o solo el link al archivo en Meta; un link común no", () => {
+  for (const t of ["", "   ", SIN_TEXTO, "[adjunto]", "[ADJUNTO]", ADJUNTO_IG, ` ${ADJUNTO_IG} `, "https://scontent-gru1-1.xx.fbcdn.net/v/t1.15752-9/foto.jpg", "https://cdn.fbsbx.com/v/t59/archivo.pdf"]) {
+    assert.equal(esFoto(t), true, JSON.stringify(t));
+  }
+  for (const t of [
+    "https://github.com/usuario-de-prueba", "https://www.linkedin.com/in/perfil-de-prueba", "https://www.instagram.com/reel/AbCdEf/",
+    "https://opengatehub.com/devs/gracias", "www.misitio.com", "hola", "ya pagué, te mando la captura", `mirá ${ADJUNTO_IG}`,
+    "http://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id=1", "https://lookaside.fbsbx.com.otro-sitio.com/x", "[adjunto] y algo más", null,
+  ]) {
+    assert.equal(esFoto(t), t === null, JSON.stringify(t));
+  }
+});
+
+/** Agrega un mensaje del lead de hace `seg` segundos y lo devuelve como disparo. */
+const mandaLead = (m, texto, seg = 0) => {
+  const id = m.entraLead(texto);
+  m.mensajes.at(-1).creado = new Date(AHORA.getTime() - seg * 1000);
+  return id;
+};
+
+test("una foto del lead: aviso URGENTE enseguida con el link, sin esperar la ráfaga ni al modelo; al lead nada, la charla sigue del agente y el turno queda atendido", async () => {
+  let avisosAlEsperar = null;
+  const { agente, m } = armar({
+    alEsperar: (mundo) => { avisosAlEsperar ??= mundo.avisos.length; },
+    responde: () => { throw new Error("con solo una foto no se le pide nada al modelo"); },
+  });
+  m.contacto.ig_usuario = "lead.prueba";
+  m.mensajes[1].creado = new Date(AHORA.getTime() - 3600000);
+  m.contacto.respondido_hasta = m.disparo; // lo último que escribió ya estaba contestado
+  const foto = mandaLead(m, ADJUNTO_IG);
+  const r = await agente.procesar("77", foto);
+  assert.equal(r.hecho, "solo foto");
+  assert.equal(avisosAlEsperar, 1, "el aviso sale antes de la espera de la ráfaga");
+  assert.equal(m.avisos.length, 1);
+  const { titulo, campos } = m.avisos[0];
+  assert.match(titulo, /URGENTE/);
+  assert.equal(titulo, "Lead de prueba · DM URGENTE: mandó una foto");
+  assert.equal(Object.keys(campos)[0], "Quién", "el renglón Quién primero: así se le puede contestar respondiendo el aviso");
+  assert.equal(campos.Quién, "Lead de prueba (77)");
+  assert.equal(campos["Lo último que escribió"], "mensaje de prueba");
+  assert.match(campos.Aviso, /Mandó una foto: si es el comprobante de MercadoPago, pasale el código/);
+  assert.equal(campos.Instagram, "https://ig.me/m/lead.prueba");
+  assert.doesNotMatch(JSON.stringify(m.avisos[0]), /[—¿¡]/);
+  assert.equal(m.pedidos.length, 0);
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.deepEqual(m.campos, [], "no se pausan los automáticos: no se pasa");
+  assert.equal(m.contacto.respondido_hasta, foto, "el turno queda atendido: la espera no lo vuelve a tomar");
+  assert.equal(m.salidas.length, 0, "no cuenta como un turno del agente");
+  assert.equal(m.tomado, null);
+});
+
+test("el aviso de la foto ofrece contestarle respondiendo el aviso, con el link de la charla", async () => {
+  const mandados = [];
+  const avisarCon = crearAvisoDm({
+    avisar: async (titulo, campos) => { mandados.push({ titulo, campos }); return true; },
+    leerChat: async () => null, tokenBot: () => "bot-de-prueba", respuestas: async () => true,
+  });
+  const { agente, m } = armar({ avisarCon });
+  m.contacto.ig_usuario = "lead.prueba";
+  m.contacto.id = "123456789"; // como los de ManyChat: el aviso se responde por el número
+  await agente.procesar("123456789", mandaLead(m, SIN_TEXTO));
+  assert.equal(mandados.length, 1);
+  assert.match(mandados[0].titulo, /URGENTE/);
+  assert.match(mandados[0].campos.Contestar, /respondé este mensaje/);
+  assert.equal(mandados[0].campos.Instagram, "https://ig.me/m/lead.prueba");
+  // El aviso, como lo ve Cande, lleva a esta charla cuando lo responde (lib/dm/respuestas.js).
+  const visto = `🔔 ${mandados[0].titulo}\n\n${Object.entries(mandados[0].campos).map(([k, v]) => `${k}: ${v}`).join("\n")}`;
+  const { contactoDeAviso: deAviso } = await import("../lib/dm/respuestas.js");
+  assert.equal(deAviso(visto), "123456789");
+});
+
+test("con la Mac apagada la foto se avisa igual, y no queda en espera", async () => {
+  const { agente, m } = armar({ responde: () => { throw transitoria("la Mac de Cande no contestó a tiempo"); } });
+  const foto = mandaLead(m, SIN_TEXTO);
+  m.contacto.respondido_hasta = 2;
+  assert.equal((await agente.procesar("77", foto)).hecho, "solo foto");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.contacto.respondido_hasta, foto);
+  assert.equal(m.salidas.length, 0);
+});
+
+test("un solo aviso por foto, aunque ManyChat reintente el mismo mensaje o lleguen varias juntas", async () => {
+  const { agente, m } = armar();
+  m.contacto.respondido_hasta = 2;
+  const primera = mandaLead(m, ADJUNTO_IG, 40);
+  assert.equal((await agente.procesar("77", primera)).hecho, "solo foto");
+  // ManyChat la reintenta 30 segundos después (pasada la ventana de 5 segundos de anotarLead): otro mensaje igual.
+  const reintento = mandaLead(m, ADJUNTO_IG, 10);
+  assert.equal((await agente.procesar("77", reintento)).hecho, "solo foto");
+  // Y otra foto del mismo comprobante, en la misma ráfaga.
+  const otra = mandaLead(m, SIN_TEXTO, 0);
+  assert.equal((await agente.procesar("77", otra)).hecho, "solo foto");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+  // Una foto de otro momento (más de 2 minutos después) sí avisa de nuevo.
+  const otroDia = armar();
+  otroDia.m.contacto.respondido_hasta = 2;
+  await otroDia.agente.procesar("77", mandaLead(otroDia.m, SIN_TEXTO, 600));
+  await otroDia.agente.procesar("77", mandaLead(otroDia.m, SIN_TEXTO, 0));
+  assert.equal(otroDia.m.avisos.length, 2);
+});
+
+test("foto con texto: el texto se contesta normal y el aviso URGENTE de la foto sale igual", async () => {
+  // Primero el texto y después la foto: la corrida de la foto avisa y contesta el turno entero.
+  const uno = armar();
+  uno.m.contacto.respondido_hasta = 2;
+  mandaLead(uno.m, "listo, ya está", 5);
+  const foto = mandaLead(uno.m, ADJUNTO_IG, 0);
+  assert.equal((await uno.agente.procesar("77", foto)).hecho, "enviada");
+  assert.deepEqual(uno.m.pedidos[0].turno.mensajes_del_lead, ["listo, ya está", ADJUNTO_IG]);
+  assert.deepEqual(uno.m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(uno.m.avisos.length, 1);
+  assert.match(uno.m.avisos[0].titulo, /URGENTE: mandó una foto/);
+  assert.equal(uno.m.avisos[0].campos["Lo último que escribió"], "listo, ya está");
+  assert.equal(uno.m.contacto.respondido_hasta, foto);
+  // Primero la foto y después el texto: la corrida de la foto avisa y le deja el turno a la del texto.
+  const dos = armar();
+  dos.m.contacto.respondido_hasta = 2;
+  const laFoto = mandaLead(dos.m, SIN_TEXTO, 5);
+  const texto = mandaLead(dos.m, "te mandé la captura", 0);
+  assert.equal((await dos.agente.procesar("77", laFoto)).hecho, "llegó otro mensaje");
+  assert.equal(dos.m.avisos.length, 1);
+  assert.equal((await dos.agente.procesar("77", texto)).hecho, "enviada");
+  assert.deepEqual(dos.m.pedidos[0].turno.mensajes_del_lead, [SIN_TEXTO, "te mandé la captura"]);
+  assert.equal(dos.m.avisos.length, 1, "el texto no vuelve a avisar la foto");
+});
+
+test("un turno de solo fotos que quedó abierto lo cierra el reintento de la espera, sin modelo ni otro aviso", async () => {
+  const { agente, m } = armar();
+  m.contacto.respondido_hasta = 2;
+  const foto = mandaLead(m, SIN_TEXTO, 600);
+  assert.equal((await agente.procesar("77", foto, { tarde: true })).hecho, "solo foto");
+  assert.equal(m.avisos.length + m.pedidos.length + m.enviados.length, 0);
+  assert.equal(m.contacto.respondido_hasta, foto);
+});
+
+test("un link común no es una foto: no avisa y el agente contesta", async () => {
+  const { agente, m } = armar();
+  m.contacto.respondido_hasta = 2;
+  const link = mandaLead(m, "https://github.com/usuario-de-prueba");
+  assert.equal((await agente.procesar("77", link)).hecho, "enviada");
+  assert.equal(m.avisos.length, 0);
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+});
+
+test("una foto en una charla de Cande, o con el agente apagado, no avisa: el agente no está ahí", async () => {
+  const deCande = armar({ dueno: "cande" });
+  assert.equal((await deCande.agente.procesar("77", mandaLead(deCande.m, SIN_TEXTO))).hecho, "no es del agente");
+  assert.equal(deCande.m.avisos.length, 0);
+  const apagado = armar({ modo: "apagado" });
+  assert.equal((await apagado.agente.procesar("77", mandaLead(apagado.m, SIN_TEXTO))).hecho, "apagado");
+  assert.equal(apagado.m.avisos.length, 0);
 });
