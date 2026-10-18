@@ -50,17 +50,24 @@ async function main() {
   marcarLeads(devs, eventos);
   const embudo = contarEmbudo(eventos);
 
-  const { rows: founders } = await sql`
-    SELECT id, nombre, email, whatsapp, origen, creado
-    FROM leads_preguntas ORDER BY creado DESC`.catch(() => ({ rows: [] }));
+  // El WhatsApp se lee por to_jsonb: la columna la crea /api/preguntas-lead recién con el primer
+  // founder que lo deja, y pedirla de nombre antes de eso hacía fallar la consulta entera. Si la
+  // consulta falla igual, no se pisa crm_founders.json con una lista vacía: queda el último bueno.
+  const founders = await sql`
+    SELECT id, nombre, email, to_jsonb(l) ->> 'whatsapp' AS whatsapp, origen, creado
+    FROM leads_preguntas l ORDER BY creado DESC`
+    .then((r) => r.rows)
+    .catch((e) => { console.error("crm_sync: no pude leer los founders:", e.message); return null; });
 
   await writeFile(join(TRACKER, "crm_devs.json"),
     JSON.stringify({ actualizado: new Date().toISOString(), leads: devs,
                      embudo }, null, 1));
-  await writeFile(join(TRACKER, "crm_founders.json"),
-    JSON.stringify({ actualizado: new Date().toISOString(), leads: founders }, null, 1));
+  if (founders) {
+    await writeFile(join(TRACKER, "crm_founders.json"),
+      JSON.stringify({ actualizado: new Date().toISOString(), leads: founders }, null, 1));
+  }
 
-  console.log(`OK · ${devs.length} devs · ${founders.length} founders`);
+  console.log(`OK · ${devs.length} devs · ${founders ? founders.length : "sin cambios en los"} founders`);
 }
 
 main().catch((e) => { console.error("crm_sync:", e.message); process.exit(1); });
