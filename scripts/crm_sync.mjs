@@ -51,7 +51,7 @@ async function main() {
   const embudo = contarEmbudo(eventos);
 
   const { rows: founders } = await sql`
-    SELECT id, nombre, email, origen, creado
+    SELECT id, nombre, email, whatsapp, origen, creado
     FROM leads_preguntas ORDER BY creado DESC`.catch(() => ({ rows: [] }));
 
   await writeFile(join(TRACKER, "crm_devs.json"),

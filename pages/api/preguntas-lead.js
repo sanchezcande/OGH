@@ -26,7 +26,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-async function guardar({ nombre, email, origen }) {
+async function guardar({ nombre, email, origen, whatsapp }) {
   await sql`
     CREATE TABLE IF NOT EXISTS leads_preguntas (
       id SERIAL PRIMARY KEY,
@@ -48,11 +48,21 @@ async function guardar({ nombre, email, origen }) {
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d12 TIMESTAMPTZ`;
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d17 TIMESTAMPTZ`;
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
+  // 18/10/2026, pedido de Cande: "si no que me dejen su mail y whatsapp y los contacto o algo así".
+  // El WhatsApp importa MAS que el mail acá: con mail entra a una cadena automática, con WhatsApp
+  // le escribe ella, que es como consiguió los dos founders que tiene (los dos conversando).
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS whatsapp TEXT`;
   // Si lo vuelve a pedir no duplicamos: sumamos el pedido.
+  // Si lo vuelve a pedir no duplicamos: sumamos el pedido. El WhatsApp SOLO se pisa si el
+  // nuevo trae algo: el que ya lo dejó y vuelve a bajar la guía desde otro lado (sin el campo)
+  // no puede borrarse el teléfono a sí mismo.
   const { rows } = await sql`
-    INSERT INTO leads_preguntas (nombre, email, origen)
-    VALUES (${nombre}, ${email}, ${origen})
-    ON CONFLICT (email) DO UPDATE SET pedidos = leads_preguntas.pedidos + 1, actualizado = NOW()
+    INSERT INTO leads_preguntas (nombre, email, origen, whatsapp)
+    VALUES (${nombre}, ${email}, ${origen}, ${whatsapp || null})
+    ON CONFLICT (email) DO UPDATE SET
+      pedidos = leads_preguntas.pedidos + 1,
+      whatsapp = COALESCE(NULLIF(EXCLUDED.whatsapp, ''), leads_preguntas.whatsapp),
+      actualizado = NOW()
     RETURNING pedidos`;
   return rows[0]?.pedidos || 1;
 }
@@ -102,6 +112,10 @@ export default async function handler(req, res) {
   const nombre = limpiar(req.body?.nombre, 120);
   const email = limpiar(req.body?.email, 200).toLowerCase();
   const origen = limpiar(req.body?.origen, 60) || "directo";
+  // Se guarda tal cual lo escribe la persona: los teléfonos vienen de cualquier país y de
+  // cualquier forma, y normalizarlos acá perdería más de lo que ordena. El CRM ya sabe armar
+  // el número con el código de país cuando hay que llamar.
+  const whatsapp = limpiar(req.body?.whatsapp, 40);
   // Campo trampa: los humanos no lo ven, los bots lo llenan.
   if (limpiar(req.body?.web)) return res.status(200).json({ ok: true, pdf: PDF_PATH });
 
@@ -111,7 +125,7 @@ export default async function handler(req, res) {
   let guardado = false, pedidos = 1;
   if (hayBase()) {
     try {
-      pedidos = await guardar({ nombre, email, origen });
+      pedidos = await guardar({ nombre, email, origen, whatsapp });
       guardado = true;
     } catch (e) {
       console.error("preguntas-lead: no pude guardar en Postgres:", e.message);
@@ -135,7 +149,7 @@ export default async function handler(req, res) {
   }
 
   await avisar("Founder bajó las 9 preguntas", {
-    Nombre: nombre, Email: email, Origen: origen,
+    Nombre: nombre, Email: email, WhatsApp: whatsapp || undefined, Origen: origen,
     Pedidos: pedidos > 1 ? `${pedidos} (ya lo había pedido)` : undefined,
     Guardado: guardado ? "sí" : "NO",
     "Mail enviado": mandado ? "sí" : "NO",
