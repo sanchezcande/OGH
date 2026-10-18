@@ -1,5 +1,5 @@
 // Retomar una charla que se le pasó a Cande y nadie contestó (19/10): el traspaso al agente con
-// retomar deja abiertos los mensajes del lead posteriores a lo último de la cuenta, y la espera los
+// retomar deja abiertos los mensajes del lead posteriores al último mensaje enviado, y la espera los
 // contesta tarde. Sin retomar, el traspaso sigue cerrando el turno como siempre.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -13,7 +13,7 @@ test("el traspaso al agente solo reabre con retomar explícito; si no, cierra el
   assert.match(src, /else if \(b\.dueno === "agente" && previo\?\.dueno === "cande"\) await cerrarTurno\(id/);
 });
 
-test("reabrirTurno deja atendido todo lo anterior a lo último que salió de la cuenta", async () => {
+test("reabrirTurno deja atendido todo lo anterior al último mensaje enviado por la cuenta", async () => {
   const src = await leer("../lib/dm/base.js");
   const i = src.indexOf("export async function reabrirTurno");
   assert.ok(i > -1, "falta reabrirTurno");
