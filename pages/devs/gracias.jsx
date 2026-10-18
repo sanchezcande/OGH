@@ -151,7 +151,7 @@ export default function Gracias() {
                 <CartelPrecio>${PRECIO_PESOS} <span>un solo pago</span></CartelPrecio>
                 <CartelTexto>Todo lo del video: dónde buscar, el CV comentado línea por línea y las preguntas que hago en cada entrevista.</CartelTexto>
                 <Pasos>
-                  <li>Pagás con MercadoPago</li>
+                  <li>Usás un link de MercadoPago</li>
                   <li>Me mandás el comprobante por <a href={IG_CANDE} target="_blank" rel="noopener noreferrer">Instagram</a></li>
                   <li>Te paso tu código y entrás</li>
                 </Pasos>
@@ -161,7 +161,7 @@ export default function Gracias() {
                   rel="noopener noreferrer"
                   onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
                 >
-                  🔥 PAGAR EN PESOS
+                  🔥 SÍ, LO QUIERO YA!
                 </PagarPesos>
                 <CartelChico>Garantía de 30 días: si no te sirve, te devuelvo la plata.</CartelChico>
               </Cartel>
