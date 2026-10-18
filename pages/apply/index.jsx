@@ -304,7 +304,7 @@ export default function ApplyEn() {
               )}
             </Botonera>
             {ultimo && (
-              <Nota>We'll email you right after so you can upload your CV.</Nota>
+              <Nota>We&apos;ll email you right after so you can upload your CV.</Nota>
             )}
           </form>
         </Caja>
