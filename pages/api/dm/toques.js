@@ -1,23 +1,25 @@
-// El cron del agente de DM. Lo llama Vercel cada 10 minutos (ver vercel.json). Hace cuatro cosas:
+// El cron del agente de DM. Lo llama Vercel cada 10 minutos (ver vercel.json). Hace cinco cosas:
 //
 //   1. Red de seguridad, siempre, esté el agente prendido o apagado: las respuestas que ManyChat
 //      no vino a retirar pasan a Cande. De las charlas del agente con un mensaje sin atender pasan a
 //      Cande solo las que no tienen arreglo: el agente está apagado, una respuesta pudo haber salido
-//      (no se manda dos veces) o el modelo falló 3 veces con esa charla en particular. Las demás
-//      quedan en espera, del agente y sin aviso, por más que pase el tiempo (19/10, Cande: "deberían
-//      quedar on hold y cuando prendo la pc las deberías agarrar vos"). Antes pasaban a la hora y le
-//      llegaba un aviso por charla cada vez que apagaba la compu. Las contesta el cron de la espera
-//      (/api/dm/espera, cada 2 minutos) cuando la Mac vuelve.
+//      (no se manda dos veces) o el modelo falló 3 veces con esa charla en particular (mientras con
+//      las demás andaba). Las demás quedan en espera, del agente y sin aviso, por más que pase el
+//      tiempo (19/10, Cande: "deberían quedar on hold y cuando prendo la pc las deberías agarrar
+//      vos"). Antes pasaban a la hora y le llegaba un aviso por charla cada vez que apagaba la compu.
+//      Las contesta el cron de la espera (/api/dm/espera, cada 2 minutos) cuando la Mac vuelve.
 //   2. Las que esperaron tanto que Instagram ya no deja escribirles (23 horas y media desde lo último
 //      del lead: la Mac apagada casi un día): UN aviso por vuelta con la lista, nombre y link de cada
 //      una, y el turno de cada una se cierra (no vuelve a salir en otro aviso).
-//   3. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
+//   3. Las fotos del lead que se quedaron sin su aviso URGENTE (Telegram no anduvo, o la corrida se
+//      cortó antes de avisar): se avisan de nuevo, una vez cada una, esté la Mac o no.
+//   4. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
 //      Mac está contestando, no hay charlas esperando respuesta (primero se contesta a quien escribió)
 //      y es de día en Argentina (de 9 a 21).
 //      Cada toque vencido se reclama de a uno y pasa por el agente con el evento "seguimiento":
 //      el agente vuelve a mirar que la charla siga siendo suya, que el lead no haya escrito y
 //      que la ventana de 24 horas de Instagram siga abierta.
-//   4. Borra lo guardado de las charlas que llevan 90 días quietas.
+//   5. Borra lo guardado de las charlas que llevan 90 días quietas.
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
 import { agente, colaDe } from "../../../lib/dm/armado";
@@ -27,7 +29,8 @@ import {
   MAC_VIVA_SEGUNDOS, REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar,
 } from "../../../lib/dm/seguimientos";
 import {
-  ajustes, borrarViejas, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas, vencerPendientes,
+  ajustes, borrarViejas, fotosSinAviso, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas,
+  vencerPendientes,
 } from "../../../lib/dm/base";
 
 const TOQUES_POR_CORRIDA = 10;
@@ -75,6 +78,14 @@ export default async function handler(req, res) {
     console.error("dm: no se pudo avisar de las charlas sin ventana", e.message);
   }
 
+  // Las fotos sin aviso: después de los pases (una charla que se acaba de pasar ya le llegó a Cande).
+  let fotos = 0;
+  try {
+    fotos = await agente.avisarFotosPendientes(await fotosSinAviso());
+  } catch (e) {
+    console.error("dm: no se pudieron avisar las fotos pendientes", e.message);
+  }
+
   // Toques: si la Mac no está contestando, si hay charlas esperando respuesta (las contesta el cron de
   // la espera, y la Mac no da para todo a la vez) o si es de noche en Argentina, no se reclama ninguno:
   // siguen en la fila y salen en una corrida de después (los que se pasan de las 24 horas los limpia
@@ -100,7 +111,7 @@ export default async function handler(req, res) {
     console.error("dm: no se pudo borrar lo viejo", e.message);
   }
   return res.status(200).json({
-    ok: true, hechos, sin_atender: sinAtender, sin_ventana: sinVentanaAvisadas, ...(prendido ? {} : { motivo: "apagado" }),
+    ok: true, hechos, sin_atender: sinAtender, sin_ventana: sinVentanaAvisadas, fotos, ...(prendido ? {} : { motivo: "apagado" }),
   });
 }
 

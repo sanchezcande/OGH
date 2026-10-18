@@ -7,13 +7,19 @@
 //
 // Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js. El doble de Postgres de
 // tests/dobles solo conoce las del goteo, así que tomar, soltar, anotarLead, sembrar,
-// retirarSalida, reclamarToque, sinContestar, reclamarEspera, sinVentana, borrarViejas, borrarCharla,
-// lugarParaAlta, darDeAlta y reservar (y lo que hacen con ellas /api/dm/config, /api/dm/toques,
-// /api/dm/espera y /api/dm/entrada con las altas prendidas) se prueban a mano contra un Postgres de
-// verdad antes de subir un cambio. De la espera hay que mirar: que fallos cuente solo las fallas
-// propias del turno, que una charla apartada no la tome otra corrida ni la vea sinContestar, que no
-// se aparten más de `tope` para contestar, que no se aparte para contestar una con una respuesta que
-// pudo haber salido, y que sinVentana no devuelva una charla con el turno ya cerrado.
+// retirarSalida, reclamarToque, sinContestar, reclamarEspera, sinVentana, reclamarAvisoFoto,
+// soltarAvisoFoto, fotosSinAviso, borrarViejas, borrarCharla, lugarParaAlta, darDeAlta y reservar (y lo
+// que hacen con ellas /api/dm/config, /api/dm/toques, /api/dm/espera y /api/dm/entrada con las altas
+// prendidas) se prueban a mano contra un Postgres de verdad antes de subir un cambio. De la espera hay
+// que mirar: que fallos cuente las fallas propias del turno y las dudosas que tuvieron otra charla
+// saliendo 10 minutos antes o después (y nunca las generales), que intentos y minutos_desde_la_falla
+// miren solo las propias y las dudosas, que una charla apartada no la tome otra corrida ni la vea
+// sinContestar, que no se aparten más de `tope` para contestar, que no se aparte para contestar una con
+// una respuesta que pudo haber salido, y que sinVentana no devuelva una charla con el turno ya cerrado.
+// De las fotos: que las charlas que ya existían arranquen con todo dado por avisado y las nuevas en 0,
+// que reclamarAvisoFoto no aparte dos veces ni dentro de los 2 minutos de otro aviso y devuelva lo de
+// antes, que soltarAvisoFoto lo devuelva, y que fotosSinAviso traiga solo fotos sin aviso de 5 minutos a
+// 24 horas de charlas del agente (sin las que fueron con un aviso).
 // De las altas hay que mirar siempre lo mismo: que quien ya figura como de Cande no cambia de
 // dueño, que el tope corta, que el alta deja el mensaje y la ventana abierta en la misma
 // sentencia, y que borrar o reservar a quien no figuraba le deja la fila que frena el alta.
@@ -28,7 +34,8 @@ const {
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno, esFoto, SIN_TEXTO } = await import("../lib/dm/agente.js");
 const {
-  correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, FALLA_GENERAL, FALLA_PROPIA, REINTENTO_MAX_FALLOS,
+  correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, vigiaDelModelo, pausaTrasFallas,
+  FALLA_GENERAL, FALLA_PROPIA, FALLA_DUDOSA, REINTENTO_MAX_FALLOS,
 } = await import("../lib/dm/seguimientos.js");
 /** Una falla del modelo que se arregla sola (la Mac sin red). */
 const transitoria = (texto) => Object.assign(new Error(texto), { transitorio: true });
@@ -357,7 +364,10 @@ function armar({
   const delLead = () => m.mensajes.filter((x) => x.quien === "lead");
   const base = {
     tablas: async () => {},
-    ajustes: async () => m.ajustes,
+    ajustes: async () => {
+      if (m.fallarAjustes > 0) { m.fallarAjustes--; throw new Error("base caída al leer los ajustes"); }
+      return m.ajustes;
+    },
     prompt: async () => prompt,
     contacto: async () => (m.contacto ? { ...m.contacto } : null),
     anotarLead: async (id, texto) => (m.contacto?.dueno === "agente" ? m.entraLead(texto) : null),
@@ -398,6 +408,20 @@ function armar({
     cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
     borrarCharla: async () => { m.contacto = { ...m.contacto, dueno: "cande", nombre: null, estado: {} }; m.mensajes = []; m.salidas = []; m.borrada = true; },
+    // La constancia del aviso de las fotos, como base.reclamarAvisoFoto y soltarAvisoFoto. La hora de la
+    // base es m.ahora (si la prueba la mueve) o la del agente.
+    reclamarAvisoFoto: async (id, hastaId) => {
+      const c = m.contacto;
+      const ya = (m.ahora ?? ahora).getTime();
+      const en = c.foto_avisada_en ? c.foto_avisada_en.getTime() : null;
+      if ((c.foto_avisada_hasta || 0) >= hastaId || (en !== null && en >= ya - 2 * 60000)) return null;
+      const antes = { hasta: c.foto_avisada_hasta || 0, en: c.foto_avisada_en || null };
+      Object.assign(c, { foto_avisada_hasta: hastaId, foto_avisada_en: new Date(ya) });
+      return antes;
+    },
+    soltarAvisoFoto: async (id, hastaId, antes) => {
+      if (m.contacto.foto_avisada_hasta === hastaId) Object.assign(m.contacto, { foto_avisada_hasta: antes.hasta, foto_avisada_en: antes.en });
+    },
   };
   const pedir = async (p) => {
     m.pedidos.push(p);
@@ -1812,7 +1836,7 @@ test("los demás endpoints tampoco entran sin su secreto, y solo por POST", asyn
 
 /* ---------- el cerebro local (lib/dm/cola.js), con las consultas de mentira ---------- */
 
-const { crearCerebroLocal } = await import("../lib/dm/cola.js");
+const { crearCerebroLocal, fallaDeLaMac } = await import("../lib/dm/cola.js");
 
 function cerebroDePrueba({ resultadoEn = 2, resultado, nunca = false } = {}) {
   const m = { creados: [], lecturas: 0, vencidos: [], vaciados: [] };
@@ -1868,6 +1892,45 @@ test("cerebro local: lo que falla la Mac (no contestó, tardó, sin uso, sin JSO
   assert.equal(await general(cerebroDePrueba({ resultado: { error: "Claude tardó más de 70 segundos" } }).pedirLocal({ turno: {} })), true);
   assert.equal(await general(cerebroDePrueba({ nunca: true }).pedirLocal({ turno: {} })), true);
   assert.equal(await general(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), false);
+});
+
+test("cerebro local: sin uso, sin sesión o sin Anthropic es general seguro; que Claude no pudo, no devolvió JSON o tardó es dudoso (puede ser de esa charla)", async () => {
+  // Los textos son los que da `claude -p` y la Mac pasa tal cual (tracker/dm_claude.py).
+  for (const t of [
+    "Claude no pudo: Claude AI usage limit reached|1760900000", "Claude no pudo: You've hit your limit · resets 3pm",
+    "Claude no pudo: Invalid API key · Please run /login", "Claude no devolvió JSON: API Error: 529 overloaded_error",
+    "Claude no pudo: API Error: Connection error.",
+  ]) {
+    assert.deepEqual(fallaDeLaMac(t), { transitorio: false, general: true, dudosa: false }, t);
+  }
+  for (const t of [
+    "Claude no pudo: error_max_structured_output_retries", "Claude no pudo: No puedo ayudar con este pedido", "Claude no devolvió JSON: ",
+    "Claude no pudo: None", "Claude no pudo: API Error: 400 invalid_request_error",
+  ]) {
+    assert.deepEqual(fallaDeLaMac(t), { transitorio: false, general: true, dudosa: true }, t);
+  }
+  assert.deepEqual(fallaDeLaMac("Claude tardó más de 60 segundos"), { transitorio: true, general: true, dudosa: true });
+  // Tal como sale del cerebro: el error que tira.
+  const clase = async (pedido) => { try { await pedido; } catch (e) { return [e.general, e.dudosa]; } return "no falló"; };
+  assert.deepEqual(await clase(cerebroDePrueba({ resultado: { error: "Claude no pudo: error_max_structured_output_retries" } }).pedirLocal({ turno: {} })), [true, true]);
+  assert.deepEqual(await clase(cerebroDePrueba({ resultado: { error: "Claude no pudo: Claude AI usage limit reached|1760900000" } }).pedirLocal({ turno: {} })), [true, false]);
+  assert.deepEqual(await clase(cerebroDePrueba({ resultado: { ...salidaValida, accion: "bailar" } }).pedirLocal({ turno: {} })), [false, false]);
+  assert.deepEqual(await clase(cerebroDePrueba({ nunca: true }).pedirLocal({ turno: {} })), [true, false], "la Mac no retiró el trabajo: no estaba");
+});
+
+test("con el error tal como lo manda la Mac, la charla espera anotada como falla dudosa (o general si es el uso), sin pase ni aviso", async () => {
+  for (const [error, motivo] of [["Claude no pudo: error_max_structured_output_retries", FALLA_DUDOSA], ["Claude no pudo: Claude AI usage limit reached|1760900000", FALLA_GENERAL]]) {
+    for (const tarde of [false, true]) {
+      const cerebro = cerebroDePrueba({ resultado: { error } });
+      const { agente, m } = armar({ responde: (p) => cerebro.pedirLocal(p) });
+      const r = await agente.procesar("77", m.disparo, { tarde });
+      assert.deepEqual([r.hecho, r.general, r.dudosa, r.reintento], ["error del modelo", true, motivo === FALLA_DUDOSA, true]);
+      assert.deepEqual(m.salidas.map((x) => [x.accion, x.estado, x.motivo]), [[tarde ? "reintento" : "error", "error", motivo]]);
+      assert.equal(m.contacto.dueno, "agente");
+      assert.equal(m.avisos.length, 0);
+      assert.ok(m.contacto.respondido_hasta < m.disparo);
+    }
+  }
 });
 
 /* ---------- Cande contesta desde el bot del agente ---------- */
@@ -2269,7 +2332,10 @@ test("el link de pago con el código de acceso cargado en los ajustes sale; con 
 
 /* ---------- la espera (19/10): con la Mac apagada nada pasa a Cande; cuando vuelve, se contesta todo ---------- */
 
-/** Lo que cuenta para el tope de una charla, como lo cuenta base.sinContestar: solo sus fallas propias. */
+/**
+ * Lo que cuenta para el tope de una charla, como lo cuenta base.sinContestar: sus fallas propias (y las
+ * dudosas que tuvieron otra charla saliendo cerca: en estas pruebas no hay otras charlas).
+ */
 const cuentaParaElTope = (s) => ["error", "reintento"].includes(s.accion) && s.estado === "error" && s.motivo === FALLA_PROPIA;
 
 test("con la Mac apagada, una charla sin contestar espera del agente, sin aviso, por más horas que pasen", async () => {
@@ -2380,13 +2446,21 @@ function relojDePrueba() {
   return { ahora: () => ahora, dormir, avanzar };
 }
 
+const VENENO = "c00";
 /**
  * Una noche con la Mac apagada deja `n` charlas esperando. La Mac vuelve en el minuto 0 y el cron de la
  * espera corre cada 2 minutos, como en vercel.json, con la ventana de pages/api/dm/espera.js. Cada
  * respuesta tarda `seg` segundos. Devuelve en qué minuto quedó contestada la última, en qué orden
  * arrancaron, cuántas hubo a la vez como mucho y si alguna se contestó dos veces.
+ *
+ * `veneno`: además, la más vieja de todas (c00) es una charla con la que el modelo falla siempre, a los
+ * `veneno` segundos y con un error dudoso (la Mac contesta que no pudo). De ella, lo que daría
+ * base.sinContestar: sus intentos, cuándo fue la última falla y cuántas cuentan para el tope (las que
+ * tuvieron otra charla saliendo 10 minutos antes o después). El cron de los toques (cada 10 minutos) la
+ * pasa a Cande si llega al tope, y no arranca toques si hay espera: se anota en cada vuelta si los frenó.
+ * Con veneno se simulan `horas` horas.
  */
-async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalelo = 2 }) {
+async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalelo = 2, veneno = null, horas = 3 }) {
   const reloj = relojDePrueba();
   const ids = Array.from({ length: n }, (_, i) => `c${String(i + 1).padStart(2, "0")}`);
   const a = apartadasDePrueba();
@@ -2395,30 +2469,58 @@ async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalel
   let maximo = 0;
   let dobles = 0;
   let ultima = null;
+  const fallasVeneno = [];
+  const exitos = [];
+  let pasadaEn = null;
+  const toquesFrenados = [];
   const procesar = async (id) => {
     if (a.hechas.has(id)) dobles++;
     arrancadas.push(id);
     maximo = Math.max(maximo, ++aLaVez);
+    if (id === VENENO) {
+      await reloj.dormir(veneno * 1000);
+      aLaVez--;
+      fallasVeneno.push(reloj.ahora());
+      return { hecho: "error del modelo", general: true, dudosa: true };
+    }
     await reloj.dormir(seg * 1000);
     aLaVez--;
     a.hechas.add(id);
+    exitos.push(reloj.ahora());
     if (a.hechas.size === n) ultima = reloj.ahora();
     return { hecho: "enviada" };
   };
+  const filaVeneno = () => ({
+    id: VENENO, ultimo_id_lead: 1, minutos: 700, intentos: fallasVeneno.length,
+    minutos_desde_la_falla: fallasVeneno.length ? (reloj.ahora() - fallasVeneno.at(-1)) / 60000 : null,
+    fallos: fallasVeneno.filter((f) => exitos.some((e) => Math.abs(e - f) <= 10 * 60000)).length,
+  });
+  const ops = { prendido: true, macViva: true, maxFallos: 3 };
   const corridas = [];
-  for (let t = 0; ultima === null && t < 4 * 3600000; t += cada * 1000) {
+  const fin = veneno ? horas * 3600000 : 4 * 3600000;
+  for (let t = 0; t < fin && (veneno || ultima === null); t += cada * 1000) {
     await reloj.avanzar(t);
-    if (ultima !== null) break;
+    if (!veneno && ultima !== null) break;
     // Lo que devuelve base.sinContestar en ese momento: lo que falta, sin lo apartado, de la más vieja a la más nueva.
-    const filas = ids.filter((id) => !a.hechas.has(id) && !a.apartadas.has(id)).map((id) => ({ id, ultimo_id_lead: 1, minutos: 600, fallos: 0 }));
+    const filas = [
+      ...(veneno && pasadaEn === null && !a.apartadas.has(VENENO) ? [filaVeneno()] : []),
+      ...ids.filter((id) => !a.hechas.has(id) && !a.apartadas.has(id)).map((id) => ({ id, ultimo_id_lead: 1, minutos: 600, fallos: 0 })),
+    ];
+    if (veneno && t % 600000 === 0) {
+      if (filas[0]?.id === VENENO && decidirSinContestar(filas[0], ops).que === "pasar") {
+        pasadaEn = t;
+        filas.shift();
+      }
+      toquesFrenados.push({ t, frena: hayEspera(filas, ops) });
+    }
     corridas.push(vaciarEspera({
-      filas, prendido: true, macViva: true, maxFallos: 3, reclamar: (id) => a.reclamar(id, { tope: enParalelo }), soltar: a.soltar,
+      filas, ...ops, reclamar: (id) => a.reclamar(id, { tope: enParalelo }), soltar: a.soltar,
       procesar, hasta: t + ventana * 1000, enParalelo, ahora: reloj.ahora, esperar: reloj.dormir,
     }));
   }
-  await reloj.avanzar(ultima + 600000);
+  await reloj.avanzar((veneno ? fin : ultima) + 600000);
   await Promise.all(corridas);
-  return { minutos: ultima / 60000, arrancadas, ids, maximo, dobles };
+  return { minutos: ultima / 60000, arrancadas, ids, maximo, dobles, fallasVeneno, pasadaEn, toquesFrenados };
 }
 
 test("caudal: cuando vuelve la Mac, 50 charlas de una noche salen en menos de 45 minutos, de la más vieja a la más nueva, una vez cada una", async () => {
@@ -2434,6 +2536,36 @@ test("caudal: cuando vuelve la Mac, 50 charlas de una noche salen en menos de 45
   // Lo de antes, para comparar: una corrida cada 10 minutos, de a una, arrancando durante 170 segundos.
   const antes = await simularEspera({ seg: 60, cada: 600, ventana: 170, enParalelo: 1 });
   assert.ok(antes.minutos > 120, `antes tardaba ${antes.minutos} minutos`);
+});
+
+test("caudal con una charla con la que el modelo falla siempre (la Mac contesta que no pudo): las otras 50 salen igual en menos de 45 minutos", async () => {
+  // La revisión del 19/10: la más vieja fallaba en cada corrida, cortaba la corrida y las 50 tardaban hasta
+  // 99 minutos; además frenaba los toques todo el día y se reintentaba unas 30 veces por hora.
+  for (const veneno of [20, 72]) {
+    for (const seg of [45, 60, 90]) {
+      const r = await simularEspera({ seg, veneno });
+      const que = `con ${seg} segundos por respuesta y la charla que falla a los ${veneno}`;
+      assert.ok(r.minutos <= 45, `${que}: tardó ${r.minutos} minutos`);
+      assert.deepEqual(r.arrancadas.filter((id) => id !== VENENO), r.ids, "las otras, de la más vieja a la más nueva, una vez cada una");
+      assert.equal(r.dobles, 0);
+      assert.equal(r.maximo, 2);
+      // Espera su pausa entre intento e intento (10, 20, 40, 80 minutos): en 3 horas, 5 intentos como mucho.
+      assert.ok(r.fallasVeneno.length >= 1 && r.fallasVeneno.length <= 5, `${que}: ${r.fallasVeneno.length} intentos`);
+      for (let i = 1; i < r.fallasVeneno.length; i++) {
+        assert.ok(r.fallasVeneno[i] - r.fallasVeneno[i - 1] >= pausaTrasFallas(i) * 60000, `${que}: la pausa ${i}`);
+      }
+      // Pasada la espera de las otras, la que falla no frena los toques (salvo la vuelta en que le toca otro intento).
+      const despues = r.toquesFrenados.filter((x) => x.t > r.minutos * 60000);
+      assert.ok(despues.filter((x) => x.frena).length <= 2, `${que}: frenó ${despues.filter((x) => x.frena).length} de ${despues.length} vueltas`);
+      // Si falló 3 veces mientras las otras salían, el cron de los toques se la pasa a Cande.
+      if (r.pasadaEn !== null) assert.ok(r.fallasVeneno.length >= 3);
+    }
+  }
+  // Con respuestas de 60 o 90 segundos falla 3 veces mientras salen las otras: pasa a Cande en menos de una hora.
+  for (const seg of [60, 90]) {
+    const r = await simularEspera({ seg, veneno: 20 });
+    assert.ok(r.pasadaEn !== null && r.pasadaEn <= 3600000, `con ${seg} segundos: ${r.pasadaEn}`);
+  }
 });
 
 test("la espera no arranca respuestas pasada la hora límite, y si la Mac tiene sus lugares ocupados espera a que se libere uno", async () => {
@@ -2457,6 +2589,42 @@ test("la espera no arranca respuestas pasada la hora límite, y si la Mac tiene 
   assert.deepEqual(llamados.map(([id]) => id), ["1"]);
   assert.ok(llamados[0][1] >= 20000 && llamados[0][1] <= 25000);
   assert.equal(r.reintentos, 1);
+});
+
+test("una charla con la que el modelo acaba de fallar espera su pausa: 10 minutos, el doble con cada falla, hasta 2 horas, y no frena los toques", () => {
+  const ops = { prendido: true, macViva: true, maxFallos: 3 };
+  assert.deepEqual([1, 2, 3, 4, 5, 9].map(pausaTrasFallas), [10, 20, 40, 80, 120, 120]);
+  assert.equal(decidirSinContestar({ intentos: 1, minutos_desde_la_falla: 9 }, ops).que, "esperar");
+  assert.equal(decidirSinContestar({ intentos: 1, minutos_desde_la_falla: 10.5 }, ops).que, "reintentar");
+  assert.equal(decidirSinContestar({ intentos: 2, minutos_desde_la_falla: 15 }, ops).que, "esperar");
+  assert.equal(decidirSinContestar({ intentos: "2", minutos_desde_la_falla: "25" }, ops).que, "reintentar", "como vienen de la base");
+  assert.equal(decidirSinContestar({ intentos: 0, minutos_desde_la_falla: null }, ops).que, "reintentar", "sin fallas propias ni dudosas no hay pausa");
+  assert.equal(decidirSinContestar({ intentos: 3, minutos_desde_la_falla: 1, fallos: 3 }, ops).que, "pasar", "el tope manda");
+  assert.equal(decidirSinContestar({ intentos: 1, minutos_desde_la_falla: 1 }, { ...ops, macViva: false }).que, "esperar");
+  assert.equal(hayEspera([{ id: "1", intentos: 1, minutos_desde_la_falla: 2 }], ops), false, "en pausa no frena los toques");
+});
+
+test("la espera y los toques: una falla dudosa (puede ser de esa charla) no corta la corrida; dos seguidas sí; una general, enseguida", async () => {
+  const dudosa = { hecho: "error del modelo", general: true, dudosa: true };
+  const v = vigiaDelModelo();
+  assert.deepEqual([v(dudosa), v({ hecho: "enviada" }), v(dudosa), v(dudosa)], [false, false, false, true]);
+  assert.equal(vigiaDelModelo()({ hecho: "error del modelo", general: true }), true);
+  assert.equal(vigiaDelModelo()({ hecho: "error del modelo", general: false }), false);
+  const filas = [1, 2, 3, 4].map((n) => ({ id: String(n), ultimo_id_lead: n, minutos: 30 }));
+  const correr = async (respuesta) => {
+    const llamados = [];
+    const a = apartadasDePrueba();
+    const r = await vaciarEspera({
+      filas, prendido: true, macViva: true, maxFallos: 3, reclamar: (id) => a.reclamar(id), soltar: a.soltar, hasta: Infinity, enParalelo: 1,
+      procesar: async (id) => { llamados.push(id); return respuesta(id); },
+    });
+    return { llamados, cayo: r.cayo };
+  };
+  assert.deepEqual(await correr((id) => (id === "1" ? dudosa : { hecho: "enviada" })), { llamados: ["1", "2", "3", "4"], cayo: false });
+  assert.deepEqual(await correr(() => dudosa), { llamados: ["1", "2"], cayo: true });
+  const fila = ["1", "2", "3", "4"];
+  await correrToques({ reclamar: async () => fila.shift() ?? null, procesar: async () => dudosa, hasta: Infinity, tope: 10 });
+  assert.deepEqual(fila, ["3", "4"], "los toques también: dos dudosas seguidas y corta");
 });
 
 test("los toques esperan mientras hay charlas por contestar: primero se contesta a quien escribió", () => {
@@ -2622,10 +2790,13 @@ test("un solo aviso por foto, aunque ManyChat reintente el mismo mensaje o llegu
   assert.equal((await agente.procesar("77", otra)).hecho, "solo foto");
   assert.equal(m.avisos.length, 1);
   assert.equal(m.pedidos.length + m.enviados.length, 0);
-  // Una foto de otro momento (más de 2 minutos después) sí avisa de nuevo.
+  assert.equal(m.contacto.foto_avisada_hasta, primera, "la constancia es de la primera: las otras fueron con ese aviso");
+  // Una foto de otro momento (más de 2 minutos después del aviso) sí avisa de nuevo.
   const otroDia = armar();
   otroDia.m.contacto.respondido_hasta = 2;
+  otroDia.m.ahora = new Date(AHORA.getTime() - 600000); // la primera se avisó cuando llegó, hace 10 minutos
   await otroDia.agente.procesar("77", mandaLead(otroDia.m, SIN_TEXTO, 600));
+  otroDia.m.ahora = AHORA;
   await otroDia.agente.procesar("77", mandaLead(otroDia.m, SIN_TEXTO, 0));
   assert.equal(otroDia.m.avisos.length, 2);
 });
@@ -2655,13 +2826,160 @@ test("foto con texto: el texto se contesta normal y el aviso URGENTE de la foto 
   assert.equal(dos.m.avisos.length, 1, "el texto no vuelve a avisar la foto");
 });
 
-test("un turno de solo fotos que quedó abierto lo cierra el reintento de la espera, sin modelo ni otro aviso", async () => {
-  const { agente, m } = armar();
-  m.contacto.respondido_hasta = 2;
-  const foto = mandaLead(m, SIN_TEXTO, 600);
+test("un turno de solo fotos que quedó abierto: la espera lo cierra sin otro aviso si el suyo ya salió, y si no salió nunca lo avisa", async () => {
+  // Con su aviso ya dado (la constancia está): la espera solo cierra el turno, sin modelo ni otro aviso.
+  const ya = armar();
+  ya.m.contacto.respondido_hasta = 2;
+  const foto = mandaLead(ya.m, SIN_TEXTO, 600);
+  Object.assign(ya.m.contacto, { foto_avisada_hasta: foto, foto_avisada_en: new Date(AHORA.getTime() - 600000) });
+  assert.equal((await ya.agente.procesar("77", foto, { tarde: true })).hecho, "solo foto");
+  assert.equal(ya.m.avisos.length + ya.m.pedidos.length + ya.m.enviados.length, 0);
+  assert.equal(ya.m.contacto.respondido_hasta, foto);
+  // La corrida de la entrada se cortó antes de avisar (la base falló al leer los ajustes; entrada.js solo lo
+  // registra): el turno sigue abierto y la espera, que lo toma, manda el aviso URGENTE antes de cerrarlo.
+  const corte = armar();
+  corte.m.contacto.respondido_hasta = 2;
+  const laFoto = mandaLead(corte.m, ADJUNTO_IG, 400);
+  corte.m.fallarAjustes = 1;
+  await assert.rejects(corte.agente.procesar("77", laFoto), /base caída/);
+  assert.equal(corte.m.avisos.length, 0);
+  assert.equal(corte.m.contacto.respondido_hasta, 2, "el turno sigue abierto: lo toma la espera");
+  assert.equal((await corte.agente.procesar("77", laFoto, { tarde: true })).hecho, "solo foto");
+  assert.equal(corte.m.avisos.length, 1);
+  assert.match(corte.m.avisos[0].titulo, /URGENTE: mandó una foto/);
+  assert.equal(corte.m.contacto.respondido_hasta, laFoto);
+  assert.equal(corte.m.pedidos.length + corte.m.enviados.length, 0);
+});
+
+/** Un agente con un Telegram que anda o no según `anda.si`, y que anota cada intento de aviso. */
+function armarConTelegram(opciones = {}) {
+  const anda = { si: false };
+  const intentos = [];
+  const mundo = armar({ ...opciones, avisarCon: async (titulo, campos) => { intentos.push({ titulo, campos }); return anda.si; } });
+  mundo.m.contacto.respondido_hasta = 2;
+  return { ...mundo, anda, intentos };
+}
+const urgentes = (intentos) => intentos.filter((a) => /URGENTE: mandó una foto/.test(a.titulo));
+
+test("si el aviso de la foto no sale, el turno no se cierra ni la charla pasa: lo reintenta la espera, y sale una sola vez", async () => {
+  const { agente, m, anda, intentos } = armarConTelegram();
+  const foto = mandaLead(m, ADJUNTO_IG, 0);
+  assert.equal((await agente.procesar("77", foto)).hecho, "foto sin avisar");
+  assert.equal(urgentes(intentos).length, 1, "lo intenta al llegar: enseguida fallaría igual");
+  assert.equal(m.contacto.respondido_hasta, 2, "el turno sigue abierto");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.deepEqual(m.campos, []);
+  assert.equal(m.pedidos.length + m.enviados.length, 0);
+  assert.equal(m.contacto.foto_avisada_hasta, 0, "la constancia se devolvió: la foto sigue sin aviso");
+  assert.deepEqual(m.salidas.map((x) => x.estado), ["aviso_fallido"], "queda anotado que no salió");
+  // La espera lo vuelve a tomar: con Telegram andando, el aviso sale y el turno queda atendido.
+  anda.si = true;
+  m.ahora = new Date(AHORA.getTime() + 5 * 60000);
   assert.equal((await agente.procesar("77", foto, { tarde: true })).hecho, "solo foto");
-  assert.equal(m.avisos.length + m.pedidos.length + m.enviados.length, 0);
+  assert.equal(urgentes(intentos).length, 2);
+  assert.equal(intentos.at(-1).campos.Aviso, "Mandó una foto: si es el comprobante de MercadoPago, pasale el código");
   assert.equal(m.contacto.respondido_hasta, foto);
+  assert.equal(m.contacto.foto_avisada_hasta, foto);
+  // Nadie la vuelve a avisar: ni el cron de los toques ni otra vuelta de la espera.
+  m.ahora = new Date(AHORA.getTime() + 20 * 60000);
+  assert.equal(await agente.avisarFotosPendientes(["77"]), 0);
+  assert.equal((await agente.procesar("77", foto, { tarde: true })).hecho, "ya estaba atendido");
+  assert.equal(urgentes(intentos).length, 2);
+});
+
+test("con la Mac apagada (sin espera), la foto cuyo aviso no salió la avisa el cron de los toques, una vez", async () => {
+  const { agente, m, anda, intentos } = armarConTelegram({ responde: () => { throw transitoria("la Mac de Cande no contestó a tiempo"); } });
+  const foto = mandaLead(m, SIN_TEXTO, 0);
+  assert.equal((await agente.procesar("77", foto)).hecho, "foto sin avisar");
+  anda.si = true;
+  m.ahora = new Date(AHORA.getTime() + 10 * 60000);
+  assert.equal(await agente.avisarFotosPendientes(["77"]), 1);
+  assert.equal(urgentes(intentos).length, 2);
+  assert.equal(intentos.at(-1).campos.Instagram, undefined, "sin usuario guardado sale sin link (con usuario, con link: ver arriba)");
+  m.ahora = new Date(AHORA.getTime() + 20 * 60000);
+  assert.equal(await agente.avisarFotosPendientes(["77"]), 0);
+  // Cuando la Mac vuelve, la espera cierra el turno sin otro aviso y sin pedirle nada al modelo.
+  assert.equal((await agente.procesar("77", foto, { tarde: true })).hecho, "solo foto");
+  assert.equal(urgentes(intentos).length, 2);
+  assert.equal(m.pedidos.length, 0);
+  assert.equal(m.contacto.dueno, "agente");
+});
+
+test("si el aviso de una foto no salió, la que llega enseguida sí avisa (con las dos): no la tapa la que no se avisó", async () => {
+  const { agente, m, anda, intentos } = armarConTelegram();
+  m.contacto.respondido_hasta = mandaLead(m, "te paso el comprobante", 60); // ya contestado
+  const primera = mandaLead(m, SIN_TEXTO, 30);
+  m.ahora = new Date(AHORA.getTime() - 30000);
+  assert.equal((await agente.procesar("77", primera)).hecho, "foto sin avisar");
+  anda.si = true;
+  m.ahora = AHORA;
+  const segunda = mandaLead(m, SIN_TEXTO, 0);
+  assert.equal((await agente.procesar("77", segunda)).hecho, "solo foto");
+  assert.equal(urgentes(intentos).length, 2);
+  assert.equal(intentos.at(-1).campos["Lo último que escribió"], "te paso el comprobante");
+  assert.equal(m.contacto.foto_avisada_hasta, segunda, "un aviso para las dos");
+});
+
+test("dos fotos a la vez: un solo aviso; y si el de la primera no sale, la foto no se pierde: la avisa el cron", async () => {
+  for (const sale of [true, false]) {
+    const enVuelo = diferida();
+    const intentos = [];
+    const { agente, m } = armar({
+      avisarCon: async (titulo) => { intentos.push(titulo); return intentos.length === 1 ? enVuelo.promesa : true; },
+    });
+    m.contacto.respondido_hasta = 2;
+    const f1 = mandaLead(m, SIN_TEXTO, 1);
+    const c1 = agente.procesar("77", f1);
+    await hasta(() => intentos.length === 1);
+    const f2 = mandaLead(m, SIN_TEXTO, 0);
+    // La segunda ve el aviso de la primera saliendo: no manda otro, y su turno (las dos fotos) queda atendido.
+    assert.equal((await agente.procesar("77", f2)).hecho, "solo foto");
+    assert.equal(intentos.length, 1);
+    enVuelo.resolver(sale);
+    assert.equal((await c1).hecho, "llegó otro mensaje");
+    assert.equal(m.contacto.respondido_hasta, f2);
+    if (sale) {
+      assert.equal(m.contacto.foto_avisada_hasta, f1);
+      m.ahora = new Date(AHORA.getTime() + 10 * 60000);
+      assert.equal(await agente.avisarFotosPendientes(["77"]), 0, "la segunda fue con ese aviso");
+      assert.equal(intentos.length, 1);
+    } else {
+      assert.equal(m.contacto.foto_avisada_hasta || 0, 0, "se devolvió la constancia");
+      m.ahora = new Date(AHORA.getTime() + 10 * 60000);
+      assert.equal(await agente.avisarFotosPendientes(["77"]), 1);
+      assert.equal(intentos.length, 2);
+      assert.equal(m.contacto.foto_avisada_hasta, f2, "un aviso para las dos");
+    }
+  }
+});
+
+test("una foto que entró con el agente apagado y lo prendieron antes del cron: la espera la avisa URGENTE", async () => {
+  const { agente, m } = armar({ modo: "apagado" });
+  m.contacto.respondido_hasta = 2;
+  const foto = mandaLead(m, SIN_TEXTO, 300);
+  assert.equal((await agente.procesar("77", foto)).hecho, "apagado");
+  assert.equal(m.avisos.length, 0);
+  m.ajustes.modo = "auto";
+  assert.equal((await agente.procesar("77", foto, { tarde: true })).hecho, "solo foto");
+  assert.equal(m.avisos.length, 1);
+  assert.match(m.avisos[0].titulo, /URGENTE: mandó una foto/);
+  assert.equal(m.contacto.respondido_hasta, foto);
+});
+
+test("foto con texto cuyo aviso no salió: el texto se contesta y la foto la avisa después el cron de los toques", async () => {
+  const { agente, m, anda, intentos } = armarConTelegram();
+  mandaLead(m, "listo, ya está", 5);
+  const foto = mandaLead(m, ADJUNTO_IG, 0);
+  assert.equal((await agente.procesar("77", foto)).hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(m.contacto.respondido_hasta, foto);
+  assert.equal(urgentes(intentos).length, 1);
+  anda.si = true;
+  m.ahora = new Date(AHORA.getTime() + 10 * 60000);
+  assert.equal(await agente.avisarFotosPendientes(["77"]), 1);
+  assert.equal(urgentes(intentos).length, 2);
+  assert.equal(intentos.at(-1).campos["Lo último que escribió"], "listo, ya está");
+  assert.equal(await agente.avisarFotosPendientes(["77"]), 0);
 });
 
 test("un link común no es una foto: no avisa y el agente contesta", async () => {

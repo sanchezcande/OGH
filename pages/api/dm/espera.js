@@ -14,6 +14,11 @@
 // en 20 a 40 minutos. Antes el cron de cada 10 minutos las contestaba de a una, 3 o 4 por vuelta
 // (más de 2 horas para 50), y a la hora se las pasaba a Cande.
 //
+// Una charla con la que el modelo falla siempre (se niega, o es tan larga que no llega a tiempo) no frena
+// a las demás: después de cada falla espera su pausa (10 minutos, el doble con cada falla, hasta 2 horas)
+// y las otras siguen saliendo. La corrida corta recién si el modelo está caído para todas (la Mac se fue
+// o se quedó sin uso, o fallan dos charlas seguidas). Ver decidirSinContestar y vigiaDelModelo.
+//
 // Nunca dos veces: cada charla se aparta para una sola corrida, sin una respuesta que pudo haber salido,
 // y el agente vuelve a mirar todo antes de mandar (lib/dm/agente.js). Lo que no tiene arreglo (el
 // agente apagado, un envío sin confirmar, el modelo que falla con esa charla) lo pasa el cron de los
