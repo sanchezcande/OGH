@@ -2165,3 +2165,12 @@ test("el aviso de una charla trae el link que la abre en Instagram; sin usuario,
   await sin.agente.procesar("77", sin.m.disparo);
   assert.equal(sin.m.avisos.at(-1).campos.Instagram, undefined);
 });
+
+test("el link de pago con el código de acceso cargado en los ajustes sale; con otro código, no", () => {
+  const dev = { textosDelLead: ["ya lo pague"], charlaDelLead: ["soy dev y busco trabajo", "me cuesta el cv", "ya lo pague"], estadoPrevio: { ...estadoDev, link_formulario_enviado: true } };
+  const conCodigo = (c) => salida([`Joyiii el código es ${c}\nget.opengatehub.com/l/programa-de-prueba/${c}`]);
+  pasa(revisar(conCodigo("CODIGODEPRUEBA"), { ...dev, linkDePago: "https://get.opengatehub.com/l/programa-de-prueba", otrosPagos: ["https://get.opengatehub.com/l/programa-de-prueba/CODIGODEPRUEBA"] }), "el cargado sale");
+  frena(revisar(conCodigo("OTRO"), { ...dev, linkDePago: "https://get.opengatehub.com/l/programa-de-prueba", otrosPagos: ["https://get.opengatehub.com/l/programa-de-prueba/CODIGODEPRUEBA"] }), "uno inventado no");
+  assert.equal(validarAjustes({ codigo_mercadopago: "CODIGO1" }).ok, true);
+  assert.equal(validarAjustes({ codigo_mercadopago: "con espacios" }).ok, false);
+});
