@@ -35,8 +35,8 @@ function versionDelVisitante() {
 // sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
 const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
 // Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
-// que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, pagá en
-// pesos", para todos (así lo ven también los que entran por un link que les pasó Cande), y al tocarlo
+// que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, apretá
+// acá" (Cande, 19/10: "no pagá en pesos"), para todos (así lo ven también los que entran por un link que les pasó Cande), y al tocarlo
 // se abre un cartelito: el link de MercadoPago y que le pase la captura por Instagram para el código.
 const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "https://mpago.li/1Ac31E4";
 const PRECIO_PESOS = process.env.NEXT_PUBLIC_DEVS_PRECIO_PESOS || "39.750";
@@ -135,7 +135,7 @@ export default function Gracias() {
               </Comprar>
               {MERCADOPAGO && (
                 <PesosBoton type="button" onClick={() => setCartel(true)}>
-                  Si sos de Argentina, pagá en pesos
+                  Si sos de Argentina, apretá acá
                 </PesosBoton>
               )}
             </Cierre>
@@ -145,20 +145,25 @@ export default function Gracias() {
             <Velo onClick={() => setCartel(false)}>
               <Cartel role="dialog" aria-modal="true" aria-labelledby="cartel-titulo" onClick={(e) => e.stopPropagation()}>
                 <Cerrar type="button" aria-label="Cerrar" onClick={() => setCartel(false)}>×</Cerrar>
-                <CartelTitulo id="cartel-titulo">Pagá en pesos por MercadoPago</CartelTitulo>
-                <CartelTexto>${PRECIO_PESOS}, pago único.</CartelTexto>
-                <CartelTexto>
-                  Pasame la captura del pago por{" "}
-                  <a href={IG_CANDE} target="_blank" rel="noopener noreferrer">Instagram</a> y te mando el código de ingreso.
-                </CartelTexto>
+                {/* Con la estética de la página y un mensaje que empuje a entrar (Cande, 19/10). */}
+                <CartelKicker>Para Argentina</CartelKicker>
+                <CartelTitulo id="cartel-titulo">Pagalo en pesos y entrás hoy</CartelTitulo>
+                <CartelPrecio>${PRECIO_PESOS} <span>un solo pago</span></CartelPrecio>
+                <CartelTexto>Todo lo del video: dónde buscar, el CV comentado línea por línea y las preguntas que hago en cada entrevista.</CartelTexto>
+                <Pasos>
+                  <li>Usás un link de MercadoPago</li>
+                  <li>Me mandás el comprobante por <a href={IG_CANDE} target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                  <li>Te paso tu código y entrás</li>
+                </Pasos>
                 <PagarPesos
                   href={MERCADOPAGO}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
                 >
-                  Ir a pagar con MercadoPago
+                  🔥 SÍ, LO QUIERO YA!
                 </PagarPesos>
+                <CartelChico>Garantía de 30 días: si no te sirve, te devuelvo la plata.</CartelChico>
               </Cartel>
             </Velo>
           )}
@@ -212,26 +217,49 @@ const Velo = styled.div`
   display: flex; align-items: center; justify-content: center; padding: 20px;
 `;
 const Cartel = styled.div`
-  position: relative; width: 100%; max-width: 400px; background: #1d181c; color: #f5f0f2;
-  border: 1px solid rgba(245,240,242,.14); border-radius: 16px; padding: 28px 24px 24px; text-align: center;
-  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  position: relative; width: 100%; max-width: 420px; background: #131013; color: #f5f0f2;
+  border: 1px solid rgba(204,90,80,.35); border-radius: 16px; padding: 30px 26px 24px; text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 `;
+const CartelKicker = styled.p`
+  display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: #6fcf9f; background: rgba(46,125,91,.18);
+  border-radius: 999px; padding: 6px 14px; margin: 0 0 16px;
+`;
+const CartelPrecio = styled.p`
+  margin: 0 0 6px; font-size: 32px; font-weight: 700; letter-spacing: -.01em;
+  span { font-size: 15px; font-weight: 600; color: #c9bcc2; letter-spacing: 0; margin-left: 6px; }
+`;
+const Pasos = styled.ol`
+  list-style: none; counter-reset: paso; text-align: left; margin: 18px auto 22px; padding: 0; max-width: 300px;
+  li { counter-increment: paso; position: relative; padding: 0 0 0 38px; margin: 0 0 12px; font-size: 15.5px; line-height: 1.4; color: #f5f0f2; font-weight: 600; }
+  li::before {
+    content: counter(paso); position: absolute; left: 0; top: -2px; width: 26px; height: 26px; border-radius: 50%;
+    background: #cc5a50; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; text-underline-offset: 3px; }
+`;
+const CartelChico = styled.p` margin: 14px 0 0; font-size: 13px; color: #a99ba1; `;
 const Cerrar = styled.button`
   position: absolute; top: 8px; right: 12px; background: none; border: 0; cursor: pointer;
   color: #a99ba1; font-size: 26px; line-height: 1; padding: 4px;
   &:hover { color: #f5f0f2; }
 `;
-const CartelTitulo = styled.p` margin: 0 0 10px; font-size: 19px; font-weight: 700; `;
+const CartelTitulo = styled.p` margin: 0 0 12px; font-size: 24px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; `;
 const CartelTexto = styled.p`
   margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: #c9bcc2;
   a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; }
 `;
 const PagarPesos = styled.a`
-  display: inline-block; margin-top: 10px; background: #009ee3; color: #fff; text-decoration: none;
-  font-size: 16px; font-weight: 700; padding: 13px 24px; border-radius: 10px;
+  /* El mismo botón que el de compra: un solo estilo de acción en toda la página. */
+  display: inline-block; background: #cc5a50; color: #fff; text-decoration: none;
+  font-size: 17px; font-weight: 700; letter-spacing: .03em; padding: 15px 30px; border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(204,90,80,.32);
   transition: transform .16s ease, background .16s ease;
   &:hover, &:focus, &:active, &:visited { color: #fff; }
-  &:hover { background: #0087c2; transform: translateY(-2px); }
+  &:hover { background: #b84a41; transform: translateY(-2px); }
+  &:active { transform: translateY(0); }
   &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 `;
 const Pendiente = styled.p`
