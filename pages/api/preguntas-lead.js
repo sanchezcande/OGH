@@ -26,7 +26,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-async function guardar({ nombre, email, origen }) {
+async function guardar({ nombre, email, origen, whatsapp }) {
   await sql`
     CREATE TABLE IF NOT EXISTS leads_preguntas (
       id SERIAL PRIMARY KEY,
@@ -38,6 +38,10 @@ async function guardar({ nombre, email, origen }) {
       actualizado TIMESTAMPTZ DEFAULT NOW()
     )`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS leads_preguntas_email ON leads_preguntas (email)`;
+  // Cande trabaja por WhatsApp: con el mail solo entra a la cadena, con el teléfono la puede
+  // llamar. Es OPCIONAL a propósito: pedirlo obligatorio frena al que solo quiere el PDF, y
+  // el mail ya alcanza para no perderlo (18/10).
+  await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS whatsapp TEXT`;
   // Cadena de nurture (ver /api/drip-preguntas): misma cadencia y arquitectura
   // que el goteo de devs — 1, 2, 3, descanso, 7, 12, 17 días. Cada columna es
   // un toque, se completa cuando sale, y drip_off la silencia para siempre.
@@ -49,10 +53,12 @@ async function guardar({ nombre, email, origen }) {
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_d17 TIMESTAMPTZ`;
   await sql`ALTER TABLE leads_preguntas ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
   // Si lo vuelve a pedir no duplicamos: sumamos el pedido.
+  // COALESCE: si vuelve sin teléfono, no se pisa el que ya había dejado.
   const { rows } = await sql`
-    INSERT INTO leads_preguntas (nombre, email, origen)
-    VALUES (${nombre}, ${email}, ${origen})
-    ON CONFLICT (email) DO UPDATE SET pedidos = leads_preguntas.pedidos + 1, actualizado = NOW()
+    INSERT INTO leads_preguntas (nombre, email, origen, whatsapp)
+    VALUES (${nombre}, ${email}, ${origen}, ${whatsapp || null})
+    ON CONFLICT (email) DO UPDATE SET pedidos = leads_preguntas.pedidos + 1, actualizado = NOW(),
+      whatsapp = COALESCE(EXCLUDED.whatsapp, leads_preguntas.whatsapp)
     RETURNING pedidos`;
   return rows[0]?.pedidos || 1;
 }
@@ -102,6 +108,9 @@ export default async function handler(req, res) {
   const nombre = limpiar(req.body?.nombre, 120);
   const email = limpiar(req.body?.email, 200).toLowerCase();
   const origen = limpiar(req.body?.origen, 60) || "directo";
+  // Se guarda lo que escribió, sin normalizar: los founders lo ponen de mil maneras y
+  // adivinar el país a partir de un número suelto sale mal más veces de las que acierta.
+  const whatsapp = limpiar(req.body?.whatsapp, 40);
   // Campo trampa: los humanos no lo ven, los bots lo llenan.
   if (limpiar(req.body?.web)) return res.status(200).json({ ok: true, pdf: PDF_PATH });
 
@@ -111,7 +120,7 @@ export default async function handler(req, res) {
   let guardado = false, pedidos = 1;
   if (hayBase()) {
     try {
-      pedidos = await guardar({ nombre, email, origen });
+      pedidos = await guardar({ nombre, email, origen, whatsapp });
       guardado = true;
     } catch (e) {
       console.error("preguntas-lead: no pude guardar en Postgres:", e.message);
@@ -135,7 +144,7 @@ export default async function handler(req, res) {
   }
 
   await avisar("Founder bajó las 9 preguntas", {
-    Nombre: nombre, Email: email, Origen: origen,
+    Nombre: nombre, Email: email, WhatsApp: whatsapp || "no dejó", Origen: origen,
     Pedidos: pedidos > 1 ? `${pedidos} (ya lo había pedido)` : undefined,
     Guardado: guardado ? "sí" : "NO",
     "Mail enviado": mandado ? "sí" : "NO",
