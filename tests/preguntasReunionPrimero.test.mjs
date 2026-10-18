@@ -73,7 +73,10 @@ test("con ?o=hola la reunión va primero: foto, título de la reunión y despué
 test("los dos botones mandan el mismo formulario, cada uno con su value", async () => {
   const src = await pagina();
   assert.match(src, /<BotonForm type="submit" name="quiere" value="reunion"[^>]*>[\s\S]{0,120}"Quiero mi reunión gratis →"/);
-  assert.match(src, /<BotonTexto type="submit" name="quiere" value="guia"[^>]*>[\s\S]{0,120}"Por ahora solo la guía, y seguimos en contacto\\u00a0→"/);
+  assert.match(src, /<BotonTexto type="submit" name="quiere" value="guia"[^>]*>[\s\S]{0,120}"Descargá la guía y seguimos en contacto\\u00a0→"/);
+  // Antes del botón se presenta qué guía es.
+  assert.ok(src.indexOf("Empezá por mi guía gratis: <b>9 de las preguntas que hago para entrevistar a un developer</b>") > -1);
+  assert.ok(src.indexOf("Empezá por mi guía gratis") < src.indexOf('<BotonTexto type="submit" name="quiere" value="guia"'), "la guía se presenta antes del botón");
   // Un solo formulario: dos botones de envío, no dos <Form>.
   assert.equal(src.split("<Form onSubmit={enviar}").length - 1, 1);
   // Qué botón apretó sale del submitter, y si no viene nada (Enter, navegador viejo) es la reunión.
