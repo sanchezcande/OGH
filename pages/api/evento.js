@@ -9,6 +9,15 @@ const FASES = new Set([
   "gracias_vista", "video_play", "video_25", "video_50", "video_75", "video_fin",
   "click_gumroad",
   "preguntas_vista", "preguntas_pdf_click", "preguntas_llamada_click",
+  // preguntas_email_enviado la manda /preguntas desde el 18/09 y NUNCA estuvo en esta lista:
+  // la API le contestaba 400 y el paso más importante del embudo de founders, el de completar
+  // el formulario, no se registró nunca. Encontrado el 18/10 por tests/foundersNoSePierden.
+  "preguntas_email_enviado",
+  // 18/10/2026: /preguntas es ahora también la bajada de "quiero contratar" de /hola, y estas
+  // dos fases son las de ESA puerta. Van por lista, que son dos y nada más. Si faltaran,
+  // /api/evento contestaría 400 y el dato se perdería en silencio, que es exactamente como
+  // se rompió el embudo del video el 12/10.
+  "preguntas_vista_hola", "preguntas_llamada_click_hola",
   "hola_vista", "hola_contrata", "hola_dev",
 ]);
 
@@ -30,11 +39,19 @@ const CON_ORIGEN = /^hola_(vista|contrata|dev)_[a-z0-9]{1,16}$/;
 // Acotado igual que el de arriba: solo las fases del video y solo _a o _b. La lista vive en
 // lib/videoAB.js porque el sync del CRM tiene que contar exactamente las mismas.
 
+// El embudo en inglés (/apply y /apply/thankyou, la versión en inglés de /devs) manda las
+// mismas fases con sufijo _en. NUNCA estuvieron acá: la API contestaba 400 y se tiraban todas,
+// así que ese embudo entero no registró un solo evento desde que existe (verificado el 18/10:
+// `SELECT count(*) FROM funnel_eventos WHERE fase LIKE '%\_en'` daba 0). Acotado como los de
+// arriba: solo estas nueve fases y solo el sufijo _en.
+const CON_IDIOMA = /^(form_visto|enviado|gracias_vista|video_play|video_25|video_50|video_75|video_fin|click_gumroad)_en$/;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   try {
     const { fase, sid } = req.body || {};
-    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !FASES_ORIGEN_FORM.has(fase) && !CON_VERSION.test(fase)) return res.status(400).json({ ok: false });
+    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !FASES_ORIGEN_FORM.has(fase)
+        && !CON_VERSION.test(fase) && !CON_IDIOMA.test(fase)) return res.status(400).json({ ok: false });
     if (hayBase()) await guardarEvento(fase, String(sid || "").slice(0, 40));
   } catch (e) {
     console.error("evento:", e.message);

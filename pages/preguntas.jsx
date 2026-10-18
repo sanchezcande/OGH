@@ -27,7 +27,14 @@ export default function Preguntas() {
 
   const cupos = fraseCupos();
 
+  // El que llega desde "quiero contratar" en /hola ya quiere HABLAR, no descargar un PDF.
+  // Antes ese botón iba derecho a la agenda y el que no reservaba se perdía sin dejar nada.
+  // Ahora cae acá, pero con la llamada ARRIBA: la guía queda como la alternativa para el que
+  // todavía no quiere hablar. Para cualquier otro origen la página no cambia.
+  const deHola = router.query.o === "hola";
+
   useEffect(() => { evento("preguntas_vista"); }, []);
+  useEffect(() => { if (deHola) evento("preguntas_vista_hola"); }, [deHola]);
 
   const enviar = async (e) => {
     e.preventDefault();
@@ -67,8 +74,22 @@ export default function Preguntas() {
         <Barra />
         <Grid>
           <Texto>
+            {deHola && (
+              <Primero>
+                <Kicker>Para founders que están por contratar</Kicker>
+                <H1>Armamos juntos el plan para contratar a tu developer</H1>
+                <Bajada>Media hora, gratis y sin que tengas que ser técnico. Salís con un plan concreto para encontrar y contratar al dev de tu proyecto.</Bajada>
+                <Cupos>Son pocos lugares. {cupos}. Reservá el tuyo.</Cupos>
+                <BotonSec href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click_hola")}>
+                  Agendá tu llamada gratis →
+                </BotonSec>
+                <Chico>Si todavía no querés hablar, abajo te dejo la guía gratis.</Chico>
+              </Primero>
+            )}
             <Kicker>Guía gratis para founders</Kicker>
-            <H1>9 de las preguntas que hago para entrevistar a un developer</H1>
+            {/* Con el bloque de la llamada arriba, el título de la guía baja a h2: dos h1 en una
+                página indexable es un problema, y acá el título de la página pasa a ser el otro. */}
+            <H1 as={deHola ? "h2" : "h1"}>9 de las preguntas que hago para entrevistar a un developer</H1>
             <Bajada>No hace falta que seas técnico. Cada pregunta viene con lo que tenés que escuchar en la respuesta.</Bajada>
 
             <Lista>
@@ -200,6 +221,12 @@ const Link = styled.a`
   display: inline-block; margin-top: 14px; font-size: 15px; font-weight: 600; color: #111111; text-decoration: underline;
   &:hover { color: #CC5A50; }
 `;
+const Primero = styled.div`
+  border-bottom: 1px solid #e6e3df;
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+`;
+
 const Siguiente = styled.div`
   margin-top: 26px; padding-top: 22px; border-top: 1px solid #E4E4E7;
   p { margin-bottom: 14px; }
