@@ -79,22 +79,10 @@ export default function Preguntas() {
         <Barra />
         <Grid>
           <Texto>
-            {deHola && (
-              <Primero>
-                <Kicker>Para founders que están por contratar</Kicker>
-                <H1>Armamos juntos el plan para contratar a tu developer</H1>
-                <Bajada>Media hora, gratis y sin que tengas que ser técnico. Salís con un plan concreto para encontrar y contratar al dev de tu proyecto.</Bajada>
-                <Cupos>Son pocos lugares. {cupos}. Reservá el tuyo.</Cupos>
-                <BotonSec href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click_hola")}>
-                  Agendá tu llamada gratis →
-                </BotonSec>
-                <Chico>Si todavía no querés hablar, abajo te dejo la guía gratis.</Chico>
-              </Primero>
-            )}
             <Kicker>Guía gratis para founders</Kicker>
-            {/* Con el bloque de la llamada arriba, el título de la guía baja a h2: dos h1 en una
-                página indexable es un problema, y acá el título de la página pasa a ser el otro. */}
-            <H1 as={deHola ? "h2" : "h1"}>9 de las preguntas que hago para entrevistar a un developer</H1>
+            {/* Primero la guía y abajo, como alternativa, la reunión (Cande, 19/10: "pondría primero la parte de
+                las preguntas, tipo poné tus datos y descargá la guía, y después o agendá directamente una reunión"). */}
+            <H1>9 de las preguntas que hago para entrevistar a un developer</H1>
             <Bajada>No hace falta que seas técnico. Cada pregunta viene con lo que tenés que escuchar en la respuesta.</Bajada>
 
             <Lista>
@@ -105,6 +93,7 @@ export default function Preguntas() {
 
             {estado !== "listo" ? (
               <Form onSubmit={enviar} noValidate>
+                {deHola && <Pedido>Poné tus datos y descargá la guía</Pedido>}
                 <Campo>
                   <label htmlFor="nombre">Nombre</label>
                   <input id="nombre" autoComplete="given-name" value={nombre}
@@ -121,7 +110,7 @@ export default function Preguntas() {
                     <input id="whatsapp" type="tel" inputMode="tel" autoComplete="tel" required
                       value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
                       placeholder="+54 9 11 1234 5678" />
-                    <Ayuda>Con el código de país. Te escribo yo por acá.</Ayuda>
+                    <Ayuda>Con el código de país.</Ayuda>
                   </Campo>
                 )}
                 <Trampa aria-hidden="true">
@@ -129,11 +118,16 @@ export default function Preguntas() {
                 </Trampa>
                 {error && <Error role="alert">{error}</Error>}
                 <BotonForm type="submit" disabled={estado === "enviando"}>
-                  {estado === "enviando" ? "Enviando…" : (deHola ? "Dejame tus datos y te escribo →" : "Mandámelas por mail →")}
+                  {estado === "enviando" ? "Enviando…" : (deHola ? "Descargá la guía gratis →" : "Mandámelas por mail →")}
                 </BotonForm>
                 <Chico>{deHola
-                  ? "Te escribo yo por WhatsApp. Y de paso te mando la guía por mail."
+                  ? "Te la mando al mail y la podés bajar en el momento."
                   : "Te llega en un minuto. Si no lo ves, fijate en spam o promociones."}</Chico>
+                {deHola && (
+                  <Alterna href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click_hola")}>
+                    O agendá directamente una reunión <b>gratis</b> conmigo →
+                  </Alterna>
+                )}
               </Form>
             ) : (
               <Listo>
@@ -226,6 +220,13 @@ const BotonForm = styled.button`
 `;
 const Ayuda = styled.p` margin: 6px 0 0; font-size: 12.5px; color: #71717A; `;
 const Chico = styled.p` margin: 0; font-size: 13px; color: #71717A; `;
+const Pedido = styled.p` margin: 0 0 2px; font-size: 18px; font-weight: 700; color: #111111; `;
+const Alterna = styled.a`
+  margin-top: 6px; font-size: 15.5px; color: #111111; text-decoration: underline; text-underline-offset: 3px;
+  &:visited, &:active { color: #111111; }
+  &:hover { color: #CC5A50; }
+  b { font-weight: 700; }
+`;
 const Listo = styled.div`
   background: #FAFAFA; border: 1px solid #E4E4E7; border-radius: 4px; padding: 28px;
   p { font-size: 15.5px; line-height: 1.55; color: #3F3F46; margin: 0; }
@@ -237,11 +238,6 @@ const Check = styled.div`
 const Link = styled.a`
   display: inline-block; margin-top: 14px; font-size: 15px; font-weight: 600; color: #111111; text-decoration: underline;
   &:hover { color: #CC5A50; }
-`;
-const Primero = styled.div`
-  border-bottom: 1px solid #e6e3df;
-  padding-bottom: 28px;
-  margin-bottom: 28px;
 `;
 
 const Siguiente = styled.div`

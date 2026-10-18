@@ -22,29 +22,24 @@ test("quiero contratar va a una pagina que captura, no a la agenda", async () =>
   assert.equal(u.searchParams.get("o"), "hola", "sin ?o=hola el lead entra sin saber de donde vino");
 });
 
-test("al que llega desde hola se le ofrece la llamada ANTES del formulario", async () => {
+test("al que llega desde hola se le ofrece la guía primero y la reunión al lado del botón, antes de enviar", async () => {
+  // Cande, 19/10: "pondría primero la parte de las preguntas, tipo poné tus datos y descargá la guía, y el cta
+  // tiene que decir algo de la guía y después, o agendá directamente una reunión GRATIS conmigo".
   const src = await leer("../pages/preguntas.jsx");
   assert.match(src, /const deHola = router\.query\.o === "hola"/);
-  const iPrimero = src.indexOf("<Primero>");
   const iForm = src.indexOf("<Form onSubmit={enviar}");
-  assert.ok(iPrimero > -1, "falta el bloque de la llamada para el que viene de /hola");
-  assert.ok(iPrimero < iForm, "la llamada quedo DEBAJO del formulario: el founder caliente se va");
+  const iPedido = src.indexOf("Poné tus datos y descargá la guía");
+  const iReunion = src.indexOf("O agendá directamente una reunión");
+  assert.ok(iPedido > iForm, "falta el pedido de la guía arriba del formulario");
+  assert.ok(iReunion > iForm, "falta la reunión como alternativa al lado del botón");
+  assert.match(src, /"Descargá la guía gratis →"/);
 });
-
 test("la llamada no queda detras del mail", async () => {
   const src = await leer("../pages/preguntas.jsx");
-  // El bloque de arriba tiene que estar fuera del estado "listo", que es el de despues de enviar.
-  const bloque = src.slice(src.indexOf("<Primero>"), src.indexOf("</Primero>"));
-  assert.match(bloque, /BotonSec href=\{LLAMADA\}/);
-  assert.ok(!/estado === "listo"/.test(bloque), "el boton de la llamada quedo detras del formulario");
+  // La reunión se ofrece dentro del formulario, antes de enviar: no solo en el estado "listo", el de después.
+  const form = src.slice(src.indexOf("<Form onSubmit={enviar}"), src.indexOf("</Form>"));
+  assert.match(form, /Alterna href=\{LLAMADA\}/);
 });
-
-// Esta es la prueba que cierra la clase de bug entera, no solo este cambio. Ya pasó tres veces
-// en un mes: el embudo del video el 12/10 (sufijos _a/_b sin aceptar), preguntas_email_enviado
-// (desde el 18/09, cero filas en la base) y el embudo en ingles completo de /apply (nueve fases
-// con sufijo _en, cero filas desde que existe). Siempre igual: la pagina manda una fase, la API
-// contesta 400 y el dato se tira sin que nadie se entere. Si alguien suma una fase nueva y se
-// olvida de habilitarla, esto falla antes de que se pierda un solo evento.
 test("ninguna pagina manda una fase que la API no acepte", async () => {
   const path = await import("node:path");
   const api = await leer("../pages/api/evento.js");
