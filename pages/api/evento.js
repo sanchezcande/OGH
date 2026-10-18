@@ -39,11 +39,19 @@ const CON_ORIGEN = /^hola_(vista|contrata|dev)_[a-z0-9]{1,16}$/;
 // Acotado igual que el de arriba: solo las fases del video y solo _a o _b. La lista vive en
 // lib/videoAB.js porque el sync del CRM tiene que contar exactamente las mismas.
 
+// El embudo en inglés (/apply y /apply/thankyou, la versión en inglés de /devs) manda las
+// mismas fases con sufijo _en. NUNCA estuvieron acá: la API contestaba 400 y se tiraban todas,
+// así que ese embudo entero no registró un solo evento desde que existe (verificado el 18/10:
+// `SELECT count(*) FROM funnel_eventos WHERE fase LIKE '%\_en'` daba 0). Acotado como los de
+// arriba: solo estas nueve fases y solo el sufijo _en.
+const CON_IDIOMA = /^(form_visto|enviado|gracias_vista|video_play|video_25|video_50|video_75|video_fin|click_gumroad)_en$/;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   try {
     const { fase, sid } = req.body || {};
-    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !FASES_ORIGEN_FORM.has(fase) && !CON_VERSION.test(fase)) return res.status(400).json({ ok: false });
+    if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !FASES_ORIGEN_FORM.has(fase)
+        && !CON_VERSION.test(fase) && !CON_IDIOMA.test(fase)) return res.status(400).json({ ok: false });
     if (hayBase()) await guardarEvento(fase, String(sid || "").slice(0, 40));
   } catch (e) {
     console.error("evento:", e.message);

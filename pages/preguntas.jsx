@@ -87,7 +87,9 @@ export default function Preguntas() {
               </Primero>
             )}
             <Kicker>Guía gratis para founders</Kicker>
-            <H1>9 de las preguntas que hago para entrevistar a un developer</H1>
+            {/* Con el bloque de la llamada arriba, el título de la guía baja a h2: dos h1 en una
+                página indexable es un problema, y acá el título de la página pasa a ser el otro. */}
+            <H1 as={deHola ? "h2" : "h1"}>9 de las preguntas que hago para entrevistar a un developer</H1>
             <Bajada>No hace falta que seas técnico. Cada pregunta viene con lo que tenés que escuchar en la respuesta.</Bajada>
 
             <Lista>
