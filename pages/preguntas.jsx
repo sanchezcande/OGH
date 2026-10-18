@@ -10,7 +10,8 @@ import { fraseCupos } from "../lib/cupos";
 // Flujo: ella manda este link por DM después de preguntarles qué están
 // construyendo. La página SÍ pide email: con eso entran a la cadena de
 // nurture de founders (ver /api/drip-preguntas) y a la llamada.
-// Mismo look que el PDF: fondo blanco, Charter en títulos y Helvetica en texto.
+// Mismo look que el PDF: fondo blanco, Charter en títulos y Helvetica en texto. Con ?o=hola los
+// títulos van en Helvetica negrita (Cande, 19/10: la serif en un título le quedaba rara).
 // Sin navbar ni footer (ver _app.js): es un embudo.
 
 const PDF = "/guias/9-preguntas-entrevista-developer.pdf";
@@ -115,7 +116,7 @@ export default function Preguntas() {
                   </div>
                 </Autora>
                 <Kicker>Para founders que quieren contratar un developer</Kicker>
-                <H1>Agendá una reunión <Coral>gratis</Coral> conmigo</H1>
+                <H1Hola>Agendá una reunión <Coral>gratis</Coral> conmigo</H1Hola>
                 <Bajada>Me contás qué estás construyendo y en 30 minutos te dejo un plan concreto para encontrar y contratar al developer que necesitás. No hace falta que seas técnico y no te comprometés a nada.</Bajada>
               </>
             ) : (
@@ -186,11 +187,13 @@ export default function Preguntas() {
               <Reunion ref={listoRef}>
                 <Check>✓</Check>
                 <H2Hola>{quien ? `Listo, ${quien}. Ahora elegí tu horario` : "Listo. Ahora elegí tu horario"}</H2Hola>
+                {/* El respaldo va ARRIBA de la agenda: si queda en blanco (Instagram en Android), abajo
+                    quedaría escondido detrás de 720 px vacíos, y si carga, el dedo mueve la agenda y no la página. */}
+                <Respaldo href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click_hola")}>
+                  No te carga? Abrí la agenda en otra pestaña →
+                </Respaldo>
                 <Agenda src={AGENDA} title="Agenda de Candelaria Sanchez"
                   onLoad={() => evento("preguntas_agenda_vista_hola")} />
-                <Link href={LLAMADA} target="_blank" rel="noopener noreferrer" onClick={() => evento("preguntas_llamada_click_hola")}>
-                  No te carga? Abrí la agenda en otra pestaña →
-                </Link>
                 <Nota>Si ningún horario te sirve, tranqui: te escribo por WhatsApp con dos opciones.</Nota>
                 <NotaChica>Google te pide nombre y mail de nuevo para mandarte la invitación.</NotaChica>
                 <NotaChica>
@@ -289,10 +292,12 @@ const H1 = styled.h1`
   font-family: ${SERIF}; font-weight: 700; font-size: clamp(32px, 5vw, 46px); line-height: 1.1;
   letter-spacing: -.01em; margin: 0 0 18px; color: #111111;
 `;
+// Hola: Helvetica negrita, sin el letter-spacing negativo, como el título del cartel de pesos (#84).
+const H1Hola = styled(H1)` font-family: ${SANS}; letter-spacing: 0; text-wrap: balance; `;
 const Coral = styled.span` color: ${CORAL}; `;
 const H2 = styled.h2` font-family: ${SERIF}; font-weight: 700; font-size: 28px; margin: 0 0 10px; color: #111111; `;
 // Los títulos de "listo" de hola son más largos y en el celu van en dos renglones: sin esto quedan muy separados.
-const H2Hola = styled(H2)` line-height: 1.2; `;
+const H2Hola = styled(H2)` font-family: ${SANS}; line-height: 1.2; text-wrap: balance; `;
 const Bajada = styled.p` font-size: 18px; line-height: 1.5; color: #52525B; margin: 0 0 26px; `;
 const Lista = styled.ul`
   list-style: none; padding: 0; margin: 0 0 34px; border-top: 1px solid #E4E4E7;
@@ -349,8 +354,13 @@ const NotaChica = styled(Chico)`
   a { color: #111111; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
   a:hover { color: ${CORAL}; }
 `;
+const Respaldo = styled.a`
+  display: inline-flex; align-items: center; min-height: 48px; font-size: 14px; color: #52525B;
+  text-decoration: underline; text-underline-offset: 2px;
+  &:hover { color: ${CORAL}; }
+`;
 const Agenda = styled.iframe`
-  display: block; width: 100%; height: 720px; border: 0; margin: 16px 0 4px;
+  display: block; width: 100%; height: 720px; border: 0; margin: 4px 0 4px;
   @media (min-width: 861px) { height: 600px; }
 `;
 const Check = styled.div`

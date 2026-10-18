@@ -92,6 +92,8 @@ test("si pidió la reunión ve la agenda en la página; si pidió la guía, la g
   assert.match(reunion, /<Agenda src=\{AGENDA\}/);
   assert.match(reunion, /Ahora elegí tu horario/);
   assert.match(reunion, /href=\{LLAMADA\} target="_blank"[^\n]*>\s*No te carga\? Abrí la agenda en otra pestaña →/);
+  // El respaldo va arriba de la agenda: si el iframe queda en blanco, abajo queda tapado por 720 px vacíos.
+  assert.ok(reunion.indexOf("No te carga?") < reunion.indexOf("<Agenda src={AGENDA}"), "el respaldo tiene que ir antes que la agenda");
   assert.match(reunion, /Si ningún horario te sirve, tranqui: te escribo por WhatsApp con dos opciones\./);
   assert.match(reunion, /href=\{PDF\}/, "el que pidió la reunión también tiene que poder bajar la guía");
 
@@ -107,6 +109,26 @@ test("si pidió la reunión ve la agenda en la página; si pidió la guía, la g
   assert.match(guia, /Seguimos en contacto por WhatsApp\./);
   assert.match(guia, /<CuposCoral>Son pocos lugares\. \{cupos\}\.<\/CuposCoral>/);
   assert.match(guia, /href=\{LLAMADA\}[^\n]*evento\("preguntas_llamada_click_hola"\)\}>\s*Agendá tu reunión gratis →/);
+});
+
+test("los títulos de hola van en Helvetica negrita y los de LinkedIn siguen en Charter", async () => {
+  const { src, hola } = await encabezados();
+  // Cande, 19/10: la serif en un título le quedó rara (cartel de pesos, #84). Con hola no va serif.
+  assert.match(hola, /<H1Hola>Agendá una reunión <Coral>gratis<\/Coral> conmigo<\/H1Hola>/);
+  assert.ok(!/<H1>/.test(hola), "el título de hola no puede usar el H1 en Charter");
+  const estilo = (n) => {
+    const i = src.indexOf(`const ${n} = styled(`);
+    assert.ok(i > -1, `falta ${n}`);
+    return src.slice(i, src.indexOf("`;", i));
+  };
+  for (const n of ["H1Hola", "H2Hola"]) {
+    assert.match(estilo(n), /font-family: \$\{SANS\}/, `${n} tiene que ir en Helvetica`);
+    assert.ok(!/letter-spacing: -/.test(estilo(n)), `${n} sin letter-spacing negativo`);
+  }
+  // Los "listo" de hola usan H2Hola; el H2 en Charter queda solo para LinkedIn.
+  const listos = src.slice(src.indexOf("</Form>"), src.lastIndexOf("<Listo>"));
+  assert.ok(!/<H2>/.test(listos), "un título de listo de hola quedó en Charter");
+  assert.match(src.slice(src.lastIndexOf("<Listo>")), /<H2>\{mandado \? "Listo, revisá tu mail"/);
 });
 
 test("los eventos nuevos se mandan donde corresponde", async () => {

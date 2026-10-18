@@ -39,12 +39,14 @@ test("al que llega desde hola se le ofrece la reunión primero y la guía como s
 test("la llamada no queda detras del mail", async () => {
   const src = await leer("../pages/preguntas.jsx");
   // La reunión se pide en el mismo formulario, antes de enviar: es el botón principal. Y al quedar
-  // "listo" la agenda aparece en la página, con el link de respaldo por si no carga.
+  // "listo" la agenda aparece en la página, con el link de respaldo ARRIBA por si queda en blanco.
   const form = src.slice(src.indexOf("<Form onSubmit={enviar}"), src.indexOf("</Form>"));
   assert.match(form, /<BotonForm type="submit" name="quiere" value="reunion"/);
   const despues = src.slice(src.indexOf("</Form>"));
   assert.match(despues, /<Agenda src=\{AGENDA\}/);
-  assert.match(despues, /<Link href=\{LLAMADA\}[^\n]*>\s*No te carga\? Abrí la agenda en otra pestaña →/);
+  assert.match(despues, /<Respaldo href=\{LLAMADA\}[^\n]*>\s*No te carga\? Abrí la agenda en otra pestaña →/);
+  assert.ok(despues.indexOf("<Respaldo href={LLAMADA}") < despues.indexOf("<Agenda src={AGENDA}"),
+    "el link de respaldo tiene que ir antes que la agenda: si queda en blanco, abajo no se ve");
 });
 test("ninguna pagina manda una fase que la API no acepte", async () => {
   const path = await import("node:path");
