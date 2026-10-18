@@ -21,6 +21,7 @@ export default function Preguntas() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [web, setWeb] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [estado, setEstado] = useState("form"); // form | enviando | listo
   const [error, setError] = useState("");
   const [mandado, setMandado] = useState(true);
@@ -45,7 +46,7 @@ export default function Preguntas() {
       const r = await fetch("/api/preguntas-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, web, origen: router.query.o || "dm" }),
+        body: JSON.stringify({ nombre, email, web, whatsapp, origen: router.query.o || "dm" }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -109,6 +110,13 @@ export default function Preguntas() {
                   <label htmlFor="email">Email</label>
                   <input id="email" type="email" inputMode="email" autoComplete="email" required
                     value={email} onChange={(e) => setEmail(e.target.value)} placeholder="martin@tuempresa.com" />
+                </Campo>
+                <Campo>
+                  {/* Opcional a propósito: obligarlo frena al que solo quiere el PDF, y con el
+                      mail ya entra a la cadena. El que lo deja es el que se puede llamar. */}
+                  <label htmlFor="whatsapp">WhatsApp <Opcional>opcional, para escribirte si estás buscando dev</Opcional></label>
+                  <input id="whatsapp" type="tel" inputMode="tel" autoComplete="tel"
+                    value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+54 9 11 ..." />
                 </Campo>
                 <Trampa aria-hidden="true">
                   <input tabIndex={-1} autoComplete="off" value={web} onChange={(e) => setWeb(e.target.value)} />
@@ -197,6 +205,7 @@ const Campo = styled.div`
   }
   input:focus { border-color: #111111; background: #ffffff; }
 `;
+const Opcional = styled.span` font-weight: 400; color: #71717A; `;
 const Trampa = styled.div` position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; `;
 const Error = styled.p` margin: 0; font-size: 14px; color: #B03A2E; `;
 const BotonForm = styled.button`
