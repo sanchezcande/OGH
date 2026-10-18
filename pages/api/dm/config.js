@@ -34,7 +34,7 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, textosDeLaCuenta, tokenRed, cerrarTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
@@ -115,10 +115,14 @@ export default async function handler(req, res) {
     // que el lead escriba de ahí en más. Sin esto el cron la encuentra de nuevo con un mensaje
     // sin contestar y se la vuelve a pasar a Cande, una y otra vez. Si ya era del agente no se
     // toca: puede haber un mensaje en camino.
-    if (b.dueno === "agente" && previo?.dueno === "cande") await cerrarTurno(id, (await ultimoIdLead(id)) || 0);
+    // Con retomar (una charla que se le pasó a Cande y nadie contestó) es al revés: lo que el lead
+    // escribió después de lo último de la cuenta queda abierto y la espera se lo contesta tarde.
+    let abiertos = 0;
+    if (b.dueno === "agente" && b.retomar === true) abiertos = await reabrirTurno(id);
+    else if (b.dueno === "agente" && previo?.dueno === "cande") await cerrarTurno(id, (await ultimoIdLead(id)) || 0);
     // El mismo campo que mira la Regla de ManyChat para pausar sus automáticos.
     const campo = await ponerCampo(id, "dm_dueno", b.dueno);
-    return res.status(200).json({ ok: true, contacto: await contacto(id), manychat: campo.ok });
+    return res.status(200).json({ ok: true, contacto: await contacto(id), manychat: campo.ok, ...(b.retomar === true ? { abiertos } : {}) });
   }
 
   if (b.accion === "sembrar") {
