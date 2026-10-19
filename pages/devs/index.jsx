@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { evento } from "../../lib/embudo";
+import { idDeCharla } from "../../lib/dm/linkFormulario";
 import { normalizarOrigen } from "../../lib/origenForm";
 
 // Red de devs de OpenGateHub — versión corta en PASOS.
@@ -108,6 +109,10 @@ export default function RedDeDevs() {
   const opVista = (c, i) => (en && c.opsEn ? c.opsEn[i] : c.ops[i]);
 
   const [paso, setPaso] = useState(0);
+  // El id de la charla de Instagram, si el link se lo pasó el agente de DM (/devs?ig=, ver
+  // lib/dm/linkFormulario.js): viaja con el formulario para que el CRM sepa de qué charla vino.
+  // Solo un id con el formato de verdad; cualquier otra cosa se ignora y el formulario sigue igual.
+  const [ig, setIg] = useState(null);
   // Ademas de form_visto, si el link trae ?de= manda form_visto_<de>, para saber que puerta
   // trajo a la persona (el DM de ManyChat por comentario, por mensaje, la bienvenida, la bio).
   // Se manda APARTE y no en lugar de form_visto: asi las cuentas de siempre no cambian.
@@ -115,7 +120,9 @@ export default function RedDeDevs() {
   React.useEffect(() => {
     evento("form_visto");
     try {
-      const de = normalizarOrigen(new URLSearchParams(window.location.search).get("de"));
+      const params = new URLSearchParams(window.location.search);
+      setIg(idDeCharla(params.get("ig")));
+      const de = normalizarOrigen(params.get("de"));
       if (de) evento("form_visto_" + de);
     } catch (e) { /* medir nunca rompe la pagina */ }
   }, []);
@@ -183,7 +190,8 @@ export default function RedDeDevs() {
       const r = await fetch("/api/devs-red", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(f),
+        // Sin ?ig= el pedido es el de siempre.
+        body: JSON.stringify(ig ? { ...f, ig } : f),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
       evento("enviado");

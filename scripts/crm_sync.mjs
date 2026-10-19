@@ -14,6 +14,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FASES_A_TRAER, contarEmbudo, marcarLeads } from "./crm_embudo.mjs";
+import { leerDevs } from "./crm_ig.mjs";
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const OGH = join(AQUI, "..");
@@ -34,11 +35,13 @@ async function main() {
   await cargarEnv();
   const { sql } = await import("@vercel/postgres");
 
-  const { rows: devs } = await sql`
-    SELECT id, nombre, email, pais, rol_principal, seniority, stack, tarifa,
-           cuando_arrancas, dedicacion, ingles, whatsapp, telegram, origen,
-           cv_url, estado, creado
-    FROM red_devs ORDER BY creado DESC`;
+  // Con la charla de Instagram de la que vino cada uno (ig_contacto, ig_usuario, ig_dueno): así Cande ve
+  // quién ya habla con el agente antes de llamarlo por WhatsApp. Ver crm_ig.mjs: si el cruce falla, los
+  // devs salen igual y lo de la charla queda como estaba en el archivo anterior.
+  const anterior = await readFile(join(TRACKER, "crm_devs.json"), "utf8")
+    .then((t) => JSON.parse(t).leads || [])
+    .catch(() => []);
+  const { devs } = await leerDevs(sql, { anterior });
 
   // Los eventos del embudo, crudos. Quién tocó comprar, qué versión del video le tocó y los
   // números por día se cuentan en crm_embudo.mjs (ahí está por qué no alcanza con el SQL).
