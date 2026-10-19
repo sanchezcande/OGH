@@ -108,7 +108,7 @@ export default function Gracias() {
       <Fondo>
         <Caja>
           <Kicker>✓ Tenemos tu perfil</Kicker>
-          <H1>Ahora mirá esto, son 2 minutos</H1>
+          <H1>Ahora mirá esto, son 5 minutos</H1>
           <Bajada>Qué hace que alguien de esa lista termine quedando adentro.</Bajada>
           {/* El CV va chico y abajo del título: solo 65 de 247 lo mandan, pero pedirlo acá
               arriba le saca el lugar al video, que es lo que mueve la venta (Cande, 07/10:
