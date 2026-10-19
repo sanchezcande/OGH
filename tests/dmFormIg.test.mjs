@@ -10,7 +10,9 @@
 //   3. la charla queda con la nota del formulario (NOTA_FORMULARIO) solo si le salió el link con ese id y nadie más
 //      lo usó, y el agente la ve (lib/dm/base.js);
 //   4. el CRM cruza los devs con las charlas sin romperse si el cruce falla, y marca el link compartido
-//      (scripts/crm_ig.mjs).
+//      (scripts/crm_ig.mjs);
+//   5. el id va firmado (&f=, lib/dm/firmaIg.js): un número cambiado a mano no se ata a la charla de otro, y sin
+//      clave en el entorno todo sigue como antes. Las claves de estas pruebas son inventadas y viven solo acá.
 //
 // Todo con dobles: ninguna prueba toca una base ni sale a la red. Los textos son inventados para la prueba.
 //
@@ -21,8 +23,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import { base as pg } from "./dobles/postgres.mjs";
 
-const { idDeCharla, idDeLink, idDeLaPestana, sinIg, conIdDeCharla, esLinkConId, NOTA_FORMULARIO, esNotaDeFormulario } =
-  await import("../lib/dm/linkFormulario.js");
+const {
+  idDeCharla, idDeLink, firmaDeLink, idDeLaPestana, firmaDeLaPestana, sinIg, conIdDeCharla, esLinkConId, NOTA_FORMULARIO,
+  esNotaDeFormulario,
+} = await import("../lib/dm/linkFormulario.js");
+const { firmarIg, firmaValida } = await import("../lib/dm/firmaIg.js");
 const { revisar } = await import("../lib/dm/frenos.js");
 const { crearAgente } = await import("../lib/dm/agente.js");
 const { anotarFormularioLleno } = await import("../lib/dm/base.js");
@@ -345,15 +350,17 @@ test("lo que carga /devs no usa (?<! ni (?<= en el código: un navegador viejo n
 
 test("/devs lee ?ig= con el mismo validador, lo saca de la barra con el router listo y lo manda solo si vale", async () => {
   const src = await leer("../pages/devs/index.jsx");
-  assert.match(src, /import \{ idDeLaPestana, sinIg \} from "\.\.\/\.\.\/lib\/dm\/linkFormulario";/);
+  assert.match(src, /import \{ firmaDeLaPestana, idDeLaPestana, sinIg \} from "\.\.\/\.\.\/lib\/dm\/linkFormulario";/);
   const efecto = src.match(/React\.useEffect\(\(\) => \{\s*if \(!router\.isReady\) return;[\s\S]*?\}, \[router\.isReady\]\);/);
   assert.ok(efecto, "el id se lee recién con el router listo: antes Next vuelve a escribir la dirección");
   assert.match(efecto[0], /setIg\(idDeLaPestana\(window\.location\.search, \(\) => window\.sessionStorage\)\);/);
+  // La firma del id (f=), igual que el id: de la dirección o de la pestaña.
+  assert.match(efecto[0], /setFirma\(firmaDeLaPestana\(window\.location\.search, \(\) => window\.sessionStorage\)\);/);
   // Sin navegar (router.replace prende el cartel de cargando de _app.js) y con el estado de Next igual de limpio.
   assert.match(efecto[0], /window\.history\.replaceState\(st\?\.__N \? \{ \.\.\.st, url: sinIg\(st\.url\), as: sinIg\(st\.as\) \} : st, "", limpia\);/);
   assert.doesNotMatch(efecto[0], /router\.(replace|push)/);
   assert.match(efecto[0], /try \{[\s\S]*\} catch \(e\)/, "nunca rompe la página");
-  assert.match(src, /body: JSON\.stringify\(ig \? \{ \.\.\.f, ig \} : f\),/);
+  assert.match(src, /body: JSON\.stringify\(ig \? \{ \.\.\.f, ig, firma \} : f\),/);
   // Medir por qué puerta entró (?de=) sigue igual, y sinIg no le saca el ?de= a la barra.
   assert.match(src, /const de = normalizarOrigen\(new URLSearchParams\(window\.location\.search\)\.get\("de"\)\);\s*if \(de\) evento\("form_visto_" \+ de\);/);
 });
@@ -680,3 +687,264 @@ test("crm_sync usa ese cruce y le pasa el archivo anterior", async () => {
   // Lo de los founders no cambió.
   assert.match(src, /to_jsonb\(l\) ->> 'whatsapp' AS whatsapp/);
 });
+
+/* ---------- 5. la firma del id ---------- */
+
+// Claves inventadas para estas pruebas. preparar.mjs borra IG_LINK_SECRET y CRON_SECRET al arrancar: sin clave es
+// lo de siempre, y cada prueba de acá pone la suya y la saca al terminar.
+const CLAVE = "clave-de-prueba-para-firmar";
+const BASE64URL_10 = /^[A-Za-z0-9_-]{10}$/;
+
+/** Corre `fn` con estas claves en el entorno y después deja el entorno como estaba. */
+async function conClaves(claves, fn) {
+  const antes = { IG_LINK_SECRET: process.env.IG_LINK_SECRET, CRON_SECRET: process.env.CRON_SECRET };
+  for (const [k, v] of Object.entries(claves)) {
+    if (v == null) delete process.env[k];
+    else process.env[k] = v;
+  }
+  try {
+    return await fn();
+  } finally {
+    for (const [k, v] of Object.entries(antes)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  }
+}
+const conClave = (fn) => conClaves({ IG_LINK_SECRET: CLAVE }, fn);
+
+/** Cambia un caracter de la firma por otro que también es base64url: misma forma, otra firma. */
+const otraFirma = (f) => (f[0] === "A" ? "B" : "A") + f.slice(1);
+
+test("la firma: 10 caracteres base64url, la misma para el mismo id y distinta para otro id o con otra clave", () =>
+  conClave(async () => {
+    const f = firmarIg(ID);
+    assert.match(f, BASE64URL_10);
+    assert.equal(firmarIg(ID), f);
+    assert.equal(firmarIg(` ${ID} `), f, "el id se limpia como en idDeCharla");
+    assert.notEqual(firmarIg(OTRO), f);
+    assert.notEqual(firmarIg(`${ID}0`), f);
+    await conClaves({ IG_LINK_SECRET: "otra-clave-de-prueba" }, () => assert.notEqual(firmarIg(ID), f));
+    // Un id que no vale no se firma.
+    for (const malo of ["12", "abc", "", null, undefined, 1234567890]) assert.equal(firmarIg(malo), null, String(malo));
+  }));
+
+test("la clave es IG_LINK_SECRET y, si no está, CRON_SECRET; sin ninguna no hay firma", async () => {
+  const conPropia = await conClaves({ IG_LINK_SECRET: CLAVE, CRON_SECRET: "clave-de-cron-de-prueba" }, () => firmarIg(ID));
+  const soloPropia = await conClaves({ IG_LINK_SECRET: CLAVE, CRON_SECRET: null }, () => firmarIg(ID));
+  const soloCron = await conClaves({ IG_LINK_SECRET: null, CRON_SECRET: "clave-de-cron-de-prueba" }, () => firmarIg(ID));
+  assert.equal(conPropia, soloPropia, "con las dos, firma IG_LINK_SECRET");
+  assert.match(soloCron, BASE64URL_10);
+  assert.notEqual(soloCron, soloPropia);
+  assert.equal(await conClaves({ IG_LINK_SECRET: null, CRON_SECRET: null }, () => firmarIg(ID)), null);
+  assert.equal(await conClaves({ IG_LINK_SECRET: "", CRON_SECRET: "" }, () => firmarIg(ID)), null);
+});
+
+test("firmaValida: la firma de ese id vale; una cambiada, la de otro id, otro largo o ninguna no", () =>
+  conClave(() => {
+    const f = firmarIg(ID);
+    assert.equal(firmaValida(ID, f), true);
+    assert.equal(firmaValida(ID, otraFirma(f)), false);
+    assert.equal(firmaValida(OTRO, f), false, "un id cambiado no coincide con la firma del otro");
+    assert.equal(firmaValida(ID, firmarIg(OTRO)), false);
+    for (const mala of [f.slice(0, 9), `${f}A`, "", "é".repeat(5), null, undefined, 123, [f], { f }]) {
+      assert.equal(firmaValida(ID, mala), false, JSON.stringify(mala));
+    }
+    assert.equal(firmaValida("abc", f), false);
+  }));
+
+test("sin clave, firmaValida deja pasar todo (es lo de hoy: el link salió sin firma) y firmarIg no firma", () => {
+  assert.equal(firmarIg(ID), null);
+  for (const cualquiera of [undefined, null, "", "AAAAAAAAAA", "lo-que-sea"]) assert.equal(firmaValida(ID, cualquiera), true);
+});
+
+test("firmaIg.js es solo de servidor: ni la página ni lo que ella carga lo importan", async () => {
+  for (const p of ["../pages/devs/index.jsx", "../lib/dm/linkFormulario.js"]) {
+    // Sin los comentarios: nombrar el archivo en una explicación no es importarlo.
+    const src = (await leer(p)).replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    assert.doesNotMatch(src, /from ["'][^"']*firmaIg["']|import\(["'][^"']*firmaIg/, p);
+    assert.doesNotMatch(src, /node:crypto|from ["']crypto["']/, p);
+  }
+  const firma = await leer("../lib/dm/firmaIg.js");
+  assert.match(firma, /^import \{ createHmac, timingSafeEqual \} from "node:crypto";$/m);
+  assert.match(firma, /process\.env\.IG_LINK_SECRET \|\| process\.env\.CRON_SECRET/);
+});
+
+test("el link lleva la firma atrás del id, y un f= que ya estaba se cambia por esta o se saca", () => {
+  const F = "AbC-_d3F9z";
+  const casos = [
+    ["Va el formulario\nopengatehub.com/devs", `Va el formulario\nopengatehub.com/devs?ig=${ID}&f=${F}`],
+    ["opengatehub.com/devs?de=dm", `opengatehub.com/devs?de=dm&ig=${ID}&f=${F}`],
+    ["Pudiste llenar opengatehub.com/devs?", `Pudiste llenar opengatehub.com/devs?ig=${ID}&f=${F}?`],
+    ["(opengatehub.com/devs)", `(opengatehub.com/devs?ig=${ID}&f=${F})`],
+    ["opengatehub.com/devs?de=dm🙌", `opengatehub.com/devs?de=dm&ig=${ID}&f=${F}🙌`],
+    // Lo copió del historial con otra firma, o con el id y la firma de otra charla: quedan los de esta.
+    [`opengatehub.com/devs?ig=${ID}&f=ZZZZZZZZZZ`, `opengatehub.com/devs?ig=${ID}&f=${F}`],
+    [`opengatehub.com/devs?f=ZZZZZZZZZZ&ig=${OTRO}&de=dm`, `opengatehub.com/devs?de=dm&ig=${ID}&f=${F}`],
+  ];
+  for (const [antes, despues] of casos) assert.equal(conIdDeCharla(antes, ID, { firma: F }), despues, antes);
+  // Dos veces da lo mismo.
+  const una = conIdDeCharla("Va: opengatehub.com/devs?de=dm", ID, { firma: F });
+  assert.equal(conIdDeCharla(una, ID, { firma: F }), una);
+  // Sin firma (sin clave), el f= viejo se saca: un f= nunca queda pegado a un id que no es el suyo.
+  assert.equal(conIdDeCharla(`opengatehub.com/devs?ig=${OTRO}&f=${F}`, ID), `opengatehub.com/devs?ig=${ID}`);
+  // Una firma sin la forma de una no se pone.
+  for (const mala of ["corta", `${F}x`, "AbC+/d3F9=", "", 1234567890, {}]) {
+    assert.equal(conIdDeCharla("opengatehub.com/devs", ID, { firma: mala }), `opengatehub.com/devs?ig=${ID}`, String(mala));
+  }
+  // El tope de Instagram cuenta también la firma.
+  const justo = `${"x".repeat(965)} opengatehub.com/devs`;
+  assert.equal(conIdDeCharla(justo, ID, { firma: F }), justo);
+});
+
+test("los frenos aceptan ?ig=<id>&f=<10 base64url> y nada más", () => {
+  const F = "AbC-_d3F9z";
+  for (const m of [
+    `Va: opengatehub.com/devs?ig=${ID}&f=${F}`, `https://www.opengatehub.com/devs?ig=${ID}&f=${F}.`, `opengatehub.com/devs/?ig=${ID}&f=${F}`,
+    `Pudiste? opengatehub.com/devs?ig=${ID}&f=${F}?`,
+  ]) {
+    assert.deepEqual(revisar(salida([m]), { contacto: ID }), { ok: true }, m);
+  }
+  assert.equal(esLinkConId(`opengatehub.com/devs?ig=${ID}&f=${F.toLowerCase()}`, ID), true, "en plano la firma llega en minúsculas");
+  for (const m of [
+    `opengatehub.com/devs?ig=${ID}&f=${F.slice(0, 9)}`, `opengatehub.com/devs?ig=${ID}&f=${F}x`, `opengatehub.com/devs?ig=${ID}&f=`,
+    `opengatehub.com/devs?ig=${ID}&f=abc+/d3f9=`, `opengatehub.com/devs?ig=${ID}&f=abc%20d3f9z`, `opengatehub.com/devs?ig=${ID}&f=abcde.fghi`,
+    `opengatehub.com/devs?ig=${ID}&f=${F}&f=${F}`, `opengatehub.com/devs?ig=${ID}&f=${F}&de=dm`, `opengatehub.com/devs?f=${F}&ig=${ID}`,
+    `opengatehub.com/devs?ig=${ID}&g=${F}`, `opengatehub.com/devs?ig=${OTRO}&f=${F}`,
+  ]) {
+    assert.equal(revisar(salida([m]), { contacto: ID }).motivo, "link que no está en la lista permitida", m);
+  }
+});
+
+test("/devs: la firma viaja con su id, de la barra o de la pestaña, y nunca con otro id", () => {
+  const F = "AbC-_d3F9z";
+  const p = pestana();
+  assert.equal(idDeLaPestana(`?de=dm&ig=${ID}&f=${F}?`, p.almacen), ID);
+  assert.equal(firmaDeLaPestana(`?de=dm&ig=${ID}&f=${F}?`, p.almacen), F, "el signo pegado queda en el f=, el último");
+  // Recarga sin nada en la barra: los dos de la pestaña.
+  assert.equal(idDeLaPestana("", p.almacen), ID);
+  assert.equal(firmaDeLaPestana("", p.almacen), F);
+  // Otro link en la misma pestaña, sin firma: la firma vieja no se le pega al id nuevo.
+  assert.equal(firmaDeLaPestana(`?ig=${OTRO}`, p.almacen), null);
+  assert.equal(idDeLaPestana("", p.almacen), OTRO);
+  assert.equal(firmaDeLaPestana("", p.almacen), null);
+  // Un f= sin ig=, o con un ig= que no vale, no cuenta ni pisa lo guardado.
+  const q = pestana();
+  assert.equal(firmaDeLaPestana(`?f=${F}`, q.almacen), null);
+  firmaDeLaPestana(`?ig=${ID}&f=${F}`, q.almacen);
+  assert.equal(firmaDeLaPestana(`?ig=abc&f=ZZZZZZZZZZ`, q.almacen), F);
+  // Algo que no tiene la forma de una firma no se usa.
+  for (const mala of ["corta", `${F}x`, `${F}_`, "AbC+/d3F9=", ""]) {
+    assert.equal(firmaDeLaPestana(`?ig=${ID}&f=${encodeURIComponent(mala)}`, pestana().almacen), null, mala);
+  }
+  // Sin almacenamiento, la de la barra igual sirve, y nada tira.
+  assert.equal(firmaDeLaPestana(`?ig=${ID}&f=${F}`, pestana({ roto: true }).almacen), F);
+  assert.equal(firmaDeLaPestana(undefined, () => null), null);
+  // firmaDeLink: como idDeLink, aguanta el signo pegado y nada más.
+  for (const v of [F, `${F}.`, `${F}?`, `${F})`, `${F}🙌`, ` ${F} `]) assert.equal(firmaDeLink(v), F, v);
+  for (const malo of [`${F}a`, `${F}_`, `${F} 5`, F.slice(1), "", null, undefined, 1234567890]) assert.equal(firmaDeLink(malo), null, String(malo));
+});
+
+test("sinIg también saca el f= de la barra y deja todo lo demás", () => {
+  const casos = [
+    [`/devs?ig=${ID}&f=AbC-_d3F9z`, "/devs"],
+    [`/devs?de=dm&ig=${ID}&f=AbC-_d3F9z?#arriba`, "/devs?de=dm#arriba"],
+    ["/devs?de=dm&F=x&f", "/devs?de=dm"],
+    ["/devs?fx=1&de=dm", "/devs?fx=1&de=dm"],
+  ];
+  for (const [antes, despues] of casos) assert.equal(sinIg(antes), despues, antes);
+});
+
+test("con clave, el agente manda el link firmado, y lo mismo queda en la salida y en la charla", () =>
+  conClave(async () => {
+    const firmado = `Va el formulario\nopengatehub.com/devs?ig=${ID}&f=${firmarIg(ID)}`;
+    const { agente, m } = armar({ responde: () => salida(["Te paso el formulario", "Va el formulario\nopengatehub.com/devs"]) });
+    assert.equal((await agente.procesar(ID, m.disparo)).hecho, "enviada");
+    assert.deepEqual(m.enviados, ["Te paso el formulario", firmado]);
+    assert.deepEqual(m.salidas.at(-1).mensajes, m.enviados);
+    assert.deepEqual(m.mensajes.filter((x) => x.quien === "agente").slice(1).map((x) => x.texto), m.enviados);
+    // La nota de la charla la sigue encontrando: el patrón de anotarFormularioLleno ve el ig= con el f= atrás.
+    const h = baseDelFormulario();
+    await anotarFormularioLleno(ID);
+    assert.equal(new RegExp(h.notas[0].params.find((p) => typeof p === "string" && p.includes("ig="))).test(firmado), true);
+  }));
+
+test("con clave, si el modelo copia el link firmado del historial sale igual, y con una firma inventada sale con la de verdad", () =>
+  conClave(async () => {
+    const firmado = `Acá de nuevo: opengatehub.com/devs?ig=${ID}&f=${firmarIg(ID)}`;
+    let a = armar({ responde: () => salida([firmado]) });
+    assert.equal((await a.agente.procesar(ID, a.m.disparo)).hecho, "enviada");
+    assert.deepEqual(a.m.enviados, [firmado]);
+    a = armar({ responde: () => salida([`Acá de nuevo: opengatehub.com/devs?ig=${ID}&f=${otraFirma(firmarIg(ID))}`]) });
+    assert.equal((await a.agente.procesar(ID, a.m.disparo)).hecho, "enviada");
+    assert.deepEqual(a.m.enviados, [firmado]);
+    // Con un f= de otro largo, el freno lo para.
+    a = armar({ responde: () => salida([`Va: opengatehub.com/devs?ig=${ID}&f=${firmarIg(ID)}x`]) });
+    assert.equal((await a.agente.procesar(ID, a.m.disparo)).hecho, "frenada");
+    assert.equal(a.m.enviados.length, 0);
+  }));
+
+test("con clave, la API guarda ig_contacto y anota la charla solo con la firma de ese id", () =>
+  conClave(async () => {
+    const f = firmarIg(ID);
+    let h = baseDelFormulario();
+    let res = await mandarFormulario({ ig: ID, firma: f });
+    assert.deepEqual(res.cuerpo, { ok: true, guardado: true });
+    assert.equal(h.insert.ig_contacto, ID);
+    assert.equal(h.notas.length, 1);
+    assert.match(avisos.at(-1), /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · ya habla con el agente/);
+
+    // Firma cambiada, id cambiado a mano (con la firma del original), firma de otro largo o sin firma: el formulario
+    // se guarda igual, sin ig_contacto, sin tocar ninguna charla, y el aviso lo dice.
+    for (const cuerpo of [
+      { ig: ID, firma: otraFirma(f) }, { ig: OTRO, firma: f }, { ig: ID, firma: `${f}A` }, { ig: ID, firma: f.slice(1) },
+      { ig: ID }, { ig: ID, firma: null }, { ig: ID, firma: [f] },
+    ]) {
+      h = baseDelFormulario();
+      res = await mandarFormulario(cuerpo);
+      assert.deepEqual(res.cuerpo, { ok: true, guardado: true }, JSON.stringify(cuerpo));
+      assert.equal(h.insert.ig_contacto, null, JSON.stringify(cuerpo));
+      assert.equal(h.notas.length, 0, JSON.stringify(cuerpo));
+      assert.match(avisos.at(-1), /<b>Instagram:<\/b> vino con un id de charla que no coincide con su firma/, JSON.stringify(cuerpo));
+      assert.match(avisos.at(-1), /<b>Guardado:<\/b> sí/);
+    }
+  }));
+
+test("con clave, la firma con el signo pegado que se llevó Instagram igual vale", () =>
+  conClave(async () => {
+    const h = baseDelFormulario();
+    await mandarFormulario({ ig: ID, firma: `${firmarIg(ID)}?` });
+    assert.equal(h.insert.ig_contacto, ID);
+    assert.equal(h.notas.length, 1);
+  }));
+
+test("sin clave, la API se comporta como hoy: el id se guarda con o sin firma, y la firma no importa", async () => {
+  for (const firma of [undefined, null, "AAAAAAAAAA", "cualquier-cosa"]) {
+    const h = baseDelFormulario();
+    await mandarFormulario(firma === undefined ? { ig: ID } : { ig: ID, firma });
+    assert.equal(h.insert.ig_contacto, ID, String(firma));
+    assert.equal(h.notas.length, 1, String(firma));
+    assert.doesNotMatch(avisos.at(-1), /no coincide con su firma/);
+  }
+});
+
+test("de punta a punta, con clave: el link que arma el agente, leído como /devs, pasa la API; con un número cambiado, no", () =>
+  conClave(async () => {
+    for (const texto of ["Va: opengatehub.com/devs", "Pudiste llenar opengatehub.com/devs?", "opengatehub.com/devs?de=dm.", "(opengatehub.com/devs)"]) {
+      const link = conIdDeCharla(texto, ID, { firma: firmarIg(ID) }).match(/opengatehub\.com\/devs\S*/)[0];
+      const busqueda = link.slice(link.indexOf("?"));
+      const p = pestana();
+      const cuerpo = { ig: idDeLaPestana(busqueda, p.almacen), firma: firmaDeLaPestana(busqueda, p.almacen) };
+      let h = baseDelFormulario();
+      await mandarFormulario(cuerpo);
+      assert.equal(h.insert.ig_contacto, ID, `${texto} → ${link}`);
+
+      // El mismo link con el número cambiado a mano.
+      const tocado = busqueda.replace(`ig=${ID}`, `ig=${OTRO}`);
+      const q = pestana();
+      h = baseDelFormulario();
+      await mandarFormulario({ ig: idDeLaPestana(tocado, q.almacen), firma: firmaDeLaPestana(tocado, q.almacen) });
+      assert.equal(h.insert.ig_contacto, null, `${texto} → ${tocado}`);
+      assert.equal(h.notas.length, 0);
+    }
+  }));

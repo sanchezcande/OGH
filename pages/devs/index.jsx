@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { evento } from "../../lib/embudo";
-import { idDeLaPestana, sinIg } from "../../lib/dm/linkFormulario";
+import { firmaDeLaPestana, idDeLaPestana, sinIg } from "../../lib/dm/linkFormulario";
 import { normalizarOrigen } from "../../lib/origenForm";
 
 // Red de devs de OpenGateHub — versión corta en PASOS.
@@ -113,6 +113,9 @@ export default function RedDeDevs() {
   // lib/dm/linkFormulario.js): viaja con el formulario para que el CRM sepa de qué charla vino.
   // Solo un id con el formato de verdad; cualquier otra cosa se ignora y el formulario sigue igual.
   const [ig, setIg] = useState(null);
+  // La firma del id (el f= del link, mismo tratamiento que el ig=): la API ata el formulario a la charla solo si
+  // la firma es la de ese id (lib/dm/firmaIg.js, en el servidor; acá no se puede mirar).
+  const [firma, setFirma] = useState(null);
   // Se lee una vez, queda en esta pestaña (si recarga, sigue) y se saca de la barra: quien copia la
   // dirección para pasársela a alguien no le pasa también su charla. Recién con el router listo: hasta
   // ahí Next vuelve a escribir la dirección con lo que traía y taparía el cambio. Se cambia sin navegar
@@ -122,6 +125,7 @@ export default function RedDeDevs() {
     if (!router.isReady) return;
     try {
       setIg(idDeLaPestana(window.location.search, () => window.sessionStorage));
+      setFirma(firmaDeLaPestana(window.location.search, () => window.sessionStorage));
       const ahora = window.location.pathname + window.location.search + window.location.hash;
       const limpia = sinIg(ahora);
       if (limpia !== ahora) {
@@ -205,8 +209,8 @@ export default function RedDeDevs() {
       const r = await fetch("/api/devs-red", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Sin ?ig= el pedido es el de siempre.
-        body: JSON.stringify(ig ? { ...f, ig } : f),
+        // Sin ?ig= el pedido es el de siempre. La firma va solo con su id.
+        body: JSON.stringify(ig ? { ...f, ig, firma } : f),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
       evento("enviado");

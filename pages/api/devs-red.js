@@ -1,7 +1,8 @@
 import { guardarDev, hayBase } from "../../lib/db";
 import { anotarFormularioLleno } from "../../lib/dm/base";
+import { firmaValida } from "../../lib/dm/firmaIg";
 import { linkCharlaIg } from "../../lib/dm/instagram";
-import { idDeLink } from "../../lib/dm/linkFormulario";
+import { firmaDeLink, idDeLink } from "../../lib/dm/linkFormulario";
 import { avisar } from "../../lib/notificar";
 import { pedirCV } from "../../lib/pedirCV";
 
@@ -24,7 +25,11 @@ export default async function handler(req, res) {
   // El id de la charla de Instagram, si llegó con el link que le pasó el agente (/devs?ig=, ver
   // lib/dm/linkFormulario.js). La página ya lo manda limpio; acá se vuelve a mirar igual, también con un signo
   // pegado. Lo que no tenga el formato de un id no se guarda ni se usa.
-  d.ig = idDeLink(d.ig);
+  // Y con su firma (el f= del link, que la página manda como `firma`; lib/dm/firmaIg.js): un número cambiado a mano
+  // no coincide, y entonces el formulario se guarda igual pero sin ig_contacto y sin tocar ninguna charla.
+  const igDelLink = idDeLink(d.ig);
+  const firmaOk = Boolean(igDelLink) && firmaValida(igDelLink, firmaDeLink(d.firma));
+  d.ig = firmaOk ? igDelLink : null;
 
   let guardado = false;
   let compartido = false;
@@ -67,7 +72,9 @@ export default async function handler(req, res) {
     Arranca: [d.cuandoArrancas, d.dedicacion].filter(Boolean).join(" · "),
     Inglés: d.ingles,
     "Llegó por": d.comoLlegaste,
-    Instagram: d.ig ? charlaParaAviso(charla, compartido) : null,
+    Instagram: d.ig
+      ? charlaParaAviso(charla, compartido)
+      : igDelLink ? "vino con un id de charla que no coincide con su firma (cambiado a mano?): no lo até a ninguna charla" : null,
     Guardado: guardado ? "sí" : "NO",
     "Mail CV": mailCV ? "enviado" : "NO salió",
   });
