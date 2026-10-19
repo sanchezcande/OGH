@@ -26,6 +26,9 @@ import { avisar } from "../../lib/notificar";
 
 const CODIGO_URL = process.env.MP_CODIGO_URL || "https://get.opengatehub.com/l/acelerador-de-carrera/PARAVOS";
 const DE = "Cande de OpenGateHub <cande@opengatehub.com>";
+// Las ventas van al bot de ventas (@oghventas_bot), igual que las de Gumroad: ahí es donde ella
+// las mira. Si ese bot no está configurado, `avisar` cae solo en el de los leads.
+const VENTAS = { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS };
 
 /** El id del pago viene en tres formas distintas según cómo MercadoPago mande el aviso. */
 function idDelPago(req) {
@@ -75,14 +78,14 @@ export default async function handler(req, res) {
     if (!id) return res.status(200).json({ ok: true, ignorado: true });
     if (!token) {
       console.error("mp-webhook: falta MP_ACCESS_TOKEN");
-      await avisar("Pago en pesos SIN procesar", { "Qué pasó": "falta MP_ACCESS_TOKEN en Vercel", "Pago": id });
+      await avisar("Pago en pesos SIN procesar", { "Qué pasó": "falta MP_ACCESS_TOKEN en Vercel", "Pago": id }, VENTAS);
       return res.status(200).json({ ok: true, sinToken: true });
     }
 
     const { pago, error } = await traerPago(id, token);
     if (error || !pago) {
       console.error("mp-webhook:", error);
-      await avisar("Pago en pesos sin verificar", { "Qué pasó": error || "MercadoPago no contestó", "Pago": id });
+      await avisar("Pago en pesos sin verificar", { "Qué pasó": error || "MercadoPago no contestó", "Pago": id }, VENTAS);
       return res.status(200).json({ ok: true, noVerificado: true });
     }
     if (pago.status !== "approved") {
@@ -115,11 +118,11 @@ export default async function handler(req, res) {
       Mail: mail || "sin mail",
       Pagó: `$${monto} ARS`,
       Código: mailOk ? "ya se lo mandé por mail" : `NO salió el mail (${motivo}), mandáselo vos: ${CODIGO_URL}`,
-    });
+    }, VENTAS);
     return res.status(200).json({ ok: true, mail: mailOk });
   } catch (e) {
     console.error("mp-webhook:", e.message);
-    try { await avisar("El webhook de MercadoPago falló", { Error: e.message }); } catch (_) {}
+    try { await avisar("El webhook de MercadoPago falló", { Error: e.message }, VENTAS); } catch (_) {}
     return res.status(200).json({ ok: true, error: true });
   }
 }
