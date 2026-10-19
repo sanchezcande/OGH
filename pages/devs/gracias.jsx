@@ -8,10 +8,11 @@ import { evento } from "../../lib/embudo";
 // El video está en Wistia. Su player es un web component: hay que cargar dos
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
-// Video único desde el 19/10/2026 (4 min 23): el de 2 min de siempre + las respuestas a las objeciones
-// + los testimonios de alumnos. Cande decidió dejar un solo video y terminar la prueba A/B del 12/10
-// (al 18/10: A 52 llegaron y 10 tocaron comprar, B 46 y 17).
-const WISTIA_A = "2r0ut42goj";
+// Video único desde el 19/10/2026: el de 2 min de siempre + las respuestas a las objeciones + los testimonios
+// de alumnos. Cande decidió dejar un solo video y terminar la prueba A/B del 12/10 (al 18/10: A 52 llegaron y
+// 10 tocaron comprar, B 46 y 17). Desde la tarde del 19/10 va la versión de 5 min 01, con el testimonio de
+// Francisco Peña después del de Andrés y el cierre "Tocá abajo para acelerar tu carrera" (antes: "2r0ut42goj").
+const WISTIA_A = "3b4jx1k83g";
 // Sin B no hay prueba: todos ven el A y los eventos vuelven a sus nombres de siempre. Se ignora a propósito
 // NEXT_PUBLIC_DEVS_VIDEO_B, que en Vercel apunta al video B, que ya no existe.
 const WISTIA_B = "";
