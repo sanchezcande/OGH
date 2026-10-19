@@ -4,10 +4,13 @@
 // guardaba al lead sin saber de qué charla venía. Estas pruebas cubren cada paso:
 //   1. el agente manda el link del formulario con el id de la charla (?ig=), y los frenos aceptan ese link
 //      con ese id y nada más (lib/dm/linkFormulario.js, lib/dm/frenos.js, lib/dm/agente.js);
-//   2. /devs lee ?ig= y la API lo guarda en red_devs.ig_contacto (pages/devs/index.jsx, pages/api/devs-red.js,
-//      lib/db.js), con la migración que aguanta a dos funciones a la vez;
-//   3. la charla queda con la nota del formulario (NOTA_FORMULARIO), y el agente la ve (lib/dm/base.js);
-//   4. el CRM cruza los devs con las charlas sin romperse si el cruce falla (scripts/crm_ig.mjs).
+//   2. /devs lee ?ig= (también con un signo pegado), lo guarda en la pestaña y lo saca de la barra, y la API lo
+//      guarda en red_devs.ig_contacto (pages/devs/index.jsx, pages/api/devs-red.js, lib/db.js), con la migración
+//      que aguanta a dos funciones a la vez;
+//   3. la charla queda con la nota del formulario (NOTA_FORMULARIO) solo si le salió el link con ese id y nadie más
+//      lo usó, y el agente la ve (lib/dm/base.js);
+//   4. el CRM cruza los devs con las charlas sin romperse si el cruce falla, y marca el link compartido
+//      (scripts/crm_ig.mjs).
 //
 // Todo con dobles: ninguna prueba toca una base ni sale a la red. Los textos son inventados para la prueba.
 //
@@ -18,12 +21,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import { base as pg } from "./dobles/postgres.mjs";
 
-const { idDeCharla, conIdDeCharla, esLinkConId, NOTA_FORMULARIO, esNotaDeFormulario } = await import("../lib/dm/linkFormulario.js");
+const { idDeCharla, idDeLink, idDeLaPestana, sinIg, conIdDeCharla, esLinkConId, NOTA_FORMULARIO, esNotaDeFormulario } =
+  await import("../lib/dm/linkFormulario.js");
 const { revisar } = await import("../lib/dm/frenos.js");
 const { crearAgente } = await import("../lib/dm/agente.js");
 const { anotarFormularioLleno } = await import("../lib/dm/base.js");
 const { default: devsRed } = await import("../pages/api/devs-red.js");
-const { leerDevs, conCharlaAnterior } = await import("../scripts/crm_ig.mjs");
+const { leerDevs, conCharlaAnterior, marcarCompartidos } = await import("../scripts/crm_ig.mjs");
 
 const ID = "1234567890";
 const OTRO = "9876543210";
@@ -62,8 +66,31 @@ test("el link del formulario sale con el id de la charla, como lo haya escrito e
     ["opengatehub.com/devs?de=dm.", `opengatehub.com/devs?de=dm&ig=${ID}.`],
     // Dos veces el mismo link: los dos.
     ["opengatehub.com/devs y opengatehub.com/devs", `opengatehub.com/devs?ig=${ID} y opengatehub.com/devs?ig=${ID}`],
+    // Un emoji pegado (lo puede escribir Cande en una indicación) es del texto: el id va antes, no después.
+    ["opengatehub.com/devs?de=dm🙌", `opengatehub.com/devs?de=dm&ig=${ID}🙌`],
+    ["opengatehub.com/devs?🙌", `opengatehub.com/devs?ig=${ID}?🙌`],
+    ["opengatehub.com/devs🙌 dale", `opengatehub.com/devs?ig=${ID}🙌 dale`],
   ];
   for (const [antes, despues] of casos) assert.equal(conIdDeCharla(antes, ID), despues, antes);
+});
+
+test("el id llega a /devs aunque Instagram meta adentro del link el signo que quedó pegado", () => {
+  // Lo que puede llegar en ig= si el lector de links de Instagram se lleva la puntuación del texto.
+  for (const v of [ID, `${ID}.`, `${ID}?`, `${ID})`, `${ID}),`, `${ID}🙌`, `${ID}?🙌`, ` ${ID} `]) {
+    assert.equal(idDeLink(v), ID, JSON.stringify(v));
+  }
+  // Una letra, un número de más, un espacio con algo atrás o un id que no vale ya no son este id.
+  for (const malo of [`${ID}abc`, `${ID}_`, `${ID} 5`, `${ID}' OR 1=1`, "12.", `${"1".repeat(21)}.`, "abc", "", "?", null, undefined, 1234567890]) {
+    assert.equal(idDeLink(malo), null, JSON.stringify(malo));
+  }
+  // De punta a punta: cada mensaje que arma el sitio, leído como lo leería /devs, se lleve o no el signo de atrás.
+  for (const texto of [
+    "Pudiste llenar opengatehub.com/devs?", "Entrá a opengatehub.com/devs.", "(opengatehub.com/devs)", "opengatehub.com/devs?de=dm.",
+    "opengatehub.com/devs?de=dm🙌", "opengatehub.com/devs?🙌", "Va: opengatehub.com/devs",
+  ]) {
+    const link = conIdDeCharla(texto, ID).match(/opengatehub\.com\/devs\S*/)[0];
+    assert.equal(idDeLink(new URLSearchParams(link.slice(link.indexOf("?"))).get("ig")), ID, `${texto} → ${link}`);
+  }
 });
 
 test("pasarlo dos veces da lo mismo, y un id que ya estaba se cambia por el de esta charla", () => {
@@ -316,13 +343,63 @@ test("lo que carga /devs no usa (?<! ni (?<= en el código: un navegador viejo n
   assert.doesNotMatch(src, /^import /m, "la página carga este archivo: no puede traer nada del servidor");
 });
 
-test("/devs lee ?ig= con el mismo validador y lo manda solo si vale: sin ?ig= el pedido es el de siempre", async () => {
+test("/devs lee ?ig= con el mismo validador, lo saca de la barra con el router listo y lo manda solo si vale", async () => {
   const src = await leer("../pages/devs/index.jsx");
-  assert.match(src, /import \{ idDeCharla \} from "\.\.\/\.\.\/lib\/dm\/linkFormulario";/);
-  assert.match(src, /setIg\(idDeCharla\(params\.get\("ig"\)\)\);/);
+  assert.match(src, /import \{ idDeLaPestana, sinIg \} from "\.\.\/\.\.\/lib\/dm\/linkFormulario";/);
+  const efecto = src.match(/React\.useEffect\(\(\) => \{\s*if \(!router\.isReady\) return;[\s\S]*?\}, \[router\.isReady\]\);/);
+  assert.ok(efecto, "el id se lee recién con el router listo: antes Next vuelve a escribir la dirección");
+  assert.match(efecto[0], /setIg\(idDeLaPestana\(window\.location\.search, \(\) => window\.sessionStorage\)\);/);
+  // Sin navegar (router.replace prende el cartel de cargando de _app.js) y con el estado de Next igual de limpio.
+  assert.match(efecto[0], /window\.history\.replaceState\(st\?\.__N \? \{ \.\.\.st, url: sinIg\(st\.url\), as: sinIg\(st\.as\) \} : st, "", limpia\);/);
+  assert.doesNotMatch(efecto[0], /router\.(replace|push)/);
+  assert.match(efecto[0], /try \{[\s\S]*\} catch \(e\)/, "nunca rompe la página");
   assert.match(src, /body: JSON\.stringify\(ig \? \{ \.\.\.f, ig \} : f\),/);
-  // Medir por qué puerta entró (?de=) sigue igual.
-  assert.match(src, /const de = normalizarOrigen\(params\.get\("de"\)\);\s*if \(de\) evento\("form_visto_" \+ de\);/);
+  // Medir por qué puerta entró (?de=) sigue igual, y sinIg no le saca el ?de= a la barra.
+  assert.match(src, /const de = normalizarOrigen\(new URLSearchParams\(window\.location\.search\)\.get\("de"\)\);\s*if \(de\) evento\("form_visto_" \+ de\);/);
+});
+
+/** Un sessionStorage de mentira. `roto`: pedirlo tira, como en modo privado o con el almacenamiento bloqueado. */
+function pestana({ guardado = null, roto = false } = {}) {
+  const datos = new Map(guardado == null ? [] : [["ogh_charla_ig", guardado]]);
+  const s = { getItem: (k) => (datos.has(k) ? datos.get(k) : null), setItem: (k, v) => datos.set(k, String(v)) };
+  return { almacen: () => { if (roto) throw new Error("SecurityError"); return s; }, datos };
+}
+
+test("el id queda en la pestaña: si recarga sin el ?ig= en la barra, el formulario lo sigue mandando", () => {
+  const p = pestana();
+  assert.equal(idDeLaPestana(`?de=dm&ig=${ID}?`, p.almacen), ID);
+  assert.equal(p.datos.get("ogh_charla_ig"), ID);
+  assert.equal(idDeLaPestana("?de=dm", p.almacen), ID);
+  assert.equal(idDeLaPestana("", p.almacen), ID);
+  // Un link con otro id en la misma pestaña manda ese.
+  assert.equal(idDeLaPestana(`?ig=${OTRO}`, p.almacen), OTRO);
+  assert.equal(idDeLaPestana("", p.almacen), OTRO);
+  // Sin nada guardado, o con algo que no es un id, no hay id.
+  assert.equal(idDeLaPestana("", pestana().almacen), null);
+  assert.equal(idDeLaPestana("?ig=abc", pestana().almacen), null);
+  assert.equal(idDeLaPestana("", pestana({ guardado: "<b>x</b>" }).almacen), null);
+  // Un ?ig= que no vale no tapa el que estaba guardado.
+  assert.equal(idDeLaPestana("?ig=abc", pestana({ guardado: ID }).almacen), ID);
+  // Sin almacenamiento, el de la barra igual sirve, y nada tira.
+  assert.equal(idDeLaPestana(`?ig=${ID}`, pestana({ roto: true }).almacen), ID);
+  assert.equal(idDeLaPestana("", pestana({ roto: true }).almacen), null);
+  assert.equal(idDeLaPestana(undefined, () => null), null);
+});
+
+test("sinIg saca el ig= de la dirección y deja todo lo demás como estaba", () => {
+  const casos = [
+    [`/devs?ig=${ID}`, "/devs"],
+    [`/devs?de=dm&ig=${ID}`, "/devs?de=dm"],
+    [`/devs?ig=${ID}&de=dm`, "/devs?de=dm"],
+    [`/devs?de=dm&ig=${ID}?#arriba`, "/devs?de=dm#arriba"],
+    [`/en/devs?ig=${ID}&IG=${OTRO}&ig`, "/en/devs"],
+    ["/devs?de=dm", "/devs?de=dm"],
+    ["/devs?igual=1&de=dm", "/devs?igual=1&de=dm"],
+    ["/devs", "/devs"],
+    ["/devs#ig=1", "/devs#ig=1"],
+    [undefined, ""],
+  ];
+  for (const [antes, despues] of casos) assert.equal(sinIg(antes), despues, String(antes));
 });
 
 const FORM = {
@@ -334,8 +411,11 @@ const FORM = {
 /**
  * La base de mentira para la API: anota lo que guarda y contesta lo que pide el formulario. `charla`: lo que devuelve
  * la nota en la charla (null: no hay charla con ese id; un Error: la consulta falla). `alterFalla`: el error del ALTER.
+ * `compartido`: guardarDev dice que el id ya está en la ficha de otro mail.
  */
-function baseDelFormulario({ charla = { ig_usuario: "usuario.prueba", dueno: "agente", anotada: 1 }, alterFalla = null } = {}) {
+function baseDelFormulario({
+  charla = { ig_usuario: "usuario.prueba", dueno: "agente", link_enviado: true, anotada: 1 }, alterFalla = null, compartido = false,
+} = {}) {
   const h = { insert: null, notas: [] };
   pg.otras = async (t, params) => {
     if (/^CREATE (TABLE|UNIQUE INDEX) IF NOT EXISTS/.test(t) || /^ALTER TABLE red_devs ALTER COLUMN/.test(t)) return { rows: [] };
@@ -346,7 +426,7 @@ function baseDelFormulario({ charla = { ig_usuario: "usuario.prueba", dueno: "ag
     if (/^INSERT INTO red_devs \(/.test(t)) {
       const cols = t.match(/^INSERT INTO red_devs \(([^)]*)\)/)[1].split(",").map((c) => c.trim());
       h.insert = Object.fromEntries(cols.map((c, i) => [c, params[i]]));
-      return { rows: [{ id: 1, creado: new Date() }] };
+      return { rows: [{ id: 1, creado: new Date(), ig_compartido: compartido }] };
     }
     if (/^WITH c AS \(SELECT id, ig_usuario, dueno FROM dm_contactos WHERE id = \?\)/.test(t)) {
       h.notas.push({ t, params });
@@ -377,8 +457,9 @@ test("la API guarda el id en red_devs.ig_contacto, anota el formulario en la cha
   assert.equal(h.notas.length, 1);
   assert.ok(h.notas[0].params.includes(ID));
   assert.ok(h.notas[0].params.includes(NOTA_FORMULARIO));
-  // La nota es de sistema, una sola vez, y solo si la charla existe.
-  assert.match(h.notas[0].t, /INSERT INTO dm_mensajes \(contacto, quien, texto\) SELECT c\.id, 'sistema', \?::text FROM c WHERE NOT EXISTS/);
+  assert.ok(h.notas[0].params.includes(true), "guardado y sin compartir: deja la nota");
+  // La nota es de sistema, una sola vez, solo si la charla existe y si le salió el link con ese id.
+  assert.match(h.notas[0].t, /INSERT INTO dm_mensajes \(contacto, quien, texto\) SELECT c\.id, 'sistema', \?::text FROM c, l WHERE \?::boolean AND l\.enviado AND NOT EXISTS/);
   assert.match(avisos[0], /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · ya habla con el agente/);
   assert.match(avisos[0], /<b>Guardado:<\/b> sí/);
 });
@@ -423,8 +504,43 @@ test("si la charla no está o la nota falla, el formulario anda igual y el aviso
   assert.ok(registros.some((r) => /no pude anotar el formulario en la charla/.test(r)));
 });
 
+test("un id que viene con el signo pegado se guarda limpio", async () => {
+  const h = baseDelFormulario();
+  await mandarFormulario({ ig: `${ID}?` });
+  assert.equal(h.insert.ig_contacto, ID);
+  assert.ok(h.notas[0].params.includes(ID));
+});
+
+test("link compartido: si el id ya está en la ficha de otro mail, la charla no recibe la nota y el aviso no dice que ya habla con el agente", async () => {
+  const h = baseDelFormulario({ compartido: true, charla: { ig_usuario: "usuario.prueba", dueno: "agente", link_enviado: true, anotada: 0 } });
+  const res = await mandarFormulario({ ig: ID });
+  assert.deepEqual(res.cuerpo, { ok: true, guardado: true });
+  assert.equal(h.insert.ig_contacto, ID, "el id igual queda en su ficha: el CRM lo marca como compartido");
+  assert.equal(h.notas.length, 1);
+  assert.ok(h.notas[0].params.includes(false), "mira la charla para el aviso pero no deja la nota");
+  assert.ok(!h.notas[0].params.includes(true));
+  assert.match(avisos.at(-1), /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · link compartido: ese link ya lo usó otro mail/);
+  assert.doesNotMatch(avisos.at(-1), /ya habla con el agente/);
+});
+
+test("si a esa charla nunca le salió el link con ese id, el aviso lo dice en vez de que ya habla con el agente", async () => {
+  baseDelFormulario({ charla: { ig_usuario: "usuario.prueba", dueno: "agente", link_enviado: false, anotada: 0 } });
+  await mandarFormulario({ ig: ID });
+  assert.match(avisos.at(-1), /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · a esa charla no le salió el link con este id/);
+  assert.doesNotMatch(avisos.at(-1), /ya habla con el agente/);
+});
+
+test("si el lead no se pudo guardar, la charla no recibe la nota", async () => {
+  const h = baseDelFormulario({ alterFalla: Object.assign(new Error("otra cosa"), { code: "42501" }) });
+  const res = await mandarFormulario({ ig: ID });
+  assert.deepEqual(res.cuerpo, { ok: true, guardado: false });
+  assert.equal(h.notas.length, 1);
+  assert.ok(h.notas[0].params.includes(false));
+  assert.ok(!h.notas[0].params.includes(true));
+});
+
 test("una charla de Cande o sin usuario guardado también se nombra en el aviso", async () => {
-  baseDelFormulario({ charla: { ig_usuario: null, dueno: "cande", anotada: 0 } });
+  baseDelFormulario({ charla: { ig_usuario: null, dueno: "cande", link_enviado: true, anotada: 0 } });
   await mandarFormulario({ ig: ID });
   assert.match(avisos.at(-1), /<b>Instagram:<\/b> sin usuario guardado · la charla es tuya/);
 });
@@ -436,13 +552,46 @@ test("guardarDev: un id que no vale no llega a la base aunque la API no lo hubie
   assert.equal(h.insert.ig_contacto, null);
   const consulta = pg.consultas.find((t) => t.startsWith("INSERT INTO red_devs"));
   assert.match(consulta, /ig_contacto = COALESCE\(EXCLUDED\.ig_contacto, red_devs\.ig_contacto\)/);
+  // Dice si ese id ya está en la ficha de otro mail (otra fila): la misma persona que vuelve no cuenta.
+  assert.match(consulta, /RETURNING id, creado, .*EXISTS \(SELECT 1 FROM red_devs o WHERE o\.ig_contacto = red_devs\.ig_contacto AND o\.id <> red_devs\.id\) AS ig_compartido$/);
 });
 
 test("anotarFormularioLleno devuelve la charla, o null si no hay charla con ese id", async () => {
-  baseDelFormulario({ charla: { ig_usuario: "usuario.prueba", dueno: "agente", anotada: 1 } });
-  assert.deepEqual(await anotarFormularioLleno(ID), { ig_usuario: "usuario.prueba", dueno: "agente", anotada: 1 });
+  const charla = { ig_usuario: "usuario.prueba", dueno: "agente", link_enviado: true, anotada: 1 };
+  baseDelFormulario({ charla });
+  assert.deepEqual(await anotarFormularioLleno(ID), charla);
   baseDelFormulario({ charla: null });
   assert.equal(await anotarFormularioLleno(ID), null);
+});
+
+test("la nota queda solo si a esa charla le salió el link con ese id, de la cuenta y no del lead", async () => {
+  const h = baseDelFormulario();
+  await anotarFormularioLleno(ID);
+  const [{ t, params }] = h.notas;
+  assert.match(t, /SELECT 1 FROM dm_mensajes WHERE contacto = \? AND quien IN \('agente', 'cande'\) AND texto ~ \?/);
+  assert.match(t, /SELECT c\.ig_usuario, c\.dueno, l\.enviado AS link_enviado, \(SELECT COUNT\(\*\)::int FROM n\) AS anotada FROM c, l$/);
+  // El patrón es el link con este id y no con uno que empieza igual (Postgres y JavaScript lo leen igual).
+  const patron = new RegExp(params.find((p) => typeof p === "string" && p.includes("ig=")));
+  for (const si of [`opengatehub.com/devs?ig=${ID}`, `Va: opengatehub.com/devs?de=dm&ig=${ID}.`, `devs?ig=${ID}?`, `devs?ig=${ID}🙌`]) {
+    assert.equal(patron.test(si), true, si);
+  }
+  for (const no of [`opengatehub.com/devs?ig=${ID}5`, `opengatehub.com/devs?ig=5${ID}`, `opengatehub.com/devs?big=${ID}`, `ig=${ID}`, "opengatehub.com/devs"]) {
+    assert.equal(patron.test(no), false, no);
+  }
+});
+
+test("anotar: false mira la charla sin dejar la nota, y un id que no vale no llega a la base", async () => {
+  let h = baseDelFormulario();
+  await anotarFormularioLleno(ID, { anotar: false });
+  assert.ok(h.notas[0].params.includes(false));
+  assert.ok(!h.notas[0].params.includes(true));
+  // Cualquier cosa que no sea true no anota.
+  h = baseDelFormulario();
+  await anotarFormularioLleno(ID, { anotar: "si" });
+  assert.ok(!h.notas[0].params.includes(true));
+  h = baseDelFormulario();
+  for (const malo of ["abc", "12", `${ID}' OR 1=1`, null, 1234567890]) assert.equal(await anotarFormularioLleno(malo), null, String(malo));
+  assert.equal(h.notas.length, 0);
 });
 
 /* ---------- 4. el CRM ---------- */
@@ -464,7 +613,7 @@ test("el CRM trae ig_contacto por to_jsonb (no falla sin la columna) y cruza con
   const { sql, consultas } = sqlDe(() => ({ rows: filas }));
   const r = await leerDevs(sql);
   assert.equal(r.cruce, true);
-  assert.deepEqual(r.devs, filas);
+  assert.deepEqual(r.devs, filas.map((d) => ({ ...d, ig_compartido: false })));
   assert.equal(consultas.length, 1);
   assert.match(consultas[0], /to_jsonb\(r\) ->> 'ig_contacto' AS ig_contacto, c\.ig_usuario, c\.dueno AS ig_dueno/);
   assert.match(consultas[0], /FROM red_devs r LEFT JOIN dm_contactos c ON c\.id = to_jsonb\(r\) ->> 'ig_contacto'/);
@@ -486,12 +635,30 @@ test("si el cruce con las charlas falla, los devs salen igual y la charla de cad
   assert.equal(r.cruce, false);
   assert.equal(consultas.length, 2);
   assert.match(consultas[1], /to_jsonb\(r\) ->> 'ig_contacto' AS ig_contacto FROM red_devs r ORDER BY creado DESC/);
-  assert.deepEqual(r.devs.map((d) => [d.id, d.ig_contacto, d.ig_usuario, d.ig_dueno]), [
-    [1, ID, "usuario.prueba", "agente"],
-    [2, "5555555555", null, null],
-    [3, null, null, null],
+  assert.deepEqual(r.devs.map((d) => [d.id, d.ig_contacto, d.ig_usuario, d.ig_dueno, d.ig_compartido]), [
+    [1, ID, "usuario.prueba", "agente", false],
+    [2, "5555555555", null, null, false],
+    [3, null, null, null, false],
   ]);
   assert.ok(registros.some((x) => /no pude cruzar los devs con las charlas de Instagram/.test(x)));
+});
+
+test("link compartido: el mismo id en la ficha de dos mails queda marcado en las dos, con o sin el cruce", async () => {
+  const filas = [
+    dev(1, { ig_contacto: ID, ig_usuario: "usuario.prueba", ig_dueno: "agente" }),
+    dev(2, { ig_contacto: ID, ig_usuario: "usuario.prueba", ig_dueno: "agente" }),
+    dev(3, { ig_contacto: OTRO, ig_usuario: "otro.usuario", ig_dueno: "agente" }),
+    dev(4, { ig_contacto: null, ig_usuario: null, ig_dueno: null }),
+    dev(5, { ig_contacto: null, ig_usuario: null, ig_dueno: null }),
+  ];
+  const conCruce = await leerDevs(sqlDe(() => ({ rows: filas })).sql);
+  assert.deepEqual(conCruce.devs.map((d) => [d.id, d.ig_compartido]), [[1, true], [2, true], [3, false], [4, false], [5, false]]);
+  const sinCruce = await leerDevs(sqlDe((t) => {
+    if (/LEFT JOIN/.test(t)) throw new Error("sin dm_contactos");
+    return { rows: filas.map(({ ig_usuario, ig_dueno, ...d }) => d) };
+  }).sql);
+  assert.deepEqual(sinCruce.devs.map((d) => [d.id, d.ig_compartido]), [[1, true], [2, true], [3, false], [4, false], [5, false]]);
+  assert.deepEqual(marcarCompartidos([]), []);
 });
 
 test("si tampoco se pueden leer los devs, tira: crm_sync no escribe nada y queda el archivo de antes", async () => {

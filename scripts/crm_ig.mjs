@@ -7,6 +7,11 @@
  * red_devs.ig_contacto. Acá se cruza con dm_contactos: el usuario de Instagram (ig_usuario) y de quién es la
  * charla (ig_dueno: agente o cande).
  *
+ * ig_compartido: el mismo id de charla está en la ficha de más de un mail. El id viaja en claro en el link, y un
+ * lead lo puede reenviar a un amigo: esas fichas no son "ya habla con el agente" aunque ig_dueno diga agente (no
+ * se sabe cuál de ellas es la persona de la charla), y a esa gente sí hay que escribirle. /api/devs-red tampoco le
+ * deja la nota del formulario a la charla en ese caso.
+ *
  * Dos cuidados, los mismos que con el WhatsApp de los founders en crm_sync.mjs:
  *   - ig_contacto se lee por to_jsonb: la columna la crea /api/devs-red recién con el primer formulario después
  *     del deploy, y pedirla de nombre antes de eso hacía fallar la consulta entera.
@@ -15,7 +20,7 @@
  *     Si falla la lectura de red_devs, tira: crm_sync no escribe nada y queda el archivo de antes.
  */
 
-/** Los devs con ig_contacto, ig_usuario e ig_dueno. `anterior`: los leads del último crm_devs.json. */
+/** Los devs con ig_contacto, ig_usuario, ig_dueno e ig_compartido. `anterior`: los leads del último crm_devs.json. */
 export async function leerDevs(sql, { anterior = [] } = {}) {
   try {
     const { rows } = await sql`
@@ -25,7 +30,7 @@ export async function leerDevs(sql, { anterior = [] } = {}) {
              to_jsonb(r) ->> 'ig_contacto' AS ig_contacto, c.ig_usuario, c.dueno AS ig_dueno
       FROM red_devs r LEFT JOIN dm_contactos c ON c.id = to_jsonb(r) ->> 'ig_contacto'
       ORDER BY r.creado DESC`;
-    return { devs: rows, cruce: true };
+    return { devs: marcarCompartidos(rows), cruce: true };
   } catch (e) {
     console.error("crm_sync: no pude cruzar los devs con las charlas de Instagram:", e.message);
   }
@@ -34,7 +39,14 @@ export async function leerDevs(sql, { anterior = [] } = {}) {
            cuando_arrancas, dedicacion, ingles, whatsapp, telegram, origen,
            cv_url, estado, creado, to_jsonb(r) ->> 'ig_contacto' AS ig_contacto
     FROM red_devs r ORDER BY creado DESC`;
-  return { devs: conCharlaAnterior(rows, anterior), cruce: false };
+  return { devs: marcarCompartidos(conCharlaAnterior(rows, anterior)), cruce: false };
+}
+
+/** A cada dev, ig_compartido: si su ig_contacto está también en la ficha de otro (otro mail). */
+export function marcarCompartidos(devs) {
+  const cuantos = new Map();
+  for (const d of devs) if (d.ig_contacto) cuantos.set(d.ig_contacto, (cuantos.get(d.ig_contacto) || 0) + 1);
+  return devs.map((d) => ({ ...d, ig_compartido: Boolean(d.ig_contacto) && cuantos.get(d.ig_contacto) > 1 }));
 }
 
 /**

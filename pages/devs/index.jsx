@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { evento } from "../../lib/embudo";
-import { idDeCharla } from "../../lib/dm/linkFormulario";
+import { idDeLaPestana, sinIg } from "../../lib/dm/linkFormulario";
 import { normalizarOrigen } from "../../lib/origenForm";
 
 // Red de devs de OpenGateHub — versión corta en PASOS.
@@ -113,6 +113,23 @@ export default function RedDeDevs() {
   // lib/dm/linkFormulario.js): viaja con el formulario para que el CRM sepa de qué charla vino.
   // Solo un id con el formato de verdad; cualquier otra cosa se ignora y el formulario sigue igual.
   const [ig, setIg] = useState(null);
+  // Se lee una vez, queda en esta pestaña (si recarga, sigue) y se saca de la barra: quien copia la
+  // dirección para pasársela a alguien no le pasa también su charla. Recién con el router listo: hasta
+  // ahí Next vuelve a escribir la dirección con lo que traía y taparía el cambio. Se cambia sin navegar
+  // (con router.replace aparecería el cartel de cargando de _app.js) y el estado de Next queda igual
+  // de limpio, así volver atrás tampoco trae el id de vuelta.
+  React.useEffect(() => {
+    if (!router.isReady) return;
+    try {
+      setIg(idDeLaPestana(window.location.search, () => window.sessionStorage));
+      const ahora = window.location.pathname + window.location.search + window.location.hash;
+      const limpia = sinIg(ahora);
+      if (limpia !== ahora) {
+        const st = window.history.state;
+        window.history.replaceState(st?.__N ? { ...st, url: sinIg(st.url), as: sinIg(st.as) } : st, "", limpia);
+      }
+    } catch (e) { /* la charla es un dato de más: nunca rompe la pagina */ }
+  }, [router.isReady]);
   // Ademas de form_visto, si el link trae ?de= manda form_visto_<de>, para saber que puerta
   // trajo a la persona (el DM de ManyChat por comentario, por mensaje, la bienvenida, la bio).
   // Se manda APARTE y no en lugar de form_visto: asi las cuentas de siempre no cambian.
@@ -120,9 +137,7 @@ export default function RedDeDevs() {
   React.useEffect(() => {
     evento("form_visto");
     try {
-      const params = new URLSearchParams(window.location.search);
-      setIg(idDeCharla(params.get("ig")));
-      const de = normalizarOrigen(params.get("de"));
+      const de = normalizarOrigen(new URLSearchParams(window.location.search).get("de"));
       if (de) evento("form_visto_" + de);
     } catch (e) { /* medir nunca rompe la pagina */ }
   }, []);

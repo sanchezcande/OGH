@@ -35,9 +35,9 @@ async function main() {
   await cargarEnv();
   const { sql } = await import("@vercel/postgres");
 
-  // Con la charla de Instagram de la que vino cada uno (ig_contacto, ig_usuario, ig_dueno): así Cande ve
-  // quién ya habla con el agente antes de llamarlo por WhatsApp. Ver crm_ig.mjs: si el cruce falla, los
-  // devs salen igual y lo de la charla queda como estaba en el archivo anterior.
+  // Con la charla de Instagram de la que vino cada uno (ig_contacto, ig_usuario, ig_dueno, ig_compartido):
+  // así Cande ve quién ya habla con el agente antes de llamarlo por WhatsApp. Ver crm_ig.mjs: si el cruce
+  // falla, los devs salen igual y lo de la charla queda como estaba en el archivo anterior.
   const anterior = await readFile(join(TRACKER, "crm_devs.json"), "utf8")
     .then((t) => JSON.parse(t).leads || [])
     .catch(() => []);
