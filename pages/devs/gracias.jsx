@@ -38,18 +38,21 @@ function versionDelVisitante() {
 const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
 // Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
 // que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, apretá
-// acá" (Cande, 19/10: "no pagá en pesos"), para todos (así lo ven también los que entran por un link que les pasó Cande), y al tocarlo
-// se abre un cartelito: el link de MercadoPago y que le pase la captura por Instagram para el código.
-const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "https://mpago.li/1Ac31E4";
-const PRECIO_PESOS = process.env.NEXT_PUBLIC_DEVS_PRECIO_PESOS || "39.750";
-const IG_CANDE = "https://ig.me/m/candelaria.sanchezg";
+// acá" (Cande, 19/10: "no pagá en pesos"), para todos (así lo ven también los que entran por un link que
+// les pasó Cande).
+//
+// 19/10, de noche: antes esto abría un cartelito con tres pasos (pagás, mandás el comprobante por
+// Instagram, ella te pasa el código). Esos pasos ya no existen: `/api/pagar-pesos` arma el checkout y el
+// código sale solo cuando MercadoPago confirma el pago, así que el botón va DERECHO a MercadoPago.
+// Cande: "debería solamente decir si sos de argentina apretá acá y ya abrir directo mercadopago".
+// El precio y la garantía los muestra el checkout, no hace falta repetirlos en un cartel.
+const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "/api/pagar-pesos";
 
 export default function Gracias() {
   const [termino, setTermino] = useState(false);
   // El sorteo pasa en el navegador, no en el render del servidor: si no, Next devuelve la misma
   // versión cacheada a todo el mundo y la prueba no reparte.
   const [ver, setVer] = useState("a");
-  const [cartel, setCartel] = useState(false);   // el cartelito del pago en pesos
   const WISTIA_ID = ver === "b" ? WISTIA_B : WISTIA_A;   // lo usa el <wistia-player> de abajo
 
   useEffect(() => {
@@ -95,14 +98,6 @@ export default function Gracias() {
     return () => clearInterval(reloj);
   }, []);
 
-  // El cartelito se cierra también con Escape.
-  useEffect(() => {
-    if (!cartel) return undefined;
-    const tecla = (e) => { if (e.key === "Escape") setCartel(false); };
-    window.addEventListener("keydown", tecla);
-    return () => window.removeEventListener("keydown", tecla);
-  }, [cartel]);
-
   return (
     <>
       <Head>
@@ -136,38 +131,14 @@ export default function Gracias() {
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>
               {MERCADOPAGO && (
-                <PesosBoton type="button" onClick={() => setCartel(true)}>
+                <PesosBoton
+                  href={MERCADOPAGO}
+                  onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
+                >
                   Si sos de Argentina, apretá acá
                 </PesosBoton>
               )}
             </Cierre>
-          )}
-
-          {cartel && (
-            <Velo onClick={() => setCartel(false)}>
-              <Cartel role="dialog" aria-modal="true" aria-labelledby="cartel-titulo" onClick={(e) => e.stopPropagation()}>
-                <Cerrar type="button" aria-label="Cerrar" onClick={() => setCartel(false)}>×</Cerrar>
-                {/* Con la estética de la página y un mensaje que empuje a entrar (Cande, 19/10). */}
-                <CartelKicker>Para Argentina</CartelKicker>
-                <CartelTitulo id="cartel-titulo">Pagalo en pesos y entrás hoy</CartelTitulo>
-                <CartelPrecio>${PRECIO_PESOS}</CartelPrecio>
-                <CartelTexto>Todo lo del video: dónde buscar, el CV comentado línea por línea y las preguntas que hago en cada entrevista.</CartelTexto>
-                <Pasos>
-                  <li>Usás un link de MercadoPago</li>
-                  <li>Me mandás el comprobante por <a href={IG_CANDE} target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                  <li>Te paso tu código y entrás</li>
-                </Pasos>
-                <PagarPesos
-                  href={MERCADOPAGO}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
-                >
-                  🔥 SÍ, LO QUIERO YA!
-                </PagarPesos>
-                <CartelChico>Garantía de 30 días: si no te sirve, te devuelvo la plata.</CartelChico>
-              </Cartel>
-            </Velo>
           )}
 
         </Caja>
@@ -207,63 +178,13 @@ const Cierre = styled.div`
   @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { animation: none; }
 `;
-const PesosBoton = styled.button`
+const PesosBoton = styled.a`
   display: block; margin: 16px auto 0; background: none; border: 0; cursor: pointer;
   font: inherit; font-size: 15px; font-weight: 600; color: #c9bcc2; text-decoration: underline;
   text-underline-offset: 3px;
+  &:visited { color: #c9bcc2; }
   &:hover { color: #f5f0f2; }
   &:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
-`;
-const SERIA = `"Helvetica Neue", Helvetica, Arial, sans-serif`;
-const Velo = styled.div`
-  position: fixed; inset: 0; z-index: 50; background: rgba(10,8,10,.72);
-  display: flex; align-items: center; justify-content: center; padding: 20px;
-`;
-const Cartel = styled.div`
-  position: relative; width: 100%; max-width: 420px; background: #131013; color: #f5f0f2;
-  border: 1px solid rgba(204,90,80,.35); border-radius: 16px; padding: 30px 26px 24px; text-align: center;
-  box-shadow: 0 24px 60px rgba(0,0,0,.55);
-  /* Todo con la letra seria, el título en negrita como los pasos (Cande, 19/10: la serif y la de la página en el título quedaban raras). */
-  font-family: ${SERIA};
-`;
-const CartelKicker = styled.p`
-  display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: #6fcf9f; background: rgba(46,125,91,.18);
-  border-radius: 999px; padding: 6px 14px; margin: 0 0 16px;
-`;
-const CartelPrecio = styled.p`
-  margin: 0 0 8px; font-size: 20px; font-weight: 700;
-`;
-const Pasos = styled.ol`
-  list-style: none; counter-reset: paso; text-align: left; margin: 18px auto 22px; padding: 0; max-width: 300px;
-  li { counter-increment: paso; position: relative; padding: 0 0 0 38px; margin: 0 0 12px; font-size: 15.5px; line-height: 1.4; color: #f5f0f2; font-weight: 600; }
-  li::before {
-    content: counter(paso); position: absolute; left: 0; top: -2px; width: 26px; height: 26px; border-radius: 50%;
-    background: #cc5a50; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
-  }
-  a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; text-underline-offset: 3px; }
-`;
-const CartelChico = styled.p` margin: 14px 0 0; font-size: 13px; color: #a99ba1; `;
-const Cerrar = styled.button`
-  position: absolute; top: 8px; right: 12px; background: none; border: 0; cursor: pointer;
-  color: #a99ba1; font-size: 26px; line-height: 1; padding: 4px;
-  &:hover { color: #f5f0f2; }
-`;
-const CartelTitulo = styled.p` margin: 0 0 10px; font-size: 22px; line-height: 1.25; font-weight: 700; text-wrap: balance; `;
-const CartelTexto = styled.p`
-  margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: #c9bcc2;
-  a, a:visited, a:hover { color: #f5f0f2; text-decoration: underline; }
-`;
-const PagarPesos = styled.a`
-  /* El mismo botón que el de compra: un solo estilo de acción en toda la página. */
-  display: inline-block; background: #cc5a50; color: #fff; text-decoration: none;
-  font-size: 17px; font-weight: 700; letter-spacing: .03em; padding: 15px 30px; border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(204,90,80,.32);
-  transition: transform .16s ease, background .16s ease;
-  &:hover, &:focus, &:active, &:visited { color: #fff; }
-  &:hover { background: #b84a41; transform: translateY(-2px); }
-  &:active { transform: translateY(0); }
-  &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 `;
 const Pendiente = styled.p`
   margin: 12px 0 0; font-size: 13px; color: #8a7f84;
