@@ -1,12 +1,19 @@
 // Doble de "@vercel/postgres": tablas en memoria que entienden las consultas del goteo
 // (ALTER, el SELECT de pendientes de un toque y el UPDATE que lo anota).
 // Cualquier otra consulta revienta, así una prueba no pasa por casualidad.
+//
+// `otras`: una prueba puede atender sus propias consultas (tests/dmFormIg.test.mjs, el formulario de /devs).
+// Recibe el texto con los espacios juntados y los parámetros; devuelve el resultado, o undefined si no es
+// suya y la consulta sigue como siempre (reventando si nadie la conoce). Va primero: así una prueba también
+// puede hacer fallar un ALTER.
 export const base = {
   tablas: {},
   consultas: [],
+  otras: null,
   reiniciar(tablas = {}) {
     this.tablas = tablas;
     this.consultas = [];
+    this.otras = null;
   },
 };
 
@@ -17,6 +24,10 @@ export const hace = (dias) => new Date(AHORA - dias * 86400000);
 async function query(texto, params = []) {
   const t = texto.replace(/\s+/g, " ").trim();
   base.consultas.push(t);
+  if (base.otras) {
+    const r = await base.otras(t, params);
+    if (r !== undefined) return r;
+  }
   if (/^ALTER TABLE \w+ ADD COLUMN IF NOT EXISTS /.test(t) || /^SELECT 1 FROM \w+ LIMIT 1$/.test(t)) {
     return { rows: [] };
   }

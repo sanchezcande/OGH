@@ -8,7 +8,7 @@ register("./hooks.mjs", import.meta.url);
 process.env.RESEND_API_KEY = "clave-de-prueba";
 process.env.TELEGRAM_BOT_TOKEN = "token-de-prueba";
 process.env.TELEGRAM_CHAT_ID = "1";
-for (const k of ["CRON_SECRET", "POSTGRES_URL", "DEVS_MAIL_FROM", "DEVS_MAIL_REPLYTO", "PREGUNTAS_MAIL_REPLYTO"]) {
+for (const k of ["CRON_SECRET", "IG_LINK_SECRET", "POSTGRES_URL", "DEVS_MAIL_FROM", "DEVS_MAIL_REPLYTO", "PREGUNTAS_MAIL_REPLYTO"]) {
   delete process.env[k];
 }
 
