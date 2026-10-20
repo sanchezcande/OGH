@@ -28,6 +28,8 @@
 //                                                  la cuenta ya le escribió después del último mensaje del lead, si el agente
 //                                                  está por contestar o si no tiene la marca sin usar. Se pregunta justo
 //                                                  antes de copiar: el lead pudo escribir y el agente contestarle. No cambia nada
+//   { accion: "link_formulario", contactos: [id, ...] } → el link del formulario de /devs con el id de cada charla y
+//                                                  su firma, como lo manda el agente: para lo que Cande pega a mano
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
@@ -79,6 +81,8 @@ import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerE
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
 import { CLAVE_PATRONES, validarPatrones } from "../../../lib/dm/controlador";
 import { frenoDelCodigo } from "../../../lib/dm/frenos";
+import { firmarIg } from "../../../lib/dm/firmaIg";
+import { conIdDeCharla, idDeCharla } from "../../../lib/dm/linkFormulario";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
 // Quién puede figurar en una charla cargada a mano. "agente" no: lo que mandó el agente lo anota él.
@@ -270,6 +274,16 @@ export default async function handler(req, res) {
     const textos = (Array.isArray(b.textos) ? b.textos : []).map((t) => String(t || "").trim()).filter(Boolean);
     if (!id || !textos.length || textos.length > 10) return res.status(400).json({ error: "falta contacto o textos (de 1 a 10)" });
     return res.status(200).json({ ok: true, sacados: await desanotar(id, textos) });
+  }
+
+  if (b.accion === "link_formulario") {
+    // Cande contesta a mano charlas viejas (más de 24 h) pegando un texto armado. Si ese texto trae el formulario,
+    // tiene que ir con el id de la charla y su firma, igual que el del agente: así, cuando lo llene, el sitio le
+    // anota la charla (anotarFormularioLleno mira lo que salió de la cuenta con ese id) y el agente sigue desde ahí.
+    const ids = (Array.isArray(b.contactos) ? b.contactos : []).map(idDeCharla).filter(Boolean);
+    if (!ids.length || ids.length > 300) return res.status(400).json({ error: "faltan contactos (de 1 a 300, solo dígitos)" });
+    const links = Object.fromEntries(ids.map((c) => [c, conIdDeCharla("opengatehub.com/devs", c, { firma: firmarIg(c) })]));
+    return res.status(200).json({ ok: true, links });
   }
 
   if (b.accion === "borrar") {

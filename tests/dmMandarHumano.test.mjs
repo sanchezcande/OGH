@@ -66,3 +66,15 @@ test("desanotar saca solo mensajes de Cande de las últimas 24 h con ese texto e
   const src = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
   assert.match(src, /b\.accion === "desanotar"[\s\S]{0,400}textos\.length > 10/);
 });
+
+test("link_formulario arma el link de /devs con el id de la charla y su firma, como el del agente", async () => {
+  const src = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
+  const i = src.indexOf('b.accion === "link_formulario"');
+  assert.ok(i > -1);
+  const cuerpo = src.slice(i, i + 900);
+  assert.match(cuerpo, /map\(idDeCharla\)/);
+  assert.match(cuerpo, /ids\.length > 300/);
+  assert.match(cuerpo, /conIdDeCharla\("opengatehub\.com\/devs", c, \{ firma: firmarIg\(c\) \}\)/);
+  const { conIdDeCharla } = await import("../lib/dm/linkFormulario.js");
+  assert.equal(conIdDeCharla("opengatehub.com/devs", "12345", { firma: "abcdefghij" }), "opengatehub.com/devs?ig=12345&f=abcdefghij");
+});
