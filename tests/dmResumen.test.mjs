@@ -16,8 +16,8 @@ import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const { franjaDeResumen, etiquetaDe, agrupar, armarRenglones, crearResumen, TOPE_CHARLAS } = await import("../lib/dm/resumen.js");
-const { leerRespuesta, crearRespuestaTelegram, etiquetaDeResumen, contactoDeAviso, AYUDA_RESUMEN } = await import("../lib/dm/respuestas.js");
+const { franjaDeResumen, etiquetaDe, agrupar, armarPartes, corteDe, crearResumen, TOPE_TEXTO, TOPE_PARTES, TOPE_FILAS } = await import("../lib/dm/resumen.js");
+const { leerRespuesta, crearRespuestaTelegram, etiquetaDeResumen, contactoDeAviso, porNumero, AYUDA_RESUMEN } = await import("../lib/dm/respuestas.js");
 const { avisar } = await import("../lib/notificar.js");
 const { crearAvisoDm } = await import("../lib/dm/armado.js");
 
@@ -83,15 +83,83 @@ test("las notas van por charla, sin repetir, con su número, cuánto queda para 
   ];
   const charlas = agrupar(filas);
   assert.deepEqual(charlas.map((c) => [c.contacto, c.notas]), [["11", ["preguntó algo de prueba", "otra cosa de prueba"]], ["22", ["ofrece algo de prueba"]]]);
-  const { renglones, mapa, afuera } = armarRenglones(charlas, { ahora: AHORA, links: { 11: "https://ig.me/m/usuario_de_prueba" } });
-  assert.deepEqual(mapa, { 1: "11", 2: "22" });
+  const { partes, afuera } = armarPartes(charlas, { ahora: AHORA, links: { 11: "https://ig.me/m/usuario_de_prueba" } });
+  assert.equal(partes.length, 1);
+  assert.deepEqual(partes[0].numeros, { 1: "11", 2: "22" });
   assert.equal(afuera, 0);
-  assert.equal(renglones[0], "1. Lead uno: preguntó algo de prueba / otra cosa de prueba (quedan 21 h para escribirle por acá) https://ig.me/m/usuario_de_prueba");
-  assert.equal(renglones[1], "2. Lead dos: ofrece algo de prueba (pasó el día: escribile desde la app)");
-  const muchas = Array.from({ length: TOPE_CHARLAS + 5 }, (_, i) => ({ contacto: String(100 + i), nombre: `Lead ${i}`, notas: ["nota de prueba"], ultimo_lead: AHORA }));
-  const tope = armarRenglones(muchas, { ahora: AHORA });
-  assert.equal(tope.renglones.length, TOPE_CHARLAS);
-  assert.equal(tope.afuera, 5);
+  assert.equal(partes[0].renglones[0], "1. Lead uno: preguntó algo de prueba / otra cosa de prueba (quedan 21 h para escribirle por acá) https://ig.me/m/usuario_de_prueba");
+  assert.equal(partes[0].renglones[1], "2. Lead dos: ofrece algo de prueba (pasó el día: escribile desde la app)");
+});
+
+test("una nota sin el prefijo exacto también va: Nota:, nota: o sin nada", () => {
+  const charlas = agrupar([
+    { contacto: "11", nombre: "Lead uno", aviso: "Nota: algo de prueba" },
+    { contacto: "22", nombre: "Lead dos", aviso: "nota - otra cosa de prueba" },
+    { contacto: "33", nombre: "Lead tres", aviso: "Ojo: una más de prueba" },
+  ]);
+  assert.deepEqual(charlas.map((c) => c.notas[0]), ["algo de prueba", "otra cosa de prueba", "Ojo: una más de prueba"]);
+});
+
+test("muchas charlas van en varios mensajes, con la numeración seguida: ninguna queda afuera", () => {
+  const muchas = Array.from({ length: 30 }, (_, i) => ({
+    contacto: String(100 + i), nombre: `Lead de prueba ${i}`, notas: ["x".repeat(220)], ultimo_lead: AHORA,
+    primera: new Date(AHORA - (40 - i) * 60000),
+  }));
+  const { partes, afuera } = armarPartes(muchas, { ahora: AHORA, links: Object.fromEntries(muchas.map((c) => [c.contacto, "https://ig.me/m/usuario_de_prueba"])) });
+  assert.equal(afuera, 0);
+  assert.ok(partes.length > 1);
+  const numeros = Object.assign({}, ...partes.map((p) => p.numeros));
+  assert.deepEqual(Object.keys(numeros).map(Number), Array.from({ length: 30 }, (_, i) => i + 1));
+  assert.deepEqual(Object.values(numeros), muchas.map((c) => c.contacto));
+  for (const p of partes) assert.ok(p.renglones.join("\n").length <= TOPE_TEXTO);
+  // Más de lo que entra en TOPE_PARTES mensajes: lo que sobra queda afuera y el corte se queda antes de su primera nota.
+  const demasiadas = Array.from({ length: TOPE_PARTES * 20 }, (_, i) => ({ ...muchas[0], contacto: String(1000 + i), primera: new Date(AHORA - 1000 * 60000 + i * 60000) }));
+  const r = armarPartes(demasiadas, { ahora: AHORA });
+  assert.equal(r.partes.length, TOPE_PARTES);
+  assert.ok(r.afuera > 0);
+  const salieron = new Set(r.partes.flatMap((p) => Object.values(p.numeros)));
+  const quedaron = demasiadas.filter((c) => !salieron.has(c.contacto));
+  assert.equal(corteDe({ ahora: AHORA, quedaron }).getTime(), quedaron[0].primera.getTime() - 1);
+  assert.equal(corteDe({ ahora: AHORA }).getTime(), AHORA.getTime());
+  assert.equal(corteDe({ ahora: AHORA, ultimaLeida: "2026-10-20T09:00:00Z" }).toISOString(), "2026-10-20T09:00:00.000Z");
+});
+
+test("con 30 charlas el resumen sale en varios mensajes y ninguna nota se pierde; si uno no sale, lo que faltó vuelve en el siguiente", async () => {
+  const notas = Array.from({ length: 30 }, (_, i) => ({
+    contacto: String(100 + i), nombre: `Lead de prueba ${i}`, ig_usuario: "usuario_de_prueba", aviso: `NOTA: ${"y".repeat(200)} ${i}`,
+    ultimo_lead: new Date("2026-10-20T09:00:00Z"), creado: new Date(Date.parse("2026-10-20T02:00:00Z") + i * 60000).toISOString(),
+  }));
+  const base = baseDeResumen({ notas });
+  const mandados = [];
+  const mandar = crearResumen({ base, avisar: async (titulo, campos) => { mandados.push({ titulo, campos }); return true; }, reloj: () => AHORA });
+  assert.deepEqual(await mandar(), { hecho: "enviado", charlas: 30 });
+  assert.ok(mandados.length > 1);
+  assert.match(mandados[0].titulo, /^DM: notas del agente · 20\/10 18 h \(1\/\d\)$/);
+  assert.equal(etiquetaDeResumen(`🔔 ${mandados[1].titulo}\n\nNotas: algo`), "20/10 18 h", "cada mensaje se puede responder");
+  assert.equal(mandados.filter((x) => x.campos.Contestar).length, 1, "la ayuda para contestar va en el último");
+  assert.equal(Object.keys(base.listas["20/10 18 h"]).length, 30);
+  assert.equal(base.resumen.hasta, AHORA.toISOString());
+  // El segundo mensaje no sale: el corte queda antes de la primera nota de lo que no salió.
+  const otra = baseDeResumen({ notas });
+  let n = 0;
+  const corta = crearResumen({ base: otra, avisar: async () => ++n === 1, reloj: () => AHORA });
+  const r = await corta();
+  assert.equal(r.hecho, "enviado");
+  assert.ok(r.charlas > 0 && r.charlas < 30);
+  const primeraQueFalto = notas[r.charlas];
+  assert.equal(otra.resumen.hasta, new Date(Date.parse(primeraQueFalto.creado) - 1).toISOString());
+  assert.equal(Object.keys(otra.listas["20/10 18 h"]).length, r.charlas);
+});
+
+test("si la consulta de notas llega a su tope, el corte queda en la última leída", async () => {
+  const notas = Array.from({ length: TOPE_FILAS }, (_, i) => ({
+    contacto: String(100 + (i % 3)), nombre: "Lead de prueba", aviso: "NOTA: algo de prueba", ultimo_lead: null,
+    creado: new Date(Date.parse("2026-10-20T02:00:00Z") + i * 1000).toISOString(),
+  }));
+  const base = baseDeResumen({ notas });
+  const mandar = crearResumen({ base, avisar: async () => true, reloj: () => AHORA });
+  assert.equal((await mandar()).hecho, "enviado");
+  assert.equal(base.resumen.hasta, new Date(notas.at(-1).creado).toISOString());
 });
 
 test("el resumen sale una sola vez por franja, sin sonido, y guarda qué charla es cada número", async () => {
@@ -174,6 +242,38 @@ test("respondiendo el resumen con el número, es como responder el aviso de esa 
   assert.deepEqual(leer("2: decile algo", { bot: false }), { ayuda: "Para contestarle a alguien, respondé (deslizá) el aviso de su charla." });
   // Un nombre de lead no puede hacerse pasar por el título: cuenta solo el primer renglón.
   assert.equal(etiquetaDeResumen("🔔 DM: aviso de prueba\n\n🔔 DM: notas del agente · 20/10 18 h"), null);
+});
+
+test("varias respuestas en un mensaje, una por renglón: cada una va a su charla", async () => {
+  assert.deepEqual(porNumero("1: decile algo de prueba\n2: --"), [{ numero: 1, texto: "decile algo de prueba" }, { numero: 2, texto: "--" }]);
+  assert.deepEqual(porNumero("2: decile algo\nque siga en otro renglón"), [{ numero: 2, texto: "decile algo\nque siga en otro renglón" }]);
+  assert.deepEqual(porNumero("2:\ndecile algo de prueba"), [{ numero: 2, texto: "decile algo de prueba" }]);
+  assert.equal(porNumero("decile algo\n2: otra"), null);
+  assert.deepEqual(porNumero("2: algo\n2: otra"), { repetido: 2 });
+  const leer = (texto) => leerRespuesta(novedad(texto, AVISO_RESUMEN), { duena: "42" });
+  const r = leer("1: decile que sirve de prueba\n2: decile que no de prueba\n3: --");
+  assert.deepEqual(r.varias.map((x) => [x.numero, x.accion, x.texto ?? null]), [
+    [1, "indicacion", "decile que sirve de prueba"], [2, "indicacion", "decile que no de prueba"], [3, "cande", null],
+  ]);
+  assert.match(leer("2: algo\n2: otra").ayuda, /dos veces/);
+  assert.match(leer("1: algo de prueba\n2: /textual").ayuda, /^El 2: .*No mandé nada\.$/);
+  const base = {
+    reclamarNovedad: async () => true,
+    numeroDeResumen: async (e, n) => ({ 1: "11", 2: "22", 3: "33" })[n] ?? null,
+    contacto: async (id) => ({ id, nombre: `Lead ${id}`, dueno: "agente" }),
+    ponerDueno: async (id, d) => { duenos.push([id, d]); },
+    descartarPendientes: async () => {},
+  };
+  const duenos = [];
+  const pedidos = [];
+  const dichos = [];
+  const agente = { procesar: async (id, _, op) => { pedidos.push([id, op.indicacion]); return { hecho: "enviada", enviado: ["Mensaje de prueba"] }; } };
+  const manychat = { ponerCampo: async () => ({ ok: true }) };
+  const responder = crearRespuestaTelegram({ base, manychat, decir: async (t) => { dichos.push(t); }, agente });
+  assert.equal(await responder(r, { updateId: 9 }), "indicacion enviada, indicacion enviada, cande");
+  assert.deepEqual(pedidos, [["11", "decile que sirve de prueba"], ["22", "decile que no de prueba"]]);
+  assert.deepEqual(duenos, [["33", "cande"]]);
+  assert.equal(dichos.length, 3);
 });
 
 test("el número del resumen se busca en la lista guardada: a esa charla le escribe el agente", async () => {
