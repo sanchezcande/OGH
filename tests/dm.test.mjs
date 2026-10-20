@@ -1744,6 +1744,33 @@ test("la entrada lee el cuerpo crudo del pedido y rescata el JSON roto de ManyCh
   }
 });
 
+test("la entrada acepta el cuerpo de Full Contact Data de ManyChat, con saltos de línea y comillas", async () => {
+  const { default: handler } = await import("../pages/api/dm/entrada.js");
+  const { avisos } = await import("./dobles/preparar.mjs");
+  process.env.DM_SECRETO = "secreto-de-prueba";
+  process.env.POSTGRES_URL = "postgres://de-prueba";
+  try {
+    const llega = async (obj) => {
+      async function* trozos() { yield Buffer.from(JSON.stringify(obj)); }
+      const req = Object.assign(trozos(), { method: "POST", headers: { "x-dm-secreto": "secreto-de-prueba" } });
+      const res = respuesta();
+      await handler(req, res);
+      return res;
+    };
+    // Sin id no pasa.
+    assert.deepEqual((await llega({ name: "x", last_input_text: "hola" })).cuerpo, { error: "falta contacto" });
+    // Con id, nombre y un texto con salto de línea y comillas pasa la lectura (falla recién en el doble de la base,
+    // y el aviso trae el nombre y el id leídos de "name" e "id").
+    const antes = avisos.length;
+    const res = await llega({ id: "88", name: "Lead de prueba dos", last_input_text: 'uno\n"dos"', ig_username: "x" });
+    assert.equal(res.codigo, 200);
+    assert.match(avisos.slice(antes).join("\n"), /Lead de prueba dos \(88\)/);
+  } finally {
+    delete process.env.DM_SECRETO;
+    delete process.env.POSTGRES_URL;
+  }
+});
+
 test("el cuerpo crudo se lee entero y tiene tope", async () => {
   async function* trozos(lista) { for (const t of lista) yield Buffer.from(t); }
   assert.equal(await leerCrudo(trozos(['{"contacto":"77",', '"texto":"hola"}'])), '{"contacto":"77","texto":"hola"}');

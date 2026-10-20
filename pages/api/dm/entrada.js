@@ -48,12 +48,16 @@ export default async function handler(req, res) {
   } catch {
     return res.status(400).json({ error: "cuerpo ilegible" });
   }
-  const id = String(b.contacto ?? b.subscriber_id ?? "").trim();
+  // "contacto"/"nombre"/"texto" es el cuerpo armado a mano en ManyChat; "id"/"name"/"last_input_text" es el
+  // de "Full Contact Data" ({{subscriber_data}}), que ManyChat escapa solo. El armado a mano pegaba el texto sin
+  // escapar y con un salto de línea o una comilla el JSON salía roto: ManyChat no mandaba el pedido y el mensaje
+  // se perdía sin dejar rastro (37 mensajes de 26 personas entre el 17 y el 20/10).
+  const id = String(b.contacto ?? b.subscriber_id ?? b.id ?? "").trim();
   if (!id) return res.status(400).json({ error: "falta contacto" });
   const texto = String(b.texto ?? b.last_input_text ?? "").trim() || SIN_TEXTO;
   // El nombre es para que el aviso a Cande diga quién es y no un número de ManyChat.
   // Sin saltos de línea: el aviso a Cande lleva el nombre en el renglón "Quién", y de ahí sale a quién va su respuesta.
-  const nombre = String(b.nombre ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || null;
+  const nombre = String(b.nombre ?? b.name ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || null;
   const quien = `${nombre || "sin nombre"} (${id})`;
 
   let idMensaje;
