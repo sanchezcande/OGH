@@ -13,7 +13,9 @@
 // borrarControl borre solo lo que sigue corrigiendo, que reclamarControl dé la vuelta a una sola corrida, la suelte solo
 // quien la tiene y la libere sola a los 6 minutos, que datosParaControl traiga las charlas de la bandeja por su id o su
 // usuario de Instagram, que notasParaResumen traiga los renglones del controlador y que corridasEnUnDia, sinContestar
-// (quizas_salio), salidaSinLlegar, enviadosEnLaCharla y salidasDesde no los cuenten.
+// (quizas_salio), salidaSinLlegar, enviadosEnLaCharla y salidasDesde no los cuenten. Y después de la revisión: que
+// marcarControl le ponga la hora de ahora solo a la fila que recibe un renglón, y que datosParaControl traiga
+// dueno_desde de los contactos y el detalle de las salidas.
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -22,7 +24,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const C = await import("../lib/dm/controlador.js");
-const { crearAgente, notaControl } = await import("../lib/dm/agente.js");
+const { crearAgente, notaControl, DETALLE_INDICACION } = await import("../lib/dm/agente.js");
 const baseJs = await import("../lib/dm/base.js");
 const { esUrgente } = await import("../lib/dm/resumen.js");
 const { base: pg } = await import("./dobles/postgres.mjs");
@@ -62,30 +64,27 @@ const puenteConOtraPregunta = () => charla([
 ]);
 
 /** Una base de mentira para el controlador: lo que traería datosParaControl y lo que anota en dm_salidas. */
-function baseFalsa({
-  mensajes = [], contactos = null, salidas = [], pendientes = [], controles = [], ajustes = {}, vistaBandeja = AHORA.toISOString(),
-} = {}) {
+function baseFalsa({ mensajes = [], contactos = null, salidas = [], pendientes = [], controles = [], ajustes = {} } = {}) {
   const b = {
-    mensajes, contactos: contactos ?? (mensajes.length ? [contactoDe(mensajes)] : []), salidas, pendientes, vistaBandeja,
+    mensajes, contactos: contactos ?? (mensajes.length ? [contactoDe(mensajes)] : []), salidas, pendientes,
     filas: controles.map((x, i) => ({ id: i + 1, ...x })), llamadas: [], ocupada: false,
+    // La hora de la base (NOW()): guardarControl la pone al anotar y marcarControl al poner un renglón.
+    reloj: () => AHORA,
     ajustes: async () => ({ modo: "auto", bandeja: true, controlador: true, ...ajustes }),
     reclamarControl: async () => { b.llamadas.push("reclamar"); return !b.ocupada; },
     soltarControl: async () => { b.llamadas.push("soltar"); },
     datosParaControl: async (horas) => {
       b.llamadas.push(`datos ${horas}`);
-      return {
-        mensajes: b.mensajes, contactos: b.contactos, salidas: b.salidas, controles: b.filas.map((f) => ({ ...f })), pendientes: b.pendientes,
-        vistaBandeja: b.vistaBandeja,
-      };
+      return { mensajes: b.mensajes, contactos: b.contactos, salidas: b.salidas, controles: b.filas.map((f) => ({ ...f })), pendientes: b.pendientes };
     },
     guardarControl: async ({ contacto, clave, estado, aviso = null, motivo = null }) => {
       if (b.filas.some((f) => f.contacto === contacto && f.detalle === clave)) return null;
       const id = (b.filas.at(-1)?.id ?? 0) + 1;
-      b.filas.push({ id, contacto, detalle: clave, estado, aviso, motivo, creado: AHORA.toISOString() });
+      b.filas.push({ id, contacto, detalle: clave, estado, aviso, motivo, creado: b.reloj().toISOString() });
       return id;
     },
     marcarControl: async (id, { estado, aviso = null, motivo = null }) => {
-      Object.assign(b.filas.find((f) => f.id === id), { estado, aviso, ...(motivo ? { motivo } : {}) });
+      Object.assign(b.filas.find((f) => f.id === id), { estado, aviso, ...(motivo ? { motivo } : {}), ...(aviso ? { creado: b.reloj().toISOString() } : {}) });
     },
     borrarControl: async (id) => {
       b.filas = b.filas.filter((f) => !(f.id === id && f.estado === C.ESTADOS.corrigiendo));
@@ -171,6 +170,42 @@ test("F2: le gustó el video y lo que siguió no dice cuánto sale", () => {
   assert.deepEqual(reglas(C.videoSinPrecio(charla([["agente", "Pudiste mirar el video?", 70], ["lead", "no me gustó", 60], ["agente", "Y por qué?", 59]]), {
     contacto: contactoDe([]), ahora: AHORA.getTime(),
   })), [], "sin interés no hay falla");
+});
+
+test("F2: las preguntas del agente para quien todavía no vio el video no cuentan, ni quien dice que lo va a ver", () => {
+  // El agente calló después (o contestó otra cosa): antes se tomaba como que lo vio y le gustó.
+  const caso = (lineas) => reglas(detectar(charla(lineas)));
+  assert.deepEqual(caso([["agente", "Dale! cuando lo llenes y lo mires me avisás qué tal, qué te pareció?", 70], ["lead", "Siii genial!", 60]]), []);
+  assert.deepEqual(caso([["agente", "Te dejo el video corto de prueba, lo podés ver ahora?", 70], ["lead", "Genial, ahora lo veo!", 60]]), []);
+  assert.deepEqual(caso([["agente", "Y qué te pareció la entrevista de prueba?", 70], ["lead", "me gustó", 60]]), [], "no es el video");
+  // "Qué te pareció?" a quien ya dijo que lo vio sí cuenta.
+  assert.deepEqual(caso([
+    ["agente", "Pudiste?", 90], ["lead", "sii ya lo vi", 80], ["agente", "Y qué te pareció?", 70], ["lead", "me encantó, muy claro todo", 60],
+  ]), ["F2 nada"]);
+});
+
+test("F2: un sí cuando se le preguntó si le sirve, después del video, también es el paso 9", () => {
+  const conVideo = [["agente", "Te dejo el video de prueba acá", 120], ["lead", "listo, está bien", 90]];
+  const sirve = (resp) => charla([...conVideo, ["agente", "Y eso te puede servir para lo que buscás?", 70], ["lead", "seguro que si", 60], ...resp]);
+  assert.deepEqual(reglas(detectar(sirve([["agente", "Buenísimo, y de qué país sos?", 59]]))), ["F2 otra_cosa"]);
+  assert.deepEqual(reglas(detectar(sirve([]))), ["F2 nada"]);
+  assert.deepEqual(reglas(detectar(sirve([["agente", "Genial! Está en 27 dólares de prueba", 59]]))), []);
+  // Sin video antes, o con una oferta en el mismo tramo (el sí es a la oferta), no.
+  assert.deepEqual(reglas(detectar(charla([["agente", "Y eso te puede servir para lo que buscás?", 70], ["lead", "seguro que si", 60]]))), []);
+});
+
+test("F2: no es falla si ya sabía cuánto sale, ni si lo que siguió es una pregunta que va antes del monto", () => {
+  // Se le dijo cuánto sale antes del video.
+  const sabia = charla([
+    ["agente", "Te cuento, está en 27 dólares de prueba", 120], ["lead", "ok, lo miro", 110],
+    ["agente", "Pudiste mirar el video?", 70], ["lead", "Listo, lo vi. Me re gustó", 60], ["agente", "Genial! Te paso el link?", 59],
+  ]);
+  assert.deepEqual(reglas(detectar(sabia)), []);
+  // El estado dice que ya se le dijo, aunque la frase no esté en lo que se mira.
+  assert.deepEqual(reglas(detectar(videoConInteres("Genial, me alegra un montón de prueba"), { estado: { quien: "dev", busca: "si", dolor: "x", precio_dicho: true } })), []);
+  // Las preguntas que el prompt pide antes del monto: a quien es de Cuba, y si le sirve.
+  assert.deepEqual(reglas(detectar(videoConInteres("Che, y desde Cuba podés pagar desde afuera con alguna tarjeta?"))), []);
+  assert.deepEqual(reglas(detectar(videoConInteres("Y eso te puede servir para lo que buscás?"))), []);
 });
 
 /* ---------- F3: pregunta repetida ---------- */
@@ -424,12 +459,111 @@ test("si otra corrida tenía la charla (el cron de los toques), no pasó nada: l
   assert.equal(base.filas[0].estado, C.ESTADOS.corregida);
 });
 
-test("corrige el video con interés sin precio pidiendo el paso 9", async () => {
-  const base = baseFalsa({ mensajes: videoConInteres("Genial! Y sentís que te suma?") });
+test("corrige el video con interés sin precio pidiendo el paso 9; si el agente le hizo otra pregunta, no se la pisa", async () => {
+  const base = baseFalsa({ mensajes: videoConInteres("Genial, me alegra un montón de prueba") });
   const { agente, controlar } = controlador(base);
   assert.equal((await controlar()).corregidas, 1);
   assert.match(agente.pedidos[0].indicacion, /paso 9/);
+  assert.match(agente.pedidos[0].indicacion, /Cuba/, "a quien es de Cuba, primero si puede pagar desde afuera");
   assert.equal(base.filas[0].detalle, "F2#101");
+  // Con otra pregunta en el medio (puede ser una que el prompt pide antes del monto): al resumen, sin corregir.
+  const conPregunta = baseFalsa({ mensajes: videoConInteres("Genial! Y sentís que te suma?") });
+  const otro = controlador(conPregunta);
+  const r = await otro.controlar();
+  assert.equal(otro.agente.pedidos.length, 0);
+  assert.equal(r.al_resumen, 1);
+  assert.match(conPregunta.filas[0].aviso, /No la corregí: el agente le hizo otra pregunta y no se la piso\.$/);
+});
+
+test("F2 no se corrige en el turno en que contó que se quedó sin trabajo (el freno 13)", async () => {
+  const ms = charla([["agente", "Pudiste mirar el video?", 70], ["lead", "sí, me gustó mucho. Igual me quedé sin trabajo la semana pasada", 60]]);
+  const [d] = detectar(ms);
+  assert.equal(`${d.regla} ${d.tipo}`, "F2 nada");
+  assert.deepEqual(C.decidirCorreccion(d, { contacto: contactoDe(ms), mensajes: ms, ahora: AHORA.getTime() }), { no: "contó que se quedó sin trabajo" });
+});
+
+test("una sola corrección por charla en cada vuelta: el sí al puente y el video en el mismo turno no salen seguidos", async () => {
+  // Le ofreció el puente, dijo que sí y que ya vio el video y le encantó, y el agente calló: F1 y F2 a la vez.
+  const ms = charla([["agente", OFERTA, 70], ["lead", "Sii! y ya vi el video de prueba, me encantó", 60]]);
+  assert.deepEqual(reglas(detectar(ms)), ["F1 nada", "F2 nada"]);
+  const base = baseFalsa({ mensajes: ms });
+  const { agente, controlar } = controlador(base);
+  const r = await controlar();
+  assert.equal(agente.pedidos.length, 1, "una sola");
+  assert.equal(agente.pedidos[0].indicacion.includes("turno 2"), true);
+  assert.equal(r.esperan, 1, "la otra queda para la vuelta siguiente");
+  assert.equal(base.filas.length, 1);
+  // Salió el turno 2 y el lead no contestó: la del video ya no se corrige (sería el segundo mensaje seguido).
+  base.mensajes = [...ms, ...charla([["agente", TURNO_2, 0]], { desde: 300 })];
+  base.contactos = [contactoDe(base.mensajes)];
+  await controlar();
+  assert.equal(agente.pedidos.length, 1);
+  const video = base.filas.find((f) => f.detalle.startsWith("F2"));
+  assert.equal(video.estado, C.ESTADOS.alResumen);
+  assert.match(video.aviso, /No la corregí: ya le mandé otra corrección después y no contestó\.$/);
+});
+
+test("no corrige una charla que pasó por Cande después de la falla, ni encima de lo que salió con una indicación suya", () => {
+  const ms = puenteConOtraPregunta();
+  const [d] = detectar(ms);
+  const decidir = (extra = {}, mensajes = ms, salidas = []) =>
+    C.decidirCorreccion(d, { contacto: contactoDe(ms, extra), mensajes, salidas, ahora: AHORA.getTime() });
+  assert.deepEqual(decidir(), { si: true });
+  // La sacó la vuelta de Instagram (escribió a mano) y la devolvió con /agente: lo que mandó a mano no está en la base.
+  assert.deepEqual(decidir({ dueno_desde: hace(20) }), { no: "pasó por vos después" });
+  assert.deepEqual(decidir({ dueno_desde: hace(300) }), { si: true }, "si la devolvió antes, no cuenta");
+  // La nota que deja esa vuelta, o la devolución desde Telegram.
+  for (const nota of ["La charla quedó de Cande: le escribiste vos", "Cande llevó esta charla a mano: lo de prueba"]) {
+    assert.deepEqual(decidir({}, [...ms, { contacto: ID, id: 300, quien: "sistema", texto: nota, creado: hace(30) }]), { no: "le escribiste vos" });
+  }
+  // Lo que salió con una indicación de Cande desde Telegram queda como del agente: lo decidió ella.
+  const indicacion = { contacto: ID, accion: "responder", estado: "enviada", detalle: DETALLE_INDICACION, creado: hace(59) };
+  assert.deepEqual(decidir({}, ms, [indicacion]), { no: "le diste una indicación desde Telegram" });
+  assert.deepEqual(decidir({}, ms, [{ ...indicacion, creado: hace(200) }]), { si: true }, "una de antes de la oferta, no");
+});
+
+test("F1: el puente que ofreció Cande en una charla del agente también cuenta", async () => {
+  const ms = charla([["cande", OFERTA, 70], ["lead", SI, 60], ["agente", OTRA, 59]]);
+  assert.deepEqual(reglas(detectar(ms)), ["F1 otra_cosa"]);
+  assert.deepEqual(reglas(detectar(ms, { dueno: "cande" })), [], "en una charla de Cande, lo que ella ofrece lo sigue ella");
+  const base = baseFalsa({ mensajes: ms });
+  assert.equal((await controlador(base).controlar()).corregidas, 1);
+});
+
+test("un renglón que se pone en otra vuelta lleva su hora: no se pierde si la fila es de antes del corte del resumen", async () => {
+  const ms = puenteConOtraPregunta();
+  const base = baseFalsa({ mensajes: ms });
+  await controlador(base).controlar();
+  assert.equal(base.filas[0].estado, C.ESTADOS.corregida);
+  // El resumen corta entre las dos vueltas.
+  const corte = new Date(AHORA.getTime() + 5 * MIN);
+  const despues = new Date(AHORA.getTime() + 10 * MIN);
+  base.mensajes = [...ms, ...charla([["agente", "Bueno, igual contame más de vos", 0]], { desde: 300 })];
+  base.contactos = [contactoDe(base.mensajes)];
+  base.reloj = () => despues;
+  await controlador(base, { ahora: despues }).controlar();
+  assert.equal(base.filas[0].estado, C.ESTADOS.sinCorregir);
+  assert.ok(new Date(base.filas[0].creado) > corte, "entra en el resumen siguiente");
+});
+
+test("F5 y F6 de la bandeja: no si la base ya tiene la respuesta, ni una despedida o un adjunto después de un cierre", () => {
+  const ahora = AHORA.getTime();
+  const deCande = contactoDe([], { dueno: "cande" });
+  const cierre = charla([["lead", "dale, gracias por todo", 8 * 60 + 10], ["cande", "Un placer de prueba, éxitos!", 8 * 60]]);
+  const ver = (p, mensajes) => reglas(C.deLaBandeja([p], [deCande], { ahora, mensajes }));
+  assert.deepEqual(ver(pendiente(7 * 60), cierre), ["F6 pase"]);
+  assert.deepEqual(ver(pendiente(7 * 60, { texto: "Igualmente! que tengas buen finde" }), cierre), []);
+  assert.deepEqual(ver(pendiente(7 * 60, { texto: "[adjunto o mensaje sin texto]" }), cierre), []);
+  assert.deepEqual(ver(pendiente(7 * 60, { texto: "gracias! y cuánto dura?" }), cierre), ["F6 pase"], "con una pregunta espera");
+  // Si después del cierre Cande tuvo la charla (escribió a mano: no está en la base), no se sabe qué fue lo último.
+  const aMano = [...cierre, { contacto: ID, id: 400, quien: "sistema", texto: "La charla quedó de Cande: le escribiste vos", creado: hace(7 * 60 + 30) }];
+  assert.deepEqual(ver(pendiente(7 * 60, { texto: "[adjunto o mensaje sin texto]" }), aMano), ["F6 pase"]);
+  // La cuenta le contestó (desde Telegram) y la bandeja todavía no lo vio.
+  const contestada = [...cierre, ...charla([["cande", "Respuesta de prueba", 6 * 60]], { desde: 300 })];
+  assert.deepEqual(ver(pendiente(7 * 60), contestada), []);
+  // Y las dos quedan solo para medir.
+  const [d] = C.deLaBandeja([pendiente(7 * 60)], [deCande], { ahora });
+  assert.equal(d.medida, true);
 });
 
 test("como mucho 3 correcciones por vuelta, y ninguna pasada la hora: las demás quedan para la siguiente", async () => {
@@ -471,45 +605,64 @@ test("lo que no se corrige va al resumen de las notas: un renglón 'Controlador:
   assert.equal(base.filas.length, 1, "una sola vez");
 });
 
-test("F5 y F6 salen del resumen cuando les contestan; en una charla de Cande ya contestada, el F1 queda solo para medir", async () => {
+test("F5 de la bandeja y F6 quedan solo para medir: ya salen en el resumen de la bandeja; una F5 de la base sale del resumen cuando le contestan", async () => {
   const deCande = contactoDe([], { dueno: "cande" });
   const base = baseFalsa({ contactos: [deCande], pendientes: [pendiente(7 * 60)] });
-  const { controlar } = controlador(base);
-  await controlar();
-  assert.equal(base.filas[0].estado, C.ESTADOS.alResumen);
-  assert.match(base.filas[0].aviso, /^Controlador: es tuya y el lead espera hace 7 h/);
-  base.pendientes = []; // la bandeja ya la ve contestada
-  const r = await controlar();
-  assert.equal(r.resueltas, 1);
-  assert.equal(base.filas[0].estado, C.ESTADOS.resuelta);
-  assert.equal(base.filas[0].aviso, null);
-  // Con la red de la bandeja apagada no se sabe: no se resuelve nada de la bandeja.
-  const apagada = baseFalsa({ contactos: [deCande], pendientes: [pendiente(7 * 60)] });
-  await controlador(apagada).controlar();
-  apagada.pendientes = [];
-  apagada.ajustes = async () => ({ modo: "auto", bandeja: false });
-  await controlador(apagada).controlar();
-  assert.equal(apagada.filas[0].estado, C.ESTADOS.alResumen);
+  const r = await controlador(base).controlar();
+  assert.equal(r.medidas, 1);
+  assert.deepEqual(r.fallas, { F6: 1 });
+  assert.equal(base.filas[0].estado, C.ESTADOS.medida);
+  assert.equal(base.filas[0].aviso, null, "no se repite en el resumen de las notas");
+  assert.equal(base.filas[0].motivo, `F6 pase a Cande sin respuesta: pase (${C.EN_LA_BANDEJA})`);
+  const delAgente = baseFalsa({ contactos: [contactoDe([])], pendientes: [pendiente(120, { nota: "el mensaje no le llegó al agente" })] });
+  await controlador(delAgente).controlar();
+  assert.equal(delAgente.filas[0].estado, C.ESTADOS.medida);
+  assert.equal(delAgente.filas[0].aviso, null);
 
-  // El sí al puente que se frenó y pasó a Cande: si la bandeja todavía la tiene esperando, va al resumen; si ella ya
-  // contestó, solo para medir.
+  // Una F5 de la base (la Mac apagada): al resumen; cuando la espera la contesta, el renglón sale.
+  const ms = charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", 30]]);
+  const abierta = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { respondido_hasta: 0 })] });
+  const ctl = controlador(abierta, { macViva: false });
+  await ctl.controlar();
+  assert.equal(abierta.filas[0].estado, C.ESTADOS.alResumen);
+  assert.match(abierta.filas[0].aviso, /^Controlador: escribió hace 30 min .*la Mac no está contestando/);
+  abierta.contactos = [contactoDe(ms)];
+  assert.equal((await ctl.controlar()).resueltas, 1);
+  assert.equal(abierta.filas[0].estado, C.ESTADOS.resuelta);
+  assert.equal(abierta.filas[0].aviso, null);
+});
+
+test("en una charla de Cande, 'ya la contestaste vos' pide una prueba: un mensaje de la cuenta en la base después de la falla", async () => {
   const ms = charla([["agente", OFERTA, 70], ["lead", SI, 60]]);
-  const esperando = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { dueno: "cande" })], pendientes: [pendiente(60)] });
-  await controlador(esperando).controlar();
-  assert.match(esperando.filas.find((f) => f.detalle.startsWith("F1")).aviso, /No la corregí: la charla es tuya\.$/);
-  const contestada = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { dueno: "cande" })], pendientes: [] });
+  // La bandeja no la tiene esperando (la sigue, o contestó un automático): eso no prueba que Cande le contestó.
+  const sinPrueba = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { dueno: "cande" })], pendientes: [] });
+  await controlador(sinPrueba).controlar();
+  assert.equal(sinPrueba.filas[0].estado, C.ESTADOS.alResumen);
+  assert.match(sinPrueba.filas[0].aviso, /No la corregí: la charla es tuya\. Si ya le contestaste, ignoralo\.$/);
+  // Con su respuesta en la base (desde Telegram), solo para medir.
+  const conPrueba = [...ms, ...charla([["cande", "Hola! te cuento yo de prueba", 40]], { desde: 300 })];
+  const contestada = baseFalsa({ mensajes: conPrueba, contactos: [contactoDe(conPrueba, { dueno: "cande" })] });
   await controlador(contestada).controlar();
   assert.equal(contestada.filas[0].estado, C.ESTADOS.medida);
   assert.match(contestada.filas[0].motivo, /ya la contestaste vos/);
-  // Si la red de la bandeja no dio una vuelta entera después del sí (no anda, o todavía no la miró), no se sabe: al resumen.
-  const sinMirar = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { dueno: "cande" })], pendientes: [], vistaBandeja: hace(58) });
-  await controlador(sinMirar).controlar();
-  assert.equal(sinMirar.filas[0].estado, C.ESTADOS.alResumen);
-  // Y cuando la red da otra vuelta y ya no la tiene esperando (contestó), el renglón sale del resumen.
-  sinMirar.vistaBandeja = new Date(AHORA.getTime() + 6 * MIN).toISOString();
-  assert.equal((await controlador(sinMirar).controlar()).resueltas, 1);
-  assert.equal(sinMirar.filas[0].estado, C.ESTADOS.resuelta);
-  assert.equal(sinMirar.filas[0].aviso, null);
+  // Las otras pruebas: la nota de la vuelta de Instagram que la vio escribir a mano, y una indicación suya. Un mensaje
+  // del agente no prueba nada: puede ser justo la respuesta que falló.
+  const deCande = contactoDe(ms, { dueno: "cande" });
+  const nota = { contacto: ID, id: 300, quien: "sistema", texto: "La charla quedó de Cande: le escribiste vos", creado: hace(40) };
+  const delAgente = { contacto: ID, id: 301, quien: "agente", texto: OTRA, creado: hace(50) };
+  const indicacion = { contacto: ID, accion: "responder", estado: "enviada", detalle: DETALLE_INDICACION, creado: hace(40) };
+  const desde = AHORA.getTime() - 60 * MIN;
+  assert.equal(C.contestoCande(deCande, { mensajes: [...ms, nota], desde }), true);
+  assert.equal(C.contestoCande(deCande, { mensajes: ms, salidas: [indicacion], desde }), true);
+  assert.equal(C.contestoCande(deCande, { mensajes: [...ms, delAgente], desde }), false);
+  assert.equal(C.contestoCande({ ...deCande, dueno: "agente" }, { mensajes: [...ms, nota], desde }), false);
+  // Y si la respuesta aparece después de anotada, el renglón sale del resumen.
+  const despues = new Date(AHORA.getTime() + 20 * MIN);
+  sinPrueba.mensajes = [...ms, ...charla([["cande", "Hola! te cuento yo de prueba", -10]], { desde: 300 })];
+  sinPrueba.reloj = () => despues;
+  assert.equal((await controlador(sinPrueba, { ahora: despues }).controlar()).resueltas, 1);
+  assert.equal(sinPrueba.filas[0].estado, C.ESTADOS.resuelta);
+  assert.equal(sinPrueba.filas[0].aviso, null);
 });
 
 test("con el ajuste apagado no hace nada, y si otra vuelta lo tiene tampoco", async () => {
@@ -631,6 +784,30 @@ test("el turno 'control' solo en una charla del agente, con la ventana abierta, 
   assert.deepEqual(sacadas, ["le escribiste vos"]);
 });
 
+test("el turno 'control' mira los frenos del último turno del lead: no dice cuánto sale a quien acaba de contar que se quedó sin trabajo", async () => {
+  const mensajes = charla([
+    ["lead", "hola, soy dev y busco hace un tiempo", 200],
+    ["agente", "Va un mensaje automático de prueba\nY cómo viene eso?", 199],
+    ["lead", "sí, el video me gustó mucho. Igual me quedé sin trabajo la semana pasada", 60],
+  ]);
+  const precio = () => ({ accion: "responder", mensajes: ["Genial! Está en 27 dólares de prueba"], estado: { quien: "dev", busca: "si", dolor: "x" } });
+  const { agente, m } = agenteDeVerdad({ mensajes, responde: precio });
+  const r = await corregir(agente);
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /sin trabajo/);
+  assert.deepEqual(m.enviados, []);
+});
+
+test("lo que sale por una indicación de Cande desde Telegram queda marcado en su salida", async () => {
+  const { agente, m } = agenteDeVerdad();
+  assert.equal((await agente.procesar(ID, null, { evento: "indicacion", indicacion: "decile algo de prueba" })).hecho, "enviada");
+  assert.equal(m.salidas.at(-1).detalle, DETALLE_INDICACION);
+  // Lo del controlador no lleva esa marca: es del agente.
+  const otro = agenteDeVerdad();
+  await corregir(otro.agente);
+  assert.equal(otro.m.salidas.at(-1).detalle ?? null, null);
+});
+
 test("si ante el controlador el agente calla, el toque que ya estaba agendado sigue", async () => {
   const agendado = new Date(AHORA.getTime() + 3 * HORA);
   const { agente, m } = agenteDeVerdad({
@@ -685,6 +862,8 @@ test("guardarControl anota una sola vez por charla y clave, y marcarControl solo
   assert.deepEqual(consultas[0].params, [ID, "Controlador: algo", "F1 algo", "al_resumen", "F1#103"]);
   assert.match(consultas[1].t, /WHERE id = \? AND accion = 'control'/);
   assert.equal(consultas[1].params[1], null, "resuelta: el renglón sale del resumen");
+  // Un renglón puesto después lleva la hora de ahora: si no, puede caer en una franja del resumen que ya salió.
+  assert.match(consultas[1].t, /creado = CASE WHEN \?::text IS NULL THEN creado ELSE NOW\(\) END/);
   assert.match(consultas[2].t, /^DELETE FROM dm_salidas WHERE id = \? AND accion = 'control' AND estado = 'corrigiendo'$/, "solo lo que no llegó a pasar");
 });
 
@@ -709,8 +888,9 @@ test("datosParaControl busca las charlas de la bandeja por su id y su usuario de
   }
   assert.equal(consultas.length, 4);
   assert.deepEqual(d.pendientes.length, 1);
-  assert.equal(d.vistaBandeja, "2026-10-20T14:58:00.000Z", "cuándo terminó la última vuelta entera de la red");
   const contactos = consultas.find((x) => x.t.startsWith("SELECT c.id"));
+  assert.match(contactos.t, /c\.dueno_desde/, "desde cuándo es de quien es: si pasó por Cande después de la falla no se corrige");
+  assert.match(consultas.find((x) => x.t.startsWith("SELECT s.id")).t, /s\.detalle/, "lo que salió con una indicación de Cande lo dice ahí");
   assert.ok(contactos.params.includes(JSON.stringify(["9001"])));
   assert.ok(contactos.params.includes(JSON.stringify(["lead.prueba"])), "el usuario en minúscula");
   assert.match(contactos.t, /AS tomada/);
