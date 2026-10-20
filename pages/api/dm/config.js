@@ -11,6 +11,10 @@
 //                                                  (se corre antes de prender las altas, con los contactos que ya existen)
 //   { accion: "desanotar", contacto, textos }      → saca lo anotado como de Cande en las últimas 24 h que al final no
 //                                                  salió (texto exacto); para corregir un borrador antes de que ella lo pegue
+//   { accion: "retomar_marcar", contactos: [id, ...], dias?, quitar? } → marca como retomadas esas charlas por `dias`
+//                                                  (7 si no se dice, de 1 a 30): si Cande les escribe a mano desde
+//                                                  Instagram, el agente no sale, anota lo suyo y sigue (lib/dm/instagram.js).
+//                                                  Con quitar: true les saca la marca. Su "--" las saca igual
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
@@ -50,12 +54,13 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, desanotar, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
-  desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  desdeValido, hayBase, historial, leerConfig, marcarRetomadas, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import {
-  codigoEnHilo, desdeDe, desdeManual, explicarError, linkCharlaIg, manualEnHilo, usuarioIg, usuarioParaAviso,
+  CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, usuarioIg,
+  usuarioParaAviso,
 } from "../../../lib/dm/instagram";
 import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
@@ -69,6 +74,8 @@ const QUIEN_A_MANO = ["cande", "automatico"];
 const TOPE_TEXTO = 4000;
 const TOPE_SIEMBRA = 300;
 const TOPE_RESERVA = 5000;
+const TOPE_RETOMADAS = 1000;
+const DIA_MS = 86400000;
 const TOPE_AVISO = 3000;   // Telegram corta a los 4096
 const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Telegram no sigue la redirección
 
@@ -122,6 +129,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RESERVA} ids` });
     }
     return res.status(200).json({ ok: true, recibidos: ids.length, reservados: await reservar(ids) });
+  }
+
+  if (b.accion === "retomar_marcar") {
+    // Antes de que Cande conteste a mano las charlas viejas (20/10): la marca dura `dias` y después vence sola.
+    const ids = Array.isArray(b.contactos) ? [...new Set(b.contactos.map((x) => String(x ?? "").trim()))] : [];
+    if (!ids.length || ids.length > TOPE_RETOMADAS || ids.some((x) => !/^[0-9A-Za-z_-]{1,40}$/.test(x))) {
+      return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RETOMADAS} ids` });
+    }
+    const dias = b.dias === undefined || b.dias === null ? DIAS_RETOMADA : b.dias;
+    if (!Number.isInteger(dias) || dias < 1 || dias > 30) return res.status(400).json({ error: "dias: un entero de 1 a 30" });
+    const quitar = b.quitar === true;
+    const hasta = Date.now() + dias * DIA_MS;
+    const vigentes = await marcarRetomadas(ids, { hasta, quitar });
+    if (quitar) return res.status(200).json({ ok: true, recibidos: ids.length, vigentes });
+    // Las que todavía no son del agente: la marca sola no se las da (eso es "dueno" o "sembrar").
+    const delAgente = new Set(await cualesDelAgente(ids));
+    return res.status(200).json({
+      ok: true, recibidos: ids.length, vigentes, hasta: new Date(hasta).toISOString(), no_son_del_agente: ids.filter((x) => !delAgente.has(x)),
+    });
   }
 
   if (b.accion === "dueno") {
@@ -382,6 +408,7 @@ export default async function handler(req, res) {
             la_seguis: p.laSigue, mensajes_con_texto: hilo ? hilo.mensajes.filter((m) => m.texto != null).length : 0,
             hay_codigo: Boolean(hilo && codigoEnHilo(hilo, yo, desdeDe(c))),
             escribio_cande: Boolean(hilo && manualEnHilo(hilo, yo, await textosDeLaCuenta(id), desdeManual(c))),
+            retomada: esRetomada(await leerConfig(CLAVE_RETOMADAS), id),
           });
         }
       } catch (e) {

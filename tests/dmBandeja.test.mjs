@@ -119,6 +119,20 @@ function mundo({
       if (n) Object.assign(c, { toques: 0, proximo_toque: null });
       return n;
     },
+    // Como la consulta: solo en una charla del agente y una vez por ig_mid; lo del lead hasta el último de esos mensajes
+    // (por la hora) queda contestado y el toque se cancela.
+    anotarCandeDesdeIg: async (id, lista) => {
+      const c = w.contactos.get(id);
+      if (!c || c.dueno !== "agente") return 0;
+      const nuevos = lista.filter((m) => !w.mensajes.some((x) => x.ig_mid === m.mid));
+      for (const m of nuevos) nuevoMensaje({ contacto: id, quien: "cande", texto: m.texto, creado: new Date(m.creado), ig_mid: m.mid });
+      if (nuevos.length) {
+        const tope = Math.max(...nuevos.map((m) => new Date(m.creado).getTime()));
+        const leads = w.mensajes.filter((x) => x.contacto === id && x.quien === "lead" && x.creado.getTime() <= tope).map((x) => x.id);
+        Object.assign(c, { respondido_hasta: Math.max(c.respondido_hasta || 0, ...leads), proximo_toque: null });
+      }
+      return nuevos.length;
+    },
     darDeAltaDesdeBandeja: async (id, { nombre, mensajes: lista, contexto, tope, igId, usuario }) => {
       const van = w.altasRedHoy;
       if (w.contactos.has(id) || van >= tope) return { guardados: 0, van };
@@ -762,6 +776,33 @@ test("en una charla del agente donde Cande escribió a mano o puso --, no se gua
     assert.equal(w.mensajes.length, 0, suyo);
     assert.match(w.resumenes()[0].campos[SECCION_VOS], nota, suyo);
   }
+});
+
+test("en una charla retomada donde Cande escribió a mano, lo suyo queda anotado antes que lo del lead y lo del lead se guarda para la espera", async () => {
+  // La marca de las charlas viejas que Cande contesta a mano (lib/dm/instagram.js): lo que escribe no saca al agente.
+  const pegado = "Texto que Cande pegó cambiado, de prueba";
+  const w = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600), respondido_hasta: 0 }],
+    hilos: [charla(1, DEL_AGENTE, [["cuenta", pegado, 60], ["lead", "respuesta de prueba del lead", 30]])],
+    config: { retomadas: { 77: { hasta: AHORA.getTime() + 7 * 24 * HORA } } },
+  });
+  assert.equal((await w.revisar()).recuperados, 1);
+  assert.deepEqual(w.delContacto("77").map((m) => [m.quien, m.texto, m.ig_mid]), [["cande", pegado, "m1-0"], ["lead", "respuesta de prueba del lead", "m1-1"]]);
+  assert.equal(w.contactos.get("77").dueno, "agente");
+  assert.equal(w.contactos.get("77").respondido_hasta, 0, "lo que el lead escribió después de ella queda abierto: lo contesta la espera");
+  assert.equal(w.resumenes().length, 0);
+  w.pasar(3);
+  await w.revisar();
+  assert.equal(w.delContacto("77").length, 2, "la vuelta siguiente no anota nada de nuevo");
+  // Con la marca vencida, como siempre: no se guarda nada y va al resumen.
+  const vencida = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) }],
+    hilos: [charla(1, DEL_AGENTE, [["cuenta", pegado, 60], ["lead", "respuesta de prueba del lead", 30]])],
+    config: { retomadas: { 77: { hasta: AHORA.getTime() - MIN } } },
+  });
+  assert.equal((await vencida.revisar()).recuperados, 0);
+  assert.equal(vencida.mensajes.length, 0);
+  assert.match(vencida.resumenes()[0].campos[SECCION_VOS], /le escribiste vos/);
 });
 
 /* ---------- 8. lo que el agente no puede tomar va al resumen ---------- */

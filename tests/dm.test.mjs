@@ -3351,3 +3351,78 @@ test("una respuesta vencida no sale por la API si se escribió en la charla desp
   assert.equal(await sale.agente.rescatarVencida(fila()), "reenviada");
   assert.deepEqual(sale.m.enviados, ["Pregunta de prueba?"]);
 });
+
+/* ---------- charlas retomadas (20/10): lo que Cande escribe a mano no saca al agente (lib/dm/instagram.js) ---------- */
+
+const A_MANO = "Texto de prueba que Cande escribió a mano";
+
+/** Lo que hace la mirada en una charla retomada: anota lo de Cande y deja contestado lo del lead hasta `hasta`. */
+const anotaACande = (mundo, hasta) => () => {
+  const { m } = mundo();
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: A_MANO });
+  if (hasta !== undefined) m.contacto.respondido_hasta = hasta;
+  return null;
+};
+
+test("charla retomada: si la mirada anota que Cande ya contestó lo del lead, el agente no le contesta encima ni le pide nada al modelo", async () => {
+  let mundo;
+  const ig = reglasFalsas([anotaACande(() => mundo, 2), null], () => mundo.m);
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "ya estaba atendido");
+  assert.equal(mundo.m.pedidos.length, 0);
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.contacto.dueno, "agente");
+  assert.deepEqual(ig.sacadas, []);
+  assert.equal(mundo.m.tomado, null);
+});
+
+test("charla retomada: si el lead le contestó a lo que Cande escribió a mano, contesta el agente con lo de ella en el historial", async () => {
+  let mundo;
+  const ig = reglasFalsas([anotaACande(() => mundo, 2), null], () => mundo.m);
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  // El lead le contestó a Cande; la mirada anota lo de ella después (lo vio recién), con el turno contestado hasta lo de antes.
+  const id = mundo.m.entraLead("respuesta de prueba del lead");
+  const r = await mundo.agente.procesar("77", id);
+  assert.equal(r.hecho, "enviada");
+  const { turno } = mundo.m.pedidos[0];
+  assert.deepEqual(turno.mensajes_del_lead, ["respuesta de prueba del lead"]);
+  assert.deepEqual(turno.historial.at(-1), { quien: "cande", texto: A_MANO });
+  assert.equal(mundo.m.contacto.dueno, "agente");
+  assert.equal(mundo.m.contacto.respondido_hasta, id);
+});
+
+test("charla retomada: un toque no sale detrás de lo que Cande acaba de escribir a mano", async () => {
+  let mundo;
+  const ig = reglasFalsas([anotaACande(() => mundo), null], () => mundo.m);
+  mundo = armarToque({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await toque(mundo.agente);
+  assert.equal(r.hecho, "le escribió Cande");
+  assert.equal(mundo.m.pedidos.length, 0);
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.contacto.dueno, "agente");
+});
+
+test("charla retomada: lo de Cande que se anotó tarde pero lo escribió antes que el lead no hace que el reintento tarde le pase la charla", async () => {
+  const minAntes = (min) => new Date(AHORA.getTime() - min * 60000);
+  const armarTarde = (candeHace) => {
+    const w = armar({ envio: "campo", ultimoLeadHace: 2 });
+    w.m.mensajes[1].creado = minAntes(180);
+    w.m.contacto.respondido_hasta = 2;
+    w.m.mensajes.push({ id: 3, quien: "lead", texto: "respuesta de prueba del lead", creado: minAntes(60) });
+    w.m.mensajes.push({ id: 4, quien: "cande", texto: A_MANO, creado: minAntes(candeHace) });
+    return w;
+  };
+  const antes = armarTarde(90);
+  const r = await antes.agente.procesar("77", 3, { tarde: true });
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(antes.m.pedidos[0].turno.mensajes_del_lead, ["respuesta de prueba del lead"]);
+  assert.equal(antes.m.contacto.dueno, "agente");
+  // Si escribió después de lo del lead, como siempre: está metida ahí y la charla pasa a ella.
+  const despues = armarTarde(30);
+  assert.equal((await despues.agente.procesar("77", 3, { tarde: true })).hecho, "pasada a Cande");
+  assert.equal(despues.m.pedidos.length, 0);
+});
