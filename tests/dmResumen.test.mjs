@@ -5,11 +5,14 @@
 // Todos los textos de este archivo son inventados para la prueba. Este repo es público: acá no va ninguna frase de
 // una charla real ni del prompt del agente.
 //
-// Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js (notasParaResumen, reclamarResumen, soltarResumen,
-// cerrarResumen, numeroDeResumen y la de vencerPendientes con la respuesta vencida). Se prueban a mano contra un
-// Postgres de verdad antes de subir: que reclamarResumen devuelva una fila una sola vez por franja aunque corran dos
-// a la vez (y ninguna para una franja vieja), que soltarResumen la deje libre, que notasParaResumen no traiga lo
-// frenado ni lo descartado, y que vencerPendientes diga bien si el lead escribió después de la respuesta.
+// Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js (reclamarResumen, soltarResumen, la de
+// vencerPendientes con la respuesta vencida, y lo que hace Postgres con notasParaResumen). cerrarResumen y
+// numeroDeResumen sí, con un dm_config que ordena las claves como jsonb; de notasParaResumen, qué deja afuera y con qué
+// patrón. Lo demás se prueba a mano contra un Postgres de verdad antes de subir: que reclamarResumen devuelva una fila
+// una sola vez por franja aunque corran dos a la vez (y ninguna para una franja vieja), que soltarResumen la deje
+// libre, que notasParaResumen no traiga lo frenado, lo descartado ni el borrador del código y que su patrón (~*) deje
+// afuera "hoy:" y " HOY :", y que vencerPendientes diga bien si el lead escribió después de la respuesta
+// (escribio_despues) y si alguien escribió en la charla después (charla_cambio).
 //
 // Correr:  node --test tests/*.test.mjs
 import "./dobles/preparar.mjs";
@@ -87,7 +90,7 @@ test("las notas van por charla, sin repetir, con su número, cuánto queda para 
   assert.equal(partes.length, 1);
   assert.deepEqual(partes[0].numeros, { 1: "11", 2: "22" });
   assert.equal(afuera, 0);
-  assert.equal(partes[0].renglones[0], "1. Lead uno: preguntó algo de prueba / otra cosa de prueba (quedan 21 h para escribirle por acá) https://ig.me/m/usuario_de_prueba");
+  assert.equal(partes[0].renglones[0], "1. Lead uno: otra cosa de prueba (+1 nota antes) (quedan 21 h para escribirle por acá) https://ig.me/m/usuario_de_prueba");
   assert.equal(partes[0].renglones[1], "2. Lead dos: ofrece algo de prueba (pasó el día: escribile desde la app)");
 });
 
@@ -294,4 +297,172 @@ test("el número del resumen se busca en la lista guardada: a esa charla le escr
   assert.equal(await responder(otro, { updateId: 8 }), "sin contacto");
   assert.match(dichos.at(-1), /No encuentro el 9/);
   assert.equal(pedidos.length, 1);
+});
+
+/* ---------- revisión del PR de los avisos (20/10) ---------- */
+
+const resumenJs = await import("../lib/dm/resumen.js");
+const respuestasJs = await import("../lib/dm/respuestas.js");
+const baseJs = await import("../lib/dm/base.js");
+const { base: pg } = await import("./dobles/postgres.mjs");
+
+test("E: de cada charla va la nota más nueva entera (hasta 600) y cuántas hubo antes; lo que no entra va en otro mensaje", () => {
+  const vieja = `NOTA: ${"vieja de prueba ".repeat(10).trim()}`;
+  const nueva = `NOTA: ${"nueva de prueba ".repeat(37).trim()}`; // 591 caracteres sin el NOTA:
+  assert.ok(nueva.length - 6 > 220 && nueva.length - 6 <= 600);
+  const charlas = agrupar([
+    { contacto: "11", nombre: "Lead uno", aviso: vieja, creado: "2026-10-20T02:00:00Z", ultimo_lead: new Date(AHORA - HORA) },
+    { contacto: "11", nombre: "Lead uno", aviso: "NOTA: otra de prueba", creado: "2026-10-20T03:00:00Z", ultimo_lead: new Date(AHORA - HORA) },
+    { contacto: "11", nombre: "Lead uno", aviso: nueva, creado: "2026-10-20T04:00:00Z", ultimo_lead: new Date(AHORA - HORA) },
+  ]);
+  const { partes } = armarPartes(charlas, { ahora: AHORA });
+  const renglon = partes[0].renglones[0];
+  assert.ok(renglon.includes(nueva.slice(6)), "la nota más nueva va entera");
+  assert.ok(!renglon.includes("vieja de prueba"), "las de antes no van");
+  assert.match(renglon, /\(\+2 notas antes\) \(quedan 22 h para escribirle por acá\)$/);
+  // Una nota que volvió a llegar es la más nueva.
+  assert.deepEqual(agrupar([
+    { contacto: "11", aviso: "NOTA: a de prueba" }, { contacto: "11", aviso: "NOTA: b de prueba" }, { contacto: "11", aviso: "NOTA: a de prueba" },
+  ])[0].notas, ["b de prueba", "a de prueba"]);
+  // Muchas charlas con notas largas: van en varios mensajes y ninguna se recorta.
+  const largas = Array.from({ length: 20 }, (_, i) => ({ contacto: String(100 + i), nombre: `Lead ${i}`, notas: [`${"z".repeat(590)} ${i}`], ultimo_lead: AHORA }));
+  const r = armarPartes(largas, { ahora: AHORA });
+  assert.equal(r.afuera, 0);
+  assert.ok(r.partes.length > 1);
+  for (const p of r.partes) assert.ok(p.renglones.join("\n").length <= TOPE_TEXTO);
+  largas.forEach((c, i) => assert.ok(r.partes.flatMap((p) => p.renglones).some((x) => x.includes(c.notas[0])), `la ${i} va entera`));
+});
+
+test("G: una lista dentro de una indicación es una sola indicación para el primer número; varias solo con N: en cada renglón", () => {
+  const { porNumero: pn, AYUDA_DE_A_UNO, AYUDA_AMBIGUA } = respuestasJs;
+  const lista = "5: decile que antes haga dos cosas de prueba:\n1. que mande el CV\n2. que llene el formulario";
+  assert.deepEqual(pn(lista), [{ numero: 5, texto: "decile que antes haga dos cosas de prueba:\n1. que mande el CV\n2. que llene el formulario" }]);
+  assert.deepEqual(pn("4: decile que tiene 3 partes de prueba:\n- una\n- otra"), [{ numero: 4, texto: "decile que tiene 3 partes de prueba:\n- una\n- otra" }]);
+  assert.deepEqual(pn("5: decile algo de prueba:\n1) una cosa\notra línea"), [{ numero: 5, texto: "decile algo de prueba:\n1) una cosa\notra línea" }]);
+  for (const t of ["2-3: decile que sí", "2 y 3: decile que sí", "2, 3: decile que sí", "1: decile algo\n2-4: decile otra"]) {
+    assert.deepEqual(pn(t), { ayuda: AYUDA_DE_A_UNO }, t);
+  }
+  assert.deepEqual(pn("1. decile algo de prueba\n2. decile otra cosa"), { ayuda: AYUDA_AMBIGUA });
+  // "N:" mezclados con un renglón suelto: lo del 2 iría al 1. No sale nada.
+  assert.deepEqual(pn("1: decile algo de prueba\n2: decile otra cosa\nque siga en otro renglón"), { ayuda: AYUDA_AMBIGUA });
+  // "10:30" es una hora, no la charla 10.
+  assert.deepEqual(pn("5: decile que la llamada de prueba es a las\n10:30"), [{ numero: 5, texto: "decile que la llamada de prueba es a las\n10:30" }]);
+  assert.deepEqual(pn("1: decile algo de prueba\n2: 3 veces de prueba"), [{ numero: 1, texto: "decile algo de prueba" }, { numero: 2, texto: "3 veces de prueba" }]);
+  assert.deepEqual(pn("1: decile algo de prueba\n\n3: --"), [{ numero: 1, texto: "decile algo de prueba" }, { numero: 3, texto: "--" }]);
+  const leer = (texto) => leerRespuesta(novedad(texto, AVISO_RESUMEN), { duena: "42" });
+  const r = leer(lista);
+  assert.equal(r.varias, undefined, "no se reparte");
+  assert.equal(r.numero, 5);
+  assert.equal(r.texto, "decile que antes haga dos cosas de prueba:\n1. que mande el CV\n2. que llene el formulario");
+  assert.deepEqual(leer("2-3: decile que sí"), { ayuda: AYUDA_DE_A_UNO });
+});
+
+test("G: con varias, si un número no está en ese resumen no sale ninguna; nunca a una charla que no sea la del número", async () => {
+  const pedidos = [];
+  const dichos = [];
+  const base = {
+    reclamarNovedad: async () => true,
+    numeroDeResumen: async (e, n) => ({ 1: "11", 3: "33" })[n] ?? null,
+    contacto: async (id) => ({ id, nombre: `Lead ${id}`, dueno: "agente" }),
+  };
+  const agente = { procesar: async (id, _, op) => { pedidos.push([id, op.indicacion]); return { hecho: "enviada", enviado: ["Mensaje de prueba"] }; } };
+  const responder = crearRespuestaTelegram({ base, manychat: {}, decir: async (t) => { dichos.push(t); }, agente });
+  const r = leerRespuesta(novedad("1: decile algo de prueba\n7: decile otra cosa", AVISO_RESUMEN), { duena: "42" });
+  assert.equal(await responder(r, { updateId: 11 }), "sin contacto");
+  assert.deepEqual(pedidos, []);
+  assert.match(dichos.at(-1), /^No mandé nada: no encuentro el 7 en ese resumen/);
+});
+
+test("más de 4 en un mensaje: salen las primeras 4 y a Cande se le dice cuáles no, para que las mande aparte", async () => {
+  const pedidos = [];
+  const dichos = [];
+  const base = {
+    reclamarNovedad: async () => true,
+    numeroDeResumen: async (e, n) => String(10 + n),
+    contacto: async (id) => ({ id, nombre: `Lead ${id}`, dueno: "agente" }),
+  };
+  const agente = { procesar: async (id, _, op) => { pedidos.push([id, op.indicacion]); return { hecho: "enviada", enviado: ["Mensaje de prueba"] }; } };
+  const responder = crearRespuestaTelegram({ base, manychat: {}, decir: async (t) => { dichos.push(t); }, agente });
+  const texto = Array.from({ length: 6 }, (_, i) => `${i + 1}: decile algo de prueba ${i + 1}`).join("\n");
+  const r = leerRespuesta(novedad(texto, AVISO_RESUMEN), { duena: "42" });
+  assert.equal(r.varias.length, 6);
+  const hecho = await responder(r, { updateId: 12 });
+  assert.equal(respuestasJs.MAX_POR_MENSAJE, 4);
+  assert.deepEqual(pedidos.map((x) => x[0]), ["11", "12", "13", "14"]);
+  assert.match(dichos[0], /No mandé las del 5, 6: mandámelas aparte/);
+  assert.match(hecho, /sin mandar: 5, 6$/);
+});
+
+/** dm_config como la guarda Postgres: jsonb ordena las claves de un objeto (primero las cortas) y no guarda el orden. */
+function configComoJsonb() {
+  const guardado = {};
+  const jsonb = (v) => (Array.isArray(v) ? v.map(jsonb) : v && typeof v === "object"
+    ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.length - b.length || (a < b ? -1 : a > b ? 1 : 0)).map(([k, x]) => [k, jsonb(x)]))
+    : v);
+  pg.otras = (t, params) => {
+    if (t.startsWith("UPDATE dm_config SET valor = valor || jsonb_build_object('hasta'")) return { rows: [] };
+    if (t.startsWith("SELECT valor FROM dm_config WHERE clave =")) return { rows: params[0] in guardado ? [{ valor: structuredClone(guardado[params[0]]) }] : [] };
+    if (t.startsWith("INSERT INTO dm_config (clave, valor)")) {
+      guardado[params[0]] = jsonb(JSON.parse(params[1]));
+      return { rows: [] };
+    }
+    return undefined;
+  };
+  return guardado;
+}
+
+test("H: el número se encuentra en el resumen que respondió aunque ya haya salido el siguiente, también al cambiar de mes", async () => {
+  configComoJsonb();
+  try {
+    const franjas = [];
+    for (let d = Date.parse("2026-10-20T01:00:00Z"); d <= Date.parse("2026-11-03T10:00:00Z"); d += 12 * HORA) {
+      franjas.push(new Date(d), new Date(d + 9 * HORA));
+    }
+    let previa = null;
+    for (const f of franjas.filter((x, i, a) => a.findIndex((y) => y.getTime() === x.getTime()) === i).sort((a, b) => a - b)) {
+      const etiqueta = etiquetaDe(f);
+      await baseJs.cerrarResumen(f.toISOString(), f, { etiqueta, en: f.toISOString(), mapa: { 1: `id ${etiqueta}`, 12: `doce ${etiqueta}` } });
+      assert.equal(await baseJs.numeroDeResumen(etiqueta, 1), `id ${etiqueta}`, etiqueta);
+      if (previa) assert.equal(await baseJs.numeroDeResumen(previa, 12), `doce ${previa}`, `al guardar ${etiqueta} sigue ${previa}`);
+      previa = etiqueta;
+    }
+    // Quedan los de las últimas 72 horas (con el de hace justo 72, 7): uno más viejo ya no, y nunca se busca el número
+    // en otro resumen.
+    assert.equal(await baseJs.numeroDeResumen("31/10 18 h", 1), "id 31/10 18 h");
+    assert.equal(await baseJs.numeroDeResumen("31/10 9 h", 1), null);
+    assert.equal(await baseJs.numeroDeResumen("20/10 9 h", 1), null);
+    assert.equal(await baseJs.numeroDeResumen("03/11 18 h", 99), null);
+  } finally {
+    pg.otras = null;
+  }
+  const lista = resumenJs.conResumen(null, { etiqueta: "20/10 9 h", en: "2026-10-20T01:00:00.000Z", mapa: { 1: "11" } });
+  assert.deepEqual(lista, [{ etiqueta: "20/10 9 h", en: "2026-10-20T01:00:00.000Z", mapa: { 1: "11" } }]);
+  assert.equal(resumenJs.numeroEn({ "20/10 9 h": { 1: "11" } }, "20/10 9 h", 1), null, "una lista vieja (objeto) no vale");
+});
+
+test("las notas del resumen no traen el borrador del código y dejan afuera lo urgente con la misma definición que el agente", async () => {
+  const consultas = [];
+  pg.otras = (t, params) => {
+    if (t.includes("FROM dm_salidas s JOIN dm_contactos c")) {
+      consultas.push({ t, params });
+      return { rows: [] };
+    }
+    return undefined;
+  };
+  try {
+    await baseJs.notasParaResumen(new Date("2026-10-20T01:00:00Z"), new Date("2026-10-20T10:00:00Z"));
+  } finally {
+    pg.otras = null;
+  }
+  assert.equal(consultas.length, 1);
+  assert.match(consultas[0].t, /s\.accion NOT IN \('pasar_a_cande', 'codigo_mp'\)/);
+  assert.match(consultas[0].t, /s\.aviso !~\* \?/, "el patrón va como parámetro: el mismo de resumen.URGENTE");
+  const patron = consultas[0].params.find((p) => p === resumenJs.URGENTE);
+  assert.ok(patron, "usa resumen.URGENTE");
+  const comoPostgres = new RegExp(patron, "i");
+  for (const aviso of ["HOY: algo", "hoy: algo", " HOY : algo", "YA: algo", "Ya:algo", "NOTA: algo", "algo HOY: no", "Hoy no: algo", ""]) {
+    assert.equal(comoPostgres.test(aviso), resumenJs.esUrgente(aviso), aviso);
+  }
+  assert.equal(resumenJs.esUrgente("hoy: algo"), true);
+  assert.equal(resumenJs.esUrgente("NOTA: algo"), false);
 });
