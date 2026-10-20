@@ -15,6 +15,7 @@
 // El aviso nunca puede fallar la respuesta: Gumroad reintenta si no le contestamos 200, y
 // un reintento sería un segundo mensaje por la misma venta. Se contesta 200 siempre.
 import { sql } from "@vercel/postgres";
+import { asegurarTablaCompras } from "../../lib/compras";
 import { avisar } from "../../lib/notificar";
 
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -25,6 +26,23 @@ const plata = (centavos, moneda) => {
   if (!Number.isFinite(n)) return "—";
   return `${(n / 100).toFixed(2)} ${(moneda || "usd").toUpperCase()}`;
 };
+
+/** Deja la venta anotada en la base. Hasta el 20/10 la compra solo existía en Gumroad y en el
+ *  aviso de Telegram: la base no sabía quién había comprado (`leads_devs.compro` estaba en false
+ *  para los 11 compradores), así que para contestar "quién compró y de dónde salió" había que
+ *  abrir Gumroad a mano. Se guarda junto con el origen tal como estaba el día de la venta: el
+ *  lead puede editarse después y la foto del momento es la que sirve para medir.
+ *
+ *  Nunca puede romper el aviso ni la respuesta: si la base está caída, se loguea y sigue. */
+async function anotarCompra(datos) {
+  if (!process.env.POSTGRES_URL) return;
+  await asegurarTablaCompras();
+  await sql`
+    INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, venta_id)
+    VALUES (${datos.email}, ${datos.nombre}, ${datos.producto}, ${datos.precio}, ${datos.moneda},
+            ${datos.recurrencia}, ${datos.baja}, ${datos.origen}, ${datos.como_llego}, ${datos.pais}, ${datos.ventaId})
+    ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING`;
+}
 
 /** La ficha del comprador en la red de devs, por mail. Si no está, no es un lead conocido. */
 async function ficha(email) {
@@ -76,6 +94,24 @@ export default async function handler(req, res) {
     Producto: limpiar(b.product_name, 120),
   }, { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
   if (!ok) console.error("gumroad-ping: el aviso no salió", { email });
+
+  // La venta queda anotada DESPUÉS del aviso: si la base falla, ella se entera igual por Telegram,
+  // que es lo que no puede perderse. Una compra de prueba no se guarda.
+  if (!prueba) {
+    try {
+      await anotarCompra({
+        email, nombre: nombre || f?.nombre || null, producto: limpiar(b.product_name, 120) || null,
+        precio: Number.isFinite(Number(b.price)) ? Number(b.price) / 100 : null,
+        moneda: (limpiar(b.currency, 10) || "usd").toLowerCase(),
+        recurrencia: limpiar(b.recurrence, 20) || null, baja,
+        origen: f?.origen || null, como_llego: f?.como_llegaste || null,
+        pais: f?.pais || limpiar(b.ip_country, 60) || null,
+        ventaId: limpiar(b.sale_id, 80) || null,
+      });
+    } catch (e) {
+      console.error("gumroad-ping: no pude anotar la compra:", e.message);
+    }
+  }
 
   // 200 siempre: un error acá le dice a Gumroad que reintente y la venta se avisaría dos veces.
   return res.status(200).json({ ok: true });
