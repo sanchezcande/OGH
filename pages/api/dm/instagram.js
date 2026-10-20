@@ -55,8 +55,11 @@ export default async function handler(req, res) {
     const ultimo = visto?.hasta ? new Date(visto.hasta) : null;
     const desde = ultimo ? new Date(ultimo.getTime() - SOLAPE_MS) : null;
     // La primera vez mira solo las 10 últimas: los "--" viejos los ve el agente al contestar.
+    // Una falla de la base en una charla no es de Instagram: queda en el registro (sin ids ni textos) y esa charla se
+    // vuelve a mirar en la vuelta siguiente. Solo lo que tira Instagram llega a fallo (el aviso de la conexión).
     const r = await buscarCodigos({
       ig: instagram, base: { contactoDeIg, guardarIg, tomar, soltar, textosDeLaCuenta }, reglas: reglasInstagram, desde, limite: ultimo ? 20 : 10,
+      registrar: (e) => console.error("dm: la base falló en una charla de la vuelta de Instagram", e?.code ?? "", e?.name ?? ""),
     });
     ({ miradas, sacadas, anotadas } = r);
     if (r.hasta && (!ultimo || r.hasta > ultimo)) await guardarConfig("instagram_visto", { hasta: r.hasta.toISOString() });

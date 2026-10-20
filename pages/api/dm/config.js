@@ -14,13 +14,16 @@
 //   { accion: "retomar_marcar", contactos: [id, ...], dias?, quitar? } → marca como retomadas esas charlas por `dias`
 //                                                  (7 si no se dice, de 1 a 30): si Cande les escribe a mano desde
 //                                                  Instagram, el agente no sale, anota lo suyo y sigue (lib/dm/instagram.js).
+//                                                  La marca sirve una vez: lo que escriba a mano después de lo anotado
+//                                                  saca al agente; marcarla de nuevo la deja sin usar.
 //                                                  Con quitar: true les saca la marca. Su "--" las saca igual.
 //                                                  Primero la charla del agente (dueno o sembrar), después la marca, y
 //                                                  recién ahí ella pega. Lo que va a pegar no se anota antes: lo anota la marca
 //   { accion: "retomar_estado", contactos: [id, ...] } → en cuáles de esas charlas todavía le toca pegar a Cande, en el
 //                                                  momento (lib/dm/instagram.js, paraPegar): no, si ya no es del agente, si
 //                                                  la cuenta ya le escribió después del último mensaje del lead, si el agente
-//                                                  está por contestar o si no tiene la marca. No cambia nada
+//                                                  está por contestar o si no tiene la marca sin usar. Se pregunta justo
+//                                                  antes de copiar: el lead pudo escribir y el agente contestarle. No cambia nada
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot

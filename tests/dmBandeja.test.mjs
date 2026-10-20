@@ -120,7 +120,8 @@ function mundo({
       return n;
     },
     // Como la consulta: solo en una charla del agente y una vez por ig_mid; lo del lead hasta el último de esos mensajes
-    // (por la hora) queda contestado y el toque se cancela.
+    // (por la hora) queda contestado, el toque se cancela y la marca de retomada queda usada hasta ese mensaje (si ya
+    // estaba usada, queda como estaba).
     anotarCandeDesdeIg: async (id, lista) => {
       const c = w.contactos.get(id);
       if (!c || c.dueno !== "agente") return 0;
@@ -130,6 +131,8 @@ function mundo({
         const tope = Math.max(...nuevos.map((m) => new Date(m.creado).getTime()));
         const leads = w.mensajes.filter((x) => x.contacto === id && x.quien === "lead" && x.creado.getTime() <= tope).map((x) => x.id);
         Object.assign(c, { respondido_hasta: Math.max(c.respondido_hasta || 0, ...leads), proximo_toque: null });
+        const marca = w.config.retomadas?.[id];
+        if (marca && marca.usada == null) marca.usada = tope;
       }
       return nuevos.length;
     },
@@ -794,15 +797,48 @@ test("en una charla retomada donde Cande escribió a mano, lo suyo queda anotado
   w.pasar(3);
   await w.revisar();
   assert.equal(w.delContacto("77").length, 2, "la vuelta siguiente no anota nada de nuevo");
-  // Con la marca vencida, como siempre: no se guarda nada y va al resumen.
+  // Con la marca vencida antes de que ella escribiera, como siempre: no se guarda nada y va al resumen.
   const vencida = mundo({
     contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) }],
     hilos: [charla(1, DEL_AGENTE, [["cuenta", pegado, 60], ["lead", "respuesta de prueba del lead", 30]])],
-    config: { retomadas: { 77: { hasta: AHORA.getTime() - MIN } } },
+    config: { retomadas: { 77: { hasta: AHORA.getTime() - 90 * MIN } } },
   });
   assert.equal((await vencida.revisar()).recuperados, 0);
   assert.equal(vencida.mensajes.length, 0);
   assert.match(vencida.resumenes()[0].campos[SECCION_VOS], /le escribiste vos/);
+});
+
+test("charla retomada: lo que Cande pegó con la marca vigente se anota aunque la red lo vea después de que venció y aunque haya pegado lo mismo en otra charla; la marca sirve una vez", async () => {
+  const OTRA = persona("502", "lead.dos");
+  const mismo = "Texto de prueba que Cande pegó igual en dos charlas";
+  // Pegó hace 3 horas en las dos; la marca venció hace 2 y los leads contestan recién ahora.
+  const marcas = () => ({ retomadas: { 77: { hasta: AHORA.getTime() - 120 * MIN }, 78: { hasta: AHORA.getTime() - 120 * MIN } } });
+  const contactos = [
+    { id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600), respondido_hasta: 0 },
+    { id: "78", nombre: "Lead dos", ig_id: "502", ig_usuario: "lead.dos", dueno_desde: hace(600), respondido_hasta: 0 },
+  ];
+  const w = mundo({
+    contactos,
+    hilos: [
+      charla(1, DEL_AGENTE, [["cuenta", mismo, 180], ["lead", "respuesta de prueba del lead", 30]]),
+      charla(2, OTRA, [["cuenta", mismo, 181], ["lead", "otra respuesta de prueba", 31]]),
+    ],
+    config: marcas(),
+  });
+  assert.equal((await w.revisar()).recuperados, 2);
+  for (const id of ["77", "78"]) {
+    assert.deepEqual(w.delContacto(id).map((m) => m.quien), ["cande", "lead"], id);
+    assert.equal(w.contactos.get(id).dueno, "agente", id);
+  }
+  assert.equal(w.resumenes().length, 0);
+  // Con la marca ya usada, lo que escribe después a mano no se anota: va al resumen, como siempre.
+  w.hilos[0] = charla(1, DEL_AGENTE, [
+    ["cuenta", mismo, 180], ["lead", "respuesta de prueba del lead", 30], ["cuenta", "Y esto lo escribí yo a mano después", 20], ["lead", "dale de prueba", 10],
+  ]);
+  w.pasar(30);
+  await w.revisar();
+  assert.deepEqual(w.delContacto("77").map((m) => m.quien), ["cande", "lead"], "no anota lo nuevo de ella ni lo del lead");
+  assert.match(w.resumenes()[0].campos[SECCION_VOS], /le escribiste vos/);
 });
 
 /* ---------- 8. lo que el agente no puede tomar va al resumen ---------- */

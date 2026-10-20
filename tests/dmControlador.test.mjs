@@ -1351,3 +1351,40 @@ test("si Cande escribió a mano y no se pudo anotar lo suyo (el agente mira de n
   assert.equal((await controlar()).corregidas, 1);
   assert.equal(agente.pedidos.length, 2);
 });
+
+/* ---------- segunda revisión de las charlas retomadas (21/10) ---------- */
+
+test("charla retomada: lo de Cande que se anotó después de la respuesta del lead pero lo escribió antes se lee en el orden en que se escribió (sin fallas que no existen)", async () => {
+  // Lo último era un sí viejo (de hace 4 días) a una oferta, sin lo que seguía. Cande pegó C hace 25 minutos, el lead le
+  // contestó R hace 20 y el agente contestó A2 hace 19. C lo anotó recién la mirada del turno de R: quedó con un id más
+  // alto que R, con la hora de Instagram.
+  const ms = [
+    { contacto: ID, id: 100, quien: "lead", texto: "hola, soy dev y busco hace un tiempo", creado: hace(5200) },
+    { contacto: ID, id: 101, quien: "agente", texto: OFERTA, creado: hace(5100) },
+    { contacto: ID, id: 102, quien: "lead", texto: SI, creado: hace(5000) },
+    { contacto: ID, id: 103, quien: "lead", texto: "hola! sigo en la misma, de prueba", creado: hace(20) },
+    { contacto: ID, id: 104, quien: "cande", texto: "Texto de prueba que Cande pegó a mano", creado: hace(25) },
+    { contacto: ID, id: 105, quien: "agente", texto: "Uh, y qué es lo que más te traba?", creado: hace(19) },
+  ];
+  const contacto = contactoDe(ms, { respondido_hasta: 103, dueno_desde: hace(120) });
+  assert.deepEqual(reglas(C.detectar({ mensajes: ms, contactos: [contacto], salidas: [], pendientes: [] }, { ahora: AHORA.getTime(), patrones: P })), []);
+  const base = baseFalsa({ mensajes: ms, contactos: [contacto] });
+  const { agente, controlar } = controlador(base);
+  const r = await controlar();
+  assert.deepEqual(r.fallas, {});
+  assert.equal(r.al_resumen, 0);
+  assert.deepEqual(base.filas, [], "ningún renglón 'Controlador:' falso en el resumen");
+  assert.equal(agente.pedidos.length, 0);
+});
+
+test("lo último que miró el controlador (vistoHasta) es el id más alto de la charla, aunque por la hora lo último sea otro mensaje", async () => {
+  // Una falla de verdad (el sí de recién contestado con otra pregunta) y lo de Cande anotado tarde, más atrás por la hora.
+  const ms = [
+    ...charla([["agente", OFERTA, 70], ["lead", SI, 60], ["agente", OTRA, 59]], { desde: 100 }),
+    { contacto: ID, id: 103, quien: "automatico", texto: "Mensaje fijo de prueba", creado: hace(200) },
+  ];
+  const base = baseFalsa({ mensajes: ms });
+  const { agente, controlar } = controlador(base);
+  await controlar();
+  assert.deepEqual(agente.pedidos.map((p) => p.vistoHasta), [103]);
+});

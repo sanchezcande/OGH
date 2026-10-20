@@ -11,7 +11,12 @@
 // que contestaba algo de antes del último mensaje de ella (creado antes o después de ese mensaje) y deja lo que contesta
 // algo que el lead escribió después; si no anotó nada nuevo, no toca lo pendiente; estadoRetomadas trae dueño, último
 // del lead, último de la cuenta (sin los automáticos) y si hay algo por salir después del último del lead, y no trae
-// las que no están. Los ids y textos son inventados (este repo es público).
+// las que no están. Segunda revisión del 21/10, otra vez contra un Postgres 16 local y descartable (el SQL tal cual):
+// sembrar deja toda la historia con la misma hora, y estadoRetomadas trae el id de lo último de cada lado por la hora y,
+// a la misma hora, por el id (en una sembrada con el lead al final, el del lead es el más alto); anotarCandeDesdeIg deja
+// la marca "usada" con la hora de lo que anotó, no la cambia si no anotó nada nuevo ni si ya estaba usada, y no crea
+// una marca donde no había; marcarRetomadas deja sin usar la que se marca de nuevo, guarda una vencida hace 10 días y
+// limpia las de más de 30, y con quitar saca solo esas. Los ids y textos son inventados (este repo es público).
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -105,7 +110,11 @@ test("marcarRetomadas: una sola sentencia que suma sin pisar, limpia las vencida
   assert.match(cuerpo, new RegExp(`VALUES \\('${CLAVE_RETOMADAS}', \\$\\{JSON\\.stringify\\(nuevas\\)\\}::jsonb\\)`));
   assert.match(cuerpo, /ON CONFLICT \(clave\) DO UPDATE SET valor = \(/);
   assert.match(cuerpo, /jsonb_each\(dm_config\.valor \|\| EXCLUDED\.valor\)/);
-  assert.match(cuerpo, /\(e\.v->>'hasta'\)::bigint > \$\{Date\.now\(\)\}::bigint/);
+  // Las vencidas se limpian a los 30 días de vencer, no al vencer: lo escrito con la marca vigente cuenta aunque se vea
+  // después (revisión del 21/10). Vigentes son las que no vencieron.
+  assert.match(cuerpo, /\(e\.v->>'hasta'\)::bigint > \$\{ahora - GUARDAR_RETOMADA_MS\}::bigint/);
+  assert.match(await leer("../lib/dm/base.js"), /const GUARDAR_RETOMADA_MS = 30 \* 86400000;/);
+  assert.match(cuerpo, /filter\(\(v\) => Number\(v\?\.hasta\) > ahora\)\.length/);
   assert.match(cuerpo, /e\.k NOT IN \(SELECT jsonb_array_elements_text\(\$\{JSON\.stringify\(fuera\)\}::jsonb\)\)/);
   const cuales = cuerpoDe(await leer("../lib/dm/base.js"), "cualesDelAgente");
   assert.match(cuales, /WHERE dueno = 'agente' AND id IN \(SELECT jsonb_array_elements_text/);
@@ -202,4 +211,56 @@ test("las piezas nuevas están conectadas: retomar_estado en la API y lo vencido
   assert.equal(typeof (await import("../lib/dm/base.js")).estadoRetomadas, "function");
   assert.match(await leer("../pages/api/dm/config.js"), /charlas = ids\.map\(\(x\) => paraPegar\(x, filas\.get\(x\) \|\| null, retomadas\)\)/);
   assert.match(await leer("../pages/api/dm/toques.js"), /else if \(r !== "descartada"\) sinAtender\+\+/);
+});
+
+/* ---------- segunda revisión de las charlas retomadas (21/10) ---------- */
+
+test("anotarCandeDesdeIg deja usada la marca de retomada en la misma sentencia: hasta lo último que anotó, solo si anotó algo y una sola vez", async () => {
+  const cuerpo = cuerpoDe(await leer("../lib/dm/base.js"), "anotarCandeDesdeIg");
+  assert.match(cuerpo, /UPDATE dm_config SET valor = jsonb_set\(valor, ARRAY\[\$\{String\(id\)\}::text, 'usada'\],/);
+  assert.match(cuerpo, /to_jsonb\(\(SELECT \(EXTRACT\(EPOCH FROM MAX\(creado\)\) \* 1000\)::bigint FROM n\)\), true\)/);
+  assert.match(cuerpo, new RegExp(`WHERE clave = '${CLAVE_RETOMADAS}' AND EXISTS \\(SELECT 1 FROM n\\)`));
+  assert.match(cuerpo, /AND valor -> \$\{String\(id\)\}::text IS NOT NULL AND valor -> \$\{String\(id\)\}::text -> 'usada' IS NULL\)/);
+  assert.doesNotMatch(cuerpo, /valor - /, "no la borra: una mirada que corre a la vez la sigue viendo");
+});
+
+test("estadoRetomadas trae el id de lo último de cada lado, por la hora y a la misma hora por el orden en la base", async () => {
+  const cuerpo = cuerpoDe(await leer("../lib/dm/base.js"), "estadoRetomadas");
+  assert.match(cuerpo, /l\.mid AS id_ultimo_del_lead, a\.mid AS id_ultimo_de_la_cuenta/);
+  const lados = cuerpo.match(/\(ARRAY_AGG\(m\.id ORDER BY m\.creado DESC, m\.id DESC\)\)\[1\] AS mid/g) || [];
+  assert.equal(lados.length, 2, "el del lead y el de la cuenta");
+  assert.match(cuerpo, /CROSS JOIN LATERAL \(\s*SELECT MAX\(m\.creado\) AS en, /, "con agregados: la charla sin mensajes de un lado vuelve igual");
+});
+
+test("retomar_estado en las charlas sembradas (todo con la misma hora): le toca pegar si lo último en la base es del lead", async () => {
+  const { default: handler } = await import("../pages/api/dm/config.js");
+  const sembrada = new Date(Date.now() - 3600000).toISOString();
+  const filas = [
+    { id: "1", dueno: "agente", ultimo_del_lead: sembrada, ultimo_de_la_cuenta: sembrada, id_ultimo_del_lead: 14, id_ultimo_de_la_cuenta: 13, por_salir: false },
+    { id: "2", dueno: "agente", ultimo_del_lead: sembrada, ultimo_de_la_cuenta: sembrada, id_ultimo_del_lead: 23, id_ultimo_de_la_cuenta: 24, por_salir: false },
+  ];
+  const marcas = { 1: { hasta: Date.now() + 7 * DIA }, 2: { hasta: Date.now() + 7 * DIA } };
+  pg.otras = (t, params) => {
+    if (t.startsWith("SELECT c.id, c.dueno, l.en AS ultimo_del_lead")) return { rows: filas };
+    if (t === "SELECT valor FROM dm_config WHERE clave = ?" && params[0] === CLAVE_RETOMADAS) return { rows: [{ valor: marcas }] };
+    if (/^(CREATE|ALTER|UPDATE)/.test(t)) return { rows: [] };
+    return undefined;
+  };
+  process.env.COLA_SECRET = "secreto-de-prueba";
+  process.env.POSTGRES_URL = "postgres://de-prueba";
+  try {
+    const res = respuesta();
+    await handler({ method: "POST", headers: { authorization: "Bearer secreto-de-prueba" }, body: { accion: "retomar_estado", contactos: ["1", "2"] } }, res);
+    assert.equal(res.codigo, 200);
+    assert.deepEqual(res.cuerpo.charlas.map((x) => [x.contacto, x.pegar, x.motivo]), [["1", true, null], ["2", false, "ya le escribió la cuenta"]]);
+  } finally {
+    pg.otras = null;
+    delete process.env.COLA_SECRET;
+    delete process.env.POSTGRES_URL;
+  }
+});
+
+test("el cron de Instagram le pasa a buscarCodigos dónde registrar una falla de la base, sin ids ni textos", async () => {
+  const cron = await leer("../pages/api/dm/instagram.js");
+  assert.match(cron, /registrar: \(e\) => console\.error\("dm: la base falló en una charla de la vuelta de Instagram", e\?\.code \?\? "", e\?\.name \?\? ""\)/);
 });

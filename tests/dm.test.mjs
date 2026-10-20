@@ -3563,3 +3563,46 @@ test("charla retomada: lo que Cande escribió antes que el lead y se anotó desp
   assert.deepEqual(mundo.m.pedidos[1].turno.mensajes_del_lead, ["otro mensaje de prueba del lead"]);
   assert.deepEqual(mundo.m.mensajes.map((x) => x.quien), ["agente", "lead", "lead", "cande", "agente", "lead", "agente"], "en la base no se toca nada");
 });
+
+/* ---------- segunda revisión de las charlas retomadas (21/10) ---------- */
+
+test("charla retomada: lo de Cande que se anotó tarde pero lo escribió antes que el lead no frena el seguimiento que el agente agendó para esa respuesta", async () => {
+  const hora = (h) => new Date(AHORA.getTime() - h * HORA);
+  const armarCon = (candeHace) => {
+    const w = armarToque();
+    w.m.mensajes[0].creado = hora(7);
+    w.m.mensajes[1].creado = hora(6); // la respuesta del lead, que el agente atendió callando con un seguimiento
+    // Lo de Cande lo vio recién la mirada: quedó con un id más alto, con la hora en que lo escribió.
+    w.m.mensajes.push({ id: 3, quien: "cande", texto: A_MANO, creado: hora(candeHace) });
+    return w;
+  };
+  const antes = armarCon(6.1);
+  assert.equal((await toque(antes.agente)).hecho, "enviada");
+  assert.deepEqual(antes.m.enviados, ["Mensaje de seguimiento?"]);
+  // Si lo de ella es lo último que se escribió, el toque no sale detrás.
+  const despues = armarCon(1);
+  assert.equal((await toque(despues.agente)).hecho, "le escribió Cande");
+  assert.deepEqual(despues.m.enviados, []);
+});
+
+test("rescate en una charla retomada: después de la mirada la marca ya está usada y la charla sigue contando como retomada", async () => {
+  // Las reglas de verdad: retomada mira que la marca esté vigente, aunque ya se haya usado (lib/dm/instagram.js).
+  const { crearReglasInstagram } = await import("../lib/dm/instagram.js");
+  let marcas = { 77: { hasta: AHORA.getTime() + 86400000 } };
+  const reglas = crearReglasInstagram({ base: { leerConfig: async () => marcas }, manychat: {}, avisar: async () => true, reloj: () => AHORA });
+  const instagram = { conApi: true, retomada: reglas.retomada, sacar: async () => {} };
+  const w = armar({ instagram });
+  // La mirada anota lo que Cande escribió después del lead, y con eso la marca queda usada (base.anotarCandeDesdeIg).
+  instagram.porQueSale = async () => {
+    escribioCande(w.m, -2);
+    marcas = { 77: { ...marcas[77], usada: aLos(-2).getTime() } };
+    return null;
+  };
+  w.m.ajustes.instagram = true;
+  w.m.mensajes[1].creado = aLos(-10);
+  w.m.salidas.push({ accion: "responder", estado: "vencida" });
+  assert.equal(await w.agente.rescatarVencida(vencida()), "descartada");
+  assert.deepEqual(w.m.enviados, []);
+  assert.equal(w.m.contacto.dueno, "agente");
+  assert.equal(w.m.avisos.length, 0);
+});
