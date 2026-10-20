@@ -23,6 +23,10 @@
 // Si la base falla contesta 200 igual, con ok en false, y le avisa a Cande: con un 500 el
 // mensaje se pierde y nadie se entera.
 //
+// Si ManyChat no llama acá (un mensaje que se pierde, alguien nuevo que nunca entra), la red de la bandeja
+// (lib/dm/bandeja.js, cada 3 minutos) lo encuentra en la bandeja real de Instagram y lo guarda. Si después llega
+// igual por acá, no se guarda dos veces (recibir en lib/dm/agente.js).
+//
 // El cuerpo se lee crudo y no con el lector de Next: ManyChat no escapa el texto del mensaje, y
 // un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
 import { waitUntil } from "@vercel/functions";

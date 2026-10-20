@@ -19,6 +19,9 @@
 // y las otras siguen saliendo. La corrida corta recién si el modelo está caído para todas (la Mac se fue
 // o se quedó sin uso, o fallan dos charlas seguidas). Ver decidirSinContestar y vigiaDelModelo.
 //
+// También contesta lo que guarda la red de la bandeja (lib/dm/bandeja.js): los mensajes que el webhook de ManyChat
+// no trajo y la gente nueva que nunca entró por la entrada.
+//
 // Nunca dos veces: cada charla se aparta para una sola corrida, sin una respuesta que pudo haber salido,
 // y el agente vuelve a mirar todo antes de mandar (lib/dm/agente.js). Lo que no tiene arreglo (el
 // agente apagado, un envío sin confirmar, el modelo que falla con esa charla) lo pasa el cron de los
