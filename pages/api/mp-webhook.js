@@ -19,7 +19,9 @@
 // Siempre contesta 200, incluso cuando algo falla: MercadoPago reintenta mientras no reciba un
 // 200 y cada reintento sería otro mail a la misma persona. Lo que salió mal queda en el log y
 // en el aviso de Telegram, que es donde ella lo va a ver.
+import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
+import { asegurarTablaCompras } from "../../lib/compras";
 import { guardarEvento, hayBase } from "../../lib/db";
 import { mandarMail } from "../../lib/mandarMail";
 import { avisar } from "../../lib/notificar";
@@ -48,6 +50,34 @@ async function traerPago(id, token) {
   });
   if (!r.ok) return { error: `MercadoPago contestó ${r.status}` };
   return { pago: await r.json() };
+}
+
+/** Anota la venta y dice si es la PRIMERA vez que vemos este pago.
+ *
+ *  MercadoPago manda más de un aviso por el mismo pago (el 20/10 llegaron dos en el mismo minuto,
+ *  `payment.created` y `payment.updated`), y sin esto cada uno mandaba otro mail con el código a
+ *  la misma persona. El `venta_id` tiene un índice único, así que el que inserta primero gana y
+ *  el segundo no devuelve fila.
+ *
+ *  Si la base falla, devuelve true y el mail sale igual: un mail repetido molesta, quedarse sin
+ *  el código después de pagar no. */
+async function anotarVenta(pago, id) {
+  if (!hayBase()) return true;
+  try {
+    await asegurarTablaCompras();
+    const { rows } = await sql`
+      INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, venta_id)
+      VALUES (${(pago.payer?.email || "").trim().toLowerCase()},
+              ${[pago.payer?.first_name, pago.payer?.last_name].filter(Boolean).join(" ").trim() || null},
+              'Acelerador de Carrera Tech', ${pago.transaction_amount}, ${(pago.currency_id || "ars").toLowerCase()},
+              NULL, FALSE, 'mercadopago', 'pagó en pesos', NULL, ${`mp-${id}`})
+      ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING
+      RETURNING id`;
+    return rows.length > 0;
+  } catch (e) {
+    console.error("mp-webhook: no pude anotar la venta:", e.message);
+    return true;
+  }
 }
 
 const cuerpoMail = (nombre) => `Hola${nombre ? " " + nombre : ""},
@@ -95,6 +125,11 @@ export default async function handler(req, res) {
     const mail = (pago.payer?.email || "").trim();
     const nombre = (pago.payer?.first_name || "").trim();
     const monto = pago.transaction_amount;
+
+    // Primero el candado: si este pago ya se procesó, este aviso es un repetido de MercadoPago y
+    // el código ya salió. Contestar 200 y no hacer nada más.
+    const primera = await anotarVenta(pago, id);
+    if (!primera) return res.status(200).json({ ok: true, repetido: true });
 
     if (hayBase()) {
       // Queda en el mismo embudo que el resto, para poder contar cuántos pagan en pesos.
