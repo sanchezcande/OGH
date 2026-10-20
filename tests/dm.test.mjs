@@ -371,6 +371,9 @@ function armar({
     prompt: async () => prompt,
     contacto: async () => (m.contacto ? { ...m.contacto } : null),
     anotarLead: async (id, texto) => (m.contacto?.dueno === "agente" ? m.entraLead(texto) : null),
+    // Lo que la red de la bandeja ya guardó (lib/dm/bandeja.js): en estas pruebas, nada.
+    guardadosPorLaRed: async () => [],
+    marcarEco: async () => false,
     lugarParaAlta: async (id, tope) => (m.contacto || m.altasHoy >= tope ? null : m.altasHoy),
     darDeAlta: async (id, { nombre, texto, contexto, tope }) => {
       if (m.contacto || m.altasHoy >= tope) return null;
