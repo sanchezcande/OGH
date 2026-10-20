@@ -53,3 +53,16 @@ test("buscar_ig encuentra el contacto de ManyChat sin mandar nada", async () => 
   assert.doesNotMatch(cuerpo, /mandarTextos/);
   assert.match(cuerpo, /b\.etiquetar === true \? \(await ponerEtiqueta\(q\.id, ETIQUETA_AGENTE\)\)/);
 });
+
+test("desanotar saca solo mensajes de Cande de las últimas 24 h con ese texto exacto", async () => {
+  const base = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const i = base.indexOf("export async function desanotar");
+  assert.ok(i > -1);
+  const cuerpo = base.slice(i, i + 600);
+  assert.match(cuerpo, /DELETE FROM dm_mensajes/);
+  assert.match(cuerpo, /quien = 'cande'/);
+  assert.match(cuerpo, /creado > NOW\(\) - INTERVAL '24 hours'/);
+  assert.match(cuerpo, /texto IN \(SELECT jsonb_array_elements_text/);
+  const src = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
+  assert.match(src, /b\.accion === "desanotar"[\s\S]{0,400}textos\.length > 10/);
+});

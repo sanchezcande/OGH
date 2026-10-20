@@ -9,6 +9,8 @@
 //   { accion: "anotar", contacto, quien, texto }   → deja constancia de lo que Cande mandó a mano
 //   { accion: "reservar", contactos: [id, ...] }   → deja como de Cande, en tanda, a quienes todavía no figuran
 //                                                  (se corre antes de prender las altas, con los contactos que ya existen)
+//   { accion: "desanotar", contacto, textos }      → saca lo anotado como de Cande en las últimas 24 h que al final no
+//                                                  salió (texto exacto); para corregir un borrador antes de que ella lo pegue
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
@@ -44,7 +46,7 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, desanotar, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
@@ -199,6 +201,12 @@ export default async function handler(req, res) {
     if (!(await contacto(id))) return res.status(404).json({ error: "ese contacto no está en la base del agente" });
     await anotarAMano(id, b.quien, texto.slice(0, TOPE_TEXTO));
     return res.status(200).json({ ok: true });
+  }
+
+  if (b.accion === "desanotar") {
+    const textos = (Array.isArray(b.textos) ? b.textos : []).map((t) => String(t || "").trim()).filter(Boolean);
+    if (!id || !textos.length || textos.length > 10) return res.status(400).json({ error: "falta contacto o textos (de 1 a 10)" });
+    return res.status(200).json({ ok: true, sacados: await desanotar(id, textos) });
   }
 
   if (b.accion === "borrar") {
