@@ -35,3 +35,23 @@ test("el aviso a Telegram sale aunque el mail falle", () => {
   const aviso = src.lastIndexOf('avisar("Pagó en pesos');
   assert.ok(aviso > envio, "el aviso va despues de intentar el mail, con su resultado");
 });
+
+test("un aviso repetido de MercadoPago no manda el codigo dos veces", () => {
+  // 20/10: por el mismo pago llegaron dos avisos en el mismo minuto (payment.created y
+  // payment.updated) y los dos mandaron mail.
+  assert.match(src, /const primera = await anotarVenta\(pago, id\)/);
+  const candado = src.indexOf("if (!primera) return");
+  const envio = src.indexOf("mandarMail(new Resend");
+  assert.ok(candado > 0 && candado < envio, "el candado va antes del mail");
+  assert.match(src, /ON CONFLICT \(venta_id\) WHERE venta_id IS NOT NULL DO NOTHING/);
+});
+
+test("si la base falla el codigo sale igual", () => {
+  // Un mail repetido molesta; quedarse sin el curso despues de pagar, no.
+  assert.match(src, /no pude anotar la venta[\s\S]{0,80}return true/);
+});
+
+test("el pago en pesos tambien queda en la tabla de compras", () => {
+  assert.match(src, /INSERT INTO compras/);
+  assert.match(src, /'mercadopago'/);
+});

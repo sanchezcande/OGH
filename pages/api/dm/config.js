@@ -9,6 +9,8 @@
 //   { accion: "anotar", contacto, quien, texto }   → deja constancia de lo que Cande mandó a mano
 //   { accion: "reservar", contactos: [id, ...] }   → deja como de Cande, en tanda, a quienes todavía no figuran
 //                                                  (se corre antes de prender las altas, con los contactos que ya existen)
+//   { accion: "desanotar", contacto, textos }      → saca lo anotado como de Cande en las últimas 24 h que al final no
+//                                                  salió (texto exacto); para corregir un borrador antes de que ella lo pegue
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
@@ -16,9 +18,15 @@
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
-//   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) con la
-//                                                  etiqueta HUMAN_AGENT: hasta 7 días después del último mensaje del lead
-//                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
+//   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) dentro
+//                                                  de las 24 h del último mensaje del lead (ManyChat no acepta HUMAN_AGENT
+//                                                  en Instagram: pasadas las 24 h, solo a mano). Queda anotado como de ella.
+//                                                  Sin contacto, con igsid, usuario y nombres: lo busca en ManyChat como
+//                                                  la red de la bandeja; con etiquetar: true le pone agente_dm, así lo que
+//                                                  conteste le llega al agente. Devuelve el contacto de ManyChat.
+//   { accion: "buscar_ig", igsid, usuario, nombres, etiquetar? } → quién es en ManyChat alguien de Instagram que no
+//                                                  está en la base, sin mandarle nada (con etiquetar: true, le pone agente_dm).
+//                                                  Para sembrar una charla que Cande va a contestar a mano y que siga el agente
 //   { accion: "nota", contacto, texto }            → lo que encontró el repaso y no es para ahora: va al resumen de las
 //                                                  notas, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
@@ -38,14 +46,15 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, desanotar, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import {
   codigoEnHilo, desdeDe, desdeManual, explicarError, linkCharlaIg, manualEnHilo, usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
-import { datosDe, hayManyChat, mandarTextos, ponerCampo } from "../../../lib/dm/manychat";
+import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
+import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
 import { frenoDelCodigo } from "../../../lib/dm/frenos";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -149,21 +158,39 @@ export default async function handler(req, res) {
   }
 
   if (b.accion === "mandar_humano") {
-    // Un mensaje de Cande (escrito o aprobado por ella) a alguien que escribió hace más de 24 h y menos de 7 días:
-    // la API común ya no deja, la etiqueta HUMAN_AGENT de Meta sí, y es solo para respuestas de una persona
-    // (20/10: las charlas que se perdieron por la falla de ManyChat). Queda anotado como de Cande.
+    // Un mensaje de Cande (escrito o aprobado por ella), dentro de las 24 h: queda anotado como de ella. Se pensó
+    // para las charlas de hasta 7 días con la etiqueta HUMAN_AGENT, pero ManyChat la rechaza en Instagram (20/10,
+    // "Unsupported message tag"): pasadas las 24 h no hay API, se contesta a mano.
+    // Si no está en la base (escribió y ManyChat nunca lo pasó), se lo busca en ManyChat por su id de Instagram.
     const textos = (Array.isArray(b.textos) ? b.textos : [b.texto]).map((t) => String(t || "").trim()).filter(Boolean);
-    if (!id || !textos.length || textos.length > 3 || textos.some((t) => t.length > 1000)) {
+    const igsid = String(b.igsid || "").trim();
+    if (!(id || igsid) || !textos.length || textos.length > 3 || textos.some((t) => t.length > 1000)) {
       return res.status(400).json({ error: "falta contacto o textos (de 1 a 3, hasta 1000 caracteres)" });
     }
     const aj = await ajustes();
     if (frenoDelCodigo({ mensajes: textos }, aj.codigo_mercadopago)?.ok === false) {
       return res.status(400).json({ error: "el texto trae el código de acceso: eso sale solo con el ok del aviso del código" });
     }
-    const envio = await mandarTextos(id, textos, { humano: true });
-    if (!envio.ok) return res.status(502).json({ ok: false, error: envio.error, code: envio.code, incierto: envio.incierto || false });
-    if (await contacto(id)) await anotarAMano(id, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
-    return res.status(200).json({ ok: true });
+    let destino = id;
+    if (!destino) {
+      const q = await buscarIg(igsid, b);
+      if (!q.id) return res.status(q.status).json({ ok: false, error: q.error });
+      destino = q.id;
+    }
+    const envio = await mandarTextos(destino, textos);
+    if (!envio.ok) return res.status(502).json({ ok: false, contacto: destino, error: envio.error, code: envio.code, incierto: envio.incierto || false });
+    if (await contacto(destino)) await anotarAMano(destino, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
+    const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(destino, ETIQUETA_AGENTE))?.ok === true : null;
+    return res.status(200).json({ ok: true, contacto: destino, etiqueta });
+  }
+
+  if (b.accion === "buscar_ig") {
+    const igsid = String(b.igsid || "").trim();
+    if (!igsid) return res.status(400).json({ error: "falta igsid" });
+    const q = await buscarIg(igsid, b);
+    if (!q.id) return res.status(q.status).json({ ok: false, error: q.error });
+    const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(q.id, ETIQUETA_AGENTE))?.ok === true : null;
+    return res.status(200).json({ ok: true, contacto: q.id, nombre: q.nombre || null, etiqueta });
   }
 
   if (b.accion === "anotar") {
@@ -174,6 +201,12 @@ export default async function handler(req, res) {
     if (!(await contacto(id))) return res.status(404).json({ error: "ese contacto no está en la base del agente" });
     await anotarAMano(id, b.quien, texto.slice(0, TOPE_TEXTO));
     return res.status(200).json({ ok: true });
+  }
+
+  if (b.accion === "desanotar") {
+    const textos = (Array.isArray(b.textos) ? b.textos : []).map((t) => String(t || "").trim()).filter(Boolean);
+    if (!id || !textos.length || textos.length > 10) return res.status(400).json({ error: "falta contacto o textos (de 1 a 10)" });
+    return res.status(200).json({ ok: true, sacados: await desanotar(id, textos) });
   }
 
   if (b.accion === "borrar") {
@@ -360,4 +393,17 @@ export default async function handler(req, res) {
   }
 
   return res.status(400).json({ error: "accion desconocida" });
+}
+
+/**
+ * Quién es en ManyChat alguien de Instagram que no está en la base: lo busca igual que la red de la bandeja (por
+ * nombre, y vale solo si coincide su usuario o su id de Instagram). { id, nombre } o { id: null, status, error }.
+ */
+async function buscarIg(igsid, b) {
+  if (!hayManyChat()) return { id: null, status: 503, error: "falta la clave de ManyChat" };
+  const nombres = (Array.isArray(b.nombres) ? b.nombres : []).concat(b.usuario).slice(0, 4);
+  const q = await identificar({ buscarPorNombre, datosDe }, { igsid, usuario: String(b.usuario || ""), nombres, hasta: Date.now() + 20000 });
+  if (q.id) return q;
+  const error = q.varios ? "hay más de un contacto con ese usuario en ManyChat" : q.falla ? "ManyChat no contestó" : "no está en ManyChat";
+  return { id: null, status: 404, error };
 }
