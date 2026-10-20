@@ -21,3 +21,13 @@ test("reabrirTurno deja atendido todo lo anterior al último mensaje enviado por
   assert.match(cuerpo, /quien IN \('agente', 'cande', 'automatico'\)/);
   assert.match(cuerpo, /m\.quien = 'lead' AND m\.id < ultimo\.cuenta/);
 });
+
+test("retomar descarta el pase a Cande que vino después de lo último del lead (su mensaje no llegó a salir)", async () => {
+  const src = await leer("../lib/dm/base.js");
+  const i = src.indexOf("export async function reabrirTurno");
+  const cuerpo = src.slice(i, i + 2200);
+  assert.match(cuerpo, /if \(abiertos > 0\)/, "solo si quedó algo abierto");
+  assert.match(cuerpo, /SET estado = 'descartada'/);
+  assert.match(cuerpo, /s\.accion = 'pasar_a_cande'/, "solo el pase, nunca una respuesta");
+  assert.match(cuerpo, /s\.creado >= c\.ultimo_lead/);
+});
