@@ -17,6 +17,8 @@
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
 //                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
+//   { accion: "nota", contacto, texto }            → lo que encontró el repaso y no es para ahora: va al resumen de las
+//                                                  notas, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
 //                                                  con quitar: true se desconecta
 //   { accion: "seguidos", usuarios: [...], reemplazar? } → carga la lista de cuentas que sigue Cande (la baja ella de
@@ -34,7 +36,7 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
@@ -222,6 +224,15 @@ export default async function handler(req, res) {
     }
     const llego = await avisarDm("DM: repaso de las charlas", { Repaso: texto });
     return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
+  }
+
+  if (b.accion === "nota") {
+    // Queda como una salida con aviso "NOTA:", igual que las notas del agente: el resumen las junta (20/10).
+    const texto = String(b.texto || "").replace(/^NOTA:\s*/, "").trim().slice(0, 500);
+    if (!texto) return res.status(400).json({ error: "falta el texto" });
+    if (!id || !(await contacto(id))) return res.status(404).json({ error: "ese contacto no está en la base del agente" });
+    await guardarSalida({ contacto: id, accion: "nota", estado: "nota", aviso: `NOTA: ${texto}` });
+    return res.status(200).json({ ok: true });
   }
 
   if (b.accion === "telegram_respuestas") {

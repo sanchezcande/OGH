@@ -591,14 +591,16 @@ test("el reintento tarde no tiene la traba mientras se genera: el mensaje nuevo 
   assert.equal(m.enviados.length, 0);
 });
 
-test("si Cande escribió en la charla mientras el agente no podía, el reintento no contesta encima: se la pasa", async () => {
+test("si Cande escribió en la charla mientras el agente no podía, el reintento no contesta encima: la charla queda de ella, sin aviso", async () => {
+  // 20/10: ya sabe (le acaba de escribir), como cuando sale por Instagram. Antes le llegaba "la charla vuelve a vos".
   const { agente, m } = armar({ envio: "campo" });
   m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: "una respuesta de Cande" });
-  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "pasada a Cande");
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "de Cande: ya le escribió ella");
   assert.equal(m.pedidos.length + m.enviados.length, 0);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos.length, 1);
-  assert.match(m.avisos[0].campos["Lo último que dijo"], /mensaje de prueba/);
+  assert.deepEqual(m.campos, [["dm_dueno", "cande"]]);
+  assert.equal(m.contacto.respondido_hasta, m.disparo, "el turno queda cerrado: la espera no lo vuelve a tomar");
+  assert.equal(m.avisos.length, 0);
 });
 
 test("un mensaje del agente después del mensaje sin atender no lo da por contestado (el orden de los ids no dice eso)", async () => {
@@ -3028,4 +3030,132 @@ test("una foto en una charla de Cande, o con el agente apagado, no avisa: el age
   const apagado = armar({ modo: "apagado" });
   assert.equal((await apagado.agente.procesar("77", mandaLead(apagado.m, SIN_TEXTO))).hecho, "apagado");
   assert.equal(apagado.m.avisos.length, 0);
+});
+
+/* ---------- menos avisos a Telegram (20/10) ---------- */
+// Cande, 20/10: "la mayoría de los mensajes que me pasás por telegram son re resolvibles por vos". Lo que el agente
+// puede resolver solo no le llega al toque: se reescribe lo frenado, se arreglan solos los signos, un toque no suena,
+// y una respuesta que ManyChat no retiró sale por la API.
+
+const { sinSignos } = await import("../lib/dm/frenos.js");
+const { comoNota } = await import("../lib/dm/agente.js");
+
+test("empresa: construir algo propio o preguntar por una asesoría no es señal; contratar o pedir un presupuesto sí", () => {
+  const empresa = (t) => senales([t]).empresa;
+  for (const t of ["estoy construyendo un sitio raro de prueba", "ando lanzando una app propia de prueba", "sigo emprendiendo con algo de prueba", "ofrecés alguna asesoría?", "hacés asesorías?"]) {
+    assert.equal(empresa(t), false, t);
+  }
+  for (const t of ["estoy contratando devs", "estamos reclutando", "necesito un presupuesto", "me pasás una cotización?", "quiero una asesoría para mi equipo", "cuánto me sale cotizar una app"]) {
+    assert.equal(empresa(t), true, t);
+  }
+});
+
+test("quien está construyendo su portfolio puede recibir la lista: el freno de empresa ya no lo para", () => {
+  const charlaDelLead = ["estoy construyendo un sitio raro de prueba", "dale"];
+  pasa(revisar(salida(["La lista de prueba\nopengatehub.com/devs"]), { charlaDelLead, textosDelLead: ["dale"] }), "la lista");
+});
+
+test("preventa: no sale como urgencia, salvo que la haya traído el lead", () => {
+  assert.equal(revisar(salida(["Está en preventa de prueba"])).motivo, "urgencia que no es cierta");
+  pasa(revisar(salida(["Y cómo va esa preventa?"]), { charlaDelLead: ["trabajo en la preventa de una app de prueba"] }), "la preventa del lead");
+});
+
+test("spam: cuenta como pedido de baja solo dicho como queja", () => {
+  const baja = (t) => senales([t]).baja;
+  for (const t of ["esto es spam", "me hacés spam", "es spam"]) assert.equal(baja(t), true, t);
+  for (const t of ["no es spam, tranqui", "me llegó tu mail a la carpeta de spam", "tengo el spam lleno"]) assert.equal(baja(t), false, t);
+});
+
+test("los signos de apertura y el guion largo se arreglan solos antes de los frenos, sin frenar", async () => {
+  assert.equal(sinSignos("¿Pregunta de prueba?"), "Pregunta de prueba?");
+  assert.equal(sinSignos("¡Hola! Prueba — con guion"), "Hola! Prueba, con guion");
+  assert.equal(sinSignos("— Renglón de prueba\nOtro –"), "Renglón de prueba\nOtro");
+  const { agente, m } = armar({ responde: () => salida(["¿Pregunta de prueba — con guion?"]) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Pregunta de prueba, con guion?"]);
+  assert.equal(m.pedidos.length, 1);
+  assert.equal(m.avisos.length, 0);
+});
+
+test("si lo que redactó pisa un freno, tiene una vuelta más: la nueva sale por la API y la charla sigue del agente", async () => {
+  const { agente, m } = armar({
+    envio: "campo", responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : salida(["Pregunta de prueba?"])),
+  });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.equal(m.pedidos.length, 2);
+  assert.match(m.pedidos[1].turno.contexto, /no sale \(promete avisar o escribir después\)/);
+  assert.deepEqual(m.pedidos[1].turno.mensajes_del_lead, ["mensaje de prueba"]);
+  assert.deepEqual(m.enviados, ["Pregunta de prueba?"], "por la API: el retiro de ManyChat ya pasó");
+  assert.equal(m.salidas.at(-1).estado, "enviada");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.tomado, null);
+});
+
+test("si la vuelta de más también se frena, la charla pasa a Cande como siempre; un toque no tiene vuelta de más", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Mañana te escribo"]) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada");
+  assert.equal(m.pedidos.length, 2);
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+  const t = armarToque({ responde: () => salida(["Mañana te escribo?"]) });
+  assert.equal((await toque(t.agente)).hecho, "frenada");
+  assert.equal(t.m.pedidos.length, 1);
+});
+
+test("si el lead escribe mientras se reescribe, la respuesta no sale: contesta la corrida de su mensaje", async () => {
+  const { agente, m } = armar({
+    responde: (p, mundo) => {
+      if (mundo.pedidos.length === 2) mundo.entraLead("otro mensaje de prueba");
+      return mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : salida(["Pregunta de prueba?"]);
+    },
+  });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "llegó otro mensaje durante la generación");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+});
+
+test("un toque que el modelo quería pasar con HOY: no sale, no suena y su aviso queda como NOTA: para el resumen", async () => {
+  const { agente, m } = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { accion: "pasar_a_cande", aviso_para_cande: "HOY: nota de prueba" }) });
+  assert.equal((await toque(agente)).hecho, "calló");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.salidas.at(-1).aviso, "NOTA: nota de prueba");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(comoNota("YA: riesgo de prueba"), "YA: riesgo de prueba", "un YA: no se toca");
+});
+
+test("una respuesta que ManyChat no retiró sale por la API si todavía corresponde; si no, la charla pasa a Cande", async () => {
+  const fila = (extra = {}) => ({
+    id: "77", nombre: "Lead de prueba", dueno: "agente", ultimo_lead: new Date(AHORA - HORA), salida: 1, accion: "responder",
+    mensajes: ["Pregunta de prueba?"], hasta_lead: 2, escribio_despues: false, ...extra,
+  });
+  const sale = armar();
+  sale.m.salidas.push({ accion: "responder", estado: "vencida" });
+  assert.equal(await sale.agente.rescatarVencida(fila()), "reenviada");
+  assert.deepEqual(sale.m.enviados, ["Pregunta de prueba?"]);
+  assert.equal(sale.m.salidas[0].estado, "enviada");
+  assert.deepEqual(sale.m.mensajes.at(-1), { id: 3, quien: "agente", texto: "Pregunta de prueba?" });
+  assert.equal(sale.m.contacto.respondido_hasta, 2);
+  assert.equal(sale.m.avisos.length, 0);
+  for (const [caso, extra, opciones] of [
+    ["escribió después", { escribio_despues: true }, {}],
+    ["pasó el día", { ultimo_lead: new Date(AHORA - 25 * HORA) }, {}],
+    ["en sombra", {}, { modo: "sombra" }],
+    ["la charla ya es de Cande", { dueno: "cande" }, {}],
+    ["ManyChat no la manda", {}, { mandar: async () => ({ ok: false, error: "error de prueba" }) }],
+  ]) {
+    const { agente, m } = armar(opciones);
+    m.salidas.push({ accion: "responder", estado: "vencida" });
+    assert.equal(await agente.rescatarVencida(fila(extra)), "pasada a Cande", caso);
+    assert.equal(m.contacto.dueno, "cande", caso);
+    assert.equal(m.avisos.length, 1, caso);
+    assert.match(m.avisos[0].campos.Aviso, /ManyChat no la vino a retirar/, caso);
+  }
+});
+
+test("un error de la revisión de la Mac es de esa charla: el turno se reintenta y cuenta para su tope", () => {
+  assert.deepEqual(fallaDeLaMac("revisión: sigue marcado freno del sitio: promete un plazo"), { transitorio: false, general: false, dudosa: false });
 });
