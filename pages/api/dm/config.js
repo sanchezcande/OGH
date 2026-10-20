@@ -16,6 +16,8 @@
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
+//   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) con la
+//                                                  etiqueta HUMAN_AGENT: hasta 7 días después del último mensaje del lead
 //                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
 //   { accion: "nota", contacto, texto }            → lo que encontró el repaso y no es para ahora: va al resumen de las
 //                                                  notas, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js)
@@ -43,7 +45,8 @@ import {
 import {
   codigoEnHilo, desdeDe, desdeManual, explicarError, linkCharlaIg, manualEnHilo, usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
-import { datosDe, hayManyChat, ponerCampo } from "../../../lib/dm/manychat";
+import { datosDe, hayManyChat, mandarTextos, ponerCampo } from "../../../lib/dm/manychat";
+import { frenoDelCodigo } from "../../../lib/dm/frenos";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
 // Quién puede figurar en una charla cargada a mano. "agente" no: lo que mandó el agente lo anota él.
@@ -143,6 +146,24 @@ export default async function handler(req, res) {
     });
     const campo = await ponerCampo(id, "dm_dueno", "agente");
     return res.status(200).json({ ok: true, cargados: filas.length, manychat: campo.ok });
+  }
+
+  if (b.accion === "mandar_humano") {
+    // Un mensaje de Cande (escrito o aprobado por ella) a alguien que escribió hace más de 24 h y menos de 7 días:
+    // la API común ya no deja, la etiqueta HUMAN_AGENT de Meta sí, y es solo para respuestas de una persona
+    // (20/10: las charlas que se perdieron por la falla de ManyChat). Queda anotado como de Cande.
+    const textos = (Array.isArray(b.textos) ? b.textos : [b.texto]).map((t) => String(t || "").trim()).filter(Boolean);
+    if (!id || !textos.length || textos.length > 3 || textos.some((t) => t.length > 1000)) {
+      return res.status(400).json({ error: "falta contacto o textos (de 1 a 3, hasta 1000 caracteres)" });
+    }
+    const aj = await ajustes();
+    if (frenoDelCodigo({ mensajes: textos }, aj.codigo_mercadopago)?.ok === false) {
+      return res.status(400).json({ error: "el texto trae el código de acceso: eso sale solo con el ok del aviso del código" });
+    }
+    const envio = await mandarTextos(id, textos, { humano: true });
+    if (!envio.ok) return res.status(502).json({ ok: false, error: envio.error, code: envio.code, incierto: envio.incierto || false });
+    if (await contacto(id)) await anotarAMano(id, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
+    return res.status(200).json({ ok: true });
   }
 
   if (b.accion === "anotar") {
