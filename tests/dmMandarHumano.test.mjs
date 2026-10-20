@@ -37,8 +37,19 @@ test("mandar_humano sin contacto lo busca en ManyChat por su id de Instagram y, 
   const i = src.indexOf('b.accion === "mandar_humano"');
   const cuerpo = src.slice(i, i + 3000);
   assert.match(cuerpo, /if \(!\(id \|\| igsid\)/);
-  assert.match(cuerpo, /identificar\(\{ buscarPorNombre, datosDe \}, \{ igsid/);
-  assert.match(cuerpo, /status\(404\)/);
+  assert.match(cuerpo, /await buscarIg\(igsid, b\)/);
+  assert.match(src, /identificar\(\{ buscarPorNombre, datosDe \}, \{ igsid/);
+  assert.match(src, /status: 404, error/);
   assert.match(cuerpo, /mandarTextos\(destino, textos\)/);
   assert.match(cuerpo, /b\.etiquetar === true \? \(await ponerEtiqueta\(destino, ETIQUETA_AGENTE\)\)/);
+});
+
+test("buscar_ig encuentra el contacto de ManyChat sin mandar nada", async () => {
+  const src = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
+  const i = src.indexOf('b.accion === "buscar_ig"');
+  assert.ok(i > -1);
+  const cuerpo = src.slice(i, src.indexOf('b.accion === "anotar"', i));
+  assert.match(cuerpo, /await buscarIg\(igsid, b\)/);
+  assert.doesNotMatch(cuerpo, /mandarTextos/);
+  assert.match(cuerpo, /b\.etiquetar === true \? \(await ponerEtiqueta\(q\.id, ETIQUETA_AGENTE\)\)/);
 });

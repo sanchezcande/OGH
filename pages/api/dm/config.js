@@ -22,6 +22,9 @@
 //                                                  Sin contacto, con igsid, usuario y nombres: lo busca en ManyChat como
 //                                                  la red de la bandeja; con etiquetar: true le pone agente_dm, así lo que
 //                                                  conteste le llega al agente. Devuelve el contacto de ManyChat.
+//   { accion: "buscar_ig", igsid, usuario, nombres, etiquetar? } → quién es en ManyChat alguien de Instagram que no
+//                                                  está en la base, sin mandarle nada (con etiquetar: true, le pone agente_dm).
+//                                                  Para sembrar una charla que Cande va a contestar a mano y que siga el agente
 //   { accion: "nota", contacto, texto }            → lo que encontró el repaso y no es para ahora: va al resumen de las
 //                                                  notas, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
@@ -168,13 +171,8 @@ export default async function handler(req, res) {
     }
     let destino = id;
     if (!destino) {
-      if (!hayManyChat()) return res.status(503).json({ ok: false, error: "falta la clave de ManyChat" });
-      const nombres = (Array.isArray(b.nombres) ? b.nombres : []).concat(b.usuario).slice(0, 4);
-      const q = await identificar({ buscarPorNombre, datosDe }, { igsid, usuario: String(b.usuario || ""), nombres, hasta: Date.now() + 20000 });
-      if (!q.id) {
-        const error = q.varios ? "hay más de un contacto con ese usuario en ManyChat" : q.falla ? "ManyChat no contestó" : "no está en ManyChat";
-        return res.status(404).json({ ok: false, error });
-      }
+      const q = await buscarIg(igsid, b);
+      if (!q.id) return res.status(q.status).json({ ok: false, error: q.error });
       destino = q.id;
     }
     const envio = await mandarTextos(destino, textos);
@@ -182,6 +180,15 @@ export default async function handler(req, res) {
     if (await contacto(destino)) await anotarAMano(destino, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
     const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(destino, ETIQUETA_AGENTE))?.ok === true : null;
     return res.status(200).json({ ok: true, contacto: destino, etiqueta });
+  }
+
+  if (b.accion === "buscar_ig") {
+    const igsid = String(b.igsid || "").trim();
+    if (!igsid) return res.status(400).json({ error: "falta igsid" });
+    const q = await buscarIg(igsid, b);
+    if (!q.id) return res.status(q.status).json({ ok: false, error: q.error });
+    const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(q.id, ETIQUETA_AGENTE))?.ok === true : null;
+    return res.status(200).json({ ok: true, contacto: q.id, nombre: q.nombre || null, etiqueta });
   }
 
   if (b.accion === "anotar") {
@@ -378,4 +385,17 @@ export default async function handler(req, res) {
   }
 
   return res.status(400).json({ error: "accion desconocida" });
+}
+
+/**
+ * Quién es en ManyChat alguien de Instagram que no está en la base: lo busca igual que la red de la bandeja (por
+ * nombre, y vale solo si coincide su usuario o su id de Instagram). { id, nombre } o { id: null, status, error }.
+ */
+async function buscarIg(igsid, b) {
+  if (!hayManyChat()) return { id: null, status: 503, error: "falta la clave de ManyChat" };
+  const nombres = (Array.isArray(b.nombres) ? b.nombres : []).concat(b.usuario).slice(0, 4);
+  const q = await identificar({ buscarPorNombre, datosDe }, { igsid, usuario: String(b.usuario || ""), nombres, hasta: Date.now() + 20000 });
+  if (q.id) return q;
+  const error = q.varios ? "hay más de un contacto con ese usuario en ManyChat" : q.falla ? "ManyChat no contestó" : "no está en ManyChat";
+  return { id: null, status: 404, error };
 }
