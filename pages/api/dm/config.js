@@ -31,6 +31,10 @@
 //                                                  notas, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
 //                                                  con quitar: true se desconecta
+//   { accion: "controlador_patrones", patrones }   → guarda cómo reconoce el recorrido el controlador (lib/dm/controlador.js):
+//                                                  salen del prompt, que es privado, así que viven en la base y no en el
+//                                                  código. Cada patrón tiene que compilar; si falta uno no se guarda nada.
+//                                                  No devuelve los patrones
 //   { accion: "seguidos", usuarios: [...], reemplazar? } → carga la lista de cuentas que sigue Cande (la baja ella de
 //                                                  Instagram); con el ajuste "seguidos", el agente no le escribe a esa gente
 //   { accion: "instagram", contacto? }             → prueba la lectura directa de Instagram sin cambiar nada: la cuenta,
@@ -55,6 +59,7 @@ import {
 } from "../../../lib/dm/instagram";
 import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
+import { CLAVE_PATRONES, validarPatrones } from "../../../lib/dm/controlador";
 import { frenoDelCodigo } from "../../../lib/dm/frenos";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -323,6 +328,16 @@ export default async function handler(req, res) {
     if (!textos.length) return res.status(400).json({ error: "textos: una lista" });
     await guardarConfig("automaticos", { textos });
     return res.status(200).json({ ok: true, textos: textos.length });
+  }
+
+  if (b.accion === "controlador_patrones") {
+    // Como los automáticos: viven en la base. Se revisan enteros antes de guardar (validarPatrones): uno que no compila,
+    // o que coincide con cualquier texto, haría marcar o corregir lo que no es. El error nombra la clave, no el patrón.
+    if (JSON.stringify(b.patrones ?? null).length > 50000) return res.status(400).json({ error: "patrones: demasiado grande" });
+    const v = validarPatrones(b.patrones);
+    if (!v.ok) return res.status(400).json({ error: v.error });
+    await guardarConfig(CLAVE_PATRONES, v.patrones);
+    return res.status(200).json({ ok: true, patrones: Object.keys(v.patrones).length - 1, clases: v.patrones.clases.length });
   }
 
   if (b.accion === "seguidos") {
