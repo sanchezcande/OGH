@@ -235,8 +235,20 @@ test("dudoso: el aviso YA con la foto y por qué, pero sin borrador ni ok", asyn
   sinSignos(a);
 });
 
-test("una foto que el agente vio y no es un pago: el URGENTE de siempre, con la foto", async () => {
+test("una foto que el agente vio y no es un pago: la contesta él, a Cande no le llega nada y queda dada por avisada", async () => {
+  // 20/10, Cande: "la mayoría de los mensajes que me pasás por telegram son re resolvibles por vos".
   const { agente, m } = mundo({ responde: () => vio(1, { pago_pesos: null }) });
+  const foto = m.entra(FOTO);
+  await agente.procesar(ID, foto);
+  assert.equal(urgentesDeFoto(m).length, 0);
+  assert.equal(m.contacto.foto_avisada_hasta, foto, "con constancia: el cron no la avisa después");
+  assert.equal(await agente.avisarFotosPendientes([ID]), 0);
+  assert.deepEqual(m.enviados, ["Acuse de prueba"]);
+  assert.equal(m.salidas.filter((s) => s.accion === "codigo_mp").length, 0);
+});
+
+test("una foto que el agente vio y no es un pago, si le pasa la charla a Cande: el URGENTE de siempre, con la foto", async () => {
+  const { agente, m } = mundo({ responde: () => vio(1, { accion: "pasar_a_cande", mensajes: [], pago_pesos: null, aviso_para_cande: "HOY: nota de prueba" }) });
   await agente.procesar(ID, m.entra(FOTO));
   assert.equal(urgentesDeFoto(m).length, 1);
   assert.equal(urgentesDeFoto(m)[0].foto, FOTO);

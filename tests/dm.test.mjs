@@ -3029,3 +3029,325 @@ test("una foto en una charla de Cande, o con el agente apagado, no avisa: el age
   assert.equal((await apagado.agente.procesar("77", mandaLead(apagado.m, SIN_TEXTO))).hecho, "apagado");
   assert.equal(apagado.m.avisos.length, 0);
 });
+
+/* ---------- menos avisos a Telegram (20/10) ---------- */
+// Cande, 20/10: "la mayoría de los mensajes que me pasás por telegram son re resolvibles por vos". Lo que el agente
+// puede resolver solo no le llega al toque: se reescribe lo frenado, se arreglan solos los signos, un toque no suena,
+// y una respuesta que ManyChat no retiró sale por la API.
+
+const { sinSignos } = await import("../lib/dm/frenos.js");
+const { comoNota } = await import("../lib/dm/agente.js");
+
+test("empresa: construir algo propio o preguntar por una asesoría no es señal; contratar o pedir un presupuesto sí", () => {
+  const empresa = (t) => senales([t]).empresa;
+  for (const t of ["estoy construyendo un sitio raro de prueba", "ando lanzando una app propia de prueba", "sigo emprendiendo con algo de prueba", "ofrecés alguna asesoría?", "hacés asesorías?", "no tengo presupuesto", "no tengo mucho presupuesto"]) {
+    assert.equal(empresa(t), false, t);
+  }
+  for (const t of ["estoy contratando devs", "estamos reclutando", "necesito un presupuesto", "me pasás una cotización?", "quiero una asesoría para mi equipo", "cuánto me sale cotizar una app", "quisiera un presupuesto para una app de prueba", "me podrías pasar un presupuesto?", "busco asesoría"]) {
+    assert.equal(empresa(t), true, t);
+  }
+});
+
+test("quien está construyendo su portfolio puede recibir la lista: el freno de empresa ya no lo para", () => {
+  const charlaDelLead = ["estoy construyendo un sitio raro de prueba", "dale"];
+  pasa(revisar(salida(["La lista de prueba\nopengatehub.com/devs"]), { charlaDelLead, textosDelLead: ["dale"] }), "la lista");
+});
+
+test("preventa: no sale como urgencia, salvo que la haya traído el lead", () => {
+  assert.equal(revisar(salida(["Está en preventa de prueba"])).motivo, "urgencia que no es cierta");
+  pasa(revisar(salida(["Y cómo va esa preventa?"]), { charlaDelLead: ["trabajo en la preventa de una app de prueba"] }), "la preventa del lead");
+});
+
+test("spam: cuenta como pedido de baja, menos negado o hablando del spam de su mail", () => {
+  const baja = (t) => senales([t]).baja;
+  for (const t of ["esto es spam", "me hacés spam", "es spam", "basta de spam", "esto parece spam", "no quiero más spam", "spam"]) {
+    assert.equal(baja(t), true, t);
+  }
+  for (const t of ["no es spam, tranqui", "ni spam ni nada", "me llegó tu mail a la carpeta de spam", "tengo el spam lleno", "me llegó al spam", "revisá en spam", "el spam del mail de prueba"]) {
+    assert.equal(baja(t), false, t);
+  }
+});
+
+test("los signos de apertura y el guion largo se arreglan solos antes de los frenos, sin frenar", async () => {
+  assert.equal(sinSignos("¿Pregunta de prueba?"), "Pregunta de prueba?");
+  assert.equal(sinSignos("¡Hola! Prueba — con guion"), "Hola! Prueba, con guion");
+  assert.equal(sinSignos("— Renglón de prueba\nOtro –"), "Renglón de prueba\nOtro");
+  const { agente, m } = armar({ responde: () => salida(["¿Pregunta de prueba — con guion?"]) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Pregunta de prueba, con guion?"]);
+  assert.equal(m.pedidos.length, 1);
+  assert.equal(m.avisos.length, 0);
+});
+
+test("si lo que redactó pisa un freno, tiene una vuelta más: la nueva sale por la API y la charla sigue del agente", async () => {
+  const { agente, m } = armar({
+    envio: "campo", responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : salida(["Pregunta de prueba?"])),
+  });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.equal(m.pedidos.length, 2);
+  assert.match(m.pedidos[1].turno.contexto, /no sale \(promete avisar o escribir después\)/);
+  assert.deepEqual(m.pedidos[1].turno.mensajes_del_lead, ["mensaje de prueba"]);
+  assert.deepEqual(m.enviados, ["Pregunta de prueba?"], "por la API: el retiro de ManyChat ya pasó");
+  assert.equal(m.salidas.at(-1).estado, "enviada");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.tomado, null);
+});
+
+test("si la vuelta de más también se frena, la charla pasa a Cande como siempre; un toque no tiene vuelta de más", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Mañana te escribo"]) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada");
+  assert.equal(m.pedidos.length, 2);
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+  const t = armarToque({ responde: () => salida(["Mañana te escribo?"]) });
+  assert.equal((await toque(t.agente)).hecho, "frenada");
+  assert.equal(t.m.pedidos.length, 1);
+});
+
+test("la primera respuesta frenada queda guardada con su motivo antes de la vuelta de más", async () => {
+  const { agente, m } = armar({ responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : salida(["Pregunta de prueba?"])) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.equal(m.salidas[0].estado, "frenada");
+  assert.deepEqual(m.salidas[0].mensajes, ["Mañana te escribo"]);
+  assert.match(m.salidas[0].detalle, /^promete avisar o escribir después \(tuvo otra vuelta\)$/);
+});
+
+test("con una crisis, un pedido de baja o una señal de empresa en la charla, lo frenado no tiene otra vuelta: pasa a Cande al toque", async () => {
+  // Lo que es de Cande (crisis, baja, empresas) no puede terminar callado o en un mensaje sin venta que no se frena.
+  for (const [caso, lead, motivo] of [
+    ["crisis", "estoy con depresión, igual pasame lo tuyo", /crisis/],
+    ["baja", "no me escribas más", /no le escriban/],
+    ["empresa", "estoy contratando devs para mi startup de prueba", /señal de empresa/],
+    ["ambas", "ambas cosas de prueba", /señal de empresa/],
+  ]) {
+    const { agente, m } = armar({
+      responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["La lista de prueba\nopengatehub.com/devs"]) : salida([], { accion: "callar", aviso_para_cande: "NOTA: prueba" })),
+    });
+    m.mensajes.find((x) => x.id === m.disparo).texto = lead;
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada", caso);
+    assert.equal(m.pedidos.length, 1, `${caso}: sin vuelta de más`);
+    assert.equal(m.salidas.length, 1, caso);
+    assert.match(m.salidas[0].detalle, motivo, caso);
+    assert.equal(m.contacto.dueno, "cande", caso);
+    assert.equal(m.avisos.length, 1, caso);
+  }
+});
+
+test("un pase frenado no tiene vuelta de más: pasa como siempre", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Mañana te escribo"], { accion: "pasar_a_cande", aviso_para_cande: "HOY: algo de prueba" }) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada");
+  assert.equal(m.pedidos.length, 1);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.avisos.length, 1);
+});
+
+test("si el lead escribe mientras se reescribe, la respuesta no sale: contesta la corrida de su mensaje", async () => {
+  const { agente, m } = armar({
+    responde: (p, mundo) => {
+      if (mundo.pedidos.length === 2) mundo.entraLead("otro mensaje de prueba");
+      return mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : salida(["Pregunta de prueba?"]);
+    },
+  });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "llegó otro mensaje durante la generación");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+});
+
+test("un toque que el modelo quería pasar con HOY: no sale, no suena y su aviso queda como NOTA: para el resumen", async () => {
+  const { agente, m } = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { accion: "pasar_a_cande", aviso_para_cande: "HOY: nota de prueba" }) });
+  assert.equal((await toque(agente)).hecho, "calló");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.salidas.at(-1).aviso, "NOTA: nota de prueba");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(comoNota("YA: riesgo de prueba"), "YA: riesgo de prueba", "un YA: no se toca");
+});
+
+test("una respuesta que ManyChat no retiró sale por la API si todavía corresponde; si no, la charla pasa a Cande", async () => {
+  const fila = (extra = {}) => ({
+    id: "77", nombre: "Lead de prueba", dueno: "agente", ultimo_lead: new Date(AHORA - HORA), salida: 1, accion: "responder",
+    mensajes: ["Pregunta de prueba?"], hasta_lead: 2, escribio_despues: false, charla_cambio: false, ...extra,
+  });
+  const sale = armar();
+  sale.m.salidas.push({ accion: "responder", estado: "vencida" });
+  assert.equal(await sale.agente.rescatarVencida(fila()), "reenviada");
+  assert.deepEqual(sale.m.enviados, ["Pregunta de prueba?"]);
+  assert.equal(sale.m.salidas[0].estado, "enviada");
+  assert.deepEqual(sale.m.mensajes.at(-1), { id: 3, quien: "agente", texto: "Pregunta de prueba?" });
+  assert.equal(sale.m.contacto.respondido_hasta, 2);
+  assert.equal(sale.m.avisos.length, 0);
+  for (const [caso, extra, opciones] of [
+    ["escribió después", { escribio_despues: true }, {}],
+    ["pasó el día", { ultimo_lead: new Date(AHORA - 25 * HORA) }, {}],
+    ["en sombra", {}, { modo: "sombra" }],
+    ["la charla ya es de Cande", { dueno: "cande" }, {}],
+    ["ManyChat no la manda", {}, { mandar: async () => ({ ok: false, error: "error de prueba" }) }],
+  ]) {
+    const { agente, m } = armar(opciones);
+    m.salidas.push({ accion: "responder", estado: "vencida" });
+    assert.equal(await agente.rescatarVencida(fila(extra)), "pasada a Cande", caso);
+    assert.equal(m.contacto.dueno, "cande", caso);
+    assert.equal(m.avisos.length, 1, caso);
+    assert.match(m.avisos[0].campos.Aviso, /ManyChat no la vino a retirar/, caso);
+  }
+});
+
+test("un error de la revisión de la Mac es de esa charla: el turno se reintenta y cuenta para su tope", () => {
+  assert.deepEqual(fallaDeLaMac("revisión: sigue marcado freno del sitio: promete un plazo"), { transitorio: false, general: false, dudosa: false });
+});
+
+/* ---------- revisión del PR de los avisos (20/10): ante la duda, que suene ---------- */
+// Es preferible un aviso de más a un lead de Cande sin respuesta. La vuelta de más vale solo si sale un mensaje que
+// pasa todos los frenos; lo que es de Cande (plata, empresas, un aviso que ya suena) pasa al toque, como antes.
+
+const { puedeReescribir, porQueNoSirve } = await import("../lib/dm/agente.js");
+const { FRENOS_DE_CANDE, MOTIVO_EMPRESA, MOTIVO_SENAL_EMPRESA } = await import("../lib/dm/frenos.js");
+
+/** La charla pasó a Cande al toque, sin mandarle nada al lead, con lo primero que redactó en el aviso y con HOY:. */
+function pasoConLaPrimera(m, { primera, queHizo }) {
+  assert.equal(m.enviados.length, 0, "al lead no le sale nada");
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.contacto.respondido_hasta, m.disparo, "el turno queda atendido: lo tiene Cande");
+  assert.equal(m.avisos.length, 1, "a Cande le suena el pase");
+  assert.match(m.avisos[0].titulo, /DM URGENTE: te paso una charla$/);
+  assert.ok(m.avisos[0].campos.Aviso.startsWith(`HOY: Frené lo que iba a mandar (promete avisar o escribir después): ${primera}`), m.avisos[0].campos.Aviso);
+  assert.match(m.avisos[0].campos.Aviso, queHizo);
+  assert.equal(m.salidas.filter((x) => x.estado === "frenada").length, 1);
+  assert.deepEqual(m.salidas.at(-1).mensajes, [primera]);
+  assert.match(m.salidas.at(-1).detalle, /otra vuelta/);
+}
+
+test("A: si la vuelta de más calla (con NOTA o sin aviso), pasa sin escribir o el modelo no contesta, la charla pasa al toque con lo primero", async () => {
+  for (const [caso, segunda, queHizo] of [
+    ["calla con NOTA", () => salida([], { accion: "callar", aviso_para_cande: "NOTA: no supe qué contestar de prueba" }), /prefirió callar/],
+    ["calla sin aviso", () => salida([], { accion: "callar", aviso_para_cande: "" }), /prefirió callar/],
+    ["pasa sin escribir", () => salida([], { accion: "pasar_a_cande", aviso_para_cande: "NOTA: prueba" }), /pasarte la charla sin escribirle/],
+    ["el modelo no contesta", () => { throw propia("se negó de prueba"); }, /el modelo no contestó/],
+  ]) {
+    const { agente, m } = armar({ responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : segunda()) });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada", caso);
+    assert.equal(m.pedidos.length, 2, `${caso}: tuvo su vuelta de más`);
+    pasoConLaPrimera(m, { primera: "Mañana te escribo", queHizo });
+  }
+});
+
+test("A: lo de la vuelta de más que también se frena, o que dice que construye o contrata, no sale: pasa con lo primero", async () => {
+  for (const [caso, segunda, queHizo] of [
+    ["otro freno", () => salida(["Te escribo mañana de nuevo"]), /también se frenó \(promete avisar o escribir después\)/],
+    ["dice empresa", () => salida(["Contame más de lo que armás?"], { ...como("empresa") }), /construye algo o contrata/],
+  ]) {
+    const { agente, m } = armar({ responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Mañana te escribo"]) : segunda()) });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada", caso);
+    pasoConLaPrimera(m, { primera: "Mañana te escribo", queHizo });
+  }
+  assert.equal(porQueNoSirve(salida(["Pregunta de prueba?"]), { ok: true }), null, "un mensaje que pasa los frenos sirve");
+});
+
+test("B: con plata o un acceso en lo que escribió el lead, lo frenado no tiene otra vuelta: pasa a Cande al toque", async () => {
+  const conPlata = [
+    "quiero que me devuelvan la plata del curso de prueba", "me podés devolver lo que pagué?", "quiero un reembolso", "quiero el reintegro",
+    "ya pagué", "pagué y no puedo entrar", "compré el programa ayer", "hice el pago y no me llega nada",
+    "no me llegó el acceso", "no me llegó el código", "no me llegó el mail de prueba", "no puedo ingresar a la plataforma",
+    "me podés hacer factura?", "me cobraron dos veces", "te transferí recién", "te mando el comprobante",
+  ];
+  for (const t of conPlata) assert.equal(senales([t]).pagos, true, t);
+  for (const t of ["cuánto cobrás?", "voy a pagar la semana que viene", "me llegó al spam", "puedo entrar a la página del video?", "sigo con la búsqueda de prueba"]) {
+    assert.equal(senales([t]).pagos, false, t);
+  }
+  for (const lead of ["quiero que me devuelvan la plata del curso de prueba", "pagué y no puedo entrar", "compré y no me llegó el acceso"]) {
+    const { agente, m } = armar({
+      responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Dale, te hago el reembolso"]) : salida(["Dale, ahora lo veo?"])),
+    });
+    m.mensajes.find((x) => x.id === m.disparo).texto = lead;
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada", lead);
+    assert.equal(m.pedidos.length, 1, `${lead}: sin vuelta de más`);
+    assert.equal(m.enviados.length, 0, lead);
+    assert.equal(m.contacto.dueno, "cande", lead);
+    assert.equal(m.avisos.length, 1, lead);
+    assert.match(m.avisos[0].campos.Aviso, /^Frené lo que iba a mandar \(regalo, devolución o transferencia\): Dale, te hago el reembolso$/, lead);
+  }
+});
+
+test("F: si el modelo dice que construye o contrata, ahora o en un turno anterior, lo frenado no tiene otra vuelta", async () => {
+  const estEmp = { ...estadoDev, quien: "empresa" };
+  const ahora = armar({
+    responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["La lista de prueba\nopengatehub.com/devs"], { estado: estEmp }) : salida(["Contame más de lo que armás?"], { estado: estEmp })),
+  });
+  ahora.m.mensajes.find((x) => x.id === ahora.m.disparo).texto = "tengo un equipo chico y quiero ver opciones de prueba";
+  assert.equal((await ahora.agente.procesar("77", ahora.m.disparo)).hecho, "frenada");
+  assert.equal(ahora.m.pedidos.length, 1);
+  assert.equal(ahora.m.enviados.length, 0);
+  assert.equal(ahora.m.contacto.dueno, "cande");
+  assert.equal(ahora.m.avisos.length, 1);
+  assert.match(ahora.m.salidas[0].detalle, new RegExp(`^${MOTIVO_EMPRESA}$`));
+
+  const antes = armar({
+    responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["Sale 27 dólares"]) : salida(["Qué estás armando?"])),
+  });
+  antes.m.contacto.estado = { ...estadoDev, quien: "construye" };
+  assert.equal((await antes.agente.procesar("77", antes.m.disparo)).hecho, "frenada");
+  assert.equal(antes.m.pedidos.length, 1);
+  assert.equal(antes.m.enviados.length, 0);
+  assert.equal(antes.m.contacto.dueno, "cande");
+
+  // Lo mismo si lo frenó el freno de empresa, o si su aviso ya suena: es de Cande.
+  const dev = salida(["Mañana te escribo"]);
+  assert.equal(puedeReescribir(dev, ["mensaje de prueba"]), true);
+  for (const motivo of [MOTIVO_EMPRESA, MOTIVO_SENAL_EMPRESA]) {
+    assert.ok(FRENOS_DE_CANDE.has(motivo));
+    assert.equal(puedeReescribir(dev, ["mensaje de prueba"], { motivo }), false, motivo);
+  }
+  assert.equal(puedeReescribir(dev, ["mensaje de prueba"], { estadoPrevio: { quien: "empresa" } }), false);
+  // Quien busca devs dicho de otra forma: no frena nada, pero lo frenado no tiene otra vuelta.
+  for (const t of ["busco devs para mi equipo de prueba", "necesito 2 devs react", "tenemos una software house de prueba"]) {
+    assert.equal(senales([t]).empresa, false, `${t}: los frenos no cambian`);
+    assert.equal(puedeReescribir(dev, [t]), false, t);
+  }
+  assert.equal(puedeReescribir(salida(["Mañana te escribo"], { aviso_para_cande: "HOY: algo de prueba" }), ["mensaje de prueba"]), false);
+  assert.equal(puedeReescribir(salida(["Mañana te escribo"], { aviso_para_cande: "ya: algo de prueba" }), ["mensaje de prueba"]), false);
+});
+
+test("un aviso HOY: o YA: suena aunque venga en minúsculas o con espacios: es la misma definición que deja afuera del resumen", async () => {
+  for (const aviso of ["hoy: preguntó algo de prueba", " HOY : preguntó algo de prueba", "Ya: riesgo de prueba"]) {
+    const { agente, m } = armar({ responde: () => salida(["Pregunta de prueba?"], { aviso_para_cande: aviso }) });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada", aviso);
+    assert.equal(m.avisos.length, 1, `${aviso}: tiene que sonar`);
+    assert.match(m.avisos[0].titulo, /DM URGENTE: aviso del agente$/, aviso);
+  }
+  assert.equal(comoNota(" hoy : algo de prueba"), "NOTA: algo de prueba");
+});
+
+test("una respuesta vencida no sale por la API si se escribió en la charla después o si Cande está en la charla desde Instagram", async () => {
+  const fila = (extra = {}) => ({
+    id: "77", nombre: "Lead de prueba", dueno: "agente", ultimo_lead: new Date(AHORA - HORA), salida: 1, accion: "responder",
+    mensajes: ["Pregunta de prueba?"], hasta_lead: 2, escribio_despues: false, charla_cambio: false, ...extra,
+  });
+  for (const [caso, extra, porIg] of [
+    ["se escribió en la charla", { charla_cambio: true }, null],
+    ["no se sabe si cambió", { charla_cambio: undefined }, null],
+    ["Cande escribió -- en Instagram", {}, "escribiste -- en Instagram"],
+    ["Cande la sigue", {}, "la seguís en Instagram"],
+  ]) {
+    const vistas = [];
+    const instagram = { conApi: true, porQueSale: async (c) => { vistas.push(c.id); return porIg; }, sacar: async () => {} };
+    const { agente, m } = armar({ instagram });
+    m.ajustes.instagram = true;
+    m.salidas.push({ accion: "responder", estado: "vencida" });
+    assert.equal(await agente.rescatarVencida(fila(extra)), "pasada a Cande", caso);
+    assert.equal(m.enviados.length, 0, caso);
+    assert.equal(m.salidas[0].estado, "vencida", `${caso}: no figura enviada`);
+    assert.equal(m.contacto.dueno, "cande", caso);
+    assert.equal(m.avisos.length, 1, caso);
+    if (porIg) assert.match(m.avisos[0].campos.Motivo, new RegExp(porIg), caso);
+  }
+  // Sin nada de eso, sale como antes.
+  const instagram = { conApi: true, porQueSale: async () => null, sacar: async () => {} };
+  const sale = armar({ instagram });
+  sale.m.ajustes.instagram = true;
+  sale.m.salidas.push({ accion: "responder", estado: "vencida" });
+  assert.equal(await sale.agente.rescatarVencida(fila()), "reenviada");
+  assert.deepEqual(sale.m.enviados, ["Pregunta de prueba?"]);
+});

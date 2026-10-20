@@ -1,7 +1,8 @@
-// El cron del agente de DM. Lo llama Vercel cada 10 minutos (ver vercel.json). Hace cinco cosas:
+// El cron del agente de DM. Lo llama Vercel cada 10 minutos (ver vercel.json). Hace seis cosas:
 //
 //   1. Red de seguridad, siempre, esté el agente prendido o apagado: las respuestas que ManyChat
-//      no vino a retirar pasan a Cande. De las charlas del agente con un mensaje sin atender pasan a
+//      no vino a retirar salen por la API si todavía corresponde, y si no pasan a Cande
+//      (agente.rescatarVencida, 20/10). De las charlas que tiene el agente con un mensaje sin atender pasan a
 //      Cande solo las que no tienen arreglo: el agente está apagado, una respuesta pudo haber salido
 //      (no se manda dos veces) o el modelo falló 3 veces con esa charla en particular (mientras con
 //      las demás andaba). Las demás quedan en espera, del agente y sin aviso, por más que pase el
@@ -22,19 +23,26 @@
 //      Cada toque vencido se reclama de a uno y pasa por el agente con el evento "seguimiento":
 //      el agente vuelve a mirar que la charla siga siendo suya, que el lead no haya escrito y
 //      que la ventana de 24 horas de Instagram siga abierta.
-//   5. Borra lo guardado de las charlas que llevan 90 días quietas.
+//   5. El resumen de las notas del agente, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js, 20/10):
+//      lo que Cande tiene que saber y no necesita nada de ella ya.
+//   6. Borra lo guardado de las charlas que llevan 90 días quietas.
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
-import { agente, colaDe } from "../../../lib/dm/armado";
+import { agente, avisarDm, colaDe } from "../../../lib/dm/armado";
 import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
 import { horaDeToques } from "../../../lib/dm/frenos";
+import * as manychat from "../../../lib/dm/manychat";
+import { crearResumen } from "../../../lib/dm/resumen";
 import {
   MAC_VIVA_SEGUNDOS, REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar,
 } from "../../../lib/dm/seguimientos";
+import * as base from "../../../lib/dm/base";
 import {
   ajustes, borrarViejas, codigosSinAviso, fotosSinAviso, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas,
   vencerPendientes,
 } from "../../../lib/dm/base";
+
+const mandarResumen = crearResumen({ base, manychat, avisar: avisarDm });
 
 const TOQUES_POR_CORRIDA = 10;
 
@@ -51,11 +59,20 @@ export default async function handler(req, res) {
   let hechos = 0;
   let sinAtender = 0;
 
-  // Primero lo que nadie retiró: esas charlas ya pasan a Cande con su motivo, y la búsqueda de
-  // abajo no las vuelve a avisar.
-  for (const c of await vencerPendientes()) {
-    await agente.pasarACande(c, { aviso: "una respuesta quedó sin salir: ManyChat no la vino a retirar", motivo: "retiro vencido" });
-    sinAtender++;
+  // Primero lo que nadie retiró: sale por la API si todavía corresponde; si no, la charla pasa a Cande con su motivo,
+  // y la búsqueda de abajo no la vuelve a avisar.
+  // Cada rescate puede tardar hasta unos 15 s mirando Instagram: pasado un minuto y medio, las que quedan pasan a Cande
+  // como antes (con su aviso), así ninguna queda vencida sin mandar y sin aviso si Vercel corta la función.
+  let reenviadas = 0;
+  const topeRescate = inicio + 90 * 1000;
+  for (const v of await vencerPendientes()) {
+    if (Date.now() > topeRescate) {
+      await agente.pasarACande(v, { aviso: "una respuesta quedó sin salir: ManyChat no la vino a retirar", motivo: "retiro vencido" });
+      sinAtender++;
+      continue;
+    }
+    if ((await agente.rescatarVencida(v)) === "reenviada") reenviadas++;
+    else sinAtender++;
   }
   // Los toques y las respuestas de la espera los redacta la Mac de Cande (salvo cerebro "api").
   const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();
@@ -97,6 +114,14 @@ export default async function handler(req, res) {
     console.error("dm: no se pudieron avisar las fotos pendientes", e.message);
   }
 
+  // El resumen de las notas: la primera vuelta después de las 9 y de las 18 de Bali (una sola vez por franja).
+  let resumen = { hecho: "no toca", charlas: 0 };
+  try {
+    resumen = await mandarResumen({ hasta: Date.now() + 30000 });
+  } catch (e) {
+    console.error("dm: no se pudo mandar el resumen de las notas", e.message);
+  }
+
   // Toques: si la Mac no está contestando, si hay charlas esperando respuesta (las contesta el cron de
   // la espera, y la Mac no da para todo a la vez) o si es de noche en Argentina, no se reclama ninguno:
   // siguen en la fila y salen en una corrida de después (los que se pasan de las 24 horas los limpia
@@ -122,7 +147,8 @@ export default async function handler(req, res) {
     console.error("dm: no se pudo borrar lo viejo", e.message);
   }
   return res.status(200).json({
-    ok: true, hechos, sin_atender: sinAtender, sin_ventana: sinVentanaAvisadas, fotos, codigos, ...(prendido ? {} : { motivo: "apagado" }),
+    ok: true, hechos, sin_atender: sinAtender, reenviadas, sin_ventana: sinVentanaAvisadas, fotos, codigos, resumen: resumen.charlas,
+    ...(prendido ? {} : { motivo: "apagado" }),
   });
 }
 
