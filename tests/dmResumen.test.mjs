@@ -90,7 +90,7 @@ test("las notas van por charla, sin repetir, con su número, cuánto queda para 
   assert.equal(partes.length, 1);
   assert.deepEqual(partes[0].numeros, { 1: "11", 2: "22" });
   assert.equal(afuera, 0);
-  assert.equal(partes[0].renglones[0], "1. Lead uno: otra cosa de prueba (+1 nota antes) (quedan 21 h para escribirle por acá) https://ig.me/m/usuario_de_prueba");
+  assert.equal(partes[0].renglones[0], "1. Lead uno: preguntó algo de prueba · otra cosa de prueba (quedan 21 h para escribirle por acá) https://ig.me/m/usuario_de_prueba");
   assert.equal(partes[0].renglones[1], "2. Lead dos: ofrece algo de prueba (pasó el día: escribile desde la app)");
 });
 
@@ -306,7 +306,7 @@ const respuestasJs = await import("../lib/dm/respuestas.js");
 const baseJs = await import("../lib/dm/base.js");
 const { base: pg } = await import("./dobles/postgres.mjs");
 
-test("E: de cada charla va la nota más nueva entera (hasta 600) y cuántas hubo antes; lo que no entra va en otro mensaje", () => {
+test("E: de cada charla van todas sus notas en orden, cada una entera (hasta 600); lo que no entra va en otro mensaje", () => {
   const vieja = `NOTA: ${"vieja de prueba ".repeat(10).trim()}`;
   const nueva = `NOTA: ${"nueva de prueba ".repeat(37).trim()}`; // 591 caracteres sin el NOTA:
   assert.ok(nueva.length - 6 > 220 && nueva.length - 6 <= 600);
@@ -318,8 +318,19 @@ test("E: de cada charla va la nota más nueva entera (hasta 600) y cuántas hubo
   const { partes } = armarPartes(charlas, { ahora: AHORA });
   const renglon = partes[0].renglones[0];
   assert.ok(renglon.includes(nueva.slice(6)), "la nota más nueva va entera");
-  assert.ok(!renglon.includes("vieja de prueba"), "las de antes no van");
-  assert.match(renglon, /\(\+2 notas antes\) \(quedan 22 h para escribirle por acá\)$/);
+  assert.ok(renglon.includes(vieja.slice(6)), "las de antes también van, enteras");
+  assert.ok(renglon.indexOf(vieja.slice(6)) < renglon.indexOf("otra de prueba"), "en orden");
+  assert.ok(renglon.indexOf("otra de prueba") < renglon.indexOf(nueva.slice(6)), "en orden");
+  assert.match(renglon, /\(quedan 22 h para escribirle por acá\)$/);
+  // Si todas juntas no entran en un mensaje, van las más nuevas enteras y se dice cuántas más viejas quedaron afuera.
+  const muchas = agrupar(Array.from({ length: 10 }, (_, k) => ({
+    contacto: "33", nombre: "Lead tres", aviso: `NOTA: nota ${k} ${"de prueba ".repeat(58).trim()}`,
+    creado: `2026-10-20T0${k}:00:00Z`, ultimo_lead: new Date(AHORA - HORA),
+  })));
+  const r3 = armarPartes(muchas, { ahora: AHORA }).partes[0].renglones[0];
+  assert.match(r3, /^1\. Lead tres: \(\+\d+ notas más viejas\) nota \d/);
+  assert.ok(r3.includes("nota 9 "), "la más nueva va");
+  assert.ok(r3.length <= TOPE_TEXTO, "el renglón entra en un mensaje");
   // Una nota que volvió a llegar es la más nueva.
   assert.deepEqual(agrupar([
     { contacto: "11", aviso: "NOTA: a de prueba" }, { contacto: "11", aviso: "NOTA: b de prueba" }, { contacto: "11", aviso: "NOTA: a de prueba" },

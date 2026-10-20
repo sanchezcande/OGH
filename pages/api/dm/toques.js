@@ -61,8 +61,16 @@ export default async function handler(req, res) {
 
   // Primero lo que nadie retiró: sale por la API si todavía corresponde; si no, la charla pasa a Cande con su motivo,
   // y la búsqueda de abajo no la vuelve a avisar.
+  // Cada rescate puede tardar hasta unos 15 s mirando Instagram: pasado un minuto y medio, las que quedan pasan a Cande
+  // como antes (con su aviso), así ninguna queda vencida sin mandar y sin aviso si Vercel corta la función.
   let reenviadas = 0;
+  const topeRescate = inicio + 90 * 1000;
   for (const v of await vencerPendientes()) {
+    if (Date.now() > topeRescate) {
+      await agente.pasarACande(v, { aviso: "una respuesta quedó sin salir: ManyChat no la vino a retirar", motivo: "retiro vencido" });
+      sinAtender++;
+      continue;
+    }
     if ((await agente.rescatarVencida(v)) === "reenviada") reenviadas++;
     else sinAtender++;
   }
