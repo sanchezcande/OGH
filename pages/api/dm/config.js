@@ -18,7 +18,10 @@
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
 //   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) con la
 //                                                  etiqueta HUMAN_AGENT: hasta 7 días después del último mensaje del lead
-//                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot)
+//                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot).
+//                                                  Sin contacto, con igsid, usuario y nombres: lo busca en ManyChat como
+//                                                  la red de la bandeja; con etiquetar: true le pone agente_dm, así lo que
+//                                                  conteste le llega al agente. Devuelve el contacto de ManyChat.
 //   { accion: "nota", contacto, texto }            → lo que encontró el repaso y no es para ahora: va al resumen de las
 //                                                  notas, a las 9 y a las 18 de Bali y sin sonido (lib/dm/resumen.js)
 //   { accion: "telegram_respuestas" }              → Cande contesta desde el bot del agente (webhook a /api/dm/telegram);
@@ -45,7 +48,8 @@ import {
 import {
   codigoEnHilo, desdeDe, desdeManual, explicarError, linkCharlaIg, manualEnHilo, usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
-import { datosDe, hayManyChat, mandarTextos, ponerCampo } from "../../../lib/dm/manychat";
+import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
+import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
 import { frenoDelCodigo } from "../../../lib/dm/frenos";
 import { avisar, buscarGrupo, chatDuena, hayBotDm, hayTelegram, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -152,18 +156,32 @@ export default async function handler(req, res) {
     // Un mensaje de Cande (escrito o aprobado por ella) a alguien que escribió hace más de 24 h y menos de 7 días:
     // la API común ya no deja, la etiqueta HUMAN_AGENT de Meta sí, y es solo para respuestas de una persona
     // (20/10: las charlas que se perdieron por la falla de ManyChat). Queda anotado como de Cande.
+    // Si no está en la base (escribió y ManyChat nunca lo pasó), se lo busca en ManyChat por su id de Instagram.
     const textos = (Array.isArray(b.textos) ? b.textos : [b.texto]).map((t) => String(t || "").trim()).filter(Boolean);
-    if (!id || !textos.length || textos.length > 3 || textos.some((t) => t.length > 1000)) {
+    const igsid = String(b.igsid || "").trim();
+    if (!(id || igsid) || !textos.length || textos.length > 3 || textos.some((t) => t.length > 1000)) {
       return res.status(400).json({ error: "falta contacto o textos (de 1 a 3, hasta 1000 caracteres)" });
     }
     const aj = await ajustes();
     if (frenoDelCodigo({ mensajes: textos }, aj.codigo_mercadopago)?.ok === false) {
       return res.status(400).json({ error: "el texto trae el código de acceso: eso sale solo con el ok del aviso del código" });
     }
-    const envio = await mandarTextos(id, textos, { humano: true });
-    if (!envio.ok) return res.status(502).json({ ok: false, error: envio.error, code: envio.code, incierto: envio.incierto || false });
-    if (await contacto(id)) await anotarAMano(id, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
-    return res.status(200).json({ ok: true });
+    let destino = id;
+    if (!destino) {
+      if (!hayManyChat()) return res.status(503).json({ ok: false, error: "falta la clave de ManyChat" });
+      const nombres = (Array.isArray(b.nombres) ? b.nombres : []).concat(b.usuario).slice(0, 4);
+      const q = await identificar({ buscarPorNombre, datosDe }, { igsid, usuario: String(b.usuario || ""), nombres, hasta: Date.now() + 20000 });
+      if (!q.id) {
+        const error = q.varios ? "hay más de un contacto con ese usuario en ManyChat" : q.falla ? "ManyChat no contestó" : "no está en ManyChat";
+        return res.status(404).json({ ok: false, error });
+      }
+      destino = q.id;
+    }
+    const envio = await mandarTextos(destino, textos, { humano: true });
+    if (!envio.ok) return res.status(502).json({ ok: false, contacto: destino, error: envio.error, code: envio.code, incierto: envio.incierto || false });
+    if (await contacto(destino)) await anotarAMano(destino, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
+    const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(destino, ETIQUETA_AGENTE))?.ok === true : null;
+    return res.status(200).json({ ok: true, contacto: destino, etiqueta });
   }
 
   if (b.accion === "anotar") {

@@ -27,9 +27,20 @@ test("la acción mandar_humano valida los textos, frena el código y anota como 
   const src = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
   const i = src.indexOf('b.accion === "mandar_humano"');
   assert.ok(i > -1);
-  const cuerpo = src.slice(i, i + 1600);
+  const cuerpo = src.slice(i, i + 3000);
   assert.match(cuerpo, /textos\.length > 3/);
   assert.match(cuerpo, /frenoDelCodigo\(/);
-  assert.match(cuerpo, /mandarTextos\(id, textos, \{ humano: true \}\)/);
-  assert.match(cuerpo, /anotarAMano\(id, "cande"/);
+  assert.match(cuerpo, /mandarTextos\(destino, textos, \{ humano: true \}\)/);
+  assert.match(cuerpo, /anotarAMano\(destino, "cande"/);
+});
+
+test("mandar_humano sin contacto lo busca en ManyChat por su id de Instagram y, si se pide, le pone agente_dm", async () => {
+  const src = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
+  const i = src.indexOf('b.accion === "mandar_humano"');
+  const cuerpo = src.slice(i, i + 3000);
+  assert.match(cuerpo, /if \(!\(id \|\| igsid\)/);
+  assert.match(cuerpo, /identificar\(\{ buscarPorNombre, datosDe \}, \{ igsid/);
+  assert.match(cuerpo, /status\(404\)/);
+  assert.match(cuerpo, /mandarTextos\(destino, textos, \{ humano: true \}\)/);
+  assert.match(cuerpo, /b\.etiquetar === true \? \(await ponerEtiqueta\(destino, ETIQUETA_AGENTE\)\)/);
 });
