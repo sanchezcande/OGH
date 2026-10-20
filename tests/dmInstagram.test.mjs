@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 const {
   fechaDe, leerHilo, esDeLaCuenta, codigoEnHilo, desdeDe, crearInstagram, crearReglasInstagram, buscarCodigos, explicarError,
   ErrorInstagram, usuarioIg, manualEnHilo, desdeManual, manualesEnHilo, esRetomada, CLAVE_RETOMADAS, NO_AHORA, paraPegar,
-  marcaDe, seAnotaComoRetomada,
+  marcaDe, seAnotaComoRetomada, conLaMarca, escritoConLaMarca,
 } = await import("../lib/dm/instagram.js");
 
 const AHORA = new Date("2026-10-18T15:00:00Z");
@@ -225,8 +225,12 @@ function mundoReglas({ contacto = {}, manychat = { ok: true, ig_username: "Lead.
       (m.contacto.ig_id && m.contacto.ig_id === igId) || (!m.contacto.ig_id && m.contacto.ig_usuario && m.contacto.ig_usuario === usuario)
         ? { ...m.contacto } : null,
     seguidos: new Set(),
+    // Lo de la cuenta en la base: un texto suelto es de antes de todo (lo sembrado, lo viejo); { texto, creado }, con su
+    // hora. Como la consulta: con `desde`, solo lo que se escribió después de esa hora.
     conocidos: [],
-    textosDeLaCuenta: async () => base.conocidos,
+    textosDeLaCuenta: async (id, { desde = null } = {}) => base.conocidos
+      .filter((x) => !desde || (typeof x === "object" && new Date(x.creado) > desde))
+      .map((x) => (typeof x === "object" ? x.texto : x)),
     loSigue: async (u) => base.seguidos.has(u),
     anotarSeguidos: async (us) => { us.forEach((u) => base.seguidos.add(u)); return base.seguidos.size; },
     tomar: async (id, marca) => (m.tomado || m.contacto.dueno !== "agente" ? null : ((m.tomado = marca), { ...m.contacto })),
@@ -243,7 +247,7 @@ function mundoReglas({ contacto = {}, manychat = { ok: true, ig_username: "Lead.
       if (m.contacto.dueno !== "agente") return 0;
       const nuevas = lista.filter((x) => !base.anotadasCande.some((y) => y.mid === x.mid));
       base.anotadasCande.push(...nuevas);
-      base.conocidos = [...base.conocidos, ...nuevas.map((x) => x.texto)];
+      base.conocidos = [...base.conocidos, ...nuevas.map((x) => ({ texto: x.texto, creado: x.creado }))];
       const marcas = cfg.datos[CLAVE_RETOMADAS];
       if (nuevas.length && marcas?.[id] && marcas[id].usada == null) {
         marcas[id] = { ...marcas[id], usada: Math.max(...nuevas.map((x) => new Date(x.creado).getTime())) };
@@ -534,8 +538,12 @@ test("una demora o el límite de pedidos de Instagram no le llegan a Cande como 
 
 /* ---------- charlas retomadas (20/10): Cande contesta a mano charlas viejas y las sigue el agente ---------- */
 
-/** La marca de dm_config "retomadas" para ese contacto, vigente `dias` días más. */
-const marca = (id = "77", dias = 7) => ({ [id]: { hasta: AHORA.getTime() + dias * 86400000 } });
+/**
+ * La marca de dm_config "retomadas" para ese contacto, vigente `dias` días más. Se marcó hace 50 minutos: después de que
+ * la charla fue del agente (hace 60) y antes de que Cande pegara.
+ */
+const MARCADA = hace(50).getTime();
+const marca = (id = "77", dias = 7) => ({ [id]: { hasta: AHORA.getTime() + dias * 86400000, marcada: MARCADA } });
 const ANOTADO = "Texto anotado antes de que lo pegue, de prueba";
 const PEGADO = "Texto que pegó cambiado, de prueba";
 const OTRO_SUYO = "Y otra cosa que agregó, de prueba";
@@ -684,7 +692,9 @@ function mundoVarias({ contactos, hilos, marcas = null }) {
       return c ? { ...c } : null;
     },
     guardarIg: async () => {},
-    textosDeLaCuenta: async (id) => w.anotadas.filter((x) => x.id === id).map((x) => x.texto),
+    // Como la consulta: con `desde`, solo lo que se escribió después de esa hora.
+    textosDeLaCuenta: async (id, { desde = null } = {}) =>
+      w.anotadas.filter((x) => x.id === id && (!desde || new Date(x.creado) > desde)).map((x) => x.texto),
     tomar: async (id) => (w.contactos.get(id)?.dueno === "agente" ? { ...w.contactos.get(id) } : null),
     soltar: async () => {},
     descartarPendientes: async () => {},
@@ -721,7 +731,7 @@ test("la marca de retomada sirve una vez: lo que pegó se anota y lo que escribe
   assert.equal(await reglas.porQueSale(m.contacto), null);
   assert.deepEqual(base.anotadasCande.map((x) => x.texto), [PEGADO]);
   const marcas = await base.leerConfig(CLAVE_RETOMADAS);
-  assert.deepEqual(marcaDe(marcas, "77"), { hasta: marca()["77"].hasta, usada: hace(3).getTime() }, "queda usada hasta lo que se anotó");
+  assert.deepEqual(marcaDe(marcas, "77"), { hasta: marca()["77"].hasta, marcada: MARCADA, usada: hace(3).getTime() }, "queda usada hasta lo que se anotó");
   assert.equal(esRetomada(marcas, "77", AHORA), false, "ya no le toca pegar ahí");
   assert.equal(await reglas.retomada(m.contacto), true, "para el rescate sigue siendo una charla retomada");
   // Otra mirada que corrió a la vez y leyó lo pegado como a mano antes de que se anotara: lo sigue cubriendo la marca.
@@ -748,31 +758,165 @@ test("la vuelta del cron: con la marca ya usada, lo que Cande escribe a mano des
   assert.equal(w.contactos.get("77").dueno, "cande");
 });
 
-test("un conocido corto (menos de 30 letras) cuenta solo si es igual: un mensaje corto viejo de la cuenta no tapa lo que pega Cande", () => {
-  const h = (texto) => leerHilo(hiloCrudo(1, [msj(2, texto, { deCuenta: true, min: 5 })]), CUENTA);
-  const desde = hace(60);
-  assert.ok(manualEnHilo(h("Disculpá la tardanza, texto de prueba escrito a mano"), CUENTA, ["Disculpá"], desde));
-  assert.ok(manualEnHilo(h("Hola, texto de prueba que arranca con un saludo corto"), CUENTA, ["Hola!"], desde));
-  assert.equal(manualEnHilo(h("Disculpá!"), CUENTA, ["Disculpá"], desde), null, "el mismo texto corto, sí");
-  assert.equal(manualEnHilo(h("dale"), CUENTA, ["Dale!"], desde), null);
-  // Uno largo sigue valiendo con 30 letras iguales al principio o al final (el nombre de la persona en el medio).
-  const auto = "Hola Nombre! Gracias por escribir, este mensaje fijo de prueba sale solo";
-  assert.equal(manualEnHilo(h("Hola Otro! Gracias por escribir, este mensaje fijo de prueba sale solo"), CUENTA, [auto], desde), null);
-  assert.ok(manualEnHilo(h("Gracias por escribir, te contesto yo a mano en un rato"), CUENTA, [auto], desde));
+/*
+ * Sin la marca de retomada, lo de la cuenta que ya se conoce se compara como siempre (esConocido, como en main). La
+ * revisión del 21/10 lo había cambiado para todas las charlas (conocidos cortos solo iguales, 30 letras, el link del
+ * formulario pelado) y una verificación encontró dos regresiones en las charlas no marcadas: (a) lo que Cande escribe a
+ * mano con 30 letras del principio o del final iguales a algo de la cuenta pasaba por conocido y el agente no salía, y
+ * (b) una plantilla automática corta con link dejaba de reconocerse y sacaba al agente.
+ */
+const DEL_AGENTE_LARGO = "Te paso el formulario de prueba para que lo completes cuando tengas un rato libre";
+const A_MANO_MISMO_PRINCIPIO = "Te paso el formulario de prueba para que lo completes y después hablamos";
+const DEL_AGENTE_CON_LINK = "Si querés avanzar, completá el de prueba: opengatehub.com/devs?ig=12345&f=AbCdEfGhIj";
+const A_MANO_MISMO_FINAL = "Te dejo lo que hablamos, completá el de prueba: opengatehub.com/devs";
+const AUTO_LINK = "Acá va el link: opengatehub.com/devs?de=cv";
+const AUTO_LINK_LARGO = `${AUTO_LINK} Cualquier duda me escribís por acá`;
+
+/** Una charla del agente con un mensaje de la cuenta (`texto`) después de lo del lead, para la mirada y para el cron. */
+const conUnoDeLaCuenta = (texto, antes = []) => ({
+  "/me/conversations": bandeja(hiloCrudo(1, [msj(4, texto, { deCuenta: true, min: 2 }), ...antes, msj(2, "hola", { min: 30 })], 1)),
+  "/501": perfilDe(false),
 });
 
-test("lo que mandó el agente con el link firmado del formulario sigue siendo conocido, aunque el link no vuelva igual", () => {
+test("sin la marca de retomada, lo que Cande escribe a mano con 30 letras del principio o del final iguales a algo de la cuenta sigue siendo a mano y saca al agente", async () => {
   const h = (texto) => leerHilo(hiloCrudo(1, [msj(2, texto, { deCuenta: true, min: 5 })]), CUENTA);
   const desde = hace(60);
+  assert.ok(manualEnHilo(h(A_MANO_MISMO_PRINCIPIO), CUENTA, [DEL_AGENTE_LARGO], desde), "las mismas 44 letras del principio");
+  assert.ok(manualEnHilo(h(A_MANO_MISMO_FINAL), CUENTA, [DEL_AGENTE_CON_LINK], desde), "el mismo final, con el link del formulario");
+  // Como siempre: lo que mandó el agente, tal cual, es del agente; lo que no empieza igual, es de ella.
+  assert.equal(manualEnHilo(h(DEL_AGENTE_LARGO), CUENTA, [DEL_AGENTE_LARGO], desde), null);
+  assert.equal(manualEnHilo(h(DEL_AGENTE_CON_LINK), CUENTA, [DEL_AGENTE_CON_LINK], desde), null);
+  assert.equal(manualEnHilo(h("Disculpá!"), CUENTA, ["Disculpá"], desde), null, "el mismo texto corto");
+  assert.equal(manualEnHilo(h("dale"), CUENTA, ["Dale!"], desde), null);
+  const auto = "Hola Nombre! Gracias por escribir, este mensaje fijo de prueba sale solo";
+  assert.ok(manualEnHilo(h("Gracias por escribir, te contesto yo a mano en un rato"), CUENTA, [auto], desde));
   const enviado = "Acá va: opengatehub.com/devs?ig=12345&f=AbCdEfGhIj";
-  assert.equal(manualEnHilo(h(enviado), CUENTA, [enviado], desde), null, "tal cual");
-  assert.equal(manualEnHilo(h("Acá va: opengatehub.com/devs?ig=12345&f=ZyXwVuTsRq"), CUENTA, [enviado], desde), null, "con otra firma");
-  assert.equal(manualEnHilo(h("Acá va: https://www.opengatehub.com/devs/?ig=12345"), CUENTA, [enviado], desde), null, "sin la firma, con https");
-  assert.equal(manualEnHilo(h("opengatehub.com/devs?ig=12345&f=AbCdEfGhIj"), CUENTA, ["opengatehub.com/devs?ig=12345"], desde), null, "el link solo");
-  const largo = "Genial, te paso el formulario de prueba para que lo llenes: opengatehub.com/devs?ig=12345&f=AbCdEfGhIj";
-  assert.equal(manualEnHilo(h(largo), CUENTA, [largo.replace("&f=AbCdEfGhIj", "")], desde), null, "uno largo");
-  assert.ok(manualEnHilo(h("Acá va otra cosa que escribí yo: opengatehub.com/devs"), CUENTA, [enviado], desde), "lo que escribió ella con el link, no");
-  assert.ok(manualEnHilo(h("Mirá esto: opengatehub.com/devs/gracias"), CUENTA, ["Mirá esto: opengatehub.com/devs"], desde), "otra página de /devs no es el formulario");
+  assert.ok(manualEnHilo(h("Acá va otra cosa que escribí yo: opengatehub.com/devs"), CUENTA, [enviado], desde), "lo que escribió ella con el link");
+  for (const [aMano, delAgente] of [[A_MANO_MISMO_PRINCIPIO, DEL_AGENTE_LARGO], [A_MANO_MISMO_FINAL, DEL_AGENTE_CON_LINK]]) {
+    const rutas = conUnoDeLaCuenta(aMano, [msj(3, delAgente, { deCuenta: true, min: 20 })]);
+    // La mirada de cada respuesta.
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+    w.base.conocidos = [delAgente];
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), "le escribiste vos", aMano);
+    assert.deepEqual(w.base.anotadasCande, [], aMano);
+    // La vuelta del cron.
+    const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+    c.base.conocidos = [delAgente];
+    const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+    assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 1, anotadas: 0 }, aMano);
+    assert.equal(c.m.contacto.dueno, "cande", aMano);
+  }
+});
+
+test("sin la marca de retomada, una plantilla automática corta con el link del formulario se sigue reconociendo y no saca al agente", async () => {
+  const h = (texto) => leerHilo(hiloCrudo(1, [msj(2, texto, { deCuenta: true, min: 5 })]), CUENTA);
+  const desde = hace(60);
+  assert.equal(manualEnHilo(h(AUTO_LINK), CUENTA, [AUTO_LINK], desde), null, "tal cual");
+  assert.equal(manualEnHilo(h(AUTO_LINK), CUENTA, [AUTO_LINK_LARGO], desde), null, "el primer globo de un automático cargado entero");
+  assert.equal(manualEnHilo(h(`${AUTO_LINK} Nombre de prueba`), CUENTA, [AUTO_LINK], desde), null, "con algo más atrás");
+  for (const [enIg, cargado] of [[AUTO_LINK, AUTO_LINK_LARGO], [`${AUTO_LINK} Nombre de prueba`, AUTO_LINK]]) {
+    const rutas = conUnoDeLaCuenta(enIg);
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+    w.base.conocidos = [cargado];
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), null, enIg);
+    assert.equal(w.m.contacto.dueno, "agente", enIg);
+    const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+    c.base.conocidos = [cargado];
+    const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+    assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 0 }, enIg);
+    assert.equal(c.m.contacto.dueno, "agente", enIg);
+  }
+});
+
+test("charla retomada con un \"Perdón\" viejo de la cuenta en la historia sembrada: lo que Cande pega después de marcarla se anota aunque lo contenga; sin la marca, como siempre", async () => {
+  const PEGA = "Perdón por la demora! Te cuento lo que hablamos, texto de prueba";
+  const PEGA_OTRO = "Te mandé el formulario de prueba, que te parece?";
+  const rutas = conUnoDeLaCuenta(PEGA_OTRO, [msj(3, PEGA, { deCuenta: true, min: 3 })]);
+  const sembrado = ["Perdón", "Que te parece?"]; // de antes de la marca
+  // La mirada de cada respuesta.
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  w.base.conocidos = [...sembrado];
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), null);
+  assert.deepEqual(w.base.anotadasCande.map((x) => x.texto), [PEGA, PEGA_OTRO], "anotado: el agente lo ve cuando el lead conteste");
+  assert.equal(w.m.contacto.dueno, "agente");
+  // La vuelta del cron.
+  const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+  c.base.conocidos = [...sembrado];
+  await c.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.deepEqual(c.base.anotadasCande.map((x) => x.texto), [PEGA, PEGA_OTRO]);
+  // Sin la marca, como siempre: lo que contiene un conocido corto pasa por conocido (ni se anota ni saca al agente).
+  const sin = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  sin.base.conocidos = [...sembrado];
+  assert.equal(await sin.reglas.porQueSale(sin.m.contacto), null);
+  assert.deepEqual(sin.base.anotadasCande, []);
+  assert.equal(sin.m.contacto.dueno, "agente");
+});
+
+test("charla retomada: si la base no deja leer lo que la cuenta mandó desde la marca, porQueSale dice NO_AHORA; si no deja leer la marca y no se ve nada a mano, sigue como siempre", async () => {
+  const PEGA = "Perdón por la demora! Te cuento lo que hablamos, texto de prueba";
+  const rutas = conUnoDeLaCuenta(PEGA);
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  w.base.conocidos = ["Perdón"];
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const textos = w.base.textosDeLaCuenta;
+  w.base.textosDeLaCuenta = async (id, o = {}) => {
+    if (o.desde) throw new Error("base caída de prueba");
+    return textos(id, o);
+  };
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), NO_AHORA);
+  assert.deepEqual(w.base.anotadasCande, []);
+  assert.deepEqual(w.m.avisos, []);
+  assert.equal(w.m.contacto.dueno, "agente");
+  // Sin poder leer la marca y sin nada a mano a la vista (lo pegado pasa por conocido sin ella): como siempre.
+  const sinLeer = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  sinLeer.base.conocidos = ["Perdón"];
+  const leer = sinLeer.base.leerConfig;
+  sinLeer.base.leerConfig = async (k) => {
+    if (k === CLAVE_RETOMADAS) throw new Error("base caída de prueba");
+    return leer(k);
+  };
+  assert.equal(await sinLeer.reglas.porQueSale(sinLeer.m.contacto), null);
+  assert.deepEqual(sinLeer.m.avisos, []);
+  assert.equal(sinLeer.m.contacto.dueno, "agente");
+});
+
+test("con la marca vigente y sin usar, lo que la cuenta escribió después de marcarla es de Cande salvo que sea igual a algo que la cuenta mandó desde la marca", async () => {
+  const DEL_AGENTE = "Respuesta de prueba que mandó el agente después de la marca";
+  const PEGA = "Perdón, se me pasó! Texto de prueba que pegó Cande";
+  const h = leerHilo(hiloCrudo(1, [
+    msj(5, PEGA, { deCuenta: true, min: 2 }),
+    msj(4, DEL_AGENTE, { deCuenta: true, min: 10 }),
+    msj(3, "Perdón, esto lo escribió la cuenta antes de la marca", { deCuenta: true, min: 55 }),
+    msj(2, "hola", { min: 58 }),
+  ]), CUENTA);
+  const c = { id: "77", dueno: "agente", dueno_desde: hace(60) };
+  const pedidos = [];
+  // Como la consulta: con `desde`, lo que la cuenta mandó desde esa hora; sin, todo (con el "Perdón" sembrado).
+  const textos = async (id, { desde = null } = {}) => {
+    pedidos.push(desde);
+    return desde ? [DEL_AGENTE] : ["Perdón", DEL_AGENTE];
+  };
+  const conMarca = await conLaMarca(h, CUENTA, c, marca(), textos);
+  assert.deepEqual(pedidos, [new Date(MARCADA)], "pregunta lo de la cuenta desde que se marcó");
+  // Lo del agente (igual) no es de ella; lo de antes de la marca se compara como siempre (el "Perdón" viejo lo tapa).
+  assert.deepEqual(manualesEnHilo(h, CUENTA, await textos("77"), desdeManual(c), conMarca).map((m) => m.texto), [PEGA]);
+  assert.deepEqual(manualesEnHilo(h, CUENTA, await textos("77"), desdeManual(c)).map((m) => m.texto), [], "sin la marca, nada");
+  // Sin la marca, con la marca usada, sin la hora en que se marcó o vencida antes de que la cuenta escribiera: como
+  // siempre, y sin preguntarle nada a la base.
+  pedidos.length = 0;
+  for (const [marcas, por] of [
+    [null, "sin marca"], [{ 77: { ...marca()["77"], usada: hace(40).getTime() } }, "usada"], [{ 77: { hasta: marca()["77"].hasta } }, "sin la hora"],
+    [{ 77: { hasta: hace(30).getTime(), marcada: MARCADA } }, "vencida"], [marca("78"), "de otra charla"],
+  ]) {
+    assert.equal(await conLaMarca(h, CUENTA, c, marcas, textos), null, por);
+  }
+  assert.deepEqual(pedidos, []);
+  assert.equal(escritoConLaMarca(marcaDe(marca(), "77"), { creado: hace(2) }), true);
+  assert.equal(escritoConLaMarca(marcaDe(marca(), "77"), { creado: hace(55) }), false, "antes de marcarla");
+  assert.equal(escritoConLaMarca(marcaDe({ 77: { hasta: hace(5).getTime(), marcada: MARCADA } }, "77"), { creado: hace(2) }), false, "después de que venció");
 });
 
 test("charla retomada con un mensaje corto viejo de la cuenta (lo sembrado): lo que pega se anota igual, en la mirada y en la vuelta del cron", async () => {

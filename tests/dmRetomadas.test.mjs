@@ -16,7 +16,13 @@
 // a la misma hora, por el id (en una sembrada con el lead al final, el del lead es el más alto); anotarCandeDesdeIg deja
 // la marca "usada" con la hora de lo que anotó, no la cambia si no anotó nada nuevo ni si ya estaba usada, y no crea
 // una marca donde no había; marcarRetomadas deja sin usar la que se marca de nuevo, guarda una vencida hace 10 días y
-// limpia las de más de 30, y con quitar saca solo esas. Los ids y textos son inventados (este repo es público).
+// limpia las de más de 30, y con quitar saca solo esas. Tercera vuelta del 21/10, contra el mismo Postgres 16 local y
+// descartable (el SQL tal cual): marcarRetomadas guarda la hora en que se marcó; marcada de nuevo, la que seguía vigente
+// y sin usar se queda con la hora de la primera vez y la usada, la vencida o la que no tenía hora toman la nueva (con
+// el hasta nuevo y sin "usada"); con quitar no toca las otras; anotarCandeDesdeIg deja la marca usada sin perder su
+// hora; textosDeLaCuenta con desde trae lo del agente, lo anotado y los automáticos escritos después de esa hora, lo que
+// el agente armó antes y salió después, lo pendiente, y los automáticos cargados, sin lo del lead, las notas, lo de
+// control, lo descartado ni lo de otra charla. Los ids y textos son inventados (este repo es público).
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -42,11 +48,17 @@ test("retomar_marcar marca las charlas por 7 días (o los que se digan), dice cu
   const pedidos = [];
   let guardado = {};
   pg.otras = (t, params) => {
-    // Como la consulta: suma las nuevas, limpia las vencidas y saca las de `fuera`.
+    // Como la consulta: suma las nuevas (una que seguía vigente y sin usar se queda con la hora en que se marcó la
+    // primera vez), limpia las vencidas y saca las de `fuera`.
     if (t.startsWith(`INSERT INTO dm_config (clave, valor) VALUES ('${CLAVE_RETOMADAS}', ?::jsonb)`)) {
-      const [nuevas, ahora, fuera] = [JSON.parse(params[0]), Number(params[1]), JSON.parse(params[2])];
+      const [nuevas, ahora, fuera] = [JSON.parse(params[0]), Number(params[1]), JSON.parse(params[3])];
       pedidos.push({ nuevas, fuera });
-      guardado = Object.fromEntries(Object.entries({ ...guardado, ...nuevas }).filter(([k, v]) => v.hasta > ahora && !fuera.includes(k)));
+      const queda = (k, v) => {
+        const antes = guardado[k];
+        return antes && antes.usada == null && antes.marcada != null && antes.hasta > ahora ? { ...v, marcada: antes.marcada } : v;
+      };
+      guardado = Object.fromEntries(Object.entries({ ...guardado, ...Object.fromEntries(Object.entries(nuevas).map(([k, v]) => [k, queda(k, v)])) })
+        .filter(([k, v]) => v.hasta > ahora && !fuera.includes(k)));
       return { rows: [{ valor: guardado }] };
     }
     if (t.startsWith("SELECT id FROM dm_contactos WHERE dueno = 'agente' AND id IN")) {
@@ -71,12 +83,16 @@ test("retomar_marcar marca las charlas por 7 días (o los que se digan), dice cu
     const hasta = pedidos[0].nuevas["111"].hasta;
     assert.equal(DIAS_RETOMADA, 7);
     assert.ok(hasta >= antes + 7 * DIA && hasta <= Date.now() + 7 * DIA, "vence en 7 días");
+    // Guarda la hora en que se marcó: lo que la cuenta escriba después se mira con la marca (lib/dm/instagram.js).
+    const marcada = pedidos[0].nuevas["111"].marcada;
+    assert.ok(marcada >= antes && marcada <= Date.now(), "con la hora en que se marcó");
     assert.deepEqual(bien.cuerpo, { ok: true, recibidos: 3, vigentes: 3, hasta: new Date(hasta).toISOString(), no_son_del_agente: ["333"] });
 
-    const tres = await llamar({ contactos: ["444"], dias: 3 });
+    const tres = await llamar({ contactos: ["444", "111"], dias: 3 });
     assert.equal(tres.codigo, 200);
     assert.ok(Math.abs(pedidos[1].nuevas["444"].hasta - (Date.now() + 3 * DIA)) < 5000, "vence en 3 días");
     assert.equal(tres.cuerpo.vigentes, 4);
+    assert.equal(guardado["111"].marcada, marcada, "marcada de nuevo sin usar: queda la hora de la primera vez");
 
     const quitar = await llamar({ contactos: ["222"], quitar: true });
     assert.deepEqual(pedidos.at(-1), { nuevas: {}, fuera: ["222"] });
@@ -118,6 +134,25 @@ test("marcarRetomadas: una sola sentencia que suma sin pisar, limpia las vencida
   assert.match(cuerpo, /e\.k NOT IN \(SELECT jsonb_array_elements_text\(\$\{JSON\.stringify\(fuera\)\}::jsonb\)\)/);
   const cuales = cuerpoDe(await leer("../lib/dm/base.js"), "cualesDelAgente");
   assert.match(cuales, /WHERE dueno = 'agente' AND id IN \(SELECT jsonb_array_elements_text/);
+});
+
+test("marcarRetomadas guarda la hora en que se marcó y, si la marca seguía vigente y sin usar, deja la de la primera vez", async () => {
+  const cuerpo = cuerpoDe(await leer("../lib/dm/base.js"), "marcarRetomadas");
+  assert.match(cuerpo, /ids\.map\(\(x\) => \[x, \{ hasta, marcada: ahora \}\]\)/);
+  assert.match(cuerpo, /WHEN EXCLUDED\.valor -> e\.k IS NOT NULL AND dm_config\.valor -> e\.k -> 'usada' IS NULL/);
+  assert.match(cuerpo, /AND dm_config\.valor -> e\.k -> 'marcada' IS NOT NULL/);
+  assert.match(cuerpo, /AND \(dm_config\.valor -> e\.k ->> 'hasta'\)::bigint > \$\{ahora\}::bigint/);
+  assert.match(cuerpo, /THEN e\.v \|\| jsonb_build_object\('marcada', dm_config\.valor -> e\.k -> 'marcada'\)/);
+  assert.match(cuerpo, /ELSE e\.v END\), '\{\}'::jsonb\)/);
+});
+
+test("textosDeLaCuenta con desde: lo que la cuenta escribió o mandó después de esa hora, y los automáticos cargados", async () => {
+  const cuerpo = cuerpoDe(await leer("../lib/dm/base.js"), "textosDeLaCuenta");
+  assert.match(cuerpo, /quien IN \('agente', 'cande', 'automatico'\) AND creado > \$\{d\}::timestamptz/);
+  assert.match(cuerpo, /AND accion <> 'control' AND COALESCE\(enviado, creado\) > \$\{d\}::timestamptz/);
+  assert.match(cuerpo, /const automaticos = \(await leerConfig\("automaticos"\)\)\?\.textos \|\| \[\];/);
+  // Sin desde, como siempre.
+  assert.match(cuerpo, /: await sql`\s*SELECT texto FROM dm_mensajes WHERE contacto = \$\{id\} AND quien IN \('agente', 'cande', 'automatico'\)\s*UNION ALL/);
 });
 
 test("las piezas reales están conectadas: la base, la red de la bandeja, el cron de Instagram y la prueba de la conexión", async () => {

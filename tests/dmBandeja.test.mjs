@@ -90,8 +90,10 @@ function mundo({
       if (igId !== null) c.ig_id = igId;
     },
     loSigue: async (u) => w.seguidos.has(u),
-    textosDeLaCuenta: async (id) => [
-      ...w.mensajes.filter((m) => m.contacto === id && ["agente", "cande", "automatico"].includes(m.quien)).map((m) => m.texto),
+    // Como la consulta: con `desde`, solo lo que se escribió después de esa hora (los automáticos cargados, siempre).
+    textosDeLaCuenta: async (id, { desde = null } = {}) => [
+      ...w.mensajes.filter((m) => m.contacto === id && ["agente", "cande", "automatico"].includes(m.quien) && (!desde || new Date(m.creado) > desde))
+        .map((m) => m.texto),
       ...(w.config.automaticos?.textos || []),
     ],
     enviadosEnLaCharla: async (id) => [
@@ -839,6 +841,28 @@ test("charla retomada: lo que Cande pegó con la marca vigente se anota aunque l
   await w.revisar();
   assert.deepEqual(w.delContacto("77").map((m) => m.quien), ["cande", "lead"], "no anota lo nuevo de ella ni lo del lead");
   assert.match(w.resumenes()[0].campos[SECCION_VOS], /le escribiste vos/);
+});
+
+test("charla retomada con un \"Perdón\" viejo sembrado: lo que Cande pegó después de marcarla se anota aunque lo contenga; sin la marca, como siempre", async () => {
+  const pegado = "Perdón por la demora! Te cuento lo que hablamos, texto de prueba";
+  const armar = (config) => mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600), respondido_hasta: 0 }],
+    // La historia sembrada: de antes de que se marcara.
+    mensajes: [{ contacto: "77", quien: "cande", texto: "Perdón", creado: hace(700) }],
+    hilos: [charla(1, DEL_AGENTE, [["cuenta", pegado, 60], ["lead", "respuesta de prueba del lead", 30]])],
+    config,
+  });
+  const w = armar({ retomadas: { 77: { hasta: AHORA.getTime() + 7 * 24 * HORA, marcada: hace(100).getTime() } } });
+  assert.equal((await w.revisar()).recuperados, 1);
+  assert.deepEqual(w.delContacto("77").map((m) => [m.quien, m.texto]), [["cande", "Perdón"], ["cande", pegado], ["lead", "respuesta de prueba del lead"]]);
+  assert.equal(w.contactos.get("77").dueno, "agente");
+  assert.equal(w.resumenes().length, 0);
+  // Sin la marca, como siempre: lo pegado pasa por conocido (contiene el "Perdón" viejo) y lo del lead se guarda para
+  // la espera.
+  const sin = armar({});
+  assert.equal((await sin.revisar()).recuperados, 1);
+  assert.deepEqual(sin.delContacto("77").map((m) => [m.quien, m.texto]), [["cande", "Perdón"], ["lead", "respuesta de prueba del lead"]]);
+  assert.equal(sin.resumenes().length, 0);
 });
 
 /* ---------- 8. lo que el agente no puede tomar va al resumen ---------- */

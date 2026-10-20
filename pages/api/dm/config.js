@@ -14,6 +14,8 @@
 //   { accion: "retomar_marcar", contactos: [id, ...], dias?, quitar? } → marca como retomadas esas charlas por `dias`
 //                                                  (7 si no se dice, de 1 a 30): si Cande les escribe a mano desde
 //                                                  Instagram, el agente no sale, anota lo suyo y sigue (lib/dm/instagram.js).
+//                                                  Guarda la hora en que se marcó: lo que la cuenta escriba después cuenta
+//                                                  como suyo, salvo que sea igual a algo del agente o de un automático.
 //                                                  La marca sirve una vez: lo que escriba a mano después de lo anotado
 //                                                  saca al agente; marcarla de nuevo la deja sin usar.
 //                                                  Con quitar: true les saca la marca. Su "--" las saca igual.
