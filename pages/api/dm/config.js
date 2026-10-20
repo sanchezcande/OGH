@@ -16,9 +16,9 @@
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
-//   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) con la
-//                                                  etiqueta HUMAN_AGENT: hasta 7 días después del último mensaje del lead
-//                                                  (con contacto, como aviso de esa charla: lo puede responder desde el bot).
+//   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) dentro
+//                                                  de las 24 h del último mensaje del lead (ManyChat no acepta HUMAN_AGENT
+//                                                  en Instagram: pasadas las 24 h, solo a mano). Queda anotado como de ella.
 //                                                  Sin contacto, con igsid, usuario y nombres: lo busca en ManyChat como
 //                                                  la red de la bandeja; con etiquetar: true le pone agente_dm, así lo que
 //                                                  conteste le llega al agente. Devuelve el contacto de ManyChat.
@@ -153,9 +153,9 @@ export default async function handler(req, res) {
   }
 
   if (b.accion === "mandar_humano") {
-    // Un mensaje de Cande (escrito o aprobado por ella) a alguien que escribió hace más de 24 h y menos de 7 días:
-    // la API común ya no deja, la etiqueta HUMAN_AGENT de Meta sí, y es solo para respuestas de una persona
-    // (20/10: las charlas que se perdieron por la falla de ManyChat). Queda anotado como de Cande.
+    // Un mensaje de Cande (escrito o aprobado por ella), dentro de las 24 h: queda anotado como de ella. Se pensó
+    // para las charlas de hasta 7 días con la etiqueta HUMAN_AGENT, pero ManyChat la rechaza en Instagram (20/10,
+    // "Unsupported message tag"): pasadas las 24 h no hay API, se contesta a mano.
     // Si no está en la base (escribió y ManyChat nunca lo pasó), se lo busca en ManyChat por su id de Instagram.
     const textos = (Array.isArray(b.textos) ? b.textos : [b.texto]).map((t) => String(t || "").trim()).filter(Boolean);
     const igsid = String(b.igsid || "").trim();
@@ -177,7 +177,7 @@ export default async function handler(req, res) {
       }
       destino = q.id;
     }
-    const envio = await mandarTextos(destino, textos, { humano: true });
+    const envio = await mandarTextos(destino, textos);
     if (!envio.ok) return res.status(502).json({ ok: false, contacto: destino, error: envio.error, code: envio.code, incierto: envio.incierto || false });
     if (await contacto(destino)) await anotarAMano(destino, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
     const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(destino, ETIQUETA_AGENTE))?.ok === true : null;
