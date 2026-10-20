@@ -631,20 +631,21 @@ test("la vuelta del cron: en una charla retomada, el -- de Cande la saca", async
 
 /* ---------- revisión de las charlas retomadas (21/10) ---------- */
 
-test("Cande escribió a mano y la base no deja leer la marca o anotar lo suyo: porQueSale dice NO_AHORA (ni sale ni contesta encima) y no avisa de Instagram", async () => {
+test("Cande escribió a mano en una charla retomada y la base no deja anotar lo suyo: porQueSale dice NO_AHORA (ni sale ni contesta encima) y no avisa de Instagram; sin poder leer la marca, como en main", async () => {
   const rutas = {
     "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
   };
-  // Sin la marca y sin poder leerla: antes contestaba encima de Cande, con un aviso de la conexión de Instagram que no era.
+  // Sin poder leer la marca, como en main (revisión del 21/10, tercera vuelta): lo escrito a mano la saca, sin aviso.
+  // Antes de esa vuelta decía NO_AHORA también en las charlas sin marca.
   const sinLeer = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
   const leer = sinLeer.base.leerConfig;
   sinLeer.base.leerConfig = async (k) => {
     if (k === CLAVE_RETOMADAS) throw new Error("base caída de prueba");
     return leer(k);
   };
-  assert.equal(await sinLeer.reglas.porQueSale(sinLeer.m.contacto), NO_AHORA);
+  assert.equal(await sinLeer.reglas.porQueSale(sinLeer.m.contacto), "le escribiste vos");
   assert.deepEqual(sinLeer.m.avisos, []);
-  assert.equal(sinLeer.m.contacto.dueno, "agente");
+  assert.deepEqual(sinLeer.base.anotadasCande, []);
   // Con la marca y sin poder anotar lo suyo: sin esto el agente seguía sin lo de ella (un toque salía detrás).
   const sinAnotar = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
   await sinAnotar.base.guardarConfig(CLAVE_RETOMADAS, marca());
@@ -1036,30 +1037,137 @@ test("rescate de una respuesta vencida en una charla que ya pasó a Cande, con l
   assert.equal(m.contacto.dueno, "cande");
 });
 
-test("la vuelta del cron: si la base falla en una charla (leer la marca o anotar), sigue con las demás, no avisa de Instagram y esa charla se vuelve a mirar", async () => {
+test("la vuelta del cron: si la base falla al anotar en una charla retomada, sigue con las demás, no avisa de Instagram y esa charla se vuelve a mirar; sin poder leer la marca, como en main", async () => {
   const hilos = [
     hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 2),
     hiloCrudo(2, [msj(13, "--", { deCuenta: true, min: 5, otro: LEAD_B }), msj(12, "hola", { min: 900, otro: LEAD_B })], 5),
   ];
   const corte = () => Object.assign(new Error("la base de prueba cortó la conexión"), { code: "57P01" });
-  for (const falla of ["leer la marca", "anotar"]) {
-    const { w, base } = mundoVarias({
-      contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos, marcas: { 77: { hasta: AHORA.getTime() + 86400000 } },
-    });
-    if (falla === "leer la marca") {
-      const leer = base.leerConfig;
-      base.leerConfig = async (k) => { if (k === CLAVE_RETOMADAS) throw corte(); return leer(k); };
-    } else {
-      base.anotarCandeDesdeIg = async () => { throw corte(); };
-    }
-    const desde = hace(10);
-    const r = await w.vuelta(desde);
-    assert.equal(r.fallidas, 1, falla);
-    assert.equal(r.sacadas, 1, `${falla}: la otra charla se mira igual`);
-    assert.equal(w.contactos.get("78").dueno, "cande", falla);
-    assert.equal(w.contactos.get("77").dueno, "agente", falla);
-    assert.equal(w.registradas.length, 1, falla);
-    assert.deepEqual(w.avisos, [], `${falla}: no es la conexión con Instagram`);
-    assert.ok(r.hasta < hace(2) && r.hasta >= desde, `${falla}: lo mirado queda antes de la charla que falló`);
+  const armarCon = () => mundoVarias({
+    contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos, marcas: { 77: { hasta: AHORA.getTime() + 86400000 } },
+  });
+  const { w, base } = armarCon();
+  base.anotarCandeDesdeIg = async () => { throw corte(); };
+  const desde = hace(10);
+  const r = await w.vuelta(desde);
+  assert.equal(r.fallidas, 1);
+  assert.equal(r.sacadas, 1, "la otra charla se mira igual");
+  assert.equal(w.contactos.get("78").dueno, "cande");
+  assert.equal(w.contactos.get("77").dueno, "agente");
+  assert.equal(w.registradas.length, 1);
+  assert.deepEqual(w.avisos, [], "no es la conexión con Instagram");
+  assert.ok(r.hasta < hace(2) && r.hasta >= desde, "lo mirado queda antes de la charla que falló");
+  // Sin poder leer la marca, como en main (revisión del 21/10, tercera vuelta): lo escrito a mano la saca. Antes de esa
+  // vuelta la charla quedaba retenida y sin anotar.
+  const sinLeer = armarCon();
+  const leer = sinLeer.base.leerConfig;
+  sinLeer.base.leerConfig = async (k) => { if (k === CLAVE_RETOMADAS) throw corte(); return leer(k); };
+  const r2 = await sinLeer.w.vuelta(desde);
+  assert.deepEqual({ sacadas: r2.sacadas, anotadas: r2.anotadas, fallidas: r2.fallidas }, { sacadas: 2, anotadas: 0, fallidas: 0 });
+  assert.equal(sinLeer.w.contactos.get("77").dueno, "cande");
+  assert.deepEqual(sinLeer.w.avisos, []);
+});
+
+/* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
+
+// Las pruebas que empiezan con "como en main" pasan también con el código de origin/main (se corrieron contra una copia
+// de origin/main con este mismo archivo): en una charla sin la marca de retomada, o si la base no deja leer la marca,
+// la mirada y la vuelta del cron hacen exactamente lo mismo que antes de las charlas retomadas, avisos incluidos.
+
+/** La base de mentira de mundoReglas, con lo que se diga fallando (tira como un corte de la base). */
+const fallando = (base, { marca = false, textos = false } = {}) => {
+  const leer = base.leerConfig;
+  const corte = () => Object.assign(new Error("base caída de prueba"), { code: "57P01" });
+  if (marca) base.leerConfig = async (k) => { if (k === CLAVE_RETOMADAS) throw corte(); return leer(k); };
+  if (textos) base.textosDeLaCuenta = async () => { throw corte(); };
+};
+
+test("como en main: porQueSale en una charla sin la marca, o sin poder leerla: lo escrito a mano la saca y una falla de la base va al aviso de la conexión", async () => {
+  const rutas = (texto) => ({
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, texto, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  });
+  for (const [caso, marcas, sinLeer] of [["sin la marca", null, false], ["con la marca de otra charla", marca("78"), false], ["sin poder leer la marca", marca(), true]]) {
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas(PEGADO) });
+    if (marcas) await w.base.guardarConfig(CLAVE_RETOMADAS, marcas);
+    if (sinLeer) fallando(w.base, { marca: true });
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), "le escribiste vos", caso);
+    assert.deepEqual(w.m.avisos, [], caso);
+    // Lo que pasa por conocido con la comparación de siempre (un "Hola!" viejo en lo sembrado): como en main, nada.
+    const conocido = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas("Hola! Texto de prueba que pegó Cande") });
+    conocido.base.conocidos = ["Hola!"];
+    if (marcas) await conocido.base.guardarConfig(CLAVE_RETOMADAS, marcas);
+    if (sinLeer) fallando(conocido.base, { marca: true });
+    assert.equal(await conocido.reglas.porQueSale(conocido.m.contacto), null, caso);
+    assert.deepEqual(conocido.m.avisos, [], caso);
+    // Si la base no deja leer lo de la cuenta: null y el aviso de la conexión de Instagram, una vez por día.
+    const caida = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas(PEGADO) });
+    if (marcas) await caida.base.guardarConfig(CLAVE_RETOMADAS, marcas);
+    fallando(caida.base, { marca: sinLeer, textos: true });
+    assert.equal(await caida.reglas.porQueSale(caida.m.contacto), null, caso);
+    assert.deepEqual(caida.m.avisos.map((a) => a.titulo), ["DM: la conexión con Instagram no anda"], caso);
+  }
+});
+
+test("charla retomada: si la base no deja leer lo que mandó la cuenta, porQueSale dice NO_AHORA, sin anotar ni el aviso de la conexión de Instagram", async () => {
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  } });
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  fallando(w.base, { textos: true });
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), NO_AHORA);
+  assert.deepEqual(w.m.avisos, [], "no es la conexión con Instagram");
+  assert.deepEqual(w.base.anotadasCande, []);
+  assert.equal(w.m.contacto.dueno, "agente");
+});
+
+test("charla retomada: un automático que ManyChat manda con el nombre de la persona (distinto del cargado) no se toma por lo que pegó Cande, en la mirada y en la vuelta del cron", async () => {
+  // Cande pegó hace 3 minutos, el lead le contestó hace 2 con algo que dispara el automático, y el automático salió
+  // hace 1 con el nombre de la persona adentro.
+  const CARGADO = "Hola Nombre! Este es un mensaje fijo de prueba que sale solo con la palabra clave";
+  const SALIO = "Hola Juan Prueba! Este es un mensaje fijo de prueba que sale solo con la palabra clave";
+  const enIg = (otro) => [
+    msj(5, SALIO, { deCuenta: true, min: 1, otro }), msj(4, "sí, la palabra clave de prueba", { min: 2, otro }), msj(3, PEGADO, { deCuenta: true, min: 3, otro }),
+    msj(2, "hola", { min: 900, otro }),
+  ];
+  // La mirada de cada respuesta.
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, enIg(undefined))), "/501": perfilDe(false),
+  } });
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  await w.base.guardarConfig("automaticos", { textos: [CARGADO] });
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), null);
+  assert.deepEqual(w.base.anotadasCande.map((x) => x.texto), [PEGADO], "solo lo que pegó ella");
+  assert.equal(marcaDe(await w.base.leerConfig(CLAVE_RETOMADAS), "77").usada, hace(3).getTime(), "la marca queda usada hasta lo suyo: lo del lead sigue abierto");
+  // La vuelta del cron.
+  const { w: c, cfg } = mundoVarias({ contactos: [{ id: "77", otro: LEAD_A }], hilos: [hiloCrudo(1, enIg(LEAD_A), 1)], marcas: marca() });
+  cfg.datos.automaticos = { textos: [CARGADO] };
+  const r = await c.vuelta();
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.deepEqual(c.anotadas.map((x) => x.texto), [PEGADO]);
+});
+
+test("la vuelta del cron: una charla retomada sembrada con su id de Instagram y sin el usuario se mira desde la primera vuelta", async () => {
+  const { w } = mundoVarias({
+    contactos: [{ id: "77", otro: LEAD_A, ig_usuario: null }],
+    hilos: [hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 1)],
+    marcas: marca(),
+  });
+  const r = await w.vuelta();
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.equal(w.contactos.get("77").dueno, "agente");
+});
+
+test("como en main: si la base falla en una charla sin la marca, la vuelta del cron entera falla (y el cron avisa con fallo)", async () => {
+  const hilos = [
+    hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 2),
+    hiloCrudo(2, [msj(13, "--", { deCuenta: true, min: 5, otro: LEAD_B }), msj(12, "hola", { min: 900, otro: LEAD_B })], 5),
+  ];
+  const corte = () => Object.assign(new Error("la base de prueba cortó la conexión"), { code: "57P01" });
+  for (const falla of ["buscar el contacto", "leer lo de la cuenta"]) {
+    const { w, base } = mundoVarias({ contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos });
+    if (falla === "buscar el contacto") base.contactoDeIg = async () => { throw corte(); };
+    else base.textosDeLaCuenta = async () => { throw corte(); };
+    await assert.rejects(() => w.vuelta(hace(10)), /cortó la conexión/, falla);
+    assert.equal(w.contactos.get("78").dueno, "agente", `${falla}: la vuelta se cortó antes`);
   }
 });

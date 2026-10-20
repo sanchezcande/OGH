@@ -22,7 +22,12 @@
 // el hasta nuevo y sin "usada"); con quitar no toca las otras; anotarCandeDesdeIg deja la marca usada sin perder su
 // hora; textosDeLaCuenta con desde trae lo del agente, lo anotado y los automáticos escritos después de esa hora, lo que
 // el agente armó antes y salió después, lo pendiente, y los automáticos cargados, sin lo del lead, las notas, lo de
-// control, lo descartado ni lo de otra charla. Los ids y textos son inventados (este repo es público).
+// control, lo descartado ni lo de otra charla. Tercera revisión del 21/10, contra otro Postgres 16 local y descartable
+// (el SQL tal cual, armado con las funciones de lib/dm/base.js): sembrar con ig_id e ig_usuario deja los dos en el
+// contacto; en una charla retomada donde el lead contestó por el webhook antes de que se anotara lo pegado (que queda
+// con un id más alto y la hora de Instagram), --retomar por la hora deja abierto lo del lead (respondido_hasta en lo
+// sembrado, 1 abierto) y por el id, como en main, lo daba por contestado (0 abiertos). Los ids y textos son inventados
+// (este repo es público).
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -164,7 +169,8 @@ test("las piezas reales están conectadas: la base, la red de la bandeja, el cro
   const cron = await leer("../pages/api/dm/instagram.js");
   assert.match(cron, /\(\{ miradas, sacadas, anotadas \} = r\)/);
   assert.match(cron, /miradas, sacadas, anotadas, usuarios \}/);
-  assert.match(await leer("../pages/api/dm/config.js"), /retomada: esRetomada\(await leerConfig\(CLAVE_RETOMADAS\), id\)/);
+  // La prueba de la conexión dice si la charla tiene la marca; si la base no deja leerla, null (no corta la prueba).
+  assert.match(await leer("../pages/api/dm/config.js"), /retomada: await leerConfig\(CLAVE_RETOMADAS\)\.then\(\(r\) => esRetomada\(r, id\), \(\) => null\)/);
 });
 
 /* ---------- revisión del 21/10 ---------- */
@@ -298,4 +304,88 @@ test("retomar_estado en las charlas sembradas (todo con la misma hora): le toca 
 test("el cron de Instagram le pasa a buscarCodigos dónde registrar una falla de la base, sin ids ni textos", async () => {
   const cron = await leer("../pages/api/dm/instagram.js");
   assert.match(cron, /registrar: \(e\) => console\.error\("dm: la base falló en una charla de la vuelta de Instagram", e\?\.code \?\? "", e\?\.name \?\? ""\)/);
+});
+
+/* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
+
+test("sembrar guarda el id y el usuario de Instagram que vienen (el cron reconoce la charla desde la primera vuelta); sin ellos, como siempre", async () => {
+  const { default: handler } = await import("../pages/api/dm/config.js");
+  const sembradas = [];
+  pg.otras = (t, params) => {
+    if (t.startsWith("SELECT id, quien, texto, creado FROM dm_mensajes WHERE contacto = ?")) return { rows: [] };
+    if (t.startsWith("WITH m AS ( INSERT INTO dm_mensajes (contacto, quien, texto)")) {
+      sembradas.push({ t, params });
+      return { rows: [] };
+    }
+    if (/^(CREATE|ALTER|UPDATE)/.test(t)) return { rows: [] };
+    return undefined;
+  };
+  process.env.COLA_SECRET = "secreto-de-prueba";
+  process.env.POSTGRES_URL = "postgres://de-prueba";
+  const llamar = async (extra) => {
+    const res = respuesta();
+    await handler({ method: "POST", headers: { authorization: "Bearer secreto-de-prueba" }, body: {
+      accion: "sembrar", contacto: "123", nombre: "Lead de prueba", mensajes: [{ quien: "lead", texto: "hola de prueba" }], ...extra,
+    } }, res);
+    return res;
+  };
+  try {
+    assert.equal((await llamar({ ig_id: "17841400000000001", ig_usuario: "@Lead.Prueba" })).codigo, 200);
+    assert.equal(sembradas.length, 1);
+    assert.match(sembradas[0].t, /INSERT INTO dm_contactos \(id, nombre, dueno, contexto, respondido_hasta, foto_avisada_hasta, entregada, ig_id, ig_usuario\)/);
+    assert.match(sembradas[0].t, /ig_id = COALESCE\(EXCLUDED\.ig_id, dm_contactos\.ig_id\), ig_usuario = COALESCE\(EXCLUDED\.ig_usuario, dm_contactos\.ig_usuario\)/);
+    assert.deepEqual(sembradas[0].params.slice(-2), ["17841400000000001", "lead.prueba"], "el usuario como se guarda: sin @ y en minúscula");
+    // El id puede venir como número.
+    assert.equal((await llamar({ ig_id: 17841400000000002 })).codigo, 200);
+    assert.deepEqual(sembradas[1].params.slice(-2), ["17841400000000002", null]);
+    // Sin ellos, como siempre: quedan como estaban.
+    assert.equal((await llamar({})).codigo, 200);
+    assert.deepEqual(sembradas[2].params.slice(-2), [null, null]);
+    // Lo que no es un id ni un usuario de Instagram no se guarda.
+    for (const mal of [{ ig_id: "no es un id" }, { ig_id: "123abc" }, { ig_usuario: "con espacios no" }, { ig_usuario: "x".repeat(31) }]) {
+      assert.equal((await llamar(mal)).codigo, 400, JSON.stringify(mal));
+    }
+    assert.equal(sembradas.length, 3, "con un pedido malo no se siembra nada");
+  } finally {
+    pg.otras = null;
+    delete process.env.COLA_SECRET;
+    delete process.env.POSTGRES_URL;
+  }
+});
+
+test("--retomar en una charla retomada deja abierto lo que el lead escribió después de lo último de la cuenta por la hora; sin la marca (o sin poder leerla), por el id como en main", async () => {
+  const { reabrirTurno } = await import("../lib/dm/base.js");
+  const ahora = Date.now();
+  const correr = async (marcas) => {
+    const reabrir = [];
+    pg.otras = (t, params) => {
+      if (t === "SELECT valor FROM dm_config WHERE clave = ?" && params[0] === CLAVE_RETOMADAS) {
+        if (marcas === "falla") throw new Error("base caída de prueba");
+        return { rows: marcas ? [{ valor: marcas }] : [] };
+      }
+      if (t.startsWith("WITH ultimo AS (")) {
+        reabrir.push(t);
+        return { rows: [{ abiertos: 1 }] };
+      }
+      if (/^UPDATE dm_salidas/.test(t)) return { rows: [] };
+      return undefined;
+    };
+    try {
+      assert.equal(await reabrirTurno("77"), 1);
+    } finally {
+      pg.otras = null;
+    }
+    assert.equal(reabrir.length, 1);
+    return reabrir[0];
+  };
+  const porHora = await correr({ 77: { hasta: ahora + 7 * DIA, usada: ahora - 60000 } });
+  assert.match(porHora, /WHERE contacto = \? AND quien IN \('agente', 'cande', 'automatico'\) ORDER BY creado DESC, id DESC LIMIT 1\)/);
+  assert.match(porHora, /m\.quien = 'lead' AND \(m\.creado < ultimo\.creado OR \(m\.creado = ultimo\.creado AND m\.id < ultimo\.id\)\)/);
+  assert.doesNotMatch(porHora, /m\.id < ultimo\.cuenta/);
+  for (const [caso, marcas] of [["sin la marca", null], ["con la marca de otra charla", { 78: { hasta: ahora + DIA } }],
+    ["con la marca vencida sin usar", { 77: { hasta: ahora - DIA } }], ["sin poder leer la marca", "falla"]]) {
+    const t = await correr(marcas);
+    assert.match(t, /SELECT COALESCE\(MAX\(id\), 0\) AS cuenta FROM dm_mensajes WHERE contacto = \? AND quien IN \('agente', 'cande', 'automatico'\)\)/, caso);
+    assert.match(t, /m\.quien = 'lead' AND m\.id < ultimo\.cuenta/, caso);
+  }
 });

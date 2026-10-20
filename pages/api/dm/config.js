@@ -4,8 +4,10 @@
 //   { accion: "prompt", texto }                    → guarda el prompt (vive en la base: este repo es público)
 //   { accion: "ajustes", ajustes: { modo, ... } }  → cambia ajustes (modo: apagado | sombra | auto)
 //   { accion: "dueno", contacto, dueno, nombre }   → le da un contacto al agente o se lo saca
-//   { accion: "sembrar", contacto, nombre, contexto, mensajes: [{ quien, texto }] }
-//                                                  → carga una charla que ya existía y se la da al agente
+//   { accion: "sembrar", contacto, nombre, contexto, mensajes: [{ quien, texto }], ig_id?, ig_usuario? }
+//                                                  → carga una charla que ya existía y se la da al agente. Con ig_id (el id
+//                                                  de la persona en las charlas de Instagram de la cuenta) y ig_usuario,
+//                                                  el cron de Instagram reconoce su charla desde la primera vuelta
 //   { accion: "anotar", contacto, quien, texto }   → deja constancia de lo que Cande mandó a mano
 //   { accion: "reservar", contactos: [id, ...] }   → deja como de Cande, en tanda, a quienes todavía no figuran
 //                                                  (se corre antes de prender las altas, con los contactos que ya existen)
@@ -203,10 +205,16 @@ export default async function handler(req, res) {
       .map((m) => ({ quien: m.quien, texto: String(m.texto).trim().slice(0, TOPE_TEXTO) }));
     if (!id || !filas.length) return res.status(400).json({ error: "falta contacto o mensajes" });
     if (filas.length > TOPE_SIEMBRA) return res.status(400).json({ error: `son más de ${TOPE_SIEMBRA} mensajes` });
+    // Su id y su usuario de Instagram, si vienen (los dos opcionales): sin ellos, la charla de una retomada recién
+    // sembrada no la reconoce el cron hasta que se completa el usuario (revisión del 21/10, tercera vuelta).
+    const igId = b.ig_id === undefined || b.ig_id === null || b.ig_id === "" ? null : String(b.ig_id).trim();
+    const usuario = b.ig_usuario === undefined || b.ig_usuario === null || b.ig_usuario === "" ? null : usuarioIg(b.ig_usuario);
+    if (igId !== null && !/^\d{1,40}$/.test(igId)) return res.status(400).json({ error: "ig_id tiene que ser el id numérico de Instagram" });
+    if (usuario !== null && !/^[a-z0-9._]{1,30}$/.test(usuario)) return res.status(400).json({ error: "ig_usuario no es un usuario de Instagram" });
     if ((await historial(id, 1)).length) return res.status(409).json({ error: "esa charla ya tiene historial" });
     await sembrar(id, {
       nombre: String(b.nombre || "").trim().slice(0, 80) || null,
-      contexto: String(b.contexto || "").trim().slice(0, 300), mensajes: filas,
+      contexto: String(b.contexto || "").trim().slice(0, 300), mensajes: filas, igId, usuario,
     });
     const campo = await ponerCampo(id, "dm_dueno", "agente");
     return res.status(200).json({ ok: true, cargados: filas.length, manychat: campo.ok });
@@ -432,7 +440,7 @@ export default async function handler(req, res) {
             la_seguis: p.laSigue, mensajes_con_texto: hilo ? hilo.mensajes.filter((m) => m.texto != null).length : 0,
             hay_codigo: Boolean(hilo && codigoEnHilo(hilo, yo, desdeDe(c))),
             escribio_cande: Boolean(hilo && manualEnHilo(hilo, yo, await textosDeLaCuenta(id), desdeManual(c))),
-            retomada: esRetomada(await leerConfig(CLAVE_RETOMADAS), id),
+            retomada: await leerConfig(CLAVE_RETOMADAS).then((r) => esRetomada(r, id), () => null),
           });
         }
       } catch (e) {

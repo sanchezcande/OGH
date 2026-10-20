@@ -1314,3 +1314,28 @@ test("los ajustes de la red de la bandeja: prendida de fábrica, y su tope de al
   assert.equal(validarAjustes({ altas_bandeja_por_dia: 0 }).ok, false);
   assert.equal(validarAjustes({ altas_bandeja_por_dia: 15 }).ok, true);
 });
+
+/* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
+
+// Las pruebas que empiezan con "como en main" pasan también con el código de origin/main (se corrieron contra una copia
+// de origin/main con este mismo archivo).
+
+test("como en main: si la base no deja leer la marca de retomada, lo que Cande escribió a mano en una charla del agente va al resumen y no se guarda nada", async () => {
+  const pegado = "Texto que Cande pegó cambiado, de prueba";
+  const w = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600), respondido_hasta: 0 }],
+    hilos: [charla(1, DEL_AGENTE, [["cuenta", pegado, 60], ["lead", "respuesta de prueba del lead", 30]])],
+    config: { retomadas: { 77: { hasta: AHORA.getTime() + 7 * 24 * HORA } } },
+  });
+  const leer = w.base.leerConfig;
+  w.base.leerConfig = async (k) => {
+    if (k === "retomadas") throw new Error("base caída de prueba");
+    return leer(k);
+  };
+  const r = await w.revisar();
+  assert.equal(r.recuperados, 0);
+  assert.equal(r.fallas, 0, "no es una charla que falla: es lo de siempre");
+  assert.equal(w.mensajes.length, 0);
+  assert.equal(w.contactos.get("77").dueno, "agente");
+  assert.match(w.resumenes()[0].campos[SECCION_VOS], /le escribiste vos/);
+});
