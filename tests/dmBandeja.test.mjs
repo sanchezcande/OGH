@@ -7,8 +7,9 @@
 // un ig_mid, y si no guardó nada no toque ultimo_lead, los toques ni lo pendiente; que darDeAltaDesdeBandeja no toque
 // a quien ya figura, respete su propio tope y deje contacto y mensajes juntos; que la entrada y la red cuenten cada
 // una sus altas; que guardadosPorLaRed y marcarEco dejen absorber un solo eco por mensaje; que salidaSinLlegar mire
-// solo respuestas enviadas; y que la migración de personal deje como personales solo las altas borradas. Abajo hay
-// una revisión del texto de esas consultas.
+// solo respuestas enviadas; que la migración de personal deje como personales solo las altas borradas; que guardarIg
+// con soloDelAgente no toque una charla personal ni una de Cande (y sin él, como siempre); y que enviadosEnLaCharla
+// traiga lo del agente y de Cande sin los automáticos. Abajo hay una revisión del texto de esas consultas.
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -81,9 +82,10 @@ function mundo({
       return copia(l.find((c) => igId && c.ig_id === igId) || l.find((c) => usuario && c.ig_usuario === usuario && !c.ig_id));
     },
     contacto: async (id) => copia(w.contactos.get(id)),
-    guardarIg: async (id, { usuario = null, igId = null } = {}) => {
+    // Como la consulta: con soloDelAgente, solo en una charla del agente (nunca en una personal o borrada, que son de Cande).
+    guardarIg: async (id, { usuario = null, igId = null, soloDelAgente = false } = {}) => {
       const c = w.contactos.get(id);
-      if (!c) return;
+      if (!c || (soloDelAgente && (c.dueno !== "agente" || c.personal === true))) return;
       if (usuario !== null) c.ig_usuario = usuario;
       if (igId !== null) c.ig_id = igId;
     },
@@ -91,6 +93,10 @@ function mundo({
     textosDeLaCuenta: async (id) => [
       ...w.mensajes.filter((m) => m.contacto === id && ["agente", "cande", "automatico"].includes(m.quien)).map((m) => m.texto),
       ...(w.config.automaticos?.textos || []),
+    ],
+    enviadosEnLaCharla: async (id) => [
+      ...w.mensajes.filter((m) => m.contacto === id && ["agente", "cande"].includes(m.quien)).map((m) => m.texto),
+      ...w.salidas.filter((s) => s.contacto === id && ["pendiente", "enviando", "enviada", "incierta"].includes(s.estado)).flatMap((s) => s.mensajes),
     ],
     leadsGuardados: async (id) => w.mensajes.filter((m) => m.contacto === id && m.quien === "lead").map((m) => ({ ...m })),
     tomar: async (id, marca) => {
@@ -128,7 +134,7 @@ function mundo({
       s.mensajes.length > 0 && s.creado >= new Date(desde) && (s.enviado || s.creado) < w.ahora - 10 * MIN),
     guardadosPorLaRed: async (id) => w.mensajes
       .filter((m) => m.contacto === id && m.quien === "lead" && m.ig_mid && m.guardado_red && w.ahora - m.guardado_red < 24 * HORA)
-      .map((m) => ({ id: m.id, texto: m.texto, eco_en: m.eco_en, eco_reciente: Boolean(m.eco_en && w.ahora - m.eco_en < MIN) })),
+      .map((m) => ({ id: m.id, texto: m.texto, creado: m.creado, ig_mid: m.ig_mid, eco_en: m.eco_en, eco_reciente: Boolean(m.eco_en && w.ahora - m.eco_en < MIN) })),
     marcarEco: async (idMensaje) => {
       const m = w.mensajes.find((x) => x.id === idMensaje);
       if (!m || m.eco_en) return false;
@@ -373,6 +379,70 @@ test("si el agente figura con la respuesta enviada y en Instagram no aparece, no
   assert.equal(callo.resumenes().length, 0, "el agente decidió no contestar: no es una respuesta perdida");
 });
 
+test("en una charla del agente, lo que la base sabe que el agente mandó ahí es una respuesta que llegó, aunque repita la frase en otras charlas", async () => {
+  // El agente escribe con su voz y repite frases: la misma respuesta les salió a dos personas de la misma página.
+  const FRASE = "Frase fija de prueba que el agente repite: contame un poco más de lo tuyo";
+  const OTRO_DEL_AGENTE = persona("502", "lead.agente.dos");
+  const armar = (lineas) => mundo({
+    contactos: [
+      { id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) },
+      { id: "78", nombre: "Otro del agente", ig_id: "502", ig_usuario: "lead.agente.dos", dueno_desde: hace(600) },
+    ],
+    mensajes: [
+      { contacto: "77", quien: "lead", texto: "una pregunta de prueba", creado: hace(30) },
+      { contacto: "77", quien: "agente", texto: FRASE, creado: hace(29) },
+      { contacto: "78", quien: "lead", texto: "otra pregunta de prueba", creado: hace(32) },
+      { contacto: "78", quien: "agente", texto: FRASE, creado: hace(31) },
+    ],
+    salidas: [
+      { contacto: "77", creado: hace(29), enviado: hace(29), mensajes: [FRASE] },
+      { contacto: "78", creado: hace(31), enviado: hace(31), mensajes: [FRASE] },
+    ],
+    hilos: [charla(1, DEL_AGENTE, lineas), charla(2, OTRO_DEL_AGENTE, [["lead", "otra pregunta de prueba", 32], ["cuenta", FRASE, 31]])],
+  });
+  const w = armar([["lead", "una pregunta de prueba", 30], ["cuenta", FRASE, 29]]);
+  const r = await w.revisar();
+  assert.equal(r.recuperados, 0);
+  assert.deepEqual(w.config.bandeja_estado.pendientes, {}, "le llegó: no va al resumen como una respuesta que no llegó");
+  assert.equal(w.resumenes().length, 0);
+
+  // Si además se perdió un mensaje del lead justo antes de esa respuesta, no se guarda: en Instagram ya tiene
+  // respuesta, y guardarlo reabriría el turno (una segunda respuesta, o la charla pasada a Cande por quizas_salio).
+  const v = armar([["lead", "una pregunta de prueba", 30], ["lead", "algo más que no llegó, de prueba", 29.5], ["cuenta", FRASE, 29]]);
+  assert.equal((await v.revisar()).recuperados, 0);
+  assert.equal(v.delContacto("77").length, 2);
+  assert.deepEqual(v.config.bandeja_estado.pendientes, {});
+
+  // Y si lo que mandó el agente en esa charla empieza igual que un automático cargado, sigue siendo su respuesta.
+  const parecido = `${AUTOMATICO}, y te cuento algo más de prueba`;
+  const a = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) }],
+    mensajes: [
+      { contacto: "77", quien: "lead", texto: "una pregunta de prueba", creado: hace(30) },
+      { contacto: "77", quien: "agente", texto: parecido, creado: hace(29) },
+    ],
+    salidas: [{ contacto: "77", creado: hace(29), enviado: hace(29), mensajes: [parecido] }],
+    hilos: [charla(1, DEL_AGENTE, [["lead", "una pregunta de prueba", 30], ["cuenta", parecido, 29]])],
+    config: CON_AUTOMATICOS,
+  });
+  await a.revisar();
+  assert.deepEqual(a.config.bandeja_estado.pendientes, {});
+
+  // Un texto que se repite en otras charlas y la base no conoce (un saludo que Cande escribió a mano en las dos)
+  // tampoco es un automático en una charla del agente: es una respuesta, y el agente no le contesta encima.
+  const SALUDO = "Holaaa, cómo va? Te leo, contame un poco más de prueba";
+  const s = mundo({
+    contactos: [{ id: "77", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) }],
+    hilos: [
+      charla(1, DEL_AGENTE, [["lead", "un mensaje que no llegó, de prueba", 30], ["cuenta", SALUDO, 29]]),
+      charla(2, OTRO, [["lead", "hola de prueba", 300], ["cuenta", SALUDO, 299]]),
+    ],
+    perfiles: { 801: perfil("Nombre Otro", "lead.otro") },
+  });
+  assert.equal((await s.revisar()).recuperados, 0);
+  assert.equal(s.mensajes.length, 0);
+});
+
 /* ---------- 3. las charlas de Cande ---------- */
 
 test("una charla de Cande no se toma: va al resumen, en 'pasadas a vos', con su link, hace cuánto y lo último que dijo", async () => {
@@ -408,7 +478,7 @@ test("las charlas reservadas y las altas que se sacaron porque Cande escribió n
   const vos = w.resumenes()[0].campos[SECCION_VOS];
   assert.match(vos, /lead\.cande, hace 40 min/);
   assert.match(vos, /lead\.otro, hace 50 min/);
-  assert.equal(w.contactos.get("72").ig_id, "801", "de paso queda su Instagram");
+  assert.equal(w.contactos.get("72").ig_id, null, "la borró borrarCharla: la red no le vuelve a poner su Instagram");
 });
 
 test("una charla personal o de alguien que Cande sigue no va a Telegram", async () => {
@@ -425,6 +495,25 @@ test("una charla personal o de alguien que Cande sigue no va a Telegram", async 
   const r = await w.revisar();
   assert.equal(r.pendientes, 0);
   assert.equal(w.avisos.length, 0);
+});
+
+test("la red no le vuelve a poner su Instagram a una charla personal ni a una que borró borrarCharla", async () => {
+  const TRES = persona("603", "lead.tres");
+  const w = mundo({
+    contactos: [
+      { id: "70", dueno: "cande", personal: true }, // la borró el agente (no era un lead) o Cande: sin su Instagram
+      { id: "72", dueno: "cande", alta_en: hace(900), personal: false }, // un alta sacada porque Cande escribió (borrarCharla con personal en false)
+      { id: "74", dueno: "cande", personal: true, ig_usuario: "lead.tres" }, // personal, con el usuario pero sin el id
+    ],
+    hilos: [charla(1, DE_CANDE, [["lead", "hola de prueba", 40]]), charla(2, OTRO, [["lead", "hola de prueba", 50]]), charla(3, TRES, [["lead", "hola de prueba", 45]])],
+    perfiles: { 701: perfil("Nombre Cande", "lead.cande"), 801: perfil("Nombre Otro", "lead.otro"), 603: perfil("Nombre Tres", "lead.tres") },
+    directorio: [{ id: "70", nombre: "Nombre Cande", ig_username: "lead.cande" }, { id: "72", nombre: "Nombre Otro", ig_username: "lead.otro" }],
+  });
+  const r = await w.revisar();
+  assert.equal(r.altas, 0);
+  assert.deepEqual(["70", "72", "74"].map((id) => w.contactos.get(id).ig_id), [null, null, null]);
+  assert.deepEqual(["70", "72", "74"].map((id) => w.contactos.get(id).ig_usuario), [null, null, "lead.tres"]);
+  assert.doesNotMatch(w.resumenes()[0]?.campos[SECCION_VOS] || "", /lead\.(cande|tres)/, "las personales no van al resumen");
 });
 
 test("una charla de Cande que espera hace menos de 20 minutos todavía no se recuerda: recién le llegó el aviso de la charla", async () => {
@@ -528,7 +617,7 @@ function agenteDe(w) {
     lugarParaAlta: async (id) => (w.contactos.has(id) ? null : 0),
     darDeAlta: async () => null,
   };
-  return crearAgente({ base, pedir: async () => { throw new Error("no se usa"); }, manychat: {}, avisar: async () => true });
+  return crearAgente({ base, pedir: async () => { throw new Error("no se usa"); }, manychat: {}, avisar: async () => true, reloj: () => w.ahora });
 }
 
 test("si el webhook llega después de que la red guardó el mensaje, la entrada no lo guarda otra vez (no sale una segunda respuesta)", async () => {
@@ -543,7 +632,7 @@ test("si el webhook llega después de que la red guardó el mensaje, la entrada 
   assert.equal(w.delContacto("77").at(-1).texto, SIN_TEXTO);
 
   const agente = agenteDe(w);
-  w.pasar(20); // ManyChat se acordó tarde
+  w.pasar(4); // ManyChat se acordó tarde: la foto la mandó hace 13 minutos
   assert.equal(await agente.recibir("5001", "hola de prueba", "Nombre Nuevo"), null);
   assert.equal(await agente.recibir("77", "https://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id=1"), null, "la foto con link es la misma que guardó la red sin texto");
   assert.equal(w.delContacto("5001").length, 1);
@@ -551,6 +640,51 @@ test("si el webhook llega después de que la red guardó el mensaje, la entrada 
   // Lo que escribe después sí entra.
   assert.ok(await agente.recibir("5001", "otro mensaje de prueba"));
   assert.equal(w.delContacto("5001").length, 2);
+});
+
+/** Una charla del agente donde lo último que mandó el lead es un adjunto (sin texto en Instagram), hace `min` minutos. */
+const conAdjunto = (min) => mundo({
+  contactos: [{ id: "77", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) }],
+  mensajes: [{ contacto: "77", quien: "agente", texto: "Respuesta del agente de prueba", creado: hace(60) }],
+  hilos: [charla(1, DEL_AGENTE, [["cuenta", "Respuesta del agente de prueba", 60], ["lead", null, min]])],
+});
+
+test("un reel compartido que la red guardó sin texto y llega tarde por el webhook con su link es el mismo mensaje: no entra dos veces", async () => {
+  const w = conAdjunto(5);
+  assert.equal((await w.revisar()).recuperados, 1);
+  assert.equal(w.delContacto("77").at(-1).texto, SIN_TEXTO);
+  w.pasar(4); // el webhook llega 9 minutos después de que lo mandó, con el link del reel
+  assert.equal(await agenteDe(w).recibir("77", "https://www.instagram.com/reel/PRUEBA123/?igsh=prueba"), null);
+  assert.equal(w.delContacto("77").filter((m) => m.quien === "lead").length, 1);
+});
+
+test("dos adjuntos no son el mismo mensaje por ser adjuntos: la foto que manda después (el comprobante) entra", async () => {
+  const w = conAdjunto(9);
+  assert.equal((await w.revisar()).recuperados, 1);
+  w.pasar(60);
+  assert.ok(await agenteDe(w).recibir("77", "https://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id=2"), "una hora después es otra foto");
+  assert.equal(w.delContacto("77").filter((m) => m.quien === "lead").length, 2);
+  // Un audio que la red guardó hace un rato tampoco absorbe el que llega al día siguiente.
+  const d = conAdjunto(9);
+  await d.revisar();
+  d.pasar(20 * 60);
+  assert.ok(await agenteDe(d).recibir("77", SIN_TEXTO));
+});
+
+test("si el webhook trae el id del mensaje de Instagram, es la prueba: el mismo id es el eco, otro id es un mensaje nuevo", async () => {
+  const w = mundo({
+    contactos: [{ id: "77", ig_id: "501", ig_usuario: "lead.agente", dueno_desde: hace(600) }],
+    mensajes: [{ contacto: "77", quien: "agente", texto: "Respuesta del agente de prueba", creado: hace(60) }],
+    hilos: [charla(1, DEL_AGENTE, [["cuenta", "Respuesta del agente de prueba", 60], ["lead", "Sí, dale!", 8]])],
+  });
+  assert.equal((await w.revisar()).recuperados, 1);
+  const mid = w.delContacto("77").at(-1).ig_mid;
+  const agente = agenteDe(w);
+  w.pasar(3);
+  assert.ok(await agente.recibir("77", "Sí, dale!", null, { mid: `${mid}-otro` }), "el mismo texto con otro id: lo escribió de nuevo");
+  assert.equal(await agente.recibir("77", "texto que ManyChat dio distinto", null, { mid }), null, "el mismo id, aunque el texto llegue distinto");
+  assert.equal(await agente.recibir("77", "texto que ManyChat dio distinto", null, { mid }), null, "y el reintento de ManyChat de ese pedido");
+  assert.equal(w.delContacto("77").filter((m) => m.quien === "lead").length, 2);
 });
 
 test("el webhook que llega más de 2 horas tarde, o con el texto apenas distinto, tampoco se guarda dos veces; uno nuevo igual, sí", async () => {
@@ -648,6 +782,27 @@ test("si no se la encuentra en ManyChat no se contesta sola: va al resumen con s
   w.pasar(30);
   await w.revisar();
   assert.ok(w.busquedas.length > busquedas, "pasada media hora, se la busca de nuevo");
+});
+
+test("si falla el perfil de Instagram no se sabe si Cande la sigue: no hay alta en esa vuelta, y queda anotada", async () => {
+  // ManyChat la encuentra igual (por su usuario), pero sin el perfil no se sabe si Cande la sigue.
+  const armar = () => mundo({ hilos: [charla(1, NUEVO, [["lead", "hola de prueba", 10]])], directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }] });
+  const w = armar();
+  assert.equal((await w.revisar()).altas, 0);
+  assert.equal(w.contactos.size, 0);
+  assert.match(w.config.bandeja_estado.pendientes.h1.nota, /perfil/, "si sigue sin poder verse, le llega a Cande en el resumen");
+  // La vuelta siguiente Instagram ya lo da y Cande la sigue: ni se toma ni se avisa.
+  w.perfiles["601"] = perfil("Nombre Nuevo", "lead.nuevo", true);
+  w.pasar(3);
+  assert.equal((await w.revisar()).altas, 0);
+  assert.equal(w.contactos.size, 0);
+  assert.equal(w.config.bandeja_estado.pendientes.h1, undefined);
+  // Si no la sigue, entra en la vuelta siguiente.
+  const n = armar();
+  await n.revisar();
+  n.perfiles["601"] = perfil("Nombre Nuevo", "lead.nuevo");
+  n.pasar(3);
+  assert.equal((await n.revisar()).altas, 1);
 });
 
 test("dos contactos de ManyChat con el mismo Instagram: no se elige ninguno", async () => {
@@ -764,6 +919,28 @@ test("si la vuelta se corta por tiempo, la siguiente sigue desde la página dond
   const r2 = await w.revisar();
   assert.equal(r2.recuperados, 1, "la vuelta siguiente llegó hasta abajo");
   assert.equal(w.config.bandeja_paginas.objetivo, null);
+});
+
+test("lo que quedó para después por los topes no se pierde aunque tenga más de 25 horas y esté debajo de lo que repasa la red", async () => {
+  const n = BUSQUEDAS_POR_VUELTA + 2;
+  const viejos = Array.from({ length: n }, (_, i) => persona(`62${i}`, `lead.viejo${i}`));
+  // Una página de charlas recientes y otra de hace 26 horas, todas contestadas; debajo, los que escribieron hace 30 horas.
+  const contestadas = (desde, min) => Array.from({ length: CHARLAS_POR_PAGINA }, (_, i) =>
+    charla(desde + i, persona(`${desde + i}`, `relleno.${desde + i}`), [["lead", "hola", min + i], ["cuenta", "Respuesta de prueba", min + i - 1]]));
+  const w = mundo({
+    hilos: [...contestadas(1000, 20), ...contestadas(2000, 26 * 60), ...viejos.map((p, i) => charla(i + 1, p, [["lead", "hola de prueba", 30 * 60 + i]]))],
+    perfiles: Object.fromEntries(viejos.map((p, i) => [p.id, perfil(`Persona${i}`, p.username)])),
+    directorio: viejos.map((p, i) => ({ id: `50${i}`, nombre: `Persona${i}`, ig_username: p.username })),
+  });
+  const anotadas = () => viejos.filter((_, i) => w.config.bandeja_estado.pendientes[`h${i + 1}`]).length;
+  await w.revisar(); // la primera vez se lee toda la semana: las búsquedas en ManyChat se acaban antes de los dos últimos
+  assert.equal(anotadas(), BUSQUEDAS_POR_VUELTA);
+  for (let i = 0; i < 20; i++) { // una hora de vueltas, con su repaso de las últimas 25 horas
+    w.pasar(3);
+    await w.revisar();
+  }
+  assert.equal(anotadas(), n, "los que quedaron para después también llegan a Cande");
+  assert.match(w.config.bandeja_estado.pendientes.h8.nota, /nunca le llegó al agente/);
 });
 
 test("después de la primera vez, cada vuelta lee solo lo movido desde la anterior, y cada media hora repasa las últimas 25 horas", async () => {
@@ -1018,6 +1195,10 @@ test("las consultas de la red: guardar solo en charlas del agente, sin repetir, 
   assert.match(cuerpo("lugarParaAlta"), /alta_por IS NULL/, "la entrada cuenta solo las suyas");
   assert.match(cuerpo("darDeAlta"), /alta_por IS NULL/);
   assert.match(cuerpo("guardadosPorLaRed"), /ig_mid IS NOT NULL AND guardado_red > NOW\(\) - INTERVAL '24 hours'/);
+  assert.match(cuerpo("guardadosPorLaRed"), /SELECT id, texto, creado, ig_mid, eco_en/, "el eco de un adjunto se reconoce por la hora en que lo mandó");
+  assert.match(cuerpo("guardarIg"), /\$\{soloDelAgente\}::boolean = false OR \(dueno = 'agente' AND personal IS NOT TRUE\)/, "nunca en una personal o borrada");
+  assert.match(cuerpo("enviadosEnLaCharla"), /quien IN \('agente', 'cande'\)/, "lo del agente y de Cande, sin los automáticos");
+  assert.doesNotMatch(cuerpo("enviadosEnLaCharla"), /automatico/);
   assert.match(cuerpo("marcarEco"), /WHERE id = \$\{idMensaje\} AND eco_en IS NULL/);
   assert.match(cuerpo("salidaSinLlegar"), /estado = 'enviada' AND accion <> 'callar' AND jsonb_array_length\(mensajes\) > 0/);
   assert.match(cuerpo("borrarCharla"), /personal = EXCLUDED\.personal/);

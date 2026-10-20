@@ -25,7 +25,8 @@
 //
 // Si ManyChat no llama acá (un mensaje que se pierde, alguien nuevo que nunca entra), la red de la bandeja
 // (lib/dm/bandeja.js, cada 3 minutos) lo encuentra en la bandeja real de Instagram y lo guarda. Si después llega
-// igual por acá, no se guarda dos veces (recibir en lib/dm/agente.js).
+// igual por acá, no se guarda dos veces (recibir en lib/dm/agente.js). Si el cuerpo trae "ig_mid" (el id del
+// mensaje en Instagram, el mismo que da la API de Instagram), esa es la prueba de si es el mismo mensaje.
 //
 // El cuerpo se lee crudo y no con el lector de Next: ManyChat no escapa el texto del mensaje, y
 // un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
@@ -63,12 +64,13 @@ export default async function handler(req, res) {
   // Sin saltos de línea: el aviso a Cande lleva el nombre en el renglón "Quién", y de ahí sale a quién va su respuesta.
   const nombre = String(b.nombre ?? b.name ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || null;
   const quien = `${nombre || "sin nombre"} (${id})`;
+  const mid = String(b.ig_mid ?? "").trim().slice(0, 300) || null;
 
   let idMensaje;
   try {
     await tablas();
     // Devuelve null si el contacto no es del agente o si es un reintento del mismo mensaje.
-    idMensaje = await agente.recibir(id, texto.slice(0, 4000), nombre);
+    idMensaje = await agente.recibir(id, texto.slice(0, 4000), nombre, { mid });
     if (!idMensaje) {
       const c = await contacto(id);
       return res.status(200).json({ ok: true, dueno: c?.dueno === "agente" ? "agente" : "cande" });
