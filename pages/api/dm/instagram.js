@@ -5,7 +5,8 @@
 //      menos de 10 días, le avisa a Cande (un aviso por día como mucho).
 //   2. Con el ajuste "instagram" prendido, mira las charlas que se movieron desde la vuelta anterior:
 //      si Cande escribió "--" o le escribió a mano en una charla del agente, el agente sale de ahí
-//      aunque el lead no vuelva a escribir.
+//      aunque el lead no vuelva a escribir. En una charla retomada (lib/dm/instagram.js), lo que ella
+//      escribió a mano queda anotado como suyo y la charla sigue del agente.
 //   3. Va completando el usuario de Instagram de los contactos del agente (de a 10 por vuelta,
 //      ManyChat deja 10 por segundo): con eso se reconoce de quién es cada charla de la bandeja.
 //
@@ -48,15 +49,19 @@ export default async function handler(req, res) {
 
   let miradas = 0;
   let sacadas = 0;
+  let anotadas = 0;
   try {
     const visto = await leerConfig("instagram_visto");
     const ultimo = visto?.hasta ? new Date(visto.hasta) : null;
     const desde = ultimo ? new Date(ultimo.getTime() - SOLAPE_MS) : null;
     // La primera vez mira solo las 10 últimas: los "--" viejos los ve el agente al contestar.
+    // Una falla de la base en una charla no es de Instagram: queda en el registro (sin ids ni textos) y esa charla se
+    // vuelve a mirar en la vuelta siguiente. Solo lo que tira Instagram llega a fallo (el aviso de la conexión).
     const r = await buscarCodigos({
       ig: instagram, base: { contactoDeIg, guardarIg, tomar, soltar, textosDeLaCuenta }, reglas: reglasInstagram, desde, limite: ultimo ? 20 : 10,
+      registrar: (e) => console.error("dm: la base falló en una charla de la vuelta de Instagram", e?.code ?? "", e?.name ?? ""),
     });
-    ({ miradas, sacadas } = r);
+    ({ miradas, sacadas, anotadas } = r);
     if (r.hasta && (!ultimo || r.hasta > ultimo)) await guardarConfig("instagram_visto", { hasta: r.hasta.toISOString() });
   } catch (e) {
     await reglasInstagram.fallo(e);
@@ -75,7 +80,7 @@ export default async function handler(req, res) {
       usuarios++;
     }
   }
-  return res.status(200).json({ ok: true, renovacion: renovacion.hecho, miradas, sacadas, usuarios });
+  return res.status(200).json({ ok: true, renovacion: renovacion.hecho, miradas, sacadas, anotadas, usuarios });
 }
 
 export const config = { maxDuration: 60 };

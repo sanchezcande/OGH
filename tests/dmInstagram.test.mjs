@@ -14,7 +14,8 @@ import assert from "node:assert/strict";
 
 const {
   fechaDe, leerHilo, esDeLaCuenta, codigoEnHilo, desdeDe, crearInstagram, crearReglasInstagram, buscarCodigos, explicarError,
-  ErrorInstagram, usuarioIg, manualEnHilo, desdeManual,
+  ErrorInstagram, usuarioIg, manualEnHilo, desdeManual, manualesEnHilo, esRetomada, CLAVE_RETOMADAS, NO_AHORA, paraPegar,
+  marcaDe, seAnotaComoRetomada, conLaMarca, escritoConLaMarca,
 } = await import("../lib/dm/instagram.js");
 
 const AHORA = new Date("2026-10-18T15:00:00Z");
@@ -224,8 +225,12 @@ function mundoReglas({ contacto = {}, manychat = { ok: true, ig_username: "Lead.
       (m.contacto.ig_id && m.contacto.ig_id === igId) || (!m.contacto.ig_id && m.contacto.ig_usuario && m.contacto.ig_usuario === usuario)
         ? { ...m.contacto } : null,
     seguidos: new Set(),
+    // Lo de la cuenta en la base: un texto suelto es de antes de todo (lo sembrado, lo viejo); { texto, creado }, con su
+    // hora. Como la consulta: con `desde`, solo lo que se escribió después de esa hora.
     conocidos: [],
-    textosDeLaCuenta: async () => base.conocidos,
+    textosDeLaCuenta: async (id, { desde = null } = {}) => base.conocidos
+      .filter((x) => !desde || (typeof x === "object" && new Date(x.creado) > desde))
+      .map((x) => (typeof x === "object" ? x.texto : x)),
     loSigue: async (u) => base.seguidos.has(u),
     anotarSeguidos: async (us) => { us.forEach((u) => base.seguidos.add(u)); return base.seguidos.size; },
     tomar: async (id, marca) => (m.tomado || m.contacto.dueno !== "agente" ? null : ((m.tomado = marca), { ...m.contacto })),
@@ -234,6 +239,21 @@ function mundoReglas({ contacto = {}, manychat = { ok: true, ig_username: "Lead.
     borrarCharla: async () => { m.borrada = true; m.contacto.dueno = "cande"; },
     ponerDueno: async (id, d) => { m.contacto.dueno = d; },
     anotar: async (id, quien, texto) => { m.notas.push({ quien, texto }); },
+    // Como la consulta (lib/dm/base.js): una vez por id de Instagram, y solo en una charla del agente. Lo anotado ya
+    // es de la cuenta (textosDeLaCuenta lo trae), y la marca de retomada queda usada hasta lo último que se anotó (si
+    // ya estaba usada, queda como estaba).
+    anotadasCande: [],
+    anotarCandeDesdeIg: async (id, lista) => {
+      if (m.contacto.dueno !== "agente") return 0;
+      const nuevas = lista.filter((x) => !base.anotadasCande.some((y) => y.mid === x.mid));
+      base.anotadasCande.push(...nuevas);
+      base.conocidos = [...base.conocidos, ...nuevas.map((x) => ({ texto: x.texto, creado: x.creado }))];
+      const marcas = cfg.datos[CLAVE_RETOMADAS];
+      if (nuevas.length && marcas?.[id] && marcas[id].usada == null) {
+        marcas[id] = { ...marcas[id], usada: Math.max(...nuevas.map((x) => new Date(x.creado).getTime())) };
+      }
+      return nuevas.length;
+    },
   };
   const mc = {
     datosDe: async () => { m.pedidosManyChat++; return manychat; },
@@ -514,4 +534,640 @@ test("una demora o el límite de pedidos de Instagram no le llegan a Cande como 
   assert.equal(demora.m.avisos.length, 0);
   await demora.reglas.fallo(new ErrorInstagram("Error validating access token", { code: 190 }));
   assert.equal(demora.m.avisos.length, 1);
+});
+
+/* ---------- charlas retomadas (20/10): Cande contesta a mano charlas viejas y las sigue el agente ---------- */
+
+/**
+ * La marca de dm_config "retomadas" para ese contacto, vigente `dias` días más. Se marcó hace 50 minutos: después de que
+ * la charla fue del agente (hace 60) y antes de que Cande pegara.
+ */
+const MARCADA = hace(50).getTime();
+const marca = (id = "77", dias = 7) => ({ [id]: { hasta: AHORA.getTime() + dias * 86400000, marcada: MARCADA } });
+const ANOTADO = "Texto anotado antes de que lo pegue, de prueba";
+const PEGADO = "Texto que pegó cambiado, de prueba";
+const OTRO_SUYO = "Y otra cosa que agregó, de prueba";
+
+test("una marca de retomada vale para su charla y hasta que vence", () => {
+  assert.equal(esRetomada(marca(), "77", AHORA), true);
+  assert.equal(esRetomada(marca(), 77, AHORA), true, "el id puede venir como número");
+  assert.equal(esRetomada(marca("78"), "77", AHORA), false, "es de otra charla");
+  assert.equal(esRetomada({ 77: { hasta: AHORA.getTime() - 1 } }, "77", AHORA), false, "venció");
+  assert.equal(esRetomada({ 77: { hasta: "cualquier cosa" } }, "77", AHORA), false);
+  assert.equal(esRetomada(null, "77", AHORA), false);
+});
+
+test("manualesEnHilo trae todo lo que Cande escribió a mano, del más viejo al más nuevo; manualEnHilo sigue dando el más nuevo", () => {
+  const h = leerHilo(hiloCrudo(1, [
+    msj(4, OTRO_SUYO, { deCuenta: true, min: 2 }), msj(3, PEGADO, { deCuenta: true, min: 3 }), msj(2, "hola", { min: 30 }),
+    msj(1, "Mensaje viejo de antes de que fuera del agente", { deCuenta: true, min: 120 }),
+  ]), CUENTA);
+  assert.deepEqual(manualesEnHilo(h, CUENTA, [ANOTADO], hace(60)).map((m) => m.texto), [PEGADO, OTRO_SUYO]);
+  assert.equal(manualEnHilo(h, CUENTA, [ANOTADO], hace(60)).texto, OTRO_SUYO);
+  assert.deepEqual(manualesEnHilo(h, CUENTA, [PEGADO, OTRO_SUYO], hace(60)), [], "lo ya anotado no es a mano");
+});
+
+test("charla retomada: si Cande escribió a mano distinto de lo anotado, el agente no sale y lo suyo queda anotado tal cual, una sola vez; su -- la saca igual", async () => {
+  const { m, base, reglas } = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [
+      msj(4, OTRO_SUYO, { deCuenta: true, min: 2 }), msj(3, PEGADO, { deCuenta: true, min: 3 }), msj(2, "hola", { min: 30 }),
+    ])),
+    "/501": perfilDe(false),
+  } });
+  base.conocidos = [ANOTADO];
+  await base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await reglas.porQueSale(m.contacto), null);
+  assert.deepEqual(base.anotadasCande, [
+    { texto: PEGADO, creado: hace(3).toISOString(), mid: "m3" },
+    { texto: OTRO_SUYO, creado: hace(2).toISOString(), mid: "m4" },
+  ]);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.deepEqual({ notas: m.notas, campos: m.campos, descartados: m.descartados, avisos: m.avisos }, { notas: [], campos: [], descartados: 0, avisos: [] });
+  assert.equal(await reglas.porQueSale(m.contacto), null);
+  assert.equal(base.anotadasCande.length, 2, "la mirada siguiente no lo anota de nuevo");
+
+  // Su "--" la saca igual, y sin marca vigente (vencida o de otra charla) lo escrito a mano la saca como siempre.
+  const rutas = (texto) => ({
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, texto, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  });
+  const conCodigo = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas("--") });
+  await conCodigo.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await conCodigo.reglas.porQueSale(conCodigo.m.contacto), "escribiste -- en Instagram");
+  assert.deepEqual(conCodigo.base.anotadasCande, []);
+  // Vencida: venció antes de que ella escribiera (lo escrito con la marca vigente cuenta aunque se vea después, ver abajo).
+  for (const [retomadas, por] of [[{ 77: { hasta: hace(3).getTime() } }, "vencida"], [marca("78"), "de otra charla"], [null, "sin marca"]]) {
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas(PEGADO) });
+    if (retomadas) await w.base.guardarConfig(CLAVE_RETOMADAS, retomadas);
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), "le escribiste vos", por);
+    assert.deepEqual(w.base.anotadasCande, [], por);
+  }
+});
+
+test("la vuelta del cron: en una charla retomada anota lo que Cande escribió a mano y la deja del agente; sin la marca, la saca", async () => {
+  const rutas = { "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })], 2)) };
+  const con = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+  await con.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const r = await buscarCodigos({ ig: con.ig, base: con.base, reglas: con.reglas, desde: null });
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.equal(con.m.contacto.dueno, "agente");
+  assert.deepEqual(con.base.anotadasCande.map((x) => [x.texto, x.mid]), [[PEGADO, "m3"]]);
+  assert.equal(con.m.tomado, null, "suelta la traba");
+  assert.equal((await buscarCodigos({ ig: con.ig, base: con.base, reglas: con.reglas, desde: null })).anotadas, 0, "la vuelta siguiente no lo anota de nuevo");
+  const sin = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+  const r2 = await buscarCodigos({ ig: sin.ig, base: sin.base, reglas: sin.reglas, desde: null });
+  assert.deepEqual({ sacadas: r2.sacadas, anotadas: r2.anotadas }, { sacadas: 1, anotadas: 0 });
+  assert.equal(sin.m.contacto.dueno, "cande");
+});
+
+test("la vuelta del cron: en una charla retomada, el -- de Cande la saca", async () => {
+  const { m, ig, base, reglas } = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(4, "--", { deCuenta: true, min: 1 }), msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })], 1)),
+  } });
+  await base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const r = await buscarCodigos({ ig, base, reglas, desde: null });
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 1, anotadas: 0 });
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+/* ---------- revisión de las charlas retomadas (21/10) ---------- */
+
+test("Cande escribió a mano en una charla retomada y la base no deja anotar lo suyo: porQueSale dice NO_AHORA (ni sale ni contesta encima) y no avisa de Instagram; sin poder leer la marca, como en main", async () => {
+  const rutas = {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  };
+  // Sin poder leer la marca, como en main (revisión del 21/10, tercera vuelta): lo escrito a mano la saca, sin aviso.
+  // Antes de esa vuelta decía NO_AHORA también en las charlas sin marca.
+  const sinLeer = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  const leer = sinLeer.base.leerConfig;
+  sinLeer.base.leerConfig = async (k) => {
+    if (k === CLAVE_RETOMADAS) throw new Error("base caída de prueba");
+    return leer(k);
+  };
+  assert.equal(await sinLeer.reglas.porQueSale(sinLeer.m.contacto), "le escribiste vos");
+  assert.deepEqual(sinLeer.m.avisos, []);
+  assert.deepEqual(sinLeer.base.anotadasCande, []);
+  // Con la marca y sin poder anotar lo suyo: sin esto el agente seguía sin lo de ella (un toque salía detrás).
+  const sinAnotar = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  await sinAnotar.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  sinAnotar.base.anotarCandeDesdeIg = async () => { throw new Error("base caída de prueba"); };
+  assert.equal(await sinAnotar.reglas.porQueSale(sinAnotar.m.contacto), NO_AHORA);
+  assert.deepEqual(sinAnotar.m.avisos, []);
+  assert.equal(sinAnotar.m.contacto.dueno, "agente");
+});
+
+test("paraPegar: le toca pegar solo en una charla del agente, con la marca, sin nada de la cuenta después del último mensaje del lead y sin respuesta por salir", () => {
+  const fila = (extra = {}) => ({ id: "77", dueno: "agente", ultimo_del_lead: hace(3000), ultimo_de_la_cuenta: hace(4000), por_salir: false, ...extra });
+  const con = marca();
+  assert.deepEqual(paraPegar("77", fila(), con, AHORA), {
+    contacto: "77", pegar: true, motivo: null, retomada: true,
+    ultimo_del_lead: hace(3000).toISOString(), ultimo_de_la_cuenta: hace(4000).toISOString(),
+  });
+  for (const [caso, f, retomadas, motivo] of [
+    ["no está en la base", null, con, "no está en la base"],
+    ["es de Cande", fila({ dueno: "cande" }), con, "no es del agente"],
+    ["ya pegó, o le contestó el agente", fila({ ultimo_de_la_cuenta: hace(2) }), con, "ya le escribió la cuenta"],
+    ["la cuenta le escribió y el lead nunca", fila({ ultimo_del_lead: null }), con, "ya le escribió la cuenta"],
+    ["el agente está por contestar", fila({ ultimo_del_lead: hace(1), por_salir: true }), con, "el agente está por contestar"],
+    ["sin marca", fila(), null, "no tiene la marca de retomada"],
+    ["la marca venció", fila(), { 77: { hasta: AHORA.getTime() - 1 } }, "no tiene la marca de retomada"],
+  ]) {
+    const r = paraPegar("77", f, retomadas, AHORA);
+    assert.equal(r.pegar, false, caso);
+    assert.equal(r.motivo, motivo, caso);
+  }
+});
+
+/* ---------- segunda revisión de las charlas retomadas (21/10) ---------- */
+
+/** Una vuelta del cron con varias charlas del agente: `contactos` [{ id, otro: { id, username }, ... }], `hilos` crudos. */
+function mundoVarias({ contactos, hilos, marcas = null }) {
+  const cfg = configFalso(marcas ? { [CLAVE_RETOMADAS]: marcas } : {});
+  const w = { contactos: new Map(), anotadas: [], sacadas: [], registradas: [], avisos: [] };
+  for (const c of contactos) {
+    w.contactos.set(c.id, { dueno: "agente", alta_avisada: true, dueno_desde: hace(600), ig_id: c.otro.id, ig_usuario: c.otro.username, ...c, otro: undefined });
+  }
+  const base = {
+    ...cfg,
+    contactoDeIg: async ({ igId }) => {
+      const c = [...w.contactos.values()].find((x) => x.ig_id === igId);
+      return c ? { ...c } : null;
+    },
+    guardarIg: async () => {},
+    // Como la consulta: con `desde`, solo lo que se escribió después de esa hora.
+    textosDeLaCuenta: async (id, { desde = null } = {}) =>
+      w.anotadas.filter((x) => x.id === id && (!desde || new Date(x.creado) > desde)).map((x) => x.texto),
+    tomar: async (id) => (w.contactos.get(id)?.dueno === "agente" ? { ...w.contactos.get(id) } : null),
+    soltar: async () => {},
+    descartarPendientes: async () => {},
+    ponerDueno: async (id, d) => { w.contactos.get(id).dueno = d; },
+    anotar: async () => {},
+    // Como la consulta: una vez por id de Instagram, solo en una charla del agente, y la marca queda usada.
+    anotarCandeDesdeIg: async (id, lista) => {
+      if (w.contactos.get(id)?.dueno !== "agente") return 0;
+      const nuevas = lista.filter((x) => !w.anotadas.some((y) => y.mid === x.mid));
+      w.anotadas.push(...nuevas.map((x) => ({ id, ...x })));
+      const m = cfg.datos[CLAVE_RETOMADAS]?.[id];
+      if (nuevas.length && m && m.usada == null) m.usada = Math.max(...nuevas.map((x) => new Date(x.creado).getTime()));
+      return nuevas.length;
+    },
+  };
+  const falso = instagramFalso(rutasDeSiempre({ "/me/conversations": () => ({ data: hilos }) }));
+  const ig = crearInstagram({ pedir: falso.pedir, ...cfg, tokenEnv: () => "t", reloj: () => AHORA });
+  const reglas = crearReglasInstagram({
+    ig, base, manychat: { ponerCampo: async () => ({ ok: true }) }, reloj: () => AHORA,
+    avisar: async (titulo) => { w.avisos.push(titulo); return true; },
+  });
+  w.vuelta = (desde = null) => buscarCodigos({ ig, base, reglas, desde, registrar: (e) => w.registradas.push(e) });
+  return { w, base, cfg, reglas };
+}
+const LEAD_A = { id: "501", username: "lead.prueba" };
+const LEAD_B = { id: "502", username: "lead.dos" };
+
+test("la marca de retomada sirve una vez: lo que pegó se anota y lo que escribe a mano después saca al agente, como siempre", async () => {
+  const enIg = [msj(3, PEGADO, { deCuenta: true, min: 3 }), msj(2, "hola", { min: 30 })];
+  const { m, base, reglas } = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": () => ({ data: [hiloCrudo(1, enIg)] }), "/501": perfilDe(false),
+  } });
+  await base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await reglas.porQueSale(m.contacto), null);
+  assert.deepEqual(base.anotadasCande.map((x) => x.texto), [PEGADO]);
+  const marcas = await base.leerConfig(CLAVE_RETOMADAS);
+  assert.deepEqual(marcaDe(marcas, "77"), { hasta: marca()["77"].hasta, marcada: MARCADA, usada: hace(3).getTime() }, "queda usada hasta lo que se anotó");
+  assert.equal(esRetomada(marcas, "77", AHORA), false, "ya no le toca pegar ahí");
+  assert.equal(await reglas.retomada(m.contacto), true, "para el rescate sigue siendo una charla retomada");
+  // Otra mirada que corrió a la vez y leyó lo pegado como a mano antes de que se anotara: lo sigue cubriendo la marca.
+  assert.equal(seAnotaComoRetomada(m.contacto, [{ creado: hace(3) }], marcas), true);
+  // Lo que escribe a mano después saca al agente (17/10: "de repente te metés").
+  enIg.unshift(msj(4, OTRO_SUYO, { deCuenta: true, min: 1 }));
+  assert.equal(await reglas.porQueSale(m.contacto), "le escribiste vos");
+  assert.equal(base.anotadasCande.length, 1, "no se anota");
+  // Marcarla de nuevo (retomar_marcar) la deja sin usar.
+  await base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await reglas.porQueSale(m.contacto), null);
+  assert.deepEqual(base.anotadasCande.map((x) => x.texto), [PEGADO, OTRO_SUYO]);
+});
+
+test("la vuelta del cron: con la marca ya usada, lo que Cande escribe a mano después saca al agente", async () => {
+  const { w } = mundoVarias({
+    contactos: [{ id: "77", otro: LEAD_A }],
+    hilos: [hiloCrudo(1, [msj(4, OTRO_SUYO, { deCuenta: true, min: 1 }), msj(3, PEGADO, { deCuenta: true, min: 3 }), msj(2, "hola", { min: 30 })], 1)],
+    marcas: { 77: { hasta: AHORA.getTime() + 86400000, usada: hace(3).getTime() } },
+  });
+  w.anotadas.push({ id: "77", texto: PEGADO, mid: "m3" });
+  const r = await w.vuelta();
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 1, anotadas: 0 });
+  assert.equal(w.contactos.get("77").dueno, "cande");
+});
+
+/*
+ * Sin la marca de retomada, lo de la cuenta que ya se conoce se compara como siempre (esConocido, como en main). La
+ * revisión del 21/10 lo había cambiado para todas las charlas (conocidos cortos solo iguales, 30 letras, el link del
+ * formulario pelado) y una verificación encontró dos regresiones en las charlas no marcadas: (a) lo que Cande escribe a
+ * mano con 30 letras del principio o del final iguales a algo de la cuenta pasaba por conocido y el agente no salía, y
+ * (b) una plantilla automática corta con link dejaba de reconocerse y sacaba al agente.
+ */
+const DEL_AGENTE_LARGO = "Te paso el formulario de prueba para que lo completes cuando tengas un rato libre";
+const A_MANO_MISMO_PRINCIPIO = "Te paso el formulario de prueba para que lo completes y después hablamos";
+const DEL_AGENTE_CON_LINK = "Si querés avanzar, completá el de prueba: opengatehub.com/devs?ig=12345&f=AbCdEfGhIj";
+const A_MANO_MISMO_FINAL = "Te dejo lo que hablamos, completá el de prueba: opengatehub.com/devs";
+const AUTO_LINK = "Acá va el link: opengatehub.com/devs?de=cv";
+const AUTO_LINK_LARGO = `${AUTO_LINK} Cualquier duda me escribís por acá`;
+
+/** Una charla del agente con un mensaje de la cuenta (`texto`) después de lo del lead, para la mirada y para el cron. */
+const conUnoDeLaCuenta = (texto, antes = []) => ({
+  "/me/conversations": bandeja(hiloCrudo(1, [msj(4, texto, { deCuenta: true, min: 2 }), ...antes, msj(2, "hola", { min: 30 })], 1)),
+  "/501": perfilDe(false),
+});
+
+test("sin la marca de retomada, lo que Cande escribe a mano con 30 letras del principio o del final iguales a algo de la cuenta sigue siendo a mano y saca al agente", async () => {
+  const h = (texto) => leerHilo(hiloCrudo(1, [msj(2, texto, { deCuenta: true, min: 5 })]), CUENTA);
+  const desde = hace(60);
+  assert.ok(manualEnHilo(h(A_MANO_MISMO_PRINCIPIO), CUENTA, [DEL_AGENTE_LARGO], desde), "las mismas 44 letras del principio");
+  assert.ok(manualEnHilo(h(A_MANO_MISMO_FINAL), CUENTA, [DEL_AGENTE_CON_LINK], desde), "el mismo final, con el link del formulario");
+  // Como siempre: lo que mandó el agente, tal cual, es del agente; lo que no empieza igual, es de ella.
+  assert.equal(manualEnHilo(h(DEL_AGENTE_LARGO), CUENTA, [DEL_AGENTE_LARGO], desde), null);
+  assert.equal(manualEnHilo(h(DEL_AGENTE_CON_LINK), CUENTA, [DEL_AGENTE_CON_LINK], desde), null);
+  assert.equal(manualEnHilo(h("Disculpá!"), CUENTA, ["Disculpá"], desde), null, "el mismo texto corto");
+  assert.equal(manualEnHilo(h("dale"), CUENTA, ["Dale!"], desde), null);
+  const auto = "Hola Nombre! Gracias por escribir, este mensaje fijo de prueba sale solo";
+  assert.ok(manualEnHilo(h("Gracias por escribir, te contesto yo a mano en un rato"), CUENTA, [auto], desde));
+  const enviado = "Acá va: opengatehub.com/devs?ig=12345&f=AbCdEfGhIj";
+  assert.ok(manualEnHilo(h("Acá va otra cosa que escribí yo: opengatehub.com/devs"), CUENTA, [enviado], desde), "lo que escribió ella con el link");
+  for (const [aMano, delAgente] of [[A_MANO_MISMO_PRINCIPIO, DEL_AGENTE_LARGO], [A_MANO_MISMO_FINAL, DEL_AGENTE_CON_LINK]]) {
+    const rutas = conUnoDeLaCuenta(aMano, [msj(3, delAgente, { deCuenta: true, min: 20 })]);
+    // La mirada de cada respuesta.
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+    w.base.conocidos = [delAgente];
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), "le escribiste vos", aMano);
+    assert.deepEqual(w.base.anotadasCande, [], aMano);
+    // La vuelta del cron.
+    const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+    c.base.conocidos = [delAgente];
+    const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+    assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 1, anotadas: 0 }, aMano);
+    assert.equal(c.m.contacto.dueno, "cande", aMano);
+  }
+});
+
+test("sin la marca de retomada, una plantilla automática corta con el link del formulario se sigue reconociendo y no saca al agente", async () => {
+  const h = (texto) => leerHilo(hiloCrudo(1, [msj(2, texto, { deCuenta: true, min: 5 })]), CUENTA);
+  const desde = hace(60);
+  assert.equal(manualEnHilo(h(AUTO_LINK), CUENTA, [AUTO_LINK], desde), null, "tal cual");
+  assert.equal(manualEnHilo(h(AUTO_LINK), CUENTA, [AUTO_LINK_LARGO], desde), null, "el primer globo de un automático cargado entero");
+  assert.equal(manualEnHilo(h(`${AUTO_LINK} Nombre de prueba`), CUENTA, [AUTO_LINK], desde), null, "con algo más atrás");
+  for (const [enIg, cargado] of [[AUTO_LINK, AUTO_LINK_LARGO], [`${AUTO_LINK} Nombre de prueba`, AUTO_LINK]]) {
+    const rutas = conUnoDeLaCuenta(enIg);
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+    w.base.conocidos = [cargado];
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), null, enIg);
+    assert.equal(w.m.contacto.dueno, "agente", enIg);
+    const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+    c.base.conocidos = [cargado];
+    const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+    assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 0 }, enIg);
+    assert.equal(c.m.contacto.dueno, "agente", enIg);
+  }
+});
+
+test("charla retomada con un \"Perdón\" viejo de la cuenta en la historia sembrada: lo que Cande pega después de marcarla se anota aunque lo contenga; sin la marca, como siempre", async () => {
+  const PEGA = "Perdón por la demora! Te cuento lo que hablamos, texto de prueba";
+  const PEGA_OTRO = "Te mandé el formulario de prueba, que te parece?";
+  const rutas = conUnoDeLaCuenta(PEGA_OTRO, [msj(3, PEGA, { deCuenta: true, min: 3 })]);
+  const sembrado = ["Perdón", "Que te parece?"]; // de antes de la marca
+  // La mirada de cada respuesta.
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  w.base.conocidos = [...sembrado];
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), null);
+  assert.deepEqual(w.base.anotadasCande.map((x) => x.texto), [PEGA, PEGA_OTRO], "anotado: el agente lo ve cuando el lead conteste");
+  assert.equal(w.m.contacto.dueno, "agente");
+  // La vuelta del cron.
+  const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+  c.base.conocidos = [...sembrado];
+  await c.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.deepEqual(c.base.anotadasCande.map((x) => x.texto), [PEGA, PEGA_OTRO]);
+  // Sin la marca, como siempre: lo que contiene un conocido corto pasa por conocido (ni se anota ni saca al agente).
+  const sin = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  sin.base.conocidos = [...sembrado];
+  assert.equal(await sin.reglas.porQueSale(sin.m.contacto), null);
+  assert.deepEqual(sin.base.anotadasCande, []);
+  assert.equal(sin.m.contacto.dueno, "agente");
+});
+
+test("charla retomada: si la base no deja leer lo que la cuenta mandó desde la marca, porQueSale dice NO_AHORA; si no deja leer la marca y no se ve nada a mano, sigue como siempre", async () => {
+  const PEGA = "Perdón por la demora! Te cuento lo que hablamos, texto de prueba";
+  const rutas = conUnoDeLaCuenta(PEGA);
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  w.base.conocidos = ["Perdón"];
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const textos = w.base.textosDeLaCuenta;
+  w.base.textosDeLaCuenta = async (id, o = {}) => {
+    if (o.desde) throw new Error("base caída de prueba");
+    return textos(id, o);
+  };
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), NO_AHORA);
+  assert.deepEqual(w.base.anotadasCande, []);
+  assert.deepEqual(w.m.avisos, []);
+  assert.equal(w.m.contacto.dueno, "agente");
+  // Sin poder leer la marca y sin nada a mano a la vista (lo pegado pasa por conocido sin ella): como siempre.
+  const sinLeer = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  sinLeer.base.conocidos = ["Perdón"];
+  const leer = sinLeer.base.leerConfig;
+  sinLeer.base.leerConfig = async (k) => {
+    if (k === CLAVE_RETOMADAS) throw new Error("base caída de prueba");
+    return leer(k);
+  };
+  assert.equal(await sinLeer.reglas.porQueSale(sinLeer.m.contacto), null);
+  assert.deepEqual(sinLeer.m.avisos, []);
+  assert.equal(sinLeer.m.contacto.dueno, "agente");
+});
+
+test("con la marca vigente y sin usar, lo que la cuenta escribió después de marcarla es de Cande salvo que sea igual a algo que la cuenta mandó desde la marca", async () => {
+  const DEL_AGENTE = "Respuesta de prueba que mandó el agente después de la marca";
+  const PEGA = "Perdón, se me pasó! Texto de prueba que pegó Cande";
+  const h = leerHilo(hiloCrudo(1, [
+    msj(5, PEGA, { deCuenta: true, min: 2 }),
+    msj(4, DEL_AGENTE, { deCuenta: true, min: 10 }),
+    msj(3, "Perdón, esto lo escribió la cuenta antes de la marca", { deCuenta: true, min: 55 }),
+    msj(2, "hola", { min: 58 }),
+  ]), CUENTA);
+  const c = { id: "77", dueno: "agente", dueno_desde: hace(60) };
+  const pedidos = [];
+  // Como la consulta: con `desde`, lo que la cuenta mandó desde esa hora; sin, todo (con el "Perdón" sembrado).
+  const textos = async (id, { desde = null } = {}) => {
+    pedidos.push(desde);
+    return desde ? [DEL_AGENTE] : ["Perdón", DEL_AGENTE];
+  };
+  const conMarca = await conLaMarca(h, CUENTA, c, marca(), textos);
+  assert.deepEqual(pedidos, [new Date(MARCADA)], "pregunta lo de la cuenta desde que se marcó");
+  // Lo del agente (igual) no es de ella; lo de antes de la marca se compara como siempre (el "Perdón" viejo lo tapa).
+  assert.deepEqual(manualesEnHilo(h, CUENTA, await textos("77"), desdeManual(c), conMarca).map((m) => m.texto), [PEGA]);
+  assert.deepEqual(manualesEnHilo(h, CUENTA, await textos("77"), desdeManual(c)).map((m) => m.texto), [], "sin la marca, nada");
+  // Sin la marca, con la marca usada, sin la hora en que se marcó o vencida antes de que la cuenta escribiera: como
+  // siempre, y sin preguntarle nada a la base.
+  pedidos.length = 0;
+  for (const [marcas, por] of [
+    [null, "sin marca"], [{ 77: { ...marca()["77"], usada: hace(40).getTime() } }, "usada"], [{ 77: { hasta: marca()["77"].hasta } }, "sin la hora"],
+    [{ 77: { hasta: hace(30).getTime(), marcada: MARCADA } }, "vencida"], [marca("78"), "de otra charla"],
+  ]) {
+    assert.equal(await conLaMarca(h, CUENTA, c, marcas, textos), null, por);
+  }
+  assert.deepEqual(pedidos, []);
+  assert.equal(escritoConLaMarca(marcaDe(marca(), "77"), { creado: hace(2) }), true);
+  assert.equal(escritoConLaMarca(marcaDe(marca(), "77"), { creado: hace(55) }), false, "antes de marcarla");
+  assert.equal(escritoConLaMarca(marcaDe({ 77: { hasta: hace(5).getTime(), marcada: MARCADA } }, "77"), { creado: hace(2) }), false, "después de que venció");
+});
+
+test("charla retomada con un mensaje corto viejo de la cuenta (lo sembrado): lo que pega se anota igual, en la mirada y en la vuelta del cron", async () => {
+  const PEGA = "Texto de prueba con el formulario para completar, te sirve?";
+  const rutas = {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGA, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })], 1)), "/501": perfilDe(false),
+  };
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  w.base.conocidos = ["Te sirve?", "Disculpá"];
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), null);
+  assert.deepEqual(w.base.anotadasCande.map((x) => x.texto), [PEGA], "anotado: el agente lo ve cuando el lead conteste");
+  const c = mundoReglas({ contacto: { ig_usuario: "lead.prueba", dueno_desde: hace(60) }, rutas });
+  c.base.conocidos = ["Te sirve?"];
+  await c.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const r = await buscarCodigos({ ig: c.ig, base: c.base, reglas: c.reglas, desde: null });
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.deepEqual(c.base.anotadasCande.map((x) => x.texto), [PEGA]);
+});
+
+test("lo que Cande escribió con la marca vigente se anota aunque se vea después de que venció; lo escrito después de que venció la saca", async () => {
+  // Pegó a las 120 minutos, la marca venció a los 60 y el lead contesta recién ahora: nadie lo había anotado.
+  const rutas = (min) => ({
+    "/me/conversations": bandeja(hiloCrudo(1, [
+      msj(4, "respuesta de prueba del lead", { min: 1 }), msj(3, PEGADO, { deCuenta: true, min }), msj(2, "hola", { min: 600 }),
+    ])),
+    "/501": perfilDe(false),
+  });
+  const vencida = { 77: { hasta: hace(60).getTime() } };
+  const con = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(700) }, rutas: rutas(120) });
+  await con.base.guardarConfig(CLAVE_RETOMADAS, vencida);
+  assert.equal(await con.reglas.porQueSale(con.m.contacto), null);
+  assert.deepEqual(con.base.anotadasCande.map((x) => x.texto), [PEGADO]);
+  assert.equal(con.m.contacto.dueno, "agente");
+  const despues = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(700) }, rutas: rutas(30) });
+  await despues.base.guardarConfig(CLAVE_RETOMADAS, vencida);
+  assert.equal(await despues.reglas.porQueSale(despues.m.contacto), "le escribiste vos");
+  assert.deepEqual(despues.base.anotadasCande, []);
+});
+
+test("la vuelta del cron: si Cande pegó el mismo texto en dos charlas marcadas, no es un automático: se anota en las dos", async () => {
+  const MISMO = "Texto de prueba que Cande pegó igual en dos charlas";
+  const hilos = [
+    hiloCrudo(1, [msj(3, MISMO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 2),
+    hiloCrudo(2, [msj(13, MISMO, { deCuenta: true, min: 3, otro: LEAD_B }), msj(12, "hola", { min: 900, otro: LEAD_B })], 3),
+  ];
+  const marcas = { 77: { hasta: AHORA.getTime() + 86400000 }, 78: { hasta: AHORA.getTime() + 86400000 } };
+  const { w } = mundoVarias({ contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos, marcas });
+  const r = await w.vuelta();
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 2 });
+  assert.deepEqual(w.anotadas.map((x) => [x.id, x.texto]), [["77", MISMO], ["78", MISMO]]);
+  // Sin la marca, lo repetido sigue siendo un automático: no saca a nadie.
+  const sin = mundoVarias({ contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos });
+  const r2 = await sin.w.vuelta();
+  assert.deepEqual({ sacadas: r2.sacadas, anotadas: r2.anotadas }, { sacadas: 0, anotadas: 0 });
+});
+
+test("paraPegar: la cuenta y el lead a la misma hora (lo sembrado) los decide el orden en la base, no la hora sola", () => {
+  const misma = hace(30);
+  const fila = (extra) => ({ id: "77", dueno: "agente", ultimo_del_lead: misma, ultimo_de_la_cuenta: misma, por_salir: false, ...extra });
+  assert.equal(paraPegar("77", fila({ id_ultimo_del_lead: 12, id_ultimo_de_la_cuenta: 11 }), marca(), AHORA).pegar, true, "lo último es del lead");
+  assert.equal(paraPegar("77", fila({ id_ultimo_del_lead: 11, id_ultimo_de_la_cuenta: 12 }), marca(), AHORA).motivo, "ya le escribió la cuenta");
+  assert.equal(paraPegar("77", fila({ id_ultimo_del_lead: 11, id_ultimo_de_la_cuenta: 12 }), marca(), AHORA).pegar, false);
+  // A la mañana el lead escribió y le contestó el agente: la cuenta es más nueva, no pega encima.
+  const respondido = fila({ ultimo_del_lead: hace(120), ultimo_de_la_cuenta: hace(119), id_ultimo_del_lead: 30, id_ultimo_de_la_cuenta: 31 });
+  assert.equal(paraPegar("77", respondido, marca(), AHORA).motivo, "ya le escribió la cuenta");
+  // Con la marca ya usada (pegó y se anotó), tampoco.
+  const usada = { 77: { hasta: AHORA.getTime() + 86400000, usada: hace(40).getTime() } };
+  assert.equal(paraPegar("77", fila({ id_ultimo_del_lead: 12, id_ultimo_de_la_cuenta: 11 }), usada, AHORA).motivo, "no tiene la marca de retomada");
+});
+
+test("una charla que ya es de Cande, con la marca puesta: lo que escribió a mano la deja de ella (no hay nada que anotar)", async () => {
+  const { m, base, reglas } = mundoReglas({ contacto: { ig_id: "501", dueno: "cande", dueno_desde: hace(5) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 10 })])), "/501": perfilDe(false),
+  } });
+  await base.guardarConfig(CLAVE_RETOMADAS, marca());
+  assert.equal(await reglas.porQueSale(m.contacto), "le escribiste vos");
+  assert.deepEqual(base.anotadasCande, []);
+});
+
+test("rescate de una respuesta vencida en una charla que ya pasó a Cande, con la marca: no sale detrás de lo que ella escribió a mano", async () => {
+  const { crearAgente } = await import("../lib/dm/agente.js");
+  const { m, base, reglas } = mundoReglas({ contacto: { ig_id: "501", ig_usuario: "lead.prueba", dueno: "cande", dueno_desde: hace(5) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 10 })])), "/501": perfilDe(false),
+  } });
+  await base.guardarConfig(CLAVE_RETOMADAS, marca());
+  const enviados = [];
+  const avisos = [];
+  const marcadas = [];
+  const agente = crearAgente({
+    base: {
+      ...base,
+      ajustes: async () => ({ modo: "auto", envio: "campo", instagram: true }),
+      contacto: async () => ({ ...m.contacto }),
+      historial: async () => [
+        { id: 1, quien: "agente", texto: "Mensaje de prueba del agente?", creado: hace(20) },
+        { id: 2, quien: "lead", texto: "hola", creado: hace(10) },
+      ],
+      marcarSalida: async (id, estado) => { marcadas.push(estado); },
+    },
+    pedir: async () => { throw new Error("no se le pide nada al modelo"); },
+    manychat: {
+      mandarTextos: async (id, textos) => { enviados.push(...textos); return { ok: true }; },
+      ponerCampo: async () => ({ ok: true }),
+      datosDe: async () => ({ ok: true, ig_username: "lead.prueba" }),
+    },
+    avisar: async (titulo) => { avisos.push(titulo); return true; },
+    reloj: () => AHORA, instagram: reglas, esperaInstagramMs: 2000,
+  });
+  const v = {
+    id: "77", nombre: "Lead de prueba", dueno: "cande", ultimo_lead: hace(10), ig_usuario: "lead.prueba", salida: 1, accion: "pasar_a_cande",
+    mensajes: ["Te paso con alguien de prueba"], hasta_lead: 2, escribio_despues: false, charla_cambio: false,
+  };
+  assert.equal(await agente.rescatarVencida(v), "pasada a Cande");
+  assert.deepEqual(enviados, [], "no sale nada detrás de ella");
+  assert.deepEqual(base.anotadasCande, []);
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+test("la vuelta del cron: si la base falla al anotar en una charla retomada, sigue con las demás, no avisa de Instagram y esa charla se vuelve a mirar; sin poder leer la marca, como en main", async () => {
+  const hilos = [
+    hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 2),
+    hiloCrudo(2, [msj(13, "--", { deCuenta: true, min: 5, otro: LEAD_B }), msj(12, "hola", { min: 900, otro: LEAD_B })], 5),
+  ];
+  const corte = () => Object.assign(new Error("la base de prueba cortó la conexión"), { code: "57P01" });
+  const armarCon = () => mundoVarias({
+    contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos, marcas: { 77: { hasta: AHORA.getTime() + 86400000 } },
+  });
+  const { w, base } = armarCon();
+  base.anotarCandeDesdeIg = async () => { throw corte(); };
+  const desde = hace(10);
+  const r = await w.vuelta(desde);
+  assert.equal(r.fallidas, 1);
+  assert.equal(r.sacadas, 1, "la otra charla se mira igual");
+  assert.equal(w.contactos.get("78").dueno, "cande");
+  assert.equal(w.contactos.get("77").dueno, "agente");
+  assert.equal(w.registradas.length, 1);
+  assert.deepEqual(w.avisos, [], "no es la conexión con Instagram");
+  assert.ok(r.hasta < hace(2) && r.hasta >= desde, "lo mirado queda antes de la charla que falló");
+  // Sin poder leer la marca, como en main (revisión del 21/10, tercera vuelta): lo escrito a mano la saca. Antes de esa
+  // vuelta la charla quedaba retenida y sin anotar.
+  const sinLeer = armarCon();
+  const leer = sinLeer.base.leerConfig;
+  sinLeer.base.leerConfig = async (k) => { if (k === CLAVE_RETOMADAS) throw corte(); return leer(k); };
+  const r2 = await sinLeer.w.vuelta(desde);
+  assert.deepEqual({ sacadas: r2.sacadas, anotadas: r2.anotadas, fallidas: r2.fallidas }, { sacadas: 2, anotadas: 0, fallidas: 0 });
+  assert.equal(sinLeer.w.contactos.get("77").dueno, "cande");
+  assert.deepEqual(sinLeer.w.avisos, []);
+});
+
+/* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
+
+// Las pruebas que empiezan con "como en main" pasan también con el código de origin/main (se corrieron contra una copia
+// de origin/main con este mismo archivo): en una charla sin la marca de retomada, o si la base no deja leer la marca,
+// la mirada y la vuelta del cron hacen exactamente lo mismo que antes de las charlas retomadas, avisos incluidos.
+
+/** La base de mentira de mundoReglas, con lo que se diga fallando (tira como un corte de la base). */
+const fallando = (base, { marca = false, textos = false } = {}) => {
+  const leer = base.leerConfig;
+  const corte = () => Object.assign(new Error("base caída de prueba"), { code: "57P01" });
+  if (marca) base.leerConfig = async (k) => { if (k === CLAVE_RETOMADAS) throw corte(); return leer(k); };
+  if (textos) base.textosDeLaCuenta = async () => { throw corte(); };
+};
+
+test("como en main: porQueSale en una charla sin la marca, o sin poder leerla: lo escrito a mano la saca y una falla de la base va al aviso de la conexión", async () => {
+  const rutas = (texto) => ({
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, texto, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  });
+  for (const [caso, marcas, sinLeer] of [["sin la marca", null, false], ["con la marca de otra charla", marca("78"), false], ["sin poder leer la marca", marca(), true]]) {
+    const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas(PEGADO) });
+    if (marcas) await w.base.guardarConfig(CLAVE_RETOMADAS, marcas);
+    if (sinLeer) fallando(w.base, { marca: true });
+    assert.equal(await w.reglas.porQueSale(w.m.contacto), "le escribiste vos", caso);
+    assert.deepEqual(w.m.avisos, [], caso);
+    // Lo que pasa por conocido con la comparación de siempre (un "Hola!" viejo en lo sembrado): como en main, nada.
+    const conocido = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas("Hola! Texto de prueba que pegó Cande") });
+    conocido.base.conocidos = ["Hola!"];
+    if (marcas) await conocido.base.guardarConfig(CLAVE_RETOMADAS, marcas);
+    if (sinLeer) fallando(conocido.base, { marca: true });
+    assert.equal(await conocido.reglas.porQueSale(conocido.m.contacto), null, caso);
+    assert.deepEqual(conocido.m.avisos, [], caso);
+    // Si la base no deja leer lo de la cuenta: null y el aviso de la conexión de Instagram, una vez por día.
+    const caida = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: rutas(PEGADO) });
+    if (marcas) await caida.base.guardarConfig(CLAVE_RETOMADAS, marcas);
+    fallando(caida.base, { marca: sinLeer, textos: true });
+    assert.equal(await caida.reglas.porQueSale(caida.m.contacto), null, caso);
+    assert.deepEqual(caida.m.avisos.map((a) => a.titulo), ["DM: la conexión con Instagram no anda"], caso);
+  }
+});
+
+test("charla retomada: si la base no deja leer lo que mandó la cuenta, porQueSale dice NO_AHORA, sin anotar ni el aviso de la conexión de Instagram", async () => {
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  } });
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  fallando(w.base, { textos: true });
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), NO_AHORA);
+  assert.deepEqual(w.m.avisos, [], "no es la conexión con Instagram");
+  assert.deepEqual(w.base.anotadasCande, []);
+  assert.equal(w.m.contacto.dueno, "agente");
+});
+
+test("charla retomada: un automático que ManyChat manda con el nombre de la persona (distinto del cargado) no se toma por lo que pegó Cande, en la mirada y en la vuelta del cron", async () => {
+  // Cande pegó hace 3 minutos, el lead le contestó hace 2 con algo que dispara el automático, y el automático salió
+  // hace 1 con el nombre de la persona adentro.
+  const CARGADO = "Hola Nombre! Este es un mensaje fijo de prueba que sale solo con la palabra clave";
+  const SALIO = "Hola Juan Prueba! Este es un mensaje fijo de prueba que sale solo con la palabra clave";
+  const enIg = (otro) => [
+    msj(5, SALIO, { deCuenta: true, min: 1, otro }), msj(4, "sí, la palabra clave de prueba", { min: 2, otro }), msj(3, PEGADO, { deCuenta: true, min: 3, otro }),
+    msj(2, "hola", { min: 900, otro }),
+  ];
+  // La mirada de cada respuesta.
+  const w = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas: {
+    "/me/conversations": bandeja(hiloCrudo(1, enIg(undefined))), "/501": perfilDe(false),
+  } });
+  await w.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  await w.base.guardarConfig("automaticos", { textos: [CARGADO] });
+  assert.equal(await w.reglas.porQueSale(w.m.contacto), null);
+  assert.deepEqual(w.base.anotadasCande.map((x) => x.texto), [PEGADO], "solo lo que pegó ella");
+  assert.equal(marcaDe(await w.base.leerConfig(CLAVE_RETOMADAS), "77").usada, hace(3).getTime(), "la marca queda usada hasta lo suyo: lo del lead sigue abierto");
+  // La vuelta del cron.
+  const { w: c, cfg } = mundoVarias({ contactos: [{ id: "77", otro: LEAD_A }], hilos: [hiloCrudo(1, enIg(LEAD_A), 1)], marcas: marca() });
+  cfg.datos.automaticos = { textos: [CARGADO] };
+  const r = await c.vuelta();
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.deepEqual(c.anotadas.map((x) => x.texto), [PEGADO]);
+});
+
+test("la vuelta del cron: una charla retomada sembrada con su id de Instagram y sin el usuario se mira desde la primera vuelta", async () => {
+  const { w } = mundoVarias({
+    contactos: [{ id: "77", otro: LEAD_A, ig_usuario: null }],
+    hilos: [hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 1)],
+    marcas: marca(),
+  });
+  const r = await w.vuelta();
+  assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 0, anotadas: 1 });
+  assert.equal(w.contactos.get("77").dueno, "agente");
+});
+
+test("como en main: si la base falla en una charla sin la marca, la vuelta del cron entera falla (y el cron avisa con fallo)", async () => {
+  const hilos = [
+    hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2, otro: LEAD_A }), msj(2, "hola", { min: 900, otro: LEAD_A })], 2),
+    hiloCrudo(2, [msj(13, "--", { deCuenta: true, min: 5, otro: LEAD_B }), msj(12, "hola", { min: 900, otro: LEAD_B })], 5),
+  ];
+  const corte = () => Object.assign(new Error("la base de prueba cortó la conexión"), { code: "57P01" });
+  for (const falla of ["buscar el contacto", "leer lo de la cuenta"]) {
+    const { w, base } = mundoVarias({ contactos: [{ id: "77", otro: LEAD_A }, { id: "78", otro: LEAD_B }], hilos });
+    if (falla === "buscar el contacto") base.contactoDeIg = async () => { throw corte(); };
+    else base.textosDeLaCuenta = async () => { throw corte(); };
+    await assert.rejects(() => w.vuelta(hace(10)), /cortó la conexión/, falla);
+    assert.equal(w.contactos.get("78").dueno, "agente", `${falla}: la vuelta se cortó antes`);
+  }
 });

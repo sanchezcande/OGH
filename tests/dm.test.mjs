@@ -387,7 +387,10 @@ function armar({
       return m.mensajes.length;
     },
     ultimoIdLead: async () => delLead().at(-1)?.id ?? null,
-    historial: async (id, tope = 80) => m.mensajes.slice(-tope),
+    historial: async (id, tope = 80) => {
+      if (m.fallaHistorial) throw new Error("base caída al leer la charla");
+      return m.mensajes.slice(-tope);
+    },
     corridasEnUnDia: async () => m.salidas.filter((s) => !["aviso_fallido", "error"].includes(s.estado)).length,
     tomar: async (id, marca, { cualquierDueno = false } = {}) => {
       if (m.tomado || (m.contacto.dueno !== "agente" && !cualquierDueno)) return null;
@@ -2197,9 +2200,14 @@ test("una indicación contesta también lo que el lead había dejado sin respues
 
 /* ---------- la lectura directa de Instagram en cada turno (lib/dm/instagram.js) ---------- */
 
-/** Reglas de Instagram de mentira: `respuestas` es lo que contesta cada mirada, en orden. */
-function reglasFalsas(respuestas, m) {
+/**
+ * Reglas de Instagram de mentira: `respuestas` es lo que contesta cada mirada, en orden. Con `retomada` (true o false),
+ * también dicen si la charla tiene la marca de retomada (lib/dm/instagram.js, retomada); sin eso, como en main, no la
+ * dicen y la charla no es retomada.
+ */
+function reglasFalsas(respuestas, m, { retomada } = {}) {
   const r = { miradas: 0, sacadas: [] };
+  if (retomada !== undefined) r.retomada = async () => retomada;
   r.porQueSale = async () => {
     const x = respuestas[Math.min(r.miradas++, respuestas.length - 1)];
     return typeof x === "function" ? x() : x;
@@ -3350,4 +3358,399 @@ test("una respuesta vencida no sale por la API si se escribió en la charla desp
   sale.m.salidas.push({ accion: "responder", estado: "vencida" });
   assert.equal(await sale.agente.rescatarVencida(fila()), "reenviada");
   assert.deepEqual(sale.m.enviados, ["Pregunta de prueba?"]);
+});
+
+/* ---------- charlas retomadas (20/10): lo que Cande escribe a mano no saca al agente (lib/dm/instagram.js) ---------- */
+
+const A_MANO = "Texto de prueba que Cande escribió a mano";
+
+/** Lo que hace la mirada en una charla retomada: anota lo de Cande y deja contestado lo del lead hasta `hasta`. */
+const anotaACande = (mundo, hasta) => () => {
+  const { m } = mundo();
+  m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: A_MANO });
+  if (hasta !== undefined) m.contacto.respondido_hasta = hasta;
+  return null;
+};
+
+test("charla retomada: si la mirada anota que Cande ya contestó lo del lead, el agente no le contesta encima ni le pide nada al modelo", async () => {
+  let mundo;
+  const ig = reglasFalsas([anotaACande(() => mundo, 2), null], () => mundo.m, { retomada: true });
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await mundo.agente.procesar("77", mundo.m.disparo);
+  assert.equal(r.hecho, "ya estaba atendido");
+  assert.equal(mundo.m.pedidos.length, 0);
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.contacto.dueno, "agente");
+  assert.deepEqual(ig.sacadas, []);
+  assert.equal(mundo.m.tomado, null);
+});
+
+test("charla retomada: si el lead le contestó a lo que Cande escribió a mano, contesta el agente con lo de ella en el historial", async () => {
+  let mundo;
+  const ig = reglasFalsas([anotaACande(() => mundo, 2), null], () => mundo.m, { retomada: true });
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  // El lead le contestó a Cande; la mirada anota lo de ella después (lo vio recién), con el turno contestado hasta lo de antes.
+  const id = mundo.m.entraLead("respuesta de prueba del lead");
+  const r = await mundo.agente.procesar("77", id);
+  assert.equal(r.hecho, "enviada");
+  const { turno } = mundo.m.pedidos[0];
+  assert.deepEqual(turno.mensajes_del_lead, ["respuesta de prueba del lead"]);
+  assert.deepEqual(turno.historial.at(-1), { quien: "cande", texto: A_MANO });
+  assert.equal(mundo.m.contacto.dueno, "agente");
+  assert.equal(mundo.m.contacto.respondido_hasta, id);
+});
+
+test("charla retomada: un toque no sale detrás de lo que Cande acaba de escribir a mano", async () => {
+  let mundo;
+  const ig = reglasFalsas([anotaACande(() => mundo), null], () => mundo.m, { retomada: true });
+  mundo = armarToque({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  const r = await toque(mundo.agente);
+  assert.equal(r.hecho, "le escribió Cande");
+  assert.equal(mundo.m.pedidos.length, 0);
+  assert.equal(mundo.m.enviados.length, 0);
+  assert.equal(mundo.m.contacto.dueno, "agente");
+});
+
+test("charla retomada: lo de Cande que se anotó tarde pero lo escribió antes que el lead no hace que el reintento tarde le pase la charla", async () => {
+  const minAntes = (min) => new Date(AHORA.getTime() - min * 60000);
+  const armarTarde = (candeHace) => {
+    const w = armar({ envio: "campo", ultimoLeadHace: 2, instagram: { retomada: async () => true } });
+    w.m.mensajes[1].creado = minAntes(180);
+    w.m.contacto.respondido_hasta = 2;
+    w.m.mensajes.push({ id: 3, quien: "lead", texto: "respuesta de prueba del lead", creado: minAntes(60) });
+    w.m.mensajes.push({ id: 4, quien: "cande", texto: A_MANO, creado: minAntes(candeHace) });
+    return w;
+  };
+  const antes = armarTarde(90);
+  const r = await antes.agente.procesar("77", 3, { tarde: true });
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(antes.m.pedidos[0].turno.mensajes_del_lead, ["respuesta de prueba del lead"]);
+  assert.equal(antes.m.contacto.dueno, "agente");
+  // Si escribió después de lo del lead, como siempre: está metida ahí y la charla pasa a ella.
+  const despues = armarTarde(30);
+  assert.equal((await despues.agente.procesar("77", 3, { tarde: true })).hecho, "pasada a Cande");
+  assert.equal(despues.m.pedidos.length, 0);
+});
+
+/* ---------- revisión de las charlas retomadas (21/10) ---------- */
+
+const { NO_AHORA } = await import("../lib/dm/instagram.js");
+const { MIRAR_DE_NUEVO } = await import("../lib/dm/agente.js");
+const aLos = (min) => new Date(AHORA.getTime() + min * 60000);
+
+/** La fila de una respuesta que ManyChat no retiró y contestaba el mensaje 2 del lead (escrito hace 10 minutos). */
+const vencida = (extra = {}) => ({
+  id: "77", nombre: "Lead de prueba", dueno: "agente", ultimo_lead: aLos(-10), salida: 1, accion: "responder",
+  mensajes: ["Pregunta de prueba?"], hasta_lead: 2, escribio_despues: false, charla_cambio: false, ...extra,
+});
+
+/** Un mundo con esa respuesta vencida y una mirada de Instagram de mentira (`mirada(m)`), en una charla retomada o no. */
+function armarRescate({ mirada = async () => null, retomada = true } = {}) {
+  const vistas = [];
+  const instagram = { conApi: true, retomada: async () => retomada, sacar: async () => {} };
+  const w = armar({ instagram });
+  instagram.porQueSale = async (c) => { vistas.push(c.id); return mirada(w.m); };
+  w.m.ajustes.instagram = true;
+  w.m.mensajes[1].creado = aLos(-10);
+  w.m.salidas.push({ accion: "responder", estado: "vencida" });
+  return { ...w, vistas };
+}
+/** Lo que Cande escribió a mano, anotado como lo anota la base (con la hora de Instagram). */
+const escribioCande = (m, min) => m.mensajes.push({ id: m.mensajes.length + 1, quien: "cande", texto: A_MANO, creado: aLos(min) });
+
+test("rescate en una charla retomada: si la mirada anota que Cande le escribió después del lead, la respuesta vencida no sale y la charla sigue del agente sin aviso", async () => {
+  const w = armarRescate({ mirada: async (m) => { escribioCande(m, -2); return null; } });
+  assert.equal(await w.agente.rescatarVencida(vencida()), "descartada");
+  assert.equal(w.vistas.length, 1, "miró Instagram");
+  assert.deepEqual(w.m.enviados, []);
+  assert.equal(w.m.salidas[0].estado, "descartada");
+  assert.match(w.m.salidas[0].detalle, /Cande le escribió a mano/);
+  assert.equal(w.m.contacto.dueno, "agente");
+  assert.equal(w.m.avisos.length, 0);
+  assert.deepEqual(w.m.mensajes.map((x) => x.quien), ["agente", "lead", "cande"], "lo vencido no queda anotado como dicho");
+  // Si la charla no está retomada (lo de Cande lo anotó ella desde Telegram), como en main: la mirada no la saca y la
+  // respuesta sale (revisión del 21/10, tercera vuelta: en una charla sin marca el rescate no mira el historial).
+  const sin = armarRescate({ retomada: false, mirada: async (m) => { escribioCande(m, -2); return null; } });
+  assert.equal(await sin.agente.rescatarVencida(vencida()), "reenviada");
+  assert.deepEqual(sin.m.enviados, ["Pregunta de prueba?"]);
+  assert.equal(sin.m.contacto.dueno, "agente");
+  assert.equal(sin.m.avisos.length, 0);
+  // Lo de Cande de antes del mensaje del lead (el lead le contestó a eso) no frena la respuesta.
+  const antes = armarRescate({ mirada: async (m) => { escribioCande(m, -20); return null; } });
+  assert.equal(await antes.agente.rescatarVencida(vencida()), "reenviada");
+  assert.deepEqual(antes.m.enviados, ["Pregunta de prueba?"]);
+});
+
+test("rescate en una charla retomada: si lo que cambió después de la respuesta es solo lo que Cande escribió a mano (ya lo anotó el cron), se descarta sin pasarle la charla", async () => {
+  const w = armarRescate();
+  escribioCande(w.m, -1);
+  assert.equal(await w.agente.rescatarVencida(vencida({ charla_cambio: true })), "descartada");
+  assert.deepEqual(w.m.enviados, []);
+  assert.equal(w.m.salidas[0].estado, "descartada");
+  assert.equal(w.m.contacto.dueno, "agente");
+  assert.equal(w.m.avisos.length, 0);
+  // Si además hay otra cosa (una nota), o la charla no está retomada, pasa a Cande como siempre.
+  for (const [caso, retomada, extra] of [["con una nota", true, true], ["sin la marca", false, false]]) {
+    const x = armarRescate({ retomada });
+    escribioCande(x.m, -1);
+    if (extra) x.m.mensajes.push({ id: x.m.mensajes.length + 1, quien: "sistema", texto: "nota de prueba", creado: aLos(-1) });
+    assert.equal(await x.agente.rescatarVencida(vencida({ charla_cambio: true })), "pasada a Cande", caso);
+    assert.equal(x.m.contacto.dueno, "cande", caso);
+    assert.equal(x.m.avisos.length, 1, caso);
+  }
+});
+
+test("rescate: si la mirada no pudo anotar lo que Cande escribió a mano (NO_AHORA), la respuesta no sale ni pasa la charla: queda el turno abierto para la espera", async () => {
+  const w = armarRescate({ mirada: async () => NO_AHORA });
+  assert.equal(await w.agente.rescatarVencida(vencida()), "descartada");
+  assert.deepEqual(w.m.enviados, []);
+  assert.equal(w.m.salidas[0].estado, "descartada");
+  assert.equal(w.m.contacto.dueno, "agente");
+  assert.equal(w.m.contacto.respondido_hasta, 0, "el turno sigue abierto");
+  assert.equal(w.m.avisos.length, 0);
+});
+
+test("si la mirada no pudo anotar lo que Cande escribió a mano (NO_AHORA), el agente no le contesta encima ni sale de la charla: el turno queda abierto", async () => {
+  let a;
+  const igA = reglasFalsas([NO_AHORA], () => a.m, { retomada: true });
+  a = armar({ instagram: igA });
+  a.m.ajustes.instagram = true;
+  const r = await a.agente.procesar("77", a.m.disparo);
+  assert.equal(r.hecho, MIRAR_DE_NUEVO);
+  assert.equal(a.m.pedidos.length, 0);
+  assert.equal(a.m.enviados.length, 0);
+  assert.deepEqual(igA.sacadas, []);
+  assert.equal(a.m.contacto.dueno, "agente");
+  assert.equal(a.m.contacto.respondido_hasta, 0, "el turno sigue abierto: lo mira la espera");
+  assert.equal(a.m.avisos.length, 0);
+  assert.equal(a.m.tomado, null);
+  // Un toque tampoco sale.
+  let t;
+  const igT = reglasFalsas([NO_AHORA], () => t.m, { retomada: true });
+  t = armarToque({ instagram: igT });
+  t.m.ajustes.instagram = true;
+  assert.equal((await toque(t.agente)).hecho, MIRAR_DE_NUEVO);
+  assert.equal(t.m.pedidos.length, 0);
+  assert.equal(t.m.enviados.length, 0);
+  // En la mirada de antes de mandar: lo redactado no sale y el turno queda abierto.
+  let d;
+  const igD = reglasFalsas([null, NO_AHORA], () => d.m, { retomada: true });
+  d = armar({ instagram: igD });
+  d.m.ajustes.instagram = true;
+  assert.equal((await d.agente.procesar("77", d.m.disparo)).hecho, MIRAR_DE_NUEVO);
+  assert.equal(d.m.pedidos.length, 1);
+  assert.equal(d.m.enviados.length, 0);
+  assert.equal(d.m.salidas.at(-1).estado, "descartada");
+  assert.equal(d.m.contacto.respondido_hasta, 0);
+  assert.deepEqual(igD.sacadas, []);
+});
+
+test("charla retomada: lo que Cande escribió antes que el lead y se anotó después, el modelo lo ve en el orden en que se escribió, también en el turno siguiente", async () => {
+  let mundo;
+  // La mirada del primer turno anota lo de Cande (escrito antes de la respuesta del lead, visto recién ahora).
+  const ig = reglasFalsas([() => { escribioCande(mundo.m, -2); mundo.m.contacto.respondido_hasta = 2; return null; }, null], () => mundo.m, { retomada: true });
+  mundo = armar({ instagram: ig });
+  mundo.m.ajustes.instagram = true;
+  mundo.m.mensajes[0].creado = aLos(-120);
+  mundo.m.mensajes[1].creado = aLos(-60);
+  mundo.m.contacto.respondido_hasta = 2;
+  const l1 = mundo.m.entraLead("respuesta de prueba a lo de Cande");
+  mundo.m.mensajes.at(-1).creado = aLos(-1);
+  assert.equal((await mundo.agente.procesar("77", l1)).hecho, "enviada");
+  assert.deepEqual(mundo.m.pedidos[0].turno.historial.map((x) => x.texto), [AVISO, "mensaje de prueba", A_MANO]);
+  assert.deepEqual(mundo.m.pedidos[0].turno.mensajes_del_lead, ["respuesta de prueba a lo de Cande"]);
+  mundo.m.mensajes.at(-1).creado = AHORA; // lo que contestó el agente
+  const l2 = mundo.m.entraLead("otro mensaje de prueba del lead");
+  mundo.m.mensajes.at(-1).creado = aLos(1);
+  assert.equal((await mundo.agente.procesar("77", l2)).hecho, "enviada");
+  assert.deepEqual(mundo.m.pedidos[1].turno.historial.map((x) => x.texto), [
+    AVISO, "mensaje de prueba", A_MANO, "respuesta de prueba a lo de Cande", "Respuesta de prueba?",
+  ]);
+  assert.deepEqual(mundo.m.pedidos[1].turno.mensajes_del_lead, ["otro mensaje de prueba del lead"]);
+  assert.deepEqual(mundo.m.mensajes.map((x) => x.quien), ["agente", "lead", "lead", "cande", "agente", "lead", "agente"], "en la base no se toca nada");
+});
+
+/* ---------- segunda revisión de las charlas retomadas (21/10) ---------- */
+
+test("charla retomada: lo de Cande que se anotó tarde pero lo escribió antes que el lead no frena el seguimiento que el agente agendó para esa respuesta", async () => {
+  const hora = (h) => new Date(AHORA.getTime() - h * HORA);
+  const armarCon = (candeHace) => {
+    const w = armarToque({ instagram: { retomada: async () => true } });
+    w.m.mensajes[0].creado = hora(7);
+    w.m.mensajes[1].creado = hora(6); // la respuesta del lead, que el agente atendió callando con un seguimiento
+    // Lo de Cande lo vio recién la mirada: quedó con un id más alto, con la hora en que lo escribió.
+    w.m.mensajes.push({ id: 3, quien: "cande", texto: A_MANO, creado: hora(candeHace) });
+    return w;
+  };
+  const antes = armarCon(6.1);
+  assert.equal((await toque(antes.agente)).hecho, "enviada");
+  assert.deepEqual(antes.m.enviados, ["Mensaje de seguimiento?"]);
+  // Si lo de ella es lo último que se escribió, el toque no sale detrás.
+  const despues = armarCon(1);
+  assert.equal((await toque(despues.agente)).hecho, "le escribió Cande");
+  assert.deepEqual(despues.m.enviados, []);
+});
+
+test("rescate en una charla retomada: después de la mirada la marca ya está usada y la charla sigue contando como retomada", async () => {
+  // Las reglas de verdad: retomada mira que la marca esté vigente, aunque ya se haya usado (lib/dm/instagram.js).
+  const { crearReglasInstagram } = await import("../lib/dm/instagram.js");
+  let marcas = { 77: { hasta: AHORA.getTime() + 86400000 } };
+  const reglas = crearReglasInstagram({ base: { leerConfig: async () => marcas }, manychat: {}, avisar: async () => true, reloj: () => AHORA });
+  const instagram = { conApi: true, retomada: reglas.retomada, sacar: async () => {} };
+  const w = armar({ instagram });
+  // La mirada anota lo que Cande escribió después del lead, y con eso la marca queda usada (base.anotarCandeDesdeIg).
+  instagram.porQueSale = async () => {
+    escribioCande(w.m, -2);
+    marcas = { 77: { ...marcas[77], usada: aLos(-2).getTime() } };
+    return null;
+  };
+  w.m.ajustes.instagram = true;
+  w.m.mensajes[1].creado = aLos(-10);
+  w.m.salidas.push({ accion: "responder", estado: "vencida" });
+  assert.equal(await w.agente.rescatarVencida(vencida()), "descartada");
+  assert.deepEqual(w.m.enviados, []);
+  assert.equal(w.m.contacto.dueno, "agente");
+  assert.equal(w.m.avisos.length, 0);
+});
+
+/* ---------- tercera revisión de las charlas retomadas (21/10): sin la marca, todo como en main ---------- */
+
+// Las pruebas que empiezan con "como en main" pasan también con el código de origin/main (se corrieron contra una copia
+// de origin/main con este mismo archivo): en una charla sin la marca de retomada, o si la base no deja leer la marca,
+// el agente hace exactamente lo mismo que antes de las charlas retomadas, avisos incluidos.
+
+/** Las tres formas de que una charla no cuente como retomada: sin la marca, sin poder leerla, o sin las reglas de las retomadas. */
+const SIN_MARCA = [
+  ["sin la marca", { retomada: false }],
+  ["sin poder leer la marca", { retomada: "falla" }],
+  ["sin las reglas de las retomadas", {}],
+];
+/** Las reglas de Instagram de mentira de una charla sin la marca (ver SIN_MARCA), con la mirada que se diga. */
+const reglasSinMarca = ({ retomada }, mirada = async () => null) => ({
+  conApi: true, porQueSale: mirada, sacar: async () => {},
+  ...(retomada === undefined ? {} : { retomada: async () => { if (retomada === "falla") throw new Error("base caída de prueba"); return retomada; } }),
+});
+
+test("como en main: rescate de una respuesta vencida en una charla sin la marca, con un mensaje de Cande (Telegram) después del lead: sale por la API", async () => {
+  for (const [caso, opciones] of SIN_MARCA) {
+    for (const fallaHistorial of [false, true]) {
+      const w = armar({ instagram: reglasSinMarca(opciones) });
+      w.m.ajustes.instagram = true;
+      w.m.mensajes[1].creado = aLos(-10);
+      w.m.salidas.push({ accion: "responder", estado: "vencida" });
+      // Lo que Cande contestó desde Telegram a un aviso anterior, mientras se generaba esta respuesta.
+      escribioCande(w.m, -2);
+      w.m.fallaHistorial = fallaHistorial;
+      const que = `${caso}${fallaHistorial ? ", sin poder leer la charla" : ""}`;
+      assert.equal(await w.agente.rescatarVencida(vencida()), "reenviada", que);
+      assert.deepEqual(w.m.enviados, ["Pregunta de prueba?"], que);
+      assert.equal(w.m.contacto.dueno, "agente", que);
+      assert.equal(w.m.avisos.length, 0, que);
+    }
+  }
+});
+
+test("como en main: en una respuesta tarde de una charla sin la marca, si Cande contesta por Telegram mientras se mira Instagram, la charla pasa a ella con el aviso", async () => {
+  for (const [caso, opciones] of SIN_MARCA) {
+    let w;
+    // Mientras corre la mirada, un /textual de Cande: queda su mensaje y el turno contestado hasta lo del lead.
+    const mirada = async () => {
+      w.m.mensajes.push({ id: w.m.mensajes.length + 1, quien: "cande", texto: A_MANO });
+      w.m.contacto.respondido_hasta = 2;
+      return null;
+    };
+    w = armar({ instagram: reglasSinMarca(opciones, mirada), ultimoLeadHace: 2 });
+    w.m.ajustes.instagram = true;
+    const r = await w.agente.procesar("77", 2, { tarde: true });
+    assert.equal(r.hecho, "pasada a Cande", caso);
+    assert.equal(w.m.avisos.length, 1, caso);
+    assert.match(w.m.avisos[0].campos.Aviso, /le escribiste mientras el agente no podía contestar/, caso);
+    assert.equal(w.m.pedidos.length, 0, caso);
+  }
+});
+
+test("como en main: un toque en una charla sin la marca sale aunque lo último de la charla sea de Cande", async () => {
+  for (const [caso, opciones] of SIN_MARCA) {
+    const w = armarToque({ instagram: reglasSinMarca(opciones) });
+    w.m.ajustes.instagram = true;
+    w.m.mensajes.push({ id: 3, quien: "cande", texto: A_MANO });
+    assert.equal((await toque(w.agente)).hecho, "enviada", caso);
+    assert.deepEqual(w.m.enviados, ["Mensaje de seguimiento?"], caso);
+  }
+});
+
+test("como en main: en una charla sin la marca el modelo lee la charla en el orden de la base, aunque las horas digan otra cosa", async () => {
+  for (const [caso, opciones] of SIN_MARCA) {
+    const w = armar({ instagram: reglasSinMarca(opciones) });
+    w.m.ajustes.instagram = true;
+    w.m.mensajes[0].creado = aLos(-120);
+    w.m.mensajes[1].creado = aLos(-60);
+    // La respuesta del agente y un mensaje del lead que guardó tarde la red de la bandeja, con su hora de Instagram.
+    w.m.mensajes.push({ id: 3, quien: "agente", texto: "Respuesta de prueba del agente", creado: aLos(-30) });
+    w.m.mensajes.push({ id: 4, quien: "lead", texto: "mensaje de prueba que guardó la red", creado: aLos(-45) });
+    w.m.contacto.respondido_hasta = 4;
+    const id = w.m.entraLead("mensaje nuevo de prueba");
+    w.m.mensajes.at(-1).creado = aLos(-1);
+    assert.equal((await w.agente.procesar("77", id)).hecho, "enviada", caso);
+    assert.deepEqual(w.m.pedidos[0].turno.historial.map((x) => x.texto),
+      [AVISO, "mensaje de prueba", "Respuesta de prueba del agente", "mensaje de prueba que guardó la red"], caso);
+  }
+});
+
+test("como en main: en una respuesta tarde de una charla sin la marca, lo de Cande anotado después del lead pasa la charla a ella aunque su hora sea anterior", async () => {
+  for (const [caso, opciones] of SIN_MARCA) {
+    const minAntes = (min) => new Date(AHORA.getTime() - min * 60000);
+    const w = armar({ envio: "campo", ultimoLeadHace: 2, instagram: reglasSinMarca(opciones) });
+    w.m.mensajes[1].creado = minAntes(180);
+    w.m.contacto.respondido_hasta = 2;
+    w.m.mensajes.push({ id: 3, quien: "lead", texto: "respuesta de prueba del lead", creado: minAntes(60) });
+    w.m.mensajes.push({ id: 4, quien: "cande", texto: A_MANO, creado: minAntes(90) });
+    assert.equal((await w.agente.procesar("77", 3, { tarde: true })).hecho, "pasada a Cande", caso);
+    assert.equal(w.m.pedidos.length, 0, caso);
+  }
+});
+
+test("charla retomada: si la primera mirada no vio lo que pegó Cande y la de antes de mandar lo anota, lo redactado sin eso no sale y el turno se rehace con lo suyo", async () => {
+  // Cande pegó hace 2 minutos y el lead le contestó hace 1. La primera mirada no lo vio (Instagram tardó o falló); la
+  // de antes de mandar lo anota con la hora de Instagram, sin dar por contestado lo del lead (es posterior).
+  const armarCon = (retomada) => {
+    let w;
+    const anota = () => { escribioCande(w.m, -2); return null; };
+    const ig = reglasFalsas([null, anota, null], () => w.m, { retomada });
+    w = armar({ instagram: ig, ultimoLeadHace: 0 });
+    w.m.ajustes.instagram = true;
+    w.m.mensajes[0].creado = aLos(-120);
+    w.m.mensajes[1].creado = aLos(-1);
+    return { ...w, ig };
+  };
+  const w = armarCon(true);
+  const r = await w.agente.procesar("77", 2);
+  assert.equal(r.hecho, MIRAR_DE_NUEVO);
+  assert.equal(w.m.pedidos.length, 1, "se redactó sin lo de ella");
+  assert.deepEqual(w.m.enviados, [], "y no sale");
+  assert.equal(w.m.salidas.at(-1).estado, "descartada");
+  assert.match(w.m.salidas.at(-1).detalle, /lo que Cande escribió a mano/);
+  assert.equal(w.m.contacto.respondido_hasta, 0, "el turno queda abierto");
+  assert.equal(w.m.contacto.dueno, "agente");
+  assert.equal(w.m.avisos.length, 0);
+  assert.equal(w.m.tomado, null);
+  // La espera lo rehace: el modelo lo lee con lo de ella.
+  const otra = await w.agente.procesar("77", 2, { tarde: true });
+  assert.equal(otra.hecho, "enviada");
+  assert.deepEqual(w.m.pedidos[1].turno.historial.map((x) => x.texto), [AVISO, A_MANO]);
+  assert.deepEqual(w.m.pedidos[1].turno.mensajes_del_lead, ["mensaje de prueba"]);
+  assert.deepEqual(w.m.enviados, ["Respuesta de prueba?"]);
+  // Si al principio la base no dejó leer la marca, se pregunta de nuevo antes de mandar.
+  const tarde = armarCon(true);
+  let veces = 0;
+  tarde.ig.retomada = async () => { if (veces++ === 0) throw new Error("base caída de prueba"); return true; };
+  assert.equal((await tarde.agente.procesar("77", 2)).hecho, MIRAR_DE_NUEVO);
+  assert.deepEqual(tarde.m.enviados, []);
+  // Sin la marca, como en main: sale lo redactado.
+  const sin = armarCon(false);
+  assert.equal((await sin.agente.procesar("77", 2)).hecho, "enviada");
+  assert.deepEqual(sin.m.enviados, ["Respuesta de prueba?"]);
 });

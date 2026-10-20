@@ -71,8 +71,9 @@ export default async function handler(req, res) {
       sinAtender++;
       continue;
     }
-    if ((await agente.rescatarVencida(v)) === "reenviada") reenviadas++;
-    else sinAtender++;
+    const r = await agente.rescatarVencida(v);
+    if (r === "reenviada") reenviadas++;
+    else if (r !== "descartada") sinAtender++; // descartada: la charla sigue del agente (una retomada donde escribió Cande)
   }
   // Los toques y las respuestas de la espera los redacta la Mac de Cande (salvo cerebro "api").
   const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();

@@ -1334,3 +1334,97 @@ test("el cron del controlador no entra sin CRON_SECRET, corre cada 10 minutos (f
   const src = await readFile(new URL("../pages/api/dm/controlador.js", import.meta.url), "utf8");
   assert.match(src, /return res\.status\(200\)\.json\(\{ ok: true, \.\.\.r \}\);/);
 });
+
+test("si Cande escribió a mano y no se pudo anotar lo suyo (el agente mira de nuevo), no pasó nada: la corrección no se gasta", async () => {
+  const { MIRAR_DE_NUEVO } = await import("../lib/dm/agente.js");
+  const { NO_AHORA } = await import("../lib/dm/instagram.js");
+  assert.equal(typeof MIRAR_DE_NUEVO, "string");
+  const base = baseFalsa({ mensajes: puenteConOtraPregunta() });
+  let vez = 0;
+  const { agente, controlar } = controlador(base, {
+    agente: agenteFalso(() => (++vez === 1 ? { hecho: MIRAR_DE_NUEVO, motivo: NO_AHORA } : { hecho: "enviada", mando: 1 })),
+  });
+  const r = await controlar();
+  assert.equal(r.esperan, 1);
+  assert.equal(r.sin_corregir, 0);
+  assert.deepEqual(base.filas, [], "no quedó anotada");
+  assert.equal((await controlar()).corregidas, 1);
+  assert.equal(agente.pedidos.length, 2);
+});
+
+/* ---------- segunda revisión de las charlas retomadas (21/10) ---------- */
+
+test("charla retomada: lo de Cande que se anotó después de la respuesta del lead pero lo escribió antes se lee en el orden en que se escribió (sin fallas que no existen)", async () => {
+  // Lo último era un sí viejo (de hace 4 días) a una oferta, sin lo que seguía. Cande pegó C hace 25 minutos, el lead le
+  // contestó R hace 20 y el agente contestó A2 hace 19. C lo anotó recién la mirada del turno de R: quedó con un id más
+  // alto que R, con la hora de Instagram.
+  const ms = [
+    { contacto: ID, id: 100, quien: "lead", texto: "hola, soy dev y busco hace un tiempo", creado: hace(5200) },
+    { contacto: ID, id: 101, quien: "agente", texto: OFERTA, creado: hace(5100) },
+    { contacto: ID, id: 102, quien: "lead", texto: SI, creado: hace(5000) },
+    { contacto: ID, id: 103, quien: "lead", texto: "hola! sigo en la misma, de prueba", creado: hace(20) },
+    { contacto: ID, id: 104, quien: "cande", texto: "Texto de prueba que Cande pegó a mano", creado: hace(25) },
+    { contacto: ID, id: 105, quien: "agente", texto: "Uh, y qué es lo que más te traba?", creado: hace(19) },
+  ];
+  const contacto = contactoDe(ms, { respondido_hasta: 103, dueno_desde: hace(120) });
+  // La charla tiene la marca de retomada: solo en esas se lee por la hora (sin la marca, como en main: por el id).
+  const retomadas = { [ID]: { hasta: AHORA.getTime() + 24 * HORA, marcada: AHORA.getTime() - 60 * 60000, usada: AHORA.getTime() - 25 * 60000 } };
+  const datos = { mensajes: ms, contactos: [contacto], salidas: [], pendientes: [] };
+  assert.deepEqual(reglas(C.detectar(datos, { ahora: AHORA.getTime(), patrones: P, retomadas })), []);
+  const base = baseFalsa({ mensajes: ms, contactos: [contacto], config: { retomadas } });
+  const { agente, controlar } = controlador(base);
+  const r = await controlar();
+  assert.deepEqual(r.fallas, {});
+  assert.equal(r.al_resumen, 0);
+  assert.deepEqual(base.filas, [], "ningún renglón 'Controlador:' falso en el resumen");
+  assert.equal(agente.pedidos.length, 0);
+});
+
+test("lo último que miró el controlador (vistoHasta) es el id más alto de la charla, aunque por la hora lo último sea otro mensaje", async () => {
+  // Una falla de verdad (el sí de recién contestado con otra pregunta) y lo de Cande anotado tarde, más atrás por la hora.
+  const ms = [
+    ...charla([["agente", OFERTA, 70], ["lead", SI, 60], ["agente", OTRA, 59]], { desde: 100 }),
+    { contacto: ID, id: 103, quien: "automatico", texto: "Mensaje fijo de prueba", creado: hace(200) },
+  ];
+  // En una charla retomada (solo ahí se lee por la hora).
+  const base = baseFalsa({ mensajes: ms, config: { retomadas: { [ID]: { hasta: AHORA.getTime() + 24 * HORA } } } });
+  const { agente, controlar } = controlador(base);
+  await controlar();
+  assert.deepEqual(agente.pedidos.map((p) => p.vistoHasta), [103]);
+});
+
+/* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
+
+// Las pruebas que empiezan con "como en main" pasan también con el código de origin/main (se corrieron contra una copia
+// de origin/main con este mismo archivo).
+
+test("como en main: una charla sin la marca de retomada (o sin poder leer las marcas) el controlador la lee en el orden de la base, aunque las horas digan otra cosa", async () => {
+  // Lo mismo que la charla retomada de arriba, pero sin la marca: por el orden en la base, como siempre.
+  const ms = [
+    { contacto: ID, id: 100, quien: "lead", texto: "hola, soy dev y busco hace un tiempo", creado: hace(5200) },
+    { contacto: ID, id: 101, quien: "agente", texto: OFERTA, creado: hace(5100) },
+    { contacto: ID, id: 102, quien: "lead", texto: SI, creado: hace(5000) },
+    { contacto: ID, id: 103, quien: "lead", texto: "hola! sigo en la misma, de prueba", creado: hace(20) },
+    { contacto: ID, id: 104, quien: "cande", texto: "Texto de prueba que Cande escribió", creado: hace(25) },
+    { contacto: ID, id: 105, quien: "agente", texto: "Uh, y qué es lo que más te traba?", creado: hace(19) },
+  ];
+  const contacto = contactoDe(ms, { respondido_hasta: 103, dueno_desde: hace(120) });
+  const datos = { mensajes: ms, contactos: [contacto], salidas: [], pendientes: [] };
+  const otra = { 999: { hasta: AHORA.getTime() + 24 * HORA } };
+  const enMain = reglas(C.detectar(datos, { ahora: AHORA.getTime(), patrones: P }));
+  assert.deepEqual(enMain, ["F1 otra_cosa"]);
+  assert.deepEqual(reglas(C.detectar(datos, { ahora: AHORA.getTime(), patrones: P, retomadas: otra })), enMain, "la marca de otra charla");
+  const vueltas = [];
+  for (const [caso, ajustar] of [["sin la marca", () => {}], ["sin poder leer las marcas", (b) => {
+    const leer = b.leerConfig;
+    b.leerConfig = async (k) => { if (k === "retomadas") throw new Error("base caída de prueba"); return leer(k); };
+  }]]) {
+    const base = baseFalsa({ mensajes: ms, contactos: [contacto], config: { retomadas: otra } });
+    ajustar(base);
+    const { agente, controlar } = controlador(base);
+    const r = await controlar();
+    vueltas.push({ caso, fallas: r.fallas, pedidos: agente.pedidos.map((p) => p.vistoHasta) });
+  }
+  assert.deepEqual(vueltas.map((v) => v.fallas), [{ F1: 1 }, { F1: 1 }]);
+  assert.deepEqual(vueltas[0].pedidos, vueltas[1].pedidos);
+});

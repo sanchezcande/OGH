@@ -4,13 +4,30 @@
 //   { accion: "prompt", texto }                    → guarda el prompt (vive en la base: este repo es público)
 //   { accion: "ajustes", ajustes: { modo, ... } }  → cambia ajustes (modo: apagado | sombra | auto)
 //   { accion: "dueno", contacto, dueno, nombre }   → le da un contacto al agente o se lo saca
-//   { accion: "sembrar", contacto, nombre, contexto, mensajes: [{ quien, texto }] }
-//                                                  → carga una charla que ya existía y se la da al agente
+//   { accion: "sembrar", contacto, nombre, contexto, mensajes: [{ quien, texto }], ig_id?, ig_usuario? }
+//                                                  → carga una charla que ya existía y se la da al agente. Con ig_id (el id
+//                                                  de la persona en las charlas de Instagram de la cuenta) y ig_usuario,
+//                                                  el cron de Instagram reconoce su charla desde la primera vuelta
 //   { accion: "anotar", contacto, quien, texto }   → deja constancia de lo que Cande mandó a mano
 //   { accion: "reservar", contactos: [id, ...] }   → deja como de Cande, en tanda, a quienes todavía no figuran
 //                                                  (se corre antes de prender las altas, con los contactos que ya existen)
 //   { accion: "desanotar", contacto, textos }      → saca lo anotado como de Cande en las últimas 24 h que al final no
 //                                                  salió (texto exacto); para corregir un borrador antes de que ella lo pegue
+//   { accion: "retomar_marcar", contactos: [id, ...], dias?, quitar? } → marca como retomadas esas charlas por `dias`
+//                                                  (7 si no se dice, de 1 a 30): si Cande les escribe a mano desde
+//                                                  Instagram, el agente no sale, anota lo suyo y sigue (lib/dm/instagram.js).
+//                                                  Guarda la hora en que se marcó: lo que la cuenta escriba después cuenta
+//                                                  como suyo, salvo que sea igual a algo del agente o de un automático.
+//                                                  La marca sirve una vez: lo que escriba a mano después de lo anotado
+//                                                  saca al agente; marcarla de nuevo la deja sin usar.
+//                                                  Con quitar: true les saca la marca. Su "--" las saca igual.
+//                                                  Primero la charla del agente (dueno o sembrar), después la marca, y
+//                                                  recién ahí ella pega. Lo que va a pegar no se anota antes: lo anota la marca
+//   { accion: "retomar_estado", contactos: [id, ...] } → en cuáles de esas charlas todavía le toca pegar a Cande, en el
+//                                                  momento (lib/dm/instagram.js, paraPegar): no, si ya no es del agente, si
+//                                                  la cuenta ya le escribió después del último mensaje del lead, si el agente
+//                                                  está por contestar o si no tiene la marca sin usar. Se pregunta justo
+//                                                  antes de copiar: el lead pudo escribir y el agente contestarle. No cambia nada
 //   { accion: "link_formulario", contactos: [id, ...] } → el link del formulario de /devs con el id de cada charla y
 //                                                  su firma, como lo manda el agente: para lo que Cande pega a mano
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
@@ -52,12 +69,13 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, desanotar, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
-  desdeValido, hayBase, historial, leerConfig, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, estadoRetomadas, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  desdeValido, hayBase, historial, leerConfig, marcarRetomadas, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import {
-  codigoEnHilo, desdeDe, desdeManual, explicarError, linkCharlaIg, manualEnHilo, usuarioIg, usuarioParaAviso,
+  CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, paraPegar,
+  usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
 import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
@@ -73,8 +91,16 @@ const QUIEN_A_MANO = ["cande", "automatico"];
 const TOPE_TEXTO = 4000;
 const TOPE_SIEMBRA = 300;
 const TOPE_RESERVA = 5000;
+const TOPE_RETOMADAS = 1000;
+const DIA_MS = 86400000;
 const TOPE_AVISO = 3000;   // Telegram corta a los 4096
 const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Telegram no sigue la redirección
+
+/** Los ids de una tanda de charlas retomadas, sin repetir; null si no es una lista de 1 a TOPE_RETOMADAS ids válidos. */
+function idsDeLaTanda(contactos) {
+  const ids = Array.isArray(contactos) ? [...new Set(contactos.map((x) => String(x ?? "").trim()))] : [];
+  return !ids.length || ids.length > TOPE_RETOMADAS || ids.some((x) => !/^[0-9A-Za-z_-]{1,40}$/.test(x)) ? null : ids;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -128,6 +154,32 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, recibidos: ids.length, reservados: await reservar(ids) });
   }
 
+  if (b.accion === "retomar_estado") {
+    const ids = idsDeLaTanda(b.contactos);
+    if (!ids) return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RETOMADAS} ids` });
+    const filas = new Map((await estadoRetomadas(ids)).map((f) => [String(f.id), f]));
+    const retomadas = await leerConfig(CLAVE_RETOMADAS);
+    const charlas = ids.map((x) => paraPegar(x, filas.get(x) || null, retomadas));
+    return res.status(200).json({ ok: true, recibidos: ids.length, para_pegar: charlas.filter((x) => x.pegar).length, charlas });
+  }
+
+  if (b.accion === "retomar_marcar") {
+    // Antes de que Cande conteste a mano las charlas viejas (20/10): la marca dura `dias` y después vence sola.
+    const ids = idsDeLaTanda(b.contactos);
+    if (!ids) return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RETOMADAS} ids` });
+    const dias = b.dias === undefined || b.dias === null ? DIAS_RETOMADA : b.dias;
+    if (!Number.isInteger(dias) || dias < 1 || dias > 30) return res.status(400).json({ error: "dias: un entero de 1 a 30" });
+    const quitar = b.quitar === true;
+    const hasta = Date.now() + dias * DIA_MS;
+    const vigentes = await marcarRetomadas(ids, { hasta, quitar });
+    if (quitar) return res.status(200).json({ ok: true, recibidos: ids.length, vigentes });
+    // Las que todavía no son del agente: la marca sola no se las da (eso es "dueno" o "sembrar").
+    const delAgente = new Set(await cualesDelAgente(ids));
+    return res.status(200).json({
+      ok: true, recibidos: ids.length, vigentes, hasta: new Date(hasta).toISOString(), no_son_del_agente: ids.filter((x) => !delAgente.has(x)),
+    });
+  }
+
   if (b.accion === "dueno") {
     if (!id || !["agente", "cande"].includes(b.dueno)) return res.status(400).json({ error: "falta contacto o dueno" });
     const previo = await contacto(id);
@@ -157,10 +209,16 @@ export default async function handler(req, res) {
       .map((m) => ({ quien: m.quien, texto: String(m.texto).trim().slice(0, TOPE_TEXTO) }));
     if (!id || !filas.length) return res.status(400).json({ error: "falta contacto o mensajes" });
     if (filas.length > TOPE_SIEMBRA) return res.status(400).json({ error: `son más de ${TOPE_SIEMBRA} mensajes` });
+    // Su id y su usuario de Instagram, si vienen (los dos opcionales): sin ellos, la charla de una retomada recién
+    // sembrada no la reconoce el cron hasta que se completa el usuario (revisión del 21/10, tercera vuelta).
+    const igId = b.ig_id === undefined || b.ig_id === null || b.ig_id === "" ? null : String(b.ig_id).trim();
+    const usuario = b.ig_usuario === undefined || b.ig_usuario === null || b.ig_usuario === "" ? null : usuarioIg(b.ig_usuario);
+    if (igId !== null && !/^\d{1,40}$/.test(igId)) return res.status(400).json({ error: "ig_id tiene que ser el id numérico de Instagram" });
+    if (usuario !== null && !/^[a-z0-9._]{1,30}$/.test(usuario)) return res.status(400).json({ error: "ig_usuario no es un usuario de Instagram" });
     if ((await historial(id, 1)).length) return res.status(409).json({ error: "esa charla ya tiene historial" });
     await sembrar(id, {
       nombre: String(b.nombre || "").trim().slice(0, 80) || null,
-      contexto: String(b.contexto || "").trim().slice(0, 300), mensajes: filas,
+      contexto: String(b.contexto || "").trim().slice(0, 300), mensajes: filas, igId, usuario,
     });
     const campo = await ponerCampo(id, "dm_dueno", "agente");
     return res.status(200).json({ ok: true, cargados: filas.length, manychat: campo.ok });
@@ -396,6 +454,7 @@ export default async function handler(req, res) {
             la_seguis: p.laSigue, mensajes_con_texto: hilo ? hilo.mensajes.filter((m) => m.texto != null).length : 0,
             hay_codigo: Boolean(hilo && codigoEnHilo(hilo, yo, desdeDe(c))),
             escribio_cande: Boolean(hilo && manualEnHilo(hilo, yo, await textosDeLaCuenta(id), desdeManual(c))),
+            retomada: await leerConfig(CLAVE_RETOMADAS).then((r) => esRetomada(r, id), () => null),
           });
         }
       } catch (e) {
