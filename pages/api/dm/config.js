@@ -14,7 +14,13 @@
 //   { accion: "retomar_marcar", contactos: [id, ...], dias?, quitar? } → marca como retomadas esas charlas por `dias`
 //                                                  (7 si no se dice, de 1 a 30): si Cande les escribe a mano desde
 //                                                  Instagram, el agente no sale, anota lo suyo y sigue (lib/dm/instagram.js).
-//                                                  Con quitar: true les saca la marca. Su "--" las saca igual
+//                                                  Con quitar: true les saca la marca. Su "--" las saca igual.
+//                                                  Primero la charla del agente (dueno o sembrar), después la marca, y
+//                                                  recién ahí ella pega. Lo que va a pegar no se anota antes: lo anota la marca
+//   { accion: "retomar_estado", contactos: [id, ...] } → en cuáles de esas charlas todavía le toca pegar a Cande, en el
+//                                                  momento (lib/dm/instagram.js, paraPegar): no, si ya no es del agente, si
+//                                                  la cuenta ya le escribió después del último mensaje del lead, si el agente
+//                                                  está por contestar o si no tiene la marca. No cambia nada
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
@@ -54,13 +60,13 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, estadoRetomadas, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, marcarRetomadas, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
   ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import {
-  CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, usuarioIg,
-  usuarioParaAviso,
+  CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, paraPegar,
+  usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
 import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
@@ -78,6 +84,12 @@ const TOPE_RETOMADAS = 1000;
 const DIA_MS = 86400000;
 const TOPE_AVISO = 3000;   // Telegram corta a los 4096
 const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Telegram no sigue la redirección
+
+/** Los ids de una tanda de charlas retomadas, sin repetir; null si no es una lista de 1 a TOPE_RETOMADAS ids válidos. */
+function idsDeLaTanda(contactos) {
+  const ids = Array.isArray(contactos) ? [...new Set(contactos.map((x) => String(x ?? "").trim()))] : [];
+  return !ids.length || ids.length > TOPE_RETOMADAS || ids.some((x) => !/^[0-9A-Za-z_-]{1,40}$/.test(x)) ? null : ids;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -131,12 +143,19 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, recibidos: ids.length, reservados: await reservar(ids) });
   }
 
+  if (b.accion === "retomar_estado") {
+    const ids = idsDeLaTanda(b.contactos);
+    if (!ids) return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RETOMADAS} ids` });
+    const filas = new Map((await estadoRetomadas(ids)).map((f) => [String(f.id), f]));
+    const retomadas = await leerConfig(CLAVE_RETOMADAS);
+    const charlas = ids.map((x) => paraPegar(x, filas.get(x) || null, retomadas));
+    return res.status(200).json({ ok: true, recibidos: ids.length, para_pegar: charlas.filter((x) => x.pegar).length, charlas });
+  }
+
   if (b.accion === "retomar_marcar") {
     // Antes de que Cande conteste a mano las charlas viejas (20/10): la marca dura `dias` y después vence sola.
-    const ids = Array.isArray(b.contactos) ? [...new Set(b.contactos.map((x) => String(x ?? "").trim()))] : [];
-    if (!ids.length || ids.length > TOPE_RETOMADAS || ids.some((x) => !/^[0-9A-Za-z_-]{1,40}$/.test(x))) {
-      return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RETOMADAS} ids` });
-    }
+    const ids = idsDeLaTanda(b.contactos);
+    if (!ids) return res.status(400).json({ error: `contactos tiene que ser una lista de hasta ${TOPE_RETOMADAS} ids` });
     const dias = b.dias === undefined || b.dias === null ? DIAS_RETOMADA : b.dias;
     if (!Number.isInteger(dias) || dias < 1 || dias > 30) return res.status(400).json({ error: "dias: un entero de 1 a 30" });
     const quitar = b.quitar === true;

@@ -1334,3 +1334,20 @@ test("el cron del controlador no entra sin CRON_SECRET, corre cada 10 minutos (f
   const src = await readFile(new URL("../pages/api/dm/controlador.js", import.meta.url), "utf8");
   assert.match(src, /return res\.status\(200\)\.json\(\{ ok: true, \.\.\.r \}\);/);
 });
+
+test("si Cande escribió a mano y no se pudo anotar lo suyo (el agente mira de nuevo), no pasó nada: la corrección no se gasta", async () => {
+  const { MIRAR_DE_NUEVO } = await import("../lib/dm/agente.js");
+  const { NO_AHORA } = await import("../lib/dm/instagram.js");
+  assert.equal(typeof MIRAR_DE_NUEVO, "string");
+  const base = baseFalsa({ mensajes: puenteConOtraPregunta() });
+  let vez = 0;
+  const { agente, controlar } = controlador(base, {
+    agente: agenteFalso(() => (++vez === 1 ? { hecho: MIRAR_DE_NUEVO, motivo: NO_AHORA } : { hecho: "enviada", mando: 1 })),
+  });
+  const r = await controlar();
+  assert.equal(r.esperan, 1);
+  assert.equal(r.sin_corregir, 0);
+  assert.deepEqual(base.filas, [], "no quedó anotada");
+  assert.equal((await controlar()).corregidas, 1);
+  assert.equal(agente.pedidos.length, 2);
+});

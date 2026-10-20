@@ -7,7 +7,11 @@
 // 16 local y descartable, con las tablas de tablas(): anotarCandeDesdeIg anota como de Cande, no repite un ig_mid, no
 // anota en una charla de Cande, contesta lo del lead hasta el último mensaje anotado (por la hora) y cancela el toque;
 // marcarRetomadas suma marcas sin pisar las otras, limpia las vencidas y con quitar saca solo esas; cualesDelAgente
-// devuelve solo las del agente. Los ids y textos son inventados (este repo es público).
+// devuelve solo las del agente. Revisión del 21/10, contra el mismo Postgres: anotarCandeDesdeIg descarta lo pendiente
+// que contestaba algo de antes del último mensaje de ella (creado antes o después de ese mensaje) y deja lo que contesta
+// algo que el lead escribió después; si no anotó nada nuevo, no toca lo pendiente; estadoRetomadas trae dueño, último
+// del lead, último de la cuenta (sin los automáticos) y si hay algo por salir después del último del lead, y no trae
+// las que no están. Los ids y textos son inventados (este repo es público).
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -117,4 +121,85 @@ test("las piezas reales están conectadas: la base, la red de la bandeja, el cro
   assert.match(cron, /\(\{ miradas, sacadas, anotadas \} = r\)/);
   assert.match(cron, /miradas, sacadas, anotadas, usuarios \}/);
   assert.match(await leer("../pages/api/dm/config.js"), /retomada: esRetomada\(await leerConfig\(CLAVE_RETOMADAS\), id\)/);
+});
+
+/* ---------- revisión del 21/10 ---------- */
+
+test("anotarCandeDesdeIg descarta en la misma sentencia lo pendiente que contestaba algo de antes de lo que escribió Cande", async () => {
+  const cuerpo = cuerpoDe(await leer("../lib/dm/base.js"), "anotarCandeDesdeIg");
+  assert.match(cuerpo, /UPDATE dm_salidas s SET estado = 'descartada'/);
+  assert.match(cuerpo, /WHERE s\.contacto = \$\{id\} AND s\.estado = 'pendiente' AND EXISTS \(SELECT 1 FROM n\)/);
+  // Lo que contesta algo que el lead escribió después del último mensaje de ella sí sale.
+  assert.match(cuerpo, /AND NOT EXISTS \(\s*SELECT 1 FROM dm_mensajes l\s*WHERE l\.contacto = \$\{id\} AND l\.quien = 'lead' AND l\.creado > \(SELECT MAX\(creado\) FROM n\) AND l\.creado <= s\.creado\)/);
+});
+
+test("estadoRetomadas: una consulta con el dueño, lo último del lead, lo último de la cuenta sin los automáticos y lo que está por salir", async () => {
+  const cuerpo = cuerpoDe(await leer("../lib/dm/base.js"), "estadoRetomadas");
+  assert.match(cuerpo, /SELECT c\.id, c\.dueno, l\.en AS ultimo_del_lead, a\.en AS ultimo_de_la_cuenta/);
+  assert.match(cuerpo, /m\.quien IN \('agente', 'cande'\)\) a/);
+  assert.match(cuerpo, /s\.estado = 'pendiente' OR \(s\.estado = 'enviando' AND s\.creado > NOW\(\) - INTERVAL '10 minutes'\)/);
+  assert.match(cuerpo, /WHERE c\.id IN \(SELECT jsonb_array_elements_text/);
+  assert.doesNotMatch(cuerpo, /UPDATE|INSERT|DELETE/, "no cambia nada");
+});
+
+test("retomar_estado dice, en el momento, en cuáles todavía le toca pegar a Cande, y no cambia nada", async () => {
+  const { default: handler } = await import("../pages/api/dm/config.js");
+  const ahora = Date.now();
+  const iso = (min) => new Date(ahora + min * 60000).toISOString();
+  const pedidos = [];
+  const filas = [
+    { id: "1", dueno: "agente", ultimo_del_lead: iso(-3000), ultimo_de_la_cuenta: iso(-4000), por_salir: false },
+    { id: "2", dueno: "agente", ultimo_del_lead: iso(-3000), ultimo_de_la_cuenta: iso(-5), por_salir: false },
+    { id: "3", dueno: "cande", ultimo_del_lead: iso(-3000), ultimo_de_la_cuenta: null, por_salir: false },
+    { id: "4", dueno: "agente", ultimo_del_lead: iso(-1), ultimo_de_la_cuenta: iso(-4000), por_salir: true },
+    { id: "5", dueno: "agente", ultimo_del_lead: iso(-3000), ultimo_de_la_cuenta: null, por_salir: false },
+  ];
+  const marcas = Object.fromEntries(["1", "2", "3", "4", "6"].map((x) => [x, { hasta: ahora + 7 * DIA }]));
+  pg.otras = (t, params) => {
+    if (t.startsWith("SELECT c.id, c.dueno, l.en AS ultimo_del_lead")) {
+      pedidos.push(JSON.parse(params.at(-1)));
+      return { rows: filas };
+    }
+    if (t === "SELECT valor FROM dm_config WHERE clave = ?" && params[0] === CLAVE_RETOMADAS) return { rows: [{ valor: marcas }] };
+    if (/^(CREATE|ALTER|UPDATE)/.test(t)) return { rows: [] };
+    return undefined;
+  };
+  process.env.COLA_SECRET = "secreto-de-prueba";
+  process.env.POSTGRES_URL = "postgres://de-prueba";
+  const llamar = async (body) => {
+    const res = respuesta();
+    await handler({ method: "POST", headers: { authorization: "Bearer secreto-de-prueba" }, body: { accion: "retomar_estado", ...body } }, res);
+    return res;
+  };
+  try {
+    // Los pedidos malos primero (de paso, las tablas quedan listas y lo que sigue es solo la consulta).
+    for (const mal of [{}, { contactos: [] }, { contactos: ["no vale!"] }, { contactos: Array.from({ length: 1001 }, (_, i) => String(i)) }]) {
+      assert.equal((await llamar(mal)).codigo, 400, JSON.stringify(mal).slice(0, 60));
+    }
+    assert.equal(pedidos.length, 0, "con un pedido malo no se consulta nada");
+    const desde = pg.consultas.length;
+    const r = await llamar({ contactos: ["1", "2", " 3 ", "4", "5", "6", "1"] });
+    assert.equal(r.codigo, 200);
+    assert.deepEqual(pedidos, [["1", "2", "3", "4", "5", "6"]]);
+    assert.deepEqual(r.cuerpo.charlas.map((x) => [x.contacto, x.pegar, x.motivo]), [
+      ["1", true, null],
+      ["2", false, "ya le escribió la cuenta"],
+      ["3", false, "no es del agente"],
+      ["4", false, "el agente está por contestar"],
+      ["5", false, "no tiene la marca de retomada"],
+      ["6", false, "no está en la base"],
+    ]);
+    assert.deepEqual({ recibidos: r.cuerpo.recibidos, para_pegar: r.cuerpo.para_pegar }, { recibidos: 6, para_pegar: 1 });
+    assert.ok(pg.consultas.slice(desde).every((t) => t.startsWith("SELECT ")), "no cambia nada");
+  } finally {
+    pg.otras = null;
+    delete process.env.COLA_SECRET;
+    delete process.env.POSTGRES_URL;
+  }
+});
+
+test("las piezas nuevas están conectadas: retomar_estado en la API y lo vencido descartado no cuenta como pasado a Cande", async () => {
+  assert.equal(typeof (await import("../lib/dm/base.js")).estadoRetomadas, "function");
+  assert.match(await leer("../pages/api/dm/config.js"), /charlas = ids\.map\(\(x\) => paraPegar\(x, filas\.get\(x\) \|\| null, retomadas\)\)/);
+  assert.match(await leer("../pages/api/dm/toques.js"), /else if \(r !== "descartada"\) sinAtender\+\+/);
 });

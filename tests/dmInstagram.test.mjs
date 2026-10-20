@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 
 const {
   fechaDe, leerHilo, esDeLaCuenta, codigoEnHilo, desdeDe, crearInstagram, crearReglasInstagram, buscarCodigos, explicarError,
-  ErrorInstagram, usuarioIg, manualEnHilo, desdeManual, manualesEnHilo, esRetomada, CLAVE_RETOMADAS,
+  ErrorInstagram, usuarioIg, manualEnHilo, desdeManual, manualesEnHilo, esRetomada, CLAVE_RETOMADAS, NO_AHORA, paraPegar,
 } = await import("../lib/dm/instagram.js");
 
 const AHORA = new Date("2026-10-18T15:00:00Z");
@@ -612,4 +612,51 @@ test("la vuelta del cron: en una charla retomada, el -- de Cande la saca", async
   const r = await buscarCodigos({ ig, base, reglas, desde: null });
   assert.deepEqual({ sacadas: r.sacadas, anotadas: r.anotadas }, { sacadas: 1, anotadas: 0 });
   assert.equal(m.contacto.dueno, "cande");
+});
+
+/* ---------- revisión de las charlas retomadas (21/10) ---------- */
+
+test("Cande escribió a mano y la base no deja leer la marca o anotar lo suyo: porQueSale dice NO_AHORA (ni sale ni contesta encima) y no avisa de Instagram", async () => {
+  const rutas = {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(3, PEGADO, { deCuenta: true, min: 2 }), msj(2, "hola", { min: 30 })])), "/501": perfilDe(false),
+  };
+  // Sin la marca y sin poder leerla: antes contestaba encima de Cande, con un aviso de la conexión de Instagram que no era.
+  const sinLeer = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  const leer = sinLeer.base.leerConfig;
+  sinLeer.base.leerConfig = async (k) => {
+    if (k === CLAVE_RETOMADAS) throw new Error("base caída de prueba");
+    return leer(k);
+  };
+  assert.equal(await sinLeer.reglas.porQueSale(sinLeer.m.contacto), NO_AHORA);
+  assert.deepEqual(sinLeer.m.avisos, []);
+  assert.equal(sinLeer.m.contacto.dueno, "agente");
+  // Con la marca y sin poder anotar lo suyo: sin esto el agente seguía sin lo de ella (un toque salía detrás).
+  const sinAnotar = mundoReglas({ contacto: { ig_id: "501", dueno_desde: hace(60) }, rutas });
+  await sinAnotar.base.guardarConfig(CLAVE_RETOMADAS, marca());
+  sinAnotar.base.anotarCandeDesdeIg = async () => { throw new Error("base caída de prueba"); };
+  assert.equal(await sinAnotar.reglas.porQueSale(sinAnotar.m.contacto), NO_AHORA);
+  assert.deepEqual(sinAnotar.m.avisos, []);
+  assert.equal(sinAnotar.m.contacto.dueno, "agente");
+});
+
+test("paraPegar: le toca pegar solo en una charla del agente, con la marca, sin nada de la cuenta después del último mensaje del lead y sin respuesta por salir", () => {
+  const fila = (extra = {}) => ({ id: "77", dueno: "agente", ultimo_del_lead: hace(3000), ultimo_de_la_cuenta: hace(4000), por_salir: false, ...extra });
+  const con = marca();
+  assert.deepEqual(paraPegar("77", fila(), con, AHORA), {
+    contacto: "77", pegar: true, motivo: null, retomada: true,
+    ultimo_del_lead: hace(3000).toISOString(), ultimo_de_la_cuenta: hace(4000).toISOString(),
+  });
+  for (const [caso, f, retomadas, motivo] of [
+    ["no está en la base", null, con, "no está en la base"],
+    ["es de Cande", fila({ dueno: "cande" }), con, "no es del agente"],
+    ["ya pegó, o le contestó el agente", fila({ ultimo_de_la_cuenta: hace(2) }), con, "ya le escribió la cuenta"],
+    ["la cuenta le escribió y el lead nunca", fila({ ultimo_del_lead: null }), con, "ya le escribió la cuenta"],
+    ["el agente está por contestar", fila({ ultimo_del_lead: hace(1), por_salir: true }), con, "el agente está por contestar"],
+    ["sin marca", fila(), null, "no tiene la marca de retomada"],
+    ["la marca venció", fila(), { 77: { hasta: AHORA.getTime() - 1 } }, "no tiene la marca de retomada"],
+  ]) {
+    const r = paraPegar("77", f, retomadas, AHORA);
+    assert.equal(r.pegar, false, caso);
+    assert.equal(r.motivo, motivo, caso);
+  }
 });
