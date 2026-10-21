@@ -116,10 +116,12 @@ export default async function handler(req, res) {
     console.error("dm: no se pudieron avisar los códigos pendientes", e.message);
   }
 
-  // Las fotos sin aviso: después de los pases (una charla que se acaba de pasar ya le llegó a Cande).
+  // Las fotos sin aviso: después de los pases (una charla que se acaba de pasar ya le llegó a Cande). Con la Mac
+  // escuchando, las que quedaron para esta vuelta (llegaron con la Mac prendida pero sin escuchar) las mira el agente
+  // en la espera: van con el URGENTE recién si a los 20 minutos siguen sin aviso (base.fotosSinAviso).
   let fotos = 0;
   try {
-    fotos = await agente.avisarFotosPendientes(await fotosSinAviso(), { hasta: limite });
+    fotos = await agente.avisarFotosPendientes(await fotosSinAviso({ conMac: macViva }), { hasta: limite });
   } catch (e) {
     console.error("dm: no se pudieron avisar las fotos pendientes", e.message);
   }

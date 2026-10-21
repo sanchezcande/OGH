@@ -7,11 +7,13 @@
 // Todos los textos son inventados para la prueba. Este repo es público.
 //
 // Lo que estas pruebas NO cubren: lo que hace Postgres con las consultas nuevas de lib/dm/base.js (sinContestar con la
-// falla general, guardarIndicacion, vencerIndicaciones y tomarIndicacion). Antes de subir se prueban a mano contra un
-// Postgres de verdad: que sinContestar tome en el momento una charla con una falla general anotada después de su último
-// mensaje (y no una con una falla propia o dudosa, ni una de un toque, que no tiene motivo), que tomarIndicacion saque
-// de a una la más vieja, que vencerIndicaciones saque solo las de antes de la hora dada, y que guardarIndicacion con
-// `creado` la deje con esa hora.
+// falla general, guardarIndicacion, vencerIndicaciones, tomarIndicaciones, borrarIndicaciones, contactosConIndicacion,
+// ultimoDeLaCuenta y fotosSinAviso con conMac). Antes de subir se prueban a mano contra un Postgres de verdad: que
+// sinContestar tome en el momento una charla con una falla general anotada después de su último mensaje (y no una con
+// una falla propia o dudosa, ni una de un toque, que no tiene motivo), que tomarIndicaciones saque todas las de la
+// charla que tiene la más vieja, que vencerIndicaciones saque solo las de antes de la hora dada, que guardarIndicacion
+// con `creado` la deje con esa hora, y que fotosSinAviso con la Mac escuchando deje afuera la foto de hace menos de 20
+// minutos que tiene una falla general después.
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta } from "./dobles/preparar.mjs";
@@ -268,15 +270,22 @@ test("por qué no salió: con la Mac prendida no dice que está apagada", () => 
   assert.match(prendida, /la Mac está prendida/);
 });
 
-function pendientesDePrueba({ fila = [], vencidas = [], resultados = [] } = {}) {
+function pendientesDePrueba({ fila = [], vencidas = [], resultados = [], cuenta = {}, esperar = async () => {} } = {}) {
   const hechos = [];
   const dichos = [];
   const cola = [...fila];
   const fakeBase = {
     vencerIndicaciones: async (antes) => { hechos.push(["vencer", antes.getTime()]); return vencidas; },
-    tomarIndicacion: async () => cola.shift() || null,
+    // Como base.tomarIndicaciones: todas las de la charla que tiene la más vieja.
+    tomarIndicaciones: async () => {
+      const c = cola[0]?.contacto;
+      const lote = cola.filter((i) => i.contacto === c);
+      for (const i of lote) cola.splice(cola.indexOf(i), 1);
+      return lote;
+    },
     guardarIndicacion: async (i) => { hechos.push(["devolver", i.contacto, i.creado]); },
     contacto: async (id) => ({ id, nombre: `Lead ${id}`, dueno: "agente" }),
+    ultimoDeLaCuenta: async (id) => cuenta[id] || null,
   };
   const agente = {
     procesar: async (id, idDisparo, o) => {
@@ -284,7 +293,7 @@ function pendientesDePrueba({ fila = [], vencidas = [], resultados = [] } = {}) 
       return resultados.shift() || { hecho: "enviada", enviado: ["Mensaje de prueba"] };
     },
   };
-  const correr = crearIndicacionesPendientes({ base: fakeBase, agente, decir: async (t) => dichos.push(t), ahora: () => AHORA });
+  const correr = crearIndicacionesPendientes({ base: fakeBase, agente, decir: async (t) => dichos.push(t), ahora: () => AHORA, esperar });
   return { hechos, dichos, correr, cola };
 }
 
@@ -292,7 +301,7 @@ test("la espera escribe primero las indicaciones guardadas, de la más vieja a l
   const p = pendientesDePrueba({
     fila: [{ contacto: "1", texto: "primera de prueba", creado: new Date(AHORA - 20 * MIN) }, { contacto: "2", texto: "segunda de prueba", creado: new Date(AHORA - 5 * MIN) }],
   });
-  assert.deepEqual(await p.correr({ hasta: Infinity }), { hechas: 2, vencidas: 0, devueltas: 0 });
+  assert.deepEqual(await p.correr({ hasta: Infinity }), { hechas: 2, vencidas: 0, devueltas: 0, viejas: 0, charlas: 2 });
   assert.deepEqual(p.hechos, [
     ["vencer", AHORA - INDICACION_VENCE_MS],
     ["procesar", "1", null, "indicacion", "primera de prueba"],
@@ -307,13 +316,13 @@ test("si la Mac no la toma, la indicación vuelve a la fila con su hora y no se 
     fila: [{ contacto: "1", texto: "una de prueba", creado }, { contacto: "2", texto: "otra de prueba", creado }],
     resultados: [{ hecho: "error del modelo", general: true, transitorio: true }],
   });
-  assert.deepEqual(await p.correr({ hasta: Infinity }), { hechas: 0, vencidas: 0, devueltas: 1 });
+  assert.deepEqual(await p.correr({ hasta: Infinity }), { hechas: 0, vencidas: 0, devueltas: 1, viejas: 0, charlas: 1 });
   assert.deepEqual(p.hechos.slice(1), [["procesar", "1", null, "indicacion", "una de prueba"], ["devolver", "1", creado]]);
   assert.equal(p.cola.length, 1, "la otra sigue en la fila");
   assert.deepEqual(p.dichos, [], "no se le dice nada: sale en la vuelta siguiente");
 
   const vieja = pendientesDePrueba({ vencidas: [{ contacto: "3", texto: "una vieja de prueba", creado: new Date(AHORA - 3 * 3600000) }] });
-  assert.deepEqual(await vieja.correr({ conMac: false }), { hechas: 0, vencidas: 1, devueltas: 0 });
+  assert.deepEqual(await vieja.correr({ conMac: false }), { hechas: 0, vencidas: 1, devueltas: 0, viejas: 0, charlas: 0 });
   assert.equal(vieja.hechos.filter((h) => h[0] === "procesar").length, 0, "sin la Mac no se intenta nada");
   assert.match(vieja.dichos[0], /^No le escribí a Lead 3 lo que me pediste hace más de 2 horas \(«una vieja de prueba»\)/);
   assert.match(vieja.dichos[0], /\/textual/);

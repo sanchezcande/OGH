@@ -15,16 +15,20 @@
 // Sale como mucho unos 15 minutos después, más lo que tarda en redactarse. Lo que guarda la red de la bandeja
 // (sin intento en vivo) espera sus 5 minutos: sale en la vuelta que sigue a la de la red.
 //
-// Antes que las charlas, las indicaciones que Cande mandó por Telegram con la Mac sin escuchar
-// (crearIndicacionesPendientes en lib/dm/respuestas.js): las de más de 2 horas vencen y se le avisa.
+// A la par de las charlas, las indicaciones que Cande mandó por Telegram con la Mac sin escuchar
+// (crearIndicacionesPendientes en lib/dm/respuestas.js): las de más de 2 horas vencen y se le avisa. Van por su
+// lado (vueltaDeLaEspera): no le comen a la espera su rato. Las charlas que tienen una indicación guardada no las
+// contesta la espera por su lado: el turno de la indicación contesta también lo que escribió el lead.
 //
 // Caudal: cada respuesta tarda lo que la Mac en tomarla, redactarla y revisarla, más el envío: entre 45
-// y 90 segundos. Cada corrida arranca respuestas durante 150 segundos, de a dos: de 4 a 8 por vuelta, y
-// las 50 charlas de una noche salen en una hora y media a tres horas. Con el cron cada 2 minutos las
-// corridas se pisaban y salían en 20 a 40 minutos, pero la base no dormía nunca y el 21/10 se quedó sin
-// horas de cómputo. Si las corridas se pisan igual (un cron que se dispara de más, una llamada a mano),
-// entre todas nunca hay más de dos (base.reclamarEspera). Antes del 19/10 el cron de cada 10 minutos las
-// contestaba de a una, 3 o 4 por vuelta, y a la hora se las pasaba a Cande.
+// y 90 segundos. Cada corrida arranca respuestas durante 150 segundos, de a dos: de 4 a 8 por vuelta. Lo que
+// no entra no espera a la vuelta siguiente: mientras la Mac escucha, cada vez que pregunta por trabajo y no hay,
+// el sitio arranca otra de la espera (el impulso, crearImpulsoDeLaEspera en lib/dm/seguimientos.js, desde
+// /api/dm/trabajos), y como la Mac se queda escuchando 5 minutos después de cada trabajo, la espera se vacía de
+// a dos a la vez sin parar: doce charlas de un pico salen en unos 7 minutos, no en 45. Si las corridas se pisan
+// (el impulso, un cron que se dispara de más, una llamada a mano), entre todas nunca hay más de dos
+// (base.reclamarEspera). Antes del 19/10 el cron de cada 10 minutos las contestaba de a una, 3 o 4 por vuelta, y a
+// la hora se las pasaba a Cande.
 //
 // Una charla con la que el modelo falla siempre (se niega, o es tan larga que no llega a tiempo) no frena
 // a las demás: después de cada falla espera su pausa (10 minutos, el doble con cada falla, hasta 2 horas)
@@ -40,17 +44,18 @@
 // toques (/api/dm/toques).
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
-import { agente, colaDe } from "../../../lib/dm/armado";
+import { agente, colaDe, decirleACande } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
 import { MARGEN_MS, macEncendida, macEscuchando } from "../../../lib/dm/cola";
 import { crearIndicacionesPendientes } from "../../../lib/dm/respuestas";
-import { ESPERA_EN_PARALELO, REINTENTO_MAX_FALLOS, vaciarEspera } from "../../../lib/dm/seguimientos";
-import { ajustes, hayBase, reclamarEspera, sinContestar, soltarEspera, tablas } from "../../../lib/dm/base";
-import { chatDuena, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
+import {
+  ESPERA_EN_PARALELO, REINTENTO_MAX_FALLOS, vaciarEspera, vueltaDeLaEspera,
+} from "../../../lib/dm/seguimientos";
+import {
+  ajustes, contactosConIndicacion, hayBase, reclamarEspera, sinContestar, soltarEspera, tablas,
+} from "../../../lib/dm/base";
 
-/** Lo que el bot del agente le dice a Cande sobre sus indicaciones: en su chat privado con el bot, como al responderle. */
-const decirle = (texto) => llamarTelegram(tokenBotDm(), "sendMessage", { chat_id: chatDuena(), text: texto });
-const indicaciones = crearIndicacionesPendientes({ base, agente, decir: decirle, macEncendida });
+const indicaciones = crearIndicacionesPendientes({ base, agente, decir: decirleACande, macEncendida });
 
 // Una respuesta tarde puede tardar hasta unos 140 segundos (las dos miradas a Instagram, el modelo y el
 // envío, con sus topes): no se arranca ninguna si no queda ese margen antes de que Vercel corte.
@@ -69,35 +74,35 @@ export default async function handler(req, res) {
   // Las redacta la Mac de Cande (salvo cerebro "api"): sin ella escuchando, siguen esperando. Cada respuesta pasa
   // además por el portón de armado.pedir, que mira de nuevo en el momento de crear el trabajo.
   const macViva = aj.cerebro === "api" || (await macEscuchando(MARGEN_MS.espera));
+  const hasta = inicio + (config.maxDuration - MARGEN_S) * 1000;
 
-  // Las indicaciones de Cande primero: ella está esperando que salgan. Con el agente apagado no hace falta la Mac
-  // (el agente contesta "apagado" sin redactar y se le dice).
-  let ind = { hechas: 0, vencidas: 0, devueltas: 0 };
+  // Las indicaciones de Cande y las charlas, a la par. Las charlas con una indicación guardada las contesta el turno de
+  // la indicación (se miran antes de que esa corrida las saque de la fila).
+  let conIndicacion = new Set();
   try {
-    ind = await indicaciones({ hasta: inicio + (config.maxDuration - MARGEN_S) * 1000, conMac: macViva || !prendido });
+    conIndicacion = new Set(await contactosConIndicacion());
   } catch (e) {
-    console.error("dm: fallaron las indicaciones pendientes", e.message);
+    console.error("dm: no se pudieron leer las indicaciones pendientes", e.message);
   }
-  const deCande = ind.hechas || ind.vencidas ? { indicaciones: ind.hechas, indicaciones_vencidas: ind.vencidas } : {};
-
-  // Apagado no se contesta nada: el cron de los toques le pasa esas charlas a Cande.
-  if (!prendido) return res.status(200).json({ ok: true, reintentos: 0, ...deCande, motivo: "apagado" });
-  if (!macViva) return res.status(200).json({ ok: true, reintentos: 0, ...deCande, motivo: "sin Mac" });
-
-  let r = { reintentos: 0, cayo: false };
-  try {
-    r = await vaciarEspera({
-      filas: await sinContestar(), prendido, macViva, maxFallos: REINTENTO_MAX_FALLOS,
+  const { ind, r, motivo } = await vueltaDeLaEspera({
+    prendido, macViva,
+    indicaciones: ({ conMac }) => indicaciones({ hasta, conMac }),
+    contestar: async () => vaciarEspera({
+      filas: (await sinContestar()).filter((c) => !conIndicacion.has(c.id)), prendido, macViva, maxFallos: REINTENTO_MAX_FALLOS,
       reclamar: (id) => reclamarEspera(id, { tope: ESPERA_EN_PARALELO }),
       soltar: soltarEspera,
       procesar: (id, idLead) => agente.procesar(id, idLead, { tarde: true }),
-      hasta: inicio + (config.maxDuration - MARGEN_S) * 1000,
+      hasta,
       enParalelo: ESPERA_EN_PARALELO,
       registrar: (id, e) => console.error("dm: falló una respuesta de la espera", colaDe(id), e.message),
-    });
-  } catch (e) {
-    console.error("dm: falló la espera", e.message);
-  }
+    }),
+    registrar: (que, e) => console.error(`dm: falló la espera (${que})`, e.message),
+  });
+  const deCande = ind.hechas || ind.vencidas || ind.viejas
+    ? { indicaciones: ind.hechas, indicaciones_vencidas: ind.vencidas, indicaciones_viejas: ind.viejas } : {};
+
+  // Apagado no se contesta nada: el cron de los toques le pasa esas charlas a Cande.
+  if (motivo) return res.status(200).json({ ok: true, reintentos: 0, ...deCande, motivo });
   return res.status(200).json({ ok: true, reintentos: r.reintentos, ...deCande, ...(r.cayo ? { motivo: "el modelo no contesta" } : {}) });
 }
 

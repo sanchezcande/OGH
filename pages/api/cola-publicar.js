@@ -1,4 +1,5 @@
 import { sql } from "@vercel/postgres";
+import { eventosPendientes } from "../../lib/eventosPendientes";
 
 // Publica lo que Cande dejó programado, sin depender de que su Mac esté prendida.
 //
@@ -349,7 +350,16 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ ok: true, procesadas: hechas.length, hechas });
+  // Los eventos del embudo que se juntaron fuera de la base desde la vuelta anterior (lib/eventosPendientes.js): acá,
+  // que la base ya está despierta, pasan todos de una vez. Si falla, quedan juntados para la vuelta siguiente.
+  let eventos = { leidos: 0, guardados: 0 };
+  try {
+    if (eventosPendientes.hay()) eventos = await eventosPendientes.pasar({ hasta: Date.now() + 30000 });
+  } catch (e) {
+    console.error("cola-publicar: no se pudieron pasar los eventos del embudo:", e.message);
+  }
+
+  return res.status(200).json({ ok: true, procesadas: hechas.length, hechas, eventos_del_embudo: eventos.guardados });
 }
 
 // Nunca esperamos a que Meta procese un video dentro del request: se guarda el

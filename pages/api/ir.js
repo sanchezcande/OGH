@@ -1,4 +1,4 @@
-import { guardarEvento, hayBase } from "../../lib/db";
+import { guardarOJuntar } from "../../lib/eventosPendientes";
 
 // Redirección propia para medir los clicks de las cadenas de mails (05/10).
 //
@@ -15,6 +15,8 @@ import { guardarEvento, hayBase } from "../../lib/db";
 // Guarda el evento igual que el resto del embudo (funnel_eventos: solo fase, sin
 // nadie identificado). `m` dice de qué mail de la cadena vino, así se puede sacar el
 // CTR por mail cruzando contra las columnas drip_* de red_devs (cuántos se mandaron).
+// Como /api/evento, lo junta fuera de la base y pasa en la vuelta de los crons (21/10):
+// un click no despierta la base de Neon.
 const DESTINOS = {
   guia: "https://get.opengatehub.com/l/acelerador-de-carrera",
   llamada: "https://strategy.opengatehub.com",
@@ -29,7 +31,7 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (!destino) return res.redirect(302, HOME);
   try {
-    if (hayBase() && CODIGO.test(m)) await guardarEvento(`mail_click_${a}_${m}`, null);
+    if (CODIGO.test(m)) await guardarOJuntar(`mail_click_${a}_${m}`, null);
   } catch (e) {
     console.error("ir:", e.message);   // medir nunca puede romper el click
   }

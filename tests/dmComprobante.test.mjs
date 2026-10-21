@@ -18,7 +18,8 @@ import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const { crearAgente, esFoto, urlDeFoto, SIN_TEXTO } = await import("../lib/dm/agente.js");
+const { crearAgente, esFoto, urlDeFoto, SIN_TEXTO, FOTOS_A_LA_VUELTA } = await import("../lib/dm/agente.js");
+const { FALLA_GENERAL } = await import("../lib/dm/seguimientos.js");
 const { revisar, normalizar, tieneCodigo, frenoDelCodigo } = await import("../lib/dm/frenos.js");
 const { validarAjustes } = await import("../lib/dm/base.js");
 const { crearCerebroLocal } = await import("../lib/dm/cola.js");
@@ -53,7 +54,7 @@ const COMPROBANTE = { pago_pesos: "comprobante", aviso_para_cande: "YA: comproba
  * mensaje del lead ya contestado; cada prueba le suma lo suyo con `entra`.
  */
 function mundo({
-  macViva = true, responde = () => vio(1, COMPROBANTE), ajustes = {}, avisoSale = true, instagram = null, mandar = null,
+  macViva = true, responde = () => vio(1, COMPROBANTE), ajustes = {}, avisoSale = true, instagram = null, mandar = null, macEncendida = false,
 } = {}) {
   const m = {
     ajustes: {
@@ -65,7 +66,7 @@ function mundo({
       estado: estadoDev, ultimo_lead: new Date(AHORA - HORA), ig_usuario: "lead.prueba", foto_avisada_hasta: 0, foto_avisada_en: null,
     },
     mensajes: [{ id: 1, quien: "lead", texto: "mensaje de prueba", creado: new Date(AHORA - HORA) }],
-    salidas: [], enviados: [], avisos: [], pedidos: [], tomado: null, vistos: new Set(), tope: 0, macViva,
+    salidas: [], enviados: [], avisos: [], pedidos: [], tomado: null, vistos: new Set(), tope: 0, macViva, macEncendida,
   };
   m.entra = (texto, seg = 0) => {
     const id = m.mensajes.length + 1;
@@ -152,6 +153,7 @@ function mundo({
   const agente = crearAgente({
     base, pedir, manychat, avisar, esperar: async () => {}, reloj: () => AHORA, instagram, esperaInstagramMs: 50,
     veFotos: async () => m.macViva,
+    macEncendida: async () => m.macEncendida,
   });
   const dichos = [];
   const responder = crearRespuestaTelegram({ base, manychat, decir: async (t) => { dichos.push(t); }, agente });
@@ -517,6 +519,66 @@ test("con la Mac sin contestar, la foto va a Cande como hoy: URGENTE enseguida, 
   assert.equal(urgentesDeFoto(m)[0].foto, FOTO, "el aviso de siempre también va con la foto");
   assert.equal(m.contacto.respondido_hasta, foto);
   assert.equal(m.salidas.length, 0);
+});
+
+/* ---------- con la Mac prendida pero sin escuchar (entre una ventana del cuarto de hora y la otra, 21/10) ---------- */
+
+test("la foto que llega con la Mac prendida pero sin escuchar no va como URGENTE: el turno queda en espera y en la vuelta siguiente la mira el agente", async () => {
+  const { agente, m } = mundo({ macViva: false, macEncendida: true });
+  const foto = m.entra(FOTO);
+  const r = await agente.procesar(ID, foto);
+  assert.equal(r.hecho, "error del modelo");
+  assert.equal(r.reintento, true, "queda en espera, como cualquier mensaje con la Mac sin escuchar");
+  assert.equal(r.general, true);
+  assert.equal(r.transitorio, true);
+  assert.equal(m.avisos.length, 0, "ni el URGENTE ni ningún otro aviso");
+  assert.equal(m.pedidos.length, 0, "no se le pide nada a la Mac: no está escuchando");
+  assert.ok(m.contacto.respondido_hasta < foto, "el turno sigue abierto: la espera lo vuelve a tomar");
+  assert.equal(m.contacto.foto_avisada_hasta, 0, "sin constancia de aviso");
+  assert.deepEqual(m.salidas.map((s) => [s.accion, s.estado, s.motivo, s.detalle]), [["error", "error", FALLA_GENERAL, FOTOS_A_LA_VUELTA]],
+    "una falla general: base.sinContestar la toma en la vuelta siguiente sin esperar los 5 minutos");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.tomado, null, "suelta la traba");
+  // La vuelta siguiente (la espera), con la Mac escuchando: el agente mira la foto y sale lo de siempre.
+  m.macViva = true;
+  assert.equal((await agente.procesar(ID, foto, { tarde: true })).hecho, "enviada");
+  assert.deepEqual(m.pedidos[0].imagenes, [FOTO], "la foto va al agente con su link");
+  assert.deepEqual(m.enviados, ["Acuse de prueba"], "el lead recibe el acuse");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, `Lead De Prueba · ${TITULOS_CODIGO.comprobante}`, "a Cande le llega el YA con el borrador");
+  assert.equal(urgentesDeFoto(m).length, 0);
+  assert.equal(m.contacto.foto_avisada_hasta, foto);
+});
+
+test("foto y texto con la Mac prendida pero sin escuchar: el turno entero espera a la vuelta, sin URGENTE", async () => {
+  const { agente, m } = mundo({ macViva: false, macEncendida: true });
+  m.entra("te paso algo de prueba", 5);
+  const foto = m.entra(FOTO);
+  assert.equal((await agente.procesar(ID, foto)).hecho, "error del modelo");
+  assert.equal(m.avisos.length, 0);
+  assert.equal(m.pedidos.length, 0);
+  assert.equal(m.salidas.at(-1).motivo, FALLA_GENERAL);
+  assert.ok(m.contacto.respondido_hasta < foto);
+});
+
+test("si en la vuelta siguiente la Mac tampoco la puede ver, va el URGENTE de siempre; con la Mac apagada, al toque", async () => {
+  const espera = mundo({ macViva: false, macEncendida: true, responde: () => { throw new Error("no se le pide nada"); } });
+  const foto = espera.m.entra(FOTO);
+  assert.equal((await espera.agente.procesar(ID, foto, { tarde: true })).hecho, "solo foto");
+  assert.equal(urgentesDeFoto(espera.m).length, 1);
+  assert.equal(espera.m.contacto.respondido_hasta, foto);
+
+  const apagada = mundo({ macViva: false, macEncendida: false, responde: () => { throw new Error("no se le pide nada"); } });
+  const otra = apagada.m.entra(FOTO);
+  assert.equal((await apagada.agente.procesar(ID, otra)).hecho, "solo foto");
+  assert.equal(urgentesDeFoto(apagada.m).length, 1, "con la Mac apagada no hay vuelta que la mire: URGENTE ya");
+
+  // Si no se puede saber si está prendida, se da por apagada: el URGENTE de siempre.
+  const { agente, m } = mundo({ macViva: false });
+  m.macEncendida = undefined;
+  const tercera = m.entra(FOTO);
+  assert.equal((await agente.procesar(ID, tercera)).hecho, "solo foto");
+  assert.equal(urgentesDeFoto(m).length, 1);
 });
 
 test("si el modelo falla con un turno de solo fotos: el URGENTE de hoy una sola vez y el turno no queda trabado", async () => {

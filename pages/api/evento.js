@@ -1,9 +1,12 @@
-import { guardarEvento, hayBase } from "../../lib/db";
+import { guardarOJuntar } from "../../lib/eventosPendientes";
 import { CON_VERSION } from "../../lib/videoAB";
 import { FASES_ORIGEN_FORM } from "../../lib/origenForm";
 
 // Recibe un evento anónimo del embudo de devs (form_visto, paso_2, enviado,
 // video_50, click_gumroad...). Dispará-y-olvidate: nunca rompe la página.
+// No escribe en la base en el momento (21/10): lo junta fuera de ella y pasa a funnel_eventos en la vuelta
+// de los crons, así una visita no despierta la base de Neon (lib/eventosPendientes.js). Si no se puede
+// juntar, se guarda directo como antes: el dato no se pierde.
 const FASES = new Set([
   "form_visto", "paso_2", "paso_3", "enviado",
   "gracias_vista", "video_play", "video_25", "video_50", "video_75", "video_fin",
@@ -56,9 +59,11 @@ export default async function handler(req, res) {
     const { fase, sid } = req.body || {};
     if (!FASES.has(fase) && !CON_ORIGEN.test(fase) && !FASES_ORIGEN_FORM.has(fase)
         && !CON_VERSION.test(fase) && !CON_IDIOMA.test(fase)) return res.status(400).json({ ok: false });
-    if (hayBase()) await guardarEvento(fase, String(sid || "").slice(0, 40));
+    const s = String(sid || "").slice(0, 40);
+    await guardarOJuntar(fase, s);
   } catch (e) {
     console.error("evento:", e.message);
   }
   return res.status(200).json({ ok: true });
 }
+

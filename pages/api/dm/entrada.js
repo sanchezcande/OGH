@@ -14,8 +14,16 @@
 // Un mensaje sin texto (una foto, un audio, un sticker) se guarda como "[adjunto o mensaje sin
 // texto]". Una foto es casi siempre el comprobante de quien pagó en pesos: con la Mac contestando la mira
 // el agente y a Cande le llega un aviso YA con la foto y el borrador del código (lo manda el bot cuando
-// ella responde ok); sin la Mac, o si no la pudo ver, le llega enseguida el aviso URGENTE de siempre con
-// el link de la charla, y el agente no le escribe nada por la foto sola. Ver lib/dm/agente.js.
+// ella responde ok). Con la Mac prendida pero sin escuchar (entre una ventana y la otra), la foto espera a
+// la vuelta siguiente como cualquier mensaje, y ahí la mira el agente. Con la Mac apagada, o si no la pudo
+// ver, le llega enseguida el aviso URGENTE de siempre con el link de la charla, y el agente no le escribe
+// nada por la foto sola. Ver lib/dm/agente.js.
+//
+// La respuesta trae "recoger" ("si" o "no"): si ManyChat tiene que pasar a retirar la respuesta por
+// /api/dm/recoger (envío por campo). Con "no" no hay nada en camino (la Mac no está escuchando, el agente
+// no está en auto, el envío es por la API o la charla no es del agente): el flujo de ManyChat se saltea la
+// pausa de 50 segundos y los retiros. Cada retiro despertaba la base de Neon un minuto después del mensaje
+// y la dejaba prendida 5 minutos más (21/10). Ver armado.recogerDespues.
 //
 // Solo guarda mensajes de contactos que son del agente. De cualquier otro no guarda nada:
 // las charlas de Cande no pasan por esta base. Con el ajuste "altas" prendido, quien nunca
@@ -34,9 +42,9 @@
 // un salto de línea o unas comillas rompían el JSON y el mensaje se perdía (ver lib/dm/cuerpo.js).
 import { waitUntil } from "@vercel/functions";
 import { SIN_TEXTO } from "../../../lib/dm/agente";
-import { agente, avisarDm, colaDe, secretoDmValido } from "../../../lib/dm/armado";
+import { agente, avisarDm, colaDe, recogerDespues, secretoDmValido } from "../../../lib/dm/armado";
 import { cuerpoDeManyChat, leerCrudo } from "../../../lib/dm/cuerpo";
-import { contacto, hayBase, tablas } from "../../../lib/dm/base";
+import { ajustes, contacto, hayBase, tablas } from "../../../lib/dm/base";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -75,12 +83,20 @@ export default async function handler(req, res) {
     idMensaje = await agente.recibir(id, texto.slice(0, 4000), nombre, { mid });
     if (!idMensaje) {
       const c = await contacto(id);
-      return res.status(200).json({ ok: true, dueno: c?.dueno === "agente" ? "agente" : "cande" });
+      return res.status(200).json({ ok: true, dueno: c?.dueno === "agente" ? "agente" : "cande", recoger: "no" });
     }
   } catch (e) {
     console.error("dm: falló la entrada", colaDe(id), e.message);
     await avisarDm("DM: falló la entrada de un mensaje", { Quién: quien, Motivo: e.message });
     return res.status(200).json({ ok: false });
+  }
+
+  // Si ManyChat tiene que venir a retirar la respuesta. Si no se puede saber, que venga: así es como andaba siempre.
+  let recoger = true;
+  try {
+    recoger = await recogerDespues(await ajustes());
+  } catch (e) {
+    console.error("dm: no se pudo saber si hay que recoger", colaDe(id), e.message);
   }
 
   waitUntil(
@@ -92,7 +108,7 @@ export default async function handler(req, res) {
       console.error("dm: falló procesar", colaDe(id), e.message);
     }),
   );
-  return res.status(200).json({ ok: true, dueno: "agente" });
+  return res.status(200).json({ ok: true, dueno: "agente", recoger: recoger ? "si" : "no" });
 }
 
 export const config = { api: { bodyParser: false }, maxDuration: 300 };
