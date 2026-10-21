@@ -30,7 +30,9 @@ test("si falta el token no inventa: avisa y no manda nada", () => {
 });
 
 test("el aviso a Telegram sale aunque el mail falle", () => {
-  assert.match(src, /mailOk \?/, "el aviso dice si el mail salio o no");
+  // El ternario quedó partido en dos líneas al unificar el formato (22/10): lo que importa es
+  // que el aviso siga diciendo si el mail salió, no en qué línea está el signo de pregunta.
+  assert.match(src, /mailOk[\s\S]{0,30}\?/, "el aviso dice si el mail salio o no");
   const envio = src.indexOf("mandarMail(new Resend");
   const aviso = src.lastIndexOf('avisar("Pagó en pesos');
   assert.ok(aviso > envio, "el aviso va despues de intentar el mail, con su resultado");

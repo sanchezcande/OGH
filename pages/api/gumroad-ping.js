@@ -15,6 +15,7 @@
 // El aviso nunca puede fallar la respuesta: Gumroad reintenta si no le contestamos 200, y
 // un reintento sería un segundo mensaje por la misma venta. Se contesta 200 siempre.
 import { sql } from "@vercel/postgres";
+import { camposCompra, ficha } from "../../lib/avisoCompra";
 import { asegurarTablaCompras } from "../../lib/compras";
 import { avisar } from "../../lib/notificar";
 
@@ -46,25 +47,11 @@ async function anotarCompra(datos) {
   if (!process.env.POSTGRES_URL) return;
   await asegurarTablaCompras();
   await sql`
-    INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, venta_id)
+    INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, codigo, venta_id)
     VALUES (${datos.email}, ${datos.nombre}, ${datos.producto}, ${datos.precio}, ${datos.moneda},
-            ${datos.recurrencia}, ${datos.baja}, ${datos.origen}, ${datos.como_llego}, ${datos.pais}, ${datos.ventaId})
+            ${datos.recurrencia}, ${datos.baja}, ${datos.origen}, ${datos.como_llego}, ${datos.pais},
+            ${datos.codigo || null}, ${datos.ventaId})
     ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING`;
-}
-
-/** La ficha del comprador en la red de devs, por mail. Si no está, no es un lead conocido. */
-async function ficha(email) {
-  if (!process.env.POSTGRES_URL || !email) return null;
-  try {
-    const { rows } = await sql`
-      SELECT nombre, pais, rol_principal, seniority, whatsapp, telegram, origen,
-             como_llegaste, cv_url, creado
-      FROM red_devs WHERE lower(email) = ${email} LIMIT 1`;
-    return rows[0] || null;
-  } catch (e) {
-    console.error("gumroad-ping: no pude leer la ficha:", e.message);
-    return null;
-  }
 }
 
 export default async function handler(req, res) {
@@ -80,14 +67,6 @@ export default async function handler(req, res) {
   // Una devolución o una disputa llegan por el mismo ping: no son una venta nueva.
   const baja = String(b.refunded || "") === "true" || String(b.disputed || "") === "true";
 
-  const f = await ficha(email);
-  const dias = f?.creado ? Math.round((Date.now() - new Date(f.creado)) / 86400000) : null;
-
-  // De dónde salió: lo que ella necesita saber para repetirlo.
-  const salio = f?.origen
-    ? `${f.origen}${f.como_llegaste ? ` · dijo "${limpiar(f.como_llegaste, 80)}"` : ""}`
-    : limpiar(b.referrer, 120) || "no está en la red de devs";
-
   // Cande, 22/10: "me llegan raras en orden los mensajes de chat". Pasaba esto: por cada pago en
   // pesos le llegaban DOS avisos con minutos de diferencia, "Pagó en pesos" del webhook de
   // MercadoPago y después "COMPRA NUEVA" de este ping cuando la persona canjeaba el código. El
@@ -102,19 +81,20 @@ export default async function handler(req, res) {
     : porQue ? "Entró al curso ✅"
     : gratis ? "Entró con un código de 100% ✅"
     : "COMPRA NUEVA 🖤";
-  const ok = await avisar(titulo, {
-    Quién: nombre || f?.nombre || email || "—",
-    WhatsApp: f?.whatsapp || "no tengo",
-    Email: email || "—",
-    Plata: plata(b.price, b.currency) + (b.recurrence ? ` (${limpiar(b.recurrence, 20)})` : ""),
-    "De dónde salió": salio,
-    País: f?.pais || limpiar(b.ip_country, 60) || "—",
-    Rol: f ? `${f.rol_principal || "—"} · ${f.seniority || "—"}` : "—",
-    "Entró a la red hace": dias === null ? "—" : dias === 0 ? "hoy" : `${dias} días`,
-    CV: f?.cv_url ? "sí, lo tengo" : "no me lo pasó",
-    Producto: limpiar(b.product_name, 120),
-    ...(porQue ? { "Ojo": `no es una venta nueva, es el que ${porQue} entrando a la plataforma` } : {}),
-  }, { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
+
+  const f = await ficha(email);
+  const que = baja ? "Devolución" : prueba ? "Compra de PRUEBA"
+    : porQue ? `Entró al curso, ${porQue}`
+    : gratis ? "Entró con un código de 100%"
+    : "Compró en dólares";
+  const ok = await avisar(titulo, camposCompra({
+    que, email, nombre, codigo: codigo ? codigo.toUpperCase() : null,
+    plata: plata(b.price, b.currency) + (b.recurrence ? ` (${limpiar(b.recurrence, 20)})` : ""),
+    producto: limpiar(b.product_name, 120), ficha: f,
+    deDonde: f ? null : limpiar(b.referrer, 120) || null,
+    pais: limpiar(b.ip_country, 60) || null,
+    extra: porQue ? { "Ojo": "no es una venta nueva, es la misma persona entrando a la plataforma" } : null,
+  }), { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
   if (!ok) console.error("gumroad-ping: el aviso no salió", { email });
 
   // La venta queda anotada DESPUÉS del aviso: si la base falla, ella se entera igual por Telegram,
@@ -128,6 +108,7 @@ export default async function handler(req, res) {
         recurrencia: limpiar(b.recurrence, 20) || null, baja,
         origen: f?.origen || null, como_llego: f?.como_llegaste || null,
         pais: f?.pais || limpiar(b.ip_country, 60) || null,
+        codigo: codigo ? codigo.toUpperCase() : null,
         ventaId: limpiar(b.sale_id, 80) || null,
       });
     } catch (e) {
