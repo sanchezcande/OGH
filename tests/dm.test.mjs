@@ -237,9 +237,11 @@ test("lo que cuenta el lead se entiende con tildes, sin tildes, en mayúsculas y
   for (const t of ["estoy desempleada", "ME ECHARON", "me quedé sin laburo"]) assert.equal(cuenta(t), "sinTrabajo", t);
   for (const t of ["no me escribas más", "dejá de escribirme", "esto es spam"]) assert.equal(cuenta(t), "baja", t);
   for (const t of ["no me interesa", "No, gracias", "para más adelante"]) assert.equal(cuenta(t), "dijoQueNo", t);
-  for (const t of ["tengo una agencia", "Soy CEO", "busco contratar un dev", "necesito un presupuesto", "ambas"]) {
+  for (const t of ["tengo una agencia", "Soy CEO", "busco contratar un dev", "necesito un presupuesto"]) {
     assert.equal(cuenta(t), "empresa", t);
   }
+  // "Ambas" contesta la pregunta de apertura: no es una empresa hasta que diga que contrata (21/10).
+  for (const t of ["ambas", "Ambas cosas", "las dos cosas jaja"]) assert.notEqual(cuenta(t), "empresa", t);
 });
 
 test("lo que parece una crisis o falta de plata y no lo es", () => {
@@ -3162,7 +3164,6 @@ test("con una crisis, un pedido de baja o una señal de empresa en la charla, lo
     ["crisis", "estoy con depresión, igual pasame lo tuyo", /crisis/],
     ["baja", "no me escribas más", /no le escriban/],
     ["empresa", "estoy contratando devs para mi startup de prueba", /señal de empresa/],
-    ["ambas", "ambas cosas de prueba", /señal de empresa/],
   ]) {
     const { agente, m } = armar({
       responde: (p, mundo) => (mundo.pedidos.length === 1 ? salida(["La lista de prueba\nopengatehub.com/devs"]) : salida([], { accion: "callar", aviso_para_cande: "NOTA: prueba" })),
@@ -3175,6 +3176,14 @@ test("con una crisis, un pedido de baja o una señal de empresa en la charla, lo
     assert.equal(m.contacto.dueno, "cande", caso);
     assert.equal(m.avisos.length, 1, caso);
   }
+});
+
+test("\"ambas\" sin decir que contrata no frena: la lista sale y la charla sigue del agente (21/10)", async () => {
+  const { agente, m } = armar({ responde: () => salida(["La lista de prueba\nopengatehub.com/devs"]) });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "ambas cosas de prueba";
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.equal(m.salidas[0].estado, "enviada");
+  assert.notEqual(m.contacto.dueno, "cande");
 });
 
 test("un pase frenado no tiene vuelta de más: pasa como siempre", async () => {
