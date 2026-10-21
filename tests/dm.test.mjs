@@ -177,7 +177,9 @@ test("el link de pago cargado cuenta como venta, lo escriba con https o sin", ()
 
 test("a quien construye o tiene empresa no le llega la lista, el programa, la llamada ni cuánto sale", () => {
   for (const quien of ["construye", "empresa"]) {
-    for (const m of ["Va la lista: opengatehub.com/devs", "opengatehub .com/devs", "Sale 27 dólares", "Sale veintisiete", "Lo cuento en mi programa", "Tengo un curso", "Agendemos una llamada", "Mirá el video"]) {
+    // La llamada ya no: desde el 21/10 el agente le cierra la reunión a una empresa (prueba "a una empresa el agente le
+    // cierra la reunión", al final). Con un dev sigue frenada.
+    for (const m of ["Va la lista: opengatehub.com/devs", "opengatehub .com/devs", "Sale 27 dólares", "Sale veintisiete", "Lo cuento en mi programa", "Tengo un curso", "Mirá el video"]) {
       frena(revisar(salida([m], como(quien))), `${quien}: ${m}`);
     }
     pasa(revisar(salida(["Pregunta de prueba?"], como(quien))), `${quien}: una pregunta`);
@@ -3795,4 +3797,15 @@ test("charla retomada: si la primera mirada no vio lo que pegó Cande y la de an
   const sin = armarCon(false);
   assert.equal((await sin.agente.procesar("77", 2)).hecho, "enviada");
   assert.deepEqual(sin.m.enviados, ["Respuesta de prueba?"]);
+});
+
+test("a una empresa el agente le cierra la reunión con la agenda de Cande; a un dev, nunca (21/10)", () => {
+  const reunion = ["Buenísimo! Te parece si lo hablamos en una llamada corta?", "Te dejo acá para agendar\nstrategy.opengatehub.com"];
+  pasa(revisar(salida(reunion, como("empresa"))), "empresa, respondiendo");
+  pasa(revisar(salida(reunion, { ...como("empresa"), accion: "pasar_a_cande", aviso_para_cande: "HOY: prueba" })), "empresa, al pasar");
+  pasa(revisar(salida(reunion), { charlaDelLead: ["tengo una agencia de prueba"] }), "señal de empresa del lead");
+  pasa(revisar(salida(["Me pasás tu WhatsApp así lo coordinamos?"], como("empresa"))), "pedir el WhatsApp");
+  frena(revisar(salida(reunion)), "a un dev");
+  frena(revisar(salida([...reunion, "Y te dejo la lista\nopengatehub.com/devs"], como("empresa"))), "con la lista de devs");
+  frena(revisar(salida(["Te cuento del programa y agendamos una llamada"], como("empresa"))), "con el programa");
 });
