@@ -53,6 +53,67 @@ async function traerPago(id, token) {
   return { pago: await r.json() };
 }
 
+/** Completa la fila con el código que terminó saliendo. La fila se inserta antes, porque es el
+ *  candado contra el aviso repetido de MercadoPago, y el código se crea después: si se creara
+ *  antes, cada aviso repetido crearía un código nuevo. */
+async function guardarCodigo(id, codigo) {
+  if (!hayBase() || !codigo) return;
+  try {
+    await sql`UPDATE compras SET codigo = ${codigo} WHERE venta_id = ${`mp-${id}`}`;
+  } catch (e) {
+    console.error("mp-webhook: no pude guardar el código:", e.message);
+  }
+}
+
+/** El permalink del producto, sacado del link general: .../l/acelerador-de-carrera/PARAVOS */
+const PERMALINK = (CODIGO_URL.match(/\/l\/([^/?#]+)/) || [])[1] || "acelerador-de-carrera";
+const BASE_LINK = CODIGO_URL.slice(0, CODIGO_URL.indexOf("/l/") + 3 + PERMALINK.length);
+
+/** El id interno del producto en Gumroad, buscado por su permalink. Se busca en vez de tenerlo en
+ *  una variable de entorno para que no haya un id más que mantener a mano. */
+async function idDelProducto(token) {
+  const r = await fetch(`https://api.gumroad.com/v2/products?access_token=${encodeURIComponent(token)}`);
+  if (!r.ok) throw new Error(`products devolvió ${r.status}`);
+  const d = await r.json();
+  const p = (d.products || []).find((x) => x.custom_permalink === PERMALINK || x.permalink === PERMALINK);
+  if (!p) throw new Error(`no encontré el producto ${PERMALINK}`);
+  return p.id;
+}
+
+/** Un código de 100% de UN SOLO USO para este pago.
+ *
+ *  Cande, 22/10: "pero cómo sabés que es la misma persona? puede haber entrado de otro browser".
+ *  Tenía razón: con un código igual para todos, nada ata el pago con la entrada al curso, y encima
+ *  el código se puede reusar (`patricio.pastor07` entró dos veces con el mismo mail). Con uno por
+ *  pago las dos cosas se arreglan: se sabe quién entró con qué pago y no se puede compartir.
+ *
+ *  Si algo de esto falla, devuelve null y sale el código general. Un código repetido es un problema
+ *  chico; que alguien pague y se quede sin curso, no. */
+async function codigoUnico(id) {
+  const token = process.env.GUMROAD_ACCESS_TOKEN;
+  if (!token) return null;
+  try {
+    const producto = await idDelProducto(token);
+    const nombre = `PESOS${String(id).replace(/\D/g, "").slice(-9)}`;
+    const r = await fetch(`https://api.gumroad.com/v2/products/${encodeURIComponent(producto)}/offer_codes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        access_token: token, name: nombre, offer_type: "percent",
+        amount_off: "100", max_purchase_count: "1",
+      }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || d.success === false) {
+      throw new Error(`offer_codes devolvió ${r.status} ${JSON.stringify(d).slice(0, 120)}`);
+    }
+    return nombre;
+  } catch (e) {
+    console.error("mp-webhook: no pude crear el código único:", e.message);
+    return null;
+  }
+}
+
 /** Anota la venta y dice si es la PRIMERA vez que vemos este pago.
  *
  *  MercadoPago manda más de un aviso por el mismo pago (el 20/10 llegaron dos en el mismo minuto,
@@ -72,7 +133,7 @@ async function anotarVenta(pago, id) {
               ${[pago.payer?.first_name, pago.payer?.last_name].filter(Boolean).join(" ").trim() || null},
               'Acelerador de Carrera Tech', ${pago.transaction_amount}, ${(pago.currency_id || "ars").toLowerCase()},
               NULL, FALSE, 'mercadopago', 'pagó en pesos', NULL,
-              ${(process.env.MP_CODIGO || 'PARAVOS').toUpperCase()}, ${`mp-${id}`})
+              NULL, ${`mp-${id}`})
       ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING
       RETURNING id`;
     return rows.length > 0;
@@ -82,13 +143,13 @@ async function anotarVenta(pago, id) {
   }
 }
 
-const cuerpoMail = (nombre) => `Hola${nombre ? " " + nombre : ""},
+const cuerpoMail = (nombre, link) => `Hola${nombre ? " " + nombre : ""},
 
 Ya me llegó tu pago, gracias 🤍
 
 Acá está tu acceso al Acelerador de Carrera Tech. El link ya viene con tu código puesto, no tenés que escribir nada:
 
-${CODIGO_URL}
+${link}
 
 Apretá "I want this!" y te deja entrar sin pagar nada más, porque ya pagaste en pesos.
 
@@ -138,12 +199,17 @@ export default async function handler(req, res) {
       try { await guardarEvento("mp_pagado", `mp-${id}`); } catch (e) { console.error("mp-webhook evento:", e.message); }
     }
 
+    // Un código propio para este pago, de un solo uso. Si no sale, va el general.
+    const propio = await codigoUnico(id);
+    const link = propio ? `${BASE_LINK}/${propio}` : CODIGO_URL;
+    await guardarCodigo(id, propio || (process.env.MP_CODIGO || "PARAVOS").toUpperCase());
+
     let mailOk = false, motivo = "sin mail del pagador";
     if (mail && process.env.RESEND_API_KEY) {
       const r = await mandarMail(new Resend(process.env.RESEND_API_KEY), {
         from: DE, to: mail, reply_to: "cande@opengatehub.com",
         subject: "Tu acceso al Acelerador de Carrera Tech",
-        text: cuerpoMail(nombre),
+        text: cuerpoMail(nombre, link),
       });
       mailOk = r.ok; motivo = r.ok ? "" : r.motivo;
     }
@@ -157,12 +223,12 @@ export default async function handler(req, res) {
       que: "Pagó en pesos por MercadoPago",
       email: mail, nombre, ficha: f,
       plata: `$${monto} ${(pago.currency_id || "ARS").toUpperCase()}`,
-      codigo: (process.env.MP_CODIGO || "PARAVOS").toUpperCase(),
+      codigo: propio || (process.env.MP_CODIGO || "PARAVOS").toUpperCase(),
       deDonde: f ? null : "pagó en pesos, todavía no está en la red de devs",
       extra: {
         "El código": mailOk
-          ? "ya se lo mandé por mail y lo rebota a Gumroad"
-          : `NO salió el mail (${motivo}), mandáselo vos: ${CODIGO_URL}`,
+          ? `ya se lo mandé por mail${propio ? ", es solo suyo y de un solo uso" : " (el general, no pude crear uno propio)"}`
+          : `NO salió el mail (${motivo}), mandáselo vos: ${link}`,
       },
     }), VENTAS);
     return res.status(200).json({ ok: true, mail: mailOk });
