@@ -318,7 +318,7 @@ test("una indicación guardada no sale si después le escribió la cuenta (Cande
   assert.deepEqual(await p.correr({ hasta: Infinity }), { hechas: 0, vencidas: 0, devueltas: 0, viejas: 2, charlas: 2 });
   assert.deepEqual(p.hechos, [], "no se le pide nada al agente");
   assert.match(p.dichos[0], /^No le escribí a Lead 1 lo que me pediste \(«decile algo de prueba»\): después le escribiste vos/);
-  assert.match(p.dichos[1], /^No le escribí a Lead 2 lo que me pediste \(«otra cosa de prueba»\): después el agente le contestó otra cosa/);
+  assert.match(p.dichos[1], /^No le escribí a Lead 2 lo que me pediste \(«otra cosa de prueba»\): después el agente ya le escribió/);
   for (const d of p.dichos) assert.doesNotMatch(d, /[¿¡—]/);
 });
 
@@ -347,7 +347,7 @@ test("si otra corrida tenía la charla, la indicación se vuelve a probar en un 
   });
   assert.deepEqual(await q.correr({ hasta: Infinity }), { hechas: 0, vencidas: 0, devueltas: 0, viejas: 1, charlas: 1 });
   assert.equal(q.hechos.length, 1);
-  assert.match(q.dichos[0], /el agente le contestó otra cosa/);
+  assert.match(q.dichos[0], /el agente ya le escribió/);
   // Si sigue tomada, vuelve a la fila para la vuelta siguiente, sin decirle nada.
   const r = pendientes({ fila: [ind("1", "decile algo de prueba", 5)], resultados: Array(OTRA_CORRIDA_VUELTAS + 1).fill(otra) });
   assert.deepEqual(await r.correr({ hasta: Infinity }), { hechas: 0, vencidas: 0, devueltas: 1, viejas: 0, charlas: 1 });
