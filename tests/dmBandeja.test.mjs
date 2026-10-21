@@ -28,6 +28,7 @@ const { crearAgente, SIN_TEXTO } = await import("../lib/dm/agente.js");
 const MIN = 60000;
 const HORA = 60 * MIN;
 const AHORA = new Date("2026-10-20T15:00:00Z");
+const { CADA_CRON_MIN: CADA_MIN } = await import("../lib/crons.js");
 const hace = (min) => new Date(AHORA.getTime() - min * MIN);
 const ISO = (d) => d.toISOString().replace(/\.\d{3}Z$/, "+0000");
 const CUENTA = { id: "900", username: "cuenta.prueba" };
@@ -1036,22 +1037,27 @@ test("lo que quedó para después por los topes no se pierde aunque tenga más d
   const anotadas = () => viejos.filter((_, i) => w.config.bandeja_estado.pendientes[`h${i + 1}`]).length;
   await w.revisar(); // la primera vez se lee toda la semana: las búsquedas en ManyChat se acaban antes de los dos últimos
   assert.equal(anotadas(), BUSQUEDAS_POR_VUELTA);
-  for (let i = 0; i < 20; i++) { // una hora de vueltas, con su repaso de las últimas 25 horas
-    w.pasar(3);
+  for (let i = 0; i < 4; i++) { // una hora de vueltas (cada 15 minutos), con su repaso de las últimas 25 horas
+    w.pasar(CADA_MIN);
     await w.revisar();
   }
   assert.equal(anotadas(), n, "los que quedaron para después también llegan a Cande");
   assert.match(w.config.bandeja_estado.pendientes.h8.nota, /nunca le llegó al agente/);
 });
 
-test("después de la primera vez, cada vuelta lee solo lo movido desde la anterior, y cada media hora repasa las últimas 25 horas", async () => {
+test("después de la primera vez, cada vuelta lee solo lo movido desde la anterior, y cada media hora (una vuelta sí y una no) repasa las últimas 25 horas", async () => {
   const relleno = Array.from({ length: CHARLAS_POR_PAGINA + 5 }, (_, i) => charla(100 + i, persona(`9${i}`, `relleno.${i}`), [["lead", "hola", 60 + i], ["cuenta", "Respuesta de prueba", 59 + i]]));
   const w = mundo({ hilos: relleno });
   assert.equal((await w.revisar()).paginas, 2, "la primera vez, todo");
-  w.pasar(3);
-  assert.equal((await w.revisar()).paginas, 1, "después, lo de arriba");
-  w.pasar(30);
-  assert.equal((await w.revisar()).paginas, 2, "a la media hora, el repaso");
+  w.pasar(CADA_MIN);
+  assert.equal((await w.revisar()).paginas, 1, "la vuelta siguiente, lo de arriba");
+  // El cron no arranca siempre en el mismo segundo: esta vuelta arrancó unos segundos antes de cumplirse la media hora.
+  w.pasar(CADA_MIN - 0.1);
+  assert.equal((await w.revisar()).paginas, 2, "a la media hora, el repaso (no se corre a la vuelta de los 45 minutos)");
+  w.pasar(CADA_MIN);
+  assert.equal((await w.revisar()).paginas, 1);
+  w.pasar(CADA_MIN);
+  assert.equal((await w.revisar()).paginas, 2);
 });
 
 /* ---------- 10. si algo falla ---------- */
@@ -1072,13 +1078,15 @@ test("una charla que falla (Instagram que limita al leerla) no frena a las demá
   assert.match(w.resumenes()[0].campos[SECCION_VOS], /Lead de Cande/);
 });
 
-test("si la red no logra una vuelta entera en media hora, se avisa una vez por caída", async () => {
+test("si la red no logra una vuelta entera en tres vueltas seguidas (una hora con el cron cada 15 minutos), se avisa una vez por caída", async () => {
   const w = mundo();
   const vigilar = () => vigilarRed({ base: w.base, avisar: w.avisar, error: new Error("la base de prueba no contesta"), ahora: () => w.ahora });
   assert.equal(await vigilar(), false, "la primera falla solo anota desde cuándo");
-  w.pasar(20);
-  assert.equal(await vigilar(), false);
-  w.pasar(15);
+  for (let i = 0; i < 3; i++) {
+    w.pasar(CADA_MIN);
+    assert.equal(await vigilar(), false, "una, dos o tres vueltas que fallan no son una caída: Instagram puede tardar");
+  }
+  w.pasar(CADA_MIN);
   assert.equal(await vigilar(), true);
   assert.equal(w.avisos[0].titulo, "DM: la red de la bandeja no anda");
   assert.match(w.avisos[0].campos.Motivo, /la base de prueba no contesta/);
@@ -1086,7 +1094,9 @@ test("si la red no logra una vuelta entera en media hora, se avisa una vez por c
   assert.equal(await vigilar(), false, "una sola vez por caída");
   // Vuelve a andar, y se cae de nuevo: se avisa otra vez.
   await w.revisar();
-  w.pasar(40);
+  w.pasar(3 * CADA_MIN);
+  assert.equal(await vigilar(), false);
+  w.pasar(CADA_MIN);
   assert.equal(await vigilar(), true);
   assert.equal(w.avisos.length, 2);
 });
@@ -1096,8 +1106,8 @@ test("una vuelta que Vercel corta por tiempo no llega a avisar: lo ve la vuelta 
   const alEmpezar = () => vigilarRed({ base: w.base, avisar: w.avisar, alEmpezar: true, ahora: () => w.ahora });
   assert.equal(await alEmpezar(), false);
   await w.revisar(); // entera
-  for (let i = 0; i < 10; i++) {
-    w.pasar(3);
+  for (let i = 0; i < 8; i++) {
+    w.pasar(CADA_MIN);
     assert.equal(await alEmpezar(), false, "la anterior terminó");
     await w.revisar();
   }
@@ -1106,14 +1116,17 @@ test("una vuelta que Vercel corta por tiempo no llega a avisar: lo ve la vuelta 
   assert.equal(await alEmpezar(), false);
   await w.revisar();
   // Desde acá cada vuelta empieza y se corta sin terminar.
-  w.pasar(3);
+  w.pasar(CADA_MIN);
   assert.equal(await alEmpezar(), false);
-  let avisos = 0;
-  for (let i = 0; i < 15; i++) {
-    w.pasar(3);
-    if (await alEmpezar()) avisos++;
+  const avisoEn = [];
+  // El cron no arranca siempre en el mismo segundo: la tercera arranca unos segundos tarde y no avisa, la cuarta unos
+  // segundos antes de cumplirse la hora y avisa igual.
+  const corrido = { 3: 0.1, 4: -0.2 };
+  for (let i = 2; i <= 8; i++) {
+    w.pasar(CADA_MIN + (corrido[i] || 0));
+    if (await alEmpezar()) avisoEn.push(i);
   }
-  assert.equal(avisos, 1, "una vez, a la media hora");
+  assert.deepEqual(avisoEn, [4], "una vez, al empezar la cuarta vuelta: tres seguidas que no terminaron");
   assert.match(w.avisos[0].campos.Motivo, /se cortan por tiempo/);
 });
 
@@ -1255,7 +1268,7 @@ test("la búsqueda por nombre de ManyChat: usuario vacío es que no tiene; sin e
 
 const pedido = (extra = {}) => ({ method: "GET", headers: {}, ...extra });
 
-test("el cron de la bandeja no entra sin CRON_SECRET, corre cada 3 minutos y no devuelve ids", async () => {
+test("el cron de la bandeja no entra sin CRON_SECRET, corre cada 15 minutos y no devuelve ids", async () => {
   const { default: handler, config } = await import("../pages/api/dm/bandeja.js");
   const llamar = async (req) => { const res = respuesta(); await handler(req, res); return res; };
   delete process.env.CRON_SECRET;
@@ -1271,7 +1284,7 @@ test("el cron de la bandeja no entra sin CRON_SECRET, corre cada 3 minutos y no 
   }
   assert.equal(config.maxDuration, 120);
   const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
-  assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja"), { path: "/api/dm/bandeja", schedule: "*/3 * * * *" });
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja"), { path: "/api/dm/bandeja", schedule: "*/15 * * * *" });
 });
 
 test("las consultas de la red: guardar solo en charlas del agente, sin repetir, con su propio tope, y un eco por mensaje", async () => {

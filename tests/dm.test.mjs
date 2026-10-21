@@ -45,6 +45,7 @@ const general = (texto) => Object.assign(new Error(texto), { transitorio: false,
 const propia = (texto) => Object.assign(new Error(texto), { transitorio: false, general: false });
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
+const { CADA_CRON_MS } = await import("../lib/crons.js");
 
 const HORA = 3600000;
 const AHORA = new Date("2026-10-12T15:00:00Z"); // las 12 del mediodía en Argentina
@@ -1843,10 +1844,10 @@ test("el cron de la espera tampoco entra sin CRON_SECRET, y no devuelve ids", as
   } finally {
     delete process.env.CRON_SECRET;
   }
-  // Vercel la llama cada 2 minutos, y le da los 300 segundos para contestar lo que espera.
+  // Vercel la llama cada 15 minutos, con los demás crons (lib/crons.js), y le da los 300 segundos para contestar lo que espera.
   const { readFile } = await import("node:fs/promises");
   const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
-  assert.deepEqual(crons.find((c) => c.path === "/api/dm/espera"), { path: "/api/dm/espera", schedule: "*/2 * * * *" });
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/espera"), { path: "/api/dm/espera", schedule: "*/15 * * * *" });
   assert.equal((await import("../pages/api/dm/espera.js")).config.maxDuration, 300);
 });
 
@@ -2487,18 +2488,20 @@ function relojDePrueba() {
 const VENENO = "c00";
 /**
  * Una noche con la Mac apagada deja `n` charlas esperando. La Mac vuelve en el minuto 0 y el cron de la
- * espera corre cada 2 minutos, como en vercel.json, con la ventana de pages/api/dm/espera.js. Cada
- * respuesta tarda `seg` segundos. Devuelve en qué minuto quedó contestada la última, en qué orden
- * arrancaron, cuántas hubo a la vez como mucho y si alguna se contestó dos veces.
+ * espera corre cada `cada` segundos (en vercel.json, cada 15 minutos: lib/crons.js), con la ventana de
+ * pages/api/dm/espera.js. Cada respuesta tarda `seg` segundos. Devuelve en qué minuto quedó contestada la
+ * última, en qué orden arrancaron, cuántas hubo a la vez como mucho y si alguna se contestó dos veces.
  *
  * `veneno`: además, la más vieja de todas (c00) es una charla con la que el modelo falla siempre, a los
  * `veneno` segundos y con un error dudoso (la Mac contesta que no pudo). De ella, lo que daría
  * base.sinContestar: sus intentos, cuándo fue la última falla y cuántas cuentan para el tope (las que
- * tuvieron otra charla saliendo 10 minutos antes o después). El cron de los toques (cada 10 minutos) la
- * pasa a Cande si llega al tope, y no arranca toques si hay espera: se anota en cada vuelta si los frenó.
- * Con veneno se simulan `horas` horas.
+ * tuvieron otra charla saliendo 10 minutos antes o después). El cron de los toques (cada `cadaToques`
+ * segundos: en vercel.json, el mismo que la espera) la pasa a Cande si llega al tope, y no arranca toques si
+ * hay espera: se anota en cada vuelta si los frenó. Con veneno se simulan `horas` horas.
  */
-async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalelo = 2, veneno = null, horas = 3 }) {
+async function simularEspera({
+  n = 50, seg, cada = CADA_CRON_MS / 1000, cadaToques = cada, ventana = 150, enParalelo = 2, veneno = null, horas = 3,
+}) {
   const reloj = relojDePrueba();
   const ids = Array.from({ length: n }, (_, i) => `c${String(i + 1).padStart(2, "0")}`);
   const a = apartadasDePrueba();
@@ -2544,7 +2547,7 @@ async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalel
       ...(veneno && pasadaEn === null && !a.apartadas.has(VENENO) ? [filaVeneno()] : []),
       ...ids.filter((id) => !a.hechas.has(id) && !a.apartadas.has(id)).map((id) => ({ id, ultimo_id_lead: 1, minutos: 600, fallos: 0 })),
     ];
-    if (veneno && t % 600000 === 0) {
+    if (veneno && t % (cadaToques * 1000) === 0) {
       if (filas[0]?.id === VENENO && decidirSinContestar(filas[0], ops).que === "pasar") {
         pasadaEn = t;
         filas.shift();
@@ -2561,48 +2564,78 @@ async function simularEspera({ n = 50, seg, cada = 120, ventana = 150, enParalel
   return { minutos: ultima / 60000, arrancadas, ids, maximo, dobles, fallasVeneno, pasadaEn, toquesFrenados };
 }
 
-test("caudal: cuando vuelve la Mac, 50 charlas de una noche salen en menos de 45 minutos, de la más vieja a la más nueva, una vez cada una", async () => {
-  // Cada respuesta: la Mac la toma, la redacta y la revisa, y sale por ManyChat. Entre 45 y 90 segundos.
+const CADA_MIN = CADA_CRON_MS / 60000;
+/**
+ * Cuánto tarda como mucho la última de 50 charlas con el cron cada 15 minutos: cada vuelta arranca respuestas durante
+ * 150 segundos (pages/api/dm/espera.js), de a dos, así que contesta 2 * ceil(150 / seg); la última vuelta termina cuando
+ * sale la última que arrancó.
+ */
+const cotaCada15 = (seg, n = 50) => (Math.ceil(n / (2 * Math.ceil(150 / seg))) - 1) * CADA_MIN + (150 + seg) / 60;
+
+test("caudal: cuando vuelve la Mac, cada vuelta del cron (cada 15 minutos) contesta lo que entra en su ventana, de a dos, de la más vieja a la más nueva, una vez cada una", async () => {
+  // Cada respuesta: la Mac la toma, la redacta y la revisa, y sale por ManyChat. Entre 45 y 90 segundos. De 4 a 8 por
+  // vuelta: las 50 de una noche salen en una hora y media a tres horas. Es el precio de que la base duerma entre una
+  // vuelta y la otra (21/10: con el cron cada 2 minutos salían en 20 a 40, pero la base no dormía nunca).
   for (const seg of [45, 60, 90]) {
     const r = await simularEspera({ seg });
+    assert.ok(r.minutos <= cotaCada15(seg), `con ${seg} segundos por respuesta tardó ${r.minutos} minutos`);
+    assert.ok(r.minutos <= 3 * 60 + 5, "en tres horas, aun con respuestas de 90 segundos");
+    assert.ok(r.minutos >= (50 * seg) / 2 / 60, "no hay más de dos a la vez");
+    assert.deepEqual(r.arrancadas, r.ids, "de la más vieja a la más nueva, y cada una una vez");
+    assert.equal(r.dobles, 0);
+    assert.equal(r.maximo, 2, "nunca más de dos a la vez");
+  }
+  // Lo de antes del 19/10, para comparar: una corrida cada 10 minutos, de a una, arrancando durante 170 segundos.
+  const antes = await simularEspera({ seg: 60, cada: 600, ventana: 170, enParalelo: 1 });
+  assert.ok(antes.minutos > 120, `antes tardaba ${antes.minutos} minutos`);
+  assert.ok((await simularEspera({ seg: 60 })).minutos < antes.minutos, "de a dos sale antes que de a una, aunque el cron corra menos seguido");
+});
+
+test("caudal si las corridas de la espera se pisan (cada 2 minutos, como antes del 21/10, o un cron que se dispara de más): 50 charlas en menos de 45 minutos, nunca más de dos a la vez", async () => {
+  for (const seg of [45, 60, 90]) {
+    const r = await simularEspera({ seg, cada: 120 });
     assert.ok(r.minutos <= 45, `con ${seg} segundos por respuesta tardó ${r.minutos} minutos`);
     assert.ok(r.minutos >= (50 * seg) / 2 / 60, "no hay más de dos a la vez");
     assert.deepEqual(r.arrancadas, r.ids, "de la más vieja a la más nueva, y cada una una vez");
     assert.equal(r.dobles, 0);
     assert.equal(r.maximo, 2, "nunca más de dos a la vez, aunque las corridas del cron se pisen");
   }
-  // Lo de antes, para comparar: una corrida cada 10 minutos, de a una, arrancando durante 170 segundos.
-  const antes = await simularEspera({ seg: 60, cada: 600, ventana: 170, enParalelo: 1 });
-  assert.ok(antes.minutos > 120, `antes tardaba ${antes.minutos} minutos`);
 });
 
-test("caudal con una charla con la que el modelo falla siempre (la Mac contesta que no pudo): las otras 50 salen igual en menos de 45 minutos", async () => {
+test("caudal con una charla con la que el modelo falla siempre (la Mac contesta que no pudo): las otras 50 salen igual, a su ritmo", async () => {
   // La revisión del 19/10: la más vieja fallaba en cada corrida, cortaba la corrida y las 50 tardaban hasta
   // 99 minutos; además frenaba los toques todo el día y se reintentaba unas 30 veces por hora.
-  for (const veneno of [20, 72]) {
-    for (const seg of [45, 60, 90]) {
-      const r = await simularEspera({ seg, veneno });
-      const que = `con ${seg} segundos por respuesta y la charla que falla a los ${veneno}`;
-      assert.ok(r.minutos <= 45, `${que}: tardó ${r.minutos} minutos`);
-      assert.deepEqual(r.arrancadas.filter((id) => id !== VENENO), r.ids, "las otras, de la más vieja a la más nueva, una vez cada una");
-      assert.equal(r.dobles, 0);
-      assert.equal(r.maximo, 2);
-      // Espera su pausa entre intento e intento (10, 20, 40, 80 minutos): en 3 horas, 5 intentos como mucho.
-      assert.ok(r.fallasVeneno.length >= 1 && r.fallasVeneno.length <= 5, `${que}: ${r.fallasVeneno.length} intentos`);
-      for (let i = 1; i < r.fallasVeneno.length; i++) {
-        assert.ok(r.fallasVeneno[i] - r.fallasVeneno[i - 1] >= pausaTrasFallas(i) * 60000, `${que}: la pausa ${i}`);
+  // Con el cron cada 15 minutos (vercel.json), y con corridas que se pisan cada 2 (los toques cada 10, como antes).
+  const ritmos = [
+    { cada: CADA_CRON_MS / 1000, cadaToques: CADA_CRON_MS / 1000, horas: 4, cota: (seg) => cotaCada15(seg) + CADA_MIN },
+    { cada: 120, cadaToques: 600, horas: 3, cota: () => 45 },
+  ];
+  for (const { cada, cadaToques, horas, cota } of ritmos) {
+    for (const veneno of [20, 72]) {
+      for (const seg of [45, 60, 90]) {
+        const r = await simularEspera({ seg, veneno, cada, cadaToques, horas });
+        const que = `con el cron cada ${cada / 60} minutos, ${seg} segundos por respuesta y la charla que falla a los ${veneno}`;
+        assert.ok(r.minutos > 0 && r.minutos <= cota(seg), `${que}: tardó ${r.minutos} minutos`);
+        assert.deepEqual(r.arrancadas.filter((id) => id !== VENENO), r.ids, "las otras, de la más vieja a la más nueva, una vez cada una");
+        assert.equal(r.dobles, 0);
+        assert.equal(r.maximo, 2);
+        // Espera su pausa entre intento e intento (10, 20, 40, 80 minutos): en 3 o 4 horas, 5 intentos como mucho.
+        assert.ok(r.fallasVeneno.length >= 1 && r.fallasVeneno.length <= 5, `${que}: ${r.fallasVeneno.length} intentos`);
+        for (let i = 1; i < r.fallasVeneno.length; i++) {
+          assert.ok(r.fallasVeneno[i] - r.fallasVeneno[i - 1] >= pausaTrasFallas(i) * 60000, `${que}: la pausa ${i}`);
+        }
+        // Pasada la espera de las otras, la que falla no frena los toques (salvo la vuelta en que le toca otro intento).
+        const despues = r.toquesFrenados.filter((x) => x.t > r.minutos * 60000);
+        assert.ok(despues.filter((x) => x.frena).length <= 2, `${que}: frenó ${despues.filter((x) => x.frena).length} de ${despues.length} vueltas`);
+        // Si falló 3 veces mientras las otras salían, el cron de los toques se la pasa a Cande.
+        if (r.pasadaEn !== null) assert.ok(r.fallasVeneno.length >= 3);
       }
-      // Pasada la espera de las otras, la que falla no frena los toques (salvo la vuelta en que le toca otro intento).
-      const despues = r.toquesFrenados.filter((x) => x.t > r.minutos * 60000);
-      assert.ok(despues.filter((x) => x.frena).length <= 2, `${que}: frenó ${despues.filter((x) => x.frena).length} de ${despues.length} vueltas`);
-      // Si falló 3 veces mientras las otras salían, el cron de los toques se la pasa a Cande.
-      if (r.pasadaEn !== null) assert.ok(r.fallasVeneno.length >= 3);
     }
-  }
-  // Con respuestas de 60 o 90 segundos falla 3 veces mientras salen las otras: pasa a Cande en menos de una hora.
-  for (const seg of [60, 90]) {
-    const r = await simularEspera({ seg, veneno: 20 });
-    assert.ok(r.pasadaEn !== null && r.pasadaEn <= 3600000, `con ${seg} segundos: ${r.pasadaEn}`);
+    // Con respuestas de 60 o 90 segundos falla 3 veces mientras salen las otras: pasa a Cande en una hora como mucho.
+    for (const seg of [60, 90]) {
+      const r = await simularEspera({ seg, veneno: 20, cada, cadaToques, horas });
+      assert.ok(r.pasadaEn !== null && r.pasadaEn <= 3600000, `con el cron cada ${cada / 60} minutos y ${seg} segundos: ${r.pasadaEn}`);
+    }
   }
 });
 

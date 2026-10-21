@@ -180,8 +180,10 @@ test("F1: nada después del sí es falla a los 15 minutos y con el turno cerrado
   const ms = charla([["agente", OFERTA, 70], ["lead", SI, 30]]);
   assert.deepEqual(reglas(detectar(ms)), ["F1 nada"]);
   assert.deepEqual(reglas(detectar(charla([["agente", OFERTA, 70], ["lead", SI, 10]]))), [], "todavía puede llegar");
-  // Turno abierto: no lo contestó nadie todavía (la Mac apagada). Es F5, y lo contesta la espera.
-  assert.deepEqual(reglas(detectar(ms, { respondido_hasta: 0 })), ["F5 base"]);
+  // Turno abierto: no lo contestó nadie todavía (la Mac apagada). No es F1: lo contesta la espera, y si pasaron dos
+  // vueltas de la espera sin que nadie lo conteste, es F5.
+  assert.deepEqual(reglas(detectar(ms, { respondido_hasta: 0 })), [], "la espera todavía tiene su vuelta");
+  assert.deepEqual(reglas(detectar(charla([["agente", OFERTA, 90], ["lead", SI, 50]]), { respondido_hasta: 0 })), ["F5 base"]);
 });
 
 test("F1: lo que seguía y llegó más de una hora tarde queda solo para medir", () => {
@@ -284,11 +286,18 @@ test("F4: mostró interés y frenó, y el agente cerró sin dar un paso más", (
 
 /* ---------- F5 y F6: el lead que espera ---------- */
 
-test("F5: un mensaje sin atender hace más de 15 minutos sin ninguna respuesta después", () => {
-  const ms = charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", 30]]);
+test("F5: un mensaje sin atender después de dos vueltas de la espera (40 minutos) sin ninguna respuesta después", () => {
+  // La espera corre cada 15 minutos y toma lo de más de 5: lo que no se pudo contestar en el momento sale en la vuelta
+  // siguiente, y lo que guardó la red de la bandeja, en la otra. Antes de eso no es una falla.
+  assert.equal(C.SIN_ATENDER_MS, 40 * MIN);
+  const ms = charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", 50]]);
   const c = contactoDe(ms, { respondido_hasta: 0 });
   assert.deepEqual(reglas(C.sinAtender(ms, { contacto: c, ahora: AHORA.getTime() })), ["F5 base"]);
-  const salio = [{ contacto: ID, accion: "responder", estado: "enviada", creado: hace(29) }];
+  const conLead = (min) => charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", min]]);
+  const f5 = (m2) => reglas(C.sinAtender(m2, { contacto: contactoDe(m2, { respondido_hasta: 0 }), ahora: AHORA.getTime() }));
+  assert.deepEqual(f5(conLead(39)), [], "a los 39 minutos la espera todavía tiene su vuelta");
+  assert.deepEqual(f5(conLead(41)), ["F5 base"]);
+  const salio = [{ contacto: ID, accion: "responder", estado: "enviada", creado: hace(49) }];
   assert.deepEqual(C.sinAtender(ms, { contacto: c, salidas: salio, ahora: AHORA.getTime() }), [], "una respuesta salió");
   assert.deepEqual(C.sinAtender(charla([["lead", "recién", 5]]), { contacto: c, ahora: AHORA.getTime() }), []);
   assert.deepEqual(C.sinAtender(ms, { contacto: { ...c, dueno: "cande" }, ahora: AHORA.getTime() }), [], "las de Cande las mira la bandeja");
@@ -567,6 +576,39 @@ test("no corrige una charla que pasó por Cande después de la falla, ni encima 
   assert.deepEqual(decidir({}, ms, [{ ...indicacion, creado: hace(200) }]), { si: true }, "una de antes de la oferta, no");
 });
 
+test("el controlador arranca en el mismo minuto que los toques: si a la charla le toca un seguimiento, va primero y la corrección no sale después", async () => {
+  const ms = puenteConOtraPregunta();
+  const [d] = detectar(ms);
+  const decidir = (extra, toques = true) =>
+    C.decidirCorreccion(d, { contacto: contactoDe(ms, extra), mensajes: ms, ahora: AHORA.getTime(), toques });
+  const enMin = (min) => new Date(AHORA.getTime() + min * MIN).toISOString();
+  assert.deepEqual(decidir({ proximo_toque: null }), { si: true });
+  const espera = { espera: "le toca un seguimiento: va primero" };
+  assert.deepEqual(decidir({ proximo_toque: enMin(-5) }), espera, "vencido: lo manda el cron de los toques en esta vuelta");
+  assert.deepEqual(decidir({ proximo_toque: enMin(14) }), espera, "antes de la vuelta siguiente: también va primero");
+  assert.deepEqual(decidir({ proximo_toque: enMin(16) }), { si: true }, "más adelante: la corrección lo corre (el agente lo vuelve a agendar)");
+  assert.deepEqual(decidir({ proximo_toque: enMin(-5) }, false), { si: true }, "con los toques apagados no sale ninguno");
+  // De noche en Argentina (las 2 de la mañana) no sale ningún seguimiento: la corrección no lo espera.
+  const deNoche = new Date("2026-10-20T05:00:00Z");
+  const ms2 = charla([["agente", OFERTA, 70], ["lead", SI, 30], ["agente", OTRA, 29]], { ahora: deNoche });
+  const [d2] = C.detectar({ mensajes: ms2, contactos: [contactoDe(ms2)] }, { ahora: deNoche.getTime(), patrones: P });
+  const c2 = contactoDe(ms2, { proximo_toque: new Date(deNoche.getTime() - 5 * MIN).toISOString() });
+  assert.deepEqual(C.decidirCorreccion(d2, { contacto: c2, mensajes: ms2, ahora: deNoche.getTime(), toques: true }), { si: true });
+
+  // La vuelta entera: con el seguimiento por salir, nada; en la vuelta siguiente ya salió, y la corrección no va.
+  const base = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { proximo_toque: enMin(-5) })], ajustes: { toques: true } });
+  const { agente, controlar } = controlador(base);
+  const r = await controlar();
+  assert.equal(agente.pedidos.length, 0);
+  assert.equal(r.esperan, 1);
+  assert.equal(base.filas.length, 0, "no queda anotada: se decide de nuevo en la vuelta siguiente");
+  base.contactos = [contactoDe(ms, { proximo_toque: null, toques: 1 })];
+  await controlar();
+  assert.equal(agente.pedidos.length, 0, "nunca dos mensajes seguidos sin que el lead conteste");
+  assert.equal(base.filas[0].estado, C.ESTADOS.alResumen);
+  assert.match(base.filas[0].aviso, /No la corregí: ya le volvió a escribir la cuenta después\.$/);
+});
+
 test("F1: la oferta que hizo Cande en una charla del agente también cuenta", async () => {
   const ms = charla([["cande", OFERTA, 70], ["lead", SI, 60], ["agente", OTRA, 59]]);
   assert.deepEqual(reglas(detectar(ms)), ["F1 otra_cosa"]);
@@ -667,12 +709,12 @@ test("F5 de la bandeja y F6 quedan solo para medir: ya salen en el resumen de la
   assert.equal(delAgente.filas[0].aviso, null);
 
   // Una F5 de la base (la Mac apagada): al resumen; cuando la espera la contesta, el renglón sale.
-  const ms = charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", 30]]);
+  const ms = charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", 50]]);
   const abierta = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { respondido_hasta: 0 })] });
   const ctl = controlador(abierta, { macViva: false });
   await ctl.controlar();
   assert.equal(abierta.filas[0].estado, C.ESTADOS.alResumen);
-  assert.match(abierta.filas[0].aviso, /^Controlador: escribió hace 30 min .*la Mac no está contestando/);
+  assert.match(abierta.filas[0].aviso, /^Controlador: escribió hace 50 min .*la Mac no está contestando/);
   abierta.contactos = [contactoDe(ms)];
   assert.equal((await ctl.controlar()).resueltas, 1);
   assert.equal(abierta.filas[0].estado, C.ESTADOS.resuelta);
@@ -981,7 +1023,7 @@ test("contestoCande cuenta solo una indicación suya que salió: no la que dio e
 });
 
 test("sin los patrones cargados, F1 a F4 no marcan nada ni se corrigen, y la vuelta lo dice; F5 sigue", async () => {
-  const ms = [...puenteConOtraPregunta(), ...charla([["lead", "y eso cómo funciona?", 30]], { desde: 300 })];
+  const ms = [...puenteConOtraPregunta(), ...charla([["lead", "y eso cómo funciona?", 50]], { desde: 300 })];
   for (const [que, config] of [["sin cargar", { [C.CLAVE_PATRONES]: null }], ["uno que no compila", { [C.CLAVE_PATRONES]: { ...PATRONES_DE_PRUEBA, oferta: "(" } }]]) {
     const base = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { respondido_hasta: 105 })], config });
     const { agente, controlar } = controlador(base);
@@ -1301,6 +1343,7 @@ test("datosParaControl busca las charlas de la bandeja por su id y su usuario de
   const contactos = consultas.find((x) => x.t.startsWith("SELECT c.id"));
   assert.match(contactos.t, /c\.dueno_desde/, "desde cuándo es de quien es: si pasó por Cande después de la falla no se corrige");
   assert.match(contactos.t, /c\.toques/, "los seguimientos que le salieron desde lo último del lead");
+  assert.match(contactos.t, /c\.proximo_toque/, "cuándo le toca el próximo: si es ahora, el seguimiento va primero");
   assert.match(consultas.find((x) => x.t.startsWith("SELECT s.id")).t, /s\.detalle/, "lo que salió con una indicación de Cande lo dice ahí");
   assert.ok(contactos.params.includes(JSON.stringify(["9001"])));
   assert.ok(contactos.params.includes(JSON.stringify(["lead.prueba"])), "el usuario en minúscula");
@@ -1310,7 +1353,7 @@ test("datosParaControl busca las charlas de la bandeja por su id y su usuario de
 
 /* ---------- el cron ---------- */
 
-test("el cron del controlador no entra sin CRON_SECRET, corre cada 10 minutos (fuera del minuto de los toques) y no devuelve ids", async () => {
+test("el cron del controlador no entra sin CRON_SECRET, corre cada 15 minutos (en el mismo minuto que los toques) y no devuelve ids", async () => {
   const { default: handler, config } = await import("../pages/api/dm/controlador.js");
   const llamar = async (req) => { const res = respuesta(); await handler(req, res); return res; };
   const pedido = (extra = {}) => ({ method: "GET", headers: {}, ...extra });
@@ -1327,8 +1370,10 @@ test("el cron del controlador no entra sin CRON_SECRET, corre cada 10 minutos (f
   }
   assert.equal(config.maxDuration, 300);
   const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
-  assert.deepEqual(crons.find((c) => c.path === "/api/dm/controlador"), { path: "/api/dm/controlador", schedule: "5,15,25,35,45,55 * * * *" });
-  assert.deepEqual(crons.find((c) => c.path === "/api/dm/toques"), { path: "/api/dm/toques", schedule: "*/10 * * * *" });
+  // Todos en los mismos minutos (lib/crons.js): la base se despierta una vez por vuelta. Lo que el desfasaje cuidaba (el
+  // seguimiento de una charla sale antes que su corrección) lo cuida decidirCorreccion.
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/controlador"), { path: "/api/dm/controlador", schedule: "*/15 * * * *" });
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/toques"), { path: "/api/dm/toques", schedule: "*/15 * * * *" });
   // Lo que devuelve con la base: el resultado de la vuelta, que son solo cantidades (la prueba de "la vuelta devuelve
   // solo cantidades", arriba).
   const src = await readFile(new URL("../pages/api/dm/controlador.js", import.meta.url), "utf8");

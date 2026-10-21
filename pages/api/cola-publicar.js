@@ -5,7 +5,8 @@ import { sql } from "@vercel/postgres";
 // Cómo encaja todo:
 //   1. En el dashboard ella toca "programar". El dashboard sube el archivo al Blob
 //      público (ogh-publicar) y escribe una fila acá, en `cola_publicaciones`.
-//   2. El cron de Vercel (vercel.json, cada 10 minutos) llama a este endpoint.
+//   2. El cron de Vercel (vercel.json, cada 15 minutos, con los demás crons: lib/crons.js) llama a este
+//      endpoint. Lo programado sale a la hora o a la media hora, y esos minutos el cron los toca.
 //   3. Este endpoint publica lo que ya venció y marca la fila.
 //
 // Los tokens viven en `tokens_redes` y los sube el dashboard: así se pueden renovar
@@ -262,7 +263,7 @@ async function publicarTT(fila) {
       return "https://www.tiktok.com/tiktokstudio/content";
     }
     if (st === "FAILED") throw new Error("TikTok: " + (j.data.fail_reason || "falló"));
-    return null;   // PROCESSING_DOWNLOAD todavía: se retoma en 10 minutos
+    return null;   // PROCESSING_DOWNLOAD todavía: se retoma en la corrida siguiente (15 minutos)
   }
 
   const r = await fetch(`${TT_API}/post/publish/content/init/`, {
@@ -309,7 +310,7 @@ export default async function handler(req, res) {
   // filas siguen en "esperando" con su hora vieja y acá salían TODAS juntas, encima de lo que ya
   // había publicado la Mac. Es el incidente de b8v4, que salió tres veces. Cada pieza tiene su
   // horario (el test de b-rolls se lee por hora del día): si se pasó de largo no sale tarde, se
-  // marca vencida y lo cubre la Mac. Seis horas es de sobra para un cron que corre cada diez
+  // marca vencida y lo cubre la Mac. Seis horas es de sobra para un cron que corre cada quince
   // minutos; lo único que puede tardar legítimamente es un video "procesando", y ese se corta
   // antes por intentos.
   await sql`
@@ -334,7 +335,7 @@ export default async function handler(req, res) {
       const url = fila.red.startsWith("ig") ? await publicarIG(fila)
                  : fila.red.startsWith("tt") ? await publicarTT(fila)
                  : await publicarLI(fila);
-      if (url === null) {          // el video sigue procesando: lo retomamos en 10 minutos
+      if (url === null) {          // el video sigue procesando: lo retomamos en la corrida siguiente
         await sql`UPDATE cola_publicaciones SET estado = 'esperando' WHERE id = ${fila.id}`;
         hechas.push({ id: fila.id, red: fila.red, item: fila.item, estado: "procesando" });
         continue;
@@ -352,6 +353,6 @@ export default async function handler(req, res) {
 }
 
 // Nunca esperamos a que Meta procese un video dentro del request: se guarda el
-// contenedor y la corrida siguiente del cron (10 minutos después) lo publica cuando ya
+// contenedor y la corrida siguiente del cron (15 minutos después) lo publica cuando ya
 // está listo. Con Pro hay hasta 300s: margen para varios reels de LinkedIn seguidos.
 export const config = { maxDuration: 300 };

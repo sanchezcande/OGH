@@ -24,7 +24,7 @@
 // mensaje se pierde y nadie se entera.
 //
 // Si ManyChat no llama acá (un mensaje que se pierde, alguien nuevo que nunca entra), la red de la bandeja
-// (lib/dm/bandeja.js, cada 3 minutos) lo encuentra en la bandeja real de Instagram y lo guarda. Si después llega
+// (lib/dm/bandeja.js, cada 15 minutos) lo encuentra en la bandeja real de Instagram y lo guarda. Si después llega
 // igual por acá, no se guarda dos veces (recibir en lib/dm/agente.js). Si el cuerpo trae "ig_mid" (el id del
 // mensaje en Instagram, el mismo que da la API de Instagram), esa es la prueba de si es el mismo mensaje.
 //
