@@ -1,18 +1,23 @@
-// El cron de la espera del agente de DM. Lo llama Vercel cada 2 minutos (ver vercel.json).
+// El cron de la espera del agente de DM. Lo llama Vercel cada 15 minutos, en los mismos minutos que los
+// demás crons (ver vercel.json y lib/crons.js: así la base duerme entre una vuelta y la otra).
 //
 // Las charlas del agente con un mensaje del lead que el agente no pudo contestar (casi siempre la Mac
 // de Cande apagada, dormida o sin su Claude) quedan en espera: del agente, sin aviso y sin pasarlas a
 // Cande (19/10, Cande: "deberían quedar on hold y cuando prendo la pc las deberías agarrar vos").
 // Cuando la Mac vuelve, este cron las contesta tarde, por la API de ManyChat, de la más vieja a la más
 // nueva: dos a la vez (la Mac redacta tres: el otro lugar queda para quien escribe en ese momento) y
-// apenas termina una arranca la siguiente. Ver vaciarEspera en lib/dm/seguimientos.js.
+// apenas termina una arranca la siguiente. Ver vaciarEspera en lib/dm/seguimientos.js. Un mensaje que no
+// se pudo contestar en el momento lo toma la vuelta siguiente (base.sinContestar mira lo de más de 5
+// minutos): sale entre 5 y 20 minutos después; lo que guarda la red de la bandeja, en la vuelta que sigue
+// a la de la red.
 //
 // Caudal: cada respuesta tarda lo que la Mac en tomarla, redactarla y revisarla, más el envío: entre 45
-// y 90 segundos. Cada corrida arranca respuestas durante 150 segundos y el cron corre cada 2 minutos:
-// las corridas se pisan a propósito, así siempre hay una arrancando la siguiente, y entre todas nunca
-// hay más de dos (base.reclamarEspera). Salen entre 1,3 y 2,7 por minuto: las 50 charlas de una noche,
-// en 20 a 40 minutos. Antes el cron de cada 10 minutos las contestaba de a una, 3 o 4 por vuelta
-// (más de 2 horas para 50), y a la hora se las pasaba a Cande.
+// y 90 segundos. Cada corrida arranca respuestas durante 150 segundos, de a dos: de 4 a 8 por vuelta, y
+// las 50 charlas de una noche salen en una hora y media a tres horas. Con el cron cada 2 minutos las
+// corridas se pisaban y salían en 20 a 40 minutos, pero la base no dormía nunca y el 21/10 se quedó sin
+// horas de cómputo. Si las corridas se pisan igual (un cron que se dispara de más, una llamada a mano),
+// entre todas nunca hay más de dos (base.reclamarEspera). Antes del 19/10 el cron de cada 10 minutos las
+// contestaba de a una, 3 o 4 por vuelta, y a la hora se las pasaba a Cande.
 //
 // Una charla con la que el modelo falla siempre (se niega, o es tan larga que no llega a tiempo) no frena
 // a las demás: después de cada falla espera su pausa (10 minutos, el doble con cada falla, hasta 2 horas)

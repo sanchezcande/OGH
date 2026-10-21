@@ -1,4 +1,5 @@
-// El cron de la red de la bandeja (lib/dm/bandeja.js). Lo llama Vercel cada 3 minutos (ver vercel.json).
+// El cron de la red de la bandeja (lib/dm/bandeja.js). Lo llama Vercel cada 15 minutos, en los mismos minutos que los
+// demás crons (ver vercel.json y lib/crons.js).
 //
 // Mira la bandeja real de Instagram (con el permiso con el que el sitio publica, como /api/dm/instagram) para que
 // no quede ninguna charla sin contestar aunque el webhook de ManyChat no haya llegado: guarda lo que no entró y
@@ -8,9 +9,9 @@
 // nuevo en ManyChat, varios pedidos más.
 //
 // Corre siempre que haya base, salvo con el ajuste "bandeja" en false. Si Instagram falla, se avisa como en el
-// cron de Instagram (un aviso por día como mucho, y nada por una demora). Si la red no logra una vuelta entera
-// en media hora, sea por lo que sea (Instagram que limita durante horas, la base, una vuelta que Vercel corta por
-// tiempo), se avisa una vez (vigilarRed).
+// cron de Instagram (un aviso por día como mucho, y nada por una demora). Si tres vueltas seguidas de la red no
+// terminan, sea por lo que sea (Instagram que limita durante horas, la base, una vuelta que Vercel corta por tiempo),
+// se avisa una vez (vigilarRed).
 //
 // Devuelve solo cantidades: ni ids ni usuarios salen en la respuesta ni en los registros.
 import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
@@ -41,7 +42,7 @@ export default async function handler(req, res) {
     await tablas();
     const aj = await ajustes();
     if (aj.bandeja === false) return res.status(200).json({ ok: true, motivo: "red de la bandeja apagada" });
-    // Si la vuelta anterior no terminó (Vercel la cortó por tiempo y no llegó a avisar) y ya va media hora así.
+    // Si la vuelta anterior no terminó (Vercel la cortó por tiempo y no llegó a avisar) y ya van tres así.
     await vigilarRed({ base: { leerConfig, guardarConfig }, avisar: avisarDm, alEmpezar: true });
     r = await revisarBandeja({
       ig: instagram,

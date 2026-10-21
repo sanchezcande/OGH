@@ -1,5 +1,6 @@
-// El cron de la lectura directa de Instagram (lib/dm/instagram.js). Lo llama Vercel cada 2 minutos
-// (ver vercel.json). Con el ajuste "instagram" o "seguidos" prendido:
+// El cron de la lectura directa de Instagram (lib/dm/instagram.js). Lo llama Vercel cada 15 minutos, en
+// los mismos minutos que los demás crons (ver vercel.json y lib/crons.js). Con el ajuste "instagram" o
+// "seguidos" prendido:
 //
 //   1. Renueva el token una vez por semana (dura 60 días). Si no se puede y ya no anda, o le quedan
 //      menos de 10 días, le avisa a Cande (un aviso por día como mucho).
@@ -7,8 +8,8 @@
 //      si Cande escribió "--" o le escribió a mano en una charla del agente, el agente sale de ahí
 //      aunque el lead no vuelva a escribir. En una charla retomada (lib/dm/instagram.js), lo que ella
 //      escribió a mano queda anotado como suyo y la charla sigue del agente.
-//   3. Va completando el usuario de Instagram de los contactos del agente (de a 10 por vuelta,
-//      ManyChat deja 10 por segundo): con eso se reconoce de quién es cada charla de la bandeja.
+//   3. Va completando el usuario de Instagram de los contactos del agente (de a 10 por vuelta, 40 por
+//      hora: ManyChat deja 10 por segundo): con eso se reconoce de quién es cada charla de la bandeja.
 //
 // Devuelve solo cantidades: ni ids ni usuarios salen en la respuesta ni en los registros.
 import { instagram, reglasInstagram } from "../../../lib/dm/armado";
@@ -19,6 +20,12 @@ import { buscarCodigos, usuarioIg } from "../../../lib/dm/instagram";
 import { datosDe, hayManyChat } from "../../../lib/dm/manychat";
 
 const SOLAPE_MS = 5 * 60000; // cada vuelta vuelve a mirar los últimos 5 minutos: un "--" no se escapa entre dos vueltas
+/**
+ * Las charlas que mira cada vuelta como mucho: las movidas desde la anterior (15 minutos, más el solape). Una página
+ * de la bandeja, como la red (lib/dm/bandeja.js). Eran 20 con la vuelta cada 2 minutos; con una cada 15, en un rato
+ * de muchos mensajes 20 no alcanzaban y lo que quedaba abajo no lo volvía a mirar nadie hasta que se moviera.
+ */
+export const CHARLAS_POR_VUELTA = 50;
 const USUARIOS_POR_VUELTA = 10;
 
 export default async function handler(req, res) {
@@ -58,7 +65,8 @@ export default async function handler(req, res) {
     // Una falla de la base en una charla no es de Instagram: queda en el registro (sin ids ni textos) y esa charla se
     // vuelve a mirar en la vuelta siguiente. Solo lo que tira Instagram llega a fallo (el aviso de la conexión).
     const r = await buscarCodigos({
-      ig: instagram, base: { contactoDeIg, guardarIg, tomar, soltar, textosDeLaCuenta }, reglas: reglasInstagram, desde, limite: ultimo ? 20 : 10,
+      ig: instagram, base: { contactoDeIg, guardarIg, tomar, soltar, textosDeLaCuenta }, reglas: reglasInstagram, desde,
+      limite: ultimo ? CHARLAS_POR_VUELTA : 10,
       registrar: (e) => console.error("dm: la base falló en una charla de la vuelta de Instagram", e?.code ?? "", e?.name ?? ""),
     });
     ({ miradas, sacadas, anotadas } = r);

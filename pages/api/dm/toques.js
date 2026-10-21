@@ -1,4 +1,5 @@
-// El cron del agente de DM. Lo llama Vercel cada 10 minutos (ver vercel.json). Hace seis cosas:
+// El cron del agente de DM. Lo llama Vercel cada 15 minutos, en los mismos minutos que los demás crons (ver
+// vercel.json y lib/crons.js). Hace seis cosas:
 //
 //   1. Red de seguridad, siempre, esté el agente prendido o apagado: las respuestas que ManyChat
 //      no vino a retirar salen por la API si todavía corresponde, y si no pasan a Cande
@@ -8,7 +9,7 @@
 //      las demás andaba). Las demás quedan en espera, del agente y sin aviso, por más que pase el
 //      tiempo (19/10, Cande: "deberían quedar on hold y cuando prendo la pc las deberías agarrar
 //      vos"). Antes pasaban a la hora y le llegaba un aviso por charla cada vez que apagaba la compu.
-//      Las contesta el cron de la espera (/api/dm/espera, cada 2 minutos) cuando la Mac vuelve.
+//      Las contesta el cron de la espera (/api/dm/espera, cada 15 minutos) cuando la Mac vuelve.
 //   2. Las que esperaron tanto que Instagram ya no deja escribirles (23 horas y media desde lo último
 //      del lead: la Mac apagada casi un día): UN aviso por vuelta con la lista, nombre y link de cada
 //      una, y el turno de cada una se cierra (no vuelve a salir en otro aviso).

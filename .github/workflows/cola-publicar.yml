@@ -1,14 +1,17 @@
 name: Publicar la cola
 
-# Despierta al sitio cada 10 minutos para que publique lo que Cande dejó programado.
+# Despierta al sitio cada 15 minutos para que publique lo que Cande dejó programado.
 # El plan Hobby de Vercel solo permite un cron por día, así que el reloj lo pone
 # GitHub Actions, que es gratis. El que publica sigue siendo /api/cola-publicar.
+# Va en los mismos minutos que los crons de Vercel (0, 15, 30 y 45; ver lib/crons.js):
+# así la base se despierta una sola vez por vuelta. Lo programado sale a la hora o a
+# la media hora, y esos minutos los toca.
 #
 # Requiere un secreto del repo: COLA_SECRET (el mismo que está en Vercel).
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 jobs:

@@ -1,6 +1,7 @@
-// El cron del controlador del agente de DM (lib/dm/controlador.js). Lo llama Vercel cada 10 minutos (ver vercel.json), a
-// los 5 de cada decena: así no arranca en el mismo minuto que el cron de los toques, que también le pide turnos a la Mac
-// y podría tener tomada la misma charla.
+// El cron del controlador del agente de DM (lib/dm/controlador.js). Lo llama Vercel cada 15 minutos, en los mismos
+// minutos que los demás crons (ver vercel.json y lib/crons.js: así la base duerme entre una vuelta y la otra). Arranca
+// junto con el cron de los toques, que también le pide turnos a la Mac: una charla que tiene tomada otra corrida se
+// corrige en la vuelta siguiente, y a una a la que le toca un seguimiento, el seguimiento va primero.
 //
 // Reglas fijas, sin modelo, que miran las charlas de las últimas 72 horas: corrigen solas lo que es seguro (un sí a una
 // oferta sin lo que tenía que seguir, quien vio el video y opinó a favor sin saber cuánto sale) y lo demás se lo listan
