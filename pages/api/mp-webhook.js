@@ -21,6 +21,7 @@
 // en el aviso de Telegram, que es donde ella lo va a ver.
 import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
+import { camposCompra, ficha } from "../../lib/avisoCompra";
 import { asegurarTablaCompras } from "../../lib/compras";
 import { guardarEvento, hayBase } from "../../lib/db";
 import { mandarMail } from "../../lib/mandarMail";
@@ -66,11 +67,12 @@ async function anotarVenta(pago, id) {
   try {
     await asegurarTablaCompras();
     const { rows } = await sql`
-      INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, venta_id)
+      INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, codigo, venta_id)
       VALUES (${(pago.payer?.email || "").trim().toLowerCase()},
               ${[pago.payer?.first_name, pago.payer?.last_name].filter(Boolean).join(" ").trim() || null},
               'Acelerador de Carrera Tech', ${pago.transaction_amount}, ${(pago.currency_id || "ars").toLowerCase()},
-              NULL, FALSE, 'mercadopago', 'pagó en pesos', NULL, ${`mp-${id}`})
+              NULL, FALSE, 'mercadopago', 'pagó en pesos', NULL,
+              ${(process.env.MP_CODIGO || 'PARAVOS').toUpperCase()}, ${`mp-${id}`})
       ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING
       RETURNING id`;
     return rows.length > 0;
@@ -148,12 +150,21 @@ export default async function handler(req, res) {
 
     // El aviso va SIEMPRE, salga o no el mail: si el mail falló, ella lo manda a mano y se
     // entera en el momento, que es lo que hoy no pasa.
-    await avisar("Pagó en pesos 💸", {
-      Quién: nombre || "sin nombre",
-      Mail: mail || "sin mail",
-      Pagó: `$${monto} ARS`,
-      Código: mailOk ? "ya se lo mandé por mail" : `NO salió el mail (${motivo}), mandáselo vos: ${CODIGO_URL}`,
-    }, VENTAS);
+    // Mismos campos que el aviso de Gumroad, para que la misma persona se pueda comparar: cuando
+    // alguien paga en pesos llegan dos avisos, este y el de Gumroad al canjear el código.
+    const f = await ficha(mail);
+    await avisar("Pagó en pesos 💸", camposCompra({
+      que: "Pagó en pesos por MercadoPago",
+      email: mail, nombre, ficha: f,
+      plata: `$${monto} ${(pago.currency_id || "ARS").toUpperCase()}`,
+      codigo: (process.env.MP_CODIGO || "PARAVOS").toUpperCase(),
+      deDonde: f ? null : "pagó en pesos, todavía no está en la red de devs",
+      extra: {
+        "El código": mailOk
+          ? "ya se lo mandé por mail y lo rebota a Gumroad"
+          : `NO salió el mail (${motivo}), mandáselo vos: ${CODIGO_URL}`,
+      },
+    }), VENTAS);
     return res.status(200).json({ ok: true, mail: mailOk });
   } catch (e) {
     console.error("mp-webhook:", e.message);
