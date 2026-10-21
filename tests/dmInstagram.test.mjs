@@ -1171,3 +1171,14 @@ test("como en main: si la base falla en una charla sin la marca, la vuelta del c
     assert.equal(w.contactos.get("78").dueno, "agente", `${falla}: la vuelta se cortó antes`);
   }
 });
+
+test("en una charla retomada, \"Cande aquí\" es su código: no se toma como lo pegado y saca al agente", () => {
+  const ahora = Date.now();
+  const marcas = { "88": { hasta: ahora + 3600000, marcada: ahora - 3600000, usada: null } };
+  const c = { id: "88", dueno: "agente" };
+  const pegado = { texto: "Holaa perdón la demora! Te cuento de prueba", creado: new Date(ahora - 600000) };
+  const codigo = { texto: "Cande aquí", creado: new Date(ahora - 500000) };
+  assert.equal(seAnotaComoRetomada(c, [pegado], marcas), true, "lo pegado se anota");
+  assert.equal(seAnotaComoRetomada(c, [codigo], marcas), false, "Cande aquí saca al agente");
+  assert.equal(seAnotaComoRetomada(c, [pegado, { ...codigo, texto: "cande aqui, sigo yo" }], marcas), false, "aunque venga con lo pegado y sin tilde");
+});
