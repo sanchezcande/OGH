@@ -7,6 +7,9 @@
 //
 // Los frenos se aplican igual que en una charla de verdad: miran todo lo que el lead escribió
 // en el historial, y exigen el aviso de que es automático si todavía no figura.
+//
+// Con el cerebro de la Mac, la Mac tiene que estar escuchando (lib/dm/cola.js): si no, contesta al toque que no
+// está. tracker/dm_nube.py la despierta antes de probar (le abre una ventana de 2 minutos desde la misma Mac).
 import { mismoSecreto, pedir, secretoDe } from "../../../lib/dm/armado";
 import { ajustes, hayBase, prompt, tablas } from "../../../lib/dm/base";
 import { avisaQueEsAutomatico, normalizar, revisar } from "../../../lib/dm/frenos";

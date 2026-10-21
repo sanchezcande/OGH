@@ -32,10 +32,15 @@ test("vercel.json: todos los crons que tocan la base van cada 15 minutos, en los
   for (const c of crons) assert.ok(c.schedule === HORARIO_CRON || DIARIOS[c.path] === c.schedule, `${c.path}: ${c.schedule}`);
 });
 
-test("el reloj de GitHub para la cola también va cada 15 minutos, con los de Vercel", async () => {
+test("el reloj de GitHub para la cola no despierta la base: sin horario, solo a mano; la cola la publica el cron de Vercel", async () => {
+  // 21/10: GitHub no cumplía el */15 (corría cada 2 a 5 horas en minutos cualquiera) y cada corrida prendía la base fuera
+  // de la vuelta. El cron de Vercel ya publica la cola en los mismos minutos que los demás.
   const yml = await leer("../.github/workflows/cola-publicar.yml");
-  const horarios = [...yml.matchAll(/cron:\s*"([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(horarios, [HORARIO_CRON]);
+  assert.deepEqual([...yml.matchAll(/cron:\s*"([^"]+)"/g)].map((m) => m[1]), []);
+  assert.doesNotMatch(yml, /^\s*schedule:/m);
+  assert.match(yml, /^\s*workflow_dispatch:/m);
+  const crons = JSON.parse(await leer("../vercel.json")).crons;
+  assert.equal(crons.find((c) => c.path === "/api/cola-publicar")?.schedule, HORARIO_CRON);
 });
 
 test("cada vuelta del cron de Instagram mira hasta una página (50 charlas): las movidas en 15 minutos no se quedan afuera", async () => {

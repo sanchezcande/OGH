@@ -1967,6 +1967,26 @@ test("con el error tal como lo manda la Mac, la charla espera anotada como falla
   }
 });
 
+test("con la Mac sin escuchar (entre una ventana del cuarto de hora y la otra), un mensaje en vivo no crea trabajo: queda en espera como falla general, sin aviso", async () => {
+  // 21/10: la Mac pregunta solo en una ventana de cada cuarto de hora. Antes el trabajo se creaba igual y la función
+  // quedaba 75 segundos consultando la base para nada.
+  const { crearPedir } = await import("../lib/dm/armado.js");
+  const cerebro = cerebroDePrueba({ resultado: salidaValida });
+  const pedirConPorton = crearPedir({
+    ajustes: async () => ({ cerebro: "local", link_de_pago: "" }), pedirApi: async () => { throw new Error("no es la API"); },
+    pedirLocal: cerebro.pedirLocal, escuchando: async () => false,
+  });
+  const { agente, m } = armar({ responde: (p) => pedirConPorton(p) });
+  const r = await agente.procesar("77", m.disparo);
+  assert.deepEqual([r.hecho, r.general, r.dudosa, r.transitorio, r.reintento], ["error del modelo", true, false, true, true]);
+  assert.equal(cerebro.m.creados.length, 0, "ningún trabajo para la Mac");
+  assert.equal(cerebro.m.lecturas, 0, "ni una consulta esperándola");
+  assert.deepEqual(m.salidas.map((x) => [x.accion, x.estado, x.motivo]), [["error", "error", FALLA_GENERAL]]);
+  assert.equal(m.contacto.dueno, "agente");
+  assert.equal(m.avisos.length, 0);
+  assert.ok(m.contacto.respondido_hasta < m.disparo, "el turno sigue abierto: lo contesta la espera");
+});
+
 /* ---------- Cande contesta desde el bot del agente ---------- */
 
 const { contactoDeAviso, leerRespuesta, resultadoDeEnvio, crearRespuestaTelegram, quiereLaCharla } = await import("../lib/dm/respuestas.js");

@@ -19,8 +19,10 @@
 //      pesos: el borrador quedó guardado y su aviso no salió. Los dos, con el mismo tope de tiempo que los
 //      toques: lo que no entra queda para la vuelta siguiente.
 //   4. Seguimientos ("te anotaste?", "viste el video?"), solo si están prendidos en los ajustes, la
-//      Mac está contestando, no hay charlas esperando respuesta (primero se contesta a quien escribió)
-//      y es de día en Argentina (de 9 a 21).
+//      Mac está escuchando, no hay charlas esperando respuesta (primero se contesta a quien escribió)
+//      y es de día en Argentina (de 9 a 21). Que la Mac escucha se mira justo antes de reclamar cada
+//      toque, no al arrancar: desde el 21/10 escucha en una ventana corta de cada cuarto de hora
+//      (lib/dm/cola.js), y lo de arriba puede tardar.
 //      Cada toque vencido se reclama de a uno y pasa por el agente con el evento "seguimiento":
 //      el agente vuelve a mirar que la charla siga siendo suya, que el lead no haya escrito y
 //      que la ventana de 24 horas de Instagram siga abierta.
@@ -30,13 +32,11 @@
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
 import { agente, avisarDm, colaDe } from "../../../lib/dm/armado";
-import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
+import { MARGEN_MS, borrarTrabajosViejos, macEscuchando } from "../../../lib/dm/cola";
 import { horaDeToques } from "../../../lib/dm/frenos";
 import * as manychat from "../../../lib/dm/manychat";
 import { crearResumen } from "../../../lib/dm/resumen";
-import {
-  MAC_VIVA_SEGUNDOS, REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar,
-} from "../../../lib/dm/seguimientos";
+import { REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar } from "../../../lib/dm/seguimientos";
 import * as base from "../../../lib/dm/base";
 import {
   ajustes, borrarViejas, codigosSinAviso, fotosSinAviso, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas,
@@ -76,9 +76,17 @@ export default async function handler(req, res) {
     if (r === "reenviada") reenviadas++;
     else if (r !== "descartada") sinAtender++; // descartada: la charla sigue del agente (una retomada donde escribió Cande)
   }
-  // Los toques y las respuestas de la espera los redacta la Mac de Cande (salvo cerebro "api").
-  const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();
-  const macViva = latido !== null && latido < MAC_VIVA_SEGUNDOS;
+  // Los toques y las respuestas de la espera los redacta la Mac de Cande (salvo cerebro "api"). Si ahora escucha
+  // dice si hay espera para contestar ya; para cada toque se vuelve a mirar antes de reclamarlo (escucha).
+  const escucha = async (margen) => {
+    if (aj.cerebro === "api") return true;
+    try {
+      return await macEscuchando(margen);
+    } catch {
+      return false;
+    }
+  };
+  const macViva = await escucha(MARGEN_MS.espera);
   const limite = inicio + (config.maxDuration - 130) * 1000;
 
   // Las charlas sin atender: acá solo se pasa lo que no tiene arreglo. Lo demás queda en espera.
@@ -124,11 +132,13 @@ export default async function handler(req, res) {
     console.error("dm: no se pudo mandar el resumen de las notas", e.message);
   }
 
-  // Toques: si la Mac no está contestando, si hay charlas esperando respuesta (las contesta el cron de
+  // Toques: si la Mac no está escuchando, si hay charlas esperando respuesta (las contesta el cron de
   // la espera, y la Mac no da para todo a la vez) o si es de noche en Argentina, no se reclama ninguno:
   // siguen en la fila y salen en una corrida de después (los que se pasan de las 24 horas los limpia
-  // reclamarToque). Reclamar uno con la Mac dormida lo perdería: el toque no se reintenta.
-  if (prendido && aj.toques === true && macViva && !hayEspera(filas, ops) && horaDeToques(new Date())) {
+  // reclamarToque). Reclamar uno con la Mac sin escuchar lo perdería: el toque no se reintenta. Por eso se
+  // mira justo antes de cada uno, con el margen de lo que tarda un toque hasta pedir (MARGEN_MS.toque): si
+  // la ventana de la Mac se cerró mientras se hacía lo de arriba, quedan para otra vuelta.
+  if (prendido && aj.toques === true && !hayEspera(filas, ops) && horaDeToques(new Date())) {
     // Cada toque puede tardar lo que tarda el modelo (91 segundos como mucho) más el envío: no
     // se arranca uno si no queda ese margen antes de que Vercel corte la función. El margen se
     // cuenta desde que arrancó: lo de arriba puede tardar (una llamada a ManyChat y un aviso
@@ -139,6 +149,7 @@ export default async function handler(req, res) {
       hasta: limite,
       tope: TOQUES_POR_CORRIDA,
       registrar: (id, e) => console.error("dm: falló el toque", colaDe(id), e.message),
+      seguir: () => escucha(MARGEN_MS.toque),
     });
   }
 

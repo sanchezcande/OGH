@@ -7,7 +7,9 @@
 // Contesta al toque (ManyChat corta a los 10 segundos) y sigue trabajando después: espera la
 // ráfaga, le pide la respuesta al modelo y la manda. Ver lib/dm/agente.js. Si el modelo no
 // contesta (la Mac apagada o dormida), la charla queda en espera, del agente y sin aviso: la
-// contesta el cron de la espera (/api/dm/espera) cuando la Mac vuelve.
+// contesta el cron de la espera (/api/dm/espera) cuando la Mac vuelve. Lo mismo si la Mac está
+// prendida pero no escuchando (desde el 21/10 escucha en una ventana de cada cuarto de hora y
+// mientras tiene trabajo, lib/dm/cola.js): el turno no se intenta, y sale en la vuelta siguiente.
 //
 // Un mensaje sin texto (una foto, un audio, un sticker) se guarda como "[adjunto o mensaje sin
 // texto]". Una foto es casi siempre el comprobante de quien pagó en pesos: con la Mac contestando la mira

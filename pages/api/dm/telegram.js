@@ -12,6 +12,7 @@
 import { waitUntil } from "@vercel/functions";
 import { agente, mismoSecreto } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
+import { MARGEN_MS, macEncendida, macEscuchando } from "../../../lib/dm/cola";
 import * as manychat from "../../../lib/dm/manychat";
 import { crearRespuestaTelegram, leerRespuesta } from "../../../lib/dm/respuestas";
 import { chatDuena, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
@@ -38,8 +39,15 @@ export default async function handler(req, res) {
   }
   // Una indicación espera a que el agente la redacte (hasta un minuto y pico con la Mac): Telegram
   // recibe el 200 enseguida y el trabajo sigue aparte. La novedad igual se reclama una sola vez.
+  // Si el agente puede redactarla ya: con la Mac escuchando (o el cerebro de la API, o el agente apagado, que contesta
+  // sin redactar). Si no, la indicación queda para la vuelta siguiente de la espera (lib/dm/respuestas.js).
+  const macEscucha = async () => {
+    const aj = await base.ajustes();
+    if (aj.cerebro === "api" || (aj.modo !== "auto" && aj.modo !== "sombra")) return true;
+    return macEscuchando(MARGEN_MS.indicacion);
+  };
   waitUntil(
-    crearRespuestaTelegram({ base, manychat, decir, agente })(r, { updateId: novedad.update_id }).catch(async (e) => {
+    crearRespuestaTelegram({ base, manychat, decir, agente, macEscucha, macEncendida })(r, { updateId: novedad.update_id }).catch(async (e) => {
       // Si el mensaje ya había salido, crearRespuestaTelegram lo dice antes: acá solo llega lo que falló antes de mandar.
       console.error("dm telegram:", e.message);
       await decir(`No salió: algo falló del lado del sitio (${String(e.message).slice(0, 150)})`);

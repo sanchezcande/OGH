@@ -721,6 +721,20 @@ test("F5 de la bandeja y F6 quedan solo para medir: ya salen en el resumen de la
   assert.equal(abierta.filas[0].aviso, null);
 });
 
+test("una F5 de la base con la Mac prendida entre una ventana y la otra no dice que la Mac no contesta (21/10: era un aviso falso)", async () => {
+  // La Mac escucha en una ventana de cada cuarto de hora: que no escuche en este momento no es que esté apagada.
+  const ms = charla([["agente", "Pregunta de prueba?", 60], ["lead", "respuesta de prueba", 50]]);
+  const abierta = baseFalsa({ mensajes: ms, contactos: [contactoDe(ms, { respondido_hasta: 0 })] });
+  const ctl = C.crearControlador({
+    base: abierta, agente: agenteFalso(), reloj: () => AHORA, macViva: async () => false, macEncendida: async () => true,
+  });
+  await ctl();
+  assert.equal(abierta.filas[0].estado, C.ESTADOS.alResumen);
+  assert.match(abierta.filas[0].aviso, /^Controlador: escribió hace 50 min .*: la espera no lo tomó\.$/);
+  assert.doesNotMatch(abierta.filas[0].aviso, /la Mac/);
+  assert.match(C.queDecir({ regla: "F5", tipo: "base", dijo: "algo", edad: 50 * 60000 }, { macEncendida: false }), /está apagada/);
+});
+
 test("en una charla de Cande, 'ya la contestaste vos' pide una prueba: un mensaje de la cuenta en la base después de la falla", async () => {
   const ms = charla([["agente", OFERTA, 70], ["lead", SI, 60]]);
   // La bandeja no la tiene esperando (la sigue, o contestó un automático): eso no prueba que Cande le contestó.

@@ -11,18 +11,19 @@
 // Devuelve solo cantidades: ni ids ni nombres salen en la respuesta ni en los registros.
 import { agente } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
-import { segundosDesdeElLatido } from "../../../lib/dm/cola";
+import { MARGEN_MS, macEncendida, macEscuchando } from "../../../lib/dm/cola";
 import { crearControlador } from "../../../lib/dm/controlador";
-import { MAC_VIVA_SEGUNDOS } from "../../../lib/dm/seguimientos";
 
-/** Si la Mac está redactando (salvo con el cerebro de la API): sin ella no se corrige, queda para la vuelta siguiente. */
+/**
+ * Si la Mac está escuchando (salvo con el cerebro de la API): sin ella no se corrige, queda para la vuelta siguiente.
+ * Cada corrección pasa además por el portón de armado.pedir, que mira de nuevo al crear el trabajo.
+ */
 async function macViva(aj) {
   if (aj?.cerebro === "api") return true;
-  const s = await segundosDesdeElLatido();
-  return s !== null && s < MAC_VIVA_SEGUNDOS;
+  return macEscuchando(MARGEN_MS.controlador);
 }
 
-const controlar = crearControlador({ base, agente, macViva });
+const controlar = crearControlador({ base, agente, macViva, macEncendida: (aj) => (aj?.cerebro === "api" ? true : macEncendida()) });
 
 // Una corrección puede tardar hasta unos 140 segundos (las dos miradas a Instagram, el modelo y el envío, con sus
 // topes): no se arranca ninguna si no queda ese margen antes de que Vercel corte.

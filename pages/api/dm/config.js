@@ -67,7 +67,7 @@ import { randomBytes } from "node:crypto";
 import {
   avisarDm, guardarSecretoDm, instagram, mismoSecreto, olvidarChatDm, olvidarRespuestas, reglasInstagram, secretoDe,
 } from "../../../lib/dm/armado";
-import { segundosDesdeElLatido } from "../../../lib/dm/cola";
+import { estadoDelCerebro } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, estadoRetomadas, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, marcarRetomadas, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
@@ -475,7 +475,9 @@ export default async function handler(req, res) {
         telegram: hayTelegram(), bot_del_agente: hayBotDm(), respuestas_por_telegram: Boolean((await leerConfig("telegram_respuestas"))?.secreto), telegram_del_agente: (await leerConfig("telegram_dm"))?.nombre || null,
         cron_secret: Boolean(process.env.CRON_SECRET), instagram: Boolean(await tokenRed("ig")),
       },
-      cerebro_local_hace_segundos: await segundosDesdeElLatido(),
+      // La Mac escucha en una ventana de cada cuarto de hora y mientras tiene trabajo (lib/dm/cola.js): que no esté
+      // escuchando ahora no es que esté caída. Prendida = preguntó en los últimos 20 minutos.
+      ...(await estadoDelCerebro()),
       ...(await resumen()),
     });
   }
