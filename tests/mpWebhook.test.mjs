@@ -57,3 +57,23 @@ test("el pago en pesos tambien queda en la tabla de compras", () => {
   assert.match(src, /INSERT INTO compras/);
   assert.match(src, /'mercadopago'/);
 });
+
+test("cada pago en pesos recibe un codigo propio de un solo uso", () => {
+  // 22/10: con un código igual para todos nada ata el pago con la entrada, y encima se puede reusar.
+  assert.match(src, /max_purchase_count: "1"/);
+  assert.match(src, /amount_off: "100"/);
+  assert.match(src, /offer_type: "percent"/);
+});
+
+test("si el codigo propio no sale, igual recibe el general", () => {
+  // Un código repetido es un problema chico; pagar y quedarse sin curso, no.
+  assert.match(src, /no pude crear el código único[\s\S]{0,60}return null/);
+  assert.match(src, /const link = propio \? `\$\{BASE_LINK\}\/\$\{propio\}` : CODIGO_URL/);
+});
+
+test("el codigo se crea DESPUES del candado, no antes", () => {
+  // Si se creara antes, cada aviso repetido de MercadoPago crearia un codigo nuevo.
+  const candado = src.indexOf("const primera = await anotarVenta");
+  const crea = src.indexOf("const propio = await codigoUnico");
+  assert.ok(candado > 0 && crea > candado, "el candado va primero");
+});
