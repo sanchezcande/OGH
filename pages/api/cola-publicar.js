@@ -304,6 +304,19 @@ export default async function handler(req, res) {
     UPDATE cola_publicaciones SET estado = 'error', resultado = 'se cortó 3 veces (video muy pesado?)'
     WHERE estado = 'yendo' AND intentos >= 3 AND COALESCE(tomado_en, cuando) < NOW() - INTERVAL '15 minutes'`;
 
+  // 21/10/2026: la base (Neon) se pasó de cuota y estuvo horas sin aceptar una sola conexión, así
+  // que este cron no corrió y lo de la cola lo fue publicando la Mac. El problema es la vuelta: esas
+  // filas siguen en "esperando" con su hora vieja y acá salían TODAS juntas, encima de lo que ya
+  // había publicado la Mac. Es el incidente de b8v4, que salió tres veces. Cada pieza tiene su
+  // horario (el test de b-rolls se lee por hora del día): si se pasó de largo no sale tarde, se
+  // marca vencida y lo cubre la Mac. Seis horas es de sobra para un cron que corre cada diez
+  // minutos; lo único que puede tardar legítimamente es un video "procesando", y ese se corta
+  // antes por intentos.
+  await sql`
+    UPDATE cola_publicaciones SET estado = 'error',
+      resultado = 'se pasó la hora: la cola no corrió a tiempo (lo publica la Mac)'
+    WHERE estado = 'esperando' AND cuando < NOW() - INTERVAL '6 hours'`;
+
   const { rows } = await sql`
     SELECT * FROM cola_publicaciones
     WHERE estado = 'esperando' AND cuando <= NOW()
