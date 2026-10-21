@@ -20,6 +20,14 @@ import { avisar } from "../../lib/notificar";
 
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
+// Los códigos de 100% que NO son una venta nueva: son alguien entrando a la plataforma después
+// de haber pagado por otro lado, o un acceso que Cande regaló.
+const CODIGOS = {
+  [(process.env.MP_CODIGO || "PARAVOS").toLowerCase()]: "pagó en pesos",
+  testimonio: "acceso a cambio de un testimonio",
+  paravos: "pagó en pesos",
+};
+
 /** Gumroad manda el precio en centavos. */
 const plata = (centavos, moneda) => {
   const n = Number(centavos);
@@ -80,7 +88,20 @@ export default async function handler(req, res) {
     ? `${f.origen}${f.como_llegaste ? ` · dijo "${limpiar(f.como_llegaste, 80)}"` : ""}`
     : limpiar(b.referrer, 120) || "no está en la red de devs";
 
-  const titulo = baja ? "Devolución en Gumroad" : prueba ? "Compra de PRUEBA" : "COMPRA NUEVA 🖤";
+  // Cande, 22/10: "me llegan raras en orden los mensajes de chat". Pasaba esto: por cada pago en
+  // pesos le llegaban DOS avisos con minutos de diferencia, "Pagó en pesos" del webhook de
+  // MercadoPago y después "COMPRA NUEVA" de este ping cuando la persona canjeaba el código. El
+  // segundo decía 0 dólares y a veces con otro mail (el de MercadoPago no siempre es el mismo),
+  // así que parecían dos personas y una regalada. No es una venta nueva: es la misma entrando.
+  const codigo = limpiar(b.offer_code || b.discount_code, 40).toLowerCase();
+  const gratis = Number(b.price) === 0;
+  const porQue = gratis ? CODIGOS[codigo] : null;
+  const titulo = baja
+    ? "Devolución en Gumroad"
+    : prueba ? "Compra de PRUEBA"
+    : porQue ? "Entró al curso ✅"
+    : gratis ? "Entró con un código de 100% ✅"
+    : "COMPRA NUEVA 🖤";
   const ok = await avisar(titulo, {
     Quién: nombre || f?.nombre || email || "—",
     WhatsApp: f?.whatsapp || "no tengo",
@@ -92,6 +113,7 @@ export default async function handler(req, res) {
     "Entró a la red hace": dias === null ? "—" : dias === 0 ? "hoy" : `${dias} días`,
     CV: f?.cv_url ? "sí, lo tengo" : "no me lo pasó",
     Producto: limpiar(b.product_name, 120),
+    ...(porQue ? { "Ojo": `no es una venta nueva, es el que ${porQue} entrando a la plataforma` } : {}),
   }, { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
   if (!ok) console.error("gumroad-ping: el aviso no salió", { email });
 

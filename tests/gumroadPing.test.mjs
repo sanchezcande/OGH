@@ -37,3 +37,15 @@ test("la tabla se define en un solo lugar", () => {
     "la DDL va en lib/compras.js (asegurarTablaCompras), no repetida en el endpoint");
   assert.match(src, /await asegurarTablaCompras\(\)/);
 });
+
+test("un canje de 100% no se avisa como venta nueva", () => {
+  // 22/10: por cada pago en pesos llegaban dos avisos y el segundo decía "COMPRA NUEVA" con 0
+  // dólares, a veces con otro mail, así que parecían dos personas.
+  assert.match(src, /const gratis = Number\(b\.price\) === 0/);
+  assert.match(src, /porQue \? "Entró al curso ✅"/);
+  assert.match(src, /no es una venta nueva/);
+});
+
+test("la venta de verdad sigue avisando como venta", () => {
+  assert.match(src, /"COMPRA NUEVA 🖤"/);
+});
