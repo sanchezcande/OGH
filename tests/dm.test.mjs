@@ -3824,16 +3824,16 @@ test("a una empresa el agente le cierra la reunión con la agenda de Cande; a un
 
 /* ---------- la página del video, del lado de la charla (lib/dm/pagina.js, 22/10) ---------- */
 
-test("el país del formulario va en el contexto, y si es de Argentina lo dice", async () => {
+test("el país del formulario va en el contexto, solo el nombre del país", async () => {
   const { agente, m } = armar();
   m.formulario = { pais: "Argentina, Córdoba", compro: false };
   assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
-  assert.match(m.pedidos[0].turno.contexto, /En el formulario puso de dónde es: "Argentina, Córdoba" \(es de Argentina\)\./);
+  assert.match(m.pedidos[0].turno.contexto, /En el formulario puso que es de Argentina\./);
   const otro = armar();
   otro.m.formulario = { pais: "Madrid", compro: false };
   await otro.agente.procesar("77", otro.m.disparo);
-  assert.match(otro.m.pedidos[0].turno.contexto, /"Madrid"\./);
-  assert.doesNotMatch(otro.m.pedidos[0].turno.contexto, /es de Argentina/);
+  assert.match(otro.m.pedidos[0].turno.contexto, /puso que es de España\./);
+  assert.doesNotMatch(otro.m.pedidos[0].turno.contexto, /Argentina/);
 });
 
 test("a quien ya tiene el programa no le sale un toque ni un turno inmediato, y si escribe el agente lo sabe", async () => {
@@ -3888,4 +3888,42 @@ test("el turno inmediato no sale si el lead escribió después, si la charla no 
   assert.equal((await lleno.agente.turnoCaliente({ id: "77", motivo: "link", desde: new Date(AHORA) })).hecho, "ya llenó el formulario");
   assert.equal((await lleno.agente.turnoCaliente({ id: "77", motivo: "otro", desde: new Date(AHORA) })).hecho, "motivo desconocido");
   assert.equal(lleno.m.pedidos.length, 0);
+});
+
+test("el turno inmediato tiene las trabas de un toque: tope de dos, no insistir, y nada encima de la cuenta (22/10)", async () => {
+  const tope = armarToque();
+  tope.m.contacto.toques = 2;
+  assert.equal((await tope.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "ya tuvo sus dos toques");
+  const noInsistir = armarToque();
+  noInsistir.m.contacto.estado = { ...estadoDev, link_formulario_enviado: true, etapa: "cerrada" };
+  assert.equal((await noInsistir.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "toque cancelado");
+  const cuenta = armarToque();
+  cuenta.m.mensajes.push({ id: 60, quien: "agente", texto: "Toque de prueba?", creado: new Date(AHORA - 5 * 60000) });
+  const r = await cuenta.agente.turnoCaliente({ id: "77", motivo: "formulario", desde: new Date(AHORA - 15 * 60000) });
+  assert.equal(r.hecho, "la cuenta ya le escribió después");
+  for (const w of [tope, noInsistir, cuenta]) assert.equal(w.m.pedidos.length, 0);
+  // Una nota del sistema después (la del formulario, la del clic) no cuenta como que la cuenta le escribió.
+  const nota = armarToque({ responde: () => salida(["Pregunta de prueba del video?"]) });
+  nota.m.mensajes.push({ id: 61, quien: "sistema", texto: NOTA_FORMULARIO, creado: new Date(AHORA - 5 * 60000) });
+  assert.equal((await nota.agente.turnoCaliente({ id: "77", motivo: "formulario", desde: new Date(AHORA - 15 * 60000) })).hecho, "enviada");
+});
+
+test("el turno del link se agenda solo al contestarle al lead, la primera vez que sale el link y si se le puede insistir", async () => {
+  const ID_LARGO = "1234567";
+  const conLink = () => salida(["Te dejo el formulario de prueba\nopengatehub.com/devs"]);
+  // Ya le había salido el link antes: no se agenda otro.
+  const yaSalio = armar({ responde: conLink });
+  yaSalio.m.mensajes.splice(1, 0, { id: 90, quien: "agente", texto: `opengatehub.com/devs?ig=${ID_LARGO}` });
+  await yaSalio.agente.procesar(ID_LARGO, yaSalio.m.disparo);
+  assert.deepEqual(yaSalio.m.calientes, []);
+  // En un toque que trae el link, tampoco.
+  const enToque = armarToque({ responde: conLink });
+  enToque.m.contacto.estado = { ...estadoDev, link_formulario_enviado: false, busca: "si" };
+  await enToque.agente.procesar(ID_LARGO, null, { evento: "seguimiento" });
+  assert.deepEqual(enToque.m.calientes, []);
+  // A quien contó que no tiene plata no se le insiste: el link sale, el turno del link no se agenda.
+  const sinPlata = armar({ responde: conLink });
+  sinPlata.m.mensajes.find((x) => x.id === sinPlata.m.disparo).texto = "no tengo plata para nada ahora";
+  await sinPlata.agente.procesar(ID_LARGO, sinPlata.m.disparo);
+  assert.deepEqual(sinPlata.m.calientes, []);
 });

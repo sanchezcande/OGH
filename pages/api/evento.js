@@ -67,12 +67,15 @@ export default async function handler(req, res) {
   // en pagar quedan como nota en la charla, y el clic agenda el turno del pago (lib/dm/pagina.js, 22/10). Solo con la
   // firma de ese id y solo si a esa charla le salió el link (anotarPagina). Si falla, el evento ya quedó guardado.
   try {
-    const { fase, ig, firma } = req.body || {};
+    const { ig, firma } = req.body || {};
+    // Con la prueba A/B del video la página manda la fase con sufijo (video_fin_a, click_mp_b): para la charla es la misma.
+    const fase = String(req.body?.fase || "").replace(/_[ab]$/, "");
     const id = NOTA_DE_FASE[fase] && hayBase() ? igFirmado(ig, firma) : null;
     if (id) {
       await tablasDm();
       const charla = await anotarPagina(id, fase);
-      if (charla?.link_enviado && charla.dueno === "agente" && FASES_DE_PAGO.has(fase)) {
+      // Solo la primera vez: otro clic (recargó la página) no agenda otro turno.
+      if (charla?.anotada === 1 && charla.dueno === "agente" && FASES_DE_PAGO.has(fase)) {
         await agendarCaliente(id, "pago", MINUTOS_CALIENTE.pago);
       }
     }
