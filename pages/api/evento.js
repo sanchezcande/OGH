@@ -1,6 +1,9 @@
 import { guardarEvento, hayBase } from "../../lib/db";
 import { CON_VERSION } from "../../lib/videoAB";
 import { FASES_ORIGEN_FORM } from "../../lib/origenForm";
+import { igFirmado } from "../../lib/dm/firmaIg";
+import { anotarPagina, agendarCaliente, tablas as tablasDm } from "../../lib/dm/base";
+import { FASES_DE_PAGO, MINUTOS_CALIENTE, NOTA_DE_FASE } from "../../lib/dm/pagina";
 
 // Recibe un evento anónimo del embudo de devs (form_visto, paso_2, enviado,
 // video_50, click_gumroad...). Dispará-y-olvidate: nunca rompe la página.
@@ -59,6 +62,25 @@ export default async function handler(req, res) {
     if (hayBase()) await guardarEvento(fase, String(sid || "").slice(0, 40));
   } catch (e) {
     console.error("evento:", e.message);
+  }
+  // Vino de una charla con el agente (el ig y su firma, que /devs/gracias lee de la pestaña): el video entero y el clic
+  // en pagar quedan como nota en la charla, y el clic agenda el turno del pago (lib/dm/pagina.js, 22/10). Solo con la
+  // firma de ese id y solo si a esa charla le salió el link (anotarPagina). Si falla, el evento ya quedó guardado.
+  try {
+    const { ig, firma } = req.body || {};
+    // Con la prueba A/B del video la página manda la fase con sufijo (video_fin_a, click_mp_b): para la charla es la misma.
+    const fase = String(req.body?.fase || "").replace(/_[ab]$/, "");
+    const id = NOTA_DE_FASE[fase] && hayBase() ? igFirmado(ig, firma) : null;
+    if (id) {
+      await tablasDm();
+      const charla = await anotarPagina(id, fase);
+      // Solo la primera vez: otro clic (recargó la página) no agenda otro turno.
+      if (charla?.anotada === 1 && charla.dueno === "agente" && FASES_DE_PAGO.has(fase)) {
+        await agendarCaliente(id, "pago", MINUTOS_CALIENTE.pago);
+      }
+    }
+  } catch (e) {
+    console.error("evento: no pude anotarlo en la charla:", e.message);
   }
   return res.status(200).json({ ok: true });
 }

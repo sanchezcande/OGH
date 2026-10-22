@@ -45,6 +45,7 @@ const general = (texto) => Object.assign(new Error(texto), { transitorio: false,
 const propia = (texto) => Object.assign(new Error(texto), { transitorio: false, general: false });
 const { validarAjustes, ajustesDesde, AJUSTES_POR_DEFECTO, desdeValido } = await import("../lib/dm/base.js");
 const { cuerpoDeManyChat, leerCrudo } = await import("../lib/dm/cuerpo.js");
+const { NOTA_FORMULARIO } = await import("../lib/dm/linkFormulario.js");
 const { CADA_CRON_MS } = await import("../lib/crons.js");
 
 const HORA = 3600000;
@@ -266,6 +267,13 @@ test("no hay seguimiento para quien ya contestó que no, no tiene plata, no busc
   assert.equal(sinSeguimiento({ estado: { ...estadoDev, busca: "no_se_sabe" } }), true); // sin link y sin decir que busca
   assert.equal(sinSeguimiento({ estado: {} }), true);
   assert.equal(sinSeguimiento({ estado: null }), true);
+  // Una pregunta de las primeras sin contestar sí tiene su toque (22/10), menos a quien no es dev, no busca o pidió que no.
+  const temprana = { ...estadoDev, busca: "no_se_sabe", link_formulario_enviado: false };
+  assert.equal(sinSeguimiento({ estado: { ...temprana, etapa: "quien_es", quien: "no_se_sabe" } }), false);
+  assert.equal(sinSeguimiento({ estado: { ...temprana, etapa: "si_busca" } }), false);
+  assert.equal(sinSeguimiento({ estado: { ...temprana, etapa: "si_busca", busca: "no" } }), true);
+  assert.equal(sinSeguimiento({ estado: { ...temprana, etapa: "quien_es", quien: "no_dev" } }), true);
+  assert.equal(sinSeguimiento({ estado: { ...temprana, etapa: "si_busca" }, charlaDelLead: ["no me escribas más"] }), true);
 });
 
 test("el seguimiento se cuenta desde el último mensaje del lead y solo dentro de sus 24 horas", () => {
@@ -362,7 +370,7 @@ function armar({
     },
     mensajes: [...(conAviso ? [{ id: 1, quien: "agente", texto: AVISO }] : []), { id: 2, quien: "lead", texto: "mensaje de prueba" }],
     disparo: 2, tomado: null, proximo: undefined, altasHoy: 0,
-    salidas: [], enviados: [], campos: [], avisos: [], pedidos: [], fallaAnotar: false, fallaSumarToque: false,
+    salidas: [], enviados: [], campos: [], avisos: [], pedidos: [], fallaAnotar: false, fallaSumarToque: false, calientes: [],
   };
   // Alguien que nunca pasó por la base: ni contacto ni mensajes.
   if (sinContacto) Object.assign(m, { contacto: null, mensajes: [], disparo: null });
@@ -417,6 +425,10 @@ function armar({
       m.contacto.toques++; m.contacto.proximo_toque = null;
     },
     cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
+    // Lo que puso en el formulario y los turnos inmediatos (lib/dm/pagina.js): en estas pruebas, lo que diga m.
+    formularioDeLaCharla: async () => m.formulario ?? null,
+    agendarCaliente: async (id, motivo, minutos) => { m.calientes.push([motivo, minutos]); return true; },
+    contarToque: async () => { m.contacto.toques++; },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
     borrarCharla: async () => { m.contacto = { ...m.contacto, dueno: "cande", nombre: null, estado: {} }; m.mensajes = []; m.salidas = []; m.borrada = true; },
     // La constancia del aviso de las fotos, como base.reclamarAvisoFoto y soltarAvisoFoto. La hora de la
@@ -3800,12 +3812,118 @@ test("charla retomada: si la primera mirada no vio lo que pegó Cande y la de an
 });
 
 test("a una empresa el agente le cierra la reunión con la agenda de Cande; a un dev, nunca (21/10)", () => {
-  const reunion = ["Buenísimo! Te parece si lo hablamos en una llamada corta?", "Te dejo acá para agendar\nstrategy.opengatehub.com"];
+  const reunion = ["Genial! Lo vemos en una llamada corta de prueba?", "Te dejo acá para agendar\nstrategy.opengatehub.com"];
   pasa(revisar(salida(reunion, como("empresa"))), "empresa, respondiendo");
   pasa(revisar(salida(reunion, { ...como("empresa"), accion: "pasar_a_cande", aviso_para_cande: "HOY: prueba" })), "empresa, al pasar");
   pasa(revisar(salida(reunion), { charlaDelLead: ["tengo una agencia de prueba"] }), "señal de empresa del lead");
-  pasa(revisar(salida(["Me pasás tu WhatsApp así lo coordinamos?"], como("empresa"))), "pedir el WhatsApp");
+  pasa(revisar(salida(["Me dejás tu WhatsApp para coordinar la prueba?"], como("empresa"))), "pedir el WhatsApp");
   frena(revisar(salida(reunion)), "a un dev");
   frena(revisar(salida([...reunion, "Y te dejo la lista\nopengatehub.com/devs"], como("empresa"))), "con la lista de devs");
   frena(revisar(salida(["Te cuento del programa y agendamos una llamada"], como("empresa"))), "con el programa");
+});
+
+/* ---------- la página del video, del lado de la charla (lib/dm/pagina.js, 22/10) ---------- */
+
+test("el país del formulario va en el contexto, solo el nombre del país", async () => {
+  const { agente, m } = armar();
+  m.formulario = { pais: "Argentina, Córdoba", compro: false };
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.match(m.pedidos[0].turno.contexto, /En el formulario puso que es de Argentina\./);
+  const otro = armar();
+  otro.m.formulario = { pais: "Madrid", compro: false };
+  await otro.agente.procesar("77", otro.m.disparo);
+  assert.match(otro.m.pedidos[0].turno.contexto, /puso que es de España\./);
+  assert.doesNotMatch(otro.m.pedidos[0].turno.contexto, /Argentina/);
+});
+
+test("a quien ya tiene el programa no le sale un toque ni un turno inmediato, y si escribe el agente lo sabe", async () => {
+  const { agente, m } = armarToque();
+  m.formulario = { pais: "Argentina", compro: true };
+  m.contacto.proximo_toque = new Date(AHORA);
+  assert.equal((await toque(agente)).hecho, "ya tiene el programa");
+  assert.equal(m.pedidos.length, 0);
+  assert.equal(m.contacto.proximo_toque, null);
+  assert.equal((await agente.procesar("77", null, { evento: "control", indicacion: "prueba" })).hecho, "ya tiene el programa");
+  const escribe = armar();
+  escribe.m.formulario = { pais: null, compro: true };
+  assert.equal((await escribe.agente.procesar("77", escribe.m.disparo)).hecho, "enviada");
+  assert.match(escribe.m.pedidos[0].turno.contexto, /Ya tiene el programa/);
+});
+
+test("al salir el link del formulario con el id de la charla se agenda el turno del link; si ya lo llenó, no", async () => {
+  // El doble de la base no mira el id: con uno que vale (el "77" de las demás pruebas es corto), el link sale con él.
+  const ID_LARGO = "1234567";
+  const { agente, m } = armar({ responde: () => salida(["Dale te dejo el formulario de prueba\nopengatehub.com/devs"]) });
+  assert.equal((await agente.procesar(ID_LARGO, m.disparo)).hecho, "enviada");
+  assert.match(m.enviados.join(" "), /ig=1234567/);
+  assert.deepEqual(m.calientes, [["link", 90]]);
+  const lleno = armar({ responde: () => salida(["Te dejo el link de nuevo de prueba\nopengatehub.com/devs"]) });
+  lleno.m.mensajes.splice(1, 0, { id: 99, quien: "sistema", texto: NOTA_FORMULARIO });
+  await lleno.agente.procesar(ID_LARGO, lleno.m.disparo);
+  assert.deepEqual(lleno.m.calientes, []);
+  const sinLink = armar();
+  await sinLink.agente.procesar("77", sinLink.m.disparo);
+  assert.deepEqual(sinLink.m.calientes, []);
+});
+
+test("el turno inmediato sale como turno del controlador con su indicación y cuenta como toque", async () => {
+  const { agente, m } = armarToque({ responde: () => salida(["Pregunta de prueba sobre el pago?"]) });
+  const desde = new Date(AHORA - 30 * 60000);
+  const r = await agente.turnoCaliente({ id: "77", motivo: "pago", desde });
+  assert.equal(r.hecho, "enviada");
+  assert.match(m.pedidos[0].turno.contexto, /INDICACIÓN DEL CONTROLADOR/);
+  assert.match(m.pedidos[0].turno.contexto, /tocó el botón de pagar hace media hora/);
+  assert.equal(m.contacto.toques, 1);
+});
+
+test("el turno inmediato no sale si el lead escribió después, si la charla no es del agente o si el link ya se llenó", async () => {
+  const escribio = armarToque();
+  escribio.m.contacto.ultimo_lead = new Date(AHORA - 5 * 60000);
+  assert.equal((await escribio.agente.turnoCaliente({ id: "77", motivo: "formulario", desde: new Date(AHORA - 15 * 60000) })).hecho, "escribió después");
+  assert.equal(escribio.m.pedidos.length, 0);
+  const deCande = armarToque({ dueno: "cande" });
+  assert.equal((await deCande.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "no es del agente");
+  const lleno = armarToque();
+  lleno.m.mensajes.push({ id: 50, quien: "sistema", texto: NOTA_FORMULARIO });
+  assert.equal((await lleno.agente.turnoCaliente({ id: "77", motivo: "link", desde: new Date(AHORA) })).hecho, "ya llenó el formulario");
+  assert.equal((await lleno.agente.turnoCaliente({ id: "77", motivo: "otro", desde: new Date(AHORA) })).hecho, "motivo desconocido");
+  assert.equal(lleno.m.pedidos.length, 0);
+});
+
+test("el turno inmediato tiene las trabas de un toque: tope de dos, no insistir, y nada encima de la cuenta (22/10)", async () => {
+  const tope = armarToque();
+  tope.m.contacto.toques = 2;
+  assert.equal((await tope.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "ya tuvo sus dos toques");
+  const noInsistir = armarToque();
+  noInsistir.m.contacto.estado = { ...estadoDev, link_formulario_enviado: true, etapa: "cerrada" };
+  assert.equal((await noInsistir.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "toque cancelado");
+  const cuenta = armarToque();
+  cuenta.m.mensajes.push({ id: 60, quien: "agente", texto: "Toque de prueba?", creado: new Date(AHORA - 5 * 60000) });
+  const r = await cuenta.agente.turnoCaliente({ id: "77", motivo: "formulario", desde: new Date(AHORA - 15 * 60000) });
+  assert.equal(r.hecho, "la cuenta ya le escribió después");
+  for (const w of [tope, noInsistir, cuenta]) assert.equal(w.m.pedidos.length, 0);
+  // Una nota del sistema después (la del formulario, la del clic) no cuenta como que la cuenta le escribió.
+  const nota = armarToque({ responde: () => salida(["Pregunta de prueba del video?"]) });
+  nota.m.mensajes.push({ id: 61, quien: "sistema", texto: NOTA_FORMULARIO, creado: new Date(AHORA - 5 * 60000) });
+  assert.equal((await nota.agente.turnoCaliente({ id: "77", motivo: "formulario", desde: new Date(AHORA - 15 * 60000) })).hecho, "enviada");
+});
+
+test("el turno del link se agenda solo al contestarle al lead, la primera vez que sale el link y si se le puede insistir", async () => {
+  const ID_LARGO = "1234567";
+  const conLink = () => salida(["Te dejo el formulario de prueba\nopengatehub.com/devs"]);
+  // Ya le había salido el link antes: no se agenda otro.
+  const yaSalio = armar({ responde: conLink });
+  yaSalio.m.mensajes.splice(1, 0, { id: 90, quien: "agente", texto: `opengatehub.com/devs?ig=${ID_LARGO}` });
+  await yaSalio.agente.procesar(ID_LARGO, yaSalio.m.disparo);
+  assert.deepEqual(yaSalio.m.calientes, []);
+  // En un toque que trae el link, tampoco.
+  const enToque = armarToque({ responde: conLink });
+  enToque.m.contacto.estado = { ...estadoDev, link_formulario_enviado: false, busca: "si" };
+  await enToque.agente.procesar(ID_LARGO, null, { evento: "seguimiento" });
+  assert.deepEqual(enToque.m.calientes, []);
+  // A quien contó que no tiene plata no se le insiste: el link sale, el turno del link no se agenda.
+  const sinPlata = armar({ responde: conLink });
+  sinPlata.m.mensajes.find((x) => x.id === sinPlata.m.disparo).texto = "no tengo plata para nada ahora";
+  await sinPlata.agente.procesar(ID_LARGO, sinPlata.m.disparo);
+  assert.deepEqual(sinPlata.m.calientes, []);
 });
