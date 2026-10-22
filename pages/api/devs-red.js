@@ -1,5 +1,6 @@
 import { guardarDev, hayBase } from "../../lib/db";
-import { anotarFormularioLleno } from "../../lib/dm/base";
+import { agendarCaliente, anotarFormularioLleno } from "../../lib/dm/base";
+import { MINUTOS_CALIENTE } from "../../lib/dm/pagina";
 import { firmaValida } from "../../lib/dm/firmaIg";
 import { linkCharlaIg } from "../../lib/dm/instagram";
 import { firmaDeLink, idDeLink } from "../../lib/dm/linkFormulario";
@@ -55,6 +56,9 @@ export default async function handler(req, res) {
   if (d.ig && hayBase()) {
     try {
       charla = await anotarFormularioLleno(d.ig, { anotar: guardado && !compartido });
+      // Y a los 15 minutos el agente le pregunta por el video, si no escribió antes (lib/dm/pagina.js, 22/10): los que
+      // compraron decidieron en esos primeros minutos.
+      if (charla?.anotada === 1 && charla.dueno === "agente") await agendarCaliente(d.ig, "formulario", MINUTOS_CALIENTE.formulario);
     } catch (e) {
       console.error("devs-red: no pude anotar el formulario en la charla:", e.message);
     }

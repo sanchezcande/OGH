@@ -39,13 +39,15 @@ import {
 } from "../../../lib/dm/seguimientos";
 import * as base from "../../../lib/dm/base";
 import {
-  ajustes, borrarViejas, codigosSinAviso, fotosSinAviso, hayBase, reclamarEspera, reclamarToque, sinContestar, sinVentana, soltarEspera, tablas,
-  vencerPendientes,
+  ajustes, borrarViejas, codigosSinAviso, fotosSinAviso, hayBase, reclamarCaliente, reclamarEspera, reclamarToque, sinContestar, sinVentana,
+  soltarEspera, tablas, vencerPendientes,
 } from "../../../lib/dm/base";
+import { CALIENTES } from "../../../lib/dm/pagina";
 
 const mandarResumen = crearResumen({ base, manychat, avisar: avisarDm });
 
 const TOQUES_POR_CORRIDA = 10;
+const CALIENTES_POR_CORRIDA = 10;
 
 export default async function handler(req, res) {
   const inicio = Date.now();
@@ -122,6 +124,23 @@ export default async function handler(req, res) {
     resumen = await mandarResumen({ hasta: Date.now() + 30000 });
   } catch (e) {
     console.error("dm: no se pudo mandar el resumen de las notas", e.message);
+  }
+
+  // Los turnos inmediatos (lib/dm/pagina.js, 22/10): después del formulario, del clic en pagar o del link sin llenar. Van
+  // antes que los toques y con las mismas condiciones, salvo la hora: el del formulario y el del pago siguen a algo que
+  // la persona acaba de hacer en la página, así que salen también de noche; el del link, solo en el horario de los toques.
+  if (prendido && aj.toques === true && macViva && !hayEspera(filas, ops)) {
+    const motivos = horaDeToques(new Date()) ? CALIENTES : CALIENTES.filter((m) => m !== "link");
+    for (let i = 0; i < CALIENTES_POR_CORRIDA && Date.now() < limite; i++) {
+      const t = await reclamarCaliente({ motivos });
+      if (!t) break;
+      try {
+        const r = await agente.turnoCaliente(t);
+        if (r?.hecho === "enviada") hechos++;
+      } catch (e) {
+        console.error("dm: falló el turno inmediato", colaDe(t.id), e.message);
+      }
+    }
   }
 
   // Toques: si la Mac no está contestando, si hay charlas esperando respuesta (las contesta el cron de

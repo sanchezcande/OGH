@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import styled from "styled-components";
 import { evento } from "../../lib/embudo";
+import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 
 // Página post-formulario (rediseño Cande sept 2026):
 // "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
@@ -53,13 +54,21 @@ export default function Gracias() {
   // El sorteo pasa en el navegador, no en el render del servidor: si no, Next devuelve la misma
   // versión cacheada a todo el mundo y la prueba no reparte.
   const [ver, setVer] = useState("a");
+  // La charla de Instagram de esta persona, si llegó con el link del agente: /devs la dejó en la pestaña. Va con el
+  // video entero y con el clic en pagar, así el agente sabe qué pasó acá (lib/dm/pagina.js, 22/10).
+  const [charla, setCharla] = useState(null);
   const WISTIA_ID = ver === "b" ? WISTIA_B : WISTIA_A;   // lo usa el <wistia-player> de abajo
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const v = versionDelVisitante();
     setVer(v);
-    const ev = f => evento(WISTIA_B ? f + "_" + v : f);   // sin prueba, los eventos van como siempre
+    const almacen = () => window.sessionStorage;
+    const ig = idDeLaPestana("", almacen);
+    const ch = ig ? { ig, firma: firmaDeLaPestana("", almacen) } : null;
+    setCharla(ch);
+    // Sin prueba, los eventos van como siempre. La charla, solo con las fases que le importan al agente.
+    const ev = f => evento(WISTIA_B ? f + "_" + v : f, f === "video_fin" ? ch : null);
     const id = v === "b" ? WISTIA_B : WISTIA_A;
     ev("gracias_vista");
 
@@ -126,14 +135,14 @@ export default function Gracias() {
                 target={GUMROAD ? "_blank" : undefined}
                 rel={GUMROAD ? "noopener noreferrer" : undefined}
                 $listo={!!GUMROAD}
-                onClick={e => { evento(WISTIA_B ? "click_gumroad_" + ver : "click_gumroad"); if (!GUMROAD) e.preventDefault(); }}
+                onClick={e => { evento(WISTIA_B ? "click_gumroad_" + ver : "click_gumroad", charla); if (!GUMROAD) e.preventDefault(); }}
               >
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>
               {MERCADOPAGO && (
                 <PesosBoton
                   href={MERCADOPAGO}
-                  onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp")}
+                  onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp", charla)}
                 >
                   Si sos de Argentina, apretá acá
                 </PesosBoton>
