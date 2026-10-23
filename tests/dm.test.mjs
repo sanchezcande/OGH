@@ -3875,6 +3875,37 @@ test("al salir el link del formulario con el id de la charla se agenda el turno 
   assert.deepEqual(sinLink.m.calientes, []);
 });
 
+test("si el lead promete llenar el formulario ya, a la hora va el de unaa pudiste: se agenda calle o conteste el agente (24/10)", async () => {
+  // 24/10, Cande: "poné que a los minutos diga: de unaa, pudiste?", "diría una hora después".
+  const ID_LARGO = "1234567";
+  const conLink = (m, texto) => m.mensajes.splice(0, m.mensajes.length,
+    { id: 0, quien: "agente", texto: AVISO },
+    { id: 1, quien: "agente", texto: "Te dejo el formulario de prueba\nopengatehub.com/devs?ig=1234567" },
+    { id: 2, quien: "lead", texto });
+  const calla = armar({ responde: () => salida([], { accion: "callar" }) });
+  conLink(calla.m, "dale, ahi lo lleno");
+  assert.equal((await calla.agente.procesar(ID_LARGO, calla.m.disparo)).hecho, "calló");
+  assert.deepEqual(calla.m.calientes, [["promesa", 60]]);
+  const contesta = armar({ responde: () => salida(["Respuesta de prueba?"]) });
+  conLink(contesta.m, "Hola, horita lo lleno");
+  assert.equal((await contesta.agente.procesar(ID_LARGO, contesta.m.disparo)).hecho, "enviada");
+  assert.deepEqual(contesta.m.calientes, [["promesa", 60]]);
+  const despues = armar({ responde: () => salida([], { accion: "callar" }) });
+  conLink(despues.m, "lo lleno mañana de prueba");
+  await despues.agente.procesar(ID_LARGO, despues.m.disparo);
+  assert.deepEqual(despues.m.calientes, []);
+  const sinLink = armar({ responde: () => salida([], { accion: "callar" }) });
+  sinLink.m.mensajes.at(-1).texto = "ahi lo lleno";
+  await sinLink.agente.procesar(ID_LARGO, sinLink.m.disparo);
+  assert.deepEqual(sinLink.m.calientes, []);
+  const lleno = armar({ responde: () => salida([], { accion: "callar" }) });
+  conLink(lleno.m, "ahi lo lleno");
+  lleno.m.mensajes.splice(2, 0, { id: 9, quien: "sistema", texto: NOTA_FORMULARIO });
+  await lleno.agente.procesar(ID_LARGO, lleno.m.disparo);
+  assert.deepEqual(lleno.m.calientes, []);
+  assert.equal((await lleno.agente.turnoCaliente({ id: "77", motivo: "promesa", desde: new Date(AHORA) })).hecho, "ya llenó el formulario");
+});
+
 test("el turno inmediato sale como turno del controlador con su indicación y cuenta como toque", async () => {
   const { agente, m } = armarToque({ responde: () => salida(["Pregunta de prueba sobre el pago?"]) });
   const desde = new Date(AHORA - 30 * 60000);
