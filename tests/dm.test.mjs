@@ -3927,3 +3927,15 @@ test("el turno del link se agenda solo al contestarle al lead, la primera vez qu
   await sinPlata.agente.procesar(ID_LARGO, sinPlata.m.disparo);
   assert.deepEqual(sinPlata.m.calientes, []);
 });
+
+test("quién redacta: la Mac si contesta, la API de respaldo si no contesta y hay clave, y si no nadie (23/10)", async () => {
+  const { quienRedacta, MAC_VIVA_SEGUNDOS } = await import("../lib/dm/seguimientos.js");
+  const local = { cerebro: "local" };
+  assert.equal(quienRedacta(local, 30, true), "mac");
+  assert.equal(quienRedacta(local, 30, false), "mac");
+  assert.equal(quienRedacta(local, MAC_VIVA_SEGUNDOS + 1, true), "api");
+  assert.equal(quienRedacta(local, null, true), "api");
+  assert.equal(quienRedacta(local, MAC_VIVA_SEGUNDOS + 1, false), null);
+  assert.equal(quienRedacta({ ...local, respaldo_api: false }, MAC_VIVA_SEGUNDOS + 1, true), null);
+  assert.equal(quienRedacta({ cerebro: "api" }, null, false), "api");
+});

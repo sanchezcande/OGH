@@ -33,10 +33,9 @@
 // toques (/api/dm/toques).
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
-import { agente, colaDe } from "../../../lib/dm/armado";
-import { segundosDesdeElLatido } from "../../../lib/dm/cola";
+import { agente, cerebroAhora, colaDe } from "../../../lib/dm/armado";
 import {
-  ESPERA_EN_PARALELO, MAC_VIVA_SEGUNDOS, REINTENTO_MAX_FALLOS, vaciarEspera,
+  ESPERA_EN_PARALELO, REINTENTO_MAX_FALLOS, vaciarEspera,
 } from "../../../lib/dm/seguimientos";
 import { ajustes, hayBase, reclamarEspera, sinContestar, soltarEspera, tablas } from "../../../lib/dm/base";
 
@@ -57,8 +56,8 @@ export default async function handler(req, res) {
   const prendido = aj.modo === "auto" || aj.modo === "sombra";
   if (!prendido) return res.status(200).json({ ok: true, reintentos: 0, motivo: "apagado" });
   // Las redacta la Mac de Cande (salvo cerebro "api"): sin ella, siguen esperando.
-  const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();
-  const macViva = latido !== null && latido < MAC_VIVA_SEGUNDOS;
+  // Hay quien redacte: la Mac, o la API de respaldo si la Mac no contesta y hay clave (lib/dm/armado.js).
+  const macViva = (await cerebroAhora(aj)) !== null;
   if (!macViva) return res.status(200).json({ ok: true, reintentos: 0, motivo: "sin Mac" });
 
   let r = { reintentos: 0, cayo: false };
