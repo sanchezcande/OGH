@@ -18,7 +18,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import { base as pg } from "./dobles/postgres.mjs";
 
-const { notaPais, NOTA_DE_FASE, NOTA_VIDEO_ENTERO, NOTA_TOCO_PESOS, CALIENTES, MINUTOS_CALIENTE, INDICACION_CALIENTE } =
+const { notaPais, NOTA_DE_FASE, NOTA_VIDEO_ENTERO, NOTA_TOCO_PESOS, CALIENTES, MINUTOS_CALIENTE, INDICACION_CALIENTE, prometeLlenar } =
   await import("../lib/dm/pagina.js");
 const { firmarIg, igFirmado } = await import("../lib/dm/firmaIg.js");
 const { anotarPagina, agendarCaliente, reclamarCaliente, formularioDeLaCharla } = await import("../lib/dm/base.js");
@@ -52,10 +52,22 @@ test("la línea del país: solo el nombre de un país que se reconoce, nunca el 
 
 test("cada fase que llega a la charla tiene su nota, y los turnos inmediatos su indicación y sus minutos", () => {
   assert.deepEqual(Object.keys(NOTA_DE_FASE).sort(), ["click_gumroad", "click_mp", "video_fin"]);
-  assert.deepEqual(CALIENTES, ["link", "formulario", "pago"]);
+  assert.deepEqual(CALIENTES, ["link", "promesa", "formulario", "pago"]);
   for (const c of CALIENTES) {
     assert.ok(MINUTOS_CALIENTE[c] > 0, c);
     assert.ok(INDICACION_CALIENTE[c].length > 40, c);
+  }
+});
+
+test("el que promete llenar el formulario ya tiene su turno a la hora con el de unaa pudiste; el que lo deja para después, no (24/10)", () => {
+  // 24/10, Cande: "poné que a los minutos diga: de unaa, pudiste?", "diría una hora después".
+  assert.equal(MINUTOS_CALIENTE.promesa, 60);
+  assert.match(INDICACION_CALIENTE.promesa, /de unaa, pudiste\?/);
+  for (const t of ["dale, ahi lo lleno", "Hola, horita lo lleno", "claro ahí mismo", "ya lo completo", "ahora voy a llenarlo", "lo estoy llenando"]) {
+    assert.equal(prometeLlenar(t), true, t);
+  }
+  for (const t of ["lo lleno mañana", "a la noche lo completo", "el finde lo hago", "después lo lleno", "no me interesa", "ya lo llené", "mensaje de prueba"]) {
+    assert.equal(prometeLlenar(t), false, t);
   }
 });
 
@@ -183,7 +195,7 @@ test("agendarCaliente: solo en una charla del agente y sin pisar a uno más avan
   const [{ t, params }] = h.calientes;
   assert.match(t, /WHERE id = \? AND dueno = 'agente'/);
   assert.match(t, /array_position\(\?::text\[\], caliente_por\) <= \?/);
-  assert.ok(params.includes(2)); // formulario es el segundo: pisa al del link y no al del pago
+  assert.ok(params.includes(3)); // formulario es el tercero: pisa al del link y al de la promesa, no al del pago
   assert.equal(await agendarCaliente(ID, "otro", 15), false);
   assert.equal(await agendarCaliente("abc", "pago", 30), false);
   assert.equal(h.calientes.length, 1);
