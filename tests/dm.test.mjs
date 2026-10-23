@@ -1044,19 +1044,28 @@ test("del aviso del modelo, cuando el agente sigue con la charla o calla, a Cand
   assert.equal(sigue.m.avisos.length, 0);
   assert.equal(sigue.m.salidas[0].aviso, "aviso de prueba");
   assert.equal(sigue.m.contacto.dueno, "agente");
-  const urgente = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "HOY: aviso de prueba" }) });
+  const urgente = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "HOY: preguntó si es un bot" }) });
   await urgente.agente.procesar("77", urgente.m.disparo);
   assert.equal(urgente.m.avisos.length, 1);
   assert.equal(urgente.m.avisos[0].campos["El agente le mandó"], "Respuesta de prueba?");
-  const calla = armar({ responde: () => salida([], { accion: "callar", aviso_para_cande: "YA: aviso de prueba" }) });
+  const calla = armar({ responde: () => salida([], { accion: "callar", aviso_para_cande: "YA: preguntó si es un bot" }) });
   assert.equal((await calla.agente.procesar("77", calla.m.disparo)).hecho, "calló");
   assert.equal(calla.m.avisos.length, 1);
   assert.equal(calla.m.avisos[0].titulo, "Lead de prueba · DM URGENTE: aviso del agente");
-  assert.equal(calla.m.salidas[0].aviso, "YA: aviso de prueba");
+  assert.equal(calla.m.salidas[0].aviso, "YA: preguntó si es un bot");
   assert.equal(calla.m.contacto.dueno, "agente");
   const sinAviso = armar();
   await sinAviso.agente.procesar("77", sinAviso.m.disparo);
   assert.equal(sinAviso.m.avisos.length, 0);
+});
+
+test("lo urgente de un dev que no nombra un bot no le llega a Cande: queda guardado con la salida (23/10)", async () => {
+  // 23/10, Cande: "me está pasando cada boludez de mensaje telegram", "me debería pasar solo empresas", "o cuando
+  // mencionan que es IA o un bot".
+  const dev = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: "HOY: preguntó algo de prueba" }) });
+  assert.equal((await dev.agente.procesar("77", dev.m.disparo)).hecho, "enviada");
+  assert.equal(dev.m.avisos.length, 0);
+  assert.equal(dev.m.salidas[0].aviso, "HOY: preguntó algo de prueba");
 });
 
 test("si el aviso a Cande no sale, queda anotado para que se vea en el estado", async () => {
@@ -1212,7 +1221,7 @@ test("en un toque, a Cande solo le llega el aviso del modelo si es urgente", asy
   const comun = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { aviso_para_cande: "una nota" }) });
   assert.equal((await toque(comun.agente)).hecho, "enviada");
   assert.equal(comun.m.avisos.length, 0);
-  const urgente = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { aviso_para_cande: "HOY: algo para mirar" }) });
+  const urgente = armarToque({ responde: () => salida(["Mensaje de seguimiento?"], { aviso_para_cande: "HOY: preguntó si es un bot" }) });
   assert.equal((await toque(urgente.agente)).hecho, "enviada");
   assert.equal(urgente.m.avisos.length, 1);
 });
@@ -3375,7 +3384,7 @@ test("F: si el modelo dice que construye o contrata, ahora o en un turno anterio
 });
 
 test("un aviso HOY: o YA: suena aunque venga en minúsculas o con espacios: es la misma definición que deja afuera del resumen", async () => {
-  for (const aviso of ["hoy: preguntó algo de prueba", " HOY : preguntó algo de prueba", "Ya: riesgo de prueba"]) {
+  for (const aviso of ["hoy: preguntó si es un bot", " HOY : preguntó si es un bot", "Ya: preguntó si es un bot"]) {
     const { agente, m } = armar({ responde: () => salida(["Pregunta de prueba?"], { aviso_para_cande: aviso }) });
     assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada", aviso);
     assert.equal(m.avisos.length, 1, `${aviso}: tiene que sonar`);

@@ -19,7 +19,7 @@ import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const { franjaDeResumen, etiquetaDe, agrupar, armarPartes, corteDe, crearResumen, TOPE_TEXTO, TOPE_PARTES, TOPE_FILAS } = await import("../lib/dm/resumen.js");
+const { franjaDeResumen, etiquetaDe, agrupar, armarPartes, corteDe, crearResumen, esParaCande, TOPE_TEXTO, TOPE_PARTES, TOPE_FILAS } = await import("../lib/dm/resumen.js");
 const { leerRespuesta, crearRespuestaTelegram, etiquetaDeResumen, contactoDeAviso, porNumero, AYUDA_RESUMEN } = await import("../lib/dm/respuestas.js");
 const { avisar } = await import("../lib/notificar.js");
 const { crearAvisoDm } = await import("../lib/dm/armado.js");
@@ -51,7 +51,8 @@ function baseDeResumen({ notas = [], previo = null } = {}) {
     },
     notasParaResumen: async (desde, hasta) => {
       b.pedidas = [desde, hasta];
-      return notas;
+      // Desde el 23/10 al resumen solo van las de empresas (esParaCande): las de estas pruebas son de empresa.
+      return notas.map((n) => ({ quien: "empresa", ...n }));
     },
     numeroDeResumen: async (etiqueta, n) => b.listas[etiqueta]?.[String(n)] ?? null,
     guardarIg: async () => {},
@@ -66,6 +67,27 @@ const novedad = (texto, aviso, { bot = true, id = 7 } = {}) => ({
 });
 
 /* ---------- cuándo y qué ---------- */
+
+test("a Telegram solo van las notas de empresas, de quien arma algo y va a contratar, o de quien pregunta si es un bot (23/10)", () => {
+  // 23/10, Cande: "me debería pasar solo empresas", "o cuando mencionan que es IA o un bot".
+  const van = [
+    { quien: "empresa", aviso: "NOTA: tiene una agencia de prueba" },
+    { quien: "construye", aviso: "NOTA: arma un producto de prueba y dice que contratarían devs el año que viene" },
+    { quien: "dev", aviso: "NOTA: preguntó si es un bot" },
+    { quien: "dev", aviso: "NOTA: de prueba", dijo: "me está respondiendo un bot?" },
+    { quien: "estudia", aviso: "NOTA: de prueba", dijo: "sos una IA?" },
+  ];
+  const noVan = [
+    { quien: "dev", aviso: "NOTA: dev que busca trabajo, de prueba" },
+    { quien: "construye", aviso: "NOTA: arma una app de prueba sin contratar a nadie" },
+    { quien: "construye", aviso: "NOTA: no contrata, busca inversión de prueba" },
+    { quien: "dev", aviso: "NOTA: arma un agente de IA de prueba para su tienda" },
+    { quien: "dev", aviso: "NOTA: arma un bot de prueba para WhatsApp" },
+    { quien: undefined, aviso: "NOTA: de prueba" },
+  ];
+  for (const c of van) assert.equal(esParaCande(c), true, JSON.stringify(c));
+  for (const c of noVan) assert.equal(esParaCande(c), false, JSON.stringify(c));
+});
 
 test("el resumen sale a las 9 y a las 18 de Bali: la franja es la última de esas horas que ya pasó", () => {
   const f = (iso) => franjaDeResumen(new Date(iso)).toISOString();
