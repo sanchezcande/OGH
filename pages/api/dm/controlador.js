@@ -9,18 +9,12 @@
 // recorrido vive en la base (dm_config "controlador_patrones"): sin eso, solo miran quién quedó sin respuesta.
 //
 // Devuelve solo cantidades: ni ids ni nombres salen en la respuesta ni en los registros.
-import { agente } from "../../../lib/dm/armado";
+import { agente, cerebroAhora } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
-import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import { crearControlador } from "../../../lib/dm/controlador";
-import { MAC_VIVA_SEGUNDOS } from "../../../lib/dm/seguimientos";
 
-/** Si la Mac está redactando (salvo con el cerebro de la API): sin ella no se corrige, queda para la vuelta siguiente. */
-async function macViva(aj) {
-  if (aj?.cerebro === "api") return true;
-  const s = await segundosDesdeElLatido();
-  return s !== null && s < MAC_VIVA_SEGUNDOS;
-}
+/** Si hay quien redacte (la Mac, o la API de respaldo): sin nadie no se corrige, queda para la vuelta siguiente. */
+const macViva = async (aj) => (await cerebroAhora(aj)) !== null;
 
 const controlar = crearControlador({ base, agente, macViva });
 

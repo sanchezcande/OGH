@@ -29,13 +29,13 @@
 //   6. Borra lo guardado de las charlas que llevan 90 días quietas.
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
-import { agente, avisarDm, colaDe } from "../../../lib/dm/armado";
-import { borrarTrabajosViejos, segundosDesdeElLatido } from "../../../lib/dm/cola";
+import { agente, avisarDm, cerebroAhora, colaDe } from "../../../lib/dm/armado";
+import { borrarTrabajosViejos } from "../../../lib/dm/cola";
 import { horaDeToques } from "../../../lib/dm/frenos";
 import * as manychat from "../../../lib/dm/manychat";
 import { crearResumen } from "../../../lib/dm/resumen";
 import {
-  MAC_VIVA_SEGUNDOS, REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar,
+  REINTENTO_MAX_FALLOS, correrToques, hayEspera, pasarSinContestar,
 } from "../../../lib/dm/seguimientos";
 import * as base from "../../../lib/dm/base";
 import {
@@ -79,8 +79,8 @@ export default async function handler(req, res) {
     else if (r !== "descartada") sinAtender++; // descartada: la charla sigue del agente (una retomada donde escribió Cande)
   }
   // Los toques y las respuestas de la espera los redacta la Mac de Cande (salvo cerebro "api").
-  const latido = aj.cerebro === "api" ? 0 : await segundosDesdeElLatido();
-  const macViva = latido !== null && latido < MAC_VIVA_SEGUNDOS;
+  // Hay quien redacte: la Mac, o la API de respaldo si la Mac no contesta y hay clave (lib/dm/armado.js).
+  const macViva = (await cerebroAhora(aj)) !== null;
   const limite = inicio + (config.maxDuration - 130) * 1000;
 
   // Las charlas sin atender: acá solo se pasa lo que no tiene arreglo. Lo demás queda en espera.
