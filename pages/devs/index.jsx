@@ -138,11 +138,14 @@ export default function RedDeDevs() {
   // trajo a la persona (el DM de ManyChat por comentario, por mensaje, la bienvenida, la bio).
   // Se manda APARTE y no en lugar de form_visto: asi las cuentas de siempre no cambian.
   // La puerta que no este en la lista entra como "otro", no se pierde (ver lib/origenForm.js).
+  // La puerta tambien viaja con el formulario (24/10/2026), para que quede en la fila del lead y se
+  // pueda cruzar con las compras: en funnel_eventos no hay nadie con nombre. Ver lib/origenForm.js.
+  const [puerta, setPuerta] = useState(null);
   React.useEffect(() => {
     evento("form_visto");
     try {
       const de = normalizarOrigen(new URLSearchParams(window.location.search).get("de"));
-      if (de) evento("form_visto_" + de);
+      if (de) { setPuerta(de); evento("form_visto_" + de); }
     } catch (e) { /* medir nunca rompe la pagina */ }
   }, []);
   const [f, setF] = useState(inicial);
@@ -210,7 +213,7 @@ export default function RedDeDevs() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Sin ?ig= el pedido es el de siempre. La firma va solo con su id.
-        body: JSON.stringify(ig ? { ...f, ig, firma } : f),
+        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}) }),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
       evento("enviado");

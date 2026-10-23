@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ORIGENES, OTRO, normalizarOrigen, FASES_ORIGEN_FORM } from "../lib/origenForm.js";
+import { ORIGENES, OTRO, normalizarOrigen, FASES_ORIGEN_FORM} from "../lib/origenForm.js";
 
 test("acepta las puertas conocidas, tal cual", () => {
   for (const o of ORIGENES) {
@@ -44,4 +44,29 @@ test("la bifurcacion /hola manda la puerta, si no bio da 0 para siempre", async 
   assert.ok(m, "no encontre el destino dev en pages/hola.jsx");
   const de = new URL(m[1], "https://x.test").searchParams.get("de");
   assert.equal(normalizarOrigen(de), "bio");
+});
+
+// La puerta queda en la fila del lead (24/10/2026). Antes el ?de= solo vivía en funnel_eventos,
+// donde nadie tiene nombre: no se podía cruzar un lead ni una compra con la puerta que lo trajo.
+test("la puerta se guarda en la fila del lead y la primera no se pisa", async () => {
+  const fs = await import("node:fs/promises");
+  const db = await fs.readFile(new URL("../lib/db.js", import.meta.url), "utf8");
+  assert.ok(/ADD COLUMN IF NOT EXISTS puerta TEXT/.test(db), "falta la columna puerta");
+  assert.ok(/ig_contacto, puerta\)/.test(db), "el INSERT no manda puerta");
+  assert.ok(/puerta = COALESCE\(red_devs\.puerta, EXCLUDED\.puerta\)/.test(db),
+            "al volver a llenar el formulario se pisaría la puerta original");
+
+  const api = await fs.readFile(new URL("../pages/api/devs-red.js", import.meta.url), "utf8");
+  assert.ok(/d\.puerta = normalizarOrigen\(d\.puerta\)/.test(api),
+            "la API tiene que normalizar la puerta y no guardar lo que venga crudo");
+
+  const pag = await fs.readFile(new URL("../pages/devs/index.jsx", import.meta.url), "utf8");
+  assert.ok(/puerta \? \{ puerta \} : \{\}/.test(pag), "la página no manda la puerta en el envío");
+});
+
+test("lo que la página manda como puerta es lo que la base puede agrupar", () => {
+  // Si la página mandara algo que normalizarOrigen no conoce, red_devs.puerta se llenaría de
+  // "otro" y no se podría contar nada por puerta.
+  for (const p of ORIGENES) assert.equal(normalizarOrigen(p), p);
+  assert.equal(normalizarOrigen("cv-comentario"), "cv-comentario");
 });

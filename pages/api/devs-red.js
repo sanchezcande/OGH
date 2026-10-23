@@ -5,6 +5,7 @@ import { firmaValida } from "../../lib/dm/firmaIg";
 import { linkCharlaIg } from "../../lib/dm/instagram";
 import { firmaDeLink, idDeLink } from "../../lib/dm/linkFormulario";
 import { avisar } from "../../lib/notificar";
+import { normalizarOrigen } from "../../lib/origenForm";
 import { pedirCV } from "../../lib/pedirCV";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,6 +29,10 @@ export default async function handler(req, res) {
   // pegado. Lo que no tenga el formato de un id no se guarda ni se usa.
   // Y con su firma (el f= del link, que la página manda como `firma`; lib/dm/firmaIg.js): un número cambiado a mano
   // no coincide, y entonces el formulario se guarda igual pero sin ig_contacto y sin tocar ninguna charla.
+  // La puerta por la que entró (el ?de= del link, que la página manda como `puerta`). Se normaliza acá
+  // también y no solo en la página: lo que llega de afuera nunca se guarda crudo. Ver lib/origenForm.js.
+  d.puerta = normalizarOrigen(d.puerta);
+
   const igDelLink = idDeLink(d.ig);
   const firmaOk = Boolean(igDelLink) && firmaValida(igDelLink, firmaDeLink(d.firma));
   d.ig = firmaOk ? igDelLink : null;
