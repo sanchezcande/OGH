@@ -3939,3 +3939,10 @@ test("quién redacta: la Mac si contesta, la API de respaldo si no contesta y ha
   assert.equal(quienRedacta({ ...local, respaldo_api: false }, MAC_VIVA_SEGUNDOS + 1, true), null);
   assert.equal(quienRedacta({ cerebro: "api" }, null, false), "api");
 });
+
+test("un aviso que es solo comillas o espacios no le llega a Cande como nota en blanco (23/10)", () => {
+  for (const vacio of ['""', "''", " \"\" ", "“”", "", "   "]) {
+    assert.equal(normalizar({ accion: "responder", mensajes: ["Hola de prueba"], aviso_para_cande: vacio }).aviso_para_cande, "", JSON.stringify(vacio));
+  }
+  assert.equal(normalizar({ accion: "responder", mensajes: ["x"], aviso_para_cande: "NOTA: de prueba" }).aviso_para_cande, "NOTA: de prueba");
+});
