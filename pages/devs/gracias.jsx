@@ -12,8 +12,8 @@ import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 // Video único de Gumroad, actualizado por Cande el 25/10/2026 con el último testimonio.
 const WISTIA_A = "gzpbw7xoib";
 const TESTIMONIOS_VIDEO = [
-  { nombre: "Francisco Peña", id: "06y0i47nkb" },
-  { nombre: "Eduardo Hidalgo", id: "rqqzkavkxe" },
+  { nombre: "Francisco Peña", lugar: "Mérida, Venezuela", id: "06y0i47nkb" },
+  { nombre: "Eduardo Hidalgo", lugar: "Ambato, Ecuador", id: "rqqzkavkxe" },
   { nombre: "Andrés Murillo", lugar: "Soledad, Colombia", id: "0mib7zqd5d" },
 ];
 // Sin B no hay prueba: todos ven el A y los eventos vuelven a sus nombres de siempre. Se ignora a propósito
