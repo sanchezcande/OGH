@@ -173,8 +173,8 @@ export default function Gracias() {
                       preload="none"
                     ></wistia-player>
                   </VideoRetrato>
-                  <Estrellas aria-label="5 de 5 estrellas">★★★★★</Estrellas>
                   <VideoFirma>
+                    <Estrellas aria-label="5 de 5 estrellas">★★★★★</Estrellas>
                     <Nombre>{persona.nombre}</Nombre>
                     {persona.lugar && <Lugar>{persona.lugar}</Lugar>}
                   </VideoFirma>
@@ -200,9 +200,9 @@ export default function Gracias() {
                 },
               ].map((persona) => (
                 <Testimonio key={persona.nombre}>
-                  <Estrellas aria-label="5 de 5 estrellas">★★★★★</Estrellas>
                   <Cita>“{persona.texto}”</Cita>
                   <Firma>
+                    <Estrellas aria-label="5 de 5 estrellas">★★★★★</Estrellas>
                     <Nombre>{persona.nombre}</Nombre>
                     <Lugar>{persona.lugar}</Lugar>
                   </Firma>
@@ -274,10 +274,10 @@ const VideoRetrato = styled.div`
   wistia-player { display: block; width: 100%; height: 100%; }
 `;
 const Estrellas = styled.p`
-  margin: 13px 0 7px; color: #c88b35; font-size: 17px; letter-spacing: .13em;
-  line-height: 1; text-align: center;
+  margin: 0 0 6px; color: #b87927; font-size: 12px; letter-spacing: .08em;
+  line-height: 1; text-align: left;
 `;
-const VideoFirma = styled.div`text-align: center;`;
+const VideoFirma = styled.div`margin-top: 12px; text-align: center; ${Estrellas} { text-align: center; }`;
 const TestimoniosGrid = styled.div`
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
   @media (max-width: 720px) {
