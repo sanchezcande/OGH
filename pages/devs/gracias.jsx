@@ -65,9 +65,13 @@ export default function Gracias() {
     if (typeof window === "undefined") return;
     const v = versionDelVisitante();
     setVer(v);
-    const almacen = () => window.sessionStorage;
-    const ig = idDeLaPestana("", almacen);
-    const ch = ig ? { ig, firma: firmaDeLaPestana("", almacen) } : null;
+    // La charla de esta pestaña (vino del formulario) o, si la página se abrió aparte, la que dejó /devs en este
+    // navegador: el link a /devs/gracias que manda el agente lo abre Instagram en otra pestaña (26/10).
+    const charlaDe = (almacen) => {
+      const ig = idDeLaPestana("", almacen);
+      return ig ? { ig, firma: firmaDeLaPestana("", almacen) } : null;
+    };
+    const ch = charlaDe(() => window.sessionStorage) || charlaDe(() => window.localStorage);
     setCharla(ch);
     // Sin prueba, los eventos van como siempre. La charla, solo con las fases que le importan al agente.
     const ev = f => evento(WISTIA_B ? f + "_" + v : f, f === "video_fin" ? ch : null);

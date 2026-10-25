@@ -356,6 +356,8 @@ test("/devs lee ?ig= con el mismo validador, lo saca de la barra con el router l
   assert.match(efecto[0], /setIg\(idDeLaPestana\(window\.location\.search, \(\) => window\.sessionStorage\)\);/);
   // La firma del id (f=), igual que el id: de la dirección o de la pestaña.
   assert.match(efecto[0], /setFirma\(firmaDeLaPestana\(window\.location\.search, \(\) => window\.sessionStorage\)\);/);
+  // Y una copia en el navegador para /devs/gracias abierta en otra pestaña (26/10).
+  assert.match(efecto[0], /idDeLaPestana\(window\.location\.search, \(\) => window\.localStorage\);/);
   // Sin navegar (router.replace prende el cartel de cargando de _app.js) y con el estado de Next igual de limpio.
   assert.match(efecto[0], /window\.history\.replaceState\(st\?\.__N \? \{ \.\.\.st, url: sinIg\(st\.url\), as: sinIg\(st\.as\) \} : st, "", limpia\);/);
   assert.doesNotMatch(efecto[0], /router\.(replace|push)/);
@@ -372,6 +374,19 @@ function pestana({ guardado = null, roto = false } = {}) {
   const s = { getItem: (k) => (datos.has(k) ? datos.get(k) : null), setItem: (k, v) => datos.set(k, String(v)) };
   return { almacen: () => { if (roto) throw new Error("SecurityError"); return s; }, datos };
 }
+
+test("la copia del navegador lleva el id y la firma a una pestaña nueva, y una visita sin ?ig= no la toca (26/10)", () => {
+  // Instagram abre el link a /devs/gracias en otra pestaña, con el sessionStorage vacío: la charla sale del localStorage.
+  const F = "AbC-_d3F9z";
+  const navegador = pestana();
+  idDeLaPestana(`?ig=${ID}&f=${F}`, navegador.almacen);
+  const nueva = pestana();
+  assert.equal(idDeLaPestana("", nueva.almacen), null);
+  assert.equal(idDeLaPestana("", navegador.almacen), ID);
+  assert.equal(firmaDeLaPestana("", navegador.almacen), F);
+  idDeLaPestana("?de=bio", navegador.almacen);
+  assert.equal(idDeLaPestana("", navegador.almacen), ID);
+});
 
 test("el id queda en la pestaña: si recarga sin el ?ig= en la barra, el formulario lo sigue mandando", () => {
   const p = pestana();
