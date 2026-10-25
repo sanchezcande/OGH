@@ -11,6 +11,11 @@ import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
 // Video único de Gumroad, actualizado por Cande el 25/10/2026 con el último testimonio.
 const WISTIA_A = "gzpbw7xoib";
+const TESTIMONIOS_VIDEO = [
+  { nombre: "Francisco Peña", id: "06y0i47nkb" },
+  { nombre: "Eduardo Hidalgo", id: "rqqzkavkxe" },
+  { nombre: "Andrés Murillo", lugar: "Soledad, Colombia", id: "0mib7zqd5d" },
+];
 // Sin B no hay prueba: todos ven el A y los eventos vuelven a sus nombres de siempre. Se ignora a propósito
 // NEXT_PUBLIC_DEVS_VIDEO_B, que en Vercel apunta al video B, que ya no existe.
 const WISTIA_B = "";
@@ -81,6 +86,9 @@ export default function Gracias() {
     };
     cargar("https://fast.wistia.com/player.js");
     cargar(`https://fast.wistia.com/embed/${id}.js`, "module");
+    TESTIMONIOS_VIDEO.forEach(({ id: testimonioId }) => {
+      cargar(`https://fast.wistia.com/embed/${testimonioId}.js`, "module");
+    });
 
     // Wistia cambió de API con el web component y sus eventos ('end', 'ended') no
     // disparan parejo. Miramos el reloj del player, que sí es confiable y además
@@ -110,6 +118,7 @@ export default function Gracias() {
         <title>Tenemos tu perfil</title>
         <meta name="robots" content="noindex" />
         <style>{`wistia-player[media-id='${WISTIA_ID}']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/${WISTIA_ID}/swatch');display:block;filter:blur(5px);padding-top:56.25%;}`}</style>
+        <style>{TESTIMONIOS_VIDEO.map(({ id }) => `wistia-player[media-id='${id}']:not(:defined){background:center / cover no-repeat url('https://fast.wistia.com/embed/medias/${id}/swatch');display:block;}`).join("")}</style>
       </Head>
       <Fondo>
         <Caja>
@@ -153,6 +162,25 @@ export default function Gracias() {
               <TestimoniosTitulo id="testimonios-titulo">Qué les sirvió del programa</TestimoniosTitulo>
               <TestimoniosIntro>Lo cuentan ellos, con sus palabras.</TestimoniosIntro>
             </TestimoniosHeader>
+            <VideosGrid>
+              {TESTIMONIOS_VIDEO.map((persona) => (
+                <VideoTestimonio key={persona.id}>
+                  <VideoRetrato>
+                    <wistia-player
+                      media-id={persona.id}
+                      aspect="0.5625"
+                      muted
+                      preload="none"
+                    ></wistia-player>
+                  </VideoRetrato>
+                  <Estrellas aria-label="5 de 5 estrellas">★★★★★</Estrellas>
+                  <VideoFirma>
+                    <Nombre>{persona.nombre}</Nombre>
+                    {persona.lugar && <Lugar>{persona.lugar}</Lugar>}
+                  </VideoFirma>
+                </VideoTestimonio>
+              ))}
+            </VideosGrid>
             <TestimoniosGrid>
               {[
                 {
@@ -172,6 +200,7 @@ export default function Gracias() {
                 },
               ].map((persona) => (
                 <Testimonio key={persona.nombre}>
+                  <Estrellas aria-label="5 de 5 estrellas">★★★★★</Estrellas>
                   <Cita>“{persona.texto}”</Cita>
                   <Firma>
                     <Nombre>{persona.nombre}</Nombre>
@@ -226,6 +255,29 @@ const TestimoniosTitulo = styled.h2`
   letter-spacing: -.02em;
 `;
 const TestimoniosIntro = styled.p`margin: 10px 0 0; color: #625b5e; font-size: 15px; line-height: 1.5;`;
+const VideosGrid = styled.div`
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 28px;
+  @media (max-width: 720px) {
+    display: flex; overflow-x: auto; gap: 12px; padding: 0 0 10px;
+    scroll-snap-type: x mandatory; overscroll-behavior-inline: contain;
+    scrollbar-width: thin; scrollbar-color: #c9bebb transparent;
+    > * { flex: 0 0 min(72vw, 270px); scroll-snap-align: start; }
+  }
+`;
+const VideoTestimonio = styled.article`
+  padding: 12px 12px 16px; background: #fff; border: 1px solid #e6e1df;
+  border-radius: 15px; box-shadow: 0 5px 15px rgba(37,27,31,.045);
+`;
+const VideoRetrato = styled.div`
+  position: relative; width: 100%; aspect-ratio: 9 / 16; overflow: hidden;
+  border-radius: 10px; background: #eee9e7;
+  wistia-player { display: block; width: 100%; height: 100%; }
+`;
+const Estrellas = styled.p`
+  margin: 13px 0 7px; color: #c88b35; font-size: 17px; letter-spacing: .13em;
+  line-height: 1; text-align: center;
+`;
+const VideoFirma = styled.div`text-align: center;`;
 const TestimoniosGrid = styled.div`
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
   @media (max-width: 720px) {
