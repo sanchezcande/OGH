@@ -2700,6 +2700,16 @@ test("una charla con la que el modelo acaba de fallar espera su pausa: 10 minuto
   assert.equal(hayEspera([{ id: "1", intentos: 1, minutos_desde_la_falla: 2 }], ops), false, "en pausa no frena los toques");
 });
 
+test("después de una caída para todas, la pausa de cada charla cuenta solo sus fallas: una dudosa sin otra charla contestada no pausa (26/10)", async () => {
+  // 26/10: el cerebro falló un día y medio con todas las charlas y al volver cada una seguía en su pausa de 2 horas.
+  const fs = await import("node:fs/promises");
+  const src = await fs.readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const sin = src.slice(src.indexOf("export async function sinContestar()"));
+  const pausa = sin.slice(sin.indexOf("AS intentos"), sin.indexOf(") f"));
+  assert.match(pausa, /e\.motivo = \$\{FALLA_PROPIA\} OR \(e\.motivo = \$\{FALLA_DUDOSA\} AND EXISTS \(/);
+  assert.doesNotMatch(pausa, /e\.motivo IN \(\$\{FALLA_PROPIA\}, \$\{FALLA_DUDOSA\}\)/);
+});
+
 test("si hay gente esperando hace más de una hora y el modelo no contesta nada, a Cande le llega la alarma, una cada 6 horas (26/10)", async () => {
   // Del 24/10 al 26/10 el cerebro de la nube falló con todos los turnos y no salió nada en un día y medio sin que nadie
   // se enterara: la espera no avisa a propósito (19/10), así que la alarma es aparte.
