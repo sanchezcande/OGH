@@ -169,7 +169,6 @@ export default function Gracias() {
                     <wistia-player
                       media-id={persona.id}
                       aspect="0.5625"
-                      muted
                       preload="none"
                     ></wistia-player>
                   </VideoRetrato>
