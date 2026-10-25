@@ -248,6 +248,9 @@ test("formularioDeLaCharla: el país solo con un único formulario; la compra co
 test("/devs/gracias manda la charla con el video entero y con los dos botones de pagar, y nada más", async () => {
   const p = await leer("../pages/devs/gracias.jsx");
   assert.match(p, /idDeLaPestana\("", almacen\)/);
+  // 26/10: si la página se abrió en otra pestaña (Instagram abre aparte el link a /devs/gracias), la charla sale de
+  // la copia que dejó /devs en el navegador.
+  assert.match(p, /const ch = charlaDe\(\(\) => window\.sessionStorage\) \|\| charlaDe\(\(\) => window\.localStorage\);/);
   assert.match(p, /evento\(WISTIA_B \? f \+ "_" \+ v : f, f === "video_fin" \? ch : null\)/);
   assert.match(p, /evento\(WISTIA_B \? "click_gumroad_" \+ ver : "click_gumroad", charla\)/);
   assert.match(p, /evento\(WISTIA_B \? "click_mp_" \+ ver : "click_mp", charla\)/);

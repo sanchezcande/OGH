@@ -126,6 +126,9 @@ export default function RedDeDevs() {
     try {
       setIg(idDeLaPestana(window.location.search, () => window.sessionStorage));
       setFirma(firmaDeLaPestana(window.location.search, () => window.sessionStorage));
+      // Una copia para /devs/gracias abierta en otra pestaña: el link que manda el agente lo abre Instagram aparte y
+      // el sessionStorage es de una sola pestaña (26/10). Sin ?ig= en la barra no escribe nada.
+      idDeLaPestana(window.location.search, () => window.localStorage);
       const ahora = window.location.pathname + window.location.search + window.location.hash;
       const limpia = sinIg(ahora);
       if (limpia !== ahora) {
