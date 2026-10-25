@@ -9,11 +9,8 @@ import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 // El video está en Wistia. Su player es un web component: hay que cargar dos
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
-// Video único desde el 19/10/2026: el de 2 min de siempre + las respuestas a las objeciones + los testimonios
-// de alumnos. Cande decidió dejar un solo video y terminar la prueba A/B del 12/10 (al 18/10: A 52 llegaron y
-// 10 tocaron comprar, B 46 y 17). Desde la tarde del 19/10 va la versión de 5 min 01, con el testimonio de
-// Francisco Peña después del de Andrés y el cierre "Tocá abajo para acelerar tu carrera" (antes: "2r0ut42goj").
-const WISTIA_A = "3b4jx1k83g";
+// Video único de Gumroad, actualizado por Cande el 25/10/2026 con el último testimonio.
+const WISTIA_A = "gzpbw7xoib";
 // Sin B no hay prueba: todos ven el A y los eventos vuelven a sus nombres de siempre. Se ignora a propósito
 // NEXT_PUBLIC_DEVS_VIDEO_B, que en Vercel apunta al video B, que ya no existe.
 const WISTIA_B = "";
@@ -117,7 +114,7 @@ export default function Gracias() {
       <Fondo>
         <Caja>
           <Kicker>✓ Tenemos tu perfil</Kicker>
-          <H1>Ahora mirá esto, son 5 minutos</H1>
+          <H1>Ahora mirá esto</H1>
           <Bajada>Qué hace que alguien de esa lista termine quedando adentro.</Bajada>
           {/* El CV va chico y abajo del título: solo 65 de 247 lo mandan, pero pedirlo acá
               arriba le saca el lugar al video, que es lo que mueve la venta (Cande, 07/10:
@@ -150,6 +147,41 @@ export default function Gracias() {
             </Cierre>
           )}
 
+          <Testimonios aria-labelledby="testimonios-titulo">
+            <TestimoniosHeader>
+              <TestimoniosEtiqueta>Experiencias reales</TestimoniosEtiqueta>
+              <TestimoniosTitulo id="testimonios-titulo">Qué les sirvió del programa</TestimoniosTitulo>
+              <TestimoniosIntro>Lo cuentan ellos, con sus palabras.</TestimoniosIntro>
+            </TestimoniosHeader>
+            <TestimoniosGrid>
+              {[
+                {
+                  nombre: "Mariano Frias",
+                  lugar: "Cotuí, República Dominicana",
+                  texto: "He descargado varios módulos y lo que he visto me ha encantado. Tu contenido tiene un espacio especial en un gap que tenemos los developers…",
+                },
+                {
+                  nombre: "Carlos Chung",
+                  lugar: "Chiclayo, Perú",
+                  texto: "Todos los modulos me ayudaron pero en especial los de como responder las preguntas y prepararme, el de que preguntar según quien te entreviste…",
+                },
+                {
+                  nombre: "Walter Cordero",
+                  lugar: "Ciudad de Guatemala",
+                  texto: "El programa realmente da muy buenos consejos con respecto a como llevar un proceso en una entrevista, como preparar y mejorar tu CV, en mi caso pude darme cuenta que tenía cierta información mal ubicada en donde no se mostraba mi potencial a primera vista…",
+                },
+              ].map((persona) => (
+                <Testimonio key={persona.nombre}>
+                  <Cita>“{persona.texto}”</Cita>
+                  <Firma>
+                    <Nombre>{persona.nombre}</Nombre>
+                    <Lugar>{persona.lugar}</Lugar>
+                  </Firma>
+                </Testimonio>
+              ))}
+            </TestimoniosGrid>
+          </Testimonios>
+
         </Caja>
       </Fondo>
     </>
@@ -157,22 +189,22 @@ export default function Gracias() {
 }
 
 const Fondo = styled.div`
-  min-height: 100vh; background: #131013; color: #f5f0f2;
+  min-height: 100vh; background: #f7f5f2; color: #171416;
   display: flex; justify-content: center;
   padding: 72px 20px 110px;
   @media (max-width: 760px) { padding: 46px 18px 90px; }
   font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 `;
-const Caja = styled.div` width: 100%; max-width: 680px; text-align: center; `;
+const Caja = styled.div` width: 100%; max-width: 980px; text-align: center; `;
 const Kicker = styled.p`
   display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: #6fcf9f; background: rgba(46,125,91,.18);
+  text-transform: uppercase; color: #2f755a; background: #e7f2ec;
   border-radius: 999px; padding: 8px 16px; margin: 0 0 26px;
 `;
-const H1 = styled.h1` font-size: clamp(30px, 5.5vw, 42px); line-height: 1.12; margin: 0 0 14px; font-weight: 700; letter-spacing: -.01em; `;
-const Bajada = styled.p` font-size: 18px; line-height: 1.55; color: #c9bcc2; margin: 0 0 34px; font-weight: 600; `;
+const H1 = styled.h1` font-size: clamp(30px, 5.5vw, 42px); line-height: 1.12; margin: 0 0 14px; font-weight: 700; letter-spacing: -.01em; color: #171416; `;
+const Bajada = styled.p` font-size: 18px; line-height: 1.55; color: #625b5e; margin: 0 0 34px; font-weight: 600; `;
 const Chico = styled.p`
-  font-size: 13px; color: #a99ba1; margin: 6px 0 0;
+  font-size: 13px; color: #756b70; margin: 6px 0 0;
 `;
 const VideoMarco = styled.div`
   position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
@@ -180,6 +212,41 @@ const VideoMarco = styled.div`
   wistia-player { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 `;
 const Nota = styled.p` font-size: 14px; color: #9d8e95; margin: 26px 0 0; `;
+
+const Testimonios = styled.section`
+  margin: 58px 0 0; padding-top: 38px; border-top: 1px solid #ded8d5; text-align: left;
+`;
+const TestimoniosHeader = styled.header`text-align: center; margin: 0 auto 26px;`;
+const TestimoniosEtiqueta = styled.p`
+  margin: 0 0 10px; color: #b84f46; font-size: 11px; font-weight: 700;
+  letter-spacing: .13em; text-transform: uppercase;
+`;
+const TestimoniosTitulo = styled.h2`
+  margin: 0; color: #171416; font: 400 clamp(26px, 4vw, 36px)/1.1 Georgia, "Times New Roman", serif;
+  letter-spacing: -.02em;
+`;
+const TestimoniosIntro = styled.p`margin: 10px 0 0; color: #625b5e; font-size: 15px; line-height: 1.5;`;
+const TestimoniosGrid = styled.div`
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
+  @media (max-width: 720px) {
+    display: flex; overflow-x: auto; gap: 12px; padding: 0 0 10px;
+    scroll-snap-type: x mandatory; overscroll-behavior-inline: contain;
+    scrollbar-width: thin; scrollbar-color: #c9bebb transparent;
+    > * { flex: 0 0 min(82vw, 330px); scroll-snap-align: start; }
+  }
+`;
+const Testimonio = styled.article`
+  min-height: 270px; padding: 23px; background: #fff; border: 1px solid #e6e1df;
+  border-radius: 15px; display: flex; flex-direction: column;
+  box-shadow: 0 5px 15px rgba(37,27,31,.045);
+`;
+const Cita = styled.blockquote`
+  margin: 0 0 24px; color: #2a2427; font: 400 16px/1.55 Georgia, "Times New Roman", serif;
+  letter-spacing: -.008em;
+`;
+const Firma = styled.div`margin-top: auto; padding-top: 14px; border-top: 1px solid #eee9e7;`;
+const Nombre = styled.p`margin: 0; color: #211c1f; font-size: 13px; line-height: 1.3; font-weight: 700;`;
+const Lugar = styled.p`margin: 3px 0 0; color: #756b6f; font-size: 11px; line-height: 1.35;`;
 
 const Cierre = styled.div`
   margin-top: 30px;
@@ -189,10 +256,10 @@ const Cierre = styled.div`
 `;
 const PesosBoton = styled.a`
   display: block; margin: 16px auto 0; background: none; border: 0; cursor: pointer;
-  font: inherit; font-size: 15px; font-weight: 600; color: #c9bcc2; text-decoration: underline;
+  font: inherit; font-size: 15px; font-weight: 600; color: #625b5e; text-decoration: underline;
   text-underline-offset: 3px;
-  &:visited { color: #c9bcc2; }
-  &:hover { color: #f5f0f2; }
+  &:visited { color: #625b5e; }
+  &:hover { color: #171416; }
   &:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
 `;
 const Pendiente = styled.p`
