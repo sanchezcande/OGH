@@ -33,11 +33,35 @@
 // toques (/api/dm/toques).
 //
 // Devuelve solo cantidades: los ids de los contactos no salen en la respuesta ni en los registros.
-import { agente, cerebroAhora, colaDe } from "../../../lib/dm/armado";
+import { agente, avisarDm, cerebroAhora, colaDe } from "../../../lib/dm/armado";
 import {
-  ESPERA_EN_PARALELO, REINTENTO_MAX_FALLOS, vaciarEspera,
+  ESPERA_EN_PARALELO, REINTENTO_MAX_FALLOS, alarmaDelCerebro, vaciarEspera,
 } from "../../../lib/dm/seguimientos";
-import { ajustes, hayBase, reclamarEspera, sinContestar, soltarEspera, tablas } from "../../../lib/dm/base";
+import {
+  ajustes, guardarConfig, hayBase, leerConfig, minutosDesdeElModelo, reclamarEspera, sinContestar, soltarEspera, tablas,
+} from "../../../lib/dm/base";
+
+/**
+ * Si el modelo no está contestando (nadie retira los turnos o fallan todos) y hay gente esperando hace más de una
+ * hora, le avisa a Cande (alarmaDelCerebro, 26/10). Solo se mira cuando esta vuelta vio el modelo caído.
+ */
+async function alarmaSiHaceFalta(filas) {
+  try {
+    const a = alarmaDelCerebro({
+      filas: filas ?? (await sinContestar()), minutosDesdeElModelo: await minutosDesdeElModelo(),
+      ultimaAlarma: (await leerConfig("alarma_cerebro"))?.en ?? null,
+    });
+    if (!a) return;
+    const ok = await avisarDm("DM URGENTE: el agente no está contestando", {
+      Esperando: `${a.esperando} ${a.esperando === 1 ? "charla" : "charlas"}, la más vieja hace ${a.horasLaMasVieja} h`,
+      "Última respuesta": a.minutosDesdeElModelo === null ? "nunca" : `hace ${Math.round(a.minutosDesdeElModelo / 60)} h`,
+      Qué: "el cerebro en la nube no está redactando: avisale a Claude",
+    }, { contestable: false });
+    if (ok) await guardarConfig("alarma_cerebro", { en: new Date().toISOString() });
+  } catch (e) {
+    console.error("dm: falló la alarma del cerebro", e.message);
+  }
+}
 
 // Una respuesta tarde puede tardar hasta unos 140 segundos (las dos miradas a Instagram, el modelo y el
 // envío, con sus topes): no se arranca ninguna si no queda ese margen antes de que Vercel corte.
@@ -58,12 +82,17 @@ export default async function handler(req, res) {
   // Las redacta la Mac de Cande (salvo cerebro "api"): sin ella, siguen esperando.
   // Hay quien redacte: la Mac, o la API de respaldo si la Mac no contesta y hay clave (lib/dm/armado.js).
   const macViva = (await cerebroAhora(aj)) !== null;
-  if (!macViva) return res.status(200).json({ ok: true, reintentos: 0, motivo: "sin Mac" });
+  if (!macViva) {
+    await alarmaSiHaceFalta(null);
+    return res.status(200).json({ ok: true, reintentos: 0, motivo: "sin Mac" });
+  }
 
   let r = { reintentos: 0, cayo: false };
+  let filas = null;
   try {
+    filas = await sinContestar();
     r = await vaciarEspera({
-      filas: await sinContestar(), prendido, macViva, maxFallos: REINTENTO_MAX_FALLOS,
+      filas, prendido, macViva, maxFallos: REINTENTO_MAX_FALLOS,
       reclamar: (id) => reclamarEspera(id, { tope: ESPERA_EN_PARALELO }),
       soltar: soltarEspera,
       procesar: (id, idLead) => agente.procesar(id, idLead, { tarde: true }),
@@ -74,6 +103,7 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("dm: falló la espera", e.message);
   }
+  if (r.cayo) await alarmaSiHaceFalta(filas);
   return res.status(200).json({ ok: true, reintentos: r.reintentos, ...(r.cayo ? { motivo: "el modelo no contesta" } : {}) });
 }
 
