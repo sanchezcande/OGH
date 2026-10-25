@@ -34,7 +34,7 @@ const {
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno, esFoto, SIN_TEXTO } = await import("../lib/dm/agente.js");
 const {
-  correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, vigiaDelModelo, pausaTrasFallas,
+  correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, vigiaDelModelo, pausaTrasFallas, alarmaDelCerebro,
   FALLA_GENERAL, FALLA_PROPIA, FALLA_DUDOSA, REINTENTO_MAX_FALLOS,
 } = await import("../lib/dm/seguimientos.js");
 /** Una falla del modelo que se arregla sola (la Mac sin red). */
@@ -2698,6 +2698,23 @@ test("una charla con la que el modelo acaba de fallar espera su pausa: 10 minuto
   assert.equal(decidirSinContestar({ intentos: 3, minutos_desde_la_falla: 1, fallos: 3 }, ops).que, "pasar", "el tope manda");
   assert.equal(decidirSinContestar({ intentos: 1, minutos_desde_la_falla: 1 }, { ...ops, macViva: false }).que, "esperar");
   assert.equal(hayEspera([{ id: "1", intentos: 1, minutos_desde_la_falla: 2 }], ops), false, "en pausa no frena los toques");
+});
+
+test("si hay gente esperando hace más de una hora y el modelo no contesta nada, a Cande le llega la alarma, una cada 6 horas (26/10)", async () => {
+  // Del 24/10 al 26/10 el cerebro de la nube falló con todos los turnos y no salió nada en un día y medio sin que nadie
+  // se enterara: la espera no avisa a propósito (19/10), así que la alarma es aparte.
+  const ahora = Date.parse("2026-10-26T00:00:00Z");
+  const filas = [{ minutos: 90 }, { minutos: 30 }];
+  assert.deepEqual(alarmaDelCerebro({ filas, minutosDesdeElModelo: 600, ahora }), { esperando: 1, horasLaMasVieja: 1, minutosDesdeElModelo: 600 });
+  assert.equal(alarmaDelCerebro({ filas, minutosDesdeElModelo: 20, ahora }), null, "el modelo contestó hace poco");
+  assert.equal(alarmaDelCerebro({ filas: [{ minutos: 30 }], minutosDesdeElModelo: 600, ahora }), null, "nadie espera hace una hora");
+  assert.equal(alarmaDelCerebro({ filas, minutosDesdeElModelo: 600, ultimaAlarma: new Date(ahora - 2 * 3600000).toISOString(), ahora }), null);
+  assert.ok(alarmaDelCerebro({ filas, minutosDesdeElModelo: 600, ultimaAlarma: new Date(ahora - 7 * 3600000).toISOString(), ahora }));
+  assert.ok(alarmaDelCerebro({ filas, minutosDesdeElModelo: null, ahora }), "nunca contestó");
+  const fs = await import("node:fs/promises");
+  const fuente = await fs.readFile(new URL("../pages/api/dm/espera.js", import.meta.url), "utf8");
+  assert.match(fuente, /if \(r\.cayo\) await alarmaSiHaceFalta\(filas\);/);
+  assert.match(fuente, /if \(!macViva\) \{\n {4}await alarmaSiHaceFalta\(null\);/);
 });
 
 test("la espera y los toques: una falla dudosa (puede ser de esa charla) no corta la corrida; dos seguidas sí; una general, enseguida", async () => {
