@@ -9,8 +9,9 @@ import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 // El video está en Wistia. Su player es un web component: hay que cargar dos
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
-// Video único de Gumroad, actualizado por Cande el 25/10/2026 con el último testimonio.
-const WISTIA_A = "gzpbw7xoib";
+// Video único de Gumroad, actualizado por Cande el 28/10/2026: los cuatro testimonios en video (Martiniano, Francisco,
+// Eduardo y Andrés) y el muro de escritos. El anterior era gzpbw7xoib.
+const WISTIA_A = "geluy2vcuu";
 const TESTIMONIOS_VIDEO = [
   { nombre: "Martiniano Olivera", lugar: "Concepción del Uruguay, Argentina", id: "c6yuoqzkm2" },
   { nombre: "Francisco Peña", lugar: "Mérida, Venezuela", id: "06y0i47nkb" },
