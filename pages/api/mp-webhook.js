@@ -22,7 +22,7 @@
 import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
-import { asegurarTablaCompras } from "../../lib/compras";
+import { asegurarTablaCompras, codigoDePesos } from "../../lib/compras";
 import { guardarEvento, hayBase } from "../../lib/db";
 import { mandarMail } from "../../lib/mandarMail";
 import { avisar } from "../../lib/notificar";
@@ -94,7 +94,7 @@ async function codigoUnico(id) {
   if (!token) return null;
   try {
     const producto = await idDelProducto(token);
-    const nombre = `PESOS${String(id).replace(/\D/g, "").slice(-9)}`;
+    const nombre = codigoDePesos(id);
     const r = await fetch(`https://api.gumroad.com/v2/products/${encodeURIComponent(producto)}/offer_codes`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },

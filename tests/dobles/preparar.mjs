@@ -13,11 +13,14 @@ for (const k of ["CRON_SECRET", "IG_LINK_SECRET", "POSTGRES_URL", "DEVS_MAIL_FRO
 }
 
 // lib/notificar.js manda el aviso con fetch. Acá queda anotado el texto y no sale nada.
+// `cuerpos` guarda el pedido entero, para mirar lo que no es texto (el botón de un aviso).
 export const avisos = [];
+export const cuerpos = [];
 globalThis.fetch = async (url, opciones) => {
   if (!String(url).startsWith("https://api.telegram.org/")) {
     throw new Error("las pruebas no usan la red");
   }
+  cuerpos.push(JSON.parse(opciones.body));
   avisos.push(JSON.parse(opciones.body).text);
   return { ok: true, status: 200, text: async () => "" };
 };

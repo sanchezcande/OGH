@@ -16,17 +16,18 @@
 // un reintento sería un segundo mensaje por la misma venta. Se contesta 200 siempre.
 import { sql } from "@vercel/postgres";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
-import { asegurarTablaCompras } from "../../lib/compras";
+import { asegurarTablaCompras, esCodigoDePesos } from "../../lib/compras";
 import { avisar } from "../../lib/notificar";
+import { PAGO_EN_PESOS, correspondeOferta, linkOferta, mensajeOferta } from "../../lib/ofertaWhatsapp";
 
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 // Los códigos de 100% que NO son una venta nueva: son alguien entrando a la plataforma después
 // de haber pagado por otro lado, o un acceso que Cande regaló.
 const CODIGOS = {
-  [(process.env.MP_CODIGO || "PARAVOS").toLowerCase()]: "pagó en pesos",
+  [(process.env.MP_CODIGO || "PARAVOS").toLowerCase()]: PAGO_EN_PESOS,
   testimonio: "acceso a cambio de un testimonio",
-  paravos: "pagó en pesos",
+  paravos: PAGO_EN_PESOS,
 };
 
 /** Gumroad manda el precio en centavos. */
@@ -54,6 +55,50 @@ async function anotarCompra(datos) {
     ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING`;
 }
 
+/** Lo que ya compró esa persona antes de esta venta: con eso se sabe si ya tiene el 1 a 1, o si ya había
+ *  entrado al curso (el código de pesos general se puede canjear dos veces, y un reintento de Gumroad trae la
+ *  misma venta). No cuenta el pago en pesos que anotó mp-webhook (venta mp-...): es esta misma compra.
+ *  Devuelve null si no se pudo saber. */
+async function comprasAnteriores(email, ventaId) {
+  if (!process.env.POSTGRES_URL || !email) return null;
+  try {
+    const { rows } = await sql`
+      SELECT producto FROM compras
+      WHERE lower(email) = ${email} AND NOT baja
+        AND venta_id IS DISTINCT FROM ${ventaId} AND (venta_id IS NULL OR venta_id NOT LIKE 'mp-%')`;
+    return rows.map((r) => String(r.producto || ""));
+  } catch (e) {
+    console.error("gumroad-ping: no pude ver las compras anteriores:", e.message);
+    return null;
+  }
+}
+
+/**
+ * Hooman, 28/10: el 1 a 1 se ofrece después de que pagó el curso, y a mano. El aviso trae un botón que abre
+ * WhatsApp con el mensaje escrito (lib/ofertaWhatsapp.js). Sin un número confiable, o si no se pudo ver si ya
+ * era comprador, el texto va en el aviso para mandarlo a mano. Nunca puede romper el aviso de la venta.
+ */
+function armarOferta({ b, f, antes, producto, baja, gratis, porQue, nombre }) {
+  try {
+    const recurrente = String(b.is_recurring_charge || "") === "true";
+    if (!correspondeOferta({ producto, baja, gratis, porQue, recurrente })) return { wa: null, oferta: null };
+    if (antes?.some((p) => /trabajo de dev/i.test(p))) return { wa: null, oferta: null };   // ya tiene el 1 a 1
+    if (antes?.some((p) => /acelerador/i.test(p))) {
+      return { wa: null, oferta: { "Ofrecele el 1 a 1": "ya había entrado al curso antes: fijate si ya se lo ofreciste" } };
+    }
+    // El nombre sale de la ficha, como el número: el de Gumroad es el del titular de la tarjeta o del PayPal.
+    const quien = f?.nombre || nombre;
+    const aMano = (por) => ({ wa: null, oferta: { "Ofrecele el 1 a 1": `${por}, mandale esto a mano: ${mensajeOferta(quien)}` } });
+    if (antes === null) return aMano("no pude ver si ya era comprador (fijate antes)");
+    const wa = linkOferta({ whatsapp: f?.whatsapp, pais: f?.pais, nombre: quien });
+    if (wa) return { wa, oferta: null };
+    return aMano(f?.whatsapp ? "no pude armar el link de WhatsApp con su número" : "no tengo su WhatsApp");
+  } catch (e) {
+    console.error("gumroad-ping: no pude armar la oferta:", e.message);
+    return { wa: null, oferta: null };
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -74,7 +119,7 @@ export default async function handler(req, res) {
   // así que parecían dos personas y una regalada. No es una venta nueva: es la misma entrando.
   const codigo = limpiar(b.offer_code || b.discount_code, 40).toLowerCase();
   const gratis = Number(b.price) === 0;
-  const porQue = gratis ? CODIGOS[codigo] : null;
+  const porQue = gratis ? CODIGOS[codigo] || (esCodigoDePesos(codigo) ? PAGO_EN_PESOS : null) : null;
   const titulo = baja
     ? "Devolución en Gumroad"
     : prueba ? "Compra de PRUEBA"
@@ -82,7 +127,10 @@ export default async function handler(req, res) {
     : gratis ? "Entró con un código de 100% ✅"
     : "COMPRA NUEVA 🖤";
 
-  const f = await ficha(email);
+  const producto = limpiar(b.product_name, 120);
+  const ventaId = limpiar(b.sale_id, 80) || null;
+  const [f, antes] = await Promise.all([ficha(email), comprasAnteriores(email, ventaId)]);
+  const { wa, oferta } = armarOferta({ b, f, antes, producto, baja, gratis, porQue, nombre });
   const que = baja ? "Devolución" : prueba ? "Compra de PRUEBA"
     : porQue ? `Entró al curso, ${porQue}`
     : gratis ? "Entró con un código de 100%"
@@ -90,11 +138,17 @@ export default async function handler(req, res) {
   const ok = await avisar(titulo, camposCompra({
     que, email, nombre, codigo: codigo ? codigo.toUpperCase() : null,
     plata: plata(b.price, b.currency) + (b.recurrence ? ` (${limpiar(b.recurrence, 20)})` : ""),
-    producto: limpiar(b.product_name, 120), ficha: f,
+    producto, ficha: f,
     deDonde: f ? null : limpiar(b.referrer, 120) || null,
     pais: limpiar(b.ip_country, 60) || null,
-    extra: porQue ? { "Ojo": "no es una venta nueva, es la misma persona entrando a la plataforma" } : null,
-  }), { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
+    extra: {
+      ...(porQue ? { "Ojo": "no es una venta nueva, es la misma persona entrando a la plataforma" } : {}),
+      ...oferta,
+    },
+  }), {
+    token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS,
+    boton: wa ? { texto: `Ofrecerle el 1 a 1 por WhatsApp (+${wa.numero})`, url: wa.url } : null,
+  });
   if (!ok) console.error("gumroad-ping: el aviso no salió", { email });
 
   // La venta queda anotada DESPUÉS del aviso: si la base falla, ella se entera igual por Telegram,
@@ -102,14 +156,14 @@ export default async function handler(req, res) {
   if (!prueba) {
     try {
       await anotarCompra({
-        email, nombre: nombre || f?.nombre || null, producto: limpiar(b.product_name, 120) || null,
+        email, nombre: nombre || f?.nombre || null, producto: producto || null,
         precio: Number.isFinite(Number(b.price)) ? Number(b.price) / 100 : null,
         moneda: (limpiar(b.currency, 10) || "usd").toLowerCase(),
         recurrencia: limpiar(b.recurrence, 20) || null, baja,
         origen: f?.origen || null, como_llego: f?.como_llegaste || null,
         pais: f?.pais || limpiar(b.ip_country, 60) || null,
         codigo: codigo ? codigo.toUpperCase() : null,
-        ventaId: limpiar(b.sale_id, 80) || null,
+        ventaId,
       });
     } catch (e) {
       console.error("gumroad-ping: no pude anotar la compra:", e.message);
