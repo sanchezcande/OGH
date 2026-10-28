@@ -12,6 +12,7 @@ import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 // Video único de Gumroad, actualizado por Cande el 25/10/2026 con el último testimonio.
 const WISTIA_A = "gzpbw7xoib";
 const TESTIMONIOS_VIDEO = [
+  { nombre: "Martiniano Olivera", lugar: "Concepción del Uruguay, Argentina", id: "c6yuoqzkm2" },
   { nombre: "Francisco Peña", lugar: "Mérida, Venezuela", id: "06y0i47nkb" },
   { nombre: "Eduardo Hidalgo", lugar: "Ambato, Ecuador", id: "rqqzkavkxe" },
   { nombre: "Andrés Murillo", lugar: "Soledad, Colombia", id: "0mib7zqd5d" },
@@ -259,7 +260,8 @@ const TestimoniosTitulo = styled.h2`
 `;
 const TestimoniosIntro = styled.p`margin: 10px 0 0; color: #625b5e; font-size: 15px; line-height: 1.5;`;
 const VideosGrid = styled.div`
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 28px;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-bottom: 28px;
+  @media (max-width: 1000px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   @media (max-width: 720px) {
     display: flex; overflow-x: auto; gap: 12px; padding: 0 0 10px;
     scroll-snap-type: x mandatory; overscroll-behavior-inline: contain;
