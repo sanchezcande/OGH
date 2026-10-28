@@ -238,6 +238,18 @@ export default function RedDeDevs() {
         <meta name="description" content={en
           ? "Join the list I search first when a project comes in. Under a minute."
           : "Entrá a la lista donde busco cuando me entra un proyecto. Menos de un minuto."} />
+        {/* La miniatura al compartir el link (WhatsApp, Instagram, LinkedIn). Cande, 29/10: "debería tener una
+            miniatura cuando mando el link". La imagen pesa menos de 300 KB, que es el tope de WhatsApp. */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.opengatehub.com/devs" />
+        <meta property="og:title" content={en ? "A hundred people apply. I take one." : "Me llegan cien aplicaciones por puesto y contrato a una"} />
+        <meta property="og:description" content={en
+          ? "Join the list I search first when a project comes in. Under a minute."
+          : "Entrá a la lista donde busco cuando me entra un proyecto. Menos de un minuto."} />
+        <meta property="og:image" content={en ? "https://www.opengatehub.com/og-image-en.png" : "https://www.opengatehub.com/og-devs.jpg"} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
         {/* Inter para el cuerpo: la Space Grotesk del sitio queda bien en un título
             grande, pero en texto chico se lee poco seria. Misma decisión que /hola. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
