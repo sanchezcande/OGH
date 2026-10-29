@@ -69,3 +69,17 @@ test("sin signos de apertura", () => {
 test("sin guion largo", () => {
   for (const t of PALABRAS.trabajo.textos) assert.ok(!t.includes("—"), t);
 });
+
+// Pedido de Cande, 30/10: "sacalos del agente y mandámelos a mí". El que contesta la palabra recibe
+// los dos mensajes y la charla pasa a ella, en código y no en el guion: el que levanta la mano por
+// una oferta de 473 lo atiende ella.
+import { readFileSync } from "node:fs";
+
+test("después de la palabra clave, la charla pasa a Cande", () => {
+  const src = readFileSync(new URL("../lib/dm/agente.js", import.meta.url), "utf8");
+  const i = src.indexOf("const clave = !evento");
+  assert.ok(i > 0, "no encontré el corte de la palabra clave en agente.js");
+  const bloque = src.slice(i, i + 2600);
+  assert.match(bloque, /pasarACande\(/, "sin esto el agente le sigue hablando al que pidió el 1 a 1");
+  assert.match(bloque, /palabra clave/, "y el motivo tiene que decir por qué se la pasa");
+});
