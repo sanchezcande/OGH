@@ -18,7 +18,7 @@ import { readFile } from "node:fs/promises";
 import { respuesta } from "./dobles/preparar.mjs";
 
 const {
-  AUTOMATICO_CV_MANYCHAT, TEXTO_CV, VENTANA_DIAS, comentariosParaContestar, contestarComentarios, enVentana, esPalabraCV, motivoDelError,
+  AUTOMATICO_CV_MANYCHAT, FRESCO_MINUTOS, TEXTO_CV, VENTANA_DIAS, comentariosParaContestar, contestarComentarios, enVentana, esPalabraCV, motivoDelError,
 } = await import("../lib/dm/comentarios.js");
 const { esAutomatico, claveTexto } = await import("../lib/dm/instagram.js");
 
@@ -51,12 +51,16 @@ test("adentro de una frase NO dispara", () => {
 
 test("la ventana de la private reply: 7 días, con margen", () => {
   assert.equal(VENTANA_DIAS, 7);
+  assert.equal(FRESCO_MINUTOS, 5);
   assert.equal(enVentana("2026-10-29T17:32:15+0000", ahora), true, "de ayer sí");
   assert.equal(enVentana("2026-10-24T03:47:12+0000", ahora), true, "de hace 6 días todavía");
   // Un comentario de 6 días y 23 horas se puede vencer entre que se lo lee y que sale el DM.
   assert.equal(enVentana("2026-10-23T07:00:00+0000", ahora), false, "a punto de vencerse, no se toma");
   assert.equal(enVentana("2026-10-20T14:48:26+0000", ahora), false, "de hace 10 días no");
   assert.equal(enVentana("2026-10-31T00:00:00+0000", ahora), false, "del futuro tampoco");
+  // Recién hecho: primero le toca a ManyChat, que contesta a los segundos.
+  assert.equal(enVentana("2026-10-30T05:58:00+0000", ahora), false, "de hace 2 minutos espera la vuelta siguiente");
+  assert.equal(enVentana("2026-10-30T05:52:00+0000", ahora), true, "de hace 8 minutos ya se puede");
   assert.equal(enVentana("cualquier cosa", ahora), false);
 });
 
@@ -100,14 +104,21 @@ test("los motivos de los errores de Instagram", () => {
 
 // ---- la vuelta completa, con dobles ----
 
-/** Un cliente de Instagram y una base de mentira. `fallas` dice con qué error contesta cada comentario. */
-function armar({ comentarios, fallas = {}, tomados = new Set() } = {}) {
+/**
+ * Un cliente de Instagram y una base de mentira. `fallas` dice con qué error contesta cada
+ * comentario; `bandeja` son las charlas que ya existen (para la traba del automático de ManyChat).
+ */
+function armar({ comentarios, fallas = {}, tomados = new Set(), bandeja = null } = {}) {
   const base = { filas: new Map(), tomados };
+  // Sin bandeja: una sola charla vieja, de alguien que no comentó. Así nadie queda tapado por la
+  // traba y la bandeja cubre desde antes de todos los comentarios.
+  const hilos = bandeja || [{ otro: { usuario: "otracualquiera" }, actualizado: new Date("2026-10-20T00:00:00Z"), mensajes: [] }];
   const ig = {
     pedidos: [],
     cuenta: async () => CUENTA,
     medios: async () => [{ id: "m1", timestamp: "2026-10-29T15:15:32+0000", comments_count: comentarios.length, permalink: "https://instagram.com/p/x" }],
     comentarios: async () => comentarios,
+    pagina: async () => ({ lista: hilos, despues: null }),
     responderComentario: async (id, texto) => {
       ig.pedidos.push({ id, texto });
       if (fallas[id]) throw fallas[id];
@@ -211,6 +222,62 @@ test("si Instagram pide despacio, el comentario se suelta para la vuelta siguien
   assert.ok(d2.ig.pedidos.some((p) => p.id === "c1"));
 });
 
+// ---- la traba contra el automático de ManyChat ----
+//
+// El 30/10 se descubrió, mandando uno de verdad, que el automático de CV de ManyChat seguía vivo y
+// contestaba los comentarios a los 7 segundos: @juliovasquez_m.a recibió el mismo link dos veces.
+// Desde entonces, a quien ya recibió algo de la cuenta no se le manda nada.
+
+/** Una charla de la bandeja: `suya` dice si la cuenta ya escribió ahí. */
+const hilo = (usuario, actualizado, suya) => ({
+  otro: { usuario, id: `ig-${usuario}` },
+  actualizado: new Date(actualizado),
+  mensajes: suya ? [{ de: { id: CUENTA.user_id, usuario: CUENTA.username }, texto: "" }] : [{ de: { id: "otro", usuario }, texto: "hola" }],
+});
+
+test("a quien ManyChat ya le contestó no se le manda nada", async () => {
+  // ManyChat le contestó a c1 y a c2 a los segundos; a c4 no le contestó nadie.
+  const bandeja = [
+    hilo("juliovasquez", "2026-10-29T17:32:26Z", true),
+    hilo("elralphv", "2026-10-29T17:23:56Z", true),
+    hilo("valensquadrone", "2026-10-29T17:14:38Z", false),
+    hilo("otracualquiera", "2026-10-29T06:00:00Z", true),
+  ];
+  const d = armar({ comentarios: CS, bandeja });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["c4"], "solo el que quedó sin contestar");
+  assert.equal(r.ya_tenia, 2);
+  assert.equal(d.base.filas.has("c1"), false, "ni se toma: no hay nada que anotar");
+});
+
+test("una charla donde la cuenta no escribió no frena nada", async () => {
+  const bandeja = [hilo("juliovasquez", "2026-10-29T17:32:15Z", false), hilo("otracualquiera", "2026-10-29T06:00:00Z", true)];
+  const d = armar({ comentarios: [CS[0]], bandeja });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.enviadas, 1, "escribió él y nadie le contestó: es justo el lead que se pierde");
+});
+
+test("un comentario más viejo de lo que se alcanzó a mirar en la bandeja no se contesta", async () => {
+  // La bandeja leída llega hasta las 17:00 del 29; el comentario de las 07:06 queda sin mirar.
+  const viejo = { id: "cx", text: "CV", timestamp: "2026-10-29T07:06:24+0000", username: "alguien" };
+  const bandeja = [hilo("quiensea", "2026-10-29T17:00:00Z", true)];
+  const d = armar({ comentarios: [CS[0], viejo], bandeja });
+  // La bandeja no devuelve más páginas, así que lo leído es todo lo que hay... para que quede un
+  // corte real, el doble dice que hay otra página y no la da.
+  d.ig.pagina = async () => ({ lista: bandeja, despues: "hay-mas" });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["c1"], "el nuevo sí, el que no se pudo mirar no");
+  assert.equal(r.sin_mirar, 1);
+});
+
+test("si se leyó la bandeja entera, nada queda sin mirar", async () => {
+  const viejo = { id: "cx", text: "CV", timestamp: "2026-10-26T07:06:24+0000", username: "alguien" };
+  const d = armar({ comentarios: [viejo], bandeja: [hilo("quiensea", "2026-10-29T17:00:00Z", true)] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.sin_mirar, 0);
+  assert.equal(r.enviadas, 1);
+});
+
 test("el tope por vuelta se respeta", async () => {
   const d = armar({ comentarios: CS });
   const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, tope: 1 });
@@ -252,7 +319,7 @@ test("el cron no entra sin CRON_SECRET, corre cada 15 minutos y arranca apagado"
   } finally {
     delete process.env.CRON_SECRET;
   }
-  assert.equal(config.maxDuration, 60);
+  assert.equal(config.maxDuration, 120);
   const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
   assert.deepEqual(crons.find((c) => c.path === "/api/dm/comentarios"), { path: "/api/dm/comentarios", schedule: "*/15 * * * *" });
 });
