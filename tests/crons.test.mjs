@@ -14,7 +14,7 @@ const leer = async (ruta) => readFile(new URL(ruta, import.meta.url), "utf8");
 /** Las que corren una vez por día, con su hora (las cadenas de mails). */
 const DIARIOS = { "/api/drip": "0 13 * * *", "/api/drip-preguntas": "45 12 * * *" };
 /** Las que tocan la base cada vuelta. */
-const CADA_VUELTA = ["/api/cola-publicar", "/api/dm/toques", "/api/dm/instagram", "/api/dm/espera", "/api/dm/bandeja", "/api/dm/controlador"];
+const CADA_VUELTA = ["/api/cola-publicar", "/api/dm/toques", "/api/dm/instagram", "/api/dm/espera", "/api/dm/bandeja", "/api/dm/controlador", "/api/dm/comentarios"];
 
 test("la cadencia es una sola: cada 15 minutos, a los 0, 15, 30 y 45 de cada hora", () => {
   assert.equal(CADA_CRON_MIN, 15);
