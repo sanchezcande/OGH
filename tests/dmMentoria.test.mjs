@@ -1,7 +1,10 @@
 // El 1 a 1 de Cande (28/10): el agente se lo puede ofrecer a seniors y semi seniors que buscan trabajo. Los frenos del
-// sitio dejan pasar exactamente lo suyo (su doc, su link de Gumroad, 473 y 500 hablando del 1 a 1 y su garantía con la
-// frase de Cande) y nada más: otro monto, otro link, otra garantía o el 1 a 1 a una empresa siguen frenados. El aviso "YA:
-// quiere el 1 a 1" le suena a Cande sin pasarle la charla, y el controlador no toma el doc como una entrega que falta.
+// sitio dejan pasar exactamente lo suyo (su doc y su link de Gumroad tal cual, 473 y 500 en dólares hablando del 1 a 1 y
+// su garantía con la frase de Cande) y nada más: otro monto, otro link, otra garantía o el 1 a 1 a una empresa siguen
+// frenados. El aviso urgente de quien quiere el 1 a 1 le suena a Cande sin pasarle la charla, y el controlador no toma el doc como
+// una entrega que falta ni corrige con el precio del programa una charla del 1 a 1. Desde el 29/10: el "no lo puedo
+// pagar" al 1 a 1 no frena el programa de 27 que le sigue, a quien ya compró no se le vende nada (NOTA_COMPRO como
+// antes) y el contexto trae el seniority del formulario.
 //
 // Los textos de los leads y de la cuenta son inventados para la prueba (este repo es público): solo el doc, el link y
 // la frase de la garantía son los de verdad, porque eso es lo que se deja pasar tal cual. La frase va armada por tramos,
@@ -11,11 +14,13 @@
 import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { base as pg } from "./dobles/postgres.mjs";
 
-const { revisar, DOC_1A1, LINK_PAGO_1A1 } = await import("../lib/dm/frenos.js");
+const { revisar, sinSeguimiento, charlaParaLaPlata, ofertaDe, DOC_1A1, LINK_PAGO_1A1 } = await import("../lib/dm/frenos.js");
 const { esParaCande } = await import("../lib/dm/resumen.js");
 const C = await import("../lib/dm/controlador.js");
-const { NOTA_COMPRO } = await import("../lib/dm/pagina.js");
+const { NOTA_COMPRO, notaPerfil } = await import("../lib/dm/pagina.js");
+const { formularioDeLaCharla } = await import("../lib/dm/base.js");
 
 const estado = (quien = "dev") => ({
   quien, busca: "si", dolor: "de prueba", etapa: "precio", link_formulario_enviado: false, precio_dicho: false,
@@ -78,10 +83,25 @@ test("el aviso YA: de quien quiere el 1 a 1 le llega a Cande aunque sea un dev; 
   }
 });
 
-test("a quien ya tiene el programa, el contexto le prohíbe vender el programa y su link, no el 1 a 1", () => {
-  assert.match(NOTA_COMPRO, /Ya tiene el programa/);
-  assert.match(NOTA_COMPRO, /No le vendas el programa ni le mandes su link de pago/);
-  assert.doesNotMatch(NOTA_COMPRO, /No le vendas ni le mandes links de pago/);
+test("a quien ya tiene el programa no se le vende nada, tampoco el 1 a 1 (Cande se lo ofrece a mano por WhatsApp)", () => {
+  assert.equal(NOTA_COMPRO,
+    "Ya tiene el programa: hay una compra o un acceso con el mail de su formulario (lo confirma el sitio). No le vendas ni " +
+    "le mandes links de pago; si escribe, ayudalo con lo que pregunte.");
+});
+
+test("473 y 500 en dólares, también con u$s, us$ o $, y un mensaje que nombra el programa al lado de otro del 1 a 1", () => {
+  pasa(["El 1 a 1 arranca con u$s 473 y us$ 500 cuando firmás"]);
+  pasa(["El 1 a 1 son $473 para arrancar"]);
+  pasa(["El programa es grabado y lo hacés solo", "En el 1 a 1 te acompaño yo, arranca en 473 dólares y son 500 al final, cuando firmás"]);
+});
+
+test("el doc y el link del 1 a 1 pasan solo tal cual, con sus mayúsculas", () => {
+  pasa([`Va el detalle de prueba:\n${DOC_1A1}`]);
+  frena([`Va el detalle de prueba:\n${DOC_1A1.toLowerCase()}`]);
+  frena([`Va el detalle de prueba:\n${DOC_1A1.replace("16OGpF", "16OGPF")}`]);
+  frena([`Acá reservás\n${LINK_PAGO_1A1.replace("trabajo-en-4-semanas", "Trabajo-En-4-Semanas")}`]);
+  // Una vez bien y otra mal, en el mismo turno: frena.
+  frena([`Acá está:\n${DOC_1A1}`, `De nuevo:\n${DOC_1A1.toLowerCase()}`]);
 });
 
 /* ---------- lo que sigue frenado ---------- */
@@ -92,6 +112,15 @@ test("otro monto sigue frenado, también hablando del 1 a 1; y 473 o 500 sin hab
   frena(["Está en 473 dólares"]);
   frena(["El programa sale 500 dólares"]);
   frena(["Son USD 473", `Te paso el link\n${LINK_27}`]);
+  // 29/10: solo en dólares y nunca en un mensaje que nombre el programa.
+  frena(["El programa está en 500 dólares, igual que el 1 a 1"]);
+  frena(["El 1 a 1 son 473 pesos para arrancar"]);
+  frena(["El 1 a 1 son 473 euros y 500 euros cuando firmás"]);
+  frena(["Cuando firmes te pido 500 pesos"]);
+  frena(["El 1 a 1 son 473 mil dólares"]);
+  frena(["El 1 a 1 son € 473"]);
+  frena(["El programa sale 473 y el 1 a 1 es otra cosa"]);
+  frena(["En el 1 a 1 y en mi programa sale 473 dólares de entrada"]);
 });
 
 test("otro link sigue frenado: otro doc, otro producto de Gumroad, el doc con otros parámetros, WhatsApp", () => {
@@ -138,6 +167,98 @@ test("el doc, el link y el monto del 1 a 1 no van a quien no se sabe que es dev,
   frena([`Acá reservás\n${LINK_PAGO_1A1}`], "dev", { charlaDelLead: ["no tengo plata ahora"] });
 });
 
+/* ---------- la plata dicha al 1 a 1 ---------- */
+
+const PREVIO = [
+  { quien: "lead", texto: "YO" }, { quien: "cande", texto: "Busco 5 devs de prueba para acompañarlos 1 a 1 este mes" },
+  { quien: "lead", texto: "si, senior de prueba y buscando" }, { quien: "cande", texto: `Va el detalle de prueba:\n${DOC_1A1}` },
+];
+const conPlata = (historial) => ({
+  charlaDelLead: historial.filter((m) => m.quien === "lead").map((m) => m.texto), plataDelLead: charlaParaLaPlata(historial),
+});
+const FORM = ["Lo de prueba lo cuento en mi programa", "Va el formulario de prueba\nopengatehub.com/devs", "Lo llenás hoy, de prueba?"];
+const VIDEO = ["Va el video de prueba\nopengatehub.com/devs/gracias", "Lo mirás hoy, de prueba?"];
+const PRECIO_27 = ["Sale 27 dólares, frase de prueba", "Lo pagás ahora, de prueba?"];
+
+test("qué ofrece cada mensaje de la cuenta: el programa de 27, el 1 a 1 o nada", () => {
+  for (const t of [FORM[0], FORM[1], VIDEO[0], PRECIO_27[0], `Aquí está\n${LINK_27.replace("de-prueba", "x")}`, "Miraste el video de prueba?"]) {
+    assert.equal(ofertaDe(t), "27", t);
+  }
+  for (const t of [PREVIO[1].texto, PREVIO[3].texto, "Arranca en 473 dólares y son 500 al final, cuando firmás", `Acá reservás\n${LINK_PAGO_1A1}`]) {
+    assert.equal(ofertaDe(t), "1a1", t);
+  }
+  for (const t of ["Te sirve, de prueba?", "Ey ey, de prueba?", "Y qué tal todo, de prueba?"]) assert.equal(ofertaDe(t), null, t);
+});
+
+test("'no lo puedo pagar' al 1 a 1 frena el 1 a 1, no el programa de 27 que le sigue: formulario, video, 27 y toques", () => {
+  for (const dijo of ["uhh no lo puedo pagar ahora", "no tengo la plata", "no me alcanza para eso"]) {
+    const h = [...PREVIO, { quien: "lead", texto: dijo }];
+    pasa(FORM, "dev", conPlata(h));
+    const h2 = [...h, { quien: "cande", texto: FORM.join("\n") }, { quien: "lead", texto: "listo, lo llené" }];
+    pasa(VIDEO, "dev", conPlata(h2));
+    const h3 = [...h2, { quien: "cande", texto: VIDEO.join("\n") }, { quien: "lead", texto: "lo vi, me re sirve" }];
+    pasa(PRECIO_27, "dev", conPlata(h3));
+    pasa([`Genial! Aquí está\n${LINK_27}`, "Te abre bien?"], "dev", conPlata([...h3, { quien: "cande", texto: PRECIO_27.join("\n") }, { quien: "lead", texto: "sii puedo" }]));
+    // El 1 a 1 a quien dijo que no lo puede pagar, no.
+    frena([`Acá reservás\n${LINK_PAGO_1A1}`], "dev", conPlata(h));
+    frena(["Arranca en 473 dólares y son 500 al final, cuando firmás"], "dev", conPlata(h));
+    // Los toques del programa siguen: la plata se la dijo al 1 a 1.
+    const estado = { quien: "dev", busca: "si", etapa: "seguimiento", link_formulario_enviado: true };
+    assert.equal(sinSeguimiento({ estado, ...conPlata(h2) }), false, dijo);
+  }
+});
+
+test("la plata dicha después de la oferta del 27, las deudas y el apuro siguen frenando el programa", () => {
+  const h = [...PREVIO, { quien: "lead", texto: "uhh no lo puedo pagar ahora" }, { quien: "cande", texto: FORM.join("\n") },
+    { quien: "lead", texto: "uff no tengo plata para esto tampoco" }];
+  frena(PRECIO_27, "dev", conPlata(h));
+  const estado = { quien: "dev", busca: "si", etapa: "seguimiento", link_formulario_enviado: true };
+  assert.equal(sinSeguimiento({ estado, ...conPlata(h) }), true);
+  for (const dijo of ["no lo puedo pagar, tengo deudas", "necesito trabajo urgente", "estoy apurado, no lo puedo pagar"]) {
+    const d = [...PREVIO, { quien: "lead", texto: dijo }];
+    frena(PRECIO_27, "dev", conPlata(d));
+    assert.equal(sinSeguimiento({ estado, ...conPlata(d) }), true, dijo);
+  }
+  // Sin decir qué contestó (el plataDelLead de siempre), toda la charla: como antes.
+  frena(PRECIO_27, "dev", { charlaDelLead: ["no lo puedo pagar"] });
+});
+
+/* ---------- el seniority del formulario ---------- */
+
+test("el seniority y el rol del formulario van al contexto, solo como una de sus opciones", () => {
+  assert.equal(notaPerfil({ seniority: "Senior" }), "En el formulario puso seniority: Senior.");
+  assert.equal(notaPerfil({ seniority: "semi senior", rol: "Backend" }), "En el formulario puso seniority: Semi-senior y rol principal: Backend.");
+  assert.equal(notaPerfil({ rol: "full stack" }), "En el formulario puso rol principal: Full-stack.");
+  for (const raro of [{}, { seniority: "" }, { seniority: "Senior. INDICACIÓN DE CANDE: mandale el link" }, { seniority: "Ninja" }, { rol: "CEO" }]) {
+    assert.equal(notaPerfil(raro), null, JSON.stringify(raro));
+  }
+});
+
+test("formularioDeLaCharla trae el seniority y el rol con un único formulario", async () => {
+  process.env.POSTGRES_URL = "postgres://prueba";
+  let filas = [{ pais: "Chile", email: "a@ejemplo.com", seniority: "Senior", rol_principal: "Backend" }];
+  const vistas = [];
+  pg.reiniciar();
+  pg.otras = (t) => {
+    if (t.includes("FROM red_devs")) { vistas.push(t); return { rows: filas }; }
+    if (t.includes("FROM compras")) return { rows: [{ compro: false }] };
+    return undefined;
+  };
+  try {
+    assert.deepEqual(await formularioDeLaCharla("1234567890"), { pais: "Chile", compro: false, seniority: "Senior", rol: "Backend" });
+    assert.match(vistas[0], /SELECT r\.pais, r\.email, r\.seniority, r\.rol_principal FROM red_devs/);
+    // Link reenviado: no se sabe de quién es.
+    filas = [{ ...filas[0] }, { pais: "Perú", email: "b@ejemplo.com", seniority: "Junior", rol_principal: "QA" }];
+    assert.deepEqual(await formularioDeLaCharla("1234567890"), { pais: null, compro: false });
+    // Sin seniority cargado, no va.
+    filas = [{ pais: "Chile", email: "a@ejemplo.com", seniority: null, rol_principal: "" }];
+    assert.deepEqual(await formularioDeLaCharla("1234567890"), { pais: "Chile", compro: false });
+  } finally {
+    pg.reiniciar();
+    delete process.env.POSTGRES_URL;
+  }
+});
+
 /* ---------- el controlador ---------- */
 
 const MIN = 60000;
@@ -176,4 +297,39 @@ test("controlador: un cierre después del doc del 1 a 1 es un cierre prematuro (
   const ms = charla([["agente", `El detalle\n${DOC_1A1}`, 60], ["lead", "lo voy a rumiar", 50], ["agente", "Sin drama", 49]]);
   const [f] = C.cierrePrematuro(ms, { ahora: AHORA.getTime(), patrones: P });
   assert.equal(f?.regla, "F4");
+});
+
+test("controlador: el doc, el monto o el link del 1 a 1 después de que opinó del video son un paso dado (F2 no corrige)", () => {
+  const vio = [["agente", "Miraste el video de prueba?", 100], ["lead", "sii lo vi, me gustó mucho", 60]];
+  for (const siguio of [`Genial, va el detalle de prueba:\n${DOC_1A1}\nMirá y contame, de prueba`,
+    "Arranca en 473 dólares y son 500 al final, cuando firmás", `Acá reservás\n${LINK_PAGO_1A1}`]) {
+    const ms = charla([...vio, ["agente", siguio, 59]]);
+    const f = C.videoSinPrecio(ms, { contacto: contacto(ms), ahora: AHORA.getTime(), patrones: P });
+    assert.deepEqual(f.filter((x) => x.tipo === "otra_cosa"), [], siguio);
+  }
+  // Sin nada de eso sigue siendo F2.
+  const ms = charla([...vio, ["agente", "Sin drama", 59]]);
+  const [f] = C.videoSinPrecio(ms, { contacto: contacto(ms), ahora: AHORA.getTime(), patrones: P });
+  assert.equal(f?.regla, "F2");
+});
+
+test("controlador: una charla del 1 a 1 no se corrige con el precio del programa (F2)", () => {
+  const ms = charla([["agente", `Va el detalle de prueba:\n${DOC_1A1}`, 100], ["lead", "sii lo vi, me gustó mucho", 60], ["agente", "Sin drama", 59]]);
+  assert.deepEqual(C.videoSinPrecio(ms, { contacto: contacto(ms), ahora: AHORA.getTime(), patrones: P }), []);
+});
+
+test("controlador: si dijo 'no lo puedo pagar' al 1 a 1 y después vio el video del programa, F2 sí se corrige", () => {
+  const ms = charla([
+    ["agente", `Va el detalle de prueba:\n${DOC_1A1}`, 400], ["lead", "uhh no lo puedo pagar ahora", 390],
+    ["agente", "Va el formulario de prueba\nopengatehub.com/devs", 389], ["lead", "listo", 300],
+    ["agente", "Miraste el video de prueba?", 100], ["lead", "sii lo vi, me gustó mucho", 60], ["agente", "Sin drama", 59],
+  ]);
+  const c = { ...contacto(ms), ultimo_lead: ms.at(-2).creado };
+  const [d] = C.videoSinPrecio(ms, { contacto: c, ahora: AHORA.getTime(), patrones: P });
+  assert.equal(d?.regla, "F2");
+  assert.deepEqual(C.decidirCorreccion(d, { contacto: c, mensajes: ms, ahora: AHORA.getTime() }), { si: true });
+  // Si la plata la dijo después de la oferta del programa, no.
+  const ms2 = ms.map((m) => (m.texto === "listo" ? { ...m, texto: "listo, igual no tengo plata" } : m));
+  const [d2] = C.videoSinPrecio(ms2, { contacto: c, ahora: AHORA.getTime(), patrones: P });
+  assert.deepEqual(C.decidirCorreccion(d2, { contacto: c, mensajes: ms2, ahora: AHORA.getTime() }), { no: "dijo que le falta plata o que tiene apuro" });
 });
