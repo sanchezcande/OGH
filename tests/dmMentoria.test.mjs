@@ -4,7 +4,9 @@
 // frenados. El aviso urgente de quien quiere el 1 a 1 le suena a Cande sin pasarle la charla, y el controlador no toma el doc como
 // una entrega que falta ni corrige con el precio del programa una charla del 1 a 1. Desde el 29/10: el "no lo puedo
 // pagar" al 1 a 1 no frena el programa de 27 que le sigue, a quien ya compró no se le vende nada (NOTA_COMPRO como
-// antes) y el contexto trae el seniority del formulario.
+// antes) y el contexto trae el seniority del formulario. Desde el 30/10 el 1 a 1 va primero a cualquiera que busca (eso
+// lo decide el prompt, no el sitio); la plata dicha al 1 a 1 cuenta hasta que le llega el programa en firme; el doc solo
+// va también al que escribió la palabra clave de la historia con algo al lado; y F2 no se saltea por un precio_dicho del 473.
 //
 // Los textos de los leads y de la cuenta son inventados para la prueba (este repo es público): solo el doc, el link y
 // la frase de la garantía son los de verdad, porque eso es lo que se deja pasar tal cual. La frase va armada por tramos,
@@ -167,14 +169,38 @@ test("el doc, el link y el monto del 1 a 1 no van a quien no se sabe que es dev,
   frena([`Acá reservás\n${LINK_PAGO_1A1}`], "dev", { charlaDelLead: ["no tengo plata ahora"] });
 });
 
+/* ---------- la palabra clave de la historia con algo al lado ---------- */
+
+test("el doc solo va al que escribió la palabra clave de la historia con algo al lado, sin saber todavía si es dev (30/10)", () => {
+  const TRABAJO = (dijo) => ({ textosDelLead: [dijo], charlaDelLead: [dijo] });
+  const MARCO = ["Busco 5 devs de prueba para acompañarlos 1 a 1 este mes", `Va el detalle de prueba:\n${DOC_1A1}`, "Es para vos, de prueba?"];
+  for (const dijo of ["TRABAJO de prueba", "trabajo!! texto de prueba", "Trabajo 🙂 prueba", "¡TRABAJO! de prueba"]) {
+    pasa(MARCO, "no_se_sabe", TRABAJO(dijo));
+    pasa(MARCO, undefined, TRABAJO(dijo));
+    // Cuánto sale o el link de pago, no: eso es para quien dijo que es para él (un dev).
+    frena([`Acá reservás\n${LINK_PAGO_1A1}`], "no_se_sabe", TRABAJO(dijo));
+    frena(["Arranca en 473 dólares y son 500 al final, cuando firmás", `Va el detalle\n${DOC_1A1}`], "no_se_sabe", TRABAJO(dijo));
+    frena([`Va el detalle\n${DOC_1A1}`, `Y el programa\n${LINK_27}`], "no_se_sabe", TRABAJO(dijo));
+    // Si el modelo dice que no es dev, tampoco el doc.
+    frena(MARCO, "no_dev", TRABAJO(dijo));
+  }
+  // Sin la palabra, el doc a quien no se sabe que es dev sigue frenado.
+  for (const dijo of ["yo quiero", "me interesa", "busco trabajo de prueba"]) frena(MARCO, "no_se_sabe", TRABAJO(dijo));
+  // Con la palabra y una empresa, una crisis o sin plata, tampoco.
+  frena(MARCO, "no_se_sabe", TRABAJO("TRABAJO! tengo una startup de prueba y busco devs"));
+  frena(MARCO, "no_se_sabe", TRABAJO("trabajo, estoy con depresión de prueba"));
+  frena(MARCO, "no_se_sabe", TRABAJO("trabajo pero no tengo plata"));
+});
+
 /* ---------- la plata dicha al 1 a 1 ---------- */
 
 const PREVIO = [
   { quien: "lead", texto: "YO" }, { quien: "cande", texto: "Busco 5 devs de prueba para acompañarlos 1 a 1 este mes" },
   { quien: "lead", texto: "si, senior de prueba y buscando" }, { quien: "cande", texto: `Va el detalle de prueba:\n${DOC_1A1}` },
 ];
-const conPlata = (historial) => ({
-  charlaDelLead: historial.filter((m) => m.quien === "lead").map((m) => m.texto), plataDelLead: charlaParaLaPlata(historial),
+// Como el agente: la plata se mira con lo que sale al final (`saliente`).
+const conPlata = (historial, saliente = []) => ({
+  charlaDelLead: historial.filter((m) => m.quien === "lead").map((m) => m.texto), plataDelLead: charlaParaLaPlata(historial, saliente),
 });
 const FORM = ["Lo de prueba lo cuento en mi programa", "Va el formulario de prueba\nopengatehub.com/devs", "Lo llenás hoy, de prueba?"];
 const VIDEO = ["Va el video de prueba\nopengatehub.com/devs/gracias", "Lo mirás hoy, de prueba?"];
@@ -206,6 +232,27 @@ test("'no lo puedo pagar' al 1 a 1 frena el 1 a 1, no el programa de 27 que le s
     const estado = { quien: "dev", busca: "si", etapa: "seguimiento", link_formulario_enviado: true };
     assert.equal(sinSeguimiento({ estado, ...conPlata(h2) }), false, dijo);
   }
+});
+
+test("la plata dicha al 1 a 1 cuenta hasta que le llega el programa en firme (30/10): sin toques ni 2 pagos sueltos", () => {
+  const h = [...PREVIO, { quien: "cande", texto: "Arranca en 473 dólares y son 500 al final, cuando firmás" },
+    { quien: "lead", texto: "uhh no lo puedo pagar ahora" }];
+  const estado = { quien: "dev", busca: "si", etapa: "precio", link_formulario_enviado: false };
+  // Un toque sobre el 1 a 1 no sale: el sitio corta los toques como en main.
+  assert.equal(sinSeguimiento({ estado, ...conPlata(h) }), true);
+  // "2 pagos" o el 27 sueltos, sin el programa en firme, se leen como cuotas del 1 a 1: frenados.
+  const DOS_PAGOS = ["Entiendo, de prueba", "Hay 2 pagos de 13,50 de prueba, te sirve?"];
+  frena(DOS_PAGOS, "dev", conPlata(h, DOS_PAGOS));
+  frena(PRECIO_27, "dev", conPlata(h, PRECIO_27));
+  // El programa en firme en el mismo turno (nombrado, con el formulario o con el video) sí sale, y los 2 pagos con él.
+  pasa(FORM, "dev", conPlata(h, FORM));
+  pasa(VIDEO, "dev", conPlata(h, VIDEO));
+  pasa(["Lo cuento en mi programa de prueba, son 2 pagos de 13,50", "Te sirve, de prueba?"], "dev",
+    conPlata(h, ["Lo cuento en mi programa de prueba, son 2 pagos de 13,50", "Te sirve, de prueba?"]));
+  // Y después de esa oferta, los toques del programa siguen.
+  const conForm = [...h, { quien: "cande", texto: FORM.join("\n") }];
+  assert.equal(sinSeguimiento({ estado: { ...estado, etapa: "seguimiento", link_formulario_enviado: true }, ...conPlata(conForm) }), false);
+  assert.equal(sinSeguimiento({ estado: { ...estado, etapa: "seguimiento" }, ...conPlata(h, FORM) }), false);
 });
 
 test("la plata dicha después de la oferta del 27, las deudas y el apuro siguen frenando el programa", () => {
@@ -332,4 +379,24 @@ test("controlador: si dijo 'no lo puedo pagar' al 1 a 1 y después vio el video 
   const ms2 = ms.map((m) => (m.texto === "listo" ? { ...m, texto: "listo, igual no tengo plata" } : m));
   const [d2] = C.videoSinPrecio(ms2, { contacto: c, ahora: AHORA.getTime(), patrones: P });
   assert.deepEqual(C.decidirCorreccion(d2, { contacto: c, mensajes: ms2, ahora: AHORA.getTime() }), { no: "dijo que le falta plata o que tiene apuro" });
+});
+
+test("controlador: con precio_dicho del 473 (sin el 27 en la charla), F2 corrige al que no pudo pagar el 1 a 1 y vio el video (30/10)", () => {
+  const ms = charla([
+    ["agente", `Va el detalle de prueba:\n${DOC_1A1}`, 500], ["agente", "Arranca en 473 dólares y son 500 al final, cuando firmás", 450],
+    ["lead", "uhh no lo puedo pagar ahora", 390], ["agente", "Va el formulario de prueba\nopengatehub.com/devs", 389],
+    ["lead", "listo", 300], ["agente", "Miraste el video de prueba?", 100], ["lead", "sii lo vi, me gustó mucho", 60], ["agente", "Sin drama", 59],
+  ]);
+  const base = contacto(ms);
+  const c = { ...base, estado: { ...base.estado, precio_dicho: true }, ultimo_lead: ms.at(-2).creado };
+  const [d] = C.videoSinPrecio(ms, { contacto: c, ahora: AHORA.getTime(), patrones: P });
+  assert.equal(d?.regla, "F2");
+  assert.deepEqual(C.decidirCorreccion(d, { contacto: c, mensajes: ms, ahora: AHORA.getTime() }), { si: true });
+  // Sin nada del 1 a 1, el precio_dicho del estado sigue valiendo como antes: no corrige.
+  const sin1a1 = ms.filter((m) => !/473|docs\.google/.test(m.texto));
+  assert.deepEqual(C.videoSinPrecio(sin1a1, { contacto: c, ahora: AHORA.getTime(), patrones: P }), []);
+  // Y si en la charla ya salió el 27, tampoco.
+  const con27 = charla([["agente", `Va el detalle de prueba:\n${DOC_1A1}`, 500], ["agente", "Sale 27 dólares, frase de prueba", 450],
+    ["lead", "uhh no lo puedo pagar ahora", 390], ["agente", "Miraste el video de prueba?", 100], ["lead", "sii lo vi, me gustó mucho", 60], ["agente", "Sin drama", 59]]);
+  assert.deepEqual(C.videoSinPrecio(con27, { contacto: { ...c, respondido_hasta: con27.at(-2).id }, ahora: AHORA.getTime(), patrones: P }), []);
 });

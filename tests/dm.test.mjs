@@ -3907,6 +3907,34 @@ test("quien dijo 'no lo puedo pagar' al 1 a 1 recibe el programa de 27 que le si
   assert.doesNotMatch(otro.m.enviados.join(" "), /27 dólares/);
 });
 
+test("'no lo puedo pagar' recién dicho al 1 a 1: sin toque ni 2 pagos sueltos hasta que le llega el programa en firme (30/10)", async () => {
+  const { DOC_1A1 } = await import("../lib/dm/frenos.js");
+  const charla = () => [
+    { id: 1, quien: "agente", texto: AVISO }, { id: 2, quien: "agente", texto: `Va el detalle de prueba:\n${DOC_1A1}` },
+    { id: 3, quien: "agente", texto: "Arranca en 473 dólares y son 500 al final, cuando firmás" },
+    { id: 4, quien: "lead", texto: "uhh no lo puedo pagar ahora" },
+  ];
+  // La pregunta de qué le cuesta sale, pero no deja toque: la plata que dijo al 1 a 1 todavía cuenta.
+  const pregunta = armar({ toques: true, responde: () => salida(["Entiendo, y qué te cuesta, de prueba?"], { seguimiento_en_horas: 20 }) });
+  pregunta.m.mensajes = charla();
+  pregunta.m.disparo = 4;
+  assert.equal((await pregunta.agente.procesar("77", pregunta.m.disparo)).hecho, "enviada");
+  assert.equal(pregunta.m.proximo, null);
+  // Los 2 pagos sueltos, sin el programa, no salen (se leen como cuotas del 1 a 1).
+  const dos = armar({ toques: true, responde: () => salida(["Entiendo, de prueba", "Hay 2 pagos de 13,50 de prueba, te sirve?"]) });
+  dos.m.mensajes = charla();
+  dos.m.disparo = 4;
+  await dos.agente.procesar("77", dos.m.disparo);
+  assert.doesNotMatch(dos.m.enviados.join(" "), /13,50/);
+  // El programa en firme (nombrado y con el formulario) sale y le deja su toque.
+  const plan = armar({ toques: true, responde: () => salida(["Lo de prueba lo cuento en mi programa", "Va el formulario de prueba\nopengatehub.com/devs", "Lo llenás hoy, de prueba?"], { seguimiento_en_horas: 6 }) });
+  plan.m.mensajes = charla();
+  plan.m.disparo = 4;
+  assert.equal((await plan.agente.procesar("77", plan.m.disparo)).hecho, "enviada");
+  assert.match(plan.m.enviados.join(" "), /mi programa/);
+  assert.ok(plan.m.proximo, "le queda agendado el toque");
+});
+
 test("a quien ya tiene el programa no le sale un toque ni un turno inmediato, y si escribe el agente lo sabe", async () => {
   const { agente, m } = armarToque();
   m.formulario = { pais: "Argentina", compro: true };

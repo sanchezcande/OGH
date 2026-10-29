@@ -31,7 +31,8 @@ export default async function handler(req, res) {
     const freno = revisar(salida, {
       textosDelLead: turno.mensajes_del_lead,
       charlaDelLead: [...previos.filter((m) => m?.quien === "lead").map((m) => m.texto), ...turno.mensajes_del_lead],
-      plataDelLead: charlaParaLaPlata([...previos, ...turno.mensajes_del_lead.map((texto) => ({ quien: "lead", texto }))]),
+      // Con lo que sale al final, como en el agente: el programa en firme deja de contar la plata dicha al 1 a 1.
+      plataDelLead: charlaParaLaPlata([...previos, ...turno.mensajes_del_lead.map((texto) => ({ quien: "lead", texto }))], salida.mensajes),
       estadoPrevio: req.body.estado_previo || null,
       linkDePago: aj.link_de_pago,
       // En el turno, lo que salió de la cuenta (del agente o de Cande) figura como "cande".
