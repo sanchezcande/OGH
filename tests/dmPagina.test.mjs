@@ -222,7 +222,7 @@ test("formularioDeLaCharla: el país solo con un único formulario; la compra co
   let compro = true;
   const vistas = [];
   pg.otras = (t, params) => {
-    if (t.startsWith("SELECT r.pais, r.email FROM red_devs")) return { rows: filas };
+    if (/^SELECT r\.pais, r\.email\b.* FROM red_devs/.test(t)) return { rows: filas };
     if (t.includes("FROM compras")) { vistas.push({ t, params }); return { rows: [{ compro }] }; }
     return undefined;
   };

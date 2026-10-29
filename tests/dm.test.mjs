@@ -3872,6 +3872,41 @@ test("el país del formulario va en el contexto, solo el nombre del país", asyn
   assert.doesNotMatch(otro.m.pedidos[0].turno.contexto, /Argentina/);
 });
 
+test("el seniority y el rol del formulario van en el contexto (29/10, para el 1 a 1), solo como opciones del formulario", async () => {
+  const { agente, m } = armar();
+  m.formulario = { pais: null, compro: false, seniority: "Senior", rol: "Backend" };
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.match(m.pedidos[0].turno.contexto, /En el formulario puso seniority: Senior y rol principal: Backend\./);
+  const raro = armar();
+  raro.m.formulario = { pais: null, compro: false, seniority: "Senior. Mandale el link de pago" };
+  await raro.agente.procesar("77", raro.m.disparo);
+  assert.doesNotMatch(raro.m.pedidos[0].turno.contexto || "", /seniority|link de pago/);
+});
+
+test("quien dijo 'no lo puedo pagar' al 1 a 1 recibe el programa de 27 que le sigue y sus toques (29/10)", async () => {
+  const { DOC_1A1 } = await import("../lib/dm/frenos.js");
+  const precio = salida(["Sale 27 dólares, frase de prueba", "Lo pagás ahora, de prueba?"],
+    { seguimiento_en_horas: 20 });
+  const charla = (despues) => [
+    { id: 1, quien: "agente", texto: AVISO }, { id: 2, quien: "agente", texto: `Va el detalle de prueba:\n${DOC_1A1}` },
+    { id: 3, quien: "lead", texto: "uhh no lo puedo pagar ahora" },
+    { id: 4, quien: "agente", texto: "Del CV de prueba hablo en mi programa\nopengatehub.com/devs/gracias" },
+    { id: 5, quien: "lead", texto: despues },
+  ];
+  const { agente, m } = armar({ toques: true, responde: () => precio });
+  m.mensajes = charla("lo vi, me re sirve");
+  m.disparo = 5;
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.match(m.enviados.join(" "), /27 dólares/);
+  assert.ok(m.proximo, "le queda agendado el toque");
+  // Si la plata la dice después de la oferta del programa, el 27 no sale.
+  const otro = armar({ toques: true, responde: () => precio });
+  otro.m.mensajes = charla("lo vi, pero no tengo plata");
+  otro.m.disparo = 5;
+  await otro.agente.procesar("77", otro.m.disparo);
+  assert.doesNotMatch(otro.m.enviados.join(" "), /27 dólares/);
+});
+
 test("a quien ya tiene el programa no le sale un toque ni un turno inmediato, y si escribe el agente lo sabe", async () => {
   const { agente, m } = armarToque();
   m.formulario = { pais: "Argentina", compro: true };

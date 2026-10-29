@@ -9,7 +9,7 @@
 // en el historial, y exigen el aviso de que es automático si todavía no figura.
 import { mismoSecreto, pedir, secretoDe } from "../../../lib/dm/armado";
 import { ajustes, hayBase, prompt, tablas } from "../../../lib/dm/base";
-import { avisaQueEsAutomatico, normalizar, revisar } from "../../../lib/dm/frenos";
+import { avisaQueEsAutomatico, charlaParaLaPlata, normalizar, revisar } from "../../../lib/dm/frenos";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -31,6 +31,7 @@ export default async function handler(req, res) {
     const freno = revisar(salida, {
       textosDelLead: turno.mensajes_del_lead,
       charlaDelLead: [...previos.filter((m) => m?.quien === "lead").map((m) => m.texto), ...turno.mensajes_del_lead],
+      plataDelLead: charlaParaLaPlata([...previos, ...turno.mensajes_del_lead.map((texto) => ({ quien: "lead", texto }))]),
       estadoPrevio: req.body.estado_previo || null,
       linkDePago: aj.link_de_pago,
       // En el turno, lo que salió de la cuenta (del agente o de Cande) figura como "cande".
