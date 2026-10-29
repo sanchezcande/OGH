@@ -48,6 +48,7 @@ test("no repite lo que ya dice la historia", () => {
 test("cierra pidiendo algo, no informando", () => {
   const ultimo = PALABRAS.trabajo.textos[PALABRAS.trabajo.textos.length - 1].trim();
   assert.match(ultimo, /\?$/, "si no termina en pregunta, no hay cierre");
+  assert.ok(!/qué te parece/i.test(ultimo), "eso pide una opinión; el cierre pide un sí o un no");
 });
 
 test("nada de nosotros: se lee como que está contratando", () => {
