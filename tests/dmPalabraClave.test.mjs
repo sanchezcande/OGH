@@ -83,3 +83,11 @@ test("después de la palabra clave, la charla pasa a Cande", () => {
   assert.match(bloque, /pasarACande\(/, "sin esto el agente le sigue hablando al que pidió el 1 a 1");
   assert.match(bloque, /palabra clave/, "y el motivo tiene que decir por qué se la pasa");
 });
+
+test("el aviso del tope de altas sale una vez por día, no una por alta", () => {
+  const src = readFileSync(new URL("../lib/dm/agente.js", import.meta.url), "utf8");
+  assert.match(src, /tocaAvisarDelTope/, "sin la guarda, el aviso sale en cada alta");
+  assert.match(src, /AVISO_TOPE_CADA_MS = 86400000/);
+  // La guarda va PEGADA a la condición del aviso: si se escribe aparte, igual sale.
+  assert.match(src, /van \+ 1 >= aj\.altas_por_dia && \(await tocaAvisarDelTope\(\)\)/);
+});
