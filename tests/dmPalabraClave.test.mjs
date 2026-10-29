@@ -50,7 +50,8 @@ test("el último mensaje pide una decisión, no una opinión", () => {
   const ultimo = PALABRAS.trabajo.textos[PALABRAS.trabajo.textos.length - 1].trim();
   // Puede ser una pregunta ("te cierra?") o un pedido directo ("decime si te cierra"): lo que no
   // puede es solo informar. Si el último mensaje no pide nada, la charla se muere ahí.
-  assert.match(ultimo, /\?$|\bdecime\b|\bcontame\b/i, "sin un pedido al final no hay cierre");
+  assert.match(ultimo, /\?$/, "el cierre es una pregunta siempre (Cande, 30/10)");
+  assert.match(ultimo, /lugar/i, "y lo que pide es el lugar, no un comentario");
   assert.ok(!/qué te parece/i.test(ultimo), "eso pide una opinión; el cierre pide un sí o un no");
 });
 
