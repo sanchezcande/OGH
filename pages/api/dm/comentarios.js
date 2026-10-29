@@ -5,10 +5,15 @@
 // cada uno su DM con una private reply (lib/dm/comentarios.js). Esto reemplaza la automatización de
 // CV de ManyChat, que quedó pausada cuando la cuenta se pasó del tope de contactos del plan Pro.
 //
+// Convive con ManyChat en vez de reemplazarlo de golpe: el 30/10, mandando uno de verdad, se vio
+// que el automático de CV de ManyChat seguía vivo y contestaba los comentarios a los 7 segundos
+// (@juliovasquez_m.a recibió el mismo link dos veces por eso). Así que antes de mandar se mira la
+// bandeja y a quien ya recibió algo de la cuenta no se le manda nada: esto contesta solo lo que
+// ManyChat dejó pasar. Cuando la automatización de ManyChat esté de verdad apagada, esto contesta
+// todo sin que haya que cambiarle nada.
+//
 // Arranca apagado: se prende con dm_config "comentarios" en { activo: true }. El tope por vuelta
-// (`tope`, 10 por defecto) está para que la primera vez no salgan 45 DM de una: si ManyChat ya le
-// había contestado a alguno, Instagram lo rechaza y queda anotado como ya_contestado, y con el tope
-// eso se ve en la primera vuelta antes de seguir con el resto.
+// (`tope`, 10 por defecto) está para que la primera vez no salga una tanda entera de una.
 //
 // Devuelve solo cantidades: ni ids ni usuarios salen en la respuesta ni en los registros.
 import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
@@ -52,4 +57,5 @@ export default async function handler(req, res) {
   }
 }
 
-export const config = { maxDuration: 60 };
+// Mirar la bandeja antes de mandar se lleva unos 30 segundos (ver bandejaDe en lib/dm/comentarios.js).
+export const config = { maxDuration: 120 };
