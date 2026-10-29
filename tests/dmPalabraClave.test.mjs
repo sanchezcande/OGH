@@ -42,12 +42,15 @@ test("no repite lo que ya dice la historia", () => {
   const todo = PALABRAS.trabajo.textos.join(" ");
   assert.ok(!/buscando 5 devs/i.test(todo), "eso ya lo leyó en la historia, no se lo repetimos");
   assert.ok(!/vas a ser vos o alguien/i.test(todo), "la pregunta de la historia tampoco se repite");
-  assert.match(todo, /todo el detalle/, "entrega lo que la historia prometió");
+  assert.match(todo, /detalle/, "entrega lo que la historia prometió");
+  assert.match(todo, /docs\.google\.com/, "y el detalle es el doc");
 });
 
-test("cierra pidiendo algo, no informando", () => {
+test("el último mensaje pide una decisión, no una opinión", () => {
   const ultimo = PALABRAS.trabajo.textos[PALABRAS.trabajo.textos.length - 1].trim();
-  assert.match(ultimo, /\?$/, "si no termina en pregunta, no hay cierre");
+  // Puede ser una pregunta ("te cierra?") o un pedido directo ("decime si te cierra"): lo que no
+  // puede es solo informar. Si el último mensaje no pide nada, la charla se muere ahí.
+  assert.match(ultimo, /\?$|\bdecime\b|\bcontame\b/i, "sin un pedido al final no hay cierre");
   assert.ok(!/qué te parece/i.test(ultimo), "eso pide una opinión; el cierre pide un sí o un no");
 });
 
