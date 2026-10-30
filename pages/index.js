@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import SEO from "../src/components/SEO/SEO";
 import ClosingCall from "../src/components/ClosingCall/ClosingCall";
+import IndiceSecciones from "../src/components/IndiceSecciones/IndiceSecciones";
 import {
   Body,
   Button,
@@ -33,6 +34,15 @@ const COPY = {
       description:
         "Te conseguimos el developer senior que tu proyecto necesita. 100% remoto y entrevistado por nosotros antes de que lo conozcas. Llamada gratis de 20 minutos.",
     },
+    indice: [
+      { id: "que-incluye", label: "Qué incluye" },
+      { id: "casos-de-uso", label: "Casos de uso" },
+      { id: "como-evaluamos", label: "Nuestro filtro" },
+      { id: "como-funciona", label: "Cómo funciona" },
+      { id: "clientes", label: "Clientes" },
+      { id: "testimonios", label: "Testimonios" },
+      { id: "preguntas", label: "Preguntas" },
+    ],
     hero: {
       eyebrow: "Staff augmentation · Contratación de developers",
       title: "Te conseguimos el developer que tu proyecto necesita.",
@@ -169,6 +179,15 @@ const COPY = {
       description:
         "We find, interview and place senior remote developers in your team. We interview each one before you meet them. Free 20-minute call.",
     },
+    indice: [
+      { id: "que-incluye", label: "What's included" },
+      { id: "casos-de-uso", label: "Use cases" },
+      { id: "como-evaluamos", label: "Our filter" },
+      { id: "como-funciona", label: "How it works" },
+      { id: "clientes", label: "Clients" },
+      { id: "testimonios", label: "Testimonials" },
+      { id: "preguntas", label: "FAQ" },
+    ],
     hero: {
       eyebrow: "Staff augmentation · Developer hiring",
       title: "Hire senior developers who fit your team.",
@@ -349,7 +368,8 @@ export async function getServerSideProps() {
 
 export default function HomePage() {
   const { t } = useTranslation();
-  const copy = COPY[useLang()];
+  const lang = useLang();
+  const copy = COPY[lang];
 
   const featuredVantage = {
     name: t("reviews.vantage.role"),
@@ -422,8 +442,11 @@ export default function HomePage() {
         </Wrap>
       </Hero>
 
+      {/* El índice de la página. Va pegado abajo del menú y lleva a cada sección. */}
+      <IndiceSecciones items={copy.indice} etiqueta={lang === "en" ? "Sections on this page" : "Secciones de esta página"} />
+
       {/* Qué es gratis y qué se paga */}
-      <Section $tight>
+      <Section $tight id="que-incluye">
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.offer.eyebrow}</Eyebrow>
@@ -464,7 +487,7 @@ export default function HomePage() {
       </Section>
 
       {/* Para quién */}
-      <Section>
+      <Section id="casos-de-uso">
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.audience.eyebrow}</Eyebrow>
@@ -518,7 +541,7 @@ export default function HomePage() {
       </Section>
 
       {/* Cómo funciona */}
-      <Section>
+      <Section id="como-funciona">
         <Wrap>
           <Split>
             <Reveal style={{ alignSelf: "stretch" }}>
@@ -556,7 +579,7 @@ export default function HomePage() {
       </Section>
 
       {/* Con quién trabajamos: logos y casos, todos juntos */}
-      <Section style={{ borderTop: `1px solid ${color.line}` }}>
+      <Section id="clientes" style={{ borderTop: `1px solid ${color.line}` }}>
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.clients.eyebrow}</Eyebrow>
@@ -614,7 +637,7 @@ export default function HomePage() {
       </Section>
 
       {/* Testimonios */}
-      <Section $tone="alt">
+      <Section $tone="alt" id="testimonios">
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.proof.eyebrow}</Eyebrow>
@@ -649,7 +672,7 @@ export default function HomePage() {
       </Section>
 
       {/* Preguntas de comprador */}
-      <Section>
+      <Section id="preguntas">
         <Wrap>
           <Split>
             <Reveal style={{ alignSelf: "stretch" }}>

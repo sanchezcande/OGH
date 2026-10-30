@@ -69,7 +69,9 @@ const tone = {
 export const Section = styled.section`
   ${({ $tone = "paper" }) => tone[$tone]}
   padding: ${({ $tight }) => ($tight ? "clamp(56px, 7vw, 96px)" : "clamp(72px, 10vw, 136px)")} 0;
-  scroll-margin-top: 72px;
+  /* Lo que mide el menú pegado arriba. Una página con índice (IndiceSecciones) lo sube: ahí son
+     dos barras y el título de la sección quedaría tapado. */
+  scroll-margin-top: var(--anclaje, 72px);
 `;
 
 export const Wrap = styled.div`
