@@ -149,6 +149,38 @@ test("un ig_id que no es un id de Instagram no se usa", async () => {
   assert.deepEqual(porIg, []);
 });
 
+test("el resto del cliente de ManyChat pasa tal cual: sin esto no se pausan sus automáticos", async () => {
+  // El agente usa ponerCampo(id, "dm_dueno", "cande") para pausar los automáticos de ManyChat
+  // cuando la charla pasa a Cande, y datosDe para el link del aviso. Si el envío los tapa, la
+  // charla queda con los automáticos prendidos y nadie se entera hasta que el lead recibe dos cosas.
+  const visto = [];
+  const envio = crearEnvio({
+    manychat: {
+      ...mcQue({ ok: true }),
+      ponerCampo: async (id, campo, valor) => { visto.push([id, campo, valor]); return { ok: true }; },
+      datosDe: async (id) => ({ ok: true, ig_username: "alguien", ig_id: "1784140" }),
+      ponerEtiqueta: async () => ({ ok: true }),
+    },
+    ig: igQue({ ok: true }),
+    base: baseCon(null),
+  });
+
+  assert.equal((await envio.ponerCampo("77", "dm_dueno", "cande")).ok, true);
+  assert.deepEqual(visto, [["77", "dm_dueno", "cande"]]);
+  assert.equal((await envio.datosDe("77")).ig_username, "alguien");
+  assert.equal(typeof envio.ponerEtiqueta, "function");
+});
+
+test("y pasa TODO lo que exporta lib/dm/manychat.js, no una lista a mano", async () => {
+  // La lista a mano es la que se olvidó de ponerCampo. Esta prueba mira el cliente de verdad.
+  const real = await import("../lib/dm/manychat.js");
+  const envio = crearEnvio({ manychat: real, ig: null, base: baseCon(null) });
+  for (const nombre of Object.keys(real)) {
+    assert.equal(typeof envio[nombre], typeof real[nombre], `el envío se comió ${nombre}`);
+  }
+  assert.notEqual(envio.mandarTextos, real.mandarTextos, "lo único distinto tiene que ser el envío");
+});
+
 test("hayManyChat sigue estando: el agente lo mira antes de un toque", async () => {
   const envio = crearEnvio({
     manychat: mcQue({ ok: true }),
