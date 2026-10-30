@@ -31,14 +31,18 @@
 //   { accion: "link_formulario", contactos: [id, ...] } → el link del formulario de /devs con el id de cada charla y
 //                                                  su firma, como lo manda el agente: para lo que Cande pega a mano
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla (queda personal: lleva la etiqueta
-//                                                  sin_intencion de ManyChat, salvo que haya comprado)
+//                                                  sin_intencion de ManyChat, salvo que haya comprado o que lo borrado
+//                                                  mostrara interés, trabajo, una oferta o algo suelto)
 //   { accion: "sin_intencion", dry, limite? }      → el barrido de la etiqueta sin_intencion (lib/dm/sinIntencion.js): Cande borra
 //                                                  o desuscribe en tanda desde ManyChat a quien la tiene. Con dry (lo que pasa
 //                                                  si no se dice dry: false) no cambia nada: cuántos la llevarían, cuántos la
-//                                                  tienen y ya no, y una muestra de hasta `limite` (id, quien, personal; sin
+//                                                  tienen y ya no, por qué no la llevan los demás, cuántas personales de antes
+//                                                  del 31/10 quedan afuera, cuántos esperan porque ManyChat falló hace poco o
+//                                                  no los tiene, y una muestra de hasta `limite` (id, quien, personal; sin
 //                                                  textos). Con dry: false se la saca a quien ya no la lleva y se la pone a los
-//                                                  que faltan, de a uno y con pausa, hasta `limite` (25 si no se dice, de 1 a
-//                                                  100) o 20 segundos; `quedan` dice cuántos faltan para otra tanda
+//                                                  que faltan, de a uno, con pausa y releyendo cada uno, hasta `limite` (25 si
+//                                                  no se dice, de 1 a 100) o 20 segundos; hay otra tanda mientras `quedan` sea
+//                                                  mayor que `fallidas`. `ojo`: hay quien tiene la etiqueta y ya no la lleva
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
 //                                                  tiene que estar adentro); con quitar: true vuelven al chat de siempre
@@ -77,19 +81,19 @@ import {
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
-  ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, estadoRetomadas, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
+  ajustes, anotarAMano, anotarFallaSinIntencion, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, estadoRetomadas, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
   desdeValido, hayBase, historial, leerConfig, marcarRetomadas, marcarSinIntencion, paraSinIntencion, ponerDueno, prompt, reservar, resumen,
   salidasDesde, sembrar, tablas, ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import {
   CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, paraPegar,
-  usuarioIg, usuarioParaAviso,
+  previoGuardado, usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
 import {
   buscarPorNombre, crearEtiqueta, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta, quitarEtiqueta,
 } from "../../../lib/dm/manychat";
 import {
-  TANDA_MAX_SIN_INTENCION, TANDA_SIN_INTENCION, barrerSinIntencion, revisarSinIntencion,
+  TANDA_MAX_SIN_INTENCION, TANDA_SIN_INTENCION, antesDeBorrar, barrerSinIntencion, revisarSinIntencion, senalDeLaCharla,
 } from "../../../lib/dm/sinIntencion";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
 import { CLAVE_PATRONES, validarPatrones } from "../../../lib/dm/controlador";
@@ -111,8 +115,11 @@ const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Tele
 const BARRIDO_MS = 20000; // lo que puede tardar una tanda del barrido de sin_intencion (como la búsqueda de buscarIg)
 // Lo que usa la etiqueta sin_intencion (lib/dm/sinIntencion.js): la base y ManyChat de verdad.
 const ETIQUETAS = {
-  base: { ajustes, paraSinIntencion, marcarSinIntencion }, manychat: { crearEtiqueta, ponerEtiqueta, quitarEtiqueta },
+  base: { ajustes, paraSinIntencion, marcarSinIntencion, anotarFallaSinIntencion },
+  manychat: { crearEtiqueta, ponerEtiqueta, quitarEtiqueta },
 };
+// Lo que se mira de una charla antes de borrarla (como los frenos del agente, HISTORIAL_PARA_LOS_FRENOS).
+const TOPE_HISTORIAL_BORRAR = 1000;
 
 /** Los ids de una tanda de charlas retomadas, sin repetir; null si no es una lista de 1 a TOPE_RETOMADAS ids válidos. */
 function idsDeLaTanda(contactos) {
@@ -215,8 +222,8 @@ export default async function handler(req, res) {
     else if (b.dueno === "agente" && previo?.dueno === "cande") await cerrarTurno(id, (await ultimoIdLead(id)) || 0);
     // El mismo campo que mira la Regla de ManyChat para pausar sus automáticos.
     const campo = await ponerCampo(id, "dm_dueno", b.dueno);
-    // Si tenía la etiqueta sin_intencion y la toma Cande, se le saca (lib/dm/sinIntencion.js).
-    if (previo?.sin_intencion_en) await revisarSinIntencion(ETIQUETAS, id);
+    // La etiqueta sin_intencion con el dueño nuevo (lib/dm/sinIntencion.js): si la toma Cande, se le saca.
+    await revisarSinIntencion(ETIQUETAS, id);
     return res.status(200).json({ ok: true, contacto: await contacto(id), manychat: campo.ok, ...(b.retomar === true ? { abiertos } : {}) });
   }
 
@@ -241,7 +248,9 @@ export default async function handler(req, res) {
       contexto: String(b.contexto || "").trim().slice(0, 300), mensajes: filas, igId, usuario,
     });
     const campo = await ponerCampo(id, "dm_dueno", "agente");
-    return res.status(200).json({ ok: true, cargados: filas.length, manychat: campo.ok });
+    // Ya no es personal ni de Cande: si tenía la etiqueta sin_intencion, se decide de nuevo (lib/dm/sinIntencion.js).
+    const etiqueta = await revisarSinIntencion(ETIQUETAS, id);
+    return res.status(200).json({ ok: true, cargados: filas.length, manychat: campo.ok, sin_intencion: etiqueta });
   }
 
   if (b.accion === "mandar_humano") {
@@ -308,10 +317,15 @@ export default async function handler(req, res) {
 
   if (b.accion === "borrar") {
     if (!id) return res.status(400).json({ error: "falta contacto" });
-    const borrado = await borrarCharla(id);
+    // Queda como charla personal: lleva la etiqueta sin_intencion, salvo que haya comprado o que lo que se borra diga
+    // otra cosa (lib/dm/sinIntencion.js). Eso se mira antes de borrarlo y, si había algo, queda anotado (dudosa).
+    const previa = await contacto(id);
+    const antes = antesDeBorrar({
+      mensajes: await historial(id, TOPE_HISTORIAL_BORRAR), previo: previoGuardado(previa?.previo_ig) || [], estados: [previa?.estado],
+    });
+    const borrado = await borrarCharla(id, { dudosa: senalDeLaCharla(antes) !== null });
     const campo = await ponerCampo(id, "dm_dueno", "cande");
-    // Queda como charla personal: lleva la etiqueta sin_intencion, salvo que haya comprado (lib/dm/sinIntencion.js).
-    const etiqueta = await revisarSinIntencion(ETIQUETAS, id);
+    const etiqueta = await revisarSinIntencion(ETIQUETAS, id, { antes });
     return res.status(200).json({ ok: true, ...borrado, manychat: campo.ok, sin_intencion: etiqueta });
   }
 

@@ -358,7 +358,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
-  hayManyChat = true, instagram = null, avisarCon = null,
+  hayManyChat = true, instagram = null, avisarCon = null, etiquetasAparte = false,
 } = {}) {
   const m = {
     ajustes: {
@@ -432,8 +432,13 @@ function armar({
     agendarCaliente: async (id, motivo, minutos) => { m.calientes.push([motivo, minutos]); return true; },
     contarToque: async () => { m.contacto.toques++; },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
-    borrarCharla: async () => {
-      m.contacto = { ...m.contacto, dueno: "cande", nombre: null, estado: {}, contexto: null, personal: true };
+    // Como base.borrarCharla: la personal queda con su fecha (personal_en) y, si lo borrado decía otra cosa, dudosa
+    // (m.sinDudosa: una base que no la guarda, para ver que el turno decide igual con lo de antes de borrar).
+    borrarCharla: async (id, { personal = true, dudosa = false } = {}) => {
+      m.contacto = {
+        ...m.contacto, dueno: "cande", nombre: null, estado: {}, contexto: null, previo_ig: null, personal,
+        personal_en: personal ? ahora : null, personal_dudosa: !m.sinDudosa && (m.contacto?.personal_dudosa === true || dudosa),
+      };
       m.mensajes = []; m.salidas = []; m.borrada = true;
     },
     // La etiqueta sin_intencion (lib/dm/sinIntencion.js), como base.paraSinIntencion y marcarSinIntencion: la fila del
@@ -445,11 +450,21 @@ function armar({
       const quien = c.estado?.quien ?? null;
       if (!c.sin_intencion_en && c.personal !== true && !(c.dueno === "agente" && quien === "no_dev")) return [];
       return [{
-        id: String(c.id), dueno: c.dueno, personal: c.personal === true, contexto: c.contexto ?? null, quien, previo_ig: c.previo_ig ?? null,
-        etiquetado: Boolean(c.sin_intencion_en), compro: m.compro === true, del_lead: m.mensajes.filter((x) => x.quien === "lead").map((x) => x.texto),
+        id: String(c.id), dueno: c.dueno, personal: c.personal === true, personal_en: c.personal_en ?? null,
+        personal_dudosa: c.personal_dudosa === true, contexto: c.contexto ?? null, quien,
+        link_formulario_enviado: c.estado?.link_formulario_enviado === true, precio_dicho: c.estado?.precio_dicho === true,
+        previo_ig: c.previo_ig ?? null, etiquetado: Boolean(c.sin_intencion_en), falla_en: c.sin_intencion_falla ?? null,
+        no_existe: c.sin_intencion_no_existe === true, compro: m.compro === true,
+        del_lead: m.mensajes.filter((x) => x.quien === "lead").map((x) => x.texto),
+        de_la_cuenta: m.mensajes.filter((x) => ["agente", "cande", "automatico"].includes(x.quien)).map((x) => x.texto),
       }];
     },
-    marcarSinIntencion: async (id, puesta) => { m.contacto.sin_intencion_en = puesta ? m.contacto.sin_intencion_en || ahora : null; },
+    marcarSinIntencion: async (id, puesta) => {
+      Object.assign(m.contacto, { sin_intencion_en: puesta ? m.contacto.sin_intencion_en || ahora : null, sin_intencion_falla: null, sin_intencion_no_existe: false });
+    },
+    anotarFallaSinIntencion: async (id, noExiste) => {
+      Object.assign(m.contacto, { sin_intencion_falla: ahora, sin_intencion_no_existe: noExiste === true });
+    },
     // La constancia del aviso de las fotos, como base.reclamarAvisoFoto y soltarAvisoFoto. La hora de la
     // base es m.ahora (si la prueba la mueve) o la del agente.
     reclamarAvisoFoto: async (id, hastaId) => {
@@ -497,8 +512,16 @@ function armar({
     return id;
   };
   const esperar = async () => { await tick(); alEsperar?.(m); };
-  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50 });
-  return { agente, m };
+  // etiquetasAparte: como en armado.js, el envío no tiene las etiquetas y vienen por `etiquetas`.
+  let etiquetas = null;
+  if (etiquetasAparte) {
+    const { ponerEtiqueta, quitarEtiqueta } = manychat;
+    etiquetas = { ponerEtiqueta, quitarEtiqueta };
+    delete manychat.ponerEtiqueta;
+    delete manychat.quitarEtiqueta;
+  }
+  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50, etiquetas });
+  return { agente, m, base, manychat };
 }
 
 /** Un toque de seguimiento listo para salir: el lead calló hace 6 horas y ya recibió el link. */
@@ -4524,3 +4547,163 @@ test("sin_intencion: si la charla pasa a Cande, se le saca", async () => {
   assert.deepEqual(m.etiquetas.map((x) => x[0]), ["poner", "sacar"]);
   assert.equal(m.contacto.sin_intencion_en, null);
 });
+
+
+/* ---------- sin_intencion, revisión del 31/10: ante la duda, no la lleva ---------- */
+
+// El prompt (freno 0) pone callar y quien no_dev también a un "yo quiero" suelto y a una respuesta a una historia.
+
+/** Un alta nueva cuyo primer mensaje es `texto`, y el modelo calla con quien no_dev: se borra como charla personal. */
+async function altaPersonal(texto, { sinDudosa = false } = {}) {
+  const mundo = armar({ sinContacto: true, altas: true, responde: callaComo("no_dev") });
+  mundo.m.sinDudosa = sinDudosa;
+  const id = await mundo.agente.recibir("88", texto, "Contacto de prueba");
+  assert.equal((await mundo.agente.procesar("88", id)).hecho, "charla personal: queda de Cande, sin aviso", texto);
+  return mundo;
+}
+
+test("sin_intencion: un \"yo quiero 🙌\" en el alta no la lleva, ni en el turno ni en el barrido de después", async () => {
+  const { sinIntencion } = await importarSinIntencion();
+  const { m, base, manychat } = await altaPersonal("yo quiero 🙌");
+  assert.deepEqual(m.etiquetas, []);
+  assert.equal(m.contacto.personal, true);
+  assert.equal(m.contacto.personal_dudosa, true, "lo que se borró decía otra cosa: queda anotado");
+  assert.deepEqual(m.mensajes, [], "y la charla igual se borra");
+  // Ya no queda nada guardado: el barrido no se la pone por ser personal.
+  const r = await sinIntencion.barrerSinIntencion({ base, manychat, dry: false, esperar: async () => {} });
+  assert.equal(r.para_poner, 0);
+  assert.deepEqual(m.etiquetas, []);
+  // El turno decide con lo que escribió antes de borrar, no solo con lo que quedó guardado.
+  const sinGuardar = await altaPersonal("yo quiero 🙌", { sinDudosa: true });
+  assert.equal(sinGuardar.m.contacto.personal_dudosa, false);
+  assert.deepEqual(sinGuardar.m.etiquetas, []);
+});
+
+test("sin_intencion: un \"yo quiero 🙌\" en una charla del agente no la lleva, calle o conteste", async () => {
+  for (const responde of [callaComo("no_dev"), comoQuien("no_dev")]) {
+    const { agente, m } = armar({ responde });
+    m.mensajes.find((x) => x.id === m.disparo).texto = "yo quiero 🙌";
+    await agente.procesar("77", m.disparo);
+    assert.deepEqual(m.etiquetas, []);
+    assert.equal(m.contacto.sin_intencion_en ?? null, null);
+  }
+});
+
+test("sin_intencion: un dev que reacciona con 🔥 a una historia no la lleva (en el alta y en una charla del agente)", async () => {
+  const alta = await altaPersonal("🔥");
+  assert.deepEqual(alta.m.etiquetas, []);
+  assert.equal(alta.m.contacto.personal_dudosa, true);
+  const { agente, m } = armar({ responde: callaComo("no_dev") });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "🔥";
+  await agente.procesar("77", m.disparo);
+  assert.deepEqual(m.etiquetas, []);
+});
+
+test("sin_intencion: un coqueteo puro (\"hermosa 😍\") sí la lleva, en el alta y en una charla del agente", async () => {
+  const alta = await altaPersonal("hermosa 😍");
+  assert.deepEqual(alta.m.etiquetas, [["poner", "88", SIN_INTENCION]]);
+  assert.equal(alta.m.contacto.personal_dudosa, false);
+  assert.ok(alta.m.contacto.personal_en, "personal desde ahora: cuenta para la etiqueta");
+  const { agente, m } = armar({ responde: callaComo("no_dev") });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "hermosa 😍";
+  await agente.procesar("77", m.disparo);
+  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+});
+
+test("sin_intencion: no la lleva si ya le llegó el formulario o el precio, o la cuenta le ofreció algo", async () => {
+  for (const [estado, cuenta] of [[{ link_formulario_enviado: true }, null], [{ precio_dicho: true }, null], [{}, "El 1 a 1 son 473 dólares"]]) {
+    const { agente, m } = armar({ responde: () => ({ ...salida([]), accion: "callar", estado: { ...estadoDev, quien: "no_dev", ...estado } }) });
+    m.mensajes.find((x) => x.id === m.disparo).texto = "hermosa 😍";
+    if (cuenta) m.mensajes.unshift({ id: 0, quien: "agente", texto: cuenta });
+    await agente.procesar("77", m.disparo);
+    assert.deepEqual(m.etiquetas, [], JSON.stringify(estado));
+  }
+});
+
+test("sin_intencion: se relee después del turno; si el barrido se la puso mientras tanto y resulta dev, se le saca", async () => {
+  for (const accion of ["callar", "responder"]) {
+    const { agente, m } = armar({
+      responde: (p, mundo) => {
+        mundo.contacto.sin_intencion_en = new Date(AHORA); // el barrido, mientras el modelo pensaba
+        const s = salida(accion === "callar" ? [] : ["Respuesta de prueba?"], { estado: { ...estadoDev, quien: "dev" } });
+        return { ...s, accion };
+      },
+    });
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, accion === "callar" ? "calló" : "enviada");
+    assert.deepEqual(m.etiquetas, [["sacar", "77", SIN_INTENCION]], accion);
+    assert.equal(m.contacto.sin_intencion_en, null, accion);
+  }
+});
+
+test("sin_intencion: con el envío sin etiquetas (armado.js), el agente las pone y las saca con `etiquetas`", async () => {
+  const { agente, m, manychat } = armar({ etiquetasAparte: true, responde: comoQuien("no_dev") });
+  assert.equal(manychat.ponerEtiqueta, undefined);
+  await agente.procesar("77", m.disparo);
+  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+  const { readFile } = await import("node:fs/promises");
+  const armado = await readFile(new URL("../lib/dm/armado.js", import.meta.url), "utf8");
+  assert.match(armado, /crearAgente\(\{[^}]*manychat: envio[^}]*etiquetas: manychat/, "armado le pasa ManyChat de verdad para las etiquetas");
+});
+
+/* ---------- los cambios de dueño que no son un turno ---------- */
+
+/** Una base y un ManyChat de mentira para la etiqueta, con un contacto que ya la tiene. */
+function conEtiquetaPuesta({ dueno = "cande", quien = "no_dev", personal = false } = {}) {
+  const m = { contacto: { id: "123456789", dueno, estado: { quien }, personal, sin_intencion_en: new Date(AHORA) }, etiquetas: [], hechos: [] };
+  const base = {
+    ajustes: async () => ({ contexto_alta: "" }),
+    paraSinIntencion: async ({ id }) => {
+      const c = m.contacto;
+      if (id !== c.id) return [];
+      const q = c.estado?.quien ?? null;
+      if (!c.sin_intencion_en && !c.personal && !(c.dueno === "agente" && q === "no_dev")) return [];
+      return [{ id: c.id, dueno: c.dueno, personal: c.personal, personal_en: c.personal ? new Date(AHORA) : null, quien: q,
+        etiquetado: Boolean(c.sin_intencion_en), compro: false, del_lead: ["hermosa de prueba"], de_la_cuenta: [] }];
+    },
+    marcarSinIntencion: async (id, puesta) => { m.contacto.sin_intencion_en = puesta ? m.contacto.sin_intencion_en : null; },
+    anotarFallaSinIntencion: async () => {},
+    ponerDueno: async (id, d) => { m.hechos.push(["ponerDueno", d]); m.contacto.dueno = d; if (d === "agente") m.contacto.personal = false; },
+    descartarPendientes: async () => {}, anotar: async () => {}, cerrarTurno: async () => {}, ultimoIdLead: async () => 5,
+    reclamarNovedad: async () => true, contacto: async () => ({ ...m.contacto, nombre: "Lead De Prueba" }),
+    borrarCharla: async () => { m.contacto = { ...m.contacto, dueno: "cande", personal: false, estado: {} }; },
+  };
+  const manychat = {
+    ponerCampo: async () => ({ ok: true }),
+    ponerEtiqueta: async (id, e) => { m.etiquetas.push(["poner", id, e]); return { ok: true }; },
+    quitarEtiqueta: async (id, e) => { m.etiquetas.push(["sacar", id, e]); return { ok: true }; },
+  };
+  return { m, base, manychat };
+}
+
+test("sin_intencion: /cande desde Telegram le saca la etiqueta (la charla es de Cande y no es personal)", async () => {
+  const { m, base, manychat } = conEtiquetaPuesta({ dueno: "agente" });
+  const responder = crearRespuestaTelegram({ base, manychat, decir: async () => {} });
+  assert.equal(await responder({ contacto: "123456789", accion: "cande" }, { updateId: 901 }), "cande");
+  assert.deepEqual(m.etiquetas, [["sacar", "123456789", SIN_INTENCION]]);
+  assert.equal(m.contacto.sin_intencion_en, null);
+});
+
+test("sin_intencion: /agente desde Telegram la decide de nuevo con la charla del agente (sin quien, se le saca)", async () => {
+  const { m, base, manychat } = conEtiquetaPuesta({ dueno: "cande", quien: null });
+  const responder = crearRespuestaTelegram({ base, manychat, decir: async () => {} });
+  assert.equal(await responder({ contacto: "123456789", accion: "agente" }, { updateId: 902 }), "agente");
+  assert.deepEqual(m.etiquetas.filter(([q]) => q === "sacar"), [["sacar", "123456789", SIN_INTENCION]]);
+  assert.equal(m.contacto.sin_intencion_en, null);
+});
+
+test("sin_intencion: instagram.sacar (también el cron del \"--\") le saca la etiqueta", async () => {
+  const { crearReglasInstagram } = await import("../lib/dm/instagram.js");
+  for (const extra of [{}, { alta_en: AHORA, alta_avisada: false }]) {
+    const { m, base, manychat } = conEtiquetaPuesta({ dueno: "agente" });
+    Object.assign(m.contacto, extra);
+    const reglas = crearReglasInstagram({ base, manychat, avisar: async () => true, reloj: () => AHORA });
+    await reglas.sacar({ ...m.contacto }, "escribiste -- en Instagram");
+    assert.equal(m.contacto.dueno, "cande", JSON.stringify(extra));
+    assert.deepEqual(m.etiquetas, [["sacar", "123456789", SIN_INTENCION]], JSON.stringify(extra));
+  }
+});
+
+/** El módulo de la etiqueta (para el barrido sobre el mundo del agente). */
+async function importarSinIntencion() {
+  return { sinIntencion: await import("../lib/dm/sinIntencion.js") };
+}
