@@ -7,6 +7,8 @@ import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 const { revisar, crearGuardia, ipDe, verificarCaptcha } = await import("../lib/antispam.js");
+const { RUTAS_PROTEGIDAS } = await import("../lib/rutasProtegidas.js");
+import { readdir, readFile } from "node:fs/promises";
 
 const pedido = (body = {}, ip = "1.2.3.4") => ({ headers: { "x-forwarded-for": ip }, body });
 /** Un guardia nuevo por prueba: si no, las cuentas de una se le suman a la otra. */
@@ -171,5 +173,55 @@ test("si el que se cae es Google, el founder manda igual", async () => {
     assert.equal(r.ok, true, "es peor perder al que escribió de verdad que dejar pasar un bot");
   } finally {
     delete process.env.RECAPTCHA_SECRET;
+  }
+});
+
+// ── El captcha invisible (BotID de Vercel) ──
+// La página le pega a cada envío la prueba de que salió de un navegador. Acá se verifica. En las
+// pruebas y en desarrollo BotID siempre dice que no es un bot, así que se inyecta `mirarBot`.
+test("si no salió de un navegador, no pasa, y el mensaje lo puede leer una persona", async () => {
+  const r = await revisar(pedido(), { guardia: guardia(), mirarBot: async () => true });
+  assert.equal(r.ok, false);
+  assert.equal(r.codigo, 403);
+  assert.match(r.error, /Instagram/, "un falso positivo tiene que tener por dónde avisar");
+  assert.ok(!r.callar, "este no se calla: si le pega a alguien de verdad, que lo vea");
+});
+
+test("el captcha invisible corre antes del tope: un bot no le gasta el cupo a nadie", async () => {
+  const g = guardia({ porIp: 1 });
+  await revisar(pedido(), { guardia: g, mirarBot: async () => true });
+  await revisar(pedido(), { guardia: g, mirarBot: async () => true });
+  assert.equal((await revisar(pedido(), { guardia: g, mirarBot: async () => false })).ok, true);
+});
+
+test("y corre DESPUÉS de la trampa: lo gratis primero", async () => {
+  let preguntas = 0;
+  const r = await revisar(pedido({ web: "spam" }), {
+    guardia: guardia(),
+    mirarBot: async () => { preguntas += 1; return true; },
+  });
+  assert.equal(r.callar, true);
+  assert.equal(preguntas, 0, "preguntarle a BotID por algo que ya sabemos que es un bot es al pedo");
+});
+
+test("toda ruta que pasa por el guardia está en la lista que usa la página", async () => {
+  // Si el servidor protege una ruta que la página no conoce, el envío llega sin la prueba y BotID
+  // lo toma por bot: el formulario deja afuera a las personas. Es el error número uno con esto.
+  const enLaLista = new Set(RUTAS_PROTEGIDAS.map((r) => r.path));
+  const faltan = [];
+  for (const archivo of await readdir(new URL("../pages/api/", import.meta.url))) {
+    if (!archivo.endsWith(".js")) continue;
+    const src = await readFile(new URL(`../pages/api/${archivo}`, import.meta.url), "utf8");
+    if (!/await revisar\(req/.test(src)) continue;
+    const ruta = `/api/${archivo.replace(/\.js$/, "")}`;
+    if (!enLaLista.has(ruta)) faltan.push(ruta);
+  }
+  assert.deepEqual(faltan, [], "estas rutas verifican el captcha pero la página no se lo pega");
+});
+
+test("y todas las de la lista son POST y en basic, que es el que no se cobra", () => {
+  for (const r of RUTAS_PROTEGIDAS) {
+    assert.equal(r.method, "POST", `${r.path} tendría que ser POST`);
+    assert.equal(r.advancedOptions?.checkLevel, "basic", `${r.path} sin basic se puede cobrar por llamada`);
   }
 });
