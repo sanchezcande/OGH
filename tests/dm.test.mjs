@@ -451,7 +451,7 @@ function armar({
       if (!c.sin_intencion_en && c.personal !== true && !(c.dueno === "agente" && quien === "no_dev")) return [];
       return [{
         id: String(c.id), dueno: c.dueno, personal: c.personal === true, personal_en: c.personal_en ?? null,
-        personal_dudosa: c.personal_dudosa === true, contexto: c.contexto ?? null, quien,
+        personal_dudosa: c.personal_dudosa === true, contexto: c.contexto ?? null, quien, etapa: c.estado?.etapa ?? null,
         link_formulario_enviado: c.estado?.link_formulario_enviado === true, precio_dicho: c.estado?.precio_dicho === true,
         previo_ig: c.previo_ig ?? null, etiquetado: Boolean(c.sin_intencion_en), falla_en: c.sin_intencion_falla ?? null,
         no_existe: c.sin_intencion_no_existe === true, compro: m.compro === true,
@@ -4409,22 +4409,30 @@ test("un aviso que es solo comillas o espacios no le llega a Cande como nota en 
 // empresa, alguien de quien no se sabe o alguien que compró, o que una falla de ManyChat frene la respuesta.
 const comoQuien = (quien, extra = {}) => () => salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien }, ...extra });
 const callaComo = (quien) => () => ({ ...salida([]), accion: "callar", estado: { ...estadoDev, quien, etapa: "cerrada" } });
+// Una charla del agente la lleva solo cerrada (tercera revisión del 31/10): el modelo contesta y la cierra.
+const cierraComo = (quien) => () => salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien, etapa: "cerrada" } });
 const SIN_INTENCION = "sin_intencion";
+// Lo único que la lleva (tercera revisión del 31/10): una charla personal o de coqueteo y nada más.
+const COQUETEO = "hermosa 😍";
+/** El mensaje del lead que dispara el turno pasa a ser `texto` (por defecto, un coqueteo puro). */
+const escribe = (m, texto = COQUETEO) => { m.mensajes.find((x) => x.id === m.disparo).texto = texto; };
 
 test("sin_intencion: a quien no es dev se le pone la etiqueta una sola vez, y queda anotado", async () => {
-  const { agente, m } = armar({ responde: comoQuien("no_dev") });
+  const { agente, m } = armar({ responde: cierraComo("no_dev") });
+  escribe(m);
   assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
   assert.deepEqual(m.enviados, ["Respuesta de prueba?"]);
   assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
   assert.ok(m.contacto.sin_intencion_en, "queda anotado cuándo se le puso");
   // Otro turno igual: ya la tiene, no se le pide a ManyChat de nuevo.
-  const id = m.entraLead("otro mensaje de prueba");
+  const id = m.entraLead("qué linda sos 😘");
   assert.equal((await agente.procesar("77", id)).hecho, "enviada");
   assert.equal(m.etiquetas.length, 1);
 });
 
 test("sin_intencion: también si el agente calla con quien no es dev", async () => {
   const { agente, m } = armar({ responde: callaComo("no_dev") });
+  escribe(m);
   assert.equal((await agente.procesar("77", m.disparo)).hecho, "calló");
   assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
   assert.ok(m.contacto.sin_intencion_en);
@@ -4432,7 +4440,7 @@ test("sin_intencion: también si el agente calla con quien no es dev", async () 
 
 test("sin_intencion: la charla personal que se borra la lleva, salvo que la base diga que compró", async () => {
   const personal = armar({ sinContacto: true, altas: true, responde: callaComo("no_dev") });
-  const id = await personal.agente.recibir("88", "mensaje personal de prueba", "Amigo de prueba");
+  const id = await personal.agente.recibir("88", COQUETEO, "Amigo de prueba");
   assert.equal((await personal.agente.procesar("88", id)).hecho, "charla personal: queda de Cande, sin aviso");
   assert.deepEqual(personal.m.etiquetas, [["poner", "88", SIN_INTENCION]]);
   assert.equal(personal.m.contacto.personal, true);
@@ -4440,7 +4448,7 @@ test("sin_intencion: la charla personal que se borra la lleva, salvo que la base
 
   const compro = armar({ sinContacto: true, altas: true, responde: callaComo("no_dev") });
   compro.m.compro = true;
-  const otro = await compro.agente.recibir("88", "mensaje personal de prueba", "Amigo de prueba");
+  const otro = await compro.agente.recibir("88", COQUETEO, "Amigo de prueba");
   assert.equal((await compro.agente.procesar("88", otro)).hecho, "charla personal: queda de Cande, sin aviso");
   assert.deepEqual(compro.m.etiquetas, []);
 });
@@ -4458,12 +4466,15 @@ test("sin_intencion: nunca a un dev (aunque no busque), un estudiante, una empre
 });
 
 test("sin_intencion: nunca a quien compró, ni si el contexto dice que compró o el lead habló de un pago o de su empresa", async () => {
-  const base = armar({ responde: comoQuien("no_dev") });
+  // Todo lo demás la llevaría: no_dev, la charla cerrada y un coqueteo puro.
+  const base = armar({ responde: cierraComo("no_dev") });
+  escribe(base.m);
   base.m.compro = true; // una compra con el mail de su formulario, o le salió el código del pago en pesos
   await base.agente.procesar("77", base.m.disparo);
   assert.deepEqual(base.m.etiquetas, []);
 
-  const contexto = armar({ responde: comoQuien("no_dev") });
+  const contexto = armar({ responde: cierraComo("no_dev") });
+  escribe(contexto.m);
   contexto.m.contacto.contexto = "Ya compró el programa, contexto de prueba";
   await contexto.agente.procesar("77", contexto.m.disparo);
   assert.deepEqual(contexto.m.etiquetas, []);
@@ -4476,7 +4487,8 @@ test("sin_intencion: nunca a quien compró, ni si el contexto dice que compró o
   }
 
   // Una charla de Cande (con una indicación suya) no la lleva aunque sea no_dev: no es personal.
-  const deCande = armar({ dueno: "cande", responde: comoQuien("no_dev") });
+  const deCande = armar({ dueno: "cande", responde: cierraComo("no_dev") });
+  escribe(deCande.m);
   await deCande.agente.procesar("77", null, { evento: "indicacion", indicacion: "decile algo de prueba" });
   assert.deepEqual(deCande.m.etiquetas, []);
 });
@@ -4484,7 +4496,8 @@ test("sin_intencion: nunca a quien compró, ni si el contexto dice que compró o
 test("sin_intencion: si ManyChat falla o la base no contesta, el turno sale igual y la etiqueta se intenta en el turno siguiente", async () => {
   const { registros } = await import("./dobles/preparar.mjs");
   for (const falla of ["no", "tira", "base"]) {
-    const { agente, m } = armar({ responde: comoQuien("no_dev") });
+    const { agente, m } = armar({ responde: cierraComo("no_dev") });
+    escribe(m);
     if (falla === "base") m.fallaSinIntencion = true;
     else m.fallaEtiqueta = falla;
     const antes = registros.length;
@@ -4499,11 +4512,11 @@ test("sin_intencion: si ManyChat falla o la base no contesta, el turno sale igua
     // Queda registrado, sin los textos del lead.
     const nuevos = registros.slice(antes).filter((x) => x.includes("sin_intencion"));
     assert.equal(nuevos.length, 1, falla);
-    assert.doesNotMatch(nuevos[0], /mensaje de prueba|Lead de prueba/, falla);
+    assert.doesNotMatch(nuevos[0], /hermosa|linda|Lead de prueba/, falla);
     // El turno siguiente la vuelve a intentar.
     m.fallaEtiqueta = false;
     m.fallaSinIntencion = false;
-    const id = m.entraLead("otro mensaje de prueba");
+    const id = m.entraLead("qué linda sos 😘");
     assert.equal((await agente.procesar("77", id)).hecho, "enviada", falla);
     assert.deepEqual(m.etiquetas.at(-1), ["poner", "77", SIN_INTENCION], falla);
     assert.ok(m.contacto.sin_intencion_en, falla);
@@ -4512,8 +4525,9 @@ test("sin_intencion: si ManyChat falla o la base no contesta, el turno sale igua
 
 test("sin_intencion: si después resulta dev, se le saca la etiqueta y se limpia la columna", async () => {
   const { agente, m } = armar({
-    responde: (p, mundo) => salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien: mundo.pedidos.length > 1 ? "dev" : "no_dev" } }),
+    responde: (p, mundo) => salida(["Respuesta de prueba?"], { estado: { ...estadoDev, etapa: "cerrada", quien: mundo.pedidos.length > 1 ? "dev" : "no_dev" } }),
   });
+  escribe(m);
   await agente.procesar("77", m.disparo);
   assert.ok(m.contacto.sin_intencion_en);
   const id = m.entraLead("en realidad soy dev, de prueba");
@@ -4522,8 +4536,9 @@ test("sin_intencion: si después resulta dev, se le saca la etiqueta y se limpia
   assert.equal(m.contacto.sin_intencion_en, null);
   // Si ManyChat no la puede sacar, la columna queda como estaba y lo vuelve a intentar.
   const otro = armar({
-    responde: (p, mundo) => salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien: mundo.pedidos.length > 1 ? "estudia" : "no_dev" } }),
+    responde: (p, mundo) => salida(["Respuesta de prueba?"], { estado: { ...estadoDev, etapa: "cerrada", quien: mundo.pedidos.length > 1 ? "estudia" : "no_dev" } }),
   });
+  escribe(otro.m);
   await otro.agente.procesar("77", otro.m.disparo);
   otro.m.fallaEtiqueta = "no";
   await otro.agente.procesar("77", otro.m.entraLead("estudio sistemas, de prueba"));
@@ -4537,12 +4552,13 @@ test("sin_intencion: si después resulta dev, se le saca la etiqueta y se limpia
 test("sin_intencion: si la charla pasa a Cande, se le saca", async () => {
   const { agente, m } = armar({
     responde: (p, mundo) => (mundo.pedidos.length > 1
-      ? { ...salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien: "no_dev" } }), accion: "pasar_a_cande", aviso_para_cande: "HOY: de prueba" }
-      : salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien: "no_dev" } })),
+      ? { ...salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien: "no_dev", etapa: "cerrada" } }), accion: "pasar_a_cande", aviso_para_cande: "HOY: de prueba" }
+      : salida(["Respuesta de prueba?"], { estado: { ...estadoDev, quien: "no_dev", etapa: "cerrada" } })),
   });
+  escribe(m);
   await agente.procesar("77", m.disparo);
   assert.ok(m.contacto.sin_intencion_en);
-  assert.equal((await agente.procesar("77", m.entraLead("otro mensaje de prueba"))).hecho, "pasada a Cande");
+  assert.equal((await agente.procesar("77", m.entraLead("qué linda sos 😘"))).hecho, "pasada a Cande");
   assert.equal(m.contacto.dueno, "cande");
   assert.deepEqual(m.etiquetas.map((x) => x[0]), ["poner", "sacar"]);
   assert.equal(m.contacto.sin_intencion_en, null);
@@ -4580,7 +4596,7 @@ test("sin_intencion: un \"yo quiero 🙌\" en el alta no la lleva, ni en el turn
 });
 
 test("sin_intencion: un \"yo quiero 🙌\" en una charla del agente no la lleva, calle o conteste", async () => {
-  for (const responde of [callaComo("no_dev"), comoQuien("no_dev")]) {
+  for (const responde of [callaComo("no_dev"), cierraComo("no_dev")]) {
     const { agente, m } = armar({ responde });
     m.mensajes.find((x) => x.id === m.disparo).texto = "yo quiero 🙌";
     await agente.procesar("77", m.disparo);
@@ -4612,7 +4628,7 @@ test("sin_intencion: un coqueteo puro (\"hermosa 😍\") sí la lleva, en el alt
 
 test("sin_intencion: no la lleva si ya le llegó el formulario o el precio, o la cuenta le ofreció algo", async () => {
   for (const [estado, cuenta] of [[{ link_formulario_enviado: true }, null], [{ precio_dicho: true }, null], [{}, "El 1 a 1 son 473 dólares"]]) {
-    const { agente, m } = armar({ responde: () => ({ ...salida([]), accion: "callar", estado: { ...estadoDev, quien: "no_dev", ...estado } }) });
+    const { agente, m } = armar({ responde: () => ({ ...salida([]), accion: "callar", estado: { ...estadoDev, quien: "no_dev", etapa: "cerrada", ...estado } }) });
     m.mensajes.find((x) => x.id === m.disparo).texto = "hermosa 😍";
     if (cuenta) m.mensajes.unshift({ id: 0, quien: "agente", texto: cuenta });
     await agente.procesar("77", m.disparo);
@@ -4636,7 +4652,8 @@ test("sin_intencion: se relee después del turno; si el barrido se la puso mient
 });
 
 test("sin_intencion: con el envío sin etiquetas (armado.js), el agente las pone y las saca con `etiquetas`", async () => {
-  const { agente, m, manychat } = armar({ etiquetasAparte: true, responde: comoQuien("no_dev") });
+  const { agente, m, manychat } = armar({ etiquetasAparte: true, responde: cierraComo("no_dev") });
+  escribe(m);
   assert.equal(manychat.ponerEtiqueta, undefined);
   await agente.procesar("77", m.disparo);
   assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
@@ -4649,7 +4666,7 @@ test("sin_intencion: con el envío sin etiquetas (armado.js), el agente las pone
 
 /** Una base y un ManyChat de mentira para la etiqueta, con un contacto que ya la tiene. */
 function conEtiquetaPuesta({ dueno = "cande", quien = "no_dev", personal = false } = {}) {
-  const m = { contacto: { id: "123456789", dueno, estado: { quien }, personal, sin_intencion_en: new Date(AHORA) }, etiquetas: [], hechos: [] };
+  const m = { contacto: { id: "123456789", dueno, estado: { quien, etapa: "cerrada" }, personal, sin_intencion_en: new Date(AHORA) }, etiquetas: [], hechos: [] };
   const base = {
     ajustes: async () => ({ contexto_alta: "" }),
     paraSinIntencion: async ({ id }) => {
@@ -4658,7 +4675,7 @@ function conEtiquetaPuesta({ dueno = "cande", quien = "no_dev", personal = false
       const q = c.estado?.quien ?? null;
       if (!c.sin_intencion_en && !c.personal && !(c.dueno === "agente" && q === "no_dev")) return [];
       return [{ id: c.id, dueno: c.dueno, personal: c.personal, personal_en: c.personal ? new Date(AHORA) : null, quien: q,
-        etiquetado: Boolean(c.sin_intencion_en), compro: false, del_lead: ["hermosa de prueba"], de_la_cuenta: [] }];
+        etapa: c.estado?.etapa ?? null, etiquetado: Boolean(c.sin_intencion_en), compro: false, del_lead: [COQUETEO], de_la_cuenta: [] }];
     },
     marcarSinIntencion: async (id, puesta) => { m.contacto.sin_intencion_en = puesta ? m.contacto.sin_intencion_en : null; },
     anotarFallaSinIntencion: async () => {},
@@ -4707,3 +4724,73 @@ test("sin_intencion: instagram.sacar (también el cron del \"--\") le saca la et
 async function importarSinIntencion() {
   return { sinIntencion: await import("../lib/dm/sinIntencion.js") };
 }
+
+/* ---------- sin_intencion, tercera revisión del 31/10: solo una charla personal o de coqueteo, y nada más ---------- */
+
+// Con la regla de antes (una lista de lo que frena), lo que no estaba en la lista la llevaba: un dev que contestaba la
+// historia del 1 a 1 con "hay cupo?" terminaba con la etiqueta y Cande lo borraba.
+const NO_LA_LLEVAN = [
+  "hay cupo?", "cómo pago?", "me cierra, cómo reservo?", "quedan lugares?", "tenés gente?", "tal cual 🙌", "buenísimo!",
+  "sos una genia", "info", "cuánto sale", "yo quiero 🙌", "🔥", "salgamos a tomar un café?",
+];
+
+test("sin_intencion: una pregunta, una compra, una reacción de dev o algo suelto no la llevan, en el alta ni en una charla del agente cerrada", async () => {
+  for (const texto of NO_LA_LLEVAN) {
+    const alta = await altaPersonal(texto);
+    assert.deepEqual(alta.m.etiquetas, [], `alta: ${texto}`);
+    assert.equal(alta.m.contacto.personal_dudosa, true, `alta: ${texto}`);
+    // El turno decide igual aunque la base no haya guardado personal_dudosa.
+    assert.deepEqual((await altaPersonal(texto, { sinDudosa: true })).m.etiquetas, [], `alta sin dudosa: ${texto}`);
+    for (const responde of [callaComo("no_dev"), cierraComo("no_dev")]) {
+      const { agente, m } = armar({ responde });
+      escribe(m, texto);
+      await agente.procesar("77", m.disparo);
+      assert.deepEqual(m.etiquetas, [], `agente: ${texto}`);
+    }
+  }
+});
+
+test("sin_intencion: un halago a ella o algo de una cita la lleva, también con un \"hola\" aparte", async () => {
+  for (const texto of ["hermosa 😍", "te vi en la app de citas"]) {
+    const alta = await altaPersonal(texto);
+    assert.deepEqual(alta.m.etiquetas, [["poner", "88", SIN_INTENCION]], texto);
+    assert.equal(alta.m.contacto.personal_dudosa, false, texto);
+  }
+  // El alta con dos mensajes en la misma ráfaga: "hola" y "qué linda sos 😘".
+  const { agente, m } = armar({ sinContacto: true, altas: true, responde: callaComo("no_dev") });
+  await agente.recibir("88", "hola", "Contacto de prueba");
+  const id = await agente.recibir("88", "qué linda sos 😘", "Contacto de prueba");
+  assert.equal((await agente.procesar("88", id)).hecho, "charla personal: queda de Cande, sin aviso");
+  assert.deepEqual(m.etiquetas, [["poner", "88", SIN_INTENCION]]);
+  assert.equal(m.contacto.personal_dudosa, false);
+});
+
+test("sin_intencion: lo suelto frena solo si es lo único: \"hola\" + \"hermosa 😍\" la lleva, \"hola\" solo no", async () => {
+  const conCoqueteo = armar({ responde: callaComo("no_dev") });
+  escribe(conCoqueteo.m, "hola");
+  await conCoqueteo.agente.procesar("77", conCoqueteo.m.entraLead(COQUETEO));
+  assert.deepEqual(conCoqueteo.m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+
+  const soloHola = armar({ responde: callaComo("no_dev") });
+  escribe(soloHola.m, "hola");
+  await soloHola.agente.procesar("77", soloHola.m.disparo);
+  assert.deepEqual(soloHola.m.etiquetas, []);
+  const altaHola = await altaPersonal("hola");
+  assert.deepEqual(altaHola.m.etiquetas, []);
+  assert.equal(altaHola.m.contacto.personal_dudosa, true);
+});
+
+test("sin_intencion: con la charla abierta (\"a qué te dedicás?\") no la lleva; cuando el modelo la cierra, sí", async () => {
+  const { agente, m } = armar({
+    responde: (p, mundo) => (mundo.pedidos.length > 1
+      ? { ...salida([]), accion: "callar", estado: { ...estadoDev, quien: "no_dev", etapa: "cerrada" } }
+      : salida(["Ahh okii :) y a qué te dedicás?"], { estado: { ...estadoDev, quien: "no_dev", etapa: "quien_es" } })),
+  });
+  escribe(m);
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.enviados, ["Ahh okii :) y a qué te dedicás?"]);
+  assert.deepEqual(m.etiquetas, [], "la pregunta sigue abierta: puede contestar que tiene una pyme");
+  assert.equal(m.contacto.sin_intencion_en ?? null, null);
+  assert.equal((await agente.procesar("77", m.entraLead("qué linda sos 😘"))).hecho, "calló");
+  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+});

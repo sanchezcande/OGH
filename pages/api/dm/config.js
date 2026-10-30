@@ -31,8 +31,8 @@
 //   { accion: "link_formulario", contactos: [id, ...] } → el link del formulario de /devs con el id de cada charla y
 //                                                  su firma, como lo manda el agente: para lo que Cande pega a mano
 //   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla (queda personal: lleva la etiqueta
-//                                                  sin_intencion de ManyChat, salvo que haya comprado o que lo borrado
-//                                                  mostrara interés, trabajo, una oferta o algo suelto)
+//                                                  sin_intencion de ManyChat solo si lo borrado era una charla personal o
+//                                                  de coqueteo y nada más, y no compró: lib/dm/sinIntencion.js)
 //   { accion: "sin_intencion", dry, limite? }      → el barrido de la etiqueta sin_intencion (lib/dm/sinIntencion.js): Cande borra
 //                                                  o desuscribe en tanda desde ManyChat a quien la tiene. Con dry (lo que pasa
 //                                                  si no se dice dry: false) no cambia nada: cuántos la llevarían, cuántos la
@@ -317,8 +317,9 @@ export default async function handler(req, res) {
 
   if (b.accion === "borrar") {
     if (!id) return res.status(400).json({ error: "falta contacto" });
-    // Queda como charla personal: lleva la etiqueta sin_intencion, salvo que haya comprado o que lo que se borra diga
-    // otra cosa (lib/dm/sinIntencion.js). Eso se mira antes de borrarlo y, si había algo, queda anotado (dudosa).
+    // Queda como charla personal: lleva la etiqueta sin_intencion solo si lo que se borra era una charla personal o de
+    // coqueteo y nada más, y no compró (lib/dm/sinIntencion.js). Eso se mira antes de borrarlo y, si no era eso, queda
+    // anotado (dudosa).
     const previa = await contacto(id);
     const antes = antesDeBorrar({
       mensajes: await historial(id, TOPE_HISTORIAL_BORRAR), previo: previoGuardado(previa?.previo_ig) || [], estados: [previa?.estado],
