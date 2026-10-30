@@ -1,5 +1,10 @@
 name: CI/CD Pipeline
 
+# Solo verifica que el sitio compile. El deploy lo hace Vercel desde main,
+# no GitHub Pages: el repo dejó de ser una SPA estática hace rato y los pasos
+# de Pages fallaban todos los días (`ls -la build` no existe en Next, que
+# compila a `.next`, y tampoco hay script `deploy` en package.json).
+
 on:
   push:
     branches:
@@ -9,15 +14,15 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
@@ -26,21 +31,3 @@ jobs:
 
       - name: Build the application
         run: npm run build
-
-      - name: List directory contents after build
-        run: ls -la
-
-      - name: List build directory contents
-        run: ls -la build
-
-      - name: Configure Git
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-      - name: Deploy to GitHub Pages
-        env:
-          NODE_ENV: production
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          npm run deploy
