@@ -29,6 +29,10 @@
       "schedule": "*/15 * * * *"
     },
     {
+      "path": "/api/dm/bandeja-rapida",
+      "schedule": "1-59/3 * * * *"
+    },
+    {
       "path": "/api/dm/controlador",
       "schedule": "*/15 * * * *"
     },
