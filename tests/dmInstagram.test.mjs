@@ -595,6 +595,35 @@ test("charlaPrevia: solo lo de los últimos 14 días antes de lo primero guardad
   assert.equal(charlaPrevia(hilo, CUENTA, guardados, { dias: 200 }).length, 3, "lo que lo deja afuera es la antigüedad");
 });
 
+test("charlaPrevia: si hay otros mensajes del lead guardados con el mismo texto, el corte va al primero y no duplica lo sembrado", () => {
+  // Sembrada: "Hola" y más adelante "Hola?" (la misma clave), todo guardado a la misma hora.
+  const sembrada = leerHilo(hiloCrudo(1, [
+    msj(6, "Hola?", { min: 1 }),
+    msj(5, "Genial, de prueba", { deCuenta: true, min: 2 }),
+    msj(4, "Si", { min: 3 }),
+    msj(3, "Sos dev?", { deCuenta: true, min: 4 }),
+    msj(2, "Hola", { min: 5 }),
+    msj(1, "Algo viejo, de prueba", { min: 60 }),
+  ]), CUENTA);
+  const ahora = hace(0);
+  const guardados = [
+    { id: 1, quien: "lead", texto: "Hola", creado: ahora }, { id: 2, quien: "cande", texto: "Sos dev?", creado: ahora },
+    { id: 3, quien: "lead", texto: "Si", creado: ahora }, { id: 4, quien: "agente", texto: "Genial, de prueba", creado: ahora },
+    { id: 5, quien: "lead", texto: "Hola?", creado: ahora },
+  ];
+  assert.deepEqual(charlaPrevia(sembrada, CUENTA, guardados), [{ quien: "lead", texto: "Algo viejo, de prueba" }]);
+
+  // La misma palabra dos veces en pocos segundos, las dos guardadas: el corte va a la primera.
+  const dosVeces = leerHilo(hiloCrudo(2, [
+    msj(4, "DEV", { min: 0.3 }),
+    msj(3, "Te paso el link, de prueba", { deCuenta: true, min: 0.45 }),
+    msj(2, "DEV", { min: 0.5 }),
+    msj(1, "Hola, de prueba", { min: 10 }),
+  ]), CUENTA);
+  const dos = [{ id: 1, quien: "lead", texto: "DEV", creado: hace(0.5) }, { id: 2, quien: "lead", texto: "DEV", creado: hace(0.3) }];
+  assert.deepEqual(charlaPrevia(dosVeces, CUENTA, dos), [{ quien: "lead", texto: "Hola, de prueba" }]);
+});
+
 test("previoGuardado: lo guardado como lo usa el turno; null si todavía no se guardó", () => {
   assert.equal(previoGuardado(null), null);
   assert.equal(previoGuardado(undefined), null);
