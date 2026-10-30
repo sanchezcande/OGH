@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { evento } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana, sinIg } from "../../lib/dm/linkFormulario";
 import { normalizarOrigen } from "../../lib/origenForm";
+import { useTrampa } from "../../lib/trampaForm";
 
 // Red de devs de OpenGateHub — versión corta en PASOS.
 // Decisiones (Cande, sept 2026):
@@ -152,6 +153,8 @@ export default function RedDeDevs() {
     } catch (e) { /* medir nunca rompe la pagina */ }
   }, []);
   const [f, setF] = useState(inicial);
+  // El reloj y la trampa que miran los envíos automáticos (lib/trampaForm.js + lib/antispam.js).
+  const { campos: camposTrampa, trampa } = useTrampa();
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
 
@@ -216,7 +219,7 @@ export default function RedDeDevs() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Sin ?ig= el pedido es el de siempre. La firma va solo con su id.
-        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}) }),
+        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}), ...camposTrampa() }),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
       evento("enviado");
@@ -275,6 +278,7 @@ export default function RedDeDevs() {
           </Progreso>
 
           <form onSubmit={enviar} noValidate>
+            {trampa}
             <Bloque>
               {PASOS[paso].campos.map((c) => (
                 <Campo key={c.id} id={`campo-${c.id}`}>

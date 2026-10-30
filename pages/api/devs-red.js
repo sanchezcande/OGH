@@ -4,6 +4,7 @@ import { MINUTOS_CALIENTE } from "../../lib/dm/pagina";
 import { firmaValida } from "../../lib/dm/firmaIg";
 import { linkCharlaIg } from "../../lib/dm/instagram";
 import { firmaDeLink, idDeLink } from "../../lib/dm/linkFormulario";
+import { revisar } from "../../lib/antispam";
 import { avisar } from "../../lib/notificar";
 import { normalizarOrigen } from "../../lib/origenForm";
 import { pedirCV } from "../../lib/pedirCV";
@@ -16,6 +17,14 @@ const OBLIGATORIOS = ["nombre", "email", "pais", "roles", "seniority", "experien
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  // Antes que nada: un envío automático no llega a tocar la base, ni Resend, ni el Telegram de Cande.
+  // Son 15 campos, así que una persona no lo llena en menos de tres segundos (ver lib/antispam.js).
+  const limpio = await revisar(req, { segundos: 3 });
+  if (!limpio.ok) {
+    if (limpio.callar) return res.status(200).json({ ok: true });
+    return res.status(limpio.codigo).json({ error: limpio.error });
+  }
 
   const d = req.body || {};
   const vacio = (v) => (Array.isArray(v) ? !v.length : !String(v || "").trim());

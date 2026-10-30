@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { evento } from "../../lib/embudo";
+import { useTrampa } from "../../lib/trampaForm";
 
 // Versión en inglés de /devs (mismo form, mismos pasos, misma API): la
 // traducción ya estaba escrita en /devs/index.jsx (con `en` apagado a mano),
@@ -96,6 +97,8 @@ export default function ApplyEn() {
   const [paso, setPaso] = useState(0);
   React.useEffect(() => { evento("form_visto_en"); }, []);
   const [f, setF] = useState(inicial);
+  // El reloj y la trampa que miran los envíos automáticos (lib/trampaForm.js + lib/antispam.js).
+  const { campos: camposTrampa, trampa } = useTrampa();
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
 
@@ -159,7 +162,7 @@ export default function ApplyEn() {
       const r = await fetch("/api/devs-red", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(f),
+        body: JSON.stringify({ ...f, ...camposTrampa() }),
       });
       if (!r.ok) throw new Error((await r.json()).error || "Something failed");
       evento("enviado_en");
@@ -192,6 +195,7 @@ export default function ApplyEn() {
           </Progreso>
 
           <form onSubmit={enviar} noValidate>
+            {trampa}
             <Bloque>
               {PASOS[paso].campos.map((c) => (
                 <Campo key={c.id} id={`campo-${c.id}`}>

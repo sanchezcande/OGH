@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { guardarLead, hayBase } from "../../lib/db";
+import { revisar } from "../../lib/antispam";
 import { avisar } from "../../lib/notificar";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -10,6 +11,12 @@ const limpiar = (v, max = 300) =>
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const limpio = await revisar(req);
+  if (!limpio.ok) {
+    if (limpio.callar) return res.status(200).json({ ok: true });
+    return res.status(limpio.codigo).json({ error: limpio.error });
+  }
 
   const nombre = limpiar(req.body?.nombre, 120);
   const email = limpiar(req.body?.email, 200).toLowerCase();
