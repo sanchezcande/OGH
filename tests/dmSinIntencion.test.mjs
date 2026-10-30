@@ -13,7 +13,10 @@
 // deja personal_dudosa aunque se borre de nuevo; marcarSinIntencion y anotarFallaSinIntencion; y el barrido entero (dry y
 // sin dry, con un ManyChat de mentira). En la tercera vuelta (31/10), otra vez: la etapa del estado en paraSinIntencion
 // (null en una personal), los emojis tal cual en del_lead, marcarDudosa (solo esa fila y solo esa columna, y queda aunque
-// se borre de nuevo) y escribioDespues con el barrido de después. Si se toca ese SQL, hay que volver a mirarlo así.
+// se borre de nuevo) y escribioDespues con el barrido de después. En la cuarta (31/10), sin cambiar el SQL: la etiqueta
+// que pudo haber salido queda con sin_intencion_en y sin_intencion_falla, el barrido la vuelve a pedir pasada la espera
+// (y la fecha de puesta queda), sacarla sin poder deja el "ojo", escribioDespues la pide sacar en una personal sin la
+// etiqueta, y la carrera con el turno. Si se toca ese SQL, hay que volver a mirarlo así.
 //
 // Correr:  node --test tests/*.test.mjs
 import { respuesta, registros } from "./dobles/preparar.mjs";
@@ -22,7 +25,8 @@ import assert from "node:assert/strict";
 
 const { base: pg } = await import("./dobles/postgres.mjs");
 const {
-  ESPERA_FALLA_MS, ETIQUETA_SIN_INTENCION, MOTIVO_DUDOSA, TANDA_SIN_INTENCION, antesDeBorrar, barrerSinIntencion, dijoQueCompro,
+  ESPERA_FALLA_MS, ETIQUETA_SIN_INTENCION, MOTIVO_DUDOSA, MOTIVO_RESPUESTA, TANDA_SIN_INTENCION, antesDeBorrar, barrerSinIntencion,
+  dijoQueCompro,
   esPregunta, esSuelto, escribioDespues, etiquetarSinIntencion, miraLoQueEscribe, motivoSinIntencion, noLoTieneManyChat,
   revisarSinIntencion, senalDeLaCharla, tipoDeMensaje,
 } = await import("../lib/dm/sinIntencion.js");
@@ -37,7 +41,10 @@ const noDev = { quien: "no_dev", dueno: "agente", personal: false, estado: { eta
 test("la llevan quien no es dev en una charla del agente y las charlas personales", () => {
   assert.equal(ETIQUETA_SIN_INTENCION, "sin_intencion");
   assert.equal(motivoSinIntencion(noDev), null);
-  assert.equal(motivoSinIntencion({ ...noDev, charlaDelLead: ["hola", COQUETEO, "gracias!"] }), null);
+  assert.equal(motivoSinIntencion({ ...noDev, charlaDelLead: ["hola", COQUETEO] }), null);
+  // Hasta la tercera revisión, un "gracias!" aparte también la llevaba. Desde la cuarta (31/10) no: un gracias contesta
+  // algo que le mandó la cuenta (la guía del CV llega sin texto en el hilo), y ante la duda no la lleva.
+  assert.equal(motivoSinIntencion({ ...noDev, charlaDelLead: ["hola", COQUETEO, "gracias!"] }), MOTIVO_RESPUESTA);
   // Una charla personal ya no tiene nada guardado (borrarCharla deja el estado vacío y de Cande).
   assert.equal(motivoSinIntencion({ personal: true, dueno: "cande" }), null);
   assert.equal(motivoSinIntencion({ personal: true, dueno: "cande", quien: "no_dev" }), null);
@@ -559,11 +566,16 @@ const NO_LA_LLEVAN = [
   "necesitamos gente", "me recomendás a alguien?", "hay cupo", "cuanto sale el 1 a 1", "tenes lugar", "qué lindo!",
   "qué linda foto", "hermosa 🙌", "hermosa, cuánto sale?", "hermosa! me sirvió mucho", "hola como estas linda",
   "no me interesa, gracias", "[adjunto o mensaje sin texto]", "hola", "gracias!", "jajaja", "😍",
+  // Hasta la tercera revisión estaba en LA_LLEVAN. Desde la cuarta (31/10), el número o el whatsapp no alcanzan solos:
+  // "dame tu whatsapp" puede ser de alguien que quiere el 1 a 1, que se cierra por WhatsApp.
+  "dame tu número",
 ];
 // Una charla personal o de coqueteo y nada más.
 const LA_LLEVAN = [
   ["hermosa 😍"], ["hola", "qué linda sos 😘"], ["te vi en la app de citas"], ["divina!!"], ["buenos días hermosaaa ❤️"],
-  ["sos re linda"], ["te extraño"], ["dame tu número"], ["hola", "🔥", "hermosa 🔥"], ["mi amor"], ["Q linda 🥰"],
+  ["sos re linda"], ["te extraño"], ["hola", "🔥", "hermosa 🔥"], ["mi amor"], ["Q linda 🥰"],
+  // El número con otra señal (cuarta revisión del 31/10: solo no alcanza; ver NO_LA_LLEVAN).
+  ["hermosa, dame tu número 😘"],
 ];
 
 test("no la llevan una pregunta, una compra, una reacción de dev, algo suelto o lo que no se reconoce (en el agente y en una personal)", () => {
@@ -653,8 +665,14 @@ test("escribioDespues: en una charla de Cande con la etiqueta o personal, cualqu
   otro.base.marcarDudosa = async () => { throw new Error("base caída"); };
   assert.equal(await escribioDespues({ base: otro.base, manychat: otro.manychat }, personal), true);
   assert.deepEqual(otro.m.llamadas, [["sacar", "571", "sin_intencion"]]);
-  const caida = { marcarDudosa: async () => { throw new Error("base caída"); }, paraSinIntencion: async () => { throw new Error("base caída"); } };
+  // La base caída en todo (también al anotar que se sacó, que desde la cuarta revisión es lo único que escribe).
+  const caida = {
+    marcarDudosa: async () => { throw new Error("base caída"); }, paraSinIntencion: async () => { throw new Error("base caída"); },
+    marcarSinIntencion: async () => { throw new Error("base caída"); },
+  };
+  const antesDeCaer = m.llamadas.length;
   assert.equal(await escribioDespues({ base: caida, manychat }, personal), false);
+  assert.deepEqual(m.llamadas.slice(antesDeCaer), [["sacar", "571", "sin_intencion"]], "a ManyChat se le pide igual");
   assert.equal(await escribioDespues({ base, manychat }, { id: "574", dueno: "agente" }), null);
 });
 
@@ -718,13 +736,14 @@ test("/api/dm/entrada: un mensaje en una charla personal con la etiqueta la deja
   assert.deepEqual(dudosa[1], ["581"]);
   assert.deepEqual(pedidos.map((p) => [p.url.split("/").at(-1), p.cuerpo.subscriber_id, p.cuerpo.tag_name]), [["removeTagByName", 581, "sin_intencion"]]);
   assert.ok(consultas.some(([t]) => /SET sin_intencion_en/.test(t)), "anotada como sacada");
-  // El texto del lead no va a nada de la etiqueta (solo a anotarLead, que no guarda nada de una charla de Cande).
+  // El texto del lead no va a nada de la etiqueta (solo a anotarLead, que no guarda nada de una charla de Cande). Desde
+  // la cuarta revisión (31/10) no relee la fila: se la pide sacar siempre, así que son dos (dudosa y sacada).
   const deLaEtiqueta = consultas.filter(([t]) => /personal_dudosa = true|SET sin_intencion_en|^SELECT c\.id, c\.dueno/.test(t));
-  assert.equal(deLaEtiqueta.length, 3);
+  assert.equal(deLaEtiqueta.length, 2);
   assert.ok(deLaEtiqueta.every(([, params]) => !JSON.stringify(params ?? []).includes("me interesa")), "sin el texto");
 });
 
-test("/api/dm/entrada: cualquier mensaje cuenta, también otro coqueteo; una personal sin la etiqueta queda dudosa y no pide nada", async () => {
+test("/api/dm/entrada: cualquier mensaje cuenta, también otro coqueteo; una personal sin la etiqueta queda dudosa y se la saca igual", async () => {
   const etiquetada = { id: "582", dueno: "cande", personal: true, personal_en: new Date(), sin_intencion_en: new Date() };
   const filaEtiquetada = fila("582", { dueno: "cande", personal: true, personal_en: new Date(), quien: null, del_lead: [], etiquetado: true });
   const coqueteo = await conEntrada(COQUETEO, { contacto: etiquetada, filas: [filaEtiquetada] });
@@ -733,7 +752,9 @@ test("/api/dm/entrada: cualquier mensaje cuenta, también otro coqueteo; una per
   const sinEtiqueta = { ...etiquetada, id: "583", sin_intencion_en: null };
   const r = await conEntrada("hola", { contacto: sinEtiqueta, filas: [fila("583", { dueno: "cande", personal: true, personal_en: new Date(), quien: null, del_lead: [] })] });
   assert.ok(r.consultas.some(([t]) => /SET personal_dudosa = true/.test(t)), "queda dudosa: el barrido no se la pone");
-  assert.deepEqual(r.pedidos, []);
+  // Hasta la tercera revisión no se le pedía nada a ManyChat. Desde la cuarta (31/10) se la pide sacar igual: un turno o
+  // el barrido pueden estar poniéndola justo ahora, y sacarla si no estaba no cambia nada.
+  assert.deepEqual(r.pedidos.map((p) => [p.url.split("/").at(-1), p.cuerpo.subscriber_id]), [["removeTagByName", 583]]);
 });
 
 test("/api/dm/entrada: una charla de Cande sin la etiqueta y no personal, o una del agente, no se toca", async () => {
@@ -769,5 +790,228 @@ test("/api/dm/entrada: si la base o ManyChat fallan al sacarla, el 200 sale igua
     pg.otras = null;
     delete process.env.DM_SECRETO;
     delete process.env.POSTGRES_URL;
+  }
+});
+
+/* ---------- cuarta revisión del 31/10 ---------- */
+
+// Una respuesta (un gracias, un sí, un dale, un ok) contesta algo que le mandó la cuenta, aunque en la charla guardada no
+// se vea: la guía del CV del automático llega al hilo sin texto. Y entre mujeres, "gracias hermosa" es la forma común de
+// agradecer. Al lado de un halago, en el mismo mensaje o aparte, no la lleva.
+const RESPUESTAS_CON_HALAGO = [
+  ["gracias hermosa!!"], ["Gracias reina 🥰"], ["graciass amiga"], ["gracias linda ❤️"], ["sii amiga"], ["dale linda"],
+  ["ok amiga"], ["gracias!", "hermosa"], ["hermosa 😍", "muchas gracias"], ["Mil gracias hermosa 🙏"], ["listo divina 😘"],
+  ["hola", "gracias reina"], ["okeyy hermosa"], ["bueno linda"],
+];
+// Señales que también dicen otra cosa: un halago al día, una cita que puede ser una frase o la llamada de TRABAJO, el
+// número o el whatsapp sin otra señal (el 1 a 1 se cierra por WhatsApp), una despedida, "amiga" sin una señal fuerte, y
+// lo que puede ser una respuesta a la foto de una historia.
+const SENALES_QUE_DICEN_OTRA_COSA = [
+  "linda tarde!", "bella noche", "hermosa tarde", "Linda semanaaa", "hermosa noche ✨", "qué linda la tarde", "linda tarde hermosa",
+  "buena cita", "la cita", "cita", "una cita", "hermosa cita", "linda cita 🔥", "el número", "el whatsapp", "dame tu whatsapp", "tu whatsapp", "hermosa, el whatsapp",
+  "nos vemos!", "nos vemos 😘", "amiga", "hola amiga hermosa", "hermosa amiga 😍", "cafecito", "bebe",
+];
+
+test("una respuesta al lado de un halago no la lleva, en el mismo mensaje o aparte (ante la duda, contesta algo de la cuenta)", () => {
+  for (const charla of RESPUESTAS_CON_HALAGO) {
+    const cual = charla.join(" + ");
+    assert.notEqual(motivoSinIntencion({ ...noDev, charlaDelLead: charla }), null, cual);
+    assert.notEqual(motivoSinIntencion({ ...noDev, charlaDelLead: [COQUETEO, ...charla] }), null, `${COQUETEO} + ${cual}`);
+    // En el alta y en "borrar", lo de antes de borrar: queda dudosa.
+    assert.notEqual(senalDeLaCharla(antesDeBorrar({ mensajes: charla.map((texto) => ({ quien: "lead", texto })) })), null, cual);
+    // Alguno es una respuesta (el halago aparte, como "hermosa", sí es personal: frena la respuesta).
+    assert.ok(charla.some((t) => tipoDeMensaje(t) === "respuesta"), cual);
+  }
+  for (const t of ["gracias hermosa!!", "Gracias reina 🥰", "graciass amiga", "dale linda", "ok amiga", "gracias!", "sí"]) {
+    assert.equal(tipoDeMensaje(t), "respuesta", t);
+  }
+  // Una respuesta aparte frena aunque el halago esté solo en otro mensaje: lo dice el barrido en no_la_llevan.
+  assert.equal(motivoSinIntencion({ ...noDev, charlaDelLead: ["gracias!", "hermosa"] }), MOTIVO_RESPUESTA);
+  // Un saludo, una risa o un emoji sí pueden ir al lado: "hola hermosa 😍" la sigue llevando.
+  for (const charla of [["hola hermosa 😍"], ["holaa", "jaja", "hermosa 😍"], ["buenas noches hermosa"], ["hey linda 🔥"]]) {
+    assert.equal(motivoSinIntencion({ ...noDev, charlaDelLead: charla }), null, charla.join(" + "));
+  }
+  // "Gracias!" solo sigue siendo algo suelto (frena igual).
+  assert.equal(esSuelto("Gracias!!"), true);
+  assert.equal(esSuelto("gracias hermosa!!"), false);
+});
+
+test("las señales que también dicen otra cosa no la llevan solas; con otra señal clara, sí", () => {
+  for (const t of SENALES_QUE_DICEN_OTRA_COSA) {
+    assert.notEqual(motivoSinIntencion({ ...noDev, charlaDelLead: [t] }), null, t);
+    assert.notEqual(senalDeLaCharla(antesDeBorrar({ mensajes: [{ quien: "lead", texto: t }] })), null, `antes: ${t}`);
+    assert.notEqual(tipoDeMensaje(t), "personal", t);
+  }
+  // "amiga" con una señal fuerte, "cita" en "app de citas", "una cita conmigo" o con un salgamos, el número con "tu" y otra
+  // señal, y "nos vemos" con un halago: la llevan.
+  for (const t of [
+    "te extraño amiga", "salgamos amiga 😘", "te vi en la app de citas", "una cita conmigo 😏", "salgamos a una cita",
+    "hermosa, dame tu número 😘", "hermosa, nos vemos 😘", "buenos días hermosaaa ❤️",
+  ]) {
+    assert.equal(tipoDeMensaje(t), "personal", t);
+    assert.equal(motivoSinIntencion({ ...noDev, charlaDelLead: [t] }), null, t);
+  }
+});
+
+test("ponerla sin saber si salió (tardó, se cortó, tiró o no volvió nada) la anota como puesta con la falla; un error de ManyChat no", async () => {
+  const casos = [
+    ["tardó", async () => ({ ok: false, incierto: true, error: "ManyChat tardó más de 8 segundos: puede haber salido igual" })],
+    ["se cortó la red", async () => ({ ok: false, sinRespuesta: true, error: "fetch failed" })],
+    ["tiró", async () => { throw new Error("ManyChat caído"); }],
+    ["no volvió nada", async () => undefined],
+  ];
+  for (const [cual, ponerEtiqueta] of casos) {
+    const { m, base } = mundo([fila("701")]);
+    assert.equal(await revisarSinIntencion({ base, manychat: { ponerEtiqueta, quitarEtiqueta: async () => ({ ok: true }) } }, "701"), false, cual);
+    assert.equal(m.filas[0].etiquetado, true, `${cual}: puede estar en ManyChat, queda anotada como puesta`);
+    assert.ok(m.filas[0].falla_en instanceof Date, `${cual}: con la falla, para volver a pedirla`);
+    assert.deepEqual(m.fallas, [["701", false]], cual);
+  }
+  // ManyChat contestó que no (un error, o que no tiene al contacto): no quedó, no se anota como puesta.
+  for (const error of ["código 9999 | de prueba", "Subscriber does not exist"]) {
+    const { m, base, manychat } = mundo([fila("702")], { falla: () => true, error });
+    assert.equal(await revisarSinIntencion({ base, manychat }, "702"), false, error);
+    assert.equal(m.filas[0].etiquetado, false, error);
+    assert.ok(m.filas[0].falla_en instanceof Date, error);
+  }
+  // El corte de red de lib/dm/manychat.js lo dice (sinRespuesta), sin cambiar lo que es incierto para el envío.
+  const { ponerEtiqueta } = await import("../lib/dm/manychat.js");
+  const antes = globalThis.fetch;
+  process.env.MANYCHAT_API_KEY = "clave-de-prueba";
+  globalThis.fetch = async () => { throw new TypeError("fetch failed"); };
+  try {
+    const r = await ponerEtiqueta("703", "sin_intencion");
+    assert.equal(r.sinRespuesta, true);
+    assert.equal(r.incierto, undefined);
+  } finally {
+    globalThis.fetch = antes;
+    delete process.env.MANYCHAT_API_KEY;
+  }
+});
+
+test("la que quedó puesta sin saber si salió se vuelve a pedir; si deja de llevarla se saca, y el dry avisa hasta que salga", async () => {
+  let poner = { ok: false, incierto: true, error: "ManyChat tardó, de prueba" };
+  let sacar = { ok: false, error: "código 9999 | de prueba" };
+  const { m, base } = mundo([fila("711"), fila("712")]);
+  const llamadas = [];
+  const manychat = {
+    ponerEtiqueta: async (id) => { llamadas.push(["poner", id]); return poner; },
+    quitarEtiqueta: async (id) => { llamadas.push(["sacar", id]); return sacar; },
+    crearEtiqueta: async () => ({ ok: true }),
+  };
+  for (const id of ["711", "712"]) await revisarSinIntencion({ base, manychat }, id);
+  // Recién: espera. Pasada la espera, el barrido las vuelve a pedir (la falla sigue anotada) y, si salen, la borra.
+  const recien = await barrerSinIntencion({ base, manychat, dry: true });
+  assert.deepEqual([recien.para_poner, recien.en_espera.poner, recien.ojo], [0, 2, undefined]);
+  poner = { ok: true };
+  const tarde = Date.now() + 2 * ESPERA_FALLA_MS;
+  // Mientras tanto 712 resulta dev: la tiene (puede) y ya no la lleva.
+  Object.assign(m.filas[1], { quien: "dev" });
+  const dry = await barrerSinIntencion({ base, manychat, dry: true, ahora: tarde });
+  assert.deepEqual([dry.para_poner, dry.para_sacar], [1, 1]);
+  assert.match(dry.ojo, /^1 tienen la etiqueta/, "Cande no borra por la etiqueta hasta que salga");
+  const r = await barrerSinIntencion({ base, manychat, dry: false, esperar: async () => {}, ahora: tarde });
+  assert.deepEqual(llamadas.slice(2), [["sacar", "712"], ["poner", "711"]]);
+  assert.deepEqual([r.puestas, r.sacadas, r.fallidas], [1, 0, 1]);
+  assert.deepEqual([m.filas[0].etiquetado, m.filas[0].falla_en], [true, null], "711 salió: sin falla, no se pide más");
+  assert.equal(m.filas[1].etiquetado, true, "712 no se pudo sacar: queda puesta, para reintentar");
+  assert.match((await barrerSinIntencion({ base, manychat, dry: true, ahora: tarde })).ojo, /^1 tienen la etiqueta/);
+  sacar = { ok: true };
+  await barrerSinIntencion({ base, manychat, dry: false, esperar: async () => {}, ahora: tarde + 2 * ESPERA_FALLA_MS });
+  assert.equal(m.filas[1].etiquetado, false);
+  const final = await barrerSinIntencion({ base, manychat, dry: true, ahora: tarde + 2 * ESPERA_FALLA_MS });
+  assert.deepEqual([final.ojo, final.para_poner, final.para_sacar], [undefined, 0, 0]);
+  // Y la siguiente vuelta, nada más.
+  const antes = llamadas.length;
+  await revisarSinIntencion({ base, manychat }, "711");
+  assert.equal(llamadas.length, antes);
+});
+
+/** Una personal recién borrada (como queda después de borrarCharla), con un coqueteo puro antes de borrarse. */
+function personalRecienBorrada(id) {
+  const mundoPersonal = mundo([fila(id, { dueno: "cande", personal: true, personal_en: new Date(), quien: null, etapa: null, del_lead: [] })]);
+  mundoPersonal.base.marcarDudosa = async (x) => { Object.assign(mundoPersonal.m.filas.find((f) => f.id === x), { personal_dudosa: true }); };
+  const contacto = { id, dueno: "cande", personal: true, personal_en: new Date(), sin_intencion_en: null };
+  return { ...mundoPersonal, contacto, antes: { charlaDelLead: [COQUETEO], charlaDeLaCuenta: [], estado: {} } };
+}
+
+test("la carrera: si el lead escribe mientras ManyChat le pone la etiqueta, al final no la tiene ni en ManyChat ni en la base", async () => {
+  // 1) La entrada saca antes de que ManyChat termine de ponerla (y la base todavía dice que no la tiene).
+  {
+    const { m, base, contacto, antes } = personalRecienBorrada("731");
+    const enManyChat = new Set();
+    let entrada;
+    const manychat = {
+      ponerEtiqueta: async (id) => {
+        // Mientras sale el pedido entra "cuánto sale el 1 a 1?" (recibir no lo guarda: la charla es de Cande).
+        entrada = await escribioDespues({ base, manychat }, contacto);
+        enManyChat.add(id);
+        return { ok: true };
+      },
+      quitarEtiqueta: async (id) => { enManyChat.delete(id); return { ok: true }; },
+    };
+    await revisarSinIntencion({ base, manychat }, "731", { antes });
+    assert.equal(entrada, true, "la entrada se la pidió sacar aunque la base dijera que no la tenía");
+    assert.equal(enManyChat.has("731"), false, "el turno releyó la fila, la vio dudosa y la sacó");
+    assert.deepEqual([m.filas[0].etiquetado, m.filas[0].personal_dudosa], [false, true]);
+    const dry = await barrerSinIntencion({ base, manychat, dry: true });
+    assert.deepEqual([dry.para_poner, dry.para_sacar, dry.ojo], [0, 0, undefined]);
+  }
+  // 2) ManyChat saca enseguida pero la entrada anota en la base después de que el turno terminó.
+  {
+    const { m, base, contacto, antes } = personalRecienBorrada("732");
+    const enManyChat = new Set();
+    let entrada;
+    let soltar;
+    const demorada = new Promise((r) => { soltar = r; });
+    let primera = true;
+    const manychat = {
+      ponerEtiqueta: async (id) => {
+        entrada = escribioDespues({ base, manychat }, contacto);
+        await new Promise((r) => { setImmediate(r); });
+        enManyChat.add(id);
+        return { ok: true };
+      },
+      quitarEtiqueta: async (id) => {
+        enManyChat.delete(id);
+        if (primera) { primera = false; await demorada; }
+        return { ok: true };
+      },
+    };
+    await revisarSinIntencion({ base, manychat }, "732", { antes });
+    assert.equal(enManyChat.has("732"), false);
+    soltar();
+    assert.equal(await entrada, true);
+    assert.deepEqual([enManyChat.has("732"), m.filas[0].etiquetado, m.filas[0].personal_dudosa], [false, false, true]);
+  }
+  // 3) ManyChat saca antes de poner, y la entrada anota que la sacó justo entre que el turno la anota como puesta y relee
+  //    la fila: la base dice que no la tiene, pero ManyChat sí. El turno la saca igual, porque la charla quedó dudosa.
+  {
+    const { m, base, contacto, antes } = personalRecienBorrada("733");
+    const enManyChat = new Set();
+    let entrada;
+    let soltar;
+    const demorada = new Promise((r) => { soltar = r; });
+    let primera = true;
+    const anotar = base.marcarSinIntencion;
+    base.marcarSinIntencion = async (id, puesta) => {
+      await anotar(id, puesta);
+      if (puesta && entrada) { soltar(); await entrada; }
+    };
+    const manychat = {
+      ponerEtiqueta: async (id) => {
+        entrada = escribioDespues({ base, manychat }, contacto);
+        await new Promise((r) => { setImmediate(r); });
+        enManyChat.add(id);
+        return { ok: true };
+      },
+      quitarEtiqueta: async (id) => {
+        enManyChat.delete(id);
+        if (primera) { primera = false; await demorada; }
+        return { ok: true };
+      },
+    };
+    await revisarSinIntencion({ base, manychat }, "733", { antes });
+    assert.deepEqual([enManyChat.has("733"), m.filas[0].etiquetado, m.filas[0].personal_dudosa], [false, false, true]);
   }
 });

@@ -22,8 +22,9 @@
 //
 // Una excepción, sin guardar el texto: si la charla de Cande tiene la etiqueta sin_intencion o es personal, cualquier
 // mensaje nuevo la deja dudosa y le saca la etiqueta (escribioDespues en lib/dm/sinIntencion.js). Lo que escribe ahí
-// no lo mira nadie más, y Cande borra por esa etiqueta: puede ser alguien que ahora pide el programa. Va después del
-// 200, como el turno, y nunca tira.
+// no lo mira nadie más, y Cande borra por esa etiqueta: puede ser alguien que ahora pide el programa. A ManyChat se le
+// pide sacarla siempre, aunque la base diga que no la tiene: un turno o el barrido pueden estar poniéndola justo ahora.
+// Va después del 200, como el turno, y nunca tira.
 //
 // Si la base falla contesta 200 igual, con ok en false, y le avisa a Cande: con un 500 el
 // mensaje se pierde y nadie se entera.
@@ -39,17 +40,12 @@ import { waitUntil } from "@vercel/functions";
 import { SIN_TEXTO } from "../../../lib/dm/agente";
 import { agente, avisarDm, colaDe, secretoDmValido } from "../../../lib/dm/armado";
 import { cuerpoDeManyChat, leerCrudo } from "../../../lib/dm/cuerpo";
-import {
-  ajustes, anotarFallaSinIntencion, contacto, hayBase, marcarDudosa, marcarSinIntencion, paraSinIntencion, tablas,
-} from "../../../lib/dm/base";
-import { ponerEtiqueta, quitarEtiqueta } from "../../../lib/dm/manychat";
+import { anotarFallaSinIntencion, contacto, hayBase, marcarDudosa, marcarSinIntencion, tablas } from "../../../lib/dm/base";
+import { quitarEtiqueta } from "../../../lib/dm/manychat";
 import { escribioDespues, miraLoQueEscribe } from "../../../lib/dm/sinIntencion";
 
 // Lo que usa la etiqueta sin_intencion (lib/dm/sinIntencion.js) cuando escribe alguien de una charla de Cande.
-const ETIQUETAS = {
-  base: { ajustes, paraSinIntencion, marcarSinIntencion, anotarFallaSinIntencion, marcarDudosa },
-  manychat: { ponerEtiqueta, quitarEtiqueta },
-};
+const ETIQUETAS = { base: { marcarSinIntencion, anotarFallaSinIntencion, marcarDudosa }, manychat: { quitarEtiqueta } };
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

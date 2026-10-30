@@ -34,6 +34,7 @@ const {
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno, esFoto, SIN_TEXTO, NOTA_HILO_PREVIO } = await import("../lib/dm/agente.js");
 const { MAX_PREVIO } = await import("../lib/dm/instagram.js");
+const { crearEnvio } = await import("../lib/dm/envio.js");
 const {
   correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, vigiaDelModelo, pausaTrasFallas, alarmaDelCerebro,
   FALLA_GENERAL, FALLA_PROPIA, FALLA_DUDOSA, REINTENTO_MAX_FALLOS,
@@ -358,7 +359,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
-  hayManyChat = true, instagram = null, avisarCon = null, etiquetasAparte = false,
+  hayManyChat = true, instagram = null, avisarCon = null, porElEnvio = false,
 } = {}) {
   const m = {
     ajustes: {
@@ -492,10 +493,12 @@ function armar({
     hayManyChat: () => hayManyChat,
     mandarTextos: mandar || (async (id, textos) => { m.enviados.push(...textos); return { ok: true }; }),
     ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return { ok: pausaManyChat }; },
-    // m.fallaEtiqueta: "no" (ManyChat contesta un error) o "tira" (se cae el pedido).
+    // m.fallaEtiqueta: "no" (ManyChat contesta un error), "tira" (se cae el pedido) o "incierto" (tardó más de 8
+    // segundos: puede haber salido igual).
     ponerEtiqueta: async (id, etiqueta) => {
       m.etiquetas.push(["poner", id, etiqueta]);
       if (m.fallaEtiqueta === "tira") throw new Error("ManyChat caído");
+      if (m.fallaEtiqueta === "incierto") return { ok: false, incierto: true, error: "ManyChat tardó, de prueba" };
       return m.fallaEtiqueta ? { ok: false, error: "código 9999 | de prueba" } : { ok: true };
     },
     quitarEtiqueta: async (id, etiqueta) => {
@@ -512,15 +515,9 @@ function armar({
     return id;
   };
   const esperar = async () => { await tick(); alEsperar?.(m); };
-  // etiquetasAparte: como en armado.js, el envío no tiene las etiquetas y vienen por `etiquetas`.
-  let etiquetas = null;
-  if (etiquetasAparte) {
-    const { ponerEtiqueta, quitarEtiqueta } = manychat;
-    etiquetas = { ponerEtiqueta, quitarEtiqueta };
-    delete manychat.ponerEtiqueta;
-    delete manychat.quitarEtiqueta;
-  }
-  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50, etiquetas });
+  // porElEnvio: como en armado.js, el agente recibe el envío (lib/dm/envio.js, sin Instagram) y no ManyChat.
+  const alAgente = porElEnvio ? crearEnvio({ manychat, base, ig: null, hayIg: () => false }) : manychat;
+  const agente = crearAgente({ base, pedir, manychat: alAgente, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50 });
   return { agente, m, base, manychat };
 }
 
@@ -4507,7 +4504,10 @@ test("sin_intencion: si ManyChat falla o la base no contesta, el turno sale igua
     assert.equal(m.contacto.respondido_hasta, m.disparo, falla);
     assert.equal(m.contacto.dueno, "agente", falla);
     assert.deepEqual(m.avisos, [], falla);
-    assert.equal(m.contacto.sin_intencion_en ?? null, null, falla);
+    // Si el pedido tiró, ManyChat pudo haberla puesto igual: queda anotada como puesta, con la falla, para que se saque
+    // si deja de llevarla (cuarta revisión del 31/10). Con un error de ManyChat o la base caída, no quedó.
+    if (falla === "tira") assert.ok(m.contacto.sin_intencion_en && m.contacto.sin_intencion_falla, falla);
+    else assert.equal(m.contacto.sin_intencion_en ?? null, null, falla);
     assert.equal(m.tomado, null, falla);
     // Queda registrado, sin los textos del lead.
     const nuevos = registros.slice(antes).filter((x) => x.includes("sin_intencion"));
@@ -4651,15 +4651,20 @@ test("sin_intencion: se relee después del turno; si el barrido se la puso mient
   }
 });
 
-test("sin_intencion: con el envío sin etiquetas (armado.js), el agente las pone y las saca con `etiquetas`", async () => {
-  const { agente, m, manychat } = armar({ etiquetasAparte: true, responde: cierraComo("no_dev") });
+test("sin_intencion: el agente la pone y la saca por el envío de armado.js, que desde #157 trae todo el cliente de ManyChat", async () => {
+  // Antes de #157 el envío solo mandaba textos, y crearAgente recibía las etiquetas aparte (cuarta revisión del 31/10).
+  const { agente, m } = armar({ porElEnvio: true, responde: (p, mundo) => salida(["Respuesta de prueba?"], {
+    estado: { ...estadoDev, etapa: "cerrada", quien: mundo.pedidos.length > 1 ? "dev" : "no_dev" },
+  }) });
   escribe(m);
-  assert.equal(manychat.ponerEtiqueta, undefined);
   await agente.procesar("77", m.disparo);
-  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+  await agente.procesar("77", m.entraLead("en realidad soy dev, de prueba"));
+  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION], ["sacar", "77", SIN_INTENCION]]);
+  assert.deepEqual(m.enviados, ["Respuesta de prueba?", "Respuesta de prueba?"], "los textos salen por el envío");
   const { readFile } = await import("node:fs/promises");
   const armado = await readFile(new URL("../lib/dm/armado.js", import.meta.url), "utf8");
-  assert.match(armado, /crearAgente\(\{[^}]*manychat: envio[^}]*etiquetas: manychat/, "armado le pasa ManyChat de verdad para las etiquetas");
+  assert.match(armado, /crearAgente\(\{[^}]*manychat: envio[^}]*\}\)/, "armado le pasa el envío");
+  assert.doesNotMatch(armado, /etiquetas: manychat/);
 });
 
 /* ---------- los cambios de dueño que no son un turno ---------- */
@@ -4793,4 +4798,86 @@ test("sin_intencion: con la charla abierta (\"a qué te dedicás?\") no la lleva
   assert.equal(m.contacto.sin_intencion_en ?? null, null);
   assert.equal((await agente.procesar("77", m.entraLead("qué linda sos 😘"))).hecho, "calló");
   assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+});
+
+/* ---------- sin_intencion, cuarta revisión del 31/10 ---------- */
+
+// Una respuesta con un halago contesta algo que le mandó la cuenta (la guía del CV del automático llega sin texto al
+// hilo, un "Pudiste anotarte?"): el freno 0 la calla con no_dev, pero es alguien del embudo.
+const RESPUESTAS_CON_HALAGO = ["gracias hermosa!!", "Gracias reina 🥰", "graciass amiga", "gracias linda ❤️", "sii amiga", "dale linda", "ok amiga"];
+// Lo que también dice otra cosa: el día, una frase con "cita", el número o el whatsapp de otro, una despedida.
+const SENALES_QUE_DICEN_OTRA_COSA = [
+  "linda tarde!", "bella noche", "hermosa tarde", "buena cita", "la cita", "cita", "el número", "el whatsapp", "dame tu whatsapp", "nos vemos!",
+];
+
+test("sin_intencion: una respuesta con un halago (\"gracias hermosa!!\", \"dale linda\") no la lleva, en el alta ni en una charla del agente cerrada", async () => {
+  for (const texto of RESPUESTAS_CON_HALAGO) {
+    const alta = await altaPersonal(texto);
+    assert.deepEqual(alta.m.etiquetas, [], `alta: ${texto}`);
+    assert.equal(alta.m.contacto.personal_dudosa, true, `alta: ${texto}`);
+    assert.deepEqual((await altaPersonal(texto, { sinDudosa: true })).m.etiquetas, [], `alta sin dudosa: ${texto}`);
+    for (const responde of [callaComo("no_dev"), cierraComo("no_dev")]) {
+      const { agente, m } = armar({ responde });
+      escribe(m, texto);
+      await agente.procesar("77", m.disparo);
+      assert.deepEqual(m.etiquetas, [], `agente: ${texto}`);
+    }
+  }
+  // Un "gracias!" en otro mensaje también: el alta con "gracias!" y "hermosa" en la misma ráfaga, y la charla del agente.
+  const { agente, m } = armar({ sinContacto: true, altas: true, responde: callaComo("no_dev") });
+  await agente.recibir("88", "gracias!", "Contacto de prueba");
+  const id = await agente.recibir("88", "hermosa", "Contacto de prueba");
+  assert.equal((await agente.procesar("88", id)).hecho, "charla personal: queda de Cande, sin aviso");
+  assert.deepEqual(m.etiquetas, []);
+  assert.equal(m.contacto.personal_dudosa, true);
+  const charla = armar({ responde: cierraComo("no_dev") });
+  escribe(charla.m, "gracias!");
+  await charla.agente.procesar("77", charla.m.entraLead("hermosa"));
+  assert.deepEqual(charla.m.etiquetas, []);
+  // Un saludo sí puede ir al lado: "hola hermosa 😍" la lleva.
+  assert.deepEqual((await altaPersonal("hola hermosa 😍")).m.etiquetas, [["poner", "88", SIN_INTENCION]]);
+});
+
+test("sin_intencion: \"linda tarde!\", \"buena cita\", \"el whatsapp\", \"dame tu whatsapp\" o \"nos vemos!\" no la llevan, en el alta ni en una charla del agente cerrada", async () => {
+  for (const texto of SENALES_QUE_DICEN_OTRA_COSA) {
+    const alta = await altaPersonal(texto);
+    assert.deepEqual(alta.m.etiquetas, [], `alta: ${texto}`);
+    assert.equal(alta.m.contacto.personal_dudosa, true, `alta: ${texto}`);
+    for (const responde of [callaComo("no_dev"), cierraComo("no_dev")]) {
+      const { agente, m } = armar({ responde });
+      escribe(m, texto);
+      await agente.procesar("77", m.disparo);
+      assert.deepEqual(m.etiquetas, [], `agente: ${texto}`);
+    }
+  }
+});
+
+test("sin_intencion: si ManyChat tarda al ponerla, queda anotada como puesta; si después pregunta el 1 a 1 y es dev, sale un sacar y el dry avisa hasta que salga", async () => {
+  const { sinIntencion } = await importarSinIntencion();
+  const { agente, m, base, manychat } = armar({
+    responde: (p, mundo) => salida(["Respuesta de prueba?"], {
+      estado: mundo.pedidos.length > 1 ? { ...estadoDev, quien: "dev" } : { ...estadoDev, quien: "no_dev", etapa: "cerrada" },
+    }),
+  });
+  escribe(m);
+  m.fallaEtiqueta = "incierto"; // ManyChat la puso pero contestó después de los 8 segundos
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION]]);
+  assert.ok(m.contacto.sin_intencion_en, "puede estar en ManyChat: queda anotada como puesta");
+  assert.ok(m.contacto.sin_intencion_falla, "con la falla, para volver a pedirla");
+  // Al otro día pregunta el precio del 1 a 1 y el modelo dice dev. ManyChat tampoco puede sacarla la primera vez.
+  m.fallaEtiqueta = "no";
+  assert.equal((await agente.procesar("77", m.entraLead("cuánto sale el 1 a 1?"))).hecho, "enviada");
+  assert.deepEqual(m.etiquetas, [["poner", "77", SIN_INTENCION], ["sacar", "77", SIN_INTENCION]]);
+  assert.ok(m.contacto.sin_intencion_en, "no se pudo sacar: sigue anotada, para reintentar");
+  const dry = await sinIntencion.barrerSinIntencion({ base, manychat, dry: true, ahora: AHORA.getTime() });
+  assert.match(dry.ojo ?? "", /^1 tienen la etiqueta/, "Cande no borra por la etiqueta hasta que salga");
+  // Pasada la espera el barrido la saca, y el aviso se va.
+  m.fallaEtiqueta = false;
+  const tarde = AHORA.getTime() + 2 * HORA;
+  const r = await sinIntencion.barrerSinIntencion({ base, manychat, dry: false, esperar: async () => {}, ahora: tarde });
+  assert.equal(r.sacadas, 1);
+  assert.equal(m.contacto.sin_intencion_en, null);
+  assert.deepEqual(m.etiquetas.map((x) => x[0]), ["poner", "sacar", "sacar"]);
+  assert.equal((await sinIntencion.barrerSinIntencion({ base, manychat, dry: true, ahora: tarde })).ojo, undefined);
 });
