@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import SEO from "../src/components/SEO/SEO";
 import ClosingCall from "../src/components/ClosingCall/ClosingCall";
+import IndiceSecciones from "../src/components/IndiceSecciones/IndiceSecciones";
+import { SECCIONES_HOME } from "../lib/seccionesHome";
 import {
   Body,
   Button,
@@ -349,7 +351,8 @@ export async function getServerSideProps() {
 
 export default function HomePage() {
   const { t } = useTranslation();
-  const copy = COPY[useLang()];
+  const lang = useLang();
+  const copy = COPY[lang];
 
   const featuredVantage = {
     name: t("reviews.vantage.role"),
@@ -422,8 +425,11 @@ export default function HomePage() {
         </Wrap>
       </Hero>
 
+      {/* El índice de la página. Va pegado abajo del menú y lleva a cada sección. */}
+      <IndiceSecciones items={SECCIONES_HOME[lang]} etiqueta={lang === "en" ? "Sections on this page" : "Secciones de esta página"} />
+
       {/* Qué es gratis y qué se paga */}
-      <Section $tight>
+      <Section $tight id="que-incluye">
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.offer.eyebrow}</Eyebrow>
@@ -464,7 +470,7 @@ export default function HomePage() {
       </Section>
 
       {/* Para quién */}
-      <Section>
+      <Section id="casos-de-uso">
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.audience.eyebrow}</Eyebrow>
@@ -518,7 +524,7 @@ export default function HomePage() {
       </Section>
 
       {/* Cómo funciona */}
-      <Section>
+      <Section id="como-funciona">
         <Wrap>
           <Split>
             <Reveal style={{ alignSelf: "stretch" }}>
@@ -556,7 +562,7 @@ export default function HomePage() {
       </Section>
 
       {/* Con quién trabajamos: logos y casos, todos juntos */}
-      <Section style={{ borderTop: `1px solid ${color.line}` }}>
+      <Section id="clientes" style={{ borderTop: `1px solid ${color.line}` }}>
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.clients.eyebrow}</Eyebrow>
@@ -614,7 +620,7 @@ export default function HomePage() {
       </Section>
 
       {/* Testimonios */}
-      <Section $tone="alt">
+      <Section $tone="alt" id="testimonios">
         <Wrap>
           <Reveal>
             <Eyebrow>{copy.proof.eyebrow}</Eyebrow>
@@ -649,7 +655,7 @@ export default function HomePage() {
       </Section>
 
       {/* Preguntas de comprador */}
-      <Section>
+      <Section id="preguntas">
         <Wrap>
           <Split>
             <Reveal style={{ alignSelf: "stretch" }}>

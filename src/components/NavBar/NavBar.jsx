@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import OGHLogo from "../Logo/OGHLogo";
 import { Button, color, font, mq, useLang } from "../../styles/kit";
+import { SECCIONES_HOME, TITULO_INDICE } from "../../../lib/seccionesHome";
 
 const COPY = {
   es: {
@@ -38,6 +39,7 @@ const COPY = {
 const NavBar = ({ alternates }) => {
   const lang = useLang();
   const copy = COPY[lang];
+  const secciones = SECCIONES_HOME[lang];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -123,9 +125,21 @@ const NavBar = ({ alternates }) => {
 
       {open && (
         <Panel>
-          {copy.links.map((item) => (
-            <PanelLink key={item.href} href={item.href} onClick={() => setOpen(false)}>
-              {item.label}
+          {/* Las páginas. Lo que ya está abajo como sección de la home no se repite acá. */}
+          {copy.links
+            .filter((item) => !secciones.some((s) => item.href === `/#${s.id}`))
+            .map((item) => (
+              <PanelLink key={item.href} href={item.href} onClick={() => setOpen(false)}>
+                {item.label}
+              </PanelLink>
+            ))}
+          {/* Y las secciones de la home. La barra de índice existe solo en la home, pero el menú
+              está en todas las páginas y es donde la gente lo busca, así que también van acá
+              (Cande, 31/10: "también en el menú hamburguesa debería ser"). */}
+          <PanelTitulo>{TITULO_INDICE[lang]}</PanelTitulo>
+          {secciones.map((s) => (
+            <PanelLink key={s.id} href={`/#${s.id}`} $muted onClick={() => setOpen(false)}>
+              {s.label}
             </PanelLink>
           ))}
           <PanelLink href="/devs" locale={false} $muted onClick={() => setOpen(false)}>
@@ -319,6 +333,16 @@ const PanelLink = styled(Link)`
   color: ${({ $muted }) => ($muted ? color.muted : color.ink)};
   padding: 16px 0;
   border-bottom: 1px solid ${color.line};
+`;
+
+const PanelTitulo = styled.p`
+  font-family: ${font.brand};
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: ${color.muted};
+  margin: 22px 0 2px;
 `;
 
 const PanelFoot = styled.div`
