@@ -30,7 +30,15 @@
 //                                                  antes de copiar: el lead pudo escribir y el agente contestarle. No cambia nada
 //   { accion: "link_formulario", contactos: [id, ...] } → el link del formulario de /devs con el id de cada charla y
 //                                                  su firma, como lo manda el agente: para lo que Cande pega a mano
-//   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla
+//   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla (queda personal: lleva la etiqueta
+//                                                  sin_intencion de ManyChat, salvo que haya comprado)
+//   { accion: "sin_intencion", dry, limite? }      → el barrido de la etiqueta sin_intencion (lib/dm/sinIntencion.js): Cande borra
+//                                                  o desuscribe en tanda desde ManyChat a quien la tiene. Con dry (lo que pasa
+//                                                  si no se dice dry: false) no cambia nada: cuántos la llevarían, cuántos la
+//                                                  tienen y ya no, y una muestra de hasta `limite` (id, quien, personal; sin
+//                                                  textos). Con dry: false se la saca a quien ya no la lleva y se la pone a los
+//                                                  que faltan, de a uno y con pausa, hasta `limite` (25 si no se dice, de 1 a
+//                                                  100) o 20 segundos; `quedan` dice cuántos faltan para otra tanda
 //   { accion: "charla", contacto }                 → lo guardado de una charla
 //   { accion: "telegram", grupo }                  → manda los avisos del agente a ese grupo de Telegram (el bot
 //                                                  tiene que estar adentro); con quitar: true vuelven al chat de siempre
@@ -70,14 +78,19 @@ import {
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
   ajustes, anotarAMano, anotarSeguidos, borrarCharla, cualesDelAgente, desanotar, estadoRetomadas, guardarIg, guardarSalida, textosDeLaCuenta, tokenRed, cerrarTurno, reabrirTurno, contacto, descartarPendientes, guardarConfig, guardarPrompt,
-  desdeValido, hayBase, historial, leerConfig, marcarRetomadas, ponerDueno, prompt, reservar, resumen, salidasDesde, sembrar, tablas,
-  ultimoIdLead, validarAjustes,
+  desdeValido, hayBase, historial, leerConfig, marcarRetomadas, marcarSinIntencion, paraSinIntencion, ponerDueno, prompt, reservar, resumen,
+  salidasDesde, sembrar, tablas, ultimoIdLead, validarAjustes,
 } from "../../../lib/dm/base";
 import {
   CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, paraPegar,
   usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
-import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
+import {
+  buscarPorNombre, crearEtiqueta, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta, quitarEtiqueta,
+} from "../../../lib/dm/manychat";
+import {
+  TANDA_MAX_SIN_INTENCION, TANDA_SIN_INTENCION, barrerSinIntencion, revisarSinIntencion,
+} from "../../../lib/dm/sinIntencion";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
 import { CLAVE_PATRONES, validarPatrones } from "../../../lib/dm/controlador";
 import { frenoDelCodigo } from "../../../lib/dm/frenos";
@@ -95,6 +108,11 @@ const TOPE_RETOMADAS = 1000;
 const DIA_MS = 86400000;
 const TOPE_AVISO = 3000;   // Telegram corta a los 4096
 const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Telegram no sigue la redirección
+const BARRIDO_MS = 20000; // lo que puede tardar una tanda del barrido de sin_intencion (como la búsqueda de buscarIg)
+// Lo que usa la etiqueta sin_intencion (lib/dm/sinIntencion.js): la base y ManyChat de verdad.
+const ETIQUETAS = {
+  base: { ajustes, paraSinIntencion, marcarSinIntencion }, manychat: { crearEtiqueta, ponerEtiqueta, quitarEtiqueta },
+};
 
 /** Los ids de una tanda de charlas retomadas, sin repetir; null si no es una lista de 1 a TOPE_RETOMADAS ids válidos. */
 function idsDeLaTanda(contactos) {
@@ -197,6 +215,8 @@ export default async function handler(req, res) {
     else if (b.dueno === "agente" && previo?.dueno === "cande") await cerrarTurno(id, (await ultimoIdLead(id)) || 0);
     // El mismo campo que mira la Regla de ManyChat para pausar sus automáticos.
     const campo = await ponerCampo(id, "dm_dueno", b.dueno);
+    // Si tenía la etiqueta sin_intencion y la toma Cande, se le saca (lib/dm/sinIntencion.js).
+    if (previo?.sin_intencion_en) await revisarSinIntencion(ETIQUETAS, id);
     return res.status(200).json({ ok: true, contacto: await contacto(id), manychat: campo.ok, ...(b.retomar === true ? { abiertos } : {}) });
   }
 
@@ -290,7 +310,19 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ error: "falta contacto" });
     const borrado = await borrarCharla(id);
     const campo = await ponerCampo(id, "dm_dueno", "cande");
-    return res.status(200).json({ ok: true, ...borrado, manychat: campo.ok });
+    // Queda como charla personal: lleva la etiqueta sin_intencion, salvo que haya comprado (lib/dm/sinIntencion.js).
+    const etiqueta = await revisarSinIntencion(ETIQUETAS, id);
+    return res.status(200).json({ ok: true, ...borrado, manychat: campo.ok, sin_intencion: etiqueta });
+  }
+
+  if (b.accion === "sin_intencion") {
+    const dry = b.dry !== false;
+    const limite = b.limite === undefined || b.limite === null ? TANDA_SIN_INTENCION : b.limite;
+    if (!Number.isInteger(limite) || limite < 1 || limite > TANDA_MAX_SIN_INTENCION) {
+      return res.status(400).json({ error: `limite: un entero de 1 a ${TANDA_MAX_SIN_INTENCION}` });
+    }
+    if (!dry && !hayManyChat()) return res.status(503).json({ error: "falta la clave de ManyChat" });
+    return res.status(200).json(await barrerSinIntencion({ ...ETIQUETAS, dry, limite, hasta: Date.now() + BARRIDO_MS }));
   }
 
   if (b.accion === "charla") {
