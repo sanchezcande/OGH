@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { hayBase } from "../../lib/db";
+import { revisar } from "../../lib/antispam";
 import { avisar } from "../../lib/notificar";
 import { fraseCupos } from "../../lib/cupos";
 
@@ -114,6 +115,14 @@ Candelaria Sanchez, Founder, OpenGateHub`;
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
+  // La trampa de /preguntas (el campo `web`) la mira ahora el guardia, con el reloj y el tope.
+  // Al bot se le sigue contestando como si todo hubiera salido bien, con el PDF y todo.
+  const limpio = await revisar(req);
+  if (!limpio.ok) {
+    if (limpio.callar) return res.status(200).json({ ok: true, pdf: PDF_PATH });
+    return res.status(limpio.codigo).json({ error: limpio.error });
+  }
+
   const nombre = limpiar(req.body?.nombre, 120);
   const email = limpiar(req.body?.email, 200).toLowerCase();
   const origen = limpiar(req.body?.origen, 60) || "directo";
@@ -122,8 +131,6 @@ export default async function handler(req, res) {
   // el número con el código de país cuando hay que llamar.
   const whatsapp = limpiar(req.body?.whatsapp, 40);
   const quiere = QUIERE.get(req.body?.quiere);
-  // Campo trampa: los humanos no lo ven, los bots lo llenan.
-  if (limpiar(req.body?.web)) return res.status(200).json({ ok: true, pdf: PDF_PATH });
 
   if (!email) return res.status(400).json({ error: "Falta el email" });
   if (!EMAIL_RE.test(email)) return res.status(400).json({ error: "Ese email no parece válido" });

@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+import { revisar } from "../../lib/antispam";
+
 // Leer la API key directamente (Next.js carga .env.local automáticamente)
 // También intentar leer desde diferentes fuentes por si acaso
 // Solo por variable de entorno (ver nota en leads.js).
@@ -33,6 +35,15 @@ export default async function handler(req, res) {
   if (!resend) {
     console.error("RESEND_API_KEY missing");
     return res.status(500).json({ error: "Email service not configured. Please check RESEND_API_KEY." });
+  }
+
+  // El widget de reCAPTCHA ya estaba en la página desde siempre, pero el token no viajaba y acá nadie
+  // lo miraba: el bot que le pega directo a la API no lo veía nunca. Ahora se verifica (si en Vercel
+  // está RECAPTCHA_SECRET) y, con o sin él, el envío pasa por el tope y la trampa de lib/antispam.js.
+  const limpio = await revisar(req, { segundos: 2, captcha: true });
+  if (!limpio.ok) {
+    if (limpio.callar) return res.status(200).json({ success: true });
+    return res.status(limpio.codigo).json({ error: limpio.error });
   }
 
   try {

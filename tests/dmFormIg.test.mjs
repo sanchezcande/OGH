@@ -363,7 +363,8 @@ test("/devs lee ?ig= con el mismo validador, lo saca de la barra con el router l
   assert.doesNotMatch(efecto[0], /router\.(replace|push)/);
   assert.match(efecto[0], /try \{[\s\S]*\} catch \(e\)/, "nunca rompe la página");
   // Desde el 24/10 también viaja la puerta (?de=), aparte del id y su firma.
-  assert.match(src, /body: JSON\.stringify\(\{ \.\.\.\(ig \? \{ \.\.\.f, ig, firma \} : f\), \.\.\.\(puerta \? \{ puerta \} : \{\}\) \}\),/);
+  // Y desde el 30/10, el reloj y la trampa del antispam (lib/trampaForm.js), que no tocan nada de esto.
+  assert.match(src, /body: JSON\.stringify\(\{ \.\.\.\(ig \? \{ \.\.\.f, ig, firma \} : f\), \.\.\.\(puerta \? \{ puerta \} : \{\}\), \.\.\.camposTrampa\(\) \}\),/);
   // Medir por qué puerta entró (?de=) sigue igual, y sinIg no le saca el ?de= a la barra.
   assert.match(src, /const de = normalizarOrigen\(new URLSearchParams\(window\.location\.search\)\.get\("de"\)\);\s*if \(de\) \{ setPuerta\(de\); evento\("form_visto_" \+ de\); \}/);
 });
