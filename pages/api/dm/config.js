@@ -30,14 +30,14 @@
 //                                                  antes de copiar: el lead pudo escribir y el agente contestarle. No cambia nada
 //   { accion: "link_formulario", contactos: [id, ...] } → el link del formulario de /devs con el id de cada charla y
 //                                                  su firma, como lo manda el agente: para lo que Cande pega a mano
-//   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla (queda personal: lleva la etiqueta
-//                                                  sin_intencion de ManyChat solo si lo borrado era una charla personal o
-//                                                  de coqueteo y nada más, y no compró: lib/dm/sinIntencion.js)
+//   { accion: "borrar", contacto }                 → borra todo lo guardado de una charla (queda personal: no lleva nunca la
+//                                                  etiqueta sin_intencion de ManyChat y, si la tenía, se le saca:
+//                                                  lib/dm/sinIntencion.js)
 //   { accion: "sin_intencion", dry, limite? }      → el barrido de la etiqueta sin_intencion (lib/dm/sinIntencion.js): Cande borra
 //                                                  o desuscribe en tanda desde ManyChat a quien la tiene. Con dry (lo que pasa
 //                                                  si no se dice dry: false) no cambia nada: cuántos la llevarían, cuántos la
-//                                                  tienen y ya no, por qué no la llevan los demás, cuántas personales de antes
-//                                                  del 31/10 quedan afuera, cuántos esperan porque ManyChat falló hace poco o
+//                                                  tienen y ya no, por qué no la llevan los demás (también las personales),
+//                                                  cuántos esperan porque ManyChat falló hace poco o
 //                                                  no los tiene, y una muestra de hasta `limite` (id, quien, personal; sin
 //                                                  textos). Con dry: false se la saca a quien ya no la lleva y se la pone a los
 //                                                  que faltan, de a uno, con pausa y releyendo cada uno, hasta `limite` (25 si
@@ -317,16 +317,16 @@ export default async function handler(req, res) {
 
   if (b.accion === "borrar") {
     if (!id) return res.status(400).json({ error: "falta contacto" });
-    // Queda como charla personal: lleva la etiqueta sin_intencion solo si lo que se borra era una charla personal o de
-    // coqueteo y nada más, y no compró (lib/dm/sinIntencion.js). Eso se mira antes de borrarlo y, si no era eso, queda
-    // anotado (dudosa).
+    // Queda como charla personal: no lleva nunca la etiqueta sin_intencion y, si la tenía, se le saca
+    // (lib/dm/sinIntencion.js). Antes de borrarlo se mira si era una charla personal o de coqueteo y nada más: si no lo
+    // era, queda anotado (dudosa), por si la charla vuelve al agente y lo borrado ya no está.
     const previa = await contacto(id);
     const antes = antesDeBorrar({
       mensajes: await historial(id, TOPE_HISTORIAL_BORRAR), previo: previoGuardado(previa?.previo_ig) || [], estados: [previa?.estado],
     });
     const borrado = await borrarCharla(id, { dudosa: senalDeLaCharla(antes) !== null });
     const campo = await ponerCampo(id, "dm_dueno", "cande");
-    const etiqueta = await revisarSinIntencion(ETIQUETAS, id, { antes });
+    const etiqueta = await revisarSinIntencion(ETIQUETAS, id);
     return res.status(200).json({ ok: true, ...borrado, manychat: campo.ok, sin_intencion: etiqueta });
   }
 

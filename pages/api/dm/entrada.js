@@ -20,11 +20,13 @@
 // pasó por acá entra como contacto del agente (ver recibir en lib/dm/agente.js): por eso en
 // ManyChat el flujo que llama acá tiene que arrancar filtrando por la etiqueta.
 //
-// Una excepción, sin guardar el texto: si la charla de Cande tiene la etiqueta sin_intencion o es personal, cualquier
-// mensaje nuevo la deja dudosa y le saca la etiqueta (escribioDespues en lib/dm/sinIntencion.js). Lo que escribe ahí
-// no lo mira nadie más, y Cande borra por esa etiqueta: puede ser alguien que ahora pide el programa. A ManyChat se le
-// pide sacarla siempre, aunque la base diga que no la tiene: un turno o el barrido pueden estar poniéndola justo ahora.
-// Va después del 200, como el turno, y nunca tira.
+// Una excepción, sin guardar el texto: si la charla de Cande tiene la etiqueta sin_intencion, cualquier mensaje nuevo
+// la deja dudosa y le saca la etiqueta (escribioDespues en lib/dm/sinIntencion.js). Es una red de más: una charla de
+// Cande no lleva esa etiqueta y el turno, el cambio de dueño o el barrido ya se la sacan (desde el 30/10 a esta ruta no
+// llega nada: ManyChat pausó sus automatizaciones). Lo que escribe ahí no lo mira nadie más, y Cande borra por esa
+// etiqueta: puede ser alguien que ahora pide el programa. A ManyChat se le pide sacarla siempre, aunque la base ya diga
+// que no la tiene: un turno o el barrido pueden estar poniéndola justo ahora. Va después del 200, como el turno, y
+// nunca tira.
 //
 // Si la base falla contesta 200 igual, con ok en false, y le avisa a Cande: con un 500 el
 // mensaje se pierde y nadie se entera.
@@ -84,7 +86,7 @@ export default async function handler(req, res) {
     idMensaje = await agente.recibir(id, texto.slice(0, 4000), nombre, { mid });
     if (!idMensaje) {
       const c = await contacto(id);
-      // Una charla de Cande con la etiqueta sin_intencion, o personal: el mensaje nuevo se la saca (ver arriba).
+      // Una charla de Cande con la etiqueta sin_intencion: el mensaje nuevo se la saca (ver arriba).
       if (miraLoQueEscribe(c)) waitUntil(escribioDespues(ETIQUETAS, c));
       return res.status(200).json({ ok: true, dueno: c?.dueno === "agente" ? "agente" : "cande" });
     }
