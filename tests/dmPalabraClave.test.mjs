@@ -7,6 +7,8 @@ import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
+import { readFileSync } from "node:fs";
+
 const { palabraClaveDe, PALABRAS } = await import("../lib/dm/palabraClave.js");
 
 test("la palabra sola dispara", () => {
@@ -31,19 +33,32 @@ test("otras palabras no disparan", () => {
   for (const t of ["cv", "dev", "hola", "", null, undefined, "   "]) assert.equal(palabraClaveDe(t), null);
 });
 
-test("lo que contesta lleva el doc y no el link de pago", () => {
-  const { textos } = PALABRAS.trabajo;
-  const todo = textos.join(" ");
-  assert.match(todo, /docs\.google\.com/, "el que va es el doc");
+test("lo que contesta lleva la agenda, y ni el doc ni el link de pago", () => {
+  const todo = PALABRAS.trabajo.textos.join(" ");
+  assert.match(todo, /opengatehub\.com\/15min/, "el que va es el link de agendar");
+  assert.ok(!/docs\.google\.com/.test(todo), "el doc muere en la charla (Hooman, 31/10): va a la llamada");
   assert.ok(!/gumroad|pagar-pesos/.test(todo), "el link de pago sirve solo para pagar (Hooman, 28/10)");
+});
+
+test("el link va limpio, sin parámetros", () => {
+  const todo = PALABRAS.trabajo.textos.join(" ");
+  // Un link con ?utm= o ?de= le da desconfianza al dev, y a Cande ya la acusaron de estafa esta
+  // semana. La cuenta de clicks pasa del lado del servidor, en pages/15min.js.
+  assert.ok(!/opengatehub\.com\/15min\?/.test(todo), "el link que ve el dev no lleva parámetros");
 });
 
 test("no repite lo que ya dice la historia", () => {
   const todo = PALABRAS.trabajo.textos.join(" ");
   assert.ok(!/buscando 5 devs/i.test(todo), "eso ya lo leyó en la historia, no se lo repetimos");
   assert.ok(!/vas a ser vos o alguien/i.test(todo), "la pregunta de la historia tampoco se repite");
-  assert.match(todo, /detalle/, "entrega lo que la historia prometió");
-  assert.match(todo, /docs\.google\.com/, "y el detalle es el doc");
+  assert.match(todo, /agend/i, "entrega lo que la historia prometió: dónde sigue la charla");
+});
+
+test("la página de la agenda cuenta el click antes de redirigir", () => {
+  const src = readFileSync(new URL("../pages/15min.js", import.meta.url), "utf8");
+  assert.match(src, /guardarEvento\(/, "sin esto Cande no sabe cuánta gente abre el calendario");
+  assert.match(src, /redirect:/, "y tiene que terminar en el calendario de Google");
+  assert.match(src, /catch/, "medir nunca puede romper el click");
 });
 
 test("el último mensaje pide una decisión, no una opinión", () => {
@@ -73,7 +88,6 @@ test("sin guion largo", () => {
 // Pedido de Cande, 30/10: "sacalos del agente y mandámelos a mí". El que contesta la palabra recibe
 // los dos mensajes y la charla pasa a ella, en código y no en el guion: el que levanta la mano por
 // una oferta de 473 lo atiende ella.
-import { readFileSync } from "node:fs";
 
 test("después de la palabra clave, la charla pasa a Cande", () => {
   const src = readFileSync(new URL("../lib/dm/agente.js", import.meta.url), "utf8");
