@@ -8,7 +8,7 @@
 // Lo que estas pruebas NO cubren: las consultas de lib/dm/base.js. El doble de Postgres de
 // tests/dobles solo conoce las del goteo, así que tomar, soltar, anotarLead, sembrar,
 // retirarSalida, reclamarToque, sinContestar, reclamarEspera, sinVentana, reclamarAvisoFoto,
-// soltarAvisoFoto, fotosSinAviso, borrarViejas, borrarCharla, lugarParaAlta, darDeAlta y reservar (y lo
+// soltarAvisoFoto, fotosSinAviso, borrarViejas, borrarCharla, guardarPrevio, lugarParaAlta, darDeAlta y reservar (y lo
 // que hacen con ellas /api/dm/config, /api/dm/toques, /api/dm/espera y /api/dm/entrada con las altas
 // prendidas) se prueban a mano contra un Postgres de verdad antes de subir un cambio. De la espera hay
 // que mirar: que fallos cuente las fallas propias del turno y las dudosas que tuvieron otra charla
@@ -32,7 +32,8 @@ import assert from "node:assert/strict";
 const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano, horaDeToques,
 } = await import("../lib/dm/frenos.js");
-const { crearAgente, armarTurno, esFoto, SIN_TEXTO } = await import("../lib/dm/agente.js");
+const { crearAgente, armarTurno, esFoto, SIN_TEXTO, NOTA_HILO_PREVIO } = await import("../lib/dm/agente.js");
+const { MAX_PREVIO } = await import("../lib/dm/instagram.js");
 const {
   correrToques, decidirSinContestar, pasarSinContestar, vaciarEspera, hayEspera, vigiaDelModelo, pausaTrasFallas, alarmaDelCerebro,
   FALLA_GENERAL, FALLA_PROPIA, FALLA_DUDOSA, REINTENTO_MAX_FALLOS,
@@ -384,8 +385,8 @@ function armar({
     prompt: async () => prompt,
     contacto: async () => (m.contacto ? { ...m.contacto } : null),
     anotarLead: async (id, texto) => (m.contacto?.dueno === "agente" ? m.entraLead(texto) : null),
-    // Lo que la red de la bandeja ya guardó (lib/dm/bandeja.js): en estas pruebas, nada.
-    guardadosPorLaRed: async () => [],
+    // Lo que la red de la bandeja ya guardó (lib/dm/bandeja.js): en estas pruebas, nada (o lo que diga m.porLaRed).
+    guardadosPorLaRed: async () => m.porLaRed ?? [],
     marcarEco: async () => false,
     lugarParaAlta: async (id, tope) => (m.contacto || m.altasHoy >= tope ? null : m.altasHoy),
     darDeAlta: async (id, { nombre, texto, contexto, tope }) => {
@@ -444,6 +445,10 @@ function armar({
     },
     soltarAvisoFoto: async (id, hastaId, antes) => {
       if (m.contacto.foto_avisada_hasta === hastaId) Object.assign(m.contacto, { foto_avisada_hasta: antes.hasta, foto_avisada_en: antes.en });
+    },
+    // Lo que se habló por Instagram antes de la base, como base.guardarPrevio: una sola vez por charla.
+    guardarPrevio: async (id, previo) => {
+      if (m.contacto.previo_ig == null) m.contacto.previo_ig = JSON.parse(JSON.stringify(previo));
     },
   };
   const pedir = async (p) => {
@@ -2344,6 +2349,275 @@ test("con solo el ajuste de seguidos (sin token), el agente mira la lista", asyn
   const r = await mundo.agente.procesar("77", mundo.m.disparo);
   assert.equal(r.hecho, "de Cande por Instagram");
   assert.deepEqual(vistas[0], { lista: true, api: false });
+});
+
+/* ---------- lo que se habló por Instagram antes de que la charla entrara a la base (30/10) ---------- */
+
+const CUENTA_IG = { user_id: "900", username: "cuenta.prueba" };
+const LEAD_IG = { id: "501", usuario: "lead.prueba" };
+/** Un mensaje del hilo como lo deja leerHilo (lib/dm/instagram.js), escrito `min` minutos antes de AHORA. */
+const enHilo = (id, texto, min, { deCuenta = false, de } = {}) => ({
+  id: `m${id}`, creado: new Date(AHORA.getTime() - min * 60000), para: [], texto,
+  de: de !== undefined ? de : deCuenta ? { id: CUENTA_IG.user_id, usuario: CUENTA_IG.username } : { ...LEAD_IG },
+});
+/** El hilo como lo da Instagram: los más nuevos primero. */
+const hiloIg = (...mensajes) => ({ id: "h1", otro: { ...LEAD_IG }, mensajes: [...mensajes].sort((a, b) => b.creado - a.creado) });
+
+/**
+ * Reglas de Instagram de mentira que, como porQueSale, dejan el hilo leído en la lectura y no sacan a nadie. `hacer`:
+ * "falla" tira, "tarda" deja el hilo y no contesta nunca, "sinLeer" contesta sin dejar nada (el token, el id o la
+ * lectura fallaron).
+ */
+function reglasConHilo(hilo, { hacer = null } = {}) {
+  const r = { miradas: 0, sacadas: [] };
+  r.porQueSale = async (c, op, lectura) => {
+    r.miradas++;
+    if (hacer === "falla") throw new Error("Instagram caído");
+    if (lectura && hacer !== "sinLeer") Object.assign(lectura, { hilo, cuenta: CUENTA_IG });
+    return hacer === "tarda" ? new Promise(() => {}) : null;
+  };
+  r.sacar = async (c, motivo) => { r.sacadas.push(motivo); };
+  return r;
+}
+
+/** Una charla que entró a la base recién con este mensaje del lead (el aviso de automático no se exige acá). */
+function charlaNueva(opciones = {}) {
+  const mundo = armar({ conAviso: false, avisoIa: false, ...opciones });
+  mundo.m.mensajes = [{ id: 1, quien: "lead", texto: "Es correcto, de prueba", creado: new Date(AHORA.getTime() - 5000) }];
+  mundo.m.disparo = 1;
+  mundo.m.ajustes.instagram = true;
+  return mundo;
+}
+
+test("una charla nueva: el modelo ve lo que se habló por Instagram antes, en orden y antes de lo guardado, sin repetir el turno ni guardarlo", async () => {
+  const hilo = hiloIg(
+    enHilo(1, "Hola, una consulta de prueba", 700),
+    enHilo(2, null, 650), // un adjunto: sin texto
+    enHilo(3, "Otra cosa de prueba?", 200, { deCuenta: true }),
+    enHilo(4, "Sos programador?", 199, { deCuenta: true }),
+    enHilo(5, "Es correcto, de prueba", 0.1), // el turno de ahora, que la base guardó unos segundos después
+  );
+  const ig = reglasConHilo(hilo);
+  const { agente, m } = charlaNueva({ instagram: ig });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  const { turno } = m.pedidos[0];
+  assert.deepEqual(turno.historial, [
+    { quien: "lead", texto: "Hola, una consulta de prueba" },
+    { quien: "cande", texto: "Otra cosa de prueba?" },
+    { quien: "cande", texto: "Sos programador?" },
+  ]);
+  assert.deepEqual(turno.mensajes_del_lead, ["Es correcto, de prueba"]);
+  assert.ok(turno.contexto.includes(NOTA_HILO_PREVIO));
+  assert.equal(ig.miradas, 2, "las dos miradas de siempre (antes de generar y antes de mandar), ninguna de más");
+  assert.deepEqual(m.mensajes.map((x) => x.quien), ["lead", "agente"], "lo de antes no va a los mensajes de la charla");
+  assert.deepEqual(m.contacto.previo_ig, turno.historial, "queda guardado en la charla (previo_ig) para los turnos siguientes");
+});
+
+test("la pregunta que Cande hizo a mano 25 segundos antes de la respuesta guardada entra, y va antes del turno (30/10)", async () => {
+  const hilo = hiloIg(
+    enHilo(1, "Hola, quiero info de prueba", 5),
+    enHilo(2, "Sos programador?", 25 / 60, { deCuenta: true }),
+    enHilo(3, "Es correcto, de prueba", 0.1), // la respuesta, que la base guardó 1 segundo después
+  );
+  const { agente, m } = charlaNueva({ instagram: reglasConHilo(hilo) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.pedidos[0].turno.historial, [
+    { quien: "lead", texto: "Hola, quiero info de prueba" },
+    { quien: "cande", texto: "Sos programador?" },
+  ]);
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["Es correcto, de prueba"]);
+});
+
+test("si la red de la bandeja guardó lo primero del lead, el corte es por su id de Instagram: lo que la cuenta le contestó después no entra", async () => {
+  const hilo = hiloIg(
+    enHilo(1, "Hola, quiero info de prueba", 5),
+    enHilo(2, "Sos programador?", 25 / 60, { deCuenta: true }),
+    enHilo(3, "Es correcto, de prueba, con otro texto", 0.1),
+    enHilo(4, "Gracias, automático de prueba", 3 / 60, { deCuenta: true }),
+  );
+  const mundo = () => {
+    const w = charlaNueva({ instagram: reglasConHilo(hilo) });
+    w.m.mensajes[0].creado = new Date(AHORA.getTime() - 1000);
+    return w;
+  };
+  const conRed = mundo();
+  conRed.m.porLaRed = [{ id: 1, texto: "Es correcto, de prueba", ig_mid: "m3" }];
+  assert.equal((await conRed.agente.procesar("77", conRed.m.disparo)).hecho, "enviada");
+  assert.deepEqual(conRed.m.pedidos[0].turno.historial, [
+    { quien: "lead", texto: "Hola, quiero info de prueba" },
+    { quien: "cande", texto: "Sos programador?" },
+  ]);
+  // Sin el id ni el mismo texto queda el respaldo por la hora: lo de la cuenta de antes de lo guardado entra todo.
+  const sinRed = mundo();
+  assert.equal((await sinRed.agente.procesar("77", sinRed.m.disparo)).hecho, "enviada");
+  assert.ok(sinRed.m.pedidos[0].turno.historial.some((x) => x.texto === "Gracias, automático de prueba"));
+});
+
+test("lo de antes va antes de lo guardado y no repite lo que la base ya tiene (una charla sembrada trae su historia)", async () => {
+  const hilo = hiloIg(
+    enHilo(1, "Algo viejo que no se sembró, de prueba", 900),
+    enHilo(2, "primer mensaje sembrado", 800),
+    enHilo(3, "lo que Cande sembró", 790, { deCuenta: true }),
+    enHilo(4, "Es correcto, de prueba", 0.1),
+  );
+  const { agente, m } = charlaNueva({ instagram: reglasConHilo(hilo) });
+  m.mensajes = [
+    { id: 1, quien: "lead", texto: "primer mensaje sembrado", creado: new Date(AHORA.getTime() - 60000) },
+    { id: 2, quien: "cande", texto: "lo que Cande sembró", creado: new Date(AHORA.getTime() - 60000) },
+    { id: 3, quien: "lead", texto: "Es correcto, de prueba", creado: new Date(AHORA.getTime() - 5000) },
+  ];
+  m.disparo = 3;
+  Object.assign(m.contacto, { respondido_hasta: 1 });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.pedidos[0].turno.historial, [
+    { quien: "lead", texto: "Algo viejo que no se sembró, de prueba" },
+    { quien: "lead", texto: "primer mensaje sembrado" },
+    { quien: "cande", texto: "lo que Cande sembró" },
+  ]);
+});
+
+test("con Instagram apagado, fallando, lento o sin poder leer el hilo, el turno es el mismo que sin Instagram", async () => {
+  const hilo = hiloIg(
+    enHilo(1, "Hola, una consulta de prueba", 700),
+    enHilo(2, "Sos programador?", 200, { deCuenta: true }),
+    enHilo(3, "Es correcto, de prueba", 0.1),
+  );
+  const sinIg = charlaNueva();
+  assert.equal((await sinIg.agente.procesar("77", sinIg.m.disparo)).hecho, "enviada");
+  const esperado = sinIg.m.pedidos[0].turno;
+  assert.deepEqual(esperado.historial, []);
+  assert.ok(!String(esperado.contexto || "").includes(NOTA_HILO_PREVIO));
+  const casos = {
+    // Con solo la lista de seguidos la mirada corre, pero sin el ajuste de Instagram lo que lea no entra.
+    apagado: () => {
+      const w = charlaNueva({ instagram: reglasConHilo(hilo) });
+      Object.assign(w.m.ajustes, { instagram: false, seguidos: true });
+      return w;
+    },
+    falla: () => charlaNueva({ instagram: reglasConHilo(hilo, { hacer: "falla" }) }),
+    tarda: () => charlaNueva({ instagram: reglasConHilo(hilo, { hacer: "tarda" }) }),
+    sinLeer: () => charlaNueva({ instagram: reglasConHilo(hilo, { hacer: "sinLeer" }) }),
+    // Sin la hora de lo guardado no se sabe qué es de antes.
+    sinHora: () => {
+      const w = charlaNueva({ instagram: reglasConHilo(hilo) });
+      delete w.m.mensajes[0].creado;
+      return w;
+    },
+  };
+  for (const [nombre, armarCaso] of Object.entries(casos)) {
+    const w = armarCaso();
+    assert.equal((await w.agente.procesar("77", w.m.disparo)).hecho, "enviada", nombre);
+    assert.deepEqual(w.m.pedidos[0].turno, esperado, nombre);
+    assert.equal(w.m.contacto.previo_ig, undefined, `${nombre}: no se guarda nada, el turno siguiente lo vuelve a leer`);
+  }
+});
+
+test("de lo de antes llegan como mucho los últimos 20, en orden", async () => {
+  const viejos = Array.from({ length: 30 }, (_, i) => enHilo(i + 1, `Mensaje viejo de prueba ${i + 1}`, 600 - i, { deCuenta: i % 2 === 1 }));
+  const { agente, m } = charlaNueva({ instagram: reglasConHilo(hiloIg(...viejos, enHilo(99, "Es correcto, de prueba", 0.1))) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  const { historial } = m.pedidos[0].turno;
+  assert.equal(MAX_PREVIO, 20);
+  assert.equal(historial.length, MAX_PREVIO);
+  assert.deepEqual(historial, viejos.slice(-MAX_PREVIO).map((x) => ({ quien: x.de.id === CUENTA_IG.user_id ? "cande" : "lead", texto: x.texto })));
+});
+
+test("lo que el lead contó por Instagram antes de la base también lo miran los frenos", async () => {
+  const precio = () => salida(["Sale 27 dólares"]);
+  const sinIg = charlaNueva({ responde: precio });
+  assert.equal((await sinIg.agente.procesar("77", sinIg.m.disparo)).hecho, "enviada");
+  const hilo = hiloIg(enHilo(1, "no tengo plata ahora, de prueba", 300), enHilo(2, "Es correcto, de prueba", 0.1));
+  const { agente, m } = charlaNueva({ responde: precio, instagram: reglasConHilo(hilo) });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /no tiene plata/);
+  assert.equal(m.enviados.length, 0);
+});
+
+test("lo de antes se guarda la primera vez: con 14 mensajes en la charla (Instagram trae los últimos 10) sigue en el turno y en los frenos", async () => {
+  // La charla entera, del más viejo al más nuevo: [quien, texto, minutos antes de AHORA]. Los 4 primeros son de antes de la base.
+  const charla = [
+    ["lead", "Hola, quiero una guia de prueba", 600], ["lead", "no tengo plata ahora, de prueba", 599],
+    ["cande", "Guia de que?", 400], ["cande", "Sos programador?", 399],
+    ["lead", "Es correcto, de prueba", 300], ["agente", "Genial de prueba", 299], ["agente", "Que te cuesta mas de prueba?", 298],
+    ["lead", "Las entrevistas de prueba", 200], ["agente", "Te entiendo de prueba", 199], ["agente", "Buscas hace mucho de prueba?", 198],
+    ["lead", "Hace 6 meses de prueba", 100], ["agente", "Te cuento de prueba", 99], ["agente", "Te sirve? de prueba", 98],
+    ["lead", "Si, cuanto sale? de prueba", 50],
+  ];
+  const ultimos10 = (n) => hiloIg(...charla.slice(Math.max(0, n - 10), n)
+    .map(([q, t, min], i) => enHilo(i + 1, t, min, { deCuenta: q !== "lead" })));
+  // Lo que guardó la base: desde que la charla entró, 3 segundos después de la hora de Instagram.
+  const enLaBase = (n) => charla.slice(4, n).map(([quien, texto, min], i) => ({ id: i + 1, quien, texto, creado: new Date(AHORA.getTime() - min * 60000 + 3000) }));
+  const previo = charla.slice(0, 4).map(([quien, texto]) => ({ quien, texto }));
+  let respuestaDelModelo = ["Respuesta de prueba?"];
+  const responde = () => salida(respuestaDelModelo);
+  const turnoCon14 = (m) => {
+    m.mensajes = enLaBase(14);
+    m.disparo = 10;
+    m.contacto.respondido_hasta = 7;
+  };
+
+  // Primer turno: la charla recién entra y el hilo todavía trae lo de antes. Se guarda.
+  const hilo = ultimos10(5);
+  const ig = reglasConHilo(hilo);
+  const { agente, m } = charlaNueva({ instagram: ig, responde });
+  m.mensajes = enLaBase(5);
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.deepEqual(m.pedidos[0].turno.historial, previo);
+  assert.deepEqual(m.contacto.previo_ig, previo);
+
+  // Con 14 mensajes el hilo ya no lo trae, pero lo guardado sigue: en el turno y en los frenos (el precio no sale).
+  hilo.mensajes = ultimos10(14).mensajes;
+  turnoCon14(m);
+  respuestaDelModelo = ["Sale 27 dólares"];
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "frenada");
+  assert.match(r.motivo, /no tiene plata/);
+  assert.deepEqual(m.pedidos[1].turno.historial.slice(0, 4), previo);
+  assert.ok(m.pedidos[1].turno.contexto.includes(NOTA_HILO_PREVIO));
+  assert.deepEqual(m.contacto.previo_ig, previo, "lo guardado no se pisa con lo que trae el hilo ahora");
+
+  // Sin lo guardado, ese mismo turno no lo ve (el hilo ya no lo trae) y el precio sale: lo que lo frena es lo guardado.
+  const sinGuardar = charlaNueva({ instagram: reglasConHilo(ultimos10(14)), responde });
+  turnoCon14(sinGuardar.m);
+  assert.equal((await sinGuardar.agente.procesar("77", sinGuardar.m.disparo)).hecho, "enviada");
+  assert.deepEqual(sinGuardar.m.contacto.previo_ig, [], "leyó el hilo y no había nada de antes: queda guardado vacío");
+});
+
+test("un turno con indicación de Cande trae lo de antes que quedó guardado, sin leer Instagram", async () => {
+  const ig = reglasConHilo(hiloIg(enHilo(1, "Esto no se lee en una indicación, de prueba", 100), enHilo(2, "Es correcto, de prueba", 0.1)));
+  const guardado = [{ quien: "lead", texto: "Como puedo tener una guia de prueba?" }, { quien: "cande", texto: "Sos programador?" }];
+  const { agente, m } = charlaNueva({ instagram: ig });
+  m.contacto.previo_ig = guardado;
+  assert.equal((await agente.procesar("77", null, { evento: "indicacion", indicacion: "contestale lo de la guia" })).hecho, "enviada");
+  assert.equal(ig.miradas, 0, "una indicación no mira Instagram");
+  assert.deepEqual(m.pedidos[0].turno.historial, [...guardado, { quien: "lead", texto: "Es correcto, de prueba" }]);
+  assert.ok(m.pedidos[0].turno.contexto.includes(NOTA_HILO_PREVIO));
+
+  // Sin nada guardado, la indicación no lo lee: va como siempre.
+  const sinNada = charlaNueva({ instagram: reglasConHilo(hiloIg(enHilo(1, "Esto no se lee en una indicación, de prueba", 100))) });
+  assert.equal((await sinNada.agente.procesar("77", null, { evento: "indicacion", indicacion: "contestale lo de la guia" })).hecho, "enviada");
+  assert.deepEqual(sinNada.m.pedidos[0].turno.historial, [{ quien: "lead", texto: "Es correcto, de prueba" }]);
+  assert.equal(sinNada.m.contacto.previo_ig, undefined);
+});
+
+test("lo de antes de hace más de 14 días no entra: un \"no me escribas más\" de hace 100 días no frena", async () => {
+  const hiloDeHace = (dias) => hiloIg(
+    enHilo(1, "no me escribas mas, de prueba", dias * 1440 + 5),
+    enHilo(2, "Te paso el link para pagar, de prueba", dias * 1440, { deCuenta: true }),
+    enHilo(3, "Es correcto, de prueba", 0.1),
+  );
+  // De hace 3 días cuenta y frena: lo que deja pasar el de hace 100 es la antigüedad.
+  const reciente = charlaNueva({ instagram: reglasConHilo(hiloDeHace(3)) });
+  const frenada = await reciente.agente.procesar("77", reciente.m.disparo);
+  assert.equal(frenada.motivo, "pidió que no le escriban");
+  assert.equal(reciente.m.enviados.length, 0);
+
+  const viejo = charlaNueva({ instagram: reglasConHilo(hiloDeHace(100)) });
+  assert.equal((await viejo.agente.procesar("77", viejo.m.disparo)).hecho, "enviada");
+  assert.deepEqual(viejo.m.pedidos[0].turno.historial, []);
+  assert.ok(!String(viejo.m.pedidos[0].turno.contexto || "").includes(NOTA_HILO_PREVIO));
+  assert.deepEqual(viejo.m.contacto.previo_ig, []);
 });
 
 test("el link de MercadoPago cargado en los ajustes sale como un link de pago; uno que no está cargado, no", () => {

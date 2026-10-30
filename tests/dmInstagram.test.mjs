@@ -15,7 +15,8 @@ import assert from "node:assert/strict";
 const {
   fechaDe, leerHilo, esDeLaCuenta, codigoEnHilo, desdeDe, crearInstagram, crearReglasInstagram, buscarCodigos, explicarError,
   ErrorInstagram, usuarioIg, manualEnHilo, desdeManual, manualesEnHilo, esRetomada, CLAVE_RETOMADAS, NO_AHORA, paraPegar,
-  marcaDe, seAnotaComoRetomada, conLaMarca, escritoConLaMarca,
+  marcaDe, seAnotaComoRetomada, conLaMarca, escritoConLaMarca, charlaPrevia, MAX_PREVIO, MARGEN_PREVIO_MS, DIAS_PREVIO,
+  previoGuardado,
 } = await import("../lib/dm/instagram.js");
 
 const AHORA = new Date("2026-10-18T15:00:00Z");
@@ -454,6 +455,155 @@ test("lo que Instagram dice que Cande sigue se suma a la lista", async () => {
   } });
   assert.equal(await reglas.porQueSale(m.contacto), null);
   assert.ok(base.seguidos.has("lead.prueba"));
+});
+
+/* ---------- lo que se habló antes de que la charla entrara a la base (30/10) ---------- */
+
+test("porQueSale deja en la lectura el hilo que leyó, sin otro pedido a Instagram; si no lo pudo leer, la deja como vino", async () => {
+  const rutas = {
+    "/me/conversations": bandeja(hiloCrudo(1, [msj(2, "hola", { min: 1 }), msj(1, "Pregunta de prueba?", { deCuenta: true, min: 120 })])),
+    "/501": perfilDe(false),
+  };
+  const sin = mundoReglas({ contacto: { ig_id: "501" }, rutas });
+  assert.equal(await sin.reglas.porQueSale(sin.m.contacto), null);
+  const con = mundoReglas({ contacto: { ig_id: "501" }, rutas });
+  const lectura = {};
+  assert.equal(await con.reglas.porQueSale(con.m.contacto, {}, lectura), null);
+  assert.deepEqual(con.pedidos.map((p) => p.ruta), sin.pedidos.map((p) => p.ruta), "los mismos pedidos que sin la lectura");
+  assert.equal(lectura.cuenta.user_id, CUENTA.user_id);
+  assert.deepEqual(lectura.hilo.mensajes.map((x) => x.texto), ["hola", "Pregunta de prueba?"]);
+  const falla = mundoReglas({ contacto: { ig_id: "501" }, rutas: {
+    "/me/conversations": () => ({ error: { message: "Error validating access token", code: 190 } }), "/501": perfilDe(false),
+  } });
+  const nada = {};
+  assert.equal(await falla.reglas.porQueSale(falla.m.contacto, {}, nada), null);
+  assert.deepEqual(nada, {});
+  const sinApi = {};
+  assert.equal(await con.reglas.porQueSale(con.m.contacto, { api: false }, sinApi), null);
+  assert.deepEqual(sinApi, {}, "sin el ajuste no se lee nada");
+});
+
+test("charlaPrevia: lo de antes de lo guardado, en orden, sin adjuntos, sin el código, sin lo ya guardado y sin el turno de ahora", () => {
+  const hilo = leerHilo(hiloCrudo(1, [
+    msj(8, "Es correcto, de prueba", { min: 0.05 }),
+    msj(7, "Sos programador?", { deCuenta: true, min: 200 }),
+    msj(6, "--", { deCuenta: true, min: 210 }),
+    { ...msj(5, null, { min: 250 }), message: undefined }, // un adjunto
+    msj(4, "   ", { min: 260 }),
+    { id: "m3", created_time: ISO(hace(270)), message: "sin saber de quién" }, // Instagram no dio el detalle
+    msj(2, "Ya guardado, de prueba", { deCuenta: true, min: 280 }),
+    msj(1, "Hola, una consulta de prueba", { min: 300 }),
+  ]), CUENTA);
+  // Una charla sembrada (todo con la misma hora): lo de la cuenta de antes del primer mensaje del lead ya está guardado.
+  const guardados = [
+    { id: 1, quien: "cande", texto: "ya guardado de prueba", creado: hace(0.01) },
+    { id: 2, quien: "lead", texto: "Es correcto, de prueba", creado: hace(0.01) },
+  ];
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, guardados), [
+    { quien: "lead", texto: "Hola, una consulta de prueba" },
+    { quien: "cande", texto: "Sos programador?" },
+  ]);
+  // Lo ya guardado se mira de su lado: el mismo texto del otro lado entra.
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, [{ quien: "lead", texto: "Ya guardado, de prueba", creado: hace(0.01) }]).map((x) => x.texto),
+    ["Hola, una consulta de prueba", "Ya guardado, de prueba", "Sos programador?"]);
+  // El margen: lo escrito justo antes de lo primero guardado es el turno de ahora.
+  const justo = leerHilo(hiloCrudo(2, [msj(2, "un mensaje distinto de prueba", { min: 1 }), msj(1, "antes de prueba", { min: 5 })]), CUENTA);
+  assert.ok(MARGEN_PREVIO_MS > 0 && MARGEN_PREVIO_MS <= 60000);
+  assert.deepEqual(charlaPrevia(justo, CUENTA, [{ quien: "lead", texto: "otro", creado: new Date(hace(1).getTime() + MARGEN_PREVIO_MS / 2) }]),
+    [{ quien: "lead", texto: "antes de prueba" }]);
+});
+
+test("charlaPrevia: como mucho los últimos 20; sin hilo, sin cuenta o sin la hora de lo guardado, nada", () => {
+  const crudos = Array.from({ length: 30 }, (_, i) => msj(i + 1, `Mensaje de prueba ${i + 1}`, { min: 600 - i, deCuenta: i % 2 === 0 })).reverse();
+  const hilo = leerHilo(hiloCrudo(1, crudos), CUENTA);
+  const guardados = [{ quien: "lead", texto: "Es correcto, de prueba", creado: hace(0) }];
+  const previo = charlaPrevia(hilo, CUENTA, guardados);
+  assert.equal(previo.length, MAX_PREVIO);
+  assert.deepEqual(previo.map((x) => x.texto), Array.from({ length: MAX_PREVIO }, (_, i) => `Mensaje de prueba ${i + 11}`));
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, guardados, { max: 3 }).map((x) => x.texto), ["Mensaje de prueba 28", "Mensaje de prueba 29", "Mensaje de prueba 30"]);
+  assert.deepEqual(charlaPrevia(null, CUENTA, guardados), []);
+  assert.deepEqual(charlaPrevia(hilo, null, guardados), []);
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, [{ quien: "lead", texto: "sin hora" }]), []);
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, []), []);
+});
+
+test("charlaPrevia: la pregunta que la cuenta hizo segundos antes de la respuesta guardada entra y va antes; lo que contesta esa respuesta, no (30/10)", () => {
+  const seg = (s) => s / 60;
+  const hilo = leerHilo(hiloCrudo(1, [
+    msj(4, "Gracias, automático de prueba", { deCuenta: true, min: seg(4) }), // el automático que contesta la respuesta
+    msj(3, "Si, soy dev de prueba", { min: seg(5) }),
+    msj(2, "Sos programador?", { deCuenta: true, min: seg(25) }),
+    msj(1, "Hola, quiero info de prueba", { min: seg(300) }),
+  ]), CUENTA);
+  const esperado = [{ quien: "lead", texto: "Hola, quiero info de prueba" }, { quien: "cande", texto: "Sos programador?" }];
+  // La base guardó la respuesta 3 segundos después de la hora de Instagram.
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, [{ id: 1, quien: "lead", texto: "Si, soy dev de prueba", creado: hace(seg(2)) }]), esperado);
+  // Media hora tarde (ManyChat reintentó): con el mismo texto se encuentra igual, el margen no hace falta.
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, [{ id: 1, quien: "lead", texto: "Si, soy dev de prueba", creado: hace(-30) }]), esperado);
+  // La guardó la red de la bandeja: por su id de Instagram, aunque el texto no coincida.
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, [{ id: 1, quien: "lead", texto: "otro texto de prueba", creado: hace(seg(5)), ig_mid: "m3" }]), esperado);
+  // Si no se encuentra, el margen queda de respaldo solo para lo del lead: la pregunta de la cuenta entra igual.
+  const sinCorte = charlaPrevia(hilo, CUENTA, [{ id: 1, quien: "lead", texto: "otro texto de prueba", creado: hace(seg(2)) }]);
+  assert.ok(sinCorte.some((x) => x.quien === "cande" && x.texto === "Sos programador?"));
+  assert.ok(!sinCorte.some((x) => x.texto === "Si, soy dev de prueba"), "el turno de ahora no entra");
+});
+
+test("charlaPrevia: un \"Si\" de antes sigue entrando aunque el lead conteste \"Si\" más tarde; cada guardado saca uno solo", () => {
+  const hilo = leerHilo(hiloCrudo(1, [
+    msj(6, "Si", { min: 10 / 60 }), // el turno de ahora (guardado)
+    msj(5, "Estas buscando trabajo? de prueba", { deCuenta: true, min: 1 }), // el agente (guardado)
+    msj(4, "Hola de nuevo, de prueba", { min: 2 }), // lo primero guardado
+    msj(3, "Si", { min: 60 }),
+    msj(2, "Sos programador?", { deCuenta: true, min: 62 }),
+    msj(1, "Hola, quiero info de prueba", { min: 120 }),
+  ]), CUENTA);
+  const guardados = (primero) => [
+    { id: 1, quien: "lead", texto: primero, creado: hace(118 / 60) },
+    { id: 2, quien: "agente", texto: "Estas buscando trabajo? de prueba", creado: hace(61 / 60) },
+    { id: 3, quien: "lead", texto: "Si", creado: hace(8 / 60) },
+  ];
+  const esperado = [
+    { quien: "lead", texto: "Hola, quiero info de prueba" }, { quien: "cande", texto: "Sos programador?" }, { quien: "lead", texto: "Si" },
+  ];
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, guardados("Hola de nuevo, de prueba")), esperado);
+  // Sin el corte (lo primero guardado llegó con otro texto): lo guardado dos turnos después no cuenta, solo el bloque del principio.
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, guardados("Hola de nuevo con otro texto, de prueba")), esperado);
+
+  // Una charla sembrada con uno solo de dos mensajes iguales de la cuenta: saca uno, el más nuevo, y el otro entra.
+  const sembrada = leerHilo(hiloCrudo(2, [
+    msj(4, "Es correcto, de prueba", { min: 0.1 }),
+    msj(3, "Te escribo de prueba", { deCuenta: true, min: 280 }),
+    msj(2, "Ok", { min: 290 }),
+    msj(1, "Te escribo de prueba", { deCuenta: true, min: 300 }),
+  ]), CUENTA);
+  assert.deepEqual(charlaPrevia(sembrada, CUENTA, [
+    { id: 1, quien: "cande", texto: "Te escribo de prueba", creado: hace(1) },
+    { id: 2, quien: "lead", texto: "Es correcto, de prueba", creado: hace(1) },
+  ]), [{ quien: "cande", texto: "Te escribo de prueba" }, { quien: "lead", texto: "Ok" }]);
+});
+
+test("charlaPrevia: solo lo de los últimos 14 días antes de lo primero guardado; lo más viejo no entra", () => {
+  const hilo = leerHilo(hiloCrudo(1, [
+    msj(4, "Hola de nuevo, de prueba", { min: 0.1 }),
+    msj(3, "Una consulta de hace poco, de prueba", { min: 13 * 1440 }),
+    msj(2, "Te paso el link para pagar, de prueba", { deCuenta: true, min: 100 * 1440 }),
+    msj(1, "no me escribas mas, de prueba", { min: 100 * 1440 + 5 }),
+  ]), CUENTA);
+  const guardados = [{ id: 1, quien: "lead", texto: "Hola de nuevo, de prueba", creado: hace(0) }];
+  assert.equal(DIAS_PREVIO, 14);
+  assert.deepEqual(charlaPrevia(hilo, CUENTA, guardados), [{ quien: "lead", texto: "Una consulta de hace poco, de prueba" }]);
+  assert.equal(charlaPrevia(hilo, CUENTA, guardados, { dias: 200 }).length, 3, "lo que lo deja afuera es la antigüedad");
+});
+
+test("previoGuardado: lo guardado como lo usa el turno; null si todavía no se guardó", () => {
+  assert.equal(previoGuardado(null), null);
+  assert.equal(previoGuardado(undefined), null);
+  assert.equal(previoGuardado({ quien: "lead" }), null);
+  assert.deepEqual(previoGuardado([]), []);
+  assert.deepEqual(previoGuardado([
+    { quien: "lead", texto: "Hola de prueba", en: 1 }, { quien: "agente", texto: "otro lado" }, { quien: "cande", texto: "  " },
+    null, { quien: "cande", texto: 3 }, { quien: "cande", texto: "Sos programador?" },
+  ]), [{ quien: "lead", texto: "Hola de prueba" }, { quien: "cande", texto: "Sos programador?" }]);
 });
 
 /* ---------- Cande escribiendo a mano, y el permiso con el que publica el sitio ---------- */
