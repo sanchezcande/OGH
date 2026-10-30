@@ -35,7 +35,7 @@ test("otras palabras no disparan", () => {
 
 test("lo que contesta lleva la agenda, y ni el doc ni el link de pago", () => {
   const todo = PALABRAS.trabajo.textos.join(" ");
-  assert.match(todo, /opengatehub\.com\/llamada/, "el que va es el link de agendar");
+  assert.match(todo, /opengatehub\.com\/15min/, "el que va es el link de agendar");
   assert.ok(!/docs\.google\.com/.test(todo), "el doc muere en la charla (Hooman, 31/10): va a la llamada");
   assert.ok(!/gumroad|pagar-pesos/.test(todo), "el link de pago sirve solo para pagar (Hooman, 28/10)");
 });
@@ -43,8 +43,8 @@ test("lo que contesta lleva la agenda, y ni el doc ni el link de pago", () => {
 test("el link va limpio, sin parámetros", () => {
   const todo = PALABRAS.trabajo.textos.join(" ");
   // Un link con ?utm= o ?de= le da desconfianza al dev, y a Cande ya la acusaron de estafa esta
-  // semana. La cuenta de clicks pasa del lado del servidor, en pages/llamada.js.
-  assert.ok(!/opengatehub\.com\/llamada\?/.test(todo), "el link que ve el dev no lleva parámetros");
+  // semana. La cuenta de clicks pasa del lado del servidor, en pages/15min.js.
+  assert.ok(!/opengatehub\.com\/15min\?/.test(todo), "el link que ve el dev no lleva parámetros");
 });
 
 test("no repite lo que ya dice la historia", () => {
@@ -55,7 +55,7 @@ test("no repite lo que ya dice la historia", () => {
 });
 
 test("la página de la agenda cuenta el click antes de redirigir", () => {
-  const src = readFileSync(new URL("../pages/llamada.js", import.meta.url), "utf8");
+  const src = readFileSync(new URL("../pages/15min.js", import.meta.url), "utf8");
   assert.match(src, /guardarEvento\(/, "sin esto Cande no sabe cuánta gente abre el calendario");
   assert.match(src, /redirect:/, "y tiene que terminar en el calendario de Google");
   assert.match(src, /catch/, "medir nunca puede romper el click");
