@@ -1,5 +1,8 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
+import { BotIdClient } from "botid/client";
+
+import { RUTAS_PROTEGIDAS } from "../lib/rutasProtegidas";
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -32,6 +35,11 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          {/* El captcha invisible de Vercel (BotID), 30/10. No se ve, no hay que apretar nada y no
+              pide claves: es un script que le pega una prueba a los envíos de los formularios para
+              que el servidor sepa que salieron de un navegador y no de un script. En desarrollo no
+              renderiza nada. Tiene que estar en todas las páginas, por eso va acá. */}
+          <BotIdClient protect={RUTAS_PROTEGIDAS} />
           {/* Tipografías: Newsreader (títulos), Inter (texto), Space Grotesk (logo y etiquetas) */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
