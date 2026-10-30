@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import SEO from "../src/components/SEO/SEO";
 import ClosingCall from "../src/components/ClosingCall/ClosingCall";
 import IndiceSecciones from "../src/components/IndiceSecciones/IndiceSecciones";
+import { SECCIONES_HOME } from "../lib/seccionesHome";
 import {
   Body,
   Button,
@@ -34,15 +35,6 @@ const COPY = {
       description:
         "Te conseguimos el developer senior que tu proyecto necesita. 100% remoto y entrevistado por nosotros antes de que lo conozcas. Llamada gratis de 20 minutos.",
     },
-    indice: [
-      { id: "que-incluye", label: "Qué incluye" },
-      { id: "casos-de-uso", label: "Casos de uso" },
-      { id: "como-evaluamos", label: "Nuestro filtro" },
-      { id: "como-funciona", label: "Cómo funciona" },
-      { id: "clientes", label: "Clientes" },
-      { id: "testimonios", label: "Testimonios" },
-      { id: "preguntas", label: "Preguntas" },
-    ],
     hero: {
       eyebrow: "Staff augmentation · Contratación de developers",
       title: "Te conseguimos el developer que tu proyecto necesita.",
@@ -179,15 +171,6 @@ const COPY = {
       description:
         "We find, interview and place senior remote developers in your team. We interview each one before you meet them. Free 20-minute call.",
     },
-    indice: [
-      { id: "que-incluye", label: "What's included" },
-      { id: "casos-de-uso", label: "Use cases" },
-      { id: "como-evaluamos", label: "Our filter" },
-      { id: "como-funciona", label: "How it works" },
-      { id: "clientes", label: "Clients" },
-      { id: "testimonios", label: "Testimonials" },
-      { id: "preguntas", label: "FAQ" },
-    ],
     hero: {
       eyebrow: "Staff augmentation · Developer hiring",
       title: "Hire senior developers who fit your team.",
@@ -443,7 +426,7 @@ export default function HomePage() {
       </Hero>
 
       {/* El índice de la página. Va pegado abajo del menú y lleva a cada sección. */}
-      <IndiceSecciones items={copy.indice} etiqueta={lang === "en" ? "Sections on this page" : "Secciones de esta página"} />
+      <IndiceSecciones items={SECCIONES_HOME[lang]} etiqueta={lang === "en" ? "Sections on this page" : "Secciones de esta página"} />
 
       {/* Qué es gratis y qué se paga */}
       <Section $tight id="que-incluye">
