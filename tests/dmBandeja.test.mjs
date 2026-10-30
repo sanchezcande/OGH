@@ -20,7 +20,7 @@ import { readFile } from "node:fs/promises";
 const {
   revisarBandeja, vigilarRed, armarResumen, faltantes, sinRespuesta, identificar, haceCuanto, esConocida, esAutomatico, largoVisible,
   GRACIA_MS, RESUMEN_CADA_MS, TITULO_RESUMEN, SECCION_VOS, SECCION_MANO, SECCION_ETIQUETA, BUSQUEDAS_POR_VUELTA, LARGO_AVISO,
-  CHARLAS_POR_PAGINA, ETIQUETA_AGENTE,
+  CHARLAS_POR_PAGINA, ETIQUETA_AGENTE, PAGINAS_RAPIDA, RED_CAIDA_MS,
 } = await import("../lib/dm/bandeja.js");
 const { crearInstagram } = await import("../lib/dm/instagram.js");
 const { crearAgente, SIN_TEXTO } = await import("../lib/dm/agente.js");
@@ -203,6 +203,8 @@ function mundo({
   w.avisar = async (titulo, campos, opciones) => { w.avisos.push({ titulo, campos, opciones }); return true; };
   w.resumenes = () => w.avisos.filter((a) => a.titulo === TITULO_RESUMEN);
   w.revisar = (extra = {}) => revisarBandeja({ ig: w.ig, base: w.base, manychat: w.manychat, aj: w.aj, avisar: w.avisar, ahora: () => w.ahora, ...extra });
+  /** La pasada rápida (pages/api/dm/bandeja-rapida.js, cada 3 minutos): la primera página y nada del cursor. */
+  w.rapida = (extra = {}) => w.revisar({ rapida: true, ...extra });
   w.delContacto = (id) => w.mensajes.filter((m) => m.contacto === id);
   w.pasar = (min) => { w.ahora = new Date(w.ahora.getTime() + min * MIN); };
   return w;
@@ -1060,6 +1062,111 @@ test("después de la primera vez, cada vuelta lee solo lo movido desde la anteri
   assert.equal((await w.revisar()).paginas, 2);
 });
 
+/* ---------- 9 bis. la pasada rápida (30/10) ---------- */
+
+// Desde que ManyChat pausó sus automatizaciones nadie le avisa al agente de un mensaje nuevo: el único camino es esta
+// red, que barre de a 10 páginas desde un cursor que gira, así que un mensaje que acaba de llegar podía tardar media
+// hora en verse. La pasada rápida lee una sola página (la de arriba) cada 3 minutos. Lo que no puede hacer es pisar el
+// cursor del barrido: si lo pisara, el barrido empezaría de nuevo en cada vuelta y el fondo de la bandeja no se
+// miraría nunca.
+
+/** Charlas contestadas de relleno, de las más nuevas a las más viejas (las que empujan al resto hacia abajo). */
+const relleno = (n, desdeMin = 20) => Array.from({ length: n }, (_, i) =>
+  charla(1000 + i, persona(`${9000 + i}`, `relleno.${i}`), [["lead", "hola", desdeMin + 1 + i], ["cuenta", "Respuesta de prueba", desdeMin + i]]));
+
+test("la pasada rápida lee una sola página, aunque haya varias", async () => {
+  const w = mundo({ hilos: relleno(3 * CHARLAS_POR_PAGINA) });
+  const r = await w.rapida();
+  assert.equal(r.paginas, PAGINAS_RAPIDA);
+  assert.equal(r.paginas, 1);
+  assert.equal(w.pedidosIg.filter((x) => x === "/me/conversations").length, 1, "un solo pedido a Meta por vuelta");
+});
+
+test("la pasada rápida ve el mensaje nuevo de arriba sin tocar el cursor del barrido, y el barrido sigue hasta el fondo", async () => {
+  const w = mundo({
+    contactos: [
+      { id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente" },
+      { id: "88", nombre: "Otro lead del agente", ig_id: "801", ig_usuario: "lead.otro" },
+    ],
+    // Dos páginas de charlas contestadas y, debajo de todas, una del agente con un mensaje que nunca llegó.
+    hilos: [...relleno(2 * CHARLAS_POR_PAGINA), charla(1, OTRO, [["lead", "perdido del fondo de prueba", 600]])],
+  });
+  // El barrido se corta por tiempo en la primera página (cada página le lleva a Meta 20 segundos): queda su cursor.
+  w.alPedir = (ruta) => { if (ruta === "/me/conversations") w.pasar(1 / 3); };
+  assert.equal((await w.revisar({ hasta: AHORA.getTime() + 40000 })).paginas, 1);
+  w.alPedir = null;
+  const cursor = JSON.parse(JSON.stringify(w.config.bandeja_paginas));
+  assert.ok(cursor.cursor && cursor.objetivo, "el barrido quedó a mitad de camino");
+
+  // Ahora escribe alguien en una charla del agente: su charla salta al puesto 1.
+  w.pasar(1);
+  w.hilos.push(charla(2, DEL_AGENTE, [["lead", "mensaje nuevo de prueba", 4]]));
+  const r = await w.rapida();
+  assert.equal(r.recuperados, 1, "lo vio en la primera página");
+  assert.equal(w.delContacto("77").length, 1);
+  assert.deepEqual(w.config.bandeja_paginas, cursor, "el cursor del barrido quedó intacto");
+
+  // Y el barrido retoma donde quedó: llega a la charla del fondo, que la rápida nunca iba a ver.
+  w.pasar(CADA_MIN);
+  assert.equal((await w.revisar()).recuperados, 1);
+  assert.equal(w.delContacto("88").length, 1);
+});
+
+test("la pasada rápida no deja la marca de una vuelta entera: vigilarRed sigue midiendo las del barrido", async () => {
+  const w = mundo({ hilos: relleno(CHARLAS_POR_PAGINA) });
+  await w.rapida();
+  assert.equal(w.config.bandeja_paginas, undefined, "ni la primera vez la escribe");
+  // Con la marca escrita, vigilarRed tomaría la pasada rápida por una vuelta entera y no avisaría nunca.
+  const alEmpezar = () => vigilarRed({ base: w.base, avisar: w.avisar, alEmpezar: true, ahora: () => w.ahora });
+  assert.equal(await alEmpezar(), false, "el primer intento solo anota desde cuándo");
+  w.pasar(RED_CAIDA_MS / MIN + 1);
+  await w.rapida();
+  assert.equal(await alEmpezar(), true, "la red lleva una hora sin una vuelta entera y se avisa igual");
+  assert.equal(w.avisos.at(-1).titulo, "DM: la red de la bandeja no anda");
+});
+
+test("el barrido que corre después de una pasada rápida no guarda ni contesta dos veces el mismo mensaje", async () => {
+  const w = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente" }],
+    hilos: [charla(1, DEL_AGENTE, [["lead", "mensaje nuevo de prueba", 5]])],
+  });
+  assert.equal((await w.rapida()).recuperados, 1);
+  w.pasar(3);
+  assert.equal((await w.revisar()).recuperados, 0, "ya está en la base, con su ig_mid");
+  assert.equal(w.delContacto("77").length, 1);
+  assert.equal(w.resumenes().length, 0);
+});
+
+test("la pasada rápida no reintenta las etiquetas que quedaron debiendo: eso es del barrido", async () => {
+  const w = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente" }],
+    hilos: [charla(1, DEL_AGENTE, [["lead", "mensaje nuevo de prueba", 5]])],
+    config: { bandeja_estado: { etiquetas: { 77: { nombre: "Lead del agente", desde: hace(40).toISOString() } } } },
+  });
+  w.etiquetaCaida = true;
+  await w.rapida();
+  // La única etiqueta que pidió es la del mensaje que acaba de guardar, no la que quedó debiendo de antes.
+  assert.equal(w.etiquetas.length, 1);
+  w.pasar(3);
+  w.etiquetaCaida = false;
+  await w.revisar();
+  assert.ok(w.etiquetas.length > 1, "el barrido sí la reintenta");
+  assert.deepEqual(w.config.bandeja_estado.etiquetas, {});
+});
+
+test("la pasada rápida pasa por las mismas trabas: una charla que otra corrida está contestando queda para después", async () => {
+  const w = mundo({
+    contactos: [{ id: "77", nombre: "Lead del agente", ig_id: "501", ig_usuario: "lead.agente" }],
+    hilos: [charla(1, DEL_AGENTE, [["lead", "mensaje nuevo de prueba", 5]])],
+  });
+  w.tomado.set("77", "otra-corrida");
+  assert.equal((await w.rapida()).recuperados, 0);
+  assert.equal(w.delContacto("77").length, 0);
+  w.tomado.delete("77");
+  w.pasar(3);
+  assert.equal((await w.rapida()).recuperados, 1);
+});
+
 /* ---------- 10. si algo falla ---------- */
 
 test("una charla que falla (Instagram que limita al leerla) no frena a las demás ni al resumen", async () => {
@@ -1285,6 +1392,34 @@ test("el cron de la bandeja no entra sin CRON_SECRET, corre cada 15 minutos y no
   assert.equal(config.maxDuration, 120);
   const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
   assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja"), { path: "/api/dm/bandeja", schedule: "*/15 * * * *" });
+});
+
+test("el cron de la pasada rápida: la misma guarda del secreto, cada 3 minutos, en minutos que no son los del barrido, y sin ids", async () => {
+  const { default: handler, config } = await import("../pages/api/dm/bandeja-rapida.js");
+  const llamar = async (req) => { const res = respuesta(); await handler(req, res); return res; };
+  delete process.env.CRON_SECRET;
+  assert.equal((await llamar(pedido())).codigo, 401);
+  process.env.CRON_SECRET = "secreto-de-prueba";
+  try {
+    assert.equal((await llamar(pedido({ headers: { authorization: "Bearer otro" } }))).codigo, 401);
+    const bien = await llamar(pedido({ headers: { authorization: "Bearer secreto-de-prueba" } }));
+    assert.equal(bien.codigo, 200);
+    assert.deepEqual(bien.cuerpo, { ok: true, motivo: "sin base" });
+  } finally {
+    delete process.env.CRON_SECRET;
+  }
+  const src = await readFile(new URL("../pages/api/dm/bandeja-rapida.js", import.meta.url), "utf8");
+  // Como el barrido: una página de la bandeja puede llevarle 25 segundos a Meta, y con un presupuesto más corto la
+  // vuelta se iba entera en pedir la página y no se miraba ninguna charla. Entra antes de la vuelta siguiente.
+  assert.equal(config.maxDuration, 120);
+  assert.match(src, /const MARGEN_S = 40;/);
+  assert.match(src, /rapida: true/);
+  // Anotar acá un intento cada 3 minutos le haría avisar "la red no anda" todo el tiempo: el reloj de la red caída
+  // mide las vueltas del barrido. Lo que sí avisa es Instagram caído (reglasInstagram.fallo).
+  assert.ok(!/vigilarRed\(/.test(src.replace(/^\s*\/\/.*$/gm, "")), "no la llama");
+  assert.match(src, /reglasInstagram\.fallo/);
+  const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja-rapida"), { path: "/api/dm/bandeja-rapida", schedule: "1-59/3 * * * *" });
 });
 
 test("las consultas de la red: guardar solo en charlas del agente, sin repetir, con su propio tope, y un eco por mensaje", async () => {
