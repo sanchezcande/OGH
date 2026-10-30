@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import ReCAPTCHA from "react-google-recaptcha";
+
+import { useTrampa } from "../../../lib/trampaForm";
 import { Body, Button, H3, Small, TextLink, color, font, mq, useLang } from "../../styles/kit";
 
 // Formulario de la página de contacto, para quien prefiere escribir antes que agendar.
@@ -109,6 +111,9 @@ const EstimateForm = () => {
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
   const [captchaMissing, setCaptchaMissing] = useState(false);
+  // El reloj y la trampa (lib/trampaForm.js). El captcha de abajo solo lo ve el que abre la página:
+  // esto es lo que mira la API del que le pega directo (lib/antispam.js).
+  const { campos: camposTrampa, trampa } = useTrampa();
 
   const formRef = useRef(null);
   const sentRef = useRef(null);
@@ -161,6 +166,9 @@ const EstimateForm = () => {
           email: values.email.trim(),
           company: values.company.trim(),
           message: buildMessage(values),
+          // Hasta hoy el token se quedaba en la página y la API nunca lo miraba.
+          captcha: captchaToken,
+          ...camposTrampa(),
         }),
       });
 
@@ -198,6 +206,7 @@ const EstimateForm = () => {
 
   return (
     <Form ref={formRef} onSubmit={handleSubmit} noValidate>
+      {trampa}
       <Field>
         <Label htmlFor="estimate-name">{copy.fields.name}</Label>
         <Input

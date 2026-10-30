@@ -32,6 +32,10 @@ export default function Preguntas() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [web, setWeb] = useState("");
+  // Cuándo se abrió el formulario: lo mira el guardia de la API (lib/antispam.js), que descarta los
+  // envíos de menos de dos segundos. La trampa de esta página es el campo `web` de acá arriba, que
+  // ya existía desde el 18/09 y se queda como está.
+  const abierto = useRef(Date.now());
   const [whatsapp, setWhatsapp] = useState("");
   const [estado, setEstado] = useState("form"); // form | enviando | listo
   const [error, setError] = useState("");
@@ -72,7 +76,7 @@ export default function Preguntas() {
       const r = await fetch("/api/preguntas-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, web, whatsapp, origen: router.query.o || "dm", quiere: pide }),
+        body: JSON.stringify({ nombre, email, web, whatsapp, origen: router.query.o || "dm", quiere: pide, t0: abierto.current }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) {
