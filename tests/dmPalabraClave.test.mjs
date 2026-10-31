@@ -30,7 +30,28 @@ test("adentro de una frase NO dispara", () => {
 });
 
 test("otras palabras no disparan", () => {
-  for (const t of ["cv", "dev", "hola", "", null, undefined, "   "]) assert.equal(palabraClaveDe(t), null);
+  // "dev" era de ManyChat y apuntaba a founders: no se portó (0 ejecuciones desde el 02/10 y la
+  // oferta de esa automatización ya no es la de ahora).
+  for (const t of ["dev", "hola", "", null, undefined, "   "]) assert.equal(palabraClaveDe(t), null);
+});
+
+test("CV manda la lista y NO le pasa la charla a Cande", () => {
+  const cv = palabraClaveDe("CV");
+  assert.ok(cv, "CV sola tiene que disparar: es lo que hacía ManyChat y ya no contesta");
+  assert.equal(cv.pasa, false, "la lista es un link que se sirve solo: la charla sigue con el agente");
+  assert.equal(cv.textos.length, 1);
+  assert.match(cv.textos[0], /opengatehub\.com\/devs/);
+  assert.equal(palabraClaveDe("cv"), cv, "en minúscula es la misma");
+  assert.equal(palabraClaveDe("mandé muchos cv y nada"), null, "adentro de una frase no");
+});
+
+test("CV dice lo mismo por DM que por comentario", async () => {
+  const { TEXTO_CV } = await import("../lib/dm/comentarios.js");
+  assert.equal(palabraClaveDe("cv").textos[0], TEXTO_CV, "una sola redacción para la misma promesa");
+});
+
+test("TRABAJO sí le pasa la charla a Cande", () => {
+  assert.equal(palabraClaveDe("TRABAJO").pasa, true);
 });
 
 test("lo que contesta lleva la agenda, y ni el doc ni el link de pago", () => {
