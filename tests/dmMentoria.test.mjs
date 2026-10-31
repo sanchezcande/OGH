@@ -18,7 +18,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { base as pg } from "./dobles/postgres.mjs";
 
-const { revisar, sinSeguimiento, charlaParaLaPlata, ofertaDe, DOC_1A1, LINK_PAGO_1A1 } = await import("../lib/dm/frenos.js");
+const { revisar, sinSeguimiento, charlaParaLaPlata, ofertaDe, DOC_1A1, LINK_PAGO_1A1, AGENDA_1A1 } = await import("../lib/dm/frenos.js");
 const { esParaCande } = await import("../lib/dm/resumen.js");
 const C = await import("../lib/dm/controlador.js");
 const { NOTA_COMPRO, notaPerfil } = await import("../lib/dm/pagina.js");
@@ -47,16 +47,20 @@ test("el doc del 1 a 1 pasa como link, con o sin /edit y con https, a un dev", (
   pasa([`Te dejo el detalle\nhttps://${DOC_1A1.replace(/\/edit$/, "")}`]);
 });
 
-test("el link de Gumroad del 1 a 1 pasa a un dev, con o sin https", () => {
-  pasa([`Genial, por acá reservás\n${LINK_PAGO_1A1}`]);
-  pasa([`Va de nuevo\nhttps://${LINK_PAGO_1A1}`]);
+test("el 1 a 1 se cierra en una llamada: la agenda de Cande pasa (con o sin www y https) y el link de Gumroad del 1 a 1 no sale nunca", () => {
+  // Cande, 31/10: "NO TIENE QUE MANDAR EL LINK DE PAGO, tiene que mandar link a mi calendario".
+  pasa([`Genial! Te cuento todo en una llamada de 15 minutos, agendá acá:\nwww.${AGENDA_1A1}`]);
+  pasa([`Va de nuevo\nhttps://www.${AGENDA_1A1}`]);
+  pasa([`Agendá acá\n${AGENDA_1A1}`]);
+  frena([`Genial, por acá reservás\n${LINK_PAGO_1A1}`]);
+  frena([`Va de nuevo\nhttps://${LINK_PAGO_1A1}`]);
 });
 
 test("473 y 500 pasan hablando del 1 a 1 (con su link, su doc, '1 a 1' o 'cuando firmás')", () => {
   pasa(["Arranca en 473 dólares y son 500 al final, cuando firmás", `Está todo acá\n${DOC_1A1}`]);
   pasa(["El 1 a 1 arranca con USD 473"]);
   pasa(["Y 500 dólares cuando firmás"]);
-  pasa([`473 dólares de entrada\n${LINK_PAGO_1A1}`]);
+  pasa([`473 dólares de entrada, te cuento todo en la llamada\nwww.${AGENDA_1A1}`]);
 });
 
 test("el marco de los 5 devs y los 5 lugares de este mes no es urgencia", () => {
