@@ -8,8 +8,8 @@
 // Convive con ManyChat en vez de reemplazarlo de golpe: el 30/10, mandando uno de verdad, se vio
 // que el automático de CV de ManyChat seguía vivo y contestaba los comentarios a los 7 segundos
 // (@juliovasquez_m.a recibió el mismo link dos veces por eso). Así que antes de mandar se mira la
-// bandeja y a quien ya recibió algo de la cuenta no se le manda nada: esto contesta solo lo que
-// ManyChat dejó pasar. Cuando la automatización de ManyChat esté de verdad apagada, esto contesta
+// bandeja y a quien ya recibió algo de la cuenta desde que comentó (o el DM de CV, cuando sea) no se
+// le manda nada: esto contesta solo lo que ManyChat dejó pasar. Cuando la automatización de ManyChat esté de verdad apagada, esto contesta
 // todo sin que haya que cambiarle nada.
 //
 // Arranca apagado: se prende con dm_config "comentarios" en { activo: true }. El tope por vuelta
@@ -19,13 +19,19 @@
 import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
 import { ajustes, hayBase, leerConfig } from "../../../lib/dm/base";
 import { contestarComentarios } from "../../../lib/dm/comentarios";
-import { anotarComentario, contarComentarios, soltarComentario, tablaComentarios, tomarComentario } from "../../../lib/dm/comentariosBase";
+import {
+  anotarComentario, anotarEnDuda, anotarYaContestado, comentariosEnLaBase, contarComentarios, soltarComentario, soltarDuda, tablaComentarios,
+  tomarComentario, usuariosConDm,
+} from "../../../lib/dm/comentariosBase";
 
 const TOPE_POR_VUELTA = 10;
+/** Pasado este rato la vuelta no empieza nada nuevo (ver `limite` en contestarComentarios). */
+const TIEMPO_MS = 90000;
 /** Los posts y reels que mira cada vuelta: con 6 por día, 25 cubre de sobra los 7 días de la ventana. */
 const MEDIOS_POR_VUELTA = 25;
 
 export default async function handler(req, res) {
+  const arranque = Date.now();
   const s = process.env.CRON_SECRET;
   if (!s || req.headers.authorization !== `Bearer ${s}`) return res.status(401).json({ error: "no" });
   if (!hayBase()) return res.status(200).json({ ok: true, motivo: "sin base" });
@@ -42,7 +48,9 @@ export default async function handler(req, res) {
   try {
     const cuentas = await contestarComentarios({
       ig: instagram,
-      base: { tomarComentario, anotarComentario, soltarComentario },
+      base: { tomarComentario, anotarComentario, soltarComentario, comentariosEnLaBase, anotarYaContestado, anotarEnDuda, soltarDuda, usuariosConDm },
+      // Lo que falta para los 120 segundos queda de margen para el envío que esté saliendo.
+      limite: arranque + TIEMPO_MS,
       avisar: avisarDm,
       tope: Number.isInteger(ajuste.tope) && ajuste.tope > 0 ? ajuste.tope : TOPE_POR_VUELTA,
       mediosQueMira: MEDIOS_POR_VUELTA,
@@ -57,5 +65,6 @@ export default async function handler(req, res) {
   }
 }
 
-// Mirar la bandeja antes de mandar se lleva unos 30 segundos (ver bandejaDe en lib/dm/comentarios.js).
+// Mirar la bandeja antes de mandar se lleva unos 30 segundos (ver bandejaDe en lib/dm/comentarios.js),
+// leer los comentarios otros 30, y buscar charlas de a una, unos segundos cada una (como mucho 5).
 export const config = { maxDuration: 120 };
