@@ -139,14 +139,20 @@ function armar({ comentarios, fallas = {}, tomados = new Set(), bandeja = null, 
   const avisos = [];
   const dobleBase = {
     tomarComentario: async (id, datos) => {
-      if (base.tomados.has(id)) return false;
+      // Un "sin_aceptar" al que ya le toca otro intento se puede volver a tomar: es el único estado
+      // que vuelve, porque lo que lo frenaba (la solicitud) lo destraba Cande sin tocar el código.
+      const vuelve = base.sinAceptarVencidos?.has(id) && base.filas.get(id)?.estado === "sin_aceptar";
+      if (base.tomados.has(id) && !vuelve) return false;
       base.tomados.add(id);
-      base.filas.set(id, { ...datos, estado: "enviando" });
+      base.filas.set(id, { ...base.filas.get(id), ...datos, estado: "enviando" });
       return true;
     },
     anotarComentario: async (id, estado, extra = {}) => base.filas.set(id, { ...base.filas.get(id), estado, ...extra }),
     // `dudasVencidas`: las dudas que ya pasaron DUDA_HORAS y vuelven a mirarse.
-    comentariosEnLaBase: async (ids) => ids.filter((id) => base.tomados.has(id) && !(base.dudasVencidas?.has(id))),
+    // `sinAceptarVencidos`: los que cayeron en una solicitud sin aceptar y ya les toca otro intento.
+    comentariosEnLaBase: async (ids) => ids.filter((id) =>
+      base.tomados.has(id) && !(base.dudasVencidas?.has(id)) && !(base.sinAceptarVencidos?.has(id))),
+    comentariosParaReintentar: async (ids) => ids.filter((id) => base.sinAceptarVencidos?.has(id)),
     soltarDuda: async (id) => {
       if (base.filas.get(id)?.estado !== "en_duda") return;
       base.filas.delete(id);
@@ -625,7 +631,44 @@ test("el cron no entra sin CRON_SECRET, corre cada 15 minutos y arranca apagado"
 test("la constancia va antes del envío y no se borra una que ya salió", async () => {
   const src = await readFile(new URL("../lib/dm/comentariosBase.js", import.meta.url), "utf8");
   // Tomar es un INSERT que no pisa: si el comentario ya estaba, no devuelve fila y no se manda nada.
-  assert.match(src, /INSERT INTO dm_comentarios[\s\S]*ON CONFLICT \(id\) DO NOTHING RETURNING id/);
+  // La única excepción es el que cayó en una solicitud sin aceptar y ya pasó SIN_ACEPTAR_HORAS: ese
+  // vuelve a quedar en "enviando" porque Cande puede haber aceptado la solicitud mientras tanto.
+  // Cualquier otro estado (enviada, ya_tenia, vencido, error) no entra en ese WHERE y no vuelve.
+  assert.match(src, /INSERT INTO dm_comentarios[\s\S]*ON CONFLICT \(id\) DO UPDATE SET estado = 'enviando'[\s\S]*WHERE dm_comentarios\.estado = 'sin_aceptar'[\s\S]*RETURNING id/);
   assert.match(src, /DELETE FROM dm_comentarios WHERE id = \$\{String\(id\)\} AND estado = 'enviando'/, "soltar solo lo que no salió");
   assert.match(src, /id\s+TEXT PRIMARY KEY/, "un comentario, una fila");
+});
+
+// ---- el que quedó en una solicitud sin aceptar ----
+//
+// El aviso que recibe Cande dice "aceptale la solicitud en Instagram y le mando la lista". Hasta el
+// 31/10 esa promesa era falsa: el comentario quedaba anotado y no se intentaba nunca más, así que
+// ella aceptaba y no pasaba nada. Ahora vuelve a entrar pasadas SIN_ACEPTAR_HORAS.
+
+test("un comentario que quedó en una solicitud sin aceptar se reintenta, y si ya la aceptó sale", async () => {
+  const fallas = { c1: Object.assign(new Error("(#10) no es propietaria del hilo"), { code: 10, subcode: 2534037 }) };
+  const d = armar({ comentarios: [CS[0]], fallas });
+  const r1 = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r1.sin_aceptar, 1);
+  assert.equal(d.base.filas.get("c1").estado, "sin_aceptar");
+  assert.equal(d.avisos.length, 1, "la primera vez sí le avisa a Cande");
+
+  // Tres horas después, con la solicitud ya aceptada: el mismo comentario vuelve a entrar y sale.
+  d.base.sinAceptarVencidos = new Set(["c1"]);
+  delete fallas.c1;
+  const r2 = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r2.enviadas, 1, "ahora sí le llega la lista");
+  assert.equal(d.base.filas.get("c1").estado, "enviada");
+});
+
+test("y si todavía no la aceptó, no le avisa a Cande de nuevo", async () => {
+  const sinAceptar = Object.assign(new Error("(#10) no es propietaria del hilo"), { code: 10, subcode: 2534037 });
+  const d = armar({ comentarios: [CS[0]], fallas: { c1: sinAceptar } });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(d.avisos.length, 1);
+
+  d.base.sinAceptarVencidos = new Set(["c1"]);
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.sin_aceptar, 1, "se reintentó");
+  assert.equal(d.avisos.length, 1, "un aviso cada tres horas sería ruido: el primero ya salió");
 });
