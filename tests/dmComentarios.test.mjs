@@ -51,16 +51,18 @@ test("adentro de una frase NO dispara", () => {
 
 test("la ventana de la private reply: 7 días, con margen", () => {
   assert.equal(VENTANA_DIAS, 7);
-  assert.equal(FRESCO_MINUTOS, 5);
+  assert.equal(FRESCO_MINUTOS, 2);
   assert.equal(enVentana("2026-10-29T17:32:15+0000", ahora), true, "de ayer sí");
   assert.equal(enVentana("2026-10-24T03:47:12+0000", ahora), true, "de hace 6 días todavía");
   // Un comentario de 6 días y 23 horas se puede vencer entre que se lo lee y que sale el DM.
   assert.equal(enVentana("2026-10-23T07:00:00+0000", ahora), false, "a punto de vencerse, no se toma");
   assert.equal(enVentana("2026-10-20T14:48:26+0000", ahora), false, "de hace 10 días no");
   assert.equal(enVentana("2026-10-31T00:00:00+0000", ahora), false, "del futuro tampoco");
-  // Recién hecho: primero le toca a ManyChat, que contesta a los segundos.
-  assert.equal(enVentana("2026-10-30T05:58:00+0000", ahora), false, "de hace 2 minutos espera la vuelta siguiente");
-  assert.equal(enVentana("2026-10-30T05:52:00+0000", ahora), true, "de hace 8 minutos ya se puede");
+  // Recién hecho: primero le toca a ManyChat, que a los contactos que ya tiene les contesta a los
+  // segundos. La espera bajó de 5 a 2 minutos el 31/10, cuando ManyChat dejó de atender contactos
+  // nuevos: lo que antes era prudencia, ahora es demora.
+  assert.equal(enVentana("2026-10-30T05:59:30+0000", ahora), false, "de hace medio minuto espera la vuelta siguiente");
+  assert.equal(enVentana("2026-10-30T05:57:00+0000", ahora), true, "de hace 3 minutos ya se puede");
   assert.equal(enVentana("cualquier cosa", ahora), false);
 });
 
@@ -229,10 +231,14 @@ test("si Instagram pide despacio, el comentario se suelta para la vuelta siguien
 // Desde entonces, a quien ya recibió algo de la cuenta no se le manda nada.
 
 /** Una charla de la bandeja: `suya` dice si la cuenta ya escribió ahí. */
-const hilo = (usuario, actualizado, suya) => ({
+const hilo = (usuario, actualizado, suya, cuando) => ({
   otro: { usuario, id: `ig-${usuario}` },
   actualizado: new Date(actualizado),
-  mensajes: suya ? [{ de: { id: CUENTA.user_id, usuario: CUENTA.username }, texto: "" }] : [{ de: { id: "otro", usuario }, texto: "hola" }],
+  mensajes: suya
+    // `cuando` es cuándo escribió la cuenta. Sin fecha se asume que fue después del comentario, que
+    // es como quedaron las charlas viejas de ManyChat: ante la duda no se manda.
+    ? [{ de: { id: CUENTA.user_id, usuario: CUENTA.username }, texto: "", ...(cuando ? { creado: new Date(cuando) } : {}) }]
+    : [{ de: { id: "otro", usuario }, texto: "hola" }],
 });
 
 test("a quien ManyChat ya le contestó no se le manda nada", async () => {
@@ -248,6 +254,25 @@ test("a quien ManyChat ya le contestó no se le manda nada", async () => {
   assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["c4"], "solo el que quedó sin contestar");
   assert.equal(r.ya_tenia, 2);
   assert.equal(d.base.filas.has("c1"), false, "ni se toma: no hay nada que anotar");
+});
+
+test("un mensaje de la cuenta ANTERIOR al comentario no frena nada", async () => {
+  // El que charló con Cande hace semanas y hoy vuelve a comentar CV tiene que recibir la lista.
+  // Hasta el 31/10 quedaba salteado para siempre: alcanzaba con que la cuenta le hubiera escrito
+  // alguna vez. Caso real: @torrealbajorgealbertovilla, comentario del 30/10 y charla del 09/10.
+  const bandeja = [hilo("juliovasquez", "2026-10-29T17:32:26Z", true, "2026-10-09T12:00:00Z")];
+  const d = armar({ comentarios: [CS[0]], bandeja });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["c1"], "le tiene que llegar la lista");
+  assert.equal(r.ya_tenia, 0);
+});
+
+test("y uno POSTERIOR sí: eso es que ya le contestaron este comentario", async () => {
+  const bandeja = [hilo("juliovasquez", "2026-10-29T17:32:26Z", true, "2026-10-29T17:32:26Z")];
+  const d = armar({ comentarios: [CS[0]], bandeja });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos, [], "ya lo contestó ManyChat: mandarlo otra vez es el link dos veces");
+  assert.equal(r.ya_tenia, 1);
 });
 
 test("una charla donde la cuenta no escribió no frena nada", async () => {
