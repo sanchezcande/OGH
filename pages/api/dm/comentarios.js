@@ -20,7 +20,7 @@ import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
 import { ajustes, hayBase, leerConfig } from "../../../lib/dm/base";
 import { contestarComentarios } from "../../../lib/dm/comentarios";
 import {
-  anotarComentario, anotarEnDuda, anotarYaContestado, comentariosEnLaBase, contarComentarios, soltarComentario, soltarDuda, tablaComentarios,
+  anotarComentario, anotarEnDuda, anotarYaContestado, comentariosEnLaBase, comentariosParaReintentar, contarComentarios, soltarComentario, soltarDuda, tablaComentarios,
   tomarComentario, usuariosConDm,
 } from "../../../lib/dm/comentariosBase";
 
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
   try {
     const cuentas = await contestarComentarios({
       ig: instagram,
-      base: { tomarComentario, anotarComentario, soltarComentario, comentariosEnLaBase, anotarYaContestado, anotarEnDuda, soltarDuda, usuariosConDm },
+      base: { tomarComentario, anotarComentario, soltarComentario, comentariosEnLaBase, comentariosParaReintentar, anotarYaContestado, anotarEnDuda, soltarDuda, usuariosConDm },
       // Lo que falta para los 120 segundos queda de margen para el envío que esté saliendo.
       limite: arranque + TIEMPO_MS,
       avisar: avisarDm,
