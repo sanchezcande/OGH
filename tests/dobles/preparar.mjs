@@ -29,10 +29,17 @@ globalThis.fetch = async (url, opciones) => {
 export const registros = [];
 console.error = (...partes) => { registros.push(partes.join(" ")); };
 
-/** Un `res` de Next de mentira: guarda el status y el JSON que contestó el endpoint. */
+/**
+ * Un `res` de Next de mentira: guarda el status y lo que contestó el endpoint. `cuerpo` es el JSON;
+ * `texto`, lo que salió con send (la verificación del webhook de Meta contesta en texto pelado).
+ */
 export const respuesta = () => ({
   codigo: null,
   cuerpo: null,
+  texto: null,
+  cabeceras: {},
   status(codigo) { this.codigo = codigo; return this; },
   json(cuerpo) { this.cuerpo = cuerpo; return this; },
+  send(texto) { this.texto = texto; return this; },
+  setHeader(clave, valor) { this.cabeceras[String(clave).toLowerCase()] = valor; return this; },
 });

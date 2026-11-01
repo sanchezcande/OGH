@@ -12,6 +12,11 @@
 // le manda nada: esto contesta solo lo que ManyChat dejó pasar. Cuando la automatización de ManyChat esté de verdad apagada, esto contesta
 // todo sin que haya que cambiarle nada.
 //
+// Desde el 02/11 esto es la red de contención y no la puerta principal: los comentarios entran por
+// el webhook de Meta (pages/api/ig/webhook.js), que avisa en el momento y contesta a los segundos.
+// Esta vuelta levanta lo que el webhook se pierda (un aviso que Meta no logra entregar, una función
+// que falla, el deploy caído) y es la única que mira la bandeja antes de mandar. No se saca.
+//
 // Arranca apagado: se prende con dm_config "comentarios" en { activo: true }. El tope por vuelta
 // (`tope`, 10 por defecto) está para que la primera vez no salga una tanda entera de una.
 //
