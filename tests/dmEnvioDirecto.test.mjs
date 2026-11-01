@@ -41,6 +41,28 @@ test("con ig_id manda por Instagram y ManyChat ni se entera", async () => {
   assert.deepEqual(porMc, [], "si sale por Instagram, ManyChat no tiene que sumar un contacto");
 });
 
+test("como lo arma el sitio (sin INSTAGRAM_TOKEN y sin decir hayIg), con ig_id sale por Instagram", async () => {
+  // 01/11: el envío miraba INSTAGRAM_TOKEN, que en Vercel no está (el cliente manda con el permiso
+  // del sitio), así que todo salía por ManyChat y a los contactos nuevos no les llegaba nada.
+  const antes = process.env.INSTAGRAM_TOKEN;
+  delete process.env.INSTAGRAM_TOKEN;
+  try {
+    const porIg = [];
+    const porMc = [];
+    const envio = crearEnvio({
+      manychat: mcQue({ ok: true }, porMc),
+      ig: igQue({ ok: true, mando: 1 }, porIg),
+      base: baseCon({ id: "77", ig_id: "17841400000000001" }),
+    });
+    const r = await envio.mandarTextos("77", ["hola"]);
+    assert.equal(r.por, "instagram");
+    assert.equal(porIg.length, 1);
+    assert.deepEqual(porMc, []);
+  } finally {
+    if (antes !== undefined) process.env.INSTAGRAM_TOKEN = antes;
+  }
+});
+
 test("sin ig_id sale por ManyChat: nadie se queda sin respuesta", async () => {
   const porMc = [];
   const envio = crearEnvio({
