@@ -82,20 +82,24 @@ test("la página de la agenda cuenta el click antes de redirigir", () => {
   assert.match(src, /catch/, "medir nunca puede romper el click");
 });
 
-test("el último mensaje pide una decisión, no una opinión", () => {
+test("el último mensaje aprieta con el cupo y no pide una opinión", () => {
   const ultimo = PALABRAS.trabajo.textos[PALABRAS.trabajo.textos.length - 1].trim();
-  // Puede ser una pregunta ("te cierra?") o un pedido directo ("decime si te cierra"): lo que no
-  // puede es solo informar. Si el último mensaje no pide nada, la charla se muere ahí.
-  // La pregunta puede no ser lo último: "Te guardo un lugar o se lo queda otro? Son 5 no más!"
-  // cierra con el cupo. Lo que no puede faltar es la pregunta.
-  assert.match(ultimo, /\?/, "el cierre lleva una pregunta siempre (Cande, 30/10)");
-  assert.match(ultimo, /lugar/i, "y lo que pide es el lugar, no un comentario");
-  assert.ok(!/qué te parece/i.test(ultimo), "eso pide una opinión; el cierre pide un sí o un no");
+  // El 30/10 el cierre era una pregunta ("Te guardo un lugar o se lo queda otro?"). El 02/11 Cande
+  // lo reescribió entero y dictó este, que aprieta con el cupo y sin preguntar: "Voy a tomar 5 este
+  // mes y ya quedan 3 no másss". Es decisión de ella y queda escrito acá para que no se "arregle"
+  // sola más adelante. Lo que sigue valiendo es que el cierre no pida una opinión: con "qué te
+  // parece" contesta cualquiera que no va a comprar, y es la falla número uno de sus 26 llamadas.
+  assert.match(ultimo, /\b5\b/, "el cierre nombra el cupo");
+  assert.ok(!/qué te parece|te gustaría saber/i.test(ultimo), "eso pide una opinión, no una decisión");
 });
 
-test("nada de nosotros: se lee como que está contratando", () => {
+test("habla ella, no una empresa", () => {
   const todo = PALABRAS.trabajo.textos.join(" ");
-  assert.ok(!/\bnosotros\b|trabajamos|seguimos/i.test(todo));
+  // "nosotros" y "trabajamos" la convierten en una agencia, y el que contesta la historia la busca a
+  // ella. "Seguimos" salió de la lista el 02/11: su texto dice "te cuento cómo seguimoss", que es
+  // ella hablándole al dev, no una empresa. Lo que se mira es que haya primera persona de ella.
+  assert.ok(!/\bnosotros\b|trabajamos/i.test(todo), todo);
+  assert.match(todo, /\bconmigo\b|\bvoy a\b|\byo\b/i, "tiene que hablar ella");
 });
 
 test("sin signos de apertura", () => {
