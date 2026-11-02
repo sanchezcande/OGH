@@ -409,3 +409,24 @@ test("sin ig_id, sin bandeja y sin ManyChat, el envío dice que no hay por dónd
   assert.equal(r.por, "ninguno");
   assert.match(r.error, /no hay por dónde/);
 });
+
+test("después de mandar, el campo dm_accion de ManyChat queda puesto una vez, y si falla no frena el envío (02/11)", async () => {
+  // La automatización de ManyChat "Seguimiento lista CV" sale si dm_accion está vacío: con el envío por la API el
+  // agente contestaba y al lead le llegaba igual un seguimiento de más.
+  const campos = [];
+  const manychat = { ...mcQue({ ok: true }), ponerCampo: async (id, campo, valor) => { campos.push([id, campo, valor]); return { ok: true }; } };
+  const envio = crearEnvio({ manychat, ig: igQue({ ok: true, mando: 1 }), base: baseCon({ id: "77", ig_id: "17841400000000001" }) });
+  assert.equal((await envio.mandarTextos("77", ["hola"])).ok, true);
+  await envio.mandarTextos("77", ["otro"]);
+  assert.deepEqual(campos, [["77", "dm_accion", "agente"]]);
+
+  const roto = { ...mcQue({ ok: true }), ponerCampo: async () => { throw new Error("ManyChat caído"); } };
+  const r = await crearEnvio({ manychat: roto, ig: igQue({ ok: true, mando: 1 }), base: baseCon({ id: "78", ig_id: "17841400000000002" }) }).mandarTextos("78", ["hola"]);
+  assert.equal(r.ok, true);
+  assert.equal(r.por, "instagram");
+
+  const sinMandar = [];
+  const nada = { ...mcQue({ ok: false, error: "no" }), ponerCampo: async (...a) => { sinMandar.push(a); return { ok: true }; } };
+  await crearEnvio({ manychat: nada, ig: igQue({ ok: false, mando: 0 }), base: baseCon({ id: "79", ig_id: "17841400000000003" }) }).mandarTextos("79", ["hola"]);
+  assert.deepEqual(sinMandar, [], "si no salió nada, no se marca");
+});
