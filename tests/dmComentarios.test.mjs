@@ -10,6 +10,9 @@
 //
 // Los comentarios de las pruebas son los de verdad: los 113 que tenía la cuenta el 30/10.
 //
+// Desde el 02/11 el mismo cron contesta "DEV" (founders, la llamada) con otro texto y las mismas
+// trabas: al final de este archivo.
+//
 // Correr:  node --test tests/*.test.mjs
 import "./dobles/preparar.mjs";
 import { test } from "node:test";
@@ -18,8 +21,9 @@ import { readFile } from "node:fs/promises";
 import { respuesta } from "./dobles/preparar.mjs";
 
 const {
-  AUTOMATICO_CV_MANYCHAT, FRESCO_MINUTOS, MENSAJES_HONDOS, MENSAJES_POR_HILO, TEXTO_CV, VENTANA_DIAS, comentariosParaContestar, contestadoDesde,
-  contestarComentarios, enVentana, esDmDeCV, esPalabraCV, motivoDelError,
+  AUTOMATICO_CV_MANYCHAT, AUTOMATICO_DEV_MANYCHAT, FRESCO_MINUTOS, MENSAJES_HONDOS, MENSAJES_POR_HILO, TEXTO_CV, TEXTO_DEV, VENTANA_DIAS,
+  comentariosParaContestar, contestadoDesde, contestarComentarios, enVentana, esDmDeCV, esDmDeDev, esPalabraCV, esPalabraDEV, motivoDelError,
+  tipoDelComentario,
 } = await import("../lib/dm/comentarios.js");
 const { esAutomatico, claveTexto } = await import("../lib/dm/instagram.js");
 
@@ -671,4 +675,150 @@ test("y si todavía no la aceptó, no le avisa a Cande de nuevo", async () => {
   const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
   assert.equal(r.sin_aceptar, 1, "se reintentó");
   assert.equal(d.avisos.length, 1, "un aviso cada tres horas sería ruido: el primero ya salió");
+});
+
+// ---- DEV: la llamada para founders (02/11) ----
+//
+// Lo último que quedaba en ManyChat ("DEV → llamada (comentario DEV)"). Misma regla estricta que CV,
+// mismas trabas (la base antes de mandar, la bandeja, contestadoDesde, una respuesta por persona);
+// cambia el texto.
+
+test("DEV: la palabra sola, o con relleno, pide la llamada; adentro de una frase no", () => {
+  for (const t of ["DEV", "Dev", "dev", "  DEV  ", "DEV.", "DEV 🙌🏼", "Dev porfa", "Hola, DEV please", "dev gracias!!"]) {
+    assert.equal(esPalabraDEV(t), true, `tendría que disparar con ${JSON.stringify(t)}`);
+  }
+  const no = [
+    "Soy dev", "dev rico", "busco un dev", "developer", "devs", "devops", "cuántos devs tenés?",
+    "cv dev", "dev cv",              // dos pedidos: es una charla, no un pedido
+    "", "   ", null, undefined, "🙌🏼",
+  ];
+  for (const t of no) assert.equal(esPalabraDEV(t), false, `no tendría que disparar con ${JSON.stringify(t)}`);
+});
+
+test("un comentario es CV, DEV o ninguno: nunca los dos, y CV sigue como estaba", () => {
+  assert.equal(tipoDelComentario("CV"), "cv");
+  assert.equal(tipoDelComentario("Holaaa! Cv. 🙌🏻"), "cv");
+  assert.equal(tipoDelComentario("DEV"), "dev");
+  assert.equal(tipoDelComentario("cv dev"), null);
+  assert.equal(tipoDelComentario("CV rico 😋"), null);
+  assert.equal(esPalabraCV("DEV"), false, "DEV no es CV");
+  assert.equal(esPalabraDEV("CV"), false, "CV no es DEV");
+});
+
+test("el texto de DEV es uno solo, lleva el link de la agenda y la red de la bandeja lo reconoce como automático", async () => {
+  assert.match(TEXTO_DEV, /strategy\.opengatehub\.com/, "el link va adentro: Instagram deja un solo mensaje por comentario");
+  assert.ok(!/\?|utm_|https?:\/\//.test(TEXTO_DEV), "el link va limpio y sin signos de pregunta");
+  assert.ok(TEXTO_DEV.length <= 1000, "Instagram corta a los 1.000 caracteres");
+  assert.ok(!TEXTO_DEV.includes("—"), TEXTO_DEV);
+  assert.ok(!/[¿¡]/.test(TEXTO_DEV), TEXTO_DEV);
+  assert.equal(TEXTO_DEV.includes("botón"), false, "una private reply no lleva botones: no puede mandar a tocar uno");
+  // Es el mismo link que el agente le da a las empresas.
+  const frenos = await readFile(new URL("../lib/dm/frenos.js", import.meta.url), "utf8");
+  assert.match(frenos, /const LINK_REUNION = "strategy\.opengatehub\.com"/);
+  // Si la bandeja no lo reconoce, el agente se sale de la charla del founder que contesta (lib/dm/bandeja.js).
+  assert.equal(esAutomatico(TEXTO_DEV, [claveTexto(AUTOMATICO_DEV_MANYCHAT)]), true);
+  assert.equal(esAutomatico(TEXTO_CV, [claveTexto(AUTOMATICO_DEV_MANYCHAT)]), false, "y los dos textos no se confunden");
+});
+
+test("esDmDeDev reconoce el DM de DEV (el nuestro o lo que lleve el link de la agenda) y nada más", () => {
+  assert.equal(esDmDeDev(TEXTO_DEV), true);
+  assert.equal(esDmDeDev("Agendá acá: https://strategy.opengatehub.com"), true);
+  assert.equal(esDmDeDev(TEXTO_CV), false);
+  assert.equal(esDmDeDev("Holii! Pudiste anotarte o te quedó para después?"), false);
+  assert.equal(esDmDeDev(""), false);
+  assert.equal(esDmDeDev(null), false);
+});
+
+const DEVS = [
+  { id: "d1", text: "DEV", timestamp: "2026-10-29T17:32:15+0000", username: "founderuno" },
+  { id: "d2", text: "Dev 🙌", timestamp: "2026-10-29T17:23:49+0000", username: "founderdos" },
+  { id: "d3", text: "dev rico", timestamp: "2026-10-29T07:06:24+0000", username: "gezulupo17" },
+];
+
+test("DEV: cada comentario recibe su texto, el de CV el suyo, y el que no pide nada ninguno", async () => {
+  const d = armar({ comentarios: [...CS, ...DEVS] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  const por = Object.fromEntries(d.ig.pedidos.map((p) => [p.id, p.texto]));
+  assert.deepEqual(Object.keys(por).sort(), ["c1", "c2", "c4", "d1", "d2"]);
+  assert.equal(por.d1, TEXTO_DEV);
+  assert.equal(por.d2, TEXTO_DEV);
+  assert.equal(por.c1, TEXTO_CV, "CV sigue saliendo con su lista");
+  assert.equal(r.enviadas, 5);
+  assert.equal(d.base.filas.has("d3"), false, "'dev rico' no pide la llamada: no se toca");
+  assert.equal(d.base.filas.get("d1").estado, "enviada");
+});
+
+test("DEV: queda tomado ANTES de mandar, y uno ya tomado no recibe nada", async () => {
+  const d = armar({ comentarios: DEVS, tomados: new Set(["d1"]) });
+  let estadoAlMandar = null;
+  const mandar = d.ig.responderComentario;
+  d.ig.responderComentario = async (id, texto) => { estadoAlMandar = d.base.filas.get(id)?.estado; return mandar(id, texto); };
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["d2"]);
+  assert.equal(estadoAlMandar, "enviando", "la constancia va antes del envío");
+});
+
+test("DEV: a quien ya le contestaron desde que comentó no se le manda nada", async () => {
+  const bandeja = [
+    hilo("founderuno", "2026-10-29T17:32:26Z", true),     // ManyChat o el agente, a los 11 segundos
+    hilo("founderdos", "2026-10-29T17:23:49Z", false),    // escribió él y nadie le contestó
+    hilo("otracualquiera", "2026-10-29T06:00:00Z", true),
+  ];
+  const d = armar({ comentarios: DEVS, bandeja });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["d2"]);
+  assert.equal(r.ya_tenia, 1);
+});
+
+test("DEV: el que ya recibió el link de la llamada o el DM de CV, aunque sea de antes, no lo recibe otra vez", async () => {
+  const t = Date.parse("2026-10-29T17:32:15Z");
+  const m = (texto) => [{ igsid: "x", pedidos: MENSAJES_POR_HILO, mensajes: [{ deLaCuenta: true, creado: new Date("2026-10-20T12:00:00Z"), texto }] }];
+  assert.equal(contestadoDesde(m(TEXTO_DEV), t), "si", "ya recibió el nuestro");
+  assert.equal(contestadoDesde(m("Agendá acá: strategy.opengatehub.com"), t), "si", "el agente ya le dio la agenda");
+  assert.equal(contestadoDesde(m(TEXTO_CV), t), "si", "un DM fijo es un DM fijo");
+  assert.equal(contestadoDesde(m("Buenass, cómo andás?"), t), "no", "una charla vieja cualquiera no tapa el comentario");
+});
+
+test("DEV: una respuesta por persona, entre CV y DEV y entre vueltas", async () => {
+  // Misma persona con CV y DEV en la vuelta: sale uno solo, por el comentario más nuevo.
+  const mismo = [
+    { id: "x1", text: "CV", timestamp: "2026-10-29T10:00:00+0000", username: "mismapersona" },
+    { id: "x2", text: "DEV", timestamp: "2026-10-29T12:00:00+0000", username: "MismaPersona" },
+  ];
+  const a = armar({ comentarios: mismo });
+  await contestarComentarios({ ig: a.ig, base: a.dobleBase, avisar: a.avisar, ahora: () => ahora });
+  assert.deepEqual(a.ig.pedidos.map((p) => [p.id, p.texto]), [["x2", TEXTO_DEV]]);
+  // Otra vuelta: la base dice que ya le salió su DM por otro comentario.
+  const b = armar({ comentarios: DEVS, conDm: ["founderuno"] });
+  await contestarComentarios({ ig: b.ig, base: b.dobleBase, avisar: b.avisar, ahora: () => ahora });
+  assert.deepEqual(b.ig.pedidos.map((p) => p.id), ["d2"]);
+});
+
+test("DEV: si el DM queda en una solicitud sin aceptar, el aviso a Cande habla de DEV y de la llamada", async () => {
+  const fallas = { d1: Object.assign(new Error("La página no es propietaria del hilo"), { code: 100, subcode: 2534037 }) };
+  const d = armar({ comentarios: DEVS, fallas });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.sin_aceptar, 1);
+  assert.equal(d.avisos.length, 1);
+  assert.match(d.avisos[0].titulo, /DEV/);
+  assert.match(d.avisos[0].campos.Qué, /DEV/);
+  assert.match(d.avisos[0].campos.Hacé, /llamada/);
+  assert.equal(r.enviadas, 1, "el otro no se frena por eso");
+});
+
+test("el aviso de CV sigue hablando de CV y de la lista", async () => {
+  const fallas = { c1: Object.assign(new Error("La página no es propietaria del hilo"), { code: 100, subcode: 2534037 }) };
+  const d = armar({ comentarios: CS, fallas });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.match(d.avisos[0].titulo, /CV/);
+  assert.match(d.avisos[0].campos.Hacé, /lista/);
+});
+
+test("DEV: pasada la ventana de 7 días o escrito por la cuenta misma, no sale", () => {
+  const cs = [
+    { id: "1", text: "DEV", timestamp: "2026-10-01T10:00:00+0000", username: "viejo" },
+    { id: "2", text: "DEV", timestamp: "2026-10-29T10:00:00+0000", username: CUENTA.username },
+    { id: "3", text: "DEV", timestamp: "2026-10-29T12:00:00+0000", username: "uno" },
+  ];
+  assert.deepEqual(comentariosParaContestar(cs, CUENTA, ahora).map((c) => [c.id, c.tipo]), [["3", "dev"]]);
 });

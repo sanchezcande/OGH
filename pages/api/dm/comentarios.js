@@ -17,6 +17,9 @@
 // Esta vuelta levanta lo que el webhook se pierda (un aviso que Meta no logra entregar, una función
 // que falla, el deploy caído) y es la única que mira la bandeja antes de mandar. No se saca.
 //
+// Desde el 02/11 contesta también "DEV" (un founder que pide la llamada): mismo camino, mismas trabas
+// y otro texto (lib/dm/comentarios.js, TEXTO_DEV). Lo último que quedaba en ManyChat.
+//
 // Arranca apagado: se prende con dm_config "comentarios" en { activo: true }. El tope por vuelta
 // (`tope`, 10 por defecto) está para que la primera vez no salga una tanda entera de una.
 //
@@ -60,7 +63,7 @@ export default async function handler(req, res) {
       tope: Number.isInteger(ajuste.tope) && ajuste.tope > 0 ? ajuste.tope : TOPE_POR_VUELTA,
       mediosQueMira: MEDIOS_POR_VUELTA,
       // Sin ids ni textos en el registro: Instagram los repite en sus errores.
-      registrar: (motivo, e) => console.error("dm: un comentario con CV no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
+      registrar: (motivo, e) => console.error("dm: un comentario con CV o DEV no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
     });
     return res.status(200).json({ ok: true, ...cuentas, total: await contarComentarios() });
   } catch (e) {
