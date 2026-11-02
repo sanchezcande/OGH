@@ -275,3 +275,137 @@ test("el token no viaja en el mensaje de error", async () => {
   assert.equal(r.ok, false);
   assert.ok(!r.error.includes("TOKEN_DE_PRUEBA"), "el token no se registra nunca");
 });
+
+// ── Cuando el contacto no tiene ig_id guardado ──
+//
+// Al 01/11 hay 620 contactos así, de los que ManyChat trajo antes de que la red de la bandeja
+// existiera. Mientras ManyChat vive salen por ahí; cuando se borre, el único camino es Instagram, y
+// para eso hace falta el id. Se lo busca por su usuario en las primeras páginas de la bandeja, UNA
+// vez por contacto: probado contra la bandeja real, de 542 sin id solo uno aparecía en 1250 hilos.
+
+const bandejaCon = (hilos, visto = []) => ({
+  mandarTextos: async () => ({ ok: true, mando: 1 }),
+  pagina: async ({ despues = null } = {}) => {
+    visto.push(despues);
+    return { lista: hilos, despues: null };
+  },
+});
+const hilo = (usuario, id) => ({ otro: { usuario, id } });
+
+test("sin ig_id lo busca en la bandeja por su usuario, lo guarda y manda por Instagram", async () => {
+  const guardado = [];
+  const marcado = [];
+  const envio = crearEnvio({
+    manychat: mcQue({ ok: true }),
+    ig: bandejaCon([hilo("otro", "999999999"), hilo("ezequiel", "17841400000000009")]),
+    base: {
+      contacto: async () => ({ id: "77", ig_id: null, ig_usuario: "Ezequiel", ig_buscado: null }),
+      guardarIg: async (id, datos) => guardado.push([id, datos]),
+      marcarIgBuscado: async (id) => marcado.push(id),
+    },
+  });
+
+  const r = await envio.mandarTextos("77", ["hola"]);
+
+  assert.equal(r.por, "instagram");
+  assert.deepEqual(guardado, [["77", { igId: "17841400000000009" }]], "el id se guarda: no se busca dos veces");
+  assert.deepEqual(marcado, ["77"]);
+});
+
+test("si no aparece, queda marcado y sale por ManyChat", async () => {
+  const marcado = [];
+  const porMc = [];
+  const envio = crearEnvio({
+    manychat: mcQue({ ok: true }, porMc),
+    ig: bandejaCon([hilo("otro", "999999999")]),
+    base: {
+      contacto: async () => ({ id: "77", ig_id: null, ig_usuario: "ezequiel", ig_buscado: null }),
+      guardarIg: async () => { throw new Error("no se guarda lo que no se encontró"); },
+      marcarIgBuscado: async (id) => marcado.push(id),
+    },
+  });
+
+  const r = await envio.mandarTextos("77", ["hola"]);
+
+  assert.equal(r.por, "manychat");
+  assert.deepEqual(porMc, [{ id: "77", textos: ["hola"] }]);
+  assert.deepEqual(marcado, ["77"], "queda marcado aunque no aparezca: no se vuelve a barrer por él");
+});
+
+test("al que ya se buscó no se lo busca de nuevo", async () => {
+  const visto = [];
+  const envio = crearEnvio({
+    manychat: mcQue({ ok: true }),
+    ig: bandejaCon([hilo("ezequiel", "17841400000000009")], visto),
+    base: {
+      contacto: async () => ({ id: "77", ig_id: null, ig_usuario: "ezequiel", ig_buscado: new Date() }),
+      marcarIgBuscado: async () => { throw new Error("no tendría que marcar de nuevo"); },
+    },
+  });
+
+  const r = await envio.mandarTextos("77", ["hola"]);
+
+  assert.equal(r.por, "manychat");
+  assert.deepEqual(visto, [], "ni abre la bandeja");
+});
+
+test("la búsqueda mira pocas páginas: la cuota de Instagram no se gasta acá", async () => {
+  const visto = [];
+  const envio = crearEnvio({
+    manychat: mcQue({ ok: true }),
+    ig: {
+      mandarTextos: async () => ({ ok: true }),
+      pagina: async ({ despues = null } = {}) => {
+        visto.push(despues);
+        return { lista: [hilo("otro", "999999999")], despues: `pag${visto.length}` };
+      },
+    },
+    base: {
+      contacto: async () => ({ id: "77", ig_id: null, ig_usuario: "ezequiel", ig_buscado: null }),
+      marcarIgBuscado: async () => {},
+    },
+    paginas: 2,
+  });
+
+  await envio.mandarTextos("77", ["hola"]);
+
+  assert.equal(visto.length, 2, "dos páginas y basta");
+});
+
+test("si Instagram se cae buscando, no queda marcado: se intenta de nuevo la próxima", async () => {
+  const marcado = [];
+  const envio = crearEnvio({
+    manychat: mcQue({ ok: true }),
+    ig: { mandarTextos: async () => ({ ok: true }), pagina: async () => { throw new Error("se cayó"); } },
+    base: {
+      contacto: async () => ({ id: "77", ig_id: null, ig_usuario: "ezequiel", ig_buscado: null }),
+      marcarIgBuscado: async (id) => marcado.push(id),
+    },
+  });
+
+  const r = await envio.mandarTextos("77", ["hola"]);
+
+  assert.equal(r.por, "manychat");
+  assert.deepEqual(marcado, [], "no se marca lo que no se llegó a mirar");
+});
+
+test("sin ig_id, sin bandeja y sin ManyChat, el envío dice que no hay por dónde", async () => {
+  // El día que ManyChat no exista: el toque se cancela, no se inventa que salió.
+  const envio = crearEnvio({
+    manychat: {
+      hayManyChat: () => false,
+      mandarTextos: async () => ({ ok: false, error: "falta MANYCHAT_API_KEY" }),
+    },
+    ig: bandejaCon([hilo("otro", "999999999")]),
+    base: {
+      contacto: async () => ({ id: "77", ig_id: null, ig_usuario: "ezequiel", ig_buscado: null }),
+      marcarIgBuscado: async () => {},
+    },
+  });
+
+  const r = await envio.mandarTextos("77", ["hola"]);
+
+  assert.equal(r.ok, false);
+  assert.equal(r.por, "ninguno");
+  assert.match(r.error, /no hay por dónde/);
+});
