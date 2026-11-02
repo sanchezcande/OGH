@@ -21,6 +21,7 @@ import { readFile } from "node:fs/promises";
 import { respuesta } from "./dobles/preparar.mjs";
 
 const {
+  RESPUESTAS_PUBLICAS, respuestaPublica, responderEnPublico,
   AUTOMATICO_CV_MANYCHAT, AUTOMATICO_DEV_MANYCHAT, FRESCO_MINUTOS, MENSAJES_HONDOS, MENSAJES_POR_HILO, TEXTO_CV, TEXTO_DEV, VENTANA_DIAS,
   comentariosParaContestar, contestadoDesde, contestarComentarios, enVentana, esDmDeCV, esDmDeDev, esPalabraCV, esPalabraDEV, motivoDelError,
   tipoDelComentario,
@@ -115,7 +116,7 @@ test("los motivos de los errores de Instagram", () => {
  * Un cliente de Instagram y una base de mentira. `fallas` dice con qué error contesta cada
  * comentario; `bandeja` son las charlas que ya existen (para la traba del automático de ManyChat).
  */
-function armar({ comentarios, fallas = {}, tomados = new Set(), bandeja = null, hondas = {}, conDm = null } = {}) {
+function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Set(), bandeja = null, hondas = {}, conDm = null } = {}) {
   const base = { filas: new Map(), tomados };
   // Sin bandeja: una sola charla vieja, de alguien que no comentó. Así nadie queda tapado por la
   // traba y la bandeja cubre desde antes de todos los comentarios.
@@ -139,6 +140,13 @@ function armar({ comentarios, fallas = {}, tomados = new Set(), bandeja = null, 
       if (fallas[id]) throw fallas[id];
       return { recipient_id: `ig-${id}`, message_id: `m-${id}` };
     },
+    // La respuesta pública de abajo del comentario. `fallasPublicas` dice con qué error contesta cada uno.
+    publicas: [],
+    responderPublico: async (id, texto) => {
+      ig.publicas.push({ id, texto });
+      if (fallasPublicas[id]) throw fallasPublicas[id];
+      return { id: `r-${id}` };
+    },
   };
   const avisos = [];
   const dobleBase = {
@@ -152,6 +160,13 @@ function armar({ comentarios, fallas = {}, tomados = new Set(), bandeja = null, 
       return true;
     },
     anotarComentario: async (id, estado, extra = {}) => base.filas.set(id, { ...base.filas.get(id), estado, ...extra }),
+    // Como la base: la toma una sola vez y solo un comentario cuyo DM salió.
+    tomarPublica: async (id) => {
+      const f = base.filas.get(id);
+      if (f?.estado !== "enviada" || f.publica) return false;
+      base.filas.set(id, { ...f, publica: true });
+      return true;
+    },
     // `dudasVencidas`: las dudas que ya pasaron DUDA_HORAS y vuelven a mirarse.
     // `sinAceptarVencidos`: los que cayeron en una solicitud sin aceptar y ya les toca otro intento.
     comentariosEnLaBase: async (ids) => ids.filter((id) =>
@@ -821,4 +836,103 @@ test("DEV: pasada la ventana de 7 días o escrito por la cuenta misma, no sale",
     { id: "3", text: "DEV", timestamp: "2026-10-29T12:00:00+0000", username: "uno" },
   ];
   assert.deepEqual(comentariosParaContestar(cs, CUENTA, ahora).map((c) => [c.id, c.tipo]), [["3", "dev"]]);
+});
+
+// ---- la respuesta pública abajo del comentario (02/11) ----
+
+test("los tres textos de la respuesta pública son los que aprobó Cande, sin guion largo ni signos de apertura", () => {
+  assert.deepEqual(RESPUESTAS_PUBLICAS, [
+    "Te mandé DM 💌 si no lo ves, fijate en solicitudes",
+    "Listo, te escribí por privado! Si no aparece, mirá en solicitudes",
+    "Ya te llegó por DM :) fijate en solicitudes si no lo ves",
+  ]);
+  for (const t of RESPUESTAS_PUBLICAS) {
+    assert.ok(!t.includes("—"), t);
+    assert.ok(!/[¿¡]/.test(t), t);
+  }
+});
+
+test("la respuesta pública rota entre los tres textos y el mismo comentario siempre recibe el mismo", () => {
+  const ids = Array.from({ length: 30 }, (_, i) => `1789${1000000000 + i * 7919}`);
+  const usados = new Set(ids.map(respuestaPublica));
+  assert.equal(usados.size, 3, "en 30 comentarios aparecen los tres");
+  for (const id of ids) assert.equal(respuestaPublica(id), respuestaPublica(id));
+});
+
+test("después de la private reply, el cron contesta también en público, una vez por comentario", async () => {
+  const d = armar({ comentarios: CS });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.publicas.map((p) => p.id), ["c1", "c2", "c4"]);
+  for (const p of d.ig.publicas) assert.equal(p.texto, respuestaPublica(p.id));
+  assert.equal(r.enviadas, 3);
+  assert.equal(r.publicas, 3);
+  assert.equal(d.base.filas.get("c1").publica, true, "queda anotada");
+  // La segunda vuelta no repite nada: los comentarios ya están en la base.
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(d.ig.publicas.length, 3);
+});
+
+test("si la private reply falla, no hay respuesta pública", async () => {
+  const d = armar({ comentarios: CS, fallas: { c1: Object.assign(new Error("(#-1) el comentario es demasiado antiguo"), { subcode: 2534024 }) } });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.publicas.map((p) => p.id), ["c2", "c4"], "c1 no recibió DM, así que tampoco la línea pública");
+  assert.equal(r.publicas, 2);
+});
+
+test("si la respuesta pública falla, no frena nada: el DM ya salió y la vuelta sigue", async () => {
+  const registrados = [];
+  const d = armar({ comentarios: CS, fallasPublicas: { c1: new Error("sin permiso") } });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, registrar: (m) => registrados.push(m) });
+  assert.equal(r.enviadas, 3, "los tres DM salieron");
+  assert.equal(r.publicas, 2);
+  assert.equal(r.errores, 0, "no cuenta como error del DM");
+  assert.equal(d.base.filas.get("c1").estado, "enviada", "el DM sigue anotado como enviado");
+  assert.deepEqual(registrados, ["publica"]);
+  // No se reintenta: la vuelta siguiente no la repite.
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(d.ig.publicas.filter((p) => p.id === "c1").length, 1);
+});
+
+test("un comentario que ya tiene su respuesta pública no recibe otra", async () => {
+  const d = armar({ comentarios: CS });
+  d.base.filas.set("c1", { estado: "enviada", publica: true });
+  assert.equal(await responderEnPublico({ ig: d.ig, base: d.dobleBase, id: "c1" }), false);
+  assert.equal(d.ig.publicas.length, 0);
+});
+
+test("la respuesta pública también sale en un comentario DEV", async () => {
+  const d = armar({ comentarios: [{ id: "d1", text: "DEV", timestamp: "2026-10-29T17:32:15+0000", username: "founder1" }] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.publicas, 1);
+  assert.equal(d.ig.pedidos[0].texto, TEXTO_DEV);
+});
+
+test("sin responderPublico o sin tomarPublica no hace nada ni tira", async () => {
+  assert.equal(await responderEnPublico({ ig: {}, base: {}, id: "c1" }), false);
+  assert.equal(await responderEnPublico({ ig: { responderPublico: async () => ({}) }, base: {}, id: "c1" }), false);
+});
+
+test("el cliente de Instagram contesta en público con POST /{comentario}/replies y el token de la página", async () => {
+  const { crearInstagram } = await import("../lib/dm/instagram.js");
+  const llamadas = [];
+  const pedir = async (url, init = {}) => {
+    llamadas.push({ url: String(url), init });
+    const r = String(url).includes("/me/accounts")
+      ? { data: [{ id: "pag1", access_token: "TOKEN_PAGINA", instagram_business_account: { id: "ig1" } }] }
+      : { id: "resp-1" };
+    return { ok: true, status: 200, json: async () => r };
+  };
+  const ig = crearInstagram({
+    pedir, leerConfig: async () => null, guardarConfig: async () => {}, tokenEnv: () => "x",
+    credencialFb: async () => ({ id: "ig1", token: "TOKEN_USUARIO" }),
+  });
+  const r = await ig.responderPublico("1789999", "Te mandé DM 💌 si no lo ves, fijate en solicitudes");
+  assert.equal(r.id, "resp-1");
+  const ultima = llamadas.at(-1);
+  assert.match(ultima.url, /graph\.facebook\.com\/v\d+\.\d+\/1789999\/replies\?access_token=TOKEN_PAGINA$/);
+  assert.equal(ultima.init.method, "POST");
+  assert.deepEqual(JSON.parse(ultima.init.body), { message: "Te mandé DM 💌 si no lo ves, fijate en solicitudes" });
+  // Sin el permiso de la página no hay respuestas: tira, y responderEnPublico lo atrapa.
+  const sinFb = crearInstagram({ pedir, leerConfig: async () => null, guardarConfig: async () => {}, tokenEnv: () => "x" });
+  await assert.rejects(() => sinFb.responderPublico("1", "x"), /página de Facebook/);
 });

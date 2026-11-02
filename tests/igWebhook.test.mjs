@@ -20,7 +20,7 @@ import { avisos, respuesta } from "./dobles/preparar.mjs";
 const {
   comentariosDelEvento, contestarDelWebhook, desafioDeVerificacion, firmaDeMeta, firmaValidaDeMeta, webhookConfigurado,
 } = await import("../lib/dm/webhookIg.js");
-const { TEXTO_CV } = await import("../lib/dm/comentarios.js");
+const { RESPUESTAS_PUBLICAS, TEXTO_CV } = await import("../lib/dm/comentarios.js");
 
 const SECRETO = "app-secret-de-prueba";
 const TOKEN = "verify-token-de-prueba";
@@ -103,18 +103,24 @@ test("el mismo comentario repetido en el aviso se cuenta una vez", () => {
 /* ---------- contestar ---------- */
 
 /** Dobles de Instagram y de la base. `fallas` es el error que tira el envío de ese comentario. */
-function armar({ fallas = {}, conDm = [] } = {}) {
+function armar({ fallas = {}, fallasPublicas = {}, conDm = [] } = {}) {
+  const publicas = [];
   const tomados = [];
   const anotados = [];
   const sueltos = [];
   const pedidos = [];
   return {
-    tomados, anotados, sueltos, pedidos,
+    tomados, anotados, sueltos, pedidos, publicas,
     ig: {
       async responderComentario(id, texto) {
         pedidos.push({ id, texto });
         if (fallas[id]) throw fallas[id];
         return { recipient_id: `ig-${id}` };
+      },
+      async responderPublico(id, texto) {
+        publicas.push({ id, texto });
+        if (fallasPublicas[id]) throw fallasPublicas[id];
+        return { id: `r-${id}` };
       },
     },
     base: {
@@ -125,6 +131,10 @@ function armar({ fallas = {}, conDm = [] } = {}) {
       },
       async anotarComentario(id, estado, datos = {}) { anotados.push({ id, estado, ...datos }); },
       async soltarComentario(id) { sueltos.push(id); },
+      async tomarPublica(id) {
+        if (!anotados.some((a) => a.id === id && a.estado === "enviada") || publicas.some((p) => p.id === id)) return false;
+        return true;
+      },
       async tieneDmDeCV(u) { return conDm.includes(String(u).toLowerCase()); },
     },
     avisar: async (titulo, campos) => { avisos.push(`${titulo} ${JSON.stringify(campos)}`); },
@@ -140,6 +150,31 @@ test("un comentario que pide la lista recibe su DM", async () => {
   assert.deepEqual(d.anotados, [{ id: "18001", estado: "enviada", igId: "ig-18001" }]);
   assert.equal(r.enviadas, 1);
   assert.equal(r.piden, 1);
+});
+
+test("después del DM, el webhook contesta también en público, una sola vez, y si falla no frena nada", async () => {
+  const d = armar();
+  const eventos = comentariosDelEvento(aviso(comentario()));
+  const r = await contestarDelWebhook({ ig: d.ig, base: d.base, comentarios: eventos, avisar: d.avisar });
+  assert.deepEqual(d.publicas.map((p) => p.id), ["18001"]);
+  assert.ok(RESPUESTAS_PUBLICAS.includes(d.publicas[0].texto));
+  assert.equal(r.publicas, 1);
+  // El aviso repetido de Meta no la repite: el comentario ya estaba tomado.
+  await contestarDelWebhook({ ig: d.ig, base: d.base, comentarios: eventos, avisar: d.avisar });
+  assert.equal(d.publicas.length, 1);
+  // Si la respuesta pública falla, el DM ya salió y queda anotado como enviado.
+  const f = armar({ fallasPublicas: { 18001: new Error("sin permiso") } });
+  const r2 = await contestarDelWebhook({ ig: f.ig, base: f.base, comentarios: eventos, avisar: f.avisar });
+  assert.equal(r2.enviadas, 1);
+  assert.equal(r2.publicas, 0);
+  assert.equal(r2.errores, 0);
+  assert.deepEqual(f.anotados, [{ id: "18001", estado: "enviada", igId: "ig-18001" }]);
+});
+
+test("si el DM no sale, tampoco la respuesta pública", async () => {
+  const d = armar({ fallas: { 18001: Object.assign(new Error("el comentario es demasiado antiguo"), { subcode: 2534024 }) } });
+  await contestarDelWebhook({ ig: d.ig, base: d.base, comentarios: comentariosDelEvento(aviso(comentario())), avisar: d.avisar });
+  assert.equal(d.publicas.length, 0);
 });
 
 test("un comentario que no pide la lista no dispara nada", async () => {

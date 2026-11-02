@@ -29,7 +29,7 @@ import { waitUntil } from "@vercel/functions";
 import { avisarDm, instagram } from "../../../lib/dm/armado";
 import { ajustes, hayBase, leerConfig } from "../../../lib/dm/base";
 import {
-  anotarComentario, soltarComentario, tablaComentarios, tieneDmDeCV, tomarComentario,
+  anotarComentario, soltarComentario, tablaComentarios, tieneDmDeCV, tomarComentario, tomarPublica,
 } from "../../../lib/dm/comentariosBase";
 import { leerCrudo } from "../../../lib/dm/cuerpo";
 import { comentariosDelEvento, contestarDelWebhook, desafioDeVerificacion, firmaValidaDeMeta } from "../../../lib/dm/webhookIg";
@@ -51,7 +51,7 @@ async function atender(comentarios) {
   await tablaComentarios();
   const cuentas = await contestarDelWebhook({
     ig: instagram,
-    base: { tomarComentario, anotarComentario, soltarComentario, tieneDmDeCV },
+    base: { tomarComentario, anotarComentario, soltarComentario, tieneDmDeCV, tomarPublica },
     comentarios,
     avisar: avisarDm,
     // Sin ids ni textos en el registro: Instagram los repite en sus errores.
