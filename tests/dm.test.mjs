@@ -1135,7 +1135,7 @@ test("callar ante un mensaje puede dejar un seguimiento agendado", async () => {
 
 test("un toque de seguimiento va con su contexto, se cuenta y no agenda otro (02/11: uno solo)", async () => {
   // El lead escribió a las 12 de Argentina y el toque sale a las 18. Aunque el modelo pida otro a las 21 horas, ya no
-  // hay segundo: 02/11, Cande: "con un follow up es suficiente".
+  // hay segundo: desde el 02/11 el seguimiento es uno solo.
   const { agente, m } = armarToque({
     ahora: new Date("2026-10-12T21:00:00Z"),
     responde: () => salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 21, estado: { ...estadoDev, link_formulario_enviado: true } }),
@@ -1150,7 +1150,7 @@ test("un toque de seguimiento va con su contexto, se cuenta y no agenda otro (02
 });
 
 test("un toque no sale si ya tuvo el suyo, si el lead recién escribió o si no hay clave de ManyChat", async () => {
-  // 02/11, Cande: "con un follow up es suficiente". Antes eran dos.
+  // Desde el 02/11 hay un solo seguimiento (pedido de Cande). Antes eran dos.
   const dos = armarToque();
   dos.m.contacto.toques = 1;
   assert.equal((await toque(dos.agente)).hecho, "ya tuvo su toque");
