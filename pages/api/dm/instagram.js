@@ -17,7 +17,7 @@ import {
   ajustes, contactoDeIg, guardarConfig, guardarIg, hayBase, leerConfig, sinUsuarioIg, soltar, tablas, textosDeLaCuenta, tomar,
 } from "../../../lib/dm/base";
 import { buscarCodigos, usuarioIg } from "../../../lib/dm/instagram";
-import { datosDe, hayManyChat } from "../../../lib/dm/manychat";
+import { datosDe, esSoloInstagram, hayManyChat } from "../../../lib/dm/manychat";
 
 const SOLAPE_MS = 5 * 60000; // cada vuelta vuelve a mirar los últimos 5 minutos: un "--" no se escapa entre dos vueltas
 /**
@@ -79,6 +79,8 @@ export default async function handler(req, res) {
   if (hayManyChat()) {
     let fallas = 0;
     for (const id of await sinUsuarioIg(USUARIOS_POR_VUELTA)) {
+      // Un contacto solo de Instagram (02/11) no está en ManyChat: no es una falla de ManyChat, no corta la vuelta.
+      if (esSoloInstagram(id)) continue;
       const d = await datosDe(id);
       if (!d.ok) {
         if (++fallas >= 3) break; // ManyChat no contesta: sigue la próxima vuelta

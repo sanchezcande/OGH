@@ -1164,6 +1164,27 @@ test("un toque no sale si ya tuvo el suyo, si el lead recién escribió o si no 
   for (const mundo of [dos, reciente, sinClave]) assert.equal(mundo.m.pedidos.length + mundo.m.enviados.length, 0);
 });
 
+test("a un contacto solo de Instagram (02/11) el toque le sale aunque no haya clave de ManyChat, y con el envío por campo su respuesta no queda esperando a ManyChat", async () => {
+  // La gente nueva que ManyChat ya no tiene: su id es su IGSID y todo le sale por Instagram (lib/dm/envio.js).
+  const SOLO_IG = "1000000000000611";
+  const sinClave = armarToque({ envio: "campo", hayManyChat: false });
+  sinClave.m.contacto.id = SOLO_IG;
+  const r = await sinClave.agente.procesar(SOLO_IG, null, { evento: "seguimiento" });
+  assert.equal(r.hecho, "enviada");
+  assert.deepEqual(sinClave.m.enviados, ["Mensaje de seguimiento?"]);
+
+  // ManyChat nunca vendría a retirar lo de alguien que no conoce: sale por la API, no queda "lista para retirar".
+  const porCampo = armar({ envio: "campo" });
+  porCampo.m.contacto.id = SOLO_IG;
+  const r2 = await porCampo.agente.procesar(SOLO_IG, porCampo.m.disparo);
+  assert.equal(r2.hecho, "enviada");
+  assert.deepEqual(porCampo.m.enviados, ["Respuesta de prueba?"]);
+  assert.equal(porCampo.m.salidas.at(-1).estado, "enviada");
+  // Uno de ManyChat, como siempre.
+  const deManyChat = armar({ envio: "campo" });
+  assert.equal((await deManyChat.agente.procesar("77", deManyChat.m.disparo)).hecho, "lista para retirar");
+});
+
 test("con envío por campo el toque sale por la API de ManyChat: nadie lo vendría a retirar", async () => {
   // Pedido del 15/10: los seguimientos no corrían porque con el envío por campo una respuesta solo
   // sale cuando el lead escribe, y a un toque lo dispara el silencio.

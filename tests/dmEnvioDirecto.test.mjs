@@ -430,3 +430,80 @@ test("después de mandar, el campo dm_accion de ManyChat queda puesto una vez, y
   await crearEnvio({ manychat: nada, ig: igQue({ ok: false, mando: 0 }), base: baseCon({ id: "79", ig_id: "17841400000000003" }) }).mandarTextos("79", ["hola"]);
   assert.deepEqual(sinMandar, [], "si no salió nada, no se marca");
 });
+
+// ── Contactos solo de Instagram (02/11): la gente nueva que ManyChat ya no tiene. Su id es su IGSID. ──
+const SOLO_IG = "1000000000000611";
+
+test("a un contacto solo de Instagram se le manda por Instagram con su propio id, sin ir a la base ni a ManyChat", async () => {
+  const porIg = [];
+  const porMc = [];
+  const campos = [];
+  const envio = crearEnvio({
+    manychat: { ...mcQue({ ok: true }, porMc), ponerCampo: async (...a) => { campos.push(a); return { ok: true }; } },
+    ig: igQue({ ok: true, mando: 1 }, porIg),
+    base: { contacto: async () => { throw new Error("no hace falta la base: el id ya es el de Instagram"); } },
+  });
+  const r = await envio.mandarTextos(SOLO_IG, ["hola"]);
+  assert.equal(r.ok, true);
+  assert.equal(r.por, "instagram");
+  assert.deepEqual(porIg, [{ igId: SOLO_IG, textos: ["hola"] }]);
+  assert.deepEqual(porMc, []);
+  assert.deepEqual(campos, [], "no tiene automatizaciones de ManyChat que frenar (dm_accion)");
+});
+
+test("si Instagram no le deja mandar a un contacto solo de Instagram, no se reintenta por ManyChat: queda el error", async () => {
+  const porMc = [];
+  const envio = crearEnvio({
+    manychat: mcQue({ ok: true }, porMc),
+    ig: igQue({ ok: false, error: "Instagram contestó 500", code: 2, mando: 0 }),
+    base: baseCon({ id: SOLO_IG, ig_id: SOLO_IG }),
+  });
+  const r = await envio.mandarTextos(SOLO_IG, ["hola"]);
+  assert.equal(r.ok, false);
+  assert.equal(r.por, "ninguno");
+  assert.match(r.error, /solo de Instagram.*no hay respaldo por ManyChat.*Instagram contestó 500/);
+  assert.deepEqual(porMc, [], "ManyChat no lo conoce");
+
+  // Sin Instagram tampoco: el mismo error, y ManyChat ni se entera.
+  const sinIg = await crearEnvio({ manychat: mcQue({ ok: true }, porMc), ig: igQue({ ok: true }), base: baseCon(null), hayIg: () => false }).mandarTextos(SOLO_IG, ["hola"]);
+  assert.equal(sinIg.ok, false);
+  assert.equal(sinIg.por, "ninguno");
+  assert.deepEqual(porMc, []);
+
+  // Un envío incierto sigue siendo incierto (pudo haber salido): no se lo da por fallado.
+  const incierto = await crearEnvio({ manychat: mcQue({ ok: true }, porMc), ig: igQue({ ok: false, incierto: true, error: "tardó", mando: 0 }), base: baseCon(null) })
+    .mandarTextos(SOLO_IG, ["hola"]);
+  assert.equal(incierto.incierto, true);
+  assert.equal(incierto.por, "instagram");
+  assert.deepEqual(porMc, []);
+});
+
+test("el cliente de ManyChat no sale a la red por un contacto solo de Instagram (02/11)", async () => {
+  const real = await import("../lib/dm/manychat.js");
+  const antesClave = process.env.MANYCHAT_API_KEY;
+  const antesFetch = globalThis.fetch;
+  const pedidos = [];
+  process.env.MANYCHAT_API_KEY = "clave-de-prueba";
+  globalThis.fetch = async (url) => {
+    pedidos.push(String(url));
+    return { ok: true, status: 200, json: async () => ({ status: "success", data: { ig_username: "alguien" } }) };
+  };
+  try {
+    // Pausar sus automáticos o ponerle la etiqueta: no hay nada que hacer, se da por hecho.
+    assert.equal((await real.ponerCampo(SOLO_IG, "dm_dueno", "cande")).ok, true);
+    assert.equal((await real.ponerEtiqueta(SOLO_IG, "agente_dm")).ok, true);
+    // Mandarle o pedir sus datos: no se puede, vuelve como falla.
+    const m = await real.mandarTextos(SOLO_IG, ["hola"]);
+    assert.equal(m.ok, false);
+    assert.equal(m.soloInstagram, true);
+    assert.equal((await real.datosDe(SOLO_IG)).ok, false);
+    assert.deepEqual(pedidos, []);
+    // Uno de ManyChat sigue saliendo como siempre.
+    assert.equal((await real.ponerCampo("5001", "dm_dueno", "cande")).ok, true);
+    assert.equal(pedidos.length, 1);
+  } finally {
+    globalThis.fetch = antesFetch;
+    if (antesClave === undefined) delete process.env.MANYCHAT_API_KEY;
+    else process.env.MANYCHAT_API_KEY = antesClave;
+  }
+});
