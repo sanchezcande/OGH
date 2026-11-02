@@ -37,7 +37,7 @@
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
-//   { accion: "mandar_humano", contacto, textos }  → manda un mensaje de Cande (escrito o aprobado por ella) dentro
+//   { accion: "mandar_humano", contacto | igsid (+ directo: true sin contacto en ManyChat), textos }  → manda un mensaje de Cande (escrito o aprobado por ella) dentro
 //                                                  de las 24 h del último mensaje del lead (ManyChat no acepta HUMAN_AGENT
 //                                                  en Instagram: pasadas las 24 h, solo a mano). Queda anotado como de ella.
 //                                                  Sin contacto, con igsid, usuario y nombres: lo busca en ManyChat como
@@ -241,7 +241,14 @@ export default async function handler(req, res) {
     let destino = id;
     if (!destino) {
       const q = await buscarIg(igsid, b);
-      if (!q.id) return res.status(q.status).json({ ok: false, error: q.error });
+      if (!q.id) {
+        // 02/11: con ManyChat en el tope de contactos, la gente nueva no tiene contacto ahí ni entra al agente, y sus
+        // "CV" por DM quedaban sin respuesta. Con directo: true sale por Instagram con su id de Instagram. No queda
+        // anotado en ninguna charla porque no hay contacto en la base.
+        if (b.directo !== true || !/^\d{5,}$/.test(igsid)) return res.status(q.status).json({ ok: false, error: q.error });
+        const r = await instagram.mandarTextos(igsid, textos);
+        return res.status(r.ok ? 200 : 502).json({ ok: Boolean(r.ok), por: "instagram", error: r.error || null, incierto: r.incierto || false });
+      }
       destino = q.id;
     }
     const envio = await mandarTextos(destino, textos);
