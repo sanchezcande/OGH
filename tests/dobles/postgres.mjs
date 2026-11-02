@@ -32,13 +32,21 @@ async function query(texto, params = []) {
     return { rows: [] };
   }
 
-  let m = t.match(/^SELECT id, nombre, email, creado FROM (\w+) WHERE email IS NOT NULL AND NOT drip_off AND (drip_d\d+) IS NULL (.*)$/);
+  let m = t.match(/^SELECT id, nombre, email, creado FROM (\w+) WHERE email IS NOT NULL AND NOT drip_off AND (\w+) IS NULL (.*)$/);
   if (m) {
     const [, tabla, col, resto] = m;
+    // Los que ya compraron el 1 a 1 quedan afuera (lib/oferta1a1.js). El doble mira la tabla
+    // `compras` igual que el NOT IN de la consulta: por mail, sin distinguir mayúsculas.
+    const compraron = new Set((base.tablas.compras || [])
+      .filter((c) => c.email && /4 semanas/.test(String(c.producto || "")))
+      .map((c) => String(c.email).toLowerCase()));
     let filas = (base.tablas[tabla] || []).filter((f) =>
       f.email != null && !f.drip_off && f[col] == null &&
       (!resto.includes("origen = 'formulario'") || f.origen === "formulario") &&
-      f.creado < hace(params[0]));
+      (!resto.includes("ingles = 'Fluido'") || f.ingles === "Fluido") &&
+      (!resto.includes("FROM compras") || !compraron.has(String(f.email).toLowerCase())) &&
+      // Sin la cláusula de antigüedad no hay parámetro de días que mirar.
+      (!resto.includes("make_interval") || f.creado < hace(params[0])));
     // Como en Postgres: sin ORDER BY no hay orden garantizado. Este doble devuelve las
     // filas como están guardadas, y las pruebas las guardan desordenadas a propósito.
     if (resto.includes("ORDER BY creado ASC, id ASC")) {
@@ -49,7 +57,7 @@ async function query(texto, params = []) {
     return { rows: filas.map(({ id, nombre, email, creado }) => ({ id, nombre, email, creado })) };
   }
 
-  m = t.match(/^UPDATE (\w+) SET (drip_d\d+) = NOW\(\) WHERE id = \$1$/);
+  m = t.match(/^UPDATE (\w+) SET (\w+) = NOW\(\) WHERE id = \$1$/);
   if (m) {
     const fila = (base.tablas[m[1]] || []).find((f) => f.id === params[0]);
     if (!fila) throw new Error(`el doble no tiene la fila ${params[0]} en ${m[1]}`);

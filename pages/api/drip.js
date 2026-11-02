@@ -2,6 +2,7 @@ import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { avisar } from "../../lib/notificar";
 import { correrGoteo } from "../../lib/mandarMail";
+import { BUSCAR as BUSCAR_1A1, TOQUE as TOQUE_1A1, primerNombre } from "../../lib/oferta1a1";
 
 // Campaña de goteo para la red de devs. La llama el cron de Vercel una vez por
 // día (ver vercel.json). Cadencia (decisión Cande 17/09):
@@ -172,6 +173,11 @@ export default async function handler(req, res) {
   }
   await sql`ALTER TABLE red_devs ADD COLUMN IF NOT EXISTS drip_off BOOLEAN NOT NULL DEFAULT FALSE`;
 
+  // Quién ya recibió un mail nuestro en esta corrida. `correrGoteo` garantiza un solo mail por
+  // persona, pero solo adentro de su propia cadena: sin esto, un dev de inglés fluido que se
+  // anotó hace dos días recibía el mail de la cadena y la oferta del 1 a 1 la misma mañana.
+  const yaLesMande = new Set();
+
   // La corrida (un mail por persona, qué se anota, cuándo se corta) vive en
   // lib/mandarMail.js, igual para las dos cadenas. Acá va solo lo propio de esta.
   const corrida = await correrGoteo({
@@ -194,9 +200,27 @@ export default async function handler(req, res) {
         subject: t.asunto(pila), text: cuerpo, html: aHtml(cuerpo),
       };
     },
+    anotar: (t, r) => { yaLesMande.add(r.id); return sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]); },
+  });
+
+  // La oferta del 1 a 1 a los de inglés fluido (lib/oferta1a1.js). Va después de la cadena y con
+  // el mismo límite de tiempo: la cadena es de todos los días y esta se termina sola cuando los
+  // 130 lo recibieron, así que si el cupo alcanza para una sola, que sea la de todos los días.
+  await sql`ALTER TABLE red_devs ADD COLUMN IF NOT EXISTS mail_1a1 TIMESTAMPTZ`;
+  const oferta1a1 = await correrGoteo({
+    cadena: "devs con inglés fluido (1 a 1)", toques: [TOQUE_1A1], resend, avisar, limite,
+    buscar: async (t) => (await sql.query(BUSCAR_1A1, [t.dias])).rows.filter((r) => !yaLesMande.has(r.id)),
+    armar: (t, r) => {
+      const cuerpo = t.cuerpo(primerNombre(r.nombre));
+      return {
+        from: FROM, to: r.email, replyTo: REPLY_TO,
+        subject: t.asunto(), text: cuerpo, html: aHtml(cuerpo),
+      };
+    },
     anotar: (t, r) => sql.query(`UPDATE red_devs SET ${t.col} = NOW() WHERE id = $1`, [r.id]),
   });
-  return res.status(200).json({ ok: true, ...corrida });
+
+  return res.status(200).json({ ok: true, ...corrida, oferta1a1 });
 }
 
 // Hasta 240 mails por corrida (6 toques de 40) con una pausa entre cada uno: unos 50
