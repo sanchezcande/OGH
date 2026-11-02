@@ -507,3 +507,60 @@ test("el cliente de ManyChat no sale a la red por un contacto solo de Instagram 
     else process.env.MANYCHAT_API_KEY = antesClave;
   }
 });
+
+test("si Instagram dice que la solicitud está sin aceptar (2534037), el resultado lo dice: a uno solo de Instagram y a uno de ManyChat que tampoco salió por ahí", async () => {
+  // 02/11: quien escribe sin que Cande lo siga cae en Solicitudes, y ahí no se le puede contestar por la API (ni por
+  // ManyChat) hasta que ella lo acepta en la app. El agente se lo pide en vez de pasarle la charla (lib/dm/agente.js).
+  const { esSinAceptar } = await import("../lib/dm/envio.js");
+  const sinAceptar = { ok: false, error: "(#100) Esta acción no es válida porque esta persona no es propietaria del hilo", code: 100, subcode: 2534037, mando: 0 };
+  assert.ok(esSinAceptar(sinAceptar));
+  assert.ok(esSinAceptar({ subcode: 2534037 }));
+  assert.ok(esSinAceptar({ error: "(#100) The user does not own the thread" }));
+  assert.equal(esSinAceptar({ ok: false, error: "otra cosa", code: 100, subcode: 2018001 }), false);
+
+  const soloIg = crearEnvio({ manychat: mcQue({ ok: true }), ig: igQue(sinAceptar), base: baseCon(null), hayIg: () => true });
+  const r = await soloIg.mandarTextos("1000000000000611", ["hola"]);
+  assert.deepEqual([r.ok, r.sinAceptar, r.por], [false, true, "ninguno"]);
+
+  const porMc = [];
+  const deMc = crearEnvio({ manychat: mcQue({ ok: false, error: "ManyChat de prueba: no salió" }, porMc), ig: igQue(sinAceptar), base: baseCon({ id: "77", ig_id: "17841400000000001" }), hayIg: () => true });
+  const r2 = await deMc.mandarTextos("77", ["hola"]);
+  assert.deepEqual([r2.ok, r2.sinAceptar, r2.por, r2.subcode], [false, true, "ninguno", 2534037]);
+  assert.match(r2.error, /propietaria del hilo/);
+  assert.equal(porMc.length, 1, "ManyChat se intenta igual, como siempre");
+
+  // Si ManyChat sí pudo, salió: no hay nada que aceptar.
+  const salio = crearEnvio({ manychat: mcQue({ ok: true }), ig: igQue(sinAceptar), base: baseCon({ id: "77", ig_id: "17841400000000001" }), hayIg: () => true });
+  const r3 = await salio.mandarTextos("77", ["hola"]);
+  assert.deepEqual([r3.ok, r3.sinAceptar, r3.por], [true, undefined, "manychat"]);
+  // Otra falla de Instagram no es una solicitud sin aceptar.
+  const otra = crearEnvio({ manychat: mcQue({ ok: true }), ig: igQue({ ok: false, error: "Instagram de prueba caído", mando: 0 }), base: baseCon(null), hayIg: () => true });
+  assert.equal((await otra.mandarTextos("1000000000000611", ["hola"])).sinAceptar, undefined);
+});
+
+test("ManyChat sin clave, o con una que ya no acepta (401 o 403), se reconoce como 'no hay ManyChat', no como una falla pasajera", async () => {
+  const { sinManyChat } = await import("../lib/dm/manychat.js");
+  assert.ok(sinManyChat({ ok: false, error: "falta MANYCHAT_API_KEY" }));
+  assert.ok(sinManyChat({ ok: false, status: 401, sinManyChat: true, error: "x" }));
+  assert.equal(sinManyChat({ ok: false, status: 500, error: "ManyChat contestó 500" }), false);
+  assert.equal(sinManyChat({ ok: false, incierto: true, error: "ManyChat tardó más de 8 segundos: puede haber salido igual" }), false);
+  assert.equal(sinManyChat({ ok: true }), false);
+  // Con la clave puesta y ManyChat contestando 401/403, cada llamada vuelve con sinManyChat.
+  const antes = { clave: process.env.MANYCHAT_API_KEY, fetch: globalThis.fetch };
+  process.env.MANYCHAT_API_KEY = "clave-de-prueba";
+  try {
+    const mc = await import("../lib/dm/manychat.js");
+    for (const status of [401, 403]) {
+      globalThis.fetch = async () => ({ ok: false, status, json: async () => ({ status: "error", message: "de prueba" }) });
+      assert.ok(sinManyChat(await mc.ponerCampo("77", "dm_dueno", "cande")), `ponerCampo ${status}`);
+      assert.ok(sinManyChat(await mc.buscarPorNombre("Nombre")), `buscarPorNombre ${status}`);
+    }
+    globalThis.fetch = async () => ({ ok: false, status: 500, json: async () => ({ status: "error", message: "de prueba" }) });
+    assert.equal(sinManyChat(await mc.ponerCampo("77", "dm_dueno", "cande")), false, "un 500 es pasajero");
+    assert.equal(sinManyChat(await mc.datosDe("77")), false);
+  } finally {
+    globalThis.fetch = antes.fetch;
+    if (antes.clave === undefined) delete process.env.MANYCHAT_API_KEY;
+    else process.env.MANYCHAT_API_KEY = antes.clave;
+  }
+});

@@ -360,7 +360,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
-  hayManyChat = true, instagram = null, avisarCon = null, codigoGratis = null,
+  hayManyChat = true, instagram = null, avisarCon = null, codigoGratis = null, campoManyChat = null,
 } = {}) {
   const m = {
     ajustes: {
@@ -453,6 +453,8 @@ function armar({
     guardarPrevio: async (id, previo) => {
       if (m.contacto.previo_ig == null) m.contacto.previo_ig = JSON.parse(JSON.stringify(previo));
     },
+    // Como base.yaSinAceptar (02/11): si ya salió el aviso de la solicitud sin aceptar por lo que el lead escribió.
+    yaSinAceptar: async () => m.salidas.some((x) => x.estado === "error" && /^sin aceptar/.test(x.detalle || "")),
   };
   const pedir = async (p) => {
     m.pedidos.push(p);
@@ -461,7 +463,7 @@ function armar({
   const manychat = {
     hayManyChat: () => hayManyChat,
     mandarTextos: mandar || (async (id, textos) => { m.enviados.push(...textos); return { ok: true }; }),
-    ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return { ok: pausaManyChat }; },
+    ponerCampo: async (id, campo, valor) => { m.campos.push([campo, valor]); return campoManyChat ?? { ok: pausaManyChat }; },
   };
   const avisar = avisarCon || (async (titulo, campos) => { m.avisos.push({ titulo, campos }); return avisoSale; });
   // Lo que hace un mensaje de verdad al entrar: se guarda, abre la ventana y pone los toques en cero.
@@ -2084,13 +2086,16 @@ test("lo que le contesta el bot dice si salió, si quizás salió o por qué no"
   assert.match(resultadoDeEnvio({ ok: false, error: "falta MANYCHAT_API_KEY" }, "Lead").texto, /MANYCHAT_API_KEY/);
 });
 
-function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = { ok: true }, fallaAnotar = false, procesado = { hecho: "enviada", enviado: ["Mensaje de prueba"] } } = {}) {
+function respuestaDePrueba({
+  dueno = "agente", envio = { ok: true }, etiqueta = { ok: true }, fallaAnotar = false, procesado = { hecho: "enviada", enviado: ["Mensaje de prueba"] },
+  delContacto = {}, campo = { ok: true },
+} = {}) {
   const hechos = [];
   const dichos = [];
   const vistos = new Set();
   const base = {
     reclamarNovedad: async (u) => { if (vistos.has(u)) return false; vistos.add(u); return true; },
-    contacto: async (id) => (id === "123456789" ? { id, nombre: "Lead De Prueba", dueno } : null),
+    contacto: async (id) => (id === "123456789" ? { id, nombre: "Lead De Prueba", dueno, ...delContacto } : null),
     anotarDeCande: async (id, texto, hasta) => { if (fallaAnotar) throw new Error("base caída"); hechos.push(["anotarDeCande", id, texto, hasta.toISOString()]); },
     descartarPendientes: async (id) => hechos.push(["descartarPendientes", id]),
     anotar: async (id, quien) => hechos.push(["anotar", id, quien]),
@@ -2101,7 +2106,7 @@ function respuestaDePrueba({ dueno = "agente", envio = { ok: true }, etiqueta = 
   const manychat = {
     mandarTextos: async (id, textos) => { hechos.push(["mandarTextos", id, ...textos]); return envio; },
     ponerEtiqueta: async (id, e) => { hechos.push(["ponerEtiqueta", id, e]); return etiqueta; },
-    ponerCampo: async () => ({ ok: true }),
+    ponerCampo: async () => campo,
   };
   const agente = { procesar: async (id, idDisparo, opciones) => { hechos.push(["procesar", id, idDisparo, opciones.evento, opciones.indicacion]); return procesado; } };
   return { hechos, dichos, responder: crearRespuestaTelegram({ base, manychat, decir: async (t) => dichos.push(t), agente }) };
@@ -4478,3 +4483,112 @@ test("CUBA después de un envío que falló: el mismo código, sin pedirle otro 
   assert.ok(m.enviados.some((t) => /\/CUBA77$/.test(t)), m.enviados.join(" / "));
 });
 
+/* ---------- revisión del PR de la gente nueva sin ManyChat (02/11) ---------- */
+
+const { SIN_ACEPTAR, pausaSinAceptar } = await import("../lib/dm/seguimientos.js");
+const SIN_ACEPTAR_IG = { ok: false, por: "ninguno", sinAceptar: true, subcode: 2534037, error: "(#100) Esta persona no es propietaria del hilo (de prueba)" };
+
+test("/agente sin ManyChat: si se sabe su Instagram la devuelve aunque no salga la etiqueta, y no dice Ojo por ManyChat", async () => {
+  // Desde el 05/11 ManyChat ya no contesta. Lo que escriba la persona lo trae la red de la bandeja por su Instagram.
+  const sinMc = { ok: false, status: 401, sinManyChat: true, error: "ManyChat de prueba: clave rechazada" };
+  for (const delContacto of [{ ig_id: "1000000000000611" }, { ig_usuario: "lead.de.prueba" }]) {
+    const r = respuestaDePrueba({ dueno: "cande", etiqueta: sinMc, campo: sinMc, delContacto });
+    assert.equal(await r.responder({ contacto: "123456789", accion: "agente" }, { updateId: 50 }), "agente", JSON.stringify(delContacto));
+    assert.deepEqual(r.hechos.map((h) => h[0]), ["ponerEtiqueta", "anotar", "cerrarTurno", "ponerDueno"]);
+    assert.equal(r.dichos[0], "Lead De Prueba vuelve a ser del agente.");
+  }
+  // Sin la clave también (es la otra forma de "no hay ManyChat").
+  const sinClave = respuestaDePrueba({ etiqueta: { ok: false, error: "falta MANYCHAT_API_KEY" }, campo: { ok: false, error: "falta MANYCHAT_API_KEY" }, delContacto: { ig_id: "1000000000000611" } });
+  assert.equal(await sinClave.responder({ contacto: "123456789", accion: "agente" }, { updateId: 51 }), "agente");
+  assert.doesNotMatch(sinClave.dichos[0], /Ojo/);
+  // Sin su Instagram, como antes: sin etiqueta no se la devuelve.
+  const sinIg = respuestaDePrueba({ dueno: "cande", etiqueta: sinMc });
+  assert.equal(await sinIg.responder({ contacto: "123456789", accion: "agente" }, { updateId: 52 }), "sin etiqueta");
+  // Con ManyChat y una falla de verdad, el Ojo sigue.
+  const falla = respuestaDePrueba({ campo: { ok: false, status: 500, error: "ManyChat de prueba caído" } });
+  await falla.responder({ contacto: "123456789", accion: "cande" }, { updateId: 53 });
+  assert.match(falla.dichos[0], /Ojo: no pude cambiar el campo dm_dueno/);
+  const pasa = respuestaDePrueba({ campo: sinMc });
+  await pasa.responder({ contacto: "123456789", accion: "cande" }, { updateId: 54 });
+  assert.doesNotMatch(pasa.dichos[0], /Ojo/);
+});
+
+test("sin ManyChat, el aviso de una charla que pasa a Cande no dice que no pudo pausar los automáticos", async () => {
+  for (const campoManyChat of [{ ok: false, status: 403, sinManyChat: true, error: "de prueba" }, { ok: false, error: "falta MANYCHAT_API_KEY" }]) {
+    const { agente, m } = armar({ campoManyChat, responde: () => salida(["Mañana te escribo"]) });
+    await agente.procesar("77", m.disparo);
+    assert.equal(m.avisos.length, 1);
+    assert.doesNotMatch(m.avisos[0].campos.Ojo || "", /no pude pausar/);
+  }
+});
+
+test("un toque sale sin la clave de ManyChat si el contacto de ManyChat tiene su ig_id (sale por Instagram)", async () => {
+  const conIg = armarToque({ envio: "campo", hayManyChat: false });
+  conIg.m.contacto.ig_id = "1000000000000611";
+  assert.equal((await toque(conIg.agente)).hecho, "enviada");
+  assert.deepEqual(conIg.m.enviados, ["Mensaje de seguimiento?"]);
+  const sinIg = armarToque({ envio: "campo", hayManyChat: false });
+  assert.equal((await toque(sinIg.agente)).hecho, "sin toques: falta la clave de ManyChat");
+});
+
+test("si escribió desde Solicitudes y Cande no la aceptó, la charla sigue del agente con el turno abierto y a Cande le llega un solo aviso", async () => {
+  const mandar = async () => ({ ...SIN_ACEPTAR_IG });
+  const { agente, m } = armar({ mandar });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "sin aceptar");
+  assert.equal(m.contacto.dueno, "agente", "no se le pasa a Cande");
+  assert.equal(m.contacto.respondido_hasta, 0, "el turno queda abierto: la espera lo vuelve a intentar");
+  assert.equal(m.salidas[0].estado, "error");
+  assert.match(m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `));
+  assert.equal(m.avisos.length, 1);
+  assert.match(m.avisos[0].titulo, /aceptale la solicitud y le contesto/);
+  assert.match(m.avisos[0].campos.Aviso, /Solicitudes/);
+  assert.equal(m.mensajes.filter((x) => x.quien === "agente" && x.texto !== AVISO).length, 0, "no se anota como mandado");
+
+  // La espera lo vuelve a intentar: si sigue sin aceptar, no sale otro aviso.
+  const r2 = await agente.procesar("77", m.disparo, { tarde: true });
+  assert.equal(r2.hecho, "sin aceptar");
+  assert.equal(m.avisos.length, 1, "un solo aviso por lo que escribió");
+
+  // Cuando la acepta, sale.
+  const listo = armar();
+  listo.m.salidas.push({ estado: "error", detalle: `${SIN_ACEPTAR}: de prueba` });
+  assert.equal((await listo.agente.procesar("77", listo.m.disparo)).hecho, "enviada");
+});
+
+test("una solicitud sin aceptar en un pase a Cande o en un toque sigue como siempre, con el aviso que dice qué hacer", async () => {
+  const mandar = async () => ({ ...SIN_ACEPTAR_IG });
+  const pasa = armar({ mandar, responde: () => salida(["Ya te paso con ella, de prueba"], { accion: "pasar_a_cande" }) });
+  assert.equal((await pasa.agente.procesar("77", pasa.m.disparo)).hecho, "error al mandar");
+  assert.equal(pasa.m.contacto.dueno, "cande");
+  assert.match(pasa.m.avisos[0].campos.Aviso, /Solicitudes/);
+  const unToque = armarToque({ mandar });
+  assert.equal((await toque(unToque.agente)).hecho, "error al mandar");
+  assert.equal(unToque.m.avisos.length, 0);
+});
+
+test("la espera reintenta una solicitud sin aceptar con su propia pausa, y no la cuenta como falla del modelo", () => {
+  const ops = { prendido: true, macViva: true, maxFallos: 3 };
+  assert.deepEqual([1, 2, 3, 4, 5, 9].map(pausaSinAceptar), [30, 60, 120, 240, 240, 240]);
+  assert.equal(decidirSinContestar({ minutos: 40, sin_aceptar: 1, minutos_desde_sin_aceptar: 10 }, ops).que, "esperar");
+  assert.equal(decidirSinContestar({ minutos: 40, sin_aceptar: 1, minutos_desde_sin_aceptar: 31 }, ops).que, "reintentar");
+  assert.equal(decidirSinContestar({ minutos: 300, sin_aceptar: "3", minutos_desde_sin_aceptar: "100" }, ops).que, "esperar");
+  assert.equal(decidirSinContestar({ minutos: 300, sin_aceptar: 3, minutos_desde_sin_aceptar: 121 }, ops).que, "reintentar");
+  assert.equal(decidirSinContestar({ minutos: 900, sin_aceptar: 8, minutos_desde_sin_aceptar: 5, fallos: 0 }, ops).que, "esperar", "nunca la pasa a Cande por esto");
+  assert.equal(decidirSinContestar({ minutos: 40, sin_aceptar: 0, minutos_desde_sin_aceptar: null }, ops).que, "reintentar");
+});
+
+test("sinContestar trae las solicitudes sin aceptar aparte de las fallas del modelo, y yaSinAceptar mira solo lo del lead sin respuesta", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const src = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const cuerpo = (nombre) => src.slice(src.indexOf(`export async function ${nombre}`), src.indexOf("\n}\n", src.indexOf(`export async function ${nombre}`)));
+  const sc = cuerpo("sinContestar");
+  assert.match(sc, /sa\.sin_aceptar, sa\.minutos_desde_sin_aceptar/);
+  assert.match(sc, /e\.estado = 'error' AND e\.creado >= p\.desde AND e\.detalle LIKE \$\{`\$\{SIN_ACEPTAR\}%`\}\) sa/);
+  // Las fallas del modelo (fallos, intentos) siguen contando solo las suyas.
+  assert.equal((sc.match(/e\.accion IN \('error', 'reintento'\)/g) || []).length, 2);
+  const ya = cuerpo("yaSinAceptar");
+  assert.match(ya, /e\.detalle LIKE \$\{`\$\{SIN_ACEPTAR\}%`\}/);
+  assert.match(ya, /m\.quien = 'lead' AND m\.id > c\.respondido_hasta/);
+  assert.doesNotMatch(ya, /UPDATE|INSERT|DELETE/);
+});

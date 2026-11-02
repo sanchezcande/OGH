@@ -10,14 +10,19 @@
 //      escribió a mano queda anotado como suyo y la charla sigue del agente.
 //   3. Va completando el usuario de Instagram de los contactos del agente (de a 10 por vuelta, 40 por
 //      hora: ManyChat deja 10 por segundo): con eso se reconoce de quién es cada charla de la bandeja.
+//   4. Lo mismo con las charlas personales que se borraron antes del 02/11 (de a 10 por vuelta): su id y
+//      su usuario de Instagram quedan aparte (base.guardarBorrado), para que la red de la bandeja las
+//      reconozca sin ManyChat y no entren como alguien nuevo (ver base.contactoBorrado). Al 02/11 son 60;
+//      ManyChat contesta hasta el 05/11.
 //
 // Devuelve solo cantidades: ni ids ni usuarios salen en la respuesta ni en los registros.
 import { instagram, reglasInstagram } from "../../../lib/dm/armado";
 import {
-  ajustes, contactoDeIg, guardarConfig, guardarIg, hayBase, leerConfig, sinUsuarioIg, soltar, tablas, textosDeLaCuenta, tomar,
+  ajustes, borradasSinIg, contactoDeIg, guardarBorrado, guardarConfig, guardarIg, hayBase, leerConfig, sinUsuarioIg, soltar, tablas,
+  textosDeLaCuenta, tomar,
 } from "../../../lib/dm/base";
 import { buscarCodigos, usuarioIg } from "../../../lib/dm/instagram";
-import { datosDe, esSoloInstagram, hayManyChat } from "../../../lib/dm/manychat";
+import { datosDe, esSoloInstagram, hayManyChat, sinManyChat } from "../../../lib/dm/manychat";
 
 const SOLAPE_MS = 5 * 60000; // cada vuelta vuelve a mirar los últimos 5 minutos: un "--" no se escapa entre dos vueltas
 /**
@@ -27,6 +32,7 @@ const SOLAPE_MS = 5 * 60000; // cada vuelta vuelve a mirar los últimos 5 minuto
  */
 export const CHARLAS_POR_VUELTA = 50;
 const USUARIOS_POR_VUELTA = 10;
+const BORRADAS_POR_VUELTA = 10;
 
 export default async function handler(req, res) {
   const s = process.env.CRON_SECRET;
@@ -90,7 +96,20 @@ export default async function handler(req, res) {
       usuarios++;
     }
   }
-  return res.status(200).json({ ok: true, renovacion: renovacion.hecho, miradas, sacadas, anotadas, usuarios });
+  let borradas = 0;
+  if (hayManyChat()) {
+    let fallas = 0;
+    for (const id of await borradasSinIg(BORRADAS_POR_VUELTA)) {
+      const d = await datosDe(id);
+      if (!d.ok) {
+        if (sinManyChat(d) || ++fallas >= 3) break; // ManyChat ya no está, o no contesta: sigue la próxima vuelta
+        continue;
+      }
+      await guardarBorrado(id, { igId: d.ig_id != null && d.ig_id !== "" ? String(d.ig_id) : "", usuario: usuarioIg(d.ig_username) || null });
+      borradas++;
+    }
+  }
+  return res.status(200).json({ ok: true, renovacion: renovacion.hecho, borradas, miradas, sacadas, anotadas, usuarios });
 }
 
 export const config = { maxDuration: 60 };
