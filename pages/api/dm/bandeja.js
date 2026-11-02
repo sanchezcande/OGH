@@ -16,9 +16,10 @@
 // Devuelve solo cantidades: ni ids ni usuarios salen en la respuesta ni en los registros.
 import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
 import { revisarBandeja, vigilarRed } from "../../../lib/dm/bandeja";
+import { vigilarEnvios } from "../../../lib/dm/vigilarEnvios";
 import {
   ajustes, anotarCandeDesdeIg, anotarDesdeBandeja, contacto, contactoDeIg, darDeAltaDesdeBandeja, enviadosEnLaCharla, guardarConfig, guardarIg, hayBase,
-  leadsGuardados, leerConfig, loSigue, salidaSinLlegar, soltar, tablas, textosDeLaCuenta, tomar,
+  leadsGuardados, leerConfig, loSigue, pulsoEnvios, salidaSinLlegar, soltar, tablas, textosDeLaCuenta, tomar,
 } from "../../../lib/dm/base";
 import { ErrorInstagram } from "../../../lib/dm/instagram";
 import { buscarPorNombre, datosDe, hayManyChat, ponerEtiqueta } from "../../../lib/dm/manychat";
@@ -44,6 +45,14 @@ export default async function handler(req, res) {
     if (aj.bandeja === false) return res.status(200).json({ ok: true, motivo: "red de la bandeja apagada" });
     // Si la vuelta anterior no terminó (Vercel la cortó por tiempo y no llegó a avisar) y ya van tres así.
     await vigilarRed({ base: { leerConfig, guardarConfig }, avisar: avisarDm, alEmpezar: true });
+    // Y el otro reloj: que lo que el agente escribe esté llegando. vigilarRed mira la lectura, este
+    // mira el envío, que es lo que se rompió callado el 31/10. Va acá para no despertar a la base en
+    // otros minutos, y nunca puede tumbar la vuelta de la bandeja.
+    try {
+      await vigilarEnvios({ base: { pulsoEnvios, leerConfig, guardarConfig }, avisar: avisarDm });
+    } catch (e) {
+      console.error("dm: no pude mirar si los envíos están saliendo:", e.message);
+    }
     r = await revisarBandeja({
       ig: instagram,
       base: {
