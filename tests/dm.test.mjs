@@ -286,10 +286,12 @@ test("el seguimiento se cuenta desde el último mensaje del lead y solo dentro d
   assert.equal(en({ horas: 6, toquesHechos: 1, maxToques: 1 }), null);              // antes del link va uno solo
   assert.equal(en({ horas: null }), null);
   assert.equal(proximoToque({ ahora: AHORA, ultimoLead: new Date(AHORA - 6 * HORA), horas: 4, toquesHechos: 0 }), null); // esa hora ya pasó
-  // El segundo toque, pedido a las 21 horas de su mensaje, cuando el primero salió a las 6.
+  // Desde el 02/11 hay un solo toque: con uno hecho, no se agenda otro.
+  assert.equal(en({ horas: 6, toquesHechos: 1 }), null);
+  // Si alguna vez se vuelve a permitir un segundo (maxToques 2): pedido a las 21 horas de su mensaje, con el primero a las 6.
   const tarde = new Date("2026-10-12T20:00:00Z");
   assert.equal(
-    proximoToque({ ahora: new Date(tarde.getTime() + 6 * HORA), ultimoLead: tarde, horas: 21, toquesHechos: 1 }).getTime(),
+    proximoToque({ ahora: new Date(tarde.getTime() + 6 * HORA), ultimoLead: tarde, horas: 21, toquesHechos: 1, maxToques: 2 }).getTime(),
     tarde.getTime() + 21 * HORA);
   assert.equal(ventanaAbierta(AHORA, new Date(AHORA - 23 * HORA)), true);
   assert.equal(ventanaAbierta(AHORA, new Date(AHORA - 24 * HORA)), false);
@@ -337,10 +339,10 @@ test("un mensaje que entró mientras salía la respuesta anterior sigue siendo d
 
 test("en un seguimiento no hay mensajes nuevos, y el contexto de una charla cargada a mano va siempre", () => {
   const mensajes = [{ id: 1, quien: "lead", texto: "uno" }];
-  const toque = armarTurno(mensajes, { evento: "seguimiento", ahora: AHORA, ultimoLead: new Date(AHORA - 6 * HORA), toque: 1, contexto: "contexto de prueba" });
+  const toque = armarTurno(mensajes, { evento: "seguimiento", ahora: AHORA, ultimoLead: new Date(AHORA - 6 * HORA), toque: 0, contexto: "contexto de prueba" });
   assert.deepEqual(toque.mensajes_del_lead, []);
   assert.equal(toque.historial.length, 1);
-  assert.match(toque.contexto, /^SEGUIMIENTO.*hace 6 horas.*toque 2 de 2.*contexto de prueba$/);
+  assert.match(toque.contexto, /^SEGUIMIENTO.*hace 6 horas.*toque 1 de 1.*contexto de prueba$/);
   assert.equal(armarTurno(mensajes, { contexto: "contexto de prueba" }).contexto, "contexto de prueba");
 });
 
@@ -1131,26 +1133,27 @@ test("callar ante un mensaje puede dejar un seguimiento agendado", async () => {
   assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 4 * HORA);
 });
 
-test("un toque de seguimiento va con su contexto, se cuenta y agenda el segundo", async () => {
-  // El lead escribió a las 12 de Argentina y el primer toque sale a las 18: el segundo, a las 21
-  // horas de su mensaje, cae a las 9 del otro día.
+test("un toque de seguimiento va con su contexto, se cuenta y no agenda otro (02/11: uno solo)", async () => {
+  // El lead escribió a las 12 de Argentina y el toque sale a las 18. Aunque el modelo pida otro a las 21 horas, ya no
+  // hay segundo: 02/11, Cande: "con un follow up es suficiente".
   const { agente, m } = armarToque({
     ahora: new Date("2026-10-12T21:00:00Z"),
     responde: () => salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 21, estado: { ...estadoDev, link_formulario_enviado: true } }),
   });
   const r = await toque(agente);
   assert.equal(r.hecho, "enviada");
-  assert.match(m.pedidos[0].turno.contexto, /SEGUIMIENTO.*toque 1 de 2/);
+  assert.match(m.pedidos[0].turno.contexto, /SEGUIMIENTO.*toque 1 de 1/);
   assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, []);
   assert.deepEqual(m.enviados, ["Mensaje de seguimiento?"]);
   assert.equal(m.contacto.toques, 1);
-  assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 21 * HORA);
+  assert.equal(m.proximo ?? null, null);
 });
 
-test("un toque no sale si ya tuvo los dos, si el lead recién escribió o si no hay clave de ManyChat", async () => {
+test("un toque no sale si ya tuvo el suyo, si el lead recién escribió o si no hay clave de ManyChat", async () => {
+  // 02/11, Cande: "con un follow up es suficiente". Antes eran dos.
   const dos = armarToque();
-  dos.m.contacto.toques = 2;
-  assert.equal((await toque(dos.agente)).hecho, "ya tuvo sus dos toques");
+  dos.m.contacto.toques = 1;
+  assert.equal((await toque(dos.agente)).hecho, "ya tuvo su toque");
   const reciente = armarToque({ ultimoLeadHace: 0.1 });
   assert.equal((await toque(reciente.agente)).hecho, "todavía no toca");
   const sinClave = armarToque({ envio: "campo", hayManyChat: false });
@@ -1375,14 +1378,14 @@ test("un toque no sale si hay un mensaje del lead sin atender", async () => {
   assert.equal(m.pedidos.length + m.enviados.length, 0);
 });
 
-test("el segundo toque sale como mínimo 4 horas después del primero", async () => {
-  // El lead escribió hace 6 horas y el modelo pide el próximo a las 7 de su mensaje: sería en una
-  // hora, pegado al toque que acaba de salir. Se corre a 4 horas de ahora.
+test("después del único toque no se agenda otro, aunque el modelo lo pida (02/11)", async () => {
+  // El lead escribió hace 6 horas y el modelo pide el próximo a las 7 de su mensaje. Antes salía un segundo toque
+  // (a 4 horas como mínimo del primero); desde el 02/11 hay uno solo.
   const { agente, m } = armarToque({
     responde: () => salida(["Mensaje de seguimiento?"], { seguimiento_en_horas: 7, estado: { ...estadoDev, link_formulario_enviado: true } }),
   });
   assert.equal((await toque(agente)).hecho, "enviada");
-  assert.equal(m.proximo.getTime(), AHORA.getTime() + 4 * HORA);
+  assert.equal(m.proximo ?? null, null);
 });
 
 test("proximoToque con noAntesDe corre la hora hacia adelante y respeta la noche y las 24 horas", () => {
@@ -4294,10 +4297,10 @@ test("el turno inmediato no sale si el lead escribió después, si la charla no 
   assert.equal(lleno.m.pedidos.length, 0);
 });
 
-test("el turno inmediato tiene las trabas de un toque: tope de dos, no insistir, y nada encima de la cuenta (22/10)", async () => {
+test("el turno inmediato tiene las trabas de un toque: tope de uno, no insistir, y nada encima de la cuenta (22/10)", async () => {
   const tope = armarToque();
-  tope.m.contacto.toques = 2;
-  assert.equal((await tope.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "ya tuvo sus dos toques");
+  tope.m.contacto.toques = 1;
+  assert.equal((await tope.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "ya tuvo su toque");
   const noInsistir = armarToque();
   noInsistir.m.contacto.estado = { ...estadoDev, link_formulario_enviado: true, etapa: "cerrada" };
   assert.equal((await noInsistir.agente.turnoCaliente({ id: "77", motivo: "pago", desde: new Date(AHORA) })).hecho, "toque cancelado");
