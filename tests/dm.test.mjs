@@ -4742,3 +4742,20 @@ test("un CV viejo no hace que un turno nuevo de dos mensajes salga como palabra 
   assert.equal(r2.clave, undefined, "el reintento sigue yendo al modelo");
   assert.equal(m.pedidos.length, 2);
 });
+
+test("CV o CUBA desde Solicitudes y mientras espera solo repite la palabra o pregunta si hay alguien: sale y sigue del agente", async () => {
+  const { esperaVacia } = await import("../lib/dm/agente.js");
+  for (const [palabra, despues] of [["CV", "CV"], ["CV", "?"], ["CV", "hola?"], ["CV", "🙏"], ["CUBA", "Cuba!"]]) {
+    const { agente, m, aceptar } = armarClaveSinAceptar(palabra, { codigoGratis: async (c) => c, responde: () => salida(["Respuesta de prueba?"]) });
+    m.ajustes.mensaje_cuba = MENSAJE_CUBA;
+    await agente.procesar("77", m.disparo);
+    const otro = m.entraLead(despues);
+    await agente.procesar("77", otro);
+    aceptar();
+    assert.equal((await agente.procesar("77", otro, { tarde: true })).hecho, "palabra clave", `${palabra} / ${despues}`);
+    assert.equal(m.contacto.dueno, "agente", `${palabra} / ${despues}: a Cande solo le llega quien contrata`);
+    assert.equal(m.avisos.length, 1, "solo el de aceptar la solicitud");
+  }
+  assert.equal(esperaVacia("hola? me llegó algo?", "cuba"), false, "eso pide algo");
+  assert.equal(esperaVacia("TRABAJO", "cv"), false);
+});
