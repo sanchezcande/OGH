@@ -1,7 +1,7 @@
 // El 1 a 1 de Cande (28/10): el agente se lo puede ofrecer a seniors y semi seniors que buscan trabajo. Los frenos del
-// sitio dejan pasar exactamente lo suyo (su doc tal cual y la agenda de la llamada) y nada más: otro link, cualquier
-// monto, la garantía o el 1 a 1 a una empresa siguen frenados. Desde el 03/11 tampoco salen el 473, el 500 ni la
-// garantía del 1 a 1: cuánto sale lo cuenta Cande en la llamada ("la idea es que bookeen una llamada no más"). El aviso urgente de quien quiere el 1 a 1 le suena a Cande sin pasarle la charla, y el controlador no toma el doc como
+// sitio dejan pasar exactamente lo suyo (su doc y su link de Gumroad tal cual, 473 y 500 en dólares hablando del 1 a 1 y
+// su garantía con la frase de Cande) y nada más: otro monto, otro link, otra garantía o el 1 a 1 a una empresa siguen
+// frenados. El aviso urgente de quien quiere el 1 a 1 le suena a Cande sin pasarle la charla, y el controlador no toma el doc como
 // una entrega que falta ni corrige con el precio del programa una charla del 1 a 1. Desde el 29/10: el "no lo puedo
 // pagar" al 1 a 1 no frena el programa de 27 que le sigue, a quien ya compró no se le vende nada (NOTA_COMPRO como
 // antes) y el contexto trae el seniority del formulario. Desde el 30/10 el 1 a 1 va primero a cualquiera que busca (eso
@@ -56,22 +56,11 @@ test("el 1 a 1 se cierra en una llamada: la agenda de Cande pasa (con o sin www 
   frena([`Va de nuevo\nhttps://${LINK_PAGO_1A1}`]);
 });
 
-test("cuánto sale el 1 a 1 no sale nunca, tampoco hablando del 1 a 1 (Cande, 03/11: lo cuenta ella en la llamada)", () => {
-  frena(["Arranca en 473 dólares y son 500 al final, cuando firmás", `Está todo acá\n${DOC_1A1}`]);
-  frena(["El 1 a 1 arranca con USD 473"]);
-  frena(["Y 500 dólares cuando firmás"]);
-  frena([`473 dólares de entrada, te cuento todo en la llamada\nwww.${AGENDA_1A1}`]);
-  // El caso real del 02/11: el lead preguntó si eran 500 para empezar y el agente lo corrigió con los dos montos.
-  frena(["Casi! Son 473 dólares para arrancar y 500 más recién cuando firmás", `Te cuento todo en la llamada\nwww.${AGENDA_1A1}`, "Te cierra?"]);
-  // Sin moneda también: "son 473" o "500 más cuando firmás".
-  frena(["Son 473 para arrancar"]);
-  frena(["Y 500 más cuando firmás"]);
-});
-
-test("lo que sí sale cuando pregunta cuánto sale el 1 a 1: la llamada", () => {
-  pasa([`Eso te lo cuento en la llamada de 15 minutos, agendá acá:\nwww.${AGENDA_1A1}`]);
-  pasa(["Eso te lo cuento en la llamada :)", "Querés agendarla así te cuento todo?"]);
-  pasa(["Te lo cuento bien en la llamada, son 15 minutos"]);
+test("473 y 500 pasan hablando del 1 a 1 (con su link, su doc, '1 a 1' o 'cuando firmás')", () => {
+  pasa(["Arranca en 473 dólares y son 500 al final, cuando firmás", `Está todo acá\n${DOC_1A1}`]);
+  pasa(["El 1 a 1 arranca con USD 473"]);
+  pasa(["Y 500 dólares cuando firmás"]);
+  pasa([`473 dólares de entrada, te cuento todo en la llamada\nwww.${AGENDA_1A1}`]);
 });
 
 test("el marco de los 5 devs y los 5 lugares de este mes no es urgencia", () => {
@@ -79,10 +68,10 @@ test("el marco de los 5 devs y los 5 lugares de este mes no es urgencia", () => 
   pasa(["Son 5 lugares este mes"]);
 });
 
-test("la garantía del 1 a 1 ya no sale, ni con la frase de Cande (03/11: va con cuánto sale, a la llamada)", () => {
-  frena([GARANTIA]);
-  frena([GARANTIA.replace("oferta,", "una oferta").replace("vos:", "vos,")]);
-  frena(["Siii", GARANTIA, `Está todo en el doc\n${DOC_1A1}`]);
+test("la garantía del 1 a 1 pasa con la frase de Cande, también con otra puntuación", () => {
+  pasa([GARANTIA]);
+  pasa([GARANTIA.replace("oferta,", "una oferta").replace("vos:", "vos,")]);
+  pasa(["Siii", GARANTIA, `Está todo en el doc\n${DOC_1A1}`]);
 });
 
 test("el programa de 27 sigue igual: su monto, sus 2 pagos, su link y su garantía de 30 días", () => {
@@ -106,10 +95,10 @@ test("a quien ya tiene el programa no se le vende nada, tampoco el 1 a 1 (Cande 
     "le mandes links de pago; si escribe, ayudalo con lo que pregunte.");
 });
 
-test("473 y 500 del 1 a 1 frenados con cualquier moneda (u$s, us$, $), también al lado de un mensaje del programa (03/11)", () => {
-  frena(["El 1 a 1 arranca con u$s 473 y us$ 500 cuando firmás"]);
-  frena(["El 1 a 1 son $473 para arrancar"]);
-  frena(["El programa es grabado y lo hacés solo", "En el 1 a 1 te acompaño yo, arranca en 473 dólares y son 500 al final, cuando firmás"]);
+test("473 y 500 en dólares, también con u$s, us$ o $, y un mensaje que nombra el programa al lado de otro del 1 a 1", () => {
+  pasa(["El 1 a 1 arranca con u$s 473 y us$ 500 cuando firmás"]);
+  pasa(["El 1 a 1 son $473 para arrancar"]);
+  pasa(["El programa es grabado y lo hacés solo", "En el 1 a 1 te acompaño yo, arranca en 473 dólares y son 500 al final, cuando firmás"]);
 });
 
 test("el doc y el link del 1 a 1 pasan solo tal cual, con sus mayúsculas", () => {
