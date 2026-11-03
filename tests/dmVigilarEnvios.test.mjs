@@ -28,7 +28,7 @@ const armar = (pulso, config = {}) => {
 };
 
 test("le escribieron y no salió nada: avisa", async () => {
-  const d = armar({ leads: 7, enviadas: 0, inciertas: 0, errores: 0 });
+  const d = armar({ leads: 7, pendientes: 7, enviadas: 0, inciertas: 0, errores: 0 });
   const r = await vigilarEnvios(d);
   assert.equal(r.aviso, true);
   assert.equal(r.mudo, true);
@@ -171,4 +171,19 @@ test("la base cuenta solo charlas del agente, por la hora de guardado, y los tur
   assert.match(fn, /m\.id > c\.respondido_hasta AS abierto/, "el turno cerrado no es silencio");
   assert.match(fn, /COUNT\(DISTINCT contacto\)::int FROM vistos\) AS leads/);
   assert.match(fn, /FILTER \(WHERE estado = 'enviada'\)::int AS enviadas/, "lo que no salió (callar, una nota del repaso) no tapa al agente mudo");
+});
+
+test("un envío que falló cerró el turno, pero no salió nada: avisa igual (el 31/10 fueron uno o dos por ventana)", async () => {
+  // El CV por DM que queda incierto cierra el turno y sigue siendo del agente; una respuesta que falla además le pasa la
+  // charla a Cande. En los dos casos no queda nada pendiente, y la falla es justo lo que el reloj tiene que ver.
+  for (const pulso of [
+    { leads: 1, pendientes: 0, enviadas: 0, inciertas: 1, errores: 0 },
+    { leads: 0, pendientes: 0, enviadas: 0, inciertas: 1, errores: 1 },
+  ]) {
+    const d = armar(pulso);
+    const r = await vigilarEnvios(d);
+    assert.equal(r.aviso, true, JSON.stringify(pulso));
+    assert.equal(r.mudo, true);
+    assert.match(d.avisos[0].campos.Qué, /no llegaron y 0 sí/);
+  }
 });
