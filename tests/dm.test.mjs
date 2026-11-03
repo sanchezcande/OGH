@@ -430,7 +430,8 @@ function armar({
     cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
     // Lo que puso en el formulario y los turnos inmediatos (lib/dm/pagina.js): en estas pruebas, lo que diga m.
     formularioDeLaCharla: async () => m.formulario ?? null,
-    pidioPalabra: async (id, nombre) => m.salidas.some((s) => s.accion === "palabra_clave" && s.motivo === `palabra clave: ${nombre}`),
+    pidioPalabra: async (id, nombre, { entregada = false } = {}) => m.salidas.some((s) => s.accion === "palabra_clave" && s.motivo === `palabra clave: ${nombre}`
+      && (!entregada || ["enviada", "incierta"].includes(s.estado))),
     agendarCaliente: async (id, motivo, minutos) => { m.calientes.push([motivo, minutos]); return true; },
     contarToque: async () => { m.contacto.toques++; },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
@@ -4591,4 +4592,81 @@ test("sinContestar trae las solicitudes sin aceptar aparte de las fallas del mod
   assert.match(ya, /e\.detalle LIKE \$\{`\$\{SIN_ACEPTAR\}%`\}/);
   assert.match(ya, /m\.quien = 'lead' AND m\.id > c\.respondido_hasta/);
   assert.doesNotMatch(ya, /UPDATE|INSERT|DELETE/);
+});
+
+/* ---------- palabra clave desde Solicitudes sin aceptar (03/11, al juntar con CUBA) ---------- */
+
+/** Un lead que escribe `palabra` desde Solicitudes: el primer envío no sale (sin aceptar), el siguiente sí. */
+function armarClaveSinAceptar(palabra, opciones = {}) {
+  let aceptada = false;
+  const mundo = armar({
+    mandar: async (id, textos) => {
+      if (!aceptada) return { ...SIN_ACEPTAR_IG };
+      mundo.m.enviados.push(...textos);
+      return { ok: true };
+    },
+    ...opciones,
+  });
+  mundo.m.mensajes.find((x) => x.id === mundo.m.disparo).texto = palabra;
+  return { ...mundo, aceptar: () => { aceptada = true; } };
+}
+
+test("TRABAJO desde Solicitudes: el turno queda abierto, un solo aviso de aceptarla, y al aceptarla salen sus mensajes y pasa a Cande", async () => {
+  const { agente, m, aceptar } = armarClaveSinAceptar("TRABAJO");
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "sin aceptar");
+  assert.equal(r.clave, "trabajo");
+  assert.equal(m.contacto.dueno, "agente", "no le llega una charla que no puede contestar");
+  assert.equal(m.contacto.respondido_hasta, 0, "el turno queda abierto: la espera lo vuelve a intentar");
+  assert.match(m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `), "con la marca: no es el envío roto");
+  assert.equal(m.avisos.length, 1);
+  assert.match(m.avisos[0].titulo, /aceptale la solicitud y le contesto/);
+  assert.match(m.avisos[0].campos.Aviso, /TRABAJO desde Solicitudes/);
+  // La espera lo vuelve a intentar y sigue sin aceptar: no sale otro aviso.
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "sin aceptar");
+  assert.equal(m.avisos.length, 1);
+  // La acepta: salen los mensajes de TRABAJO y la charla pasa a ella.
+  aceptar();
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "palabra clave");
+  assert.ok(m.enviados.some((t) => /15min/.test(t)), m.enviados.join(" / "));
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+test("CV desde Solicitudes: tampoco pasa a Cande, y sale cuando la acepta", async () => {
+  const { agente, m, aceptar } = armarClaveSinAceptar("CV");
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "sin aceptar");
+  assert.equal(m.contacto.dueno, "agente");
+  aceptar();
+  assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "palabra clave");
+  assert.equal(m.contacto.dueno, "agente");
+  assert.ok(m.enviados.length > 0);
+});
+
+test("CUBA desde Solicitudes: no cuenta como regalado hasta que le sale el link, y al aceptarla sale el mismo código", async () => {
+  const { NOTA_REGALO_CUBA } = await import("../lib/dm/pagina.js");
+  const creados = [];
+  const { agente, m, aceptar } = armarClaveSinAceptar("CUBA", {
+    codigoGratis: async (codigo) => { creados.push(codigo); return codigo; },
+    responde: () => salida(["Respuesta de prueba?"]),
+  });
+  m.ajustes.mensaje_cuba = MENSAJE_CUBA;
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "sin aceptar");
+  assert.equal(m.contacto.dueno, "agente");
+  // Mientras tanto escribe otra cosa: el agente no da por hecho que ya tiene el link.
+  aceptar();
+  const otro = m.entraLead("hola? me llegó algo?");
+  m.contacto.respondido_hasta = m.disparo; // la espera ya cerró el CUBA de antes con otra vuelta: queda solo lo nuevo
+  await agente.procesar("77", otro);
+  assert.ok(!(m.pedidos[0]?.turno.contexto || "").includes(NOTA_REGALO_CUBA), "todavía no le llegó: no está regalado");
+  // Y si vuelve a escribir CUBA ya aceptada, sale con el mismo código sin pedirle otro a Gumroad.
+  const cuba = m.entraLead("CUBA");
+  assert.equal((await agente.procesar("77", cuba)).hecho, "palabra clave");
+  assert.deepEqual(creados, ["CUBA77"]);
+  assert.ok(m.enviados.some((t) => /\/CUBA77$/.test(t)), m.enviados.join(" / "));
+});
+
+test("un pase a Cande desde Solicitudes queda con la marca SIN_ACEPTAR: el reloj del envío no lo cuenta como falla", async () => {
+  const pasa = armar({ mandar: async () => ({ ...SIN_ACEPTAR_IG }), responde: () => salida(["Ya te paso con ella, de prueba"], { accion: "pasar_a_cande" }) });
+  assert.equal((await pasa.agente.procesar("77", pasa.m.disparo)).hecho, "error al mandar");
+  assert.match(pasa.m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `));
 });
