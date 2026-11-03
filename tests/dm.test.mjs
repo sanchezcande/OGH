@@ -4759,3 +4759,48 @@ test("CV o CUBA desde Solicitudes y mientras espera solo repite la palabra o pre
   assert.equal(esperaVacia("hola? me llegó algo?", "cuba"), false, "eso pide algo");
   assert.equal(esperaVacia("TRABAJO", "cv"), false);
 });
+
+/* ---------- a un saludo solo no se le manda el toque (04/11) ---------- */
+
+// Cande, 04/11: "claramente no era un lead, no hables al pedo a un holi". El 03/11 una cuenta verificada escribió
+// "Holi" por error y recibió "Y qué onda sos dev o estás construyendo algo?" y, cuatro horas después, el toque.
+
+test("a quien solo saludó se le contesta, pero no se le agenda el toque", async () => {
+  for (const saludo of ["Holi", "hola!", "Buenas", "Hola Candelaria", "🙂"]) {
+    // Como en producción: sin el aviso de que es automático (aviso_ia apagado), el saludo es lo primero de la charla.
+    const { agente, m } = armar({ conAviso: false, avisoIa: false, toques: true, responde: () => salida(["Y qué onda sos dev o estás construyendo algo?"], { seguimiento_en_horas: 6 }) });
+    m.mensajes.find((x) => x.id === m.disparo).texto = saludo;
+    assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada", saludo);
+    assert.equal(m.proximo, null, `${saludo}: sin toque`);
+  }
+});
+
+test("el toque que ya estaba agendado para quien solo saludó se cancela", async () => {
+  const { agente, m } = armarToque({ conAviso: false, avisoIa: false });
+  m.mensajes.filter((x) => x.quien === "lead").forEach((x) => { x.texto = "Holi"; });
+  assert.equal((await toque(agente)).hecho, "toque cancelado");
+  assert.equal(m.pedidos.length, 0);
+});
+
+test("el Hola que contesta algo que le mandó la cuenta antes (la lista de CV por un comentario) sí lleva su toque", async () => {
+  // Con el mensaje de la cuenta adelante: así se ve la respuesta privada al comentario en lo leído de Instagram.
+  const { agente, m } = armar({ toques: true, responde: () => salida(["Y qué onda sos dev o estás construyendo algo?"], { seguimiento_en_horas: 6 }) });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "Hola!";
+  await agente.procesar("77", m.disparo);
+  assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 6 * HORA);
+});
+
+test("si contó algo más que el saludo, el toque sigue como siempre", async () => {
+  const { agente, m } = armar({ toques: true, responde: () => salida(["Y cómo va la búsqueda?"], { seguimiento_en_horas: 6 }) });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "Hola! soy dev y estoy buscando trabajo";
+  await agente.procesar("77", m.disparo);
+  assert.equal(m.proximo.getTime(), m.contacto.ultimo_lead.getTime() + 6 * HORA);
+});
+
+test("qué es un saludo solo y qué no", async () => {
+  const { esSoloSaludo } = await import("../lib/dm/agente.js");
+  for (const t of ["Holi", "HOLA!!", "holis", "Buenas tardes", "Hola cande, cómo estás?", "qué tal", "👋", "hola hola"]) assert.equal(esSoloSaludo(t), true, t);
+  for (const t of ["Hola gracias", "hola vi tu reel", "CV", "Trabajo", "Hola, soy dev", "", "[adjunto o mensaje sin texto]",
+    "27?", "Hola! 27?", "$27", "+54 9 11 5555-5555", "Привет, я разработчик"]) assert.equal(esSoloSaludo(t), false, t);
+  for (const t of ["👋🏻", "🙏", "❤️", "!!"]) assert.equal(esSoloSaludo(t), true, t);
+});
