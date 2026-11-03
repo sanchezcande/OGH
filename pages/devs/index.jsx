@@ -42,9 +42,11 @@ const PASOS = [
       { id: "stack", label: ["Stack", "Stack"], tipo: "varias", req: true, otro: "stackOtro",
         ayuda: ["Elegí todos los que uses. Si te falta alguno, escribilo en Otro.", "Pick everything you use. Missing one? Add it under Other."],
         ops: ["React", "Next.js", "Node", "TypeScript", "Python", "React Native", "Flutter",
-              "PHP", "Java", ".NET", "Go", "DevOps", "Data/AI", "QA", "Otro"],
+              "PHP", "Java", ".NET", "Go", "DevOps", "Data/AI",
+              "LangChain", "RAG", "Agentes de IA", "Vertex AI", "DeepInfra", "Mem0", "QA", "Otro"],
         opsEn: ["React", "Next.js", "Node", "TypeScript", "Python", "React Native", "Flutter",
-              "PHP", "Java", ".NET", "Go", "DevOps", "Data/AI", "QA", "Other"] },
+              "PHP", "Java", ".NET", "Go", "DevOps", "Data/AI",
+              "LangChain", "RAG", "AI agents", "Vertex AI", "DeepInfra", "Mem0", "QA", "Other"] },
     ],
   },
   {
