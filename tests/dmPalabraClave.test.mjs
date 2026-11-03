@@ -86,7 +86,7 @@ test("el último mensaje aprieta con el cupo y no pide una opinión", () => {
   const ultimo = PALABRAS.trabajo.textos[PALABRAS.trabajo.textos.length - 1].trim();
   // El 30/10 el cierre era una pregunta ("Te guardo un lugar o se lo queda otro?"). El 02/11 Cande
   // lo reescribió entero y dictó este, que aprieta con el cupo y sin preguntar: "Voy a tomar 5 este
-  // mes y ya quedan 3 no másss". Es decisión de ella y queda escrito acá para que no se "arregle"
+  // mes y ya quedan 3 no másss" (el 03/11 pidió bajarlo a 2). Es decisión de ella y queda escrito acá para que no se "arregle"
   // sola más adelante. Lo que sigue valiendo es que el cierre no pida una opinión: con "qué te
   // parece" contesta cualquiera que no va a comprar, y es la falla número uno de sus 26 llamadas.
   assert.match(ultimo, /\b5\b/, "el cierre nombra el cupo");
