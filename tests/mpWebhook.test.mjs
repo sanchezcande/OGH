@@ -5,6 +5,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const src = readFileSync(new URL("../pages/api/mp-webhook.js", import.meta.url), "utf8");
+// 03/11: crear el código de 100% pasó a lib/gumroadCodigos.js, porque también lo usa CUBA (el regalo a los devs de Cuba).
+const codigos = readFileSync(new URL("../lib/gumroadCodigos.js", import.meta.url), "utf8");
 
 test("nunca le cree al POST: siempre le pregunta a MercadoPago por el pago", () => {
   assert.match(src, /api\.mercadopago\.com\/v1\/payments/, "tiene que consultar el pago");
@@ -60,14 +62,15 @@ test("el pago en pesos tambien queda en la tabla de compras", () => {
 
 test("cada pago en pesos recibe un codigo propio de un solo uso", () => {
   // 22/10: con un código igual para todos nada ata el pago con la entrada, y encima se puede reusar.
-  assert.match(src, /max_purchase_count: "1"/);
-  assert.match(src, /amount_off: "100"/);
-  assert.match(src, /offer_type: "percent"/);
+  assert.match(src, /return crearCodigo100\(nombre\)/);
+  assert.match(codigos, /max_purchase_count: "1"/);
+  assert.match(codigos, /amount_off: "100"/);
+  assert.match(codigos, /offer_type: "percent"/);
 });
 
 test("si el codigo propio no sale, igual recibe el general", () => {
   // Un código repetido es un problema chico; pagar y quedarse sin curso, no.
-  assert.match(src, /no pude crear el código único[\s\S]{0,60}return null/);
+  assert.match(codigos, /no pude crear el código único[\s\S]{0,60}return null/);
   assert.match(src, /const link = propio \? `\$\{BASE_LINK\}\/\$\{propio\}` : CODIGO_URL/);
 });
 
