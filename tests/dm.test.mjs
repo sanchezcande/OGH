@@ -431,7 +431,7 @@ function armar({
     // Lo que puso en el formulario y los turnos inmediatos (lib/dm/pagina.js): en estas pruebas, lo que diga m.
     formularioDeLaCharla: async () => m.formulario ?? null,
     pidioPalabra: async (id, nombre, { entregada = false } = {}) => m.salidas.some((s) => s.accion === "palabra_clave" && s.motivo === `palabra clave: ${nombre}`
-      && (!entregada || ["enviada", "incierta"].includes(s.estado))),
+      && (!entregada || !(s.estado === "error" && /^sin aceptar/.test(s.detalle || "")))),
     agendarCaliente: async (id, motivo, minutos) => { m.calientes.push([motivo, minutos]); return true; },
     contarToque: async () => { m.contacto.toques++; },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
@@ -4642,27 +4642,65 @@ test("CV desde Solicitudes: tampoco pasa a Cande, y sale cuando la acepta", asyn
   assert.ok(m.enviados.length > 0);
 });
 
-test("CUBA desde Solicitudes: no cuenta como regalado hasta que le sale el link, y al aceptarla sale el mismo código", async () => {
-  const { NOTA_REGALO_CUBA } = await import("../lib/dm/pagina.js");
+test("CUBA desde Solicitudes: si escribe otra cosa mientras espera, al aceptarla sale igual, con el mismo código", async () => {
   const creados = [];
-  const { agente, m, aceptar } = armarClaveSinAceptar("CUBA", {
-    codigoGratis: async (codigo) => { creados.push(codigo); return codigo; },
-    responde: () => salida(["Respuesta de prueba?"]),
-  });
+  const { agente, m, aceptar } = armarClaveSinAceptar("CUBA", { codigoGratis: async (codigo) => { creados.push(codigo); return codigo; } });
   m.ajustes.mensaje_cuba = MENSAJE_CUBA;
   assert.equal((await agente.procesar("77", m.disparo)).hecho, "sin aceptar");
-  assert.equal(m.contacto.dueno, "agente");
-  // Mientras tanto escribe otra cosa: el agente no da por hecho que ya tiene el link.
-  aceptar();
   const otro = m.entraLead("hola? me llegó algo?");
-  m.contacto.respondido_hasta = m.disparo; // la espera ya cerró el CUBA de antes con otra vuelta: queda solo lo nuevo
-  await agente.procesar("77", otro);
-  assert.ok(!(m.pedidos[0]?.turno.contexto || "").includes(NOTA_REGALO_CUBA), "todavía no le llegó: no está regalado");
-  // Y si vuelve a escribir CUBA ya aceptada, sale con el mismo código sin pedirle otro a Gumroad.
-  const cuba = m.entraLead("CUBA");
-  assert.equal((await agente.procesar("77", cuba)).hecho, "palabra clave");
-  assert.deepEqual(creados, ["CUBA77"]);
+  assert.equal((await agente.procesar("77", otro)).hecho, "sin aceptar", "sigue esperando que la acepte");
+  assert.equal(m.avisos.length, 1, "un solo aviso");
+  aceptar();
+  assert.equal((await agente.procesar("77", otro, { tarde: true })).hecho, "palabra clave");
+  assert.deepEqual(creados, ["CUBA77"], "el código ya existe en Gumroad: no se pide otro");
   assert.ok(m.enviados.some((t) => /\/CUBA77$/.test(t)), m.enviados.join(" / "));
+  assert.equal(m.pedidos.length, 0, "no fue al modelo");
+});
+
+test("TRABAJO desde Solicitudes y después otro mensaje: al aceptarla salen los de TRABAJO y pasa a Cande (no va al modelo)", async () => {
+  const { agente, m, aceptar } = armarClaveSinAceptar("TRABAJO", { responde: () => salida(["Respuesta de prueba?"]) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "sin aceptar");
+  const otro = m.entraLead("hola? hay alguien?");
+  assert.equal((await agente.procesar("77", otro)).hecho, "sin aceptar");
+  aceptar();
+  assert.equal((await agente.procesar("77", otro, { tarde: true })).hecho, "palabra clave");
+  assert.ok(m.enviados.some((t) => /15min/.test(t)), m.enviados.join(" / "));
+  assert.equal(m.pedidos.length, 0);
+  assert.equal(m.contacto.dueno, "cande");
+});
+
+test("una palabra clave en un turno de dos mensajes que no quedó esperando en Solicitudes va al modelo, como siempre", async () => {
+  const { agente, m } = armar({ responde: () => salida(["Respuesta de prueba?"]) });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "TRABAJO";
+  const otro = m.entraLead("y otra cosa");
+  assert.equal((await agente.procesar("77", otro)).hecho, "enviada");
+  assert.equal(m.pedidos.length, 1);
+});
+
+test("CUBA que no salió por la solicitud sin aceptar no cuenta como regalado; uno que salió a medias sí", async () => {
+  const { NOTA_REGALO_CUBA } = await import("../lib/dm/pagina.js");
+  // Sin aceptar y el turno cerrado por otro lado (Cande lo cerró a mano): todavía no tiene su link.
+  const sin = armarClaveSinAceptar("CUBA", { codigoGratis: async (c) => c, responde: () => salida(["Respuesta de prueba?"]) });
+  sin.m.ajustes.mensaje_cuba = MENSAJE_CUBA;
+  await sin.agente.procesar("77", sin.m.disparo);
+  sin.aceptar();
+  sin.m.contacto.respondido_hasta = sin.m.disparo;
+  await sin.agente.procesar("77", sin.m.entraLead("hola?"));
+  assert.ok(!(sin.m.pedidos[0]?.turno.contexto || "").includes(NOTA_REGALO_CUBA), "no le llegó nada: no está regalado");
+  // A medias (salió el mensaje con el link y cortó después): ya lo tiene, no se le vende nada.
+  let primera = true;
+  const medias = armarCuba({
+    mandar: async (id, textos) => {
+      if (primera) { primera = false; medias.m.enviados.push(textos[0]); return { ok: false, mando: 1, error: "cortó después del primero (de prueba)" }; }
+      medias.m.enviados.push(...textos); return { ok: true };
+    },
+    responde: () => salida(["Respuesta de prueba?"]),
+  });
+  await medias.agente.procesar("77", medias.m.disparo);
+  medias.m.contacto.dueno = "agente"; // Cande se la devuelve al agente
+  const trabajo = medias.m.entraLead("TRABAJO");
+  await medias.agente.procesar("77", trabajo);
+  assert.ok(!medias.m.enviados.some((t) => /15min/.test(t)), "al que tiene el regalo no le sale la agenda del 1 a 1");
 });
 
 test("un pase a Cande desde Solicitudes queda con la marca SIN_ACEPTAR: el reloj del envío no lo cuenta como falla", async () => {
