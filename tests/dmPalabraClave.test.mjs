@@ -187,3 +187,39 @@ test("al que tiene el regalo de CUBA no le sale nada que venda: ni la llamada, n
   assert.deepEqual(revisar(salida(["Te cuento todo en una llamada de 15 minutos, agendá acá:\nwww.opengatehub.com/15min"]), { ...op, regalo: false }), { ok: true },
     "sin el regalo, la llamada sigue saliendo como siempre");
 });
+
+test("al que ya tiene el regalo solo le contesta CUBA: las otras palabras van al agente", () => {
+  assert.equal(palabraClaveDe("TRABAJO", { regalos: true, conRegalo: true }), null);
+  assert.equal(palabraClaveDe("CV", { regalos: true, conRegalo: true }), null);
+  assert.equal(palabraClaveDe("CUBA", { regalos: true, conRegalo: true })?.nombre, "cuba");
+});
+
+test("el regalo de CUBA no se borra con las charlas viejas: es lo que dice que ya tiene el programa", () => {
+  const src = readFileSync(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const i = src.indexOf("export async function borrarViejas");
+  assert.ok(i > 0);
+  assert.match(src.slice(i, i + 1200), /NOT \(accion = 'palabra_clave' AND motivo = 'palabra clave: cuba'\)/);
+});
+
+test("crear el código de 100% sirve dos veces con el mismo nombre: si ya existe, devuelve ese", async () => {
+  const { crearCodigo100 } = await import("../lib/gumroadCodigos.js");
+  const antes = { fetch: globalThis.fetch, token: process.env.GUMROAD_ACCESS_TOKEN };
+  const pedidos = [];
+  process.env.GUMROAD_ACCESS_TOKEN = "token-de-prueba";
+  globalThis.fetch = async (url, op = {}) => {
+    pedidos.push(`${op.method || "GET"} ${String(url).split("?")[0]}`);
+    const json = (d, status = 200) => ({ ok: status < 400, status, json: async () => d });
+    if (/\/v2\/products$/.test(String(url).split("?")[0])) return json({ products: [{ id: "p1", custom_permalink: "acelerador-de-carrera" }] });
+    if (op.method === "POST") return json({ success: false, message: "ya existe" }, 422);
+    return json({ offer_codes: [{ name: "CUBA77" }] });
+  };
+  try {
+    assert.equal(await crearCodigo100("CUBA77"), "CUBA77");
+    assert.equal(await crearCodigo100("CUBA88"), null, "si no existe y no se pudo crear, no hay código");
+    assert.ok(pedidos.some((p) => p.startsWith("GET") && p.endsWith("/offer_codes")), pedidos.join(" | "));
+  } finally {
+    globalThis.fetch = antes.fetch;
+    if (antes.token === undefined) delete process.env.GUMROAD_ACCESS_TOKEN; else process.env.GUMROAD_ACCESS_TOKEN = antes.token;
+  }
+});
+

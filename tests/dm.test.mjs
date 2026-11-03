@@ -430,8 +430,7 @@ function armar({
     cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
     // Lo que puso en el formulario y los turnos inmediatos (lib/dm/pagina.js): en estas pruebas, lo que diga m.
     formularioDeLaCharla: async () => m.formulario ?? null,
-    pidioPalabra: async (id, nombre) => m.salidas.some((s) => s.accion === "palabra_clave" &&
-      s.motivo === `palabra clave: ${nombre}` && ["enviando", "enviada", "incierta"].includes(s.estado)),
+    pidioPalabra: async (id, nombre) => m.salidas.some((s) => s.accion === "palabra_clave" && s.motivo === `palabra clave: ${nombre}`),
     agendarCaliente: async (id, motivo, minutos) => { m.calientes.push([motivo, minutos]); return true; },
     contarToque: async () => { m.contacto.toques++; },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
@@ -4429,5 +4428,32 @@ test("después de CUBA el agente sabe que lo tiene regalado y no le vende nada (
   assert.equal(m.salidas[1].estado, "frenada");
   assert.ok(String(m.salidas[1].detalle).includes(MOTIVO_REGALO), m.salidas[1].detalle);
   assert.equal(m.contacto.dueno, "cande");
+});
+
+test("al que tiene el regalo de CUBA, TRABAJO no le manda la agenda del 1 a 1: lo atiende el agente, con el freno", async () => {
+  const { agente, m } = armarCuba({ responde: () => salida(["Respuesta de prueba?"]) });
+  await agente.procesar("77", m.disparo);
+  const otro = m.entraLead("TRABAJO");
+  const r = await agente.procesar("77", otro);
+  assert.equal(r.hecho, "enviada");
+  assert.equal(m.pedidos.length, 1, "va al modelo, que sabe que lo tiene regalado");
+  assert.ok(!m.enviados.some((t) => /15min/.test(t)), m.enviados.join(" / "));
+  assert.equal(m.contacto.dueno, "agente");
+});
+
+test("CUBA después de un envío que falló: el mismo código, sin pedirle otro a Gumroad", async () => {
+  let falla = true;
+  const { agente, m, creados } = armarCuba({
+    mandar: async (id, textos) => {
+      if (falla) { falla = false; return { ok: false, error: "falla de prueba" }; }
+      m.enviados.push(...textos); return { ok: true };
+    },
+  });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "error al mandar");
+  m.contacto.dueno = "agente"; // Cande se la devuelve al agente
+  const otro = m.entraLead("CUBA");
+  assert.equal((await agente.procesar("77", otro)).hecho, "palabra clave");
+  assert.deepEqual(creados, ["CUBA77"]);
+  assert.ok(m.enviados.some((t) => /\/CUBA77$/.test(t)), m.enviados.join(" / "));
 });
 
