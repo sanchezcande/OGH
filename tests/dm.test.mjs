@@ -456,6 +456,8 @@ function armar({
     },
     // Como base.yaSinAceptar (02/11): si ya salió el aviso de la solicitud sin aceptar por lo que el lead escribió.
     yaSinAceptar: async () => m.salidas.some((x) => x.estado === "error" && /^sin aceptar/.test(x.detalle || "")),
+    claveSinAceptar: async (id, nombre) => m.salidas.some((x) => x.accion === "palabra_clave" && x.motivo === `palabra clave: ${nombre}`
+      && x.estado === "error" && /^sin aceptar/.test(x.detalle || "")),
   };
   const pedir = async (p) => {
     m.pedidos.push(p);
@@ -4707,4 +4709,47 @@ test("un pase a Cande desde Solicitudes queda con la marca SIN_ACEPTAR: el reloj
   const pasa = armar({ mandar: async () => ({ ...SIN_ACEPTAR_IG }), responde: () => salida(["Ya te paso con ella, de prueba"], { accion: "pasar_a_cande" }) });
   assert.equal((await pasa.agente.procesar("77", pasa.m.disparo)).hecho, "error al mandar");
   assert.match(pasa.m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `));
+});
+
+test("CV desde Solicitudes y después TRABAJO: al aceptarla sale CV, y TRABAJO sigue abierto y sale en la vuelta siguiente (pasa a Cande)", async () => {
+  const { agente, m, aceptar } = armarClaveSinAceptar("CV", { responde: () => salida(["Respuesta de prueba?"]) });
+  const cv = m.disparo;
+  assert.equal((await agente.procesar("77", cv)).hecho, "sin aceptar");
+  const trabajo = m.entraLead("TRABAJO");
+  assert.equal((await agente.procesar("77", trabajo)).hecho, "sin aceptar");
+  aceptar();
+  const r = await agente.procesar("77", trabajo, { tarde: true });
+  assert.equal(r.clave, "cv");
+  assert.equal(m.contacto.respondido_hasta, cv, "se cierra solo hasta el CV: lo de después sigue esperando respuesta");
+  assert.equal(m.contacto.dueno, "agente");
+  // La vuelta siguiente: queda solo TRABAJO, que es su palabra clave.
+  const r2 = await agente.procesar("77", trabajo, { tarde: true });
+  assert.equal(r2.clave, "trabajo");
+  assert.ok(m.enviados.some((t) => /15min/.test(t)), m.enviados.join(" / "));
+  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.pedidos.length, 0);
+});
+
+test("CV desde Solicitudes y después una pregunta: sale CV y la pregunta la contesta el agente en la vuelta siguiente", async () => {
+  const { agente, m, aceptar } = armarClaveSinAceptar("CV", { responde: () => salida(["Respuesta de prueba?"]) });
+  await agente.procesar("77", m.disparo);
+  const pregunta = m.entraLead("y me ayudás con mi linkedin?");
+  await agente.procesar("77", pregunta);
+  aceptar();
+  assert.equal((await agente.procesar("77", pregunta, { tarde: true })).clave, "cv");
+  assert.equal((await agente.procesar("77", pregunta, { tarde: true })).hecho, "enviada");
+  assert.equal(m.pedidos.length, 1, "la pregunta va al modelo");
+  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["y me ayudás con mi linkedin?"]);
+});
+
+test("un CV viejo no hace que un turno nuevo de dos mensajes salga como palabra clave: solo cuenta el que quedó esperando en este turno", async () => {
+  const { agente, m } = armar({ mandar: async () => ({ ...SIN_ACEPTAR_IG }), responde: () => salida(["Respuesta de prueba?"]) });
+  m.salidas.push({ accion: "palabra_clave", motivo: "palabra clave: cv", estado: "enviada" }); // de otro turno, días atrás
+  m.mensajes.find((x) => x.id === m.disparo).texto = "CV";
+  const otro = m.entraLead("y me ayudás con mi linkedin?");
+  assert.equal((await agente.procesar("77", otro)).hecho, "sin aceptar");
+  assert.equal(m.pedidos.length, 1, "fue al modelo");
+  const r2 = await agente.procesar("77", otro, { tarde: true });
+  assert.equal(r2.clave, undefined, "el reintento sigue yendo al modelo");
+  assert.equal(m.pedidos.length, 2);
 });
