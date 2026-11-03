@@ -187,3 +187,13 @@ test("un envío que falló cerró el turno, pero no salió nada: avisa igual (el
     assert.match(d.avisos[0].campos.Qué, /no llegaron y 0 sí/);
   }
 });
+
+test("una solicitud sin aceptar no es el envío roto: no cuenta como falla ni como sin atender", async () => {
+  // Con la gente nueva entrando sin ManyChat, la que escribe desde Solicitudes queda del agente con el turno abierto
+  // hasta que Cande la acepta, y a ella ya le llega "aceptale la solicitud". Sin esto, cada una de noche era una alarma.
+  const { readFile } = await import("node:fs/promises");
+  const src = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const fn = src.slice(src.indexOf("export async function pulsoEnvios"), src.indexOf("export async function marcarIgBuscado"));
+  assert.match(fn, /NOT EXISTS \(\s*SELECT 1 FROM dm_salidas e\s*WHERE e\.contacto = c\.id AND e\.estado = 'error' AND e\.detalle LIKE \$\{`\$\{SIN_ACEPTAR\}%`\}/);
+  assert.match(fn, /estado = 'error' AND COALESCE\(detalle, ''\) NOT LIKE \$\{`\$\{SIN_ACEPTAR\}%`\}\)::int AS errores/);
+});
