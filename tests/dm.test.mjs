@@ -4657,6 +4657,7 @@ test("CUBA desde Solicitudes: si escribe otra cosa mientras espera, al aceptarla
   assert.deepEqual(creados, ["CUBA77"], "el código ya existe en Gumroad: no se pide otro");
   assert.ok(m.enviados.some((t) => /\/CUBA77$/.test(t)), m.enviados.join(" / "));
   assert.equal(m.pedidos.length, 0, "no fue al modelo");
+  assert.equal(m.contacto.dueno, "cande", "lo que escribió mientras esperaba lo ve ella");
 });
 
 test("TRABAJO desde Solicitudes y después otro mensaje: al aceptarla salen los de TRABAJO y pasa a Cande (no va al modelo)", async () => {
@@ -4711,35 +4712,23 @@ test("un pase a Cande desde Solicitudes queda con la marca SIN_ACEPTAR: el reloj
   assert.match(pasa.m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `));
 });
 
-test("CV desde Solicitudes y después TRABAJO: al aceptarla sale CV, y TRABAJO sigue abierto y sale en la vuelta siguiente (pasa a Cande)", async () => {
-  const { agente, m, aceptar } = armarClaveSinAceptar("CV", { responde: () => salida(["Respuesta de prueba?"]) });
-  const cv = m.disparo;
-  assert.equal((await agente.procesar("77", cv)).hecho, "sin aceptar");
-  const trabajo = m.entraLead("TRABAJO");
-  assert.equal((await agente.procesar("77", trabajo)).hecho, "sin aceptar");
-  aceptar();
-  const r = await agente.procesar("77", trabajo, { tarde: true });
-  assert.equal(r.clave, "cv");
-  assert.equal(m.contacto.respondido_hasta, cv, "se cierra solo hasta el CV: lo de después sigue esperando respuesta");
-  assert.equal(m.contacto.dueno, "agente");
-  // La vuelta siguiente: queda solo TRABAJO, que es su palabra clave.
-  const r2 = await agente.procesar("77", trabajo, { tarde: true });
-  assert.equal(r2.clave, "trabajo");
-  assert.ok(m.enviados.some((t) => /15min/.test(t)), m.enviados.join(" / "));
-  assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.pedidos.length, 0);
-});
-
-test("CV desde Solicitudes y después una pregunta: sale CV y la pregunta la contesta el agente en la vuelta siguiente", async () => {
-  const { agente, m, aceptar } = armarClaveSinAceptar("CV", { responde: () => salida(["Respuesta de prueba?"]) });
-  await agente.procesar("77", m.disparo);
-  const pregunta = m.entraLead("y me ayudás con mi linkedin?");
-  await agente.procesar("77", pregunta);
-  aceptar();
-  assert.equal((await agente.procesar("77", pregunta, { tarde: true })).clave, "cv");
-  assert.equal((await agente.procesar("77", pregunta, { tarde: true })).hecho, "enviada");
-  assert.equal(m.pedidos.length, 1, "la pregunta va al modelo");
-  assert.deepEqual(m.pedidos[0].turno.mensajes_del_lead, ["y me ayudás con mi linkedin?"]);
+test("CV desde Solicitudes y después otra cosa: al aceptarla sale CV y la charla pasa a Cande con lo que escribió mientras esperaba", async () => {
+  for (const despues of ["TRABAJO", "y me ayudás con mi linkedin?"]) {
+    const { agente, m, aceptar } = armarClaveSinAceptar("CV", { responde: () => salida(["Respuesta de prueba?"]) });
+    await agente.procesar("77", m.disparo);
+    const otro = m.entraLead(despues);
+    assert.equal((await agente.procesar("77", otro)).hecho, "sin aceptar");
+    aceptar();
+    const r = await agente.procesar("77", otro, { tarde: true });
+    assert.equal(r.clave, "cv", despues);
+    assert.ok(m.enviados.length > 0);
+    assert.equal(m.pedidos.length, 0);
+    assert.equal(m.contacto.dueno, "cande", "lo que escribió después no queda sin que nadie lo vea");
+    assert.equal(m.contacto.respondido_hasta, otro);
+    const aviso = m.avisos.at(-1);
+    assert.match(aviso.campos.Aviso || aviso.titulo, /Mientras esperaba escribió más/, JSON.stringify(aviso));
+    assert.ok(JSON.stringify(aviso).includes(despues), "el aviso trae lo que escribió");
+  }
 });
 
 test("un CV viejo no hace que un turno nuevo de dos mensajes salga como palabra clave: solo cuenta el que quedó esperando en este turno", async () => {
