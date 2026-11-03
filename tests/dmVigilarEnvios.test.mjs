@@ -9,7 +9,7 @@
 import "./dobles/preparar.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-const { vigilarEnvios, VENTANA_HORAS, AVISO_CADA_HORAS } = await import("../lib/dm/vigilarEnvios.js");
+const { vigilarEnvios, VENTANA_HORAS, AVISO_CADA_HORAS, RESPUESTA_NORMAL_MIN, CHARLAS_SIN_NADA } = await import("../lib/dm/vigilarEnvios.js");
 
 /** Una base de mentira con los números de la ventana y la memoria del último aviso. */
 const armar = (pulso, config = {}) => {
@@ -28,7 +28,7 @@ const armar = (pulso, config = {}) => {
 };
 
 test("le escribieron y no salió nada: avisa", async () => {
-  const d = armar({ leads: 7, enviadas: 0, inciertas: 0, errores: 0 });
+  const d = armar({ leads: 7, pendientes: 7, enviadas: 0, inciertas: 0, errores: 0 });
   const r = await vigilarEnvios(d);
   assert.equal(r.aviso, true);
   assert.equal(r.mudo, true);
@@ -112,4 +112,78 @@ test("el cron de la bandeja lo llama, y un fallo suyo no tumba la vuelta", async
   const src = await readFile(new URL("../pages/api/dm/bandeja.js", import.meta.url), "utf8");
   assert.match(src, /vigilarEnvios\(\{ base: \{ pulsoEnvios, leerConfig, guardarConfig \}, avisar: avisarDm \}\)/);
   assert.match(src, /try \{\s*await vigilarEnvios[\s\S]*?\} catch/, "mirar si los envíos salen no puede romper la bandeja");
+});
+
+// 03/11: un lead escribió a las 11:10 UTC después de una noche sin nadie. A las 11:15 el reloj vio "1 mensaje, 0
+// respuestas" y le dijo a Cande que contestara a mano; ella contestó y la charla dejó de ser del agente, que la iba a
+// contestar en la vuelta de las 11:30. Lo recién llegado, las charlas de Cande y los turnos ya cerrados no son silencio.
+
+test("lo recién llegado no cuenta: se le pide a la base solo lo de hace más de lo que tarda en contestar", async () => {
+  const pedidos = [];
+  const d = armar(null);
+  d.base.pulsoEnvios = async (...args) => { pedidos.push(args); return { leads: 0, pendientes: 0, enviadas: 0, inciertas: 0, errores: 0 }; };
+  const r = await vigilarEnvios(d);
+  assert.deepEqual(pedidos, [[VENTANA_HORAS, RESPUESTA_NORMAL_MIN]]);
+  assert.equal(r.aviso, false);
+  // La espera contesta entre 5 y 20 minutos después de guardado (vuelta cada 15, toma lo de más de 5), más lo que tarda en redactar.
+  assert.ok(RESPUESTA_NORMAL_MIN >= 25, "con menos, un mensaje que está por salir ya dispara la alarma");
+});
+
+test("un turno que el agente cerró (calló, avisó la foto, Cande contestó la retomada) no es silencio", async () => {
+  const d = armar({ leads: 2, pendientes: 0, enviadas: 0, inciertas: 0, errores: 0 });
+  const r = await vigilarEnvios(d);
+  assert.equal(r.aviso, false, "un 'gracias' de noche que el agente deja pasar no es una falla");
+  assert.deepEqual(d.avisos, []);
+});
+
+test("un mensaje sin atender hace rato y nada que salga: avisa, y dice desde cuándo cuenta", async () => {
+  const d = armar({ leads: 1, pendientes: 1, enviadas: 0, inciertas: 0, errores: 0 });
+  const r = await vigilarEnvios(d);
+  assert.equal(r.aviso, true);
+  assert.equal(r.mudo, true);
+  assert.match(d.avisos[0].campos.Qué, /1 vez/);
+  assert.match(d.avisos[0].campos.Qué, new RegExp(`más de ${RESPUESTA_NORMAL_MIN} minutos`));
+});
+
+test("con mensajes esperando pero respuestas saliendo, no es mudo (la mañana con la espera vaciándose)", async () => {
+  const d = armar({ leads: 8, pendientes: 5, enviadas: 3, inciertas: 0, errores: 0 });
+  const r = await vigilarEnvios(d);
+  assert.equal(r.aviso, false);
+});
+
+test("un agente que calla con todos también avisa, si escribieron varias charlas", async () => {
+  assert.equal(CHARLAS_SIN_NADA, 3);
+  const d = armar({ leads: CHARLAS_SIN_NADA, pendientes: 0, enviadas: 0, inciertas: 0, errores: 0 });
+  const r = await vigilarEnvios(d);
+  assert.equal(r.aviso, true, "turnos cerrados sin mandar nada a nadie también es no contestar");
+  assert.match(d.avisos[0].campos.Qué, /3 personas/);
+});
+
+test("la base cuenta solo charlas del agente, por la hora de guardado, y los turnos abiertos como sinContestar", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const src = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const fn = src.slice(src.indexOf("export async function pulsoEnvios"), src.indexOf("export async function marcarIgBuscado"));
+  assert.match(fn, /pulsoEnvios\(horas = 2, minutos = 30\)/);
+  assert.match(fn, /c\.dueno = 'agente'/, "las charlas de Cande las contesta ella");
+  assert.match(fn, /c\.personal IS NOT TRUE/);
+  assert.match(fn, /COALESCE\(m\.guardado_red, m\.creado\) <= NOW\(\) - make_interval\(mins => \$\{minutos\}::int\)/,
+    "lo recién guardado no cuenta, aunque Instagram diga que se escribió hace rato");
+  assert.match(fn, /m\.id > c\.respondido_hasta AS abierto/, "el turno cerrado no es silencio");
+  assert.match(fn, /COUNT\(DISTINCT contacto\)::int FROM vistos\) AS leads/);
+  assert.match(fn, /FILTER \(WHERE estado = 'enviada'\)::int AS enviadas/, "lo que no salió (callar, una nota del repaso) no tapa al agente mudo");
+});
+
+test("un envío que falló cerró el turno, pero no salió nada: avisa igual (el 31/10 fueron uno o dos por ventana)", async () => {
+  // El CV por DM que queda incierto cierra el turno y sigue siendo del agente; una respuesta que falla además le pasa la
+  // charla a Cande. En los dos casos no queda nada pendiente, y la falla es justo lo que el reloj tiene que ver.
+  for (const pulso of [
+    { leads: 1, pendientes: 0, enviadas: 0, inciertas: 1, errores: 0 },
+    { leads: 0, pendientes: 0, enviadas: 0, inciertas: 1, errores: 1 },
+  ]) {
+    const d = armar(pulso);
+    const r = await vigilarEnvios(d);
+    assert.equal(r.aviso, true, JSON.stringify(pulso));
+    assert.equal(r.mudo, true);
+    assert.match(d.avisos[0].campos.Qué, /no llegaron y 0 sí/);
+  }
 });
