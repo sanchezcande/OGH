@@ -130,3 +130,60 @@ test("el aviso del tope de altas sale una vez por día, no una por alta", () => 
   // La guarda va PEGADA a la condición del aviso: si se escribe aparte, igual sale.
   assert.match(src, /van \+ 1 >= aj\.altas_por_dia && \(await tocaAvisarDelTope\(\)\)/);
 });
+
+/* ---------- CUBA (03/11): el programa regalado a los devs de Cuba ---------- */
+
+test("CUBA solo dispara con el regalo prendido, y como palabra sola", () => {
+  assert.equal(palabraClaveDe("CUBA"), null, "sin el texto cargado lo atiende el agente");
+  for (const t of ["CUBA", "cuba", "Cuba!", " CUBA 🇨🇺 "]) {
+    const c = palabraClaveDe(t, { regalos: true });
+    assert.equal(c?.nombre, "cuba", t);
+    assert.equal(c.pasa, false, "no le llena la bandeja a Cande");
+    assert.equal(c.regalo, true);
+  }
+  for (const f of ["soy de cuba", "cuba gracias", "hola desde cuba"]) assert.equal(palabraClaveDe(f, { regalos: true }), null, f);
+  assert.equal(palabraClaveDe("trabajo", { regalos: true })?.nombre, "trabajo", "las demás siguen igual");
+  assert.equal(palabraClaveDe("constructor"), null, "una propiedad de los objetos no es una palabra clave");
+});
+
+test("el regalo: un mensaje por párrafo, con el link donde dice {link}; sin {link} no hay regalo", async () => {
+  const { textosDelRegalo } = await import("../lib/dm/palabraClave.js");
+  assert.deepEqual(textosDelRegalo("Uno de prueba\n\nDos: {link}", "https://x.test/CUBA1"), ["Uno de prueba", "Dos: https://x.test/CUBA1"]);
+  assert.deepEqual(textosDelRegalo("Sin link de prueba", "https://x.test/CUBA1"), []);
+  assert.deepEqual(textosDelRegalo("Con {link}", ""), []);
+});
+
+test("el código de Cuba: uno por charla, con el id entero, y se reconoce", async () => {
+  const { codigoDeCuba, esCodigoDeCuba, esCodigoDePesos } = await import("../lib/compras.js");
+  assert.equal(codigoDeCuba("17841400000000001"), "CUBA17841400000000001");
+  assert.equal(codigoDeCuba(77), "CUBA77");
+  assert.ok(esCodigoDeCuba("cuba77") && esCodigoDeCuba("CUBA77"));
+  assert.ok(!esCodigoDeCuba("PESOS77") && !esCodigoDePesos("CUBA77") && !esCodigoDeCuba("cuba"));
+});
+
+test("el texto de CUBA se carga solo con {link} (o vacío, que lo apaga)", async () => {
+  const { validarAjustes, ajustesDesde } = await import("../lib/dm/base.js");
+  assert.equal(ajustesDesde({}).mensaje_cuba, "", "apagado de fábrica");
+  assert.equal(validarAjustes({ mensaje_cuba: "Texto de prueba {link}" }).ok, true);
+  assert.equal(validarAjustes({ mensaje_cuba: "" }).ok, true);
+  assert.equal(validarAjustes({ mensaje_cuba: "Texto de prueba sin link" }).ok, false);
+  assert.equal(validarAjustes({ mensaje_cuba: "x".repeat(900) + "{link}" }).ok, false);
+});
+
+test("al que tiene el regalo de CUBA no le sale nada que venda: ni la llamada, ni el 1 a 1, ni cuánto sale, ni un link de pago", async () => {
+  const { revisar, MOTIVO_REGALO } = await import("../lib/dm/frenos.js");
+  const salida = (mensajes) => ({
+    accion: "responder", mensajes, aviso_para_cande: "", seguimiento_en_horas: null, motivo: "",
+    estado: { quien: "dev", busca: "si", dolor: "", etapa: "seguimiento", link_formulario_enviado: false, precio_dicho: false },
+  });
+  const op = { textosDelLead: ["de prueba"], linkDePago: "get.opengatehub.com/l/de-prueba", regalo: true };
+  for (const m of [
+    ["Te cuento todo en una llamada de 15 minutos, agendá acá:\nwww.opengatehub.com/15min"],
+    ["Estoy buscando 5 devs para acompañarlos 1 a 1 este mes"],
+    ["Por ahora está en 27 dólares porque recién lo estoy lanzando"],
+    ["Te dejo el link\nget.opengatehub.com/l/de-prueba"],
+  ]) assert.deepEqual(revisar(salida(m), op), { ok: false, motivo: MOTIVO_REGALO }, m.join(" / "));
+  assert.deepEqual(revisar(salida(["Daleee, cualquier duda del módulo me escribís :)"]), op), { ok: true });
+  assert.deepEqual(revisar(salida(["Te cuento todo en una llamada de 15 minutos, agendá acá:\nwww.opengatehub.com/15min"]), { ...op, regalo: false }), { ok: true },
+    "sin el regalo, la llamada sigue saliendo como siempre");
+});

@@ -23,11 +23,11 @@ import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
 import { asegurarTablaCompras, codigoDePesos } from "../../lib/compras";
+import { BASE_LINK, CODIGO_URL, crearCodigo100 } from "../../lib/gumroadCodigos";
 import { guardarEvento, hayBase } from "../../lib/db";
 import { mandarMail } from "../../lib/mandarMail";
 import { avisar } from "../../lib/notificar";
 
-const CODIGO_URL = process.env.MP_CODIGO_URL || "https://get.opengatehub.com/l/acelerador-de-carrera/PARAVOS";
 const DE = "Cande de OpenGateHub <cande@opengatehub.com>";
 // Las ventas van al bot de ventas (@oghventas_bot), igual que las de Gumroad: ahí es donde ella
 // las mira. Si ese bot no está configurado, `avisar` cae solo en el de los leads.
@@ -65,21 +65,6 @@ async function guardarCodigo(id, codigo) {
   }
 }
 
-/** El permalink del producto, sacado del link general: .../l/acelerador-de-carrera/PARAVOS */
-const PERMALINK = (CODIGO_URL.match(/\/l\/([^/?#]+)/) || [])[1] || "acelerador-de-carrera";
-const BASE_LINK = CODIGO_URL.slice(0, CODIGO_URL.indexOf("/l/") + 3 + PERMALINK.length);
-
-/** El id interno del producto en Gumroad, buscado por su permalink. Se busca en vez de tenerlo en
- *  una variable de entorno para que no haya un id más que mantener a mano. */
-async function idDelProducto(token) {
-  const r = await fetch(`https://api.gumroad.com/v2/products?access_token=${encodeURIComponent(token)}`);
-  if (!r.ok) throw new Error(`products devolvió ${r.status}`);
-  const d = await r.json();
-  const p = (d.products || []).find((x) => x.custom_permalink === PERMALINK || x.permalink === PERMALINK);
-  if (!p) throw new Error(`no encontré el producto ${PERMALINK}`);
-  return p.id;
-}
-
 /** Un código de 100% de UN SOLO USO para este pago.
  *
  *  Cande, 22/10: "pero cómo sabés que es la misma persona? puede haber entrado de otro browser".
@@ -90,28 +75,8 @@ async function idDelProducto(token) {
  *  Si algo de esto falla, devuelve null y sale el código general. Un código repetido es un problema
  *  chico; que alguien pague y se quede sin curso, no. */
 async function codigoUnico(id) {
-  const token = process.env.GUMROAD_ACCESS_TOKEN;
-  if (!token) return null;
-  try {
-    const producto = await idDelProducto(token);
-    const nombre = codigoDePesos(id);
-    const r = await fetch(`https://api.gumroad.com/v2/products/${encodeURIComponent(producto)}/offer_codes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        access_token: token, name: nombre, offer_type: "percent",
-        amount_off: "100", max_purchase_count: "1",
-      }),
-    });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok || d.success === false) {
-      throw new Error(`offer_codes devolvió ${r.status} ${JSON.stringify(d).slice(0, 120)}`);
-    }
-    return nombre;
-  } catch (e) {
-    console.error("mp-webhook: no pude crear el código único:", e.message);
-    return null;
-  }
+  const nombre = codigoDePesos(id);
+  return crearCodigo100(nombre);
 }
 
 /** Anota la venta y dice si es la PRIMERA vez que vemos este pago.

@@ -16,7 +16,7 @@
 // un reintento sería un segundo mensaje por la misma venta. Se contesta 200 siempre.
 import { sql } from "@vercel/postgres";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
-import { asegurarTablaCompras, esCodigoDePesos } from "../../lib/compras";
+import { asegurarTablaCompras, esCodigoDeCuba, esCodigoDePesos } from "../../lib/compras";
 import { avisar } from "../../lib/notificar";
 import { PAGO_EN_PESOS, correspondeOferta, linkOferta, mensajeOferta } from "../../lib/ofertaWhatsapp";
 
@@ -24,6 +24,9 @@ const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max
 
 // Los códigos de 100% que NO son una venta nueva: son alguien entrando a la plataforma después
 // de haber pagado por otro lado, o un acceso que Cande regaló.
+// El que escribió CUBA por DM entra con su código propio (lib/compras.js, codigoDeCuba): es un regalo, no una venta, y
+// como no es un pago en pesos no se le ofrece el 1 a 1 (correspondeOferta).
+const REGALO_CUBA = "acceso gratis de Cuba (escribió CUBA por DM)";
 const CODIGOS = {
   [(process.env.MP_CODIGO || "PARAVOS").toLowerCase()]: PAGO_EN_PESOS,
   testimonio: "acceso a cambio de un testimonio",
@@ -119,7 +122,9 @@ export default async function handler(req, res) {
   // así que parecían dos personas y una regalada. No es una venta nueva: es la misma entrando.
   const codigo = limpiar(b.offer_code || b.discount_code, 40).toLowerCase();
   const gratis = Number(b.price) === 0;
-  const porQue = gratis ? CODIGOS[codigo] || (esCodigoDePesos(codigo) ? PAGO_EN_PESOS : null) : null;
+  const porQue = gratis
+    ? CODIGOS[codigo] || (esCodigoDePesos(codigo) ? PAGO_EN_PESOS : esCodigoDeCuba(codigo) ? REGALO_CUBA : null)
+    : null;
   const titulo = baja
     ? "Devolución en Gumroad"
     : prueba ? "Compra de PRUEBA"

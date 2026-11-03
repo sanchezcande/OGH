@@ -222,3 +222,10 @@ test("si Telegram rechaza el botón, el aviso sale igual sin él", async () => {
   assert.equal(pedidos.length, 2);
   assert.equal(pedidos[1].reply_markup, undefined);
 });
+
+test("el que entra con su código de CUBA es un regalo: no trae la oferta del 1 a 1 (03/11)", async () => {
+  const c = await venta({ product_name: "Acelerador de Carrera Tech", price: "0", offer_code: "CUBA77" });
+  assert.equal(boton(c), null);
+  assert.equal(/Ofrecele el 1 a 1/.test(c.text), false);
+  assert.match(c.text, /Cuba/, "el aviso dice por qué entró gratis");
+});

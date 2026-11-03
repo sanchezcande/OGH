@@ -360,7 +360,7 @@ function armar({
   modo = "auto", envio = "api", toques = false, avisoIa, dueno = "agente", ultimoLeadHace = 1, tope = 12,
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
-  hayManyChat = true, instagram = null, avisarCon = null,
+  hayManyChat = true, instagram = null, avisarCon = null, codigoGratis = null,
 } = {}) {
   const m = {
     ajustes: {
@@ -430,6 +430,8 @@ function armar({
     cerrarTurno: async (id, cual) => { m.contacto.respondido_hasta = Math.max(m.contacto.respondido_hasta, cual); },
     // Lo que puso en el formulario y los turnos inmediatos (lib/dm/pagina.js): en estas pruebas, lo que diga m.
     formularioDeLaCharla: async () => m.formulario ?? null,
+    pidioPalabra: async (id, nombre) => m.salidas.some((s) => s.accion === "palabra_clave" &&
+      s.motivo === `palabra clave: ${nombre}` && ["enviando", "enviada", "incierta"].includes(s.estado)),
     agendarCaliente: async (id, motivo, minutos) => { m.calientes.push([motivo, minutos]); return true; },
     contarToque: async () => { m.contacto.toques++; },
     marcarAltaAvisada: async () => { m.contacto.alta_avisada = true; },
@@ -471,7 +473,9 @@ function armar({
     return id;
   };
   const esperar = async () => { await tick(); alEsperar?.(m); };
-  const agente = crearAgente({ base, pedir, manychat, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50 });
+  const agente = crearAgente({
+    base, pedir, manychat, avisar, esperar, reloj: () => ahora, instagram, esperaInstagramMs: 50, ...(codigoGratis ? { codigoGratis } : {}),
+  });
   return { agente, m };
 }
 
@@ -4353,3 +4357,77 @@ test("un aviso que es solo comillas o espacios no le llega a Cande como nota en 
   }
   assert.equal(normalizar({ accion: "responder", mensajes: ["x"], aviso_para_cande: "NOTA: de prueba" }).aviso_para_cande, "NOTA: de prueba");
 });
+
+/* ---------- CUBA: el programa regalado a los devs de Cuba (03/11) ---------- */
+
+// El texto de prueba: el de verdad lo aprueba Cande y vive en la base (ajuste mensaje_cuba), no en este repo público.
+const MENSAJE_CUBA = "Mensaje de prueba uno\n\nEntrás desde acá:\n{link}";
+/** Un mundo donde el lead escribió CUBA. `creados` junta los códigos que se le pidieron a Gumroad. */
+function armarCuba({ mensaje = MENSAJE_CUBA, crea = true, ...opciones } = {}) {
+  const creados = [];
+  const mundo = armar({ codigoGratis: async (codigo) => { creados.push(codigo); return crea ? codigo : null; }, ...opciones });
+  mundo.m.ajustes.mensaje_cuba = mensaje;
+  mundo.m.mensajes.find((x) => x.id === mundo.m.disparo).texto = "CUBA";
+  return { ...mundo, creados };
+}
+
+test("CUBA: le llega su link con su código propio, sin modelo, y la charla sigue del agente (no a Cande)", async () => {
+  const { agente, m, creados } = armarCuba();
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "palabra clave");
+  assert.equal(r.clave, "cuba");
+  assert.deepEqual(creados, ["CUBA77"]);
+  assert.deepEqual(m.enviados, ["Mensaje de prueba uno", "Entrás desde acá:\nhttps://get.opengatehub.com/l/acelerador-de-carrera/CUBA77"]);
+  assert.equal(m.pedidos.length, 0, "es un texto fijo: no se le pide nada al modelo");
+  assert.equal(m.salidas[0].motivo, "palabra clave: cuba", "queda anotado quién lo pidió");
+  assert.equal(m.salidas[0].estado, "enviada");
+  assert.equal(m.contacto.dueno, "agente", "serían cientos de charlas en la bandeja de Cande");
+  assert.equal(m.contacto.respondido_hasta, m.disparo);
+});
+
+test("CUBA sin el texto cargado no dispara: lo atiende el agente como cualquier mensaje", async () => {
+  const { agente, m, creados } = armarCuba({ mensaje: "" });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "enviada");
+  assert.equal(m.pedidos.length, 1);
+  assert.deepEqual(creados, []);
+});
+
+test("CUBA: si Gumroad no crea el código, no sale nada y la charla pasa a Cande con el aviso", async () => {
+  const { agente, m } = armarCuba({ crea: false });
+  const r = await agente.procesar("77", m.disparo);
+  assert.equal(r.hecho, "regalo sin código");
+  assert.deepEqual(m.enviados, []);
+  assert.equal(m.contacto.dueno, "cande");
+  assert.ok(m.avisos.some((a) => /no pude crear su código/.test(JSON.stringify(a))), JSON.stringify(m.avisos));
+});
+
+test("CUBA dos veces: el mismo link, sin crear otro código", async () => {
+  const { agente, m, creados } = armarCuba();
+  await agente.procesar("77", m.disparo);
+  const otro = m.entraLead("Cuba");
+  const r = await agente.procesar("77", otro);
+  assert.equal(r.hecho, "palabra clave");
+  assert.deepEqual(creados, ["CUBA77"], "el código ya existe en Gumroad: otro con el mismo nombre fallaría");
+  assert.equal(m.enviados.filter((t) => /CUBA77/.test(t)).length, 2);
+});
+
+test("después de CUBA el agente sabe que lo tiene regalado y no le vende nada (ni la llamada del 1 a 1)", async () => {
+  const { NOTA_REGALO_CUBA } = await import("../lib/dm/pagina.js");
+  const { MOTIVO_REGALO } = await import("../lib/dm/frenos.js");
+  const { agente, m } = armarCuba({
+    // El modelo se equivoca a propósito: le ofrece la llamada del 1 a 1.
+    responde: () => salida(["Te cuento todo en una llamada de 15 minutos, agendá acá:\nwww.opengatehub.com/15min"]),
+  });
+  await agente.procesar("77", m.disparo);
+  const otro = m.entraLead("gracias! y el 1 a 1 cómo es?");
+  await agente.procesar("77", otro);
+  assert.ok(m.pedidos.length >= 1);
+  assert.ok((m.pedidos[0].turno.contexto || "").includes(NOTA_REGALO_CUBA), m.pedidos[0].turno.contexto);
+  assert.ok(!m.enviados.some((t) => /15min/.test(t)), "la agenda del 1 a 1 no le sale al que tiene el regalo");
+  // Lo frena el sitio (y la segunda vuelta también): la charla pasa a Cande antes que venderle algo.
+  assert.equal(m.salidas[1].estado, "frenada");
+  assert.ok(String(m.salidas[1].detalle).includes(MOTIVO_REGALO), m.salidas[1].detalle);
+  assert.equal(m.contacto.dueno, "cande");
+});
+
