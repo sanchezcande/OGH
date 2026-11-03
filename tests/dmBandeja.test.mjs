@@ -20,7 +20,7 @@ import { readFile } from "node:fs/promises";
 const {
   revisarBandeja, vigilarRed, armarResumen, faltantes, sinRespuesta, identificar, haceCuanto, esConocida, esAutomatico, largoVisible,
   GRACIA_MS, RESUMEN_CADA_MS, TITULO_RESUMEN, SECCION_VOS, SECCION_MANO, SECCION_ETIQUETA, BUSQUEDAS_POR_VUELTA, LARGO_AVISO,
-  CHARLAS_POR_PAGINA, ETIQUETA_AGENTE, PAGINAS_RAPIDA, RED_CAIDA_MS,
+  CHARLAS_POR_PAGINA, ETIQUETA_AGENTE, PAGINAS_RAPIDA, RED_CAIDA_MS, TOPE_ALTAS_RED,
 } = await import("../lib/dm/bandeja.js");
 const { crearInstagram } = await import("../lib/dm/instagram.js");
 const { crearAgente, SIN_TEXTO } = await import("../lib/dm/agente.js");
@@ -83,6 +83,12 @@ function mundo({
       return copia(l.find((c) => igId && c.ig_id === igId) || l.find((c) => usuario && c.ig_usuario === usuario && !c.ig_id));
     },
     contacto: async (id) => copia(w.contactos.get(id)),
+    // Como la consulta: una charla borrada, por el id de Instagram o el usuario que guardó aparte (02/11).
+    contactoBorrado: async ({ igId, usuario }) => {
+      const l = [...w.contactos.values()];
+      const u = usuario ? usuario.toLowerCase() : null;
+      return copia(l.find((c) => igId && c.ig_id_borrado === igId) || l.find((c) => u && (c.ig_usuario_borrado || "").toLowerCase() === u));
+    },
     // Como la consulta: con soloDelAgente, solo en una charla del agente (nunca en una personal o borrada, que son de Cande).
     guardarIg: async (id, { usuario = null, igId = null, soloDelAgente = false } = {}) => {
       const c = w.contactos.get(id);
@@ -139,16 +145,18 @@ function mundo({
       }
       return nuevos.length;
     },
+    // Como la consulta: no entra si ya figura, por su id o porque otro contacto tiene ese id de Instagram (02/11).
     darDeAltaDesdeBandeja: async (id, { nombre, mensajes: lista, contexto, tope, igId, usuario }) => {
       const van = w.altasRedHoy;
-      if (w.contactos.has(id) || van >= tope) return { guardados: 0, van };
+      const figura = w.contactos.has(id) || (igId && [...w.contactos.values()].some((c) => c.ig_id === igId || c.ig_id_borrado === igId));
+      if (figura || van >= tope) return { guardados: 0, van, figura: Boolean(figura) };
       w.altasRedHoy++;
       w.contactos.set(id, {
         id, nombre, dueno: "agente", contexto: contexto || null, alta_en: w.ahora, alta_por: "bandeja", alta_avisada: false, ig_id: igId, ig_usuario: usuario,
         ultimo_lead: new Date(Math.max(...lista.map((m) => new Date(m.creado).getTime()))), respondido_hasta: 0, toques: 0, proximo_toque: null, personal: false,
       });
       for (const m of lista) nuevoMensaje({ contacto: id, quien: "lead", texto: m.texto, creado: new Date(m.creado), ig_mid: m.mid, guardado_red: w.ahora });
-      return { guardados: lista.length, van };
+      return { guardados: lista.length, van, figura: false };
     },
     salidaSinLlegar: async (id, desde) => w.salidas.some((s) => s.contacto === id && s.estado === "enviada" && s.accion !== "callar" &&
       s.mensajes.length > 0 && s.creado >= new Date(desde) && (s.enviado || s.creado) < w.ahora - 10 * MIN),
@@ -189,7 +197,10 @@ function mundo({
     let r;
     if (ruta === "/me") r = { user_id: CUENTA.id, username: CUENTA.username };
     else if (ruta === "/me/conversations") {
-      const todas = [...w.hilos].sort((a, b) => b.updated_time.localeCompare(a.updated_time));
+      // Con user_id, como hiloDe: solo la charla con esa persona.
+      const con = u.searchParams.get("user_id");
+      const deEsa = (h) => h.messages.data.some((m) => m.from?.id === con || (m.to?.data || []).some((x) => x.id === con));
+      const todas = [...w.hilos].filter((h) => !con || deEsa(h)).sort((a, b) => b.updated_time.localeCompare(a.updated_time));
       const desde = Number(u.searchParams.get("after") || 0);
       const n = Number(u.searchParams.get("limit") || 25);
       r = { data: todas.slice(desde, desde + n), paging: { cursors: { after: String(desde + n) }, ...(desde + n < todas.length ? { next: "https://siguiente.prueba" } : {}) } };
@@ -295,21 +306,35 @@ test("si a alguien nuevo le salió de la cuenta un audio, un Sí, un emoji, un s
   }
 });
 
-test("a quien se le pasó a Cande en un resumen como nueva no entra después como alta, aunque ManyChat la encuentre", async () => {
-  const w = mundo({
+test("a quien se le pasó a Cande en un resumen como nueva la toma el agente después si puede, salvo que Cande le haya escrito (02/11)", async () => {
+  // Hasta el 02/11 quedaba anotada como de Cande (a_cande) y el agente no la tomaba más. Cande: "te vas a hacer cargo
+  // de todo vos". Si ella le escribió, se ve en la charla y sigue siendo suya.
+  const armar = () => mundo({
     hilos: [charla(1, NUEVO, [["lead", "hola de prueba", 30]])],
     perfiles: NUEVO_PERFIL,
     directorio: [{ id: "5009", nombre: "Nombre Nuevo", ig_username: "otra.cuenta" }], // todavía no se la encuentra
   });
+  const w = armar();
   await w.revisar();
   assert.match(w.resumenes()[0].campos[SECCION_VOS], /nueva, no entró al agente: no la encontré en ManyChat/);
-  // Una hora después ManyChat ya la tiene, y ella vuelve a escribir (Cande le contestó con un audio, o no le contestó).
+  assert.equal(w.config.bandeja_estado.a_cande, undefined, "no se anota a nadie como de Cande");
+  // Una hora después ManyChat ya la tiene, y ella vuelve a escribir sin que nadie le haya contestado.
   w.pasar(60);
   w.directorio.push(...NUEVO_EN_MC);
   w.hilos[0] = charla(1, NUEVO, [["lead", "hola de prueba", 90], ["lead", "sigo esperando, de prueba", 5]]);
-  assert.equal((await w.revisar()).altas, 0);
-  assert.equal(w.contactos.size, 0, "se le dijo a Cande que la conteste: el agente no se mete");
-  assert.match(w.config.bandeja_estado.pendientes.h1.nota, /ya te la había pasado/);
+  assert.equal((await w.revisar()).altas, 1);
+  assert.equal(w.contactos.get("5001").dueno, "agente");
+  assert.equal(w.config.bandeja_estado.pendientes.h1, undefined);
+
+  // Si Cande le contestó (un audio) y la persona volvió a escribir, sigue siendo de Cande.
+  const conAudio = armar();
+  await conAudio.revisar();
+  conAudio.pasar(60);
+  conAudio.directorio.push(...NUEVO_EN_MC);
+  conAudio.hilos[0] = charla(1, NUEVO, [["lead", "hola de prueba", 90], ["cuenta", null, 40], ["lead", "sigo esperando, de prueba", 5]]);
+  assert.equal((await conAudio.revisar()).altas, 0);
+  assert.equal(conAudio.contactos.size, 0);
+  assert.match(conAudio.config.bandeja_estado.pendientes.h1.nota, /hay mensajes tuyos/);
 });
 
 /* ---------- 2. un mensaje perdido de una charla del agente ---------- */
@@ -1458,9 +1483,14 @@ test("los ajustes de la red de la bandeja: prendida de fábrica, y su tope de al
   assert.equal(AJUSTES_POR_DEFECTO.bandeja, true);
   assert.equal(validarAjustes({ bandeja: "no" }).ok, false);
   assert.equal(validarAjustes({ bandeja: false }).ok, true);
-  assert.equal(AJUSTES_POR_DEFECTO.altas_bandeja_por_dia, 10);
+  // 60 desde el 02/11 (era 10): sin ManyChat toda la gente nueva entra por la red. El de fábrica y el que usa la red si
+  // los ajustes no traen uno tienen que ser el mismo.
+  assert.equal(AJUSTES_POR_DEFECTO.altas_bandeja_por_dia, 60);
+  assert.equal(AJUSTES_POR_DEFECTO.altas_bandeja_por_dia, TOPE_ALTAS_RED);
   assert.equal(validarAjustes({ altas_bandeja_por_dia: 0 }).ok, false);
   assert.equal(validarAjustes({ altas_bandeja_por_dia: 15 }).ok, true);
+  // La traba sigue: si algo se rompe, no entra la bandeja entera.
+  assert.equal(validarAjustes({ altas_bandeja_por_dia: 201 }).ok, false);
 });
 
 /* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
@@ -1486,4 +1516,346 @@ test("como en main: si la base no deja leer la marca de retomada, lo que Cande e
   assert.equal(w.mensajes.length, 0);
   assert.equal(w.contactos.get("77").dueno, "agente");
   assert.match(w.resumenes()[0].campos[SECCION_VOS], /le escribiste vos/);
+});
+
+/* ---------- 12. la gente nueva sin ManyChat (02/11) ---------- */
+
+// ManyChat llegó al tope de 2.500 contactos y Cande canceló la suscripción: quien escribe por primera vez no está en
+// ManyChat. Entra igual, como contacto solo de Instagram: su id en la base es su id de Instagram (un IGSID, de 15 a 17
+// dígitos; los ids cortos de las pruebas de arriba no tienen esa forma y no pueden entrar así).
+const { esSoloInstagram } = await import("../lib/dm/manychat.js");
+const SOLO_IG = persona("1000000000000611", "lead.solo.ig");
+const SOLO_IG_PERFIL = { [SOLO_IG.id]: perfil("Nombre Solo Ig", "lead.solo.ig") };
+
+test("una persona nueva que ManyChat no tiene entra igual, con su id de Instagram como id, sin etiqueta ni pedidos a ManyChat por ella", async () => {
+  const w = mundo({
+    hilos: [charla(1, SOLO_IG, [["cuenta", AUTOMATICO, 30], ["lead", "hola, consulta de prueba", 12], ["lead", "sigo por acá, de prueba", 11]])],
+    perfiles: SOLO_IG_PERFIL, directorio: NUEVO_EN_MC, aj: { contexto_alta: "contexto de prueba" }, config: CON_AUTOMATICOS,
+  });
+  const r = await w.revisar();
+  assert.equal(r.altas, 1);
+  const c = w.contactos.get(SOLO_IG.id);
+  assert.ok(c, "el id del contacto es su id de Instagram");
+  assert.equal(c.ig_id, c.id, "solo de Instagram: id === ig_id");
+  assert.ok(esSoloInstagram(c.id));
+  assert.deepEqual([c.dueno, c.alta_por, c.alta_avisada, c.ig_usuario, c.nombre, c.contexto], ["agente", "bandeja", false, "lead.solo.ig", "Nombre Solo Ig", "contexto de prueba"]);
+  assert.deepEqual(w.delContacto(SOLO_IG.id).map((m) => m.texto), ["hola, consulta de prueba", "sigo por acá, de prueba"]);
+  assert.deepEqual(w.etiquetas, [], "no está en ManyChat: no hay etiqueta que ponerle");
+  assert.equal(w.pedidosDatos, 0);
+  assert.equal(w.contactos.has("5001"), false);
+  assert.equal(w.avisos.length, 0, "un alta no le avisa a Cande: lo atiende el agente");
+  assert.deepEqual(w.config.bandeja_estado.etiquetas, {});
+
+  // La vuelta siguiente ya la reconoce por su Instagram: no la busca ni la guarda otra vez.
+  const busquedas = w.busquedas.length;
+  w.pasar(3);
+  const r2 = await w.revisar();
+  assert.deepEqual({ altas: r2.altas, recuperados: r2.recuperados }, { altas: 0, recuperados: 0 });
+  assert.equal(w.busquedas.length, busquedas);
+});
+
+test("lo que se perdió en la charla de un contacto solo de Instagram se guarda igual, sin etiqueta en ManyChat", async () => {
+  const w = mundo({
+    contactos: [{ id: SOLO_IG.id, nombre: "Nombre Solo Ig", ig_id: SOLO_IG.id, ig_usuario: "lead.solo.ig", respondido_hasta: 1, dueno_desde: hace(600) }],
+    mensajes: [
+      { contacto: SOLO_IG.id, quien: "lead", texto: "primero de prueba", creado: hace(60) },
+      { contacto: SOLO_IG.id, quien: "agente", texto: "Respuesta del agente de prueba", creado: hace(59) },
+    ],
+    hilos: [charla(1, SOLO_IG, [["lead", "primero de prueba", 60], ["cuenta", "Respuesta del agente de prueba", 59], ["lead", "segundo de prueba", 8]])],
+  });
+  assert.equal((await w.revisar()).recuperados, 1);
+  assert.equal(w.delContacto(SOLO_IG.id).at(-1).texto, "segundo de prueba");
+  assert.deepEqual(w.etiquetas, []);
+  assert.deepEqual(w.config.bandeja_estado.etiquetas, {});
+});
+
+test("si ManyChat no contesta (una falla pasajera), nadie entra con su id de Instagram: se la busca de nuevo en la vuelta siguiente", async () => {
+  // Revisión del PR (02/11): la persona puede estar en ManyChat. Con su id de Instagram quedaría sin dm_accion ni
+  // dm_dueno (los automáticos de ManyChat le seguirían saliendo) y otra vuelta que sí la encuentre la daría de alta otra
+  // vez con su id de ManyChat. Después de la primera falla no se busca a nadie más en esa vuelta.
+  const B = persona("1000000000000612", "lead.solo.b");
+  const C = persona("1000000000000613", "lead.solo.c");
+  const gente = [SOLO_IG, B, C];
+  const w = mundo({
+    hilos: [...relleno(CHARLAS_POR_PAGINA + 5), ...gente.map((p, i) => charla(i + 1, p, [["lead", "hola de prueba", 120 + i]]))],
+    perfiles: Object.fromEntries(gente.map((p, i) => [p.id, perfil(`Persona Ig${i}`, p.username)])),
+    directorio: [{ id: "5012", nombre: "Persona Ig1", ig_username: B.username }], // B está en ManyChat
+  });
+  w.mcCaido = true;
+  const r = await w.revisar();
+  assert.equal(r.altas, 0, "con ManyChat sin contestar no se sabe si la tiene");
+  assert.equal(w.contactos.size, 0);
+  assert.ok(w.busquedas.length <= 2, `después de la primera que falla no se busca más: ${w.busquedas.length}`);
+  for (const n of [1, 2, 3]) assert.match(w.config.bandeja_estado.pendientes[`h${n}`].nota, /no entró al agente todavía: ManyChat no contestó/);
+  assert.deepEqual(w.config.bandeja_estado.reintentar, { h1: SOLO_IG.id, h2: B.id, h3: C.id }, "se vuelven a mirar aunque no se muevan");
+  assert.equal(w.config.bandeja_ids[SOLO_IG.id]?.m_en, undefined, "no queda como no encontrada");
+
+  // La vuelta siguiente (las charlas no se movieron y están debajo de la primera página): ManyChat contesta.
+  w.mcCaido = false;
+  w.pasar(CADA_MIN);
+  w.config.bandeja_paginas = { ...w.config.bandeja_paginas, repaso_en: w.ahora.toISOString() };
+  const r2 = await w.revisar();
+  assert.equal(r2.altas, 3);
+  assert.equal(w.contactos.get(SOLO_IG.id)?.ig_id, SOLO_IG.id, "ManyChat contestó que no la tiene: entra con su id de Instagram");
+  assert.equal(w.contactos.get("5012")?.ig_id, B.id, "la que estaba en ManyChat entra con su id de ManyChat");
+  assert.equal(w.contactos.has(B.id), false);
+  assert.deepEqual(w.etiquetas, [["5012", ETIQUETA_AGENTE]]);
+  assert.deepEqual(w.config.bandeja_estado.reintentar, {});
+});
+
+test("sin la clave de ManyChat también entra, sin buscarla", async () => {
+  const w = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 10]])], perfiles: SOLO_IG_PERFIL });
+  w.manychat.hayManyChat = () => false;
+  assert.equal((await w.revisar()).altas, 1);
+  assert.ok(w.contactos.has(SOLO_IG.id));
+  assert.deepEqual(w.busquedas, []);
+});
+
+test("si ManyChat la encuentra, el alta sigue siendo con su id de ManyChat (y con su etiqueta)", async () => {
+  const w = mundo({
+    hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 10]])], perfiles: SOLO_IG_PERFIL,
+    directorio: [{ id: "5011", nombre: "Nombre Solo Ig", ig_username: "lead.solo.ig" }],
+  });
+  assert.equal((await w.revisar()).altas, 1);
+  assert.deepEqual([w.contactos.get("5011")?.ig_id, w.contactos.has(SOLO_IG.id)], [SOLO_IG.id, false]);
+  assert.deepEqual(w.etiquetas, [["5011", ETIQUETA_AGENTE]]);
+});
+
+test("la gente nueva sin ManyChat sigue las mismas reglas: si Cande la sigue o le escribió, o el agente está apagado, no entra", async () => {
+  const sigue = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 10]])], perfiles: { [SOLO_IG.id]: perfil("Nombre Solo Ig", "lead.solo.ig", true) } });
+  assert.equal((await sigue.revisar()).altas, 0);
+  assert.equal(sigue.contactos.size, 0);
+  const escribio = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30], ["cuenta", "Holaa, de prueba", 20], ["lead", "dale, de prueba", 10]])], perfiles: SOLO_IG_PERFIL });
+  assert.equal((await escribio.revisar()).altas, 0);
+  assert.match(escribio.config.bandeja_estado.pendientes.h1.nota, /hay mensajes tuyos/);
+  const apagado = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { modo: "apagado" } });
+  assert.equal((await apagado.revisar()).altas, 0);
+  assert.match(apagado.resumenes()[0].campos[SECCION_VOS], /nueva, no entró al agente: el agente está apagado/);
+});
+
+test("un contacto solo de Instagram que ya está en la base (una charla borrada, sin su ig_id) se reconoce por su id: no se duplica ni se le devuelve al agente", async () => {
+  const w = mundo({
+    contactos: [{ id: SOLO_IG.id, dueno: "cande", personal: true, ig_id: null, ig_usuario: null }],
+    hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 10]])], perfiles: SOLO_IG_PERFIL,
+  });
+  assert.equal((await w.revisar()).altas, 0);
+  assert.equal(w.contactos.get(SOLO_IG.id).dueno, "cande");
+  assert.equal(w.contactos.get(SOLO_IG.id).ig_id, null, "a una charla personal no se le vuelve a poner su Instagram");
+  assert.equal(w.resumenes().length, 0, "una charla personal no va al resumen");
+  assert.deepEqual(w.busquedas, [], "no se la busca en ManyChat como si fuera alguien nuevo");
+});
+
+test("el tope de altas de la red cuenta también las de solo Instagram, y su valor de fábrica alcanza para un día (60)", async () => {
+  const w = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { altas_bandeja_por_dia: undefined } });
+  w.altasRedHoy = TOPE_ALTAS_RED - 1;
+  assert.equal((await w.revisar()).altas, 1, "con 59 en el día todavía entra");
+  assert.equal(w.avisos.filter((a) => /tope de altas de la red/.test(a.titulo))[0]?.campos["Van en 24 horas"], "60 de 60");
+  const lleno = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { altas_bandeja_por_dia: undefined } });
+  lleno.altasRedHoy = TOPE_ALTAS_RED;
+  assert.equal((await lleno.revisar()).altas, 0);
+  assert.match(lleno.resumenes()[0].campos[SECCION_VOS], /se llenó el tope de altas de la red/);
+});
+
+test("lo que había quedado anotado como de Cande (a_cande) se vuelve a mirar en el próximo barrido y entra, aunque la charla no se haya movido", async () => {
+  // Así estaba la base el 02/11: gente nueva que no entró (por el tope, o porque ManyChat no la tenía), pasada a Cande
+  // en un resumen y anotada en a_cande ("ya te la había pasado"). Su charla no se mueve (nadie le contesta), así que
+  // queda debajo de las primeras 50 y el barrido no la lee hasta el repaso.
+  const OTRA = persona("1000000000000614", "lead.solo.d");
+  const SUYA = persona("1000000000000615", "lead.solo.e");
+  const armar = () => {
+    const pend = (n, p, nota, min) => ({
+      hilo: `h${n}`, igsid: p.id, mid: `m${n}-0`, creado: hace(min).toISOString(), usuario: p.username, texto: "hola de prueba",
+      nombre: null, nota, nueva: true,
+    });
+    return mundo({
+      hilos: [
+        ...relleno(CHARLAS_POR_PAGINA + 5),
+        charla(1, SOLO_IG, [["lead", "hola de prueba", 120]]),
+        charla(2, OTRA, [["lead", "hola de prueba", 130]]),
+        // Esta le escribió Cande: sigue siendo de ella.
+        charla(3, SUYA, [["lead", "hola de prueba", 200], ["cuenta", "Te contesto yo, de prueba", 150], ["lead", "dale, de prueba", 140]]),
+        // Esta pasó las 23 horas: el agente ya no llega, no se vuelve a mirar.
+        charla(4, NUEVO, [["lead", "hola de prueba", 25 * 60]]),
+      ],
+      perfiles: { ...SOLO_IG_PERFIL, [OTRA.id]: perfil("Otra Persona", OTRA.username), [SUYA.id]: perfil("Suya", SUYA.username), ...NUEVO_PERFIL },
+      config: {
+        bandeja_paginas: { marca: hace(15).toISOString(), repaso_en: hace(5).toISOString(), cursor: null, objetivo: null },
+        bandeja_estado: {
+          pendientes: {
+            h1: pend(1, SOLO_IG, "ya te la había pasado: la tenés vos", 120),
+            h2: pend(2, OTRA, "nueva, no entró al agente: se llenó el tope de altas de la red", 130),
+            h3: pend(3, SUYA, "ya te la había pasado: la tenés vos", 140),
+            h4: pend(4, NUEVO, "nunca le llegó al agente", 25 * 60),
+          },
+          a_cande: { [SOLO_IG.id]: hace(100).toISOString(), [SUYA.id]: hace(100).toISOString(), [NUEVO.id]: hace(100).toISOString() },
+          etiquetas: {},
+        },
+      },
+    });
+  };
+
+  // Sin lo anotado, el barrido no las ve: están debajo de la primera página y no toca el repaso.
+  const sin = armar();
+  sin.config.bandeja_estado = { pendientes: sin.config.bandeja_estado.pendientes, etiquetas: {} };
+  assert.equal((await sin.revisar()).altas, 0);
+
+  const w = armar();
+  // La pasada rápida corre antes (cada 3 minutos): no las mira, pero tampoco pierde lo anotado.
+  await w.rapida();
+  assert.equal(w.contactos.size, 0);
+  assert.equal(w.config.bandeja_estado.a_cande, undefined, "a_cande no se guarda más");
+  assert.deepEqual(w.config.bandeja_estado.reintentar, { h1: SOLO_IG.id, h2: OTRA.id, h3: SUYA.id }, "las de más de 23 horas no");
+
+  w.pasar(1);
+  const r = await w.revisar();
+  assert.equal(r.altas, 2);
+  assert.equal(w.contactos.get(SOLO_IG.id)?.dueno, "agente");
+  assert.equal(w.contactos.get(OTRA.id)?.dueno, "agente");
+  assert.equal(w.contactos.has(SUYA.id), false, "Cande le escribió: sigue siendo suya");
+  assert.match(w.config.bandeja_estado.pendientes.h3.nota, /hay mensajes tuyos/);
+  assert.deepEqual(w.config.bandeja_estado.reintentar, {}, "se miran una vez");
+  assert.deepEqual([w.config.bandeja_estado.pendientes.h1, w.config.bandeja_estado.pendientes.h2], [undefined, undefined]);
+  assert.deepEqual(w.etiquetas, []);
+});
+
+test("el id de un contacto solo de Instagram pasa por todo lo que valida ids, y nunca se confunde con uno de ManyChat", async () => {
+  const { idDeCharla, idDeLink, conIdDeCharla } = await import("../lib/dm/linkFormulario.js");
+  const { firmarIg, firmaValida, igFirmado } = await import("../lib/dm/firmaIg.js");
+  const { contactoDeAviso } = await import("../lib/dm/respuestas.js");
+  for (const id of ["100000000000061", "1000000000000611", "10000000000000611"]) { // de 15 a 17 dígitos, como los de Instagram
+    assert.ok(esSoloInstagram(id), id);
+    assert.equal(idDeCharla(id), id);
+    assert.equal(idDeLink(`${id}?`), id, "con el signo que se lleva el lector de links");
+    const antes = process.env.IG_LINK_SECRET;
+    process.env.IG_LINK_SECRET = "clave-de-prueba";
+    try {
+      const firma = firmarIg(id);
+      assert.ok(firma);
+      assert.ok(firmaValida(id, firma));
+      assert.equal(igFirmado(id, firma), id);
+      assert.equal(conIdDeCharla("opengatehub.com/devs", id, { firma }), `opengatehub.com/devs?ig=${id}&f=${firma}`);
+    } finally {
+      if (antes === undefined) delete process.env.IG_LINK_SECRET;
+      else process.env.IG_LINK_SECRET = antes;
+    }
+    assert.equal(contactoDeAviso(`🔔 DM: te paso una charla\n\nQuién: Nombre de prueba (${id})\nDijo: hola`), id, "Cande puede contestar su aviso");
+  }
+  // Los de ManyChat (hasta 10 dígitos) nunca son solo de Instagram; lo que no es un id, tampoco.
+  for (const id of ["408290", "5001", "1234567890", "12345678901234", "1000000000000000000611", "", null, undefined, "abc1000000000000611"]) {
+    assert.equal(esSoloInstagram(id), false, String(id));
+  }
+});
+
+/* ---------- 13. revisión del PR de la gente nueva sin ManyChat (02/11) ---------- */
+
+test("si ManyChat ya no deja usar su API (401 o 403, cuando vence el plan), la gente nueva entra con su id de Instagram y no se la busca más en esa vuelta", async () => {
+  const B = persona("1000000000000616", "lead.solo.f");
+  const w = mundo({
+    hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 10]]), charla(2, B, [["lead", "hola de prueba", 11]])],
+    perfiles: { ...SOLO_IG_PERFIL, [B.id]: perfil("Otra Persona", B.username) },
+  });
+  w.manychat.buscarPorNombre = async (n) => {
+    w.busquedas.push(n);
+    return { ok: false, status: 401, sinManyChat: true, error: "ManyChat de prueba: clave rechazada" };
+  };
+  assert.equal((await w.revisar()).altas, 2);
+  assert.deepEqual([w.contactos.get(SOLO_IG.id)?.ig_id, w.contactos.get(B.id)?.ig_id], [SOLO_IG.id, B.id]);
+  assert.equal(w.busquedas.length, 1, "una sola búsqueda: ManyChat ya no está");
+  assert.equal(w.config.bandeja_ids[SOLO_IG.id]?.m_en, undefined, "no queda guardado como no encontrada");
+});
+
+test("si hay más de un contacto de ManyChat con ese usuario no entra con su id de Instagram: va a Cande, como antes", async () => {
+  const w = mundo({
+    hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL,
+    directorio: [{ id: "5013", nombre: "Nombre Solo Ig", ig_username: "lead.solo.ig" }, { id: "5014", nombre: "Nombre Solo Ig", ig_username: "lead.solo.ig" }],
+  });
+  assert.equal((await w.revisar()).altas, 0);
+  assert.equal(w.contactos.size, 0);
+  assert.match(w.resumenes()[0].campos[SECCION_VOS], /nueva, no entró al agente: hay más de un contacto con ese usuario en ManyChat/);
+});
+
+test("dos vueltas que se cruzan no dejan a la misma persona dos veces, aunque una llegue con el id de ManyChat y la otra con el de Instagram", async () => {
+  // El barrido (minutos 0, 15, 30, 45) y la pasada rápida (1, 4, 7...) leen la primera página casi a la vez. La segunda
+  // leyó la base antes de que la primera guardara el alta (no la ve) y ManyChat le contesta otra cosa.
+  for (const [primeraEnMc, segundaEnMc] of [[false, true], [true, false]]) {
+    const w = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 10]])], perfiles: SOLO_IG_PERFIL });
+    const enMc = [{ id: "5015", nombre: "Nombre Solo Ig", ig_username: "lead.solo.ig" }];
+    if (primeraEnMc) w.directorio.push(...enMc);
+    assert.equal((await w.revisar()).altas, 1);
+    // La segunda vuelta: no ve lo que acaba de guardar la primera, ni lo que la primera supo de ManyChat.
+    const real = { contactoDeIg: w.base.contactoDeIg, contacto: w.base.contacto, contactoBorrado: w.base.contactoBorrado };
+    const guardados = new Set(w.contactos.keys());
+    w.base.contactoDeIg = async () => null;
+    w.base.contactoBorrado = async () => null;
+    w.base.contacto = async (id) => (guardados.has(id) ? null : real.contacto(id));
+    w.config.bandeja_ids = {};
+    w.directorio.length = 0;
+    if (segundaEnMc) w.directorio.push(...enMc);
+    else w.manychat.buscarPorNombre = async () => ({ ok: true, contactos: [] }); // contesta que no la tiene
+    const r2 = await w.rapida();
+    Object.assign(w.base, real);
+    assert.equal(r2.altas, 0, `${primeraEnMc ? "ManyChat" : "Instagram"} y después ${segundaEnMc ? "ManyChat" : "Instagram"}`);
+    assert.equal(w.contactos.size, 1, "una sola persona");
+    assert.equal(w.resumenes().length, 0, "no le llega a Cande: ya la tiene el agente");
+  }
+});
+
+test("una charla personal borrada que vuelve a escribir cuando ManyChat ya no está no entra como alguien nuevo: se la reconoce por su Instagram guardado aparte", async () => {
+  // Hasta el 02/11 a las charlas borradas (el agente calló a alguien que no era un lead, o Cande sacó a un amigo) se
+  // las reconocía solo buscándolas en ManyChat: borrarCharla les saca su Instagram. Sin ManyChat entraban como nuevas.
+  const AMIGO = persona("1000000000000617", "amigo.de.prueba");
+  const armar = (borrado) => {
+    const w = mundo({
+      contactos: [{ id: "408291", dueno: "cande", personal: true, ig_id: null, ig_usuario: null, ...borrado }],
+      hilos: [charla(1, AMIGO, [["lead", "hola, cómo andás? de prueba", 10]])],
+      perfiles: { [AMIGO.id]: perfil("Amigo De Prueba", AMIGO.username) },
+    });
+    w.manychat.hayManyChat = () => false;
+    return w;
+  };
+  // Sin lo guardado aparte, entraría como alta nueva: el agente le escribiría.
+  const sin = armar({});
+  assert.equal((await sin.revisar()).altas, 1);
+
+  for (const borrado of [{ ig_id_borrado: AMIGO.id }, { ig_id_borrado: "", ig_usuario_borrado: "Amigo.De.Prueba" }]) {
+    const w = armar(borrado);
+    assert.equal((await w.revisar()).altas, 0, JSON.stringify(borrado));
+    assert.equal(w.contactos.size, 1);
+    assert.equal(w.contactos.get("408291").dueno, "cande");
+    assert.equal(w.contactos.get("408291").ig_id, null, "no se le vuelve a poner su Instagram");
+    assert.equal(w.resumenes().length, 0, "una charla personal no va al resumen");
+  }
+});
+
+test("las consultas de la revisión: borrarCharla guarda aparte el Instagram, el alta no entra si otro tiene ese id de Instagram", async () => {
+  const src = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  const cuerpo = (nombre) => {
+    const i = src.indexOf(`export async function ${nombre}`);
+    assert.ok(i > -1, `falta ${nombre}`);
+    return src.slice(i, src.indexOf("\n}\n", i));
+  };
+  assert.match(src, /ADD COLUMN IF NOT EXISTS ig_id_borrado TEXT/);
+  assert.match(src, /ADD COLUMN IF NOT EXISTS ig_usuario_borrado TEXT/);
+  const borrar = cuerpo("borrarCharla");
+  assert.match(borrar, /ig_id = NULL/, "su Instagram se sigue vaciando");
+  assert.match(borrar, /ig_id_borrado = COALESCE\(dm_contactos\.ig_id, NULLIF\(dm_contactos\.ig_id_mc, ''\), dm_contactos\.ig_id_borrado\)/);
+  assert.match(borrar, /ig_usuario_borrado = COALESCE\(NULLIF\(dm_contactos\.ig_usuario, ''\), dm_contactos\.ig_usuario_borrado\)/);
+  const alta = cuerpo("darDeAltaDesdeBandeja");
+  assert.match(alta, /ig_id = \$\{igId \|\| null\}::text OR ig_id_borrado = \$\{igId \|\| null\}::text/);
+  assert.match(alta, /NOT ya\.figura/);
+  assert.match(alta, /figura: rows\[0\]\?\.figura === true/);
+  const deBorrada = cuerpo("contactoBorrado");
+  assert.match(deBorrada, /ig_id_borrado = \$\{igId\}::text/);
+  assert.match(deBorrada, /lower\(ig_usuario_borrado\) = \$\{u\}::text/);
+  assert.doesNotMatch(deBorrada, /UPDATE|INSERT|DELETE/);
+  assert.match(cuerpo("borradasSinIg"), /personal IS TRUE AND ig_id IS NULL AND ig_id_borrado IS NULL/);
+  assert.match(cuerpo("guardarBorrado"), /WHERE id = \$\{id\} AND ig_id_borrado IS NULL/);
+  // Las dos vueltas de la red le pasan la consulta nueva a revisarBandeja: sin ella, cada charla nueva fallaría.
+  for (const f of ["../pages/api/dm/bandeja.js", "../pages/api/dm/bandeja-rapida.js"]) {
+    assert.match(await readFile(new URL(f, import.meta.url), "utf8"), /contactoDeIg, contactoBorrado, contacto, guardarIg/, f);
+  }
+  // El cron de Instagram trae de ManyChat el Instagram de las personales borradas antes del 02/11.
+  const cron = await readFile(new URL("../pages/api/dm/instagram.js", import.meta.url), "utf8");
+  assert.match(cron, /for \(const id of await borradasSinIg\(BORRADAS_POR_VUELTA\)\)/);
+  assert.match(cron, /await guardarBorrado\(id, \{ igId:/);
 });

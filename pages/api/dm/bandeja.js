@@ -18,8 +18,9 @@ import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
 import { revisarBandeja, vigilarRed } from "../../../lib/dm/bandeja";
 import { vigilarEnvios } from "../../../lib/dm/vigilarEnvios";
 import {
-  ajustes, anotarCandeDesdeIg, anotarDesdeBandeja, contacto, contactoDeIg, darDeAltaDesdeBandeja, enviadosEnLaCharla, guardarConfig, guardarIg, hayBase,
-  leadsGuardados, leerConfig, loSigue, pulsoEnvios, salidaSinLlegar, soltar, tablas, textosDeLaCuenta, tomar,
+  ajustes, anotarCandeDesdeIg, anotarDesdeBandeja, contacto, contactoBorrado, contactoDeIg, darDeAltaDesdeBandeja, enviadosEnLaCharla,
+  guardarConfig, guardarIg, hayBase, leadsGuardados, leerConfig, loSigue, pulsoEnvios, salidaSinLlegar, soltar, tablas, textosDeLaCuenta,
+  tomar,
 } from "../../../lib/dm/base";
 import { ErrorInstagram } from "../../../lib/dm/instagram";
 import { buscarPorNombre, datosDe, hayManyChat, ponerEtiqueta } from "../../../lib/dm/manychat";
@@ -56,7 +57,7 @@ export default async function handler(req, res) {
     r = await revisarBandeja({
       ig: instagram,
       base: {
-        leerConfig, guardarConfig, contactoDeIg, contacto, guardarIg, loSigue, textosDeLaCuenta, enviadosEnLaCharla, leadsGuardados,
+        leerConfig, guardarConfig, contactoDeIg, contactoBorrado, contacto, guardarIg, loSigue, textosDeLaCuenta, enviadosEnLaCharla, leadsGuardados,
         tomar, soltar, anotarDesdeBandeja, anotarCandeDesdeIg, darDeAltaDesdeBandeja, salidaSinLlegar,
       },
       manychat: { hayManyChat, buscarPorNombre, datosDe, ponerEtiqueta },

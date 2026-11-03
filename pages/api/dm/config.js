@@ -65,7 +65,7 @@
 // el momento. El prompt anterior queda guardado.
 import { randomBytes } from "node:crypto";
 import {
-  avisarDm, guardarSecretoDm, instagram, mismoSecreto, olvidarChatDm, olvidarRespuestas, reglasInstagram, secretoDe,
+  avisarDm, envio, guardarSecretoDm, instagram, mismoSecreto, olvidarChatDm, olvidarRespuestas, reglasInstagram, secretoDe,
 } from "../../../lib/dm/armado";
 import { segundosDesdeElLatido } from "../../../lib/dm/cola";
 import {
@@ -77,7 +77,7 @@ import {
   CLAVE_RETOMADAS, DIAS_RETOMADA, codigoEnHilo, desdeDe, desdeManual, esRetomada, explicarError, linkCharlaIg, manualEnHilo, paraPegar,
   usuarioIg, usuarioParaAviso,
 } from "../../../lib/dm/instagram";
-import { buscarPorNombre, datosDe, hayManyChat, mandarTextos, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
+import { buscarPorNombre, datosDe, esSoloInstagram, hayManyChat, ponerCampo, ponerEtiqueta } from "../../../lib/dm/manychat";
 import { ETIQUETA_AGENTE, identificar } from "../../../lib/dm/bandeja";
 import { CLAVE_PATRONES, validarPatrones } from "../../../lib/dm/controlador";
 import { frenoDelCodigo } from "../../../lib/dm/frenos";
@@ -239,6 +239,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "el texto trae el código de acceso: eso sale solo con el ok del aviso del código" });
     }
     let destino = id;
+    // Si ya es un contacto solo de Instagram (la red lo dio de alta con ese id, 02/11), es esa charla: queda anotado.
+    if (!destino && esSoloInstagram(igsid) && (await contacto(igsid))) destino = igsid;
     if (!destino) {
       const q = await buscarIg(igsid, b);
       if (!q.id) {
@@ -251,8 +253,10 @@ export default async function handler(req, res) {
       }
       destino = q.id;
     }
-    const envio = await mandarTextos(destino, textos);
-    if (!envio.ok) return res.status(502).json({ ok: false, contacto: destino, error: envio.error, code: envio.code, incierto: envio.incierto || false });
+    // Por el mismo envío que el agente (lib/dm/envio.js): Instagram primero y ManyChat de respaldo. Hasta el 02/11 iba
+    // solo por ManyChat, y a un contacto solo de Instagram (lib/dm/manychat.js) no le llegaba.
+    const salida = await envio.mandarTextos(destino, textos);
+    if (!salida.ok) return res.status(502).json({ ok: false, contacto: destino, error: salida.error, code: salida.code, incierto: salida.incierto || false });
     if (await contacto(destino)) await anotarAMano(destino, "cande", textos.join("\n").slice(0, TOPE_TEXTO));
     const etiqueta = b.etiquetar === true ? (await ponerEtiqueta(destino, ETIQUETA_AGENTE))?.ok === true : null;
     return res.status(200).json({ ok: true, contacto: destino, etiqueta });
