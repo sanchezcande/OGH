@@ -57,18 +57,18 @@ test("adentro de una frase NO dispara", () => {
 
 test("la ventana de la private reply: 7 días, con margen", () => {
   assert.equal(VENTANA_DIAS, 7);
-  assert.equal(FRESCO_MINUTOS, 2);
+  assert.equal(FRESCO_MINUTOS, 0);
   assert.equal(enVentana("2026-10-29T17:32:15+0000", ahora), true, "de ayer sí");
   assert.equal(enVentana("2026-10-24T03:47:12+0000", ahora), true, "de hace 6 días todavía");
   // Un comentario de 6 días y 23 horas se puede vencer entre que se lo lee y que sale el DM.
   assert.equal(enVentana("2026-10-23T07:00:00+0000", ahora), false, "a punto de vencerse, no se toma");
   assert.equal(enVentana("2026-10-20T14:48:26+0000", ahora), false, "de hace 10 días no");
   assert.equal(enVentana("2026-10-31T00:00:00+0000", ahora), false, "del futuro tampoco");
-  // Recién hecho: primero le toca a ManyChat, que a los contactos que ya tiene les contesta a los
-  // segundos. La espera bajó de 5 a 2 minutos el 31/10, cuando ManyChat dejó de atender contactos
-  // nuevos: lo que antes era prudencia, ahora es demora.
-  assert.equal(enVentana("2026-10-30T05:59:30+0000", ahora), false, "de hace medio minuto espera la vuelta siguiente");
-  assert.equal(enVentana("2026-10-30T05:57:00+0000", ahora), true, "de hace 3 minutos ya se puede");
+  // Recién hecho: la espera existía por ManyChat, que a los contactos que ya tenía les contestaba a
+  // los segundos. Con ManyChat dado de baja (05/11) no hay a quién esperar, y el que comenta está
+  // mirando el reel justo ahí: se contesta en la misma vuelta en que se lo lee.
+  assert.equal(enVentana("2026-10-30T05:59:30+0000", ahora), true, "de hace medio minuto también");
+  assert.equal(enVentana("2026-10-30T06:00:00+0000", ahora), true, "el de este mismo segundo sale igual");
   assert.equal(enVentana("cualquier cosa", ahora), false);
 });
 
