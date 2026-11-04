@@ -82,15 +82,19 @@ test("la página de la agenda cuenta el click antes de redirigir", () => {
   assert.match(src, /catch/, "medir nunca puede romper el click");
 });
 
-test("el último mensaje aprieta con el cupo y no pide una opinión", () => {
+test("el último mensaje le pregunta por él y no por el lugar", () => {
   const ultimo = PALABRAS.trabajo.textos[PALABRAS.trabajo.textos.length - 1].trim();
-  // El 30/10 el cierre era una pregunta ("Te guardo un lugar o se lo queda otro?"). El 02/11 Cande
-  // lo reescribió entero y dictó este, que aprieta con el cupo y sin preguntar: "Voy a tomar 5 este
-  // mes y ya quedan 3 no másss" (el 03/11 pidió bajarlo a 2). Es decisión de ella y queda escrito acá para que no se "arregle"
-  // sola más adelante. Lo que sigue valiendo es que el cierre no pida una opinión: con "qué te
-  // parece" contesta cualquiera que no va a comprar, y es la falla número uno de sus 26 llamadas.
-  assert.match(ultimo, /\b5\b/, "el cierre nombra el cupo");
-  assert.ok(!/qué te parece|te gustaría saber/i.test(ultimo), "eso pide una opinión, no una decisión");
+  // El 30/10 el cierre era "Te guardo un lugar o se lo queda otro? Son 5 no más!". El 02/11 Cande lo
+  // reescribió para que apretara con el cupo sin preguntar. El 05/11 se midieron 913 charlas por la
+  // última cosa que les mandamos: el cupo trae el 14% de respuestas, el link del doc el 13%, y
+  // preguntarle por su problema el 92%. El cupo le pide decidir solo y el silencio le sale más
+  // barato; la pregunta le pide seguir hablando. Decisión de Cande el 05/11 ("cambiémoslo ya a ese
+  // diálogo") y queda escrito acá para que no se "arregle" sola más adelante.
+  assert.ok(ultimo.endsWith("?"), "el cierre es una pregunta");
+  assert.ok(!/\b5\b|quedan|lugar|cupo/i.test(ultimo), "el cupo se cuenta en la llamada, no acá");
+  // Y sigue sin pedir una opinión: con "qué te parece" contesta cualquiera que no va a comprar, y es
+  // la falla número uno de sus 26 llamadas. Lo que se pide son datos de su búsqueda.
+  assert.ok(!/qué te parece|te gustaría saber/i.test(ultimo), "eso pide una opinión, no datos");
 });
 
 test("habla ella, no una empresa", () => {
