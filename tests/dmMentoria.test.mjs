@@ -56,6 +56,18 @@ test("el 1 a 1 se cierra en una llamada: la agenda de Cande pasa (con o sin www 
   frena([`Va de nuevo\nhttps://${LINK_PAGO_1A1}`]);
 });
 
+test("los 500 con su primer sueldo: la frase nueva deja pasar el monto sola, sin la agenda al lado", () => {
+  // Cande, 05/11: "diría que 500 con el primer salario, así es mejor creo". El monto solo pasa en un
+  // turno que habla del 1 a 1, y con TRABAJO la agenda ya salió en el mensaje fijo, así que el turno
+  // del precio puede no tener ningún link. Sin esto el freno le voltea el 473.
+  pasa(["Son 473 dólares para arrancar y 500 más con tu primer salario", "Te cierra?"]);
+  pasa(["Son 473 dólares para arrancar y 500 más con tu primer sueldo"]);
+  pasa(["Arrancás con 473 dólares y los otros 500 son con tu primer sueldo"]);
+  // Lo que ya frenaba sigue frenado: otra moneda y otro monto.
+  frena(["Son 473 euros y 500 euros con tu primer sueldo"]);
+  frena(["Son 600 dólares con tu primer sueldo"]);
+});
+
 test("473 y 500 pasan hablando del 1 a 1 (con su link, su doc, '1 a 1' o 'cuando firmás')", () => {
   pasa(["Arranca en 473 dólares y son 500 al final, cuando firmás", `Está todo acá\n${DOC_1A1}`]);
   pasa(["El 1 a 1 arranca con USD 473"]);
