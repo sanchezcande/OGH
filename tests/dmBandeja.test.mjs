@@ -69,6 +69,7 @@ function mundo({
     mensajes: mensajes.map((m, i) => ({ id: i + 1, ig_mid: null, guardado_red: null, eco_en: null, creado: AHORA, ...m })),
     salidas: salidas.map((s) => ({ accion: "responder", estado: "enviada", mensajes: ["Respuesta de prueba"], enviado: null, ...s })),
     config: { ...config }, seguidos: new Set(seguidos), tomado: new Map(), avisos: [], busquedas: [], pedidosDatos: 0, pedidosIg: [], etiquetas: [],
+    hilosDeCarpeta: {}, // las otras pestañas de la bandeja: vacías salvo que la prueba ponga algo
     aj: { modo: "auto", altas: true, altas_por_dia: 25, altas_bandeja_por_dia: 10, contexto_alta: "", seguidos: false, ...aj },
     alPedir: null,
   };
@@ -197,6 +198,15 @@ function mundo({
     let r;
     if (ruta === "/me") r = { user_id: CUENTA.id, username: CUENTA.username };
     else if (ruta === "/me/conversations") {
+      // Las otras pestañas de la bandeja (Principal, General, Solicitudes) son listas aparte: con
+      // `folder` solo sale lo de esa pestaña, y la que no existe contesta con error, como Instagram.
+      const carpeta = u.searchParams.get("folder");
+      if (carpeta) {
+        const dePestana = w.hilosDeCarpeta[carpeta];
+        r = dePestana ? { data: dePestana, paging: { cursors: { after: "0" } } }
+          : { error: { message: `folder ${carpeta} no existe`, code: 100 } };
+        return { ok: !r.error, status: r.error ? 400 : 200, json: async () => r };
+      }
       // Con user_id, como hiloDe: solo la charla con esa persona.
       const con = u.searchParams.get("user_id");
       const deEsa = (h) => h.messages.data.some((m) => m.from?.id === con || (m.to?.data || []).some((x) => x.id === con));
@@ -640,7 +650,7 @@ test("nada que hacer: lo último es de la cuenta, o el lead escribió hace menos
     perfiles: NUEVO_PERFIL, directorio: NUEVO_EN_MC,
   });
   const r = await w.revisar();
-  assert.deepEqual(r, { paginas: 1, miradas: 2, recuperados: 0, altas: 0, pendientes: 0, fallas: 0, resumen: false });
+  assert.deepEqual(r, { paginas: 1, miradas: 2, recuperados: 0, altas: 0, pendientes: 0, fallas: 0, resumen: false, carpetas: {} });
   assert.equal(w.mensajes.length, 0);
   assert.equal(w.busquedas.length, 0, "ni se lo buscó en ManyChat");
   assert.equal(w.avisos.length, 0);
@@ -1858,4 +1868,32 @@ test("las consultas de la revisión: borrarCharla guarda aparte el Instagram, el
   const cron = await readFile(new URL("../pages/api/dm/instagram.js", import.meta.url), "utf8");
   assert.match(cron, /for \(const id of await borradasSinIg\(BORRADAS_POR_VUELTA\)\)/);
   assert.match(cron, /await guardarBorrado\(id, \{ igId:/);
+});
+
+test("lo que está en otra pestaña de la bandeja también se lee: la de siempre trae una sola", async () => {
+  // 04/11: José mandó "TRABAJO" y pasó 23 horas sin respuesta. No es que el agente contestara mal: el
+  // mensaje estaba en General, la lectura pide la bandeja sin decir qué pestaña, e Instagram manda una.
+  // Para el agente esa charla no existía. Lo mismo con los "CV" que Cande encontró en Solicitudes.
+  const w = mundo({
+    contactos: [{ id: "77", ig_id: "501", ig_usuario: "lead.agente" }],
+    hilos: [charla(1, DEL_AGENTE, [["lead", "hola de prueba", 20], ["cuenta", "Respuesta del agente de prueba", 19]])],
+    perfiles: NUEVO_PERFIL, directorio: NUEVO_EN_MC,
+  });
+  w.hilosDeCarpeta.page = [charla(9, NUEVO, [["lead", "TRABAJO", 30]])];
+  const r = await w.revisar();
+  assert.equal(r.carpetas.page, 1, "la pestaña General se leyó");
+  assert.equal(r.altas, 1, "el de la otra pestaña entró como alta igual que los de la principal");
+  assert.ok([...w.contactos.values()].some((c) => c.ig_id === "601"), "quedó en la base");
+});
+
+test("una pestaña que Instagram no conoce se anota y no se vuelve a pedir", async () => {
+  // Si no, serían tres pedidos al pedo cada tres minutos para siempre, y el error llenaría el registro.
+  const w = mundo({ contactos: [{ id: "77", ig_id: "501", ig_usuario: "lead.agente" }], hilos: [] });
+  w.hilosDeCarpeta = { page: [] }; // las otras dos contestan "no existe"
+  await w.revisar();
+  assert.deepEqual(w.config.bandeja_carpetas.malas, { pending: true, other: true });
+  const pedidos = () => w.pedidosIg.filter((x) => x === "/me/conversations").length;
+  const antes = pedidos();
+  await w.revisar();
+  assert.equal(pedidos() - antes, 2, "la vuelta siguiente pide la bandeja de siempre y la pestaña que sí anda");
 });
