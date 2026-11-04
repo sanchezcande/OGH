@@ -4613,7 +4613,7 @@ function armarClaveSinAceptar(palabra, opciones = {}) {
   return { ...mundo, aceptar: () => { aceptada = true; } };
 }
 
-test("TRABAJO desde Solicitudes: el turno queda abierto, un solo aviso de aceptarla, y al aceptarla salen sus mensajes y pasa a Cande", async () => {
+test("TRABAJO desde Solicitudes: el turno queda abierto, un solo aviso de aceptarla, y al aceptarla salen sus mensajes y sigue el agente", async () => {
   const { agente, m, aceptar } = armarClaveSinAceptar("TRABAJO");
   const r = await agente.procesar("77", m.disparo);
   assert.equal(r.hecho, "sin aceptar");
@@ -4627,11 +4627,12 @@ test("TRABAJO desde Solicitudes: el turno queda abierto, un solo aviso de acepta
   // La espera lo vuelve a intentar y sigue sin aceptar: no sale otro aviso.
   assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "sin aceptar");
   assert.equal(m.avisos.length, 1);
-  // La acepta: salen los mensajes de TRABAJO y la charla pasa a ella.
+  // La acepta: salen los mensajes de TRABAJO y la charla sigue del agente (05/11: antes pasaba a
+  // Cande y quedaba sin contestar, 116 de 124). Lo urgente se le pasa por los frenos.
   aceptar();
   assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "palabra clave");
   assert.ok(m.enviados.some((t) => /15min/.test(t)), m.enviados.join(" / "));
-  assert.equal(m.contacto.dueno, "cande");
+  assert.equal(m.contacto.dueno, "agente");
 });
 
 test("CV desde Solicitudes: tampoco pasa a Cande, y sale cuando la acepta", async () => {
