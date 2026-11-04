@@ -50,8 +50,13 @@ test("CV dice lo mismo por DM que por comentario", async () => {
   assert.equal(palabraClaveDe("cv").textos[0], TEXTO_CV, "una sola redacción para la misma promesa");
 });
 
-test("TRABAJO sí le pasa la charla a Cande", () => {
-  assert.equal(palabraClaveDe("TRABAJO").pasa, true);
+test("ninguna palabra clave le pasa la charla a Cande", () => {
+  // TRABAJO la pasaba desde el 30/10 ("sacalos del agente y mandámelos a mí"). El 05/11 se midió que
+  // no se atendía: de 124 charlas pasadas en 30 días, 116 no recibieron ninguna respuesta. Cande:
+  // "si me pasás 124 charlas ni las leo, si me pasás solo las urgentes sí, estas cosas podrías
+  // seguir vos". Lo urgente sigue pasando por los frenos, que es lo único que le llega.
+  assert.equal(palabraClaveDe("TRABAJO").pasa, false);
+  for (const p of Object.values(PALABRAS)) assert.ok(!p.pasa, p.nombre);
 });
 
 test("lo que contesta lleva la agenda, y ni el doc ni el link de pago", () => {
@@ -118,12 +123,16 @@ test("sin guion largo", () => {
 // los dos mensajes y la charla pasa a ella, en código y no en el guion: el que levanta la mano por
 // una oferta de 473 lo atiende ella.
 
-test("después de la palabra clave, la charla pasa a Cande", () => {
+test("después de la palabra clave sigue el agente, y solo pasa lo que quedó sin contestar", () => {
   const src = readFileSync(new URL("../lib/dm/agente.js", import.meta.url), "utf8");
   const i = src.indexOf("const clave = !evento");
   assert.ok(i > 0, "no encontré el corte de la palabra clave en agente.js");
-  const bloque = src.slice(i, i + 2600);
-  assert.match(bloque, /pasarACande\(/, "sin esto el agente le sigue hablando al que pidió el 1 a 1");
+  const bloque = src.slice(i, i + 4600);
+  // El pase por `clave.pasa` sigue en el código (hoy ninguna palabra lo prende) y lo mira el test de
+  // arriba. Lo que tiene que seguir pasando acá es el otro caso: el lead escribió más cosas
+  // mientras esperaba que Cande aceptara la solicitud, y eso no se lo contestó nadie.
+  assert.match(bloque, /claveEsperando && turno\.mensajes_del_lead/,
+    "lo que escribió mientras esperaba la solicitud no lo contesta nadie: eso sí se le pasa");
   assert.match(bloque, /palabra clave/, "y el motivo tiene que decir por qué se la pasa");
 });
 
