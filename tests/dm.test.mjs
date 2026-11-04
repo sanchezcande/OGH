@@ -4804,3 +4804,18 @@ test("qué es un saludo solo y qué no", async () => {
     "27?", "Hola! 27?", "$27", "+54 9 11 5555-5555", "Привет, я разработчик"]) assert.equal(esSoloSaludo(t), false, t);
   for (const t of ["👋🏻", "🙏", "❤️", "!!"]) assert.equal(esSoloSaludo(t), true, t);
 });
+
+test("cuando el agente pasa una charla, por qué la pasó queda escrito en la base", async () => {
+  // 05/11, Cande: "me pasa charlas que ni idea por qué me las pasa". El motivo viajaba solo adentro del
+  // aviso de Telegram, que se lee una vez y se pierde: no había con qué contestarle, ni forma de contar
+  // cuáles de los 111 pases de los últimos 14 días no tendrían que haber pasado. Ahora queda en la base.
+  const { readFile } = await import("node:fs/promises");
+  const agente = await readFile(new URL("../lib/dm/agente.js", import.meta.url), "utf8");
+  assert.match(agente, /ponerDueno\(c\.id, "cande", null, \[aviso, avisoModelo, motivo\]\.filter\(Boolean\)\.join\(" \| "\)\)/,
+    "pasarACande tiene que mandarle el motivo a ponerDueno, no solo al aviso de Telegram");
+  const base = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  assert.match(base, /ADD COLUMN IF NOT EXISTS pase_motivo TEXT/);
+  assert.match(base, /export async function ponerDueno\(id, dueno, nombre = null, motivo = null\)/);
+  // Devolverle la charla al agente borra el motivo: si no, queda el de la vez pasada y confunde.
+  assert.match(base, /pase_motivo = CASE WHEN EXCLUDED\.dueno = 'agente' THEN NULL/);
+});
