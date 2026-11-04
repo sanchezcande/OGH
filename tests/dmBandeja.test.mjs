@@ -923,25 +923,26 @@ test("si no se la encuentra en ManyChat no se contesta sola: va al resumen con s
   assert.ok(w.busquedas.length > busquedas, "pasada media hora, se la busca de nuevo");
 });
 
-test("si falla el perfil de Instagram no se sabe si Cande la sigue: no hay alta en esa vuelta, y queda anotada", async () => {
+test("si falla el perfil de Instagram se la toma igual: no se la deja esperando un perfil que no va a llegar", async () => {
   // ManyChat la encuentra igual (por su usuario), pero sin el perfil no se sabe si Cande la sigue.
+  //
+  // Hasta el 04/11 eso frenaba el alta y la charla quedaba anotada para el resumen, esperando a que Instagram
+  // diera el perfil en alguna vuelta siguiente. No volvía: 43 de las 295 charlas sin contestar del 29/10
+  // murieron así, hasta que se les venció el reloj de 23 h. Cande: "que agarre por default todas hasta que yo
+  // mande el código que dijimos". La que resulte ser una amiga se saca con "--".
   const armar = () => mundo({ hilos: [charla(1, NUEVO, [["lead", "hola de prueba", 10]])], directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }] });
   const w = armar();
-  assert.equal((await w.revisar()).altas, 0);
-  assert.equal(w.contactos.size, 0);
-  assert.match(w.config.bandeja_estado.pendientes.h1.nota, /perfil/, "si sigue sin poder verse, le llega a Cande en el resumen");
-  // La vuelta siguiente Instagram ya lo da y Cande la sigue: ni se toma ni se avisa.
-  w.perfiles["601"] = perfil("Nombre Nuevo", "lead.nuevo", true);
-  w.pasar(3);
-  assert.equal((await w.revisar()).altas, 0);
-  assert.equal(w.contactos.size, 0);
-  assert.equal(w.config.bandeja_estado.pendientes.h1, undefined);
-  // Si no la sigue, entra en la vuelta siguiente.
-  const n = armar();
-  await n.revisar();
-  n.perfiles["601"] = perfil("Nombre Nuevo", "lead.nuevo");
-  n.pasar(3);
-  assert.equal((await n.revisar()).altas, 1);
+  assert.equal((await w.revisar()).altas, 1, "sin perfil entra igual, como si Cande no la siguiera");
+  assert.equal(w.contactos.get("5001")?.dueno, "agente");
+  assert.equal(w.config.bandeja_estado.pendientes.h1, undefined, "no queda esperando en el resumen");
+  // Con el perfil, la regla de siempre: si Cande la sigue, es una amiga y el agente no se mete.
+  const n = mundo({
+    hilos: [charla(1, NUEVO, [["lead", "hola de prueba", 10]])],
+    directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }],
+    perfiles: { 601: perfil("Nombre Nuevo", "lead.nuevo", true) },
+  });
+  assert.equal((await n.revisar()).altas, 0);
+  assert.equal(n.contactos.size, 0);
 });
 
 test("dos contactos de ManyChat con el mismo Instagram: no se elige ninguno", async () => {
@@ -1896,4 +1897,34 @@ test("una pestaña que Instagram no conoce se anota y no se vuelve a pedir", asy
   const antes = pedidos();
   await w.revisar();
   assert.equal(pedidos() - antes, 2, "la vuelta siguiente pide la bandeja de siempre y la pestaña que sí anda");
+});
+
+/* ---------- sin perfil, se la toma igual (04/11) ---------- */
+
+test("Instagram no da el perfil: la charla entra igual en vez de quedar esperando un perfil que no va a llegar", async () => {
+  const w = mundo({
+    hilos: [charla(1, NUEVO, [["cuenta", AUTOMATICO, 30], ["lead", "hola, consulta de prueba", 12]])],
+    perfiles: {}, // Instagram no contesta por esta persona: cuenta privada, o cuota agotada
+    directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }],
+    config: CON_AUTOMATICOS,
+  });
+  const r = await w.revisar();
+  assert.equal(r.altas, 1, "sin perfil no se sabe si Cande la sigue, y se la toma igual: ella la saca con --");
+  assert.equal(w.contactos.get("5001")?.dueno, "agente");
+  assert.equal(r.pendientes, 0, "no queda esperando en el resumen");
+  assert.equal(w.resumenes().length, 0);
+});
+
+test("la lista de seguidos gana sin pedirle el perfil a Instagram: a una amiga no se la toma aunque el perfil falle", async () => {
+  const w = mundo({
+    hilos: [charla(1, NUEVO, [["cuenta", AUTOMATICO, 30], ["lead", "hola, consulta de prueba", 12]])],
+    perfiles: {},
+    directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }],
+    seguidos: ["lead.nuevo"],
+    aj: { seguidos: true },
+    config: CON_AUTOMATICOS,
+  });
+  const r = await w.revisar();
+  assert.equal(r.altas, 0, "está en dm_seguidos: es una amiga y el agente no se mete");
+  assert.equal(w.contactos.has("5001"), false);
 });
