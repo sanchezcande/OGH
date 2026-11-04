@@ -20,7 +20,7 @@ import { readFile } from "node:fs/promises";
 const {
   revisarBandeja, vigilarRed, armarResumen, faltantes, sinRespuesta, identificar, haceCuanto, esConocida, esAutomatico, largoVisible,
   GRACIA_MS, RESUMEN_CADA_MS, TITULO_RESUMEN, SECCION_VOS, SECCION_MANO, SECCION_ETIQUETA, BUSQUEDAS_POR_VUELTA, LARGO_AVISO,
-  CHARLAS_POR_PAGINA, ETIQUETA_AGENTE, PAGINAS_RAPIDA, RED_CAIDA_MS, TOPE_ALTAS_RED,
+  AVISO_OLA_ALTAS, CHARLAS_POR_PAGINA, ETIQUETA_AGENTE, PAGINAS_RAPIDA, RED_CAIDA_MS, TOPE_ALTAS_RED,
 } = await import("../lib/dm/bandeja.js");
 const { crearInstagram } = await import("../lib/dm/instagram.js");
 const { crearAgente, SIN_TEXTO } = await import("../lib/dm/agente.js");
@@ -150,7 +150,8 @@ function mundo({
     darDeAltaDesdeBandeja: async (id, { nombre, mensajes: lista, contexto, tope, igId, usuario }) => {
       const van = w.altasRedHoy;
       const figura = w.contactos.has(id) || (igId && [...w.contactos.values()].some((c) => c.ig_id === igId || c.ig_id_borrado === igId));
-      if (figura || van >= tope) return { guardados: 0, van, figura: Boolean(figura) };
+      const lleno = Number.isInteger(tope) && tope > 0 && van >= tope; // como la consulta: tope null o 0 es sin tope
+      if (figura || lleno) return { guardados: 0, van, figura: Boolean(figura) };
       w.altasRedHoy++;
       w.contactos.set(id, {
         id, nombre, dueno: "agente", contexto: contexto || null, alta_en: w.ahora, alta_por: "bandeja", alta_avisada: false, ig_id: igId, ig_usuario: usuario,
@@ -1475,7 +1476,7 @@ test("las consultas de la red: guardar solo en charlas del agente, sin repetir, 
   const alta = cuerpo("darDeAltaDesdeBandeja");
   assert.match(alta, /ON CONFLICT \(id\) DO NOTHING/);
   assert.match(alta, /alta_por = 'bandeja'\),/, "cuenta solo las altas de la red");
-  assert.match(alta, /hoy\.n < \$\{tope\}::int/);
+  assert.match(alta, /IS NULL OR hoy\.n < \$\{tope \|\| null\}::int/, "sin tope (0 o null) no se le niega el alta a nadie");
   assert.match(alta, /alta_avisada/);
   assert.match(cuerpo("lugarParaAlta"), /alta_por IS NULL/, "la entrada cuenta solo las suyas");
   assert.match(cuerpo("darDeAlta"), /alta_por IS NULL/);
@@ -1494,14 +1495,14 @@ test("los ajustes de la red de la bandeja: prendida de fábrica, y su tope de al
   assert.equal(AJUSTES_POR_DEFECTO.bandeja, true);
   assert.equal(validarAjustes({ bandeja: "no" }).ok, false);
   assert.equal(validarAjustes({ bandeja: false }).ok, true);
-  // 60 desde el 02/11 (era 10): sin ManyChat toda la gente nueva entra por la red. El de fábrica y el que usa la red si
-  // los ajustes no traen uno tienen que ser el mismo.
-  assert.equal(AJUSTES_POR_DEFECTO.altas_bandeja_por_dia, 60);
+  // 0 es SIN TOPE, y es lo de fábrica desde el 04/11 (fue 10, después 60, después 120: siempre corriendo atrás del
+  // pico, y el 29/10 dejó 202 personas afuera). El de fábrica y el que usa la red si los ajustes no traen uno tienen
+  // que ser el mismo.
+  assert.equal(AJUSTES_POR_DEFECTO.altas_bandeja_por_dia, 0);
   assert.equal(AJUSTES_POR_DEFECTO.altas_bandeja_por_dia, TOPE_ALTAS_RED);
-  assert.equal(validarAjustes({ altas_bandeja_por_dia: 0 }).ok, false);
-  assert.equal(validarAjustes({ altas_bandeja_por_dia: 15 }).ok, true);
-  // La traba sigue: si algo se rompe, no entra la bandeja entera.
-  assert.equal(validarAjustes({ altas_bandeja_por_dia: 201 }).ok, false);
+  assert.equal(validarAjustes({ altas_bandeja_por_dia: 0 }).ok, true, "0 es sin tope, no un valor inválido");
+  assert.equal(validarAjustes({ altas_bandeja_por_dia: 15 }).ok, true, "se le puede volver a poner tope a mano");
+  assert.equal(validarAjustes({ altas_bandeja_por_dia: -1 }).ok, false);
 });
 
 /* ---------- tercera revisión de las charlas retomadas (21/10) ---------- */
@@ -1656,13 +1657,24 @@ test("un contacto solo de Instagram que ya está en la base (una charla borrada,
   assert.deepEqual(w.busquedas, [], "no se la busca en ManyChat como si fuera alguien nuevo");
 });
 
-test("el tope de altas de la red cuenta también las de solo Instagram, y su valor de fábrica alcanza para un día (60)", async () => {
+test("de fábrica no hay tope de altas: con un día enorme encima sigue entrando, y avisa sin frenar", async () => {
+  // El tope de fábrica es 0 (sin tope) desde el 04/11. Un día con 2.000 altas encima no le cierra la puerta a nadie.
   const w = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { altas_bandeja_por_dia: undefined } });
-  w.altasRedHoy = TOPE_ALTAS_RED - 1;
-  assert.equal((await w.revisar()).altas, 1, "con 59 en el día todavía entra");
-  assert.equal(w.avisos.filter((a) => /tope de altas de la red/.test(a.titulo))[0]?.campos["Van en 24 horas"], "60 de 60");
-  const lleno = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { altas_bandeja_por_dia: undefined } });
-  lleno.altasRedHoy = TOPE_ALTAS_RED;
+  w.altasRedHoy = 2000;
+  assert.equal((await w.revisar()).altas, 1, "sin tope entra igual, con el día que sea");
+  assert.equal(w.resumenes().length, 0, "no queda nadie esperando en el resumen por el tope");
+
+  // Lo único que queda del tope: el aviso, una sola vez, al cruzar la ola.
+  const ola = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { altas_bandeja_por_dia: undefined } });
+  ola.altasRedHoy = AVISO_OLA_ALTAS - 1;
+  assert.equal((await ola.revisar()).altas, 1, "el aviso no frena el alta");
+  const aviso = ola.avisos.find((a) => /mucha gente nueva/.test(a.titulo));
+  assert.equal(aviso?.campos["Van en 24 horas"], String(AVISO_OLA_ALTAS));
+  assert.match(aviso.campos.Aviso, /no frena nada/);
+
+  // Con un tope puesto a mano, la pared de antes sigue estando.
+  const lleno = mundo({ hilos: [charla(1, SOLO_IG, [["lead", "hola de prueba", 30]])], perfiles: SOLO_IG_PERFIL, aj: { altas_bandeja_por_dia: 60 } });
+  lleno.altasRedHoy = 60;
   assert.equal((await lleno.revisar()).altas, 0);
   assert.match(lleno.resumenes()[0].campos[SECCION_VOS], /se llenó el tope de altas de la red/);
 });
