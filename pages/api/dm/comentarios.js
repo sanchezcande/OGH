@@ -25,7 +25,7 @@
 //
 // Devuelve solo cantidades: ni ids ni usuarios salen en la respuesta ni en los registros.
 import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
-import { ajustes, hayBase, leerConfig } from "../../../lib/dm/base";
+import { ajustes, guardarConfig, hayBase, leerConfig } from "../../../lib/dm/base";
 import { contestarComentarios } from "../../../lib/dm/comentarios";
 import {
   anotarComentario, anotarEnDuda, anotarYaContestado, comentariosEnLaBase, comentariosParaReintentar, contarComentarios, soltarComentario, soltarDuda, tablaComentarios,
@@ -35,8 +35,15 @@ import {
 const TOPE_POR_VUELTA = 10;
 /** Pasado este rato la vuelta no empieza nada nuevo (ver `limite` en contestarComentarios). */
 const TIEMPO_MS = 90000;
-/** Los posts y reels que mira cada vuelta: con 6 por día, 25 cubre de sobra los 7 días de la ventana. */
-const MEDIOS_POR_VUELTA = 25;
+/**
+ * Los posts y reels que se listan en cada vuelta: 3 páginas de 100, unos 5 segundos. Eran 25, y no
+ * cubrían ni la semana (el 06/11 había 31 de los últimos 7 días). De estos se leen los de la semana y
+ * los viejos con comentarios nuevos (mediosParaLeer en lib/dm/comentarios.js), con lo anotado en
+ * dm_config. 300 llega a los reels viejos que siguen juntando pedidos: el 06/11 uno era el 192.
+ */
+const MEDIOS_POR_VUELTA = 100;
+const PAGINAS_DE_MEDIOS = 3;
+const CLAVE_MEDIOS = "comentarios_medios";
 
 export default async function handler(req, res) {
   const arranque = Date.now();
@@ -56,12 +63,16 @@ export default async function handler(req, res) {
   try {
     const cuentas = await contestarComentarios({
       ig: instagram,
-      base: { tomarComentario, anotarComentario, soltarComentario, comentariosEnLaBase, comentariosParaReintentar, anotarYaContestado, anotarEnDuda, soltarDuda, usuariosConDm, tomarPublica },
+      base: {
+        tomarComentario, anotarComentario, soltarComentario, comentariosEnLaBase, comentariosParaReintentar, anotarYaContestado, anotarEnDuda, soltarDuda, usuariosConDm, tomarPublica,
+        leerMedios: () => leerConfig(CLAVE_MEDIOS), guardarMedios: (v) => guardarConfig(CLAVE_MEDIOS, v),
+      },
       // Lo que falta para los 120 segundos queda de margen para el envío que esté saliendo.
       limite: arranque + TIEMPO_MS,
       avisar: avisarDm,
       tope: Number.isInteger(ajuste.tope) && ajuste.tope > 0 ? ajuste.tope : TOPE_POR_VUELTA,
       mediosQueMira: MEDIOS_POR_VUELTA,
+      paginasDeMedios: PAGINAS_DE_MEDIOS,
       // Sin ids ni textos en el registro: Instagram los repite en sus errores.
       registrar: (motivo, e) => console.error("dm: un comentario con CV o DEV no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
     });
