@@ -23,7 +23,7 @@ import { respuesta } from "./dobles/preparar.mjs";
 const {
   RESPUESTAS_PUBLICAS, respuestaPublica, responderEnPublico,
   AUTOMATICO_CV_MANYCHAT, AUTOMATICO_DEV_MANYCHAT, FRESCO_MINUTOS, MENSAJES_HONDOS, MENSAJES_POR_HILO, TEXTO_CV, TEXTO_DEV, VENTANA_DIAS,
-  comentariosParaContestar, contestadoDesde, contestarComentarios, enVentana, esDmDeCV, esDmDeDev, esPalabraCV, esPalabraDEV, motivoDelError,
+  comentariosParaContestar, contestadoDesde, contestarComentarios, enVentana, esDmDeCV, esDmDeDev, esPalabraCV, esPalabraDEV, mediosParaLeer, motivoDelError,
   tipoDelComentario,
 } = await import("../lib/dm/comentarios.js");
 const { esAutomatico, claveTexto } = await import("../lib/dm/instagram.js");
@@ -935,4 +935,182 @@ test("el cliente de Instagram contesta en público con POST /{comentario}/replie
   // Sin el permiso de la página no hay respuestas: tira, y responderEnPublico lo atrapa.
   const sinFb = crearInstagram({ pedir, leerConfig: async () => null, guardarConfig: async () => {}, tokenEnv: () => "x" });
   await assert.rejects(() => sinFb.responderPublico("1", "x"), /página de Facebook/);
+});
+
+// ---- las dos listas de comentarios de Instagram (06/11) ----
+//
+// `/comments` se come comentarios de primer nivel sin avisar: el 06/11 devolvía 125 de 213 en los
+// medios de dos semanas, y comentarios que ya había devuelto dejaban de aparecer. `/ordered_comments`
+// los trae. El cliente lee esa, y `/comments` solo si esa no anda. Los datos de abajo son inventados.
+
+/** Un cliente con la página de Facebook y un Instagram de mentira: `listas` dice qué contesta cada borde. */
+function clienteConListas(listas) {
+  const pedidos = [];
+  const pedir = async (url) => {
+    const u = new URL(String(url));
+    pedidos.push(u.pathname + (u.searchParams.get("after") ? `?after=${u.searchParams.get("after")}` : ""));
+    if (u.pathname.endsWith("/me/accounts")) {
+      return { ok: true, status: 200, json: async () => ({ data: [{ id: "pag1", access_token: "TOKEN_PAGINA", instagram_business_account: { id: "ig1" } }] }) };
+    }
+    const borde = u.pathname.split("/").at(-1);
+    const r = listas[borde]?.(u.searchParams.get("after")) ?? { data: [] };
+    if (r.error) return { ok: false, status: 400, json: async () => r };
+    return { ok: true, status: 200, json: async () => r };
+  };
+  return { pedidos, pedir };
+}
+
+const coment = (id, usuario, cuando = "2026-11-05T10:00:00+0000") => ({ id, text: "CV", timestamp: cuando, username: usuario, from: { id: `ig-${usuario}` } });
+
+async function clienteFb(pedir) {
+  const { crearInstagram } = await import("../lib/dm/instagram.js");
+  return crearInstagram({
+    pedir, leerConfig: async () => null, guardarConfig: async () => {}, tokenEnv: () => "x",
+    credencialFb: async () => ({ id: "ig1", token: "TOKEN_USUARIO" }),
+  });
+}
+
+test("los comentarios salen de /ordered_comments, con todas sus páginas", async () => {
+  const { pedidos, pedir } = clienteConListas({
+    // La lista de la app trae todos, en dos páginas.
+    ordered_comments: (despues) => (despues
+      ? { data: [coment("k3", "devtres")] }
+      : { data: [coment("k1", "devuno"), coment("k2", "devdos")], paging: { cursors: { after: "p2" }, next: "https://graph.facebook.com/x" } }),
+    // /comments se come k2 y k3.
+    comments: () => ({ data: [coment("k1", "devuno")] }),
+  });
+  const ig = await clienteFb(pedir);
+  const cs = await ig.comentarios("medio1");
+  assert.deepEqual(cs.map((c) => c.id), ["k1", "k2", "k3"]);
+  assert.ok(pedidos.includes("/v23.0/medio1/ordered_comments?after=p2"), "sigue las páginas de la lista de la app");
+  assert.ok(!pedidos.includes("/v23.0/medio1/comments"), "con la de la app andando, /comments no se pide");
+});
+
+test("si /ordered_comments no anda en un medio, quedan los de /comments como antes", async () => {
+  const { pedir } = clienteConListas({
+    ordered_comments: () => ({ error: { message: "Unsupported get request", code: 100, error_subcode: 33 } }),
+    comments: () => ({ data: [coment("k1", "devuno")] }),
+  });
+  const ig = await clienteFb(pedir);
+  assert.deepEqual((await ig.comentarios("medio1")).map((c) => c.id), ["k1"]);
+  // Vacía (así contesta Meta sin el permiso): también quedan los de /comments.
+  const vacia = clienteConListas({ ordered_comments: () => ({ data: [] }), comments: () => ({ data: [coment("k1", "devuno")] }) });
+  assert.deepEqual((await (await clienteFb(vacia.pedir)).comentarios("medio1")).map((c) => c.id), ["k1"]);
+});
+
+test("una falla de la conexión en /ordered_comments corta la vuelta, como en /comments", async () => {
+  const { pedir } = clienteConListas({
+    ordered_comments: () => ({ error: { message: "Error validating access token", code: 190 } }),
+    comments: () => ({ data: [coment("k1", "devuno")] }),
+  });
+  const ig = await clienteFb(pedir);
+  await assert.rejects(() => ig.comentarios("medio1"), (e) => e.code === 190);
+});
+
+test("un CV que solo trae /ordered_comments recibe su lista", async () => {
+  const { pedir } = clienteConListas({
+    ordered_comments: () => ({ data: [coment("k1", "devuno", "2026-10-29T17:30:00+0000"), coment("k2", "devdos", "2026-10-29T17:31:00+0000")] }),
+    comments: () => ({ data: [coment("k1", "devuno", "2026-10-29T17:30:00+0000")] }),
+  });
+  const real = await clienteFb(pedir);
+  const d = armar({ comentarios: [] });
+  d.ig.comentarios = (m) => real.comentarios(m);
+  d.ig.medios = async () => [{ id: "m1", timestamp: "2026-10-29T15:15:32+0000", comments_count: 2, permalink: "https://instagram.com/p/x" }];
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.enviadas, 2);
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["k2", "k1"]);
+});
+
+// ---- los posts viejos con comentarios nuevos (06/11) ----
+//
+// La ventana de 7 días corre desde el comentario, no desde el post. Un post viejo se lee mientras
+// su número de comentarios haya cambiado en los últimos 7 días. Datos inventados.
+
+const reciente = { id: "nuevo", timestamp: "2026-10-29T15:00:00+0000", comments_count: 3 };
+const viejo = (n) => ({ id: "viejo", timestamp: "2026-10-10T15:00:00+0000", comments_count: n });
+
+test("mediosParaLeer: los de la semana siempre; un viejo, solo si sus comentarios cambiaron hace menos de 7 días", () => {
+  // Sin nada anotado: el viejo queda anotado y no se lee (no se sabe desde cuándo tiene lo que tiene).
+  let r = mediosParaLeer([reciente, viejo(4)], null, ahora);
+  assert.deepEqual(r.leer.map((m) => m.id), ["nuevo"]);
+  assert.deepEqual(r.anotados.viejo, { n: 4, cambio: null });
+  // Mismo número que la vuelta anterior: no se lee.
+  r = mediosParaLeer([reciente, viejo(4)], r.anotados, ahora);
+  assert.deepEqual(r.leer.map((m) => m.id), ["nuevo"]);
+  // Le entró un comentario: se lee, y se anota cuándo cambió.
+  r = mediosParaLeer([reciente, viejo(5)], r.anotados, ahora);
+  assert.deepEqual(r.leer.map((m) => m.id), ["nuevo", "viejo"]);
+  assert.deepEqual(r.anotados.viejo, { n: 5, cambio: ahora.toISOString() });
+  // Tres días después, sin más cambios: se sigue leyendo (ese comentario todavía se puede contestar).
+  const en3 = new Date(ahora.getTime() + 3 * 86400000);
+  const r3 = mediosParaLeer([viejo(5)], r.anotados, en3);
+  assert.deepEqual(r3.leer.map((m) => m.id), ["viejo"]);
+  assert.equal(r3.anotados.viejo.cambio, ahora.toISOString(), "el cambio queda en la fecha en que pasó");
+  // Pasados los 7 días del cambio: ya no.
+  const en8 = new Date(ahora.getTime() + 8 * 86400000);
+  assert.deepEqual(mediosParaLeer([viejo(5)], r.anotados, en8).leer, []);
+  // Sin comentarios no se lee nada, pero queda anotado.
+  const vacio = mediosParaLeer([{ ...reciente, comments_count: 0 }], null, ahora);
+  assert.deepEqual(vacio.leer, []);
+  assert.deepEqual(vacio.anotados.nuevo, { n: 0, cambio: null });
+});
+
+/** La vuelta con un post viejo que tiene un CV de ayer, y lo anotado en una base de mentira. */
+function conViejo({ anotado = null, fallaLeer = false } = {}) {
+  const cv = { id: "v1", text: "CV", timestamp: "2026-10-29T20:00:00+0000", username: "devdeprueba" };
+  const d = armar({ comentarios: [cv] });
+  d.ig.medios = async () => [viejo(7)];
+  d.ig.leidos = [];
+  d.ig.comentarios = async (m) => { d.ig.leidos.push(m); return [cv]; };
+  d.guardados = [];
+  d.dobleBase.leerMedios = async () => { if (fallaLeer) throw new Error("la base no contesta"); return anotado; };
+  d.dobleBase.guardarMedios = async (v) => { d.guardados.push(v); };
+  return d;
+}
+
+test("un CV nuevo en un post de hace más de 7 días recibe su lista", async () => {
+  const d = conViejo({ anotado: { viejo: { n: 6, cambio: null } } });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.viejos, 1);
+  assert.equal(r.enviadas, 1);
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["v1"]);
+  assert.deepEqual(d.guardados.at(-1).viejo, { n: 7, cambio: ahora.toISOString() });
+});
+
+test("un post viejo que se ve por primera vez se anota y no se lee", async () => {
+  const d = conViejo();
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.medios, 0);
+  assert.deepEqual(d.ig.leidos, []);
+  assert.deepEqual(d.guardados.at(-1).viejo, { n: 7, cambio: null });
+});
+
+test("si lo anotado no se puede leer, se miran solo los de la semana y no se pisa nada", async () => {
+  const d = conViejo({ fallaLeer: true });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.equal(r.medios, 0);
+  assert.deepEqual(d.guardados, [], "no se guarda encima de lo que no se pudo leer");
+});
+
+test("el cron lista 300 posts (3 páginas de 100) y anota lo de cada uno en dm_config", async () => {
+  const fuente = await readFile(new URL("../pages/api/dm/comentarios.js", import.meta.url), "utf8");
+  assert.match(fuente, /MEDIOS_POR_VUELTA = 100;/);
+  assert.match(fuente, /PAGINAS_DE_MEDIOS = 3;/);
+  assert.match(fuente, /paginasDeMedios: PAGINAS_DE_MEDIOS/);
+  assert.match(fuente, /leerMedios: \(\) => leerConfig\(CLAVE_MEDIOS\)/);
+  assert.match(fuente, /guardarMedios: \(v\) => guardarConfig\(CLAVE_MEDIOS, v\)/);
+});
+
+test("el cliente lista los posts de a páginas, siguiendo el cursor, hasta las que se piden", async () => {
+  const { pedidos, pedir } = clienteConListas({
+    media: (despues) => ({
+      data: [{ id: `p-${despues || "1"}`, timestamp: "2026-10-29T15:00:00+0000", comments_count: 1 }],
+      paging: { cursors: { after: `${despues || "1"}x` }, next: "https://graph.facebook.com/x" },
+    }),
+  });
+  const ig = await clienteFb(pedir);
+  assert.deepEqual((await ig.medios({ limite: 100, paginas: 3 })).map((m) => m.id), ["p-1", "p-1x", "p-1xx"]);
+  assert.equal(pedidos.filter((p) => p.includes("/ig1/media")).length, 3);
+  // Por defecto, una sola página, como antes.
+  assert.equal((await ig.medios()).length, 1);
 });
