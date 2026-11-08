@@ -37,6 +37,7 @@
 //   { accion: "estado" }                           → ajustes, cuántos contactos y las últimas salidas
 //   { accion: "salidas", desde }                   → las respuestas del agente desde esa fecha (el repaso de cada hora)
 //   { accion: "aviso", texto, contacto? }          → le avisa a Cande lo que encontró el repaso, por el Telegram del agente
+//   { accion: "revisor", texto }  → guarda el prompt del revisor (el cerebro lo lee de la base, 09/11)
 //   { accion: "mandar_humano", contacto | igsid (+ directo: true sin contacto en ManyChat), textos }  → manda un mensaje de Cande (escrito o aprobado por ella) dentro
 //                                                  de las 24 h del último mensaje del lead (ManyChat no acepta HUMAN_AGENT
 //                                                  en Instagram: pasadas las 24 h, solo a mano). Queda anotado como de ella.
@@ -63,7 +64,7 @@
 // Cada cambio de prompt, de modo o de cualquier otro ajuste le llega a Cande por Telegram: si
 // alguien más consigue el secreto y toca algo (el link de pago, por ejemplo), ella se entera en
 // el momento. El prompt anterior queda guardado.
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import {
   avisarDm, envio, guardarSecretoDm, instagram, mismoSecreto, olvidarChatDm, olvidarRespuestas, reglasInstagram, secretoDe,
 } from "../../../lib/dm/armado";
@@ -115,10 +116,29 @@ export default async function handler(req, res) {
     const texto = String(b.texto || "");
     if (texto.length < 2000) return res.status(400).json({ error: "el prompt es demasiado corto para ser el real" });
     const antes = await prompt();
+    // Con base (el md5 del que tenía quien sube, 09/11): si la base cambió desde entonces (una corrección por Telegram),
+    // no se pisa. dm_nube.py la manda siempre.
+    if (b.base != null && huellaDe(antes) !== String(b.base)) {
+      return res.status(409).json({ error: "el prompt de la base cambió desde que lo bajaste (una corrección por Telegram?): bajalo de nuevo" });
+    }
     await guardarPrompt(texto);
     // Sin aviso: el anterior queda guardado, y a Cande solo le llega lo que necesita que haga algo
     // (16/10: "los avisos tienen que ser solo de los que el bot no sabe qué hacer o si es relevante").
     return res.status(200).json({ ok: true, caracteres: texto.length, cambio: antes !== texto });
+  }
+
+  if (b.accion === "revisor") {
+    // El prompt del revisor (09/11): vive en la base como el del agente, y el cerebro lo lee de acá (lo puede cambiar
+    // una corrección por Telegram). El anterior queda en revisor_anterior.
+    const texto = String(b.texto || "");
+    if (texto.length < 1000) return res.status(400).json({ error: "el revisor es demasiado corto para ser el real" });
+    const antes = await leerConfig("revisor");
+    if (b.base != null && huellaDe(antes?.texto) !== String(b.base)) {
+      return res.status(409).json({ error: "el revisor de la base cambió desde que lo bajaste: bajalo de nuevo" });
+    }
+    if (antes?.texto && antes.texto !== texto) await guardarConfig("revisor_anterior", antes);
+    await guardarConfig("revisor", { texto });
+    return res.status(200).json({ ok: true, caracteres: texto.length, cambio: antes?.texto !== texto });
   }
 
   if (b.accion === "ajustes") {
@@ -391,6 +411,8 @@ export default async function handler(req, res) {
     await guardarConfig("telegram_respuestas", { secreto, vistos: [] });
     const r = await llamarTelegram(token, "setWebhook", {
       url: `${SITIO}/api/dm/telegram`, secret_token: secreto, allowed_updates: ["message"], drop_pending_updates: true,
+      // De a una (09/11): con una sola usuaria no hace falta más, y así las partes de un álbum no se pisan.
+      max_connections: 1,
     });
     if (!r.ok) {
       await guardarConfig("telegram_respuestas", {});
@@ -505,4 +527,9 @@ async function buscarIg(igsid, b) {
   if (q.id) return q;
   const error = q.varios ? "hay más de un contacto con ese usuario en ManyChat" : q.falla ? "ManyChat no contestó" : "no está en ManyChat";
   return { id: null, status: 404, error };
+}
+
+/** El md5 de un prompt ("" si no hay): lo mismo que /api/dm/trabajos prompt_leer. */
+function huellaDe(texto) {
+  return texto ? createHash("md5").update(String(texto)).digest("hex") : "";
 }
