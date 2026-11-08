@@ -91,3 +91,11 @@ test("lo que se le contesta a Cande entra en un mensaje de Telegram", () => {
   assert.equal(cortarParaTelegram("hola"), "hola");
   assert.equal(cortarParaTelegram("x".repeat(9000)).length, TOPE_TELEGRAM);
 });
+
+test("responder el QA programado (lleva la marca 🔧) sigue esa corrección, con el mensaje que respondió", () => {
+  const qa = { ...delBot(`${MARCA_RESPUESTA} QA de las charlas del 06/11 al 09/11\n\n1. Algo de prueba`), message_id: 900 };
+  const c = leerCorreccion(novedad({ text: "dale 1", reply_to_message: qa }), { duena: DUENA });
+  assert.equal(c.respondeA, 900);
+  assert.match(c.respondiendo, /QA de las charlas/);
+  assert.equal(c.contacto, null);
+});

@@ -26,6 +26,15 @@
 //   { accion: "correccion_ultima" }               → { ultima: { lote, resultado } }: la última que cambió algo
 //   { accion: "correccion_resultado", lote, estado, texto, resultado, deshizo, mensaje_id }
 //                                                 → la cierra y le contesta a Cande por el bot
+//
+// QA programado (09/11, lib/dm/qaBase.js), cada QA_CADA_HORAS:
+//   { accion: "qa_tomar", forzar }                → { ok, desde }: lo reserva si pasaron QA_CADA_HORAS desde el último
+//                                                    (desde: cuándo fue ese) o si forzar; { ok: false } si no toca
+//   { accion: "qa_soltar", previo }               → falló: vuelve a dejar el último como estaba, para reintentarlo
+//   { accion: "qa_charlas", desde }               → { charlas, pendientes_codigo, ventas }
+//   { accion: "qa_enviar", texto, resumen, propuestas, desde, hasta }
+//                                                 → se lo manda a Cande por el bot y lo guarda para que su respuesta
+//                                                    siga como una corrección (con las propuestas)
 import { createHash } from "node:crypto";
 import { mismoSecreto, secretoDe } from "../../../lib/dm/armado";
 import { guardarConfig, guardarPrompt, hayBase, leerConfig, prompt as promptGuardado, tablas } from "../../../lib/dm/base";
@@ -34,6 +43,8 @@ import {
   charlaParaCorregir, fotosDelLote, marcarDeshecha, tomarCorreccion, terminarCorreccion, ultimaConCambios,
 } from "../../../lib/dm/correccionesBase";
 import { chatDuena, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
+import { QA_CADA_HORAS, charlasParaQa, guardarQa, pendientesDeCodigo, ventasDesde } from "../../../lib/dm/qaBase";
+import { sql } from "@vercel/postgres";
 import { entregarTrabajo, latido, tomarTrabajo } from "../../../lib/dm/cola";
 
 export default async function handler(req, res) {
@@ -120,6 +131,49 @@ export default async function handler(req, res) {
     await terminarCorreccion(lote, { estado, resultado: b.resultado && typeof b.resultado === "object" ? b.resultado : null, respuestaId });
     if (b.deshizo != null && Number.isInteger(Number(b.deshizo))) await marcarDeshecha(Number(b.deshizo));
     return res.status(200).json({ ok: true, avisada: respuestaId != null });
+  }
+  if (b.accion === "qa_tomar") {
+    await tablas();
+    const ahora = new Date().toISOString();
+    // Una sola sentencia: si dos vueltas del cerebro llegan a la vez, una sola lo toma.
+    const { rows } = b.forzar === true
+      ? await sql`
+          INSERT INTO dm_config (clave, valor) VALUES ('qa_ultimo', ${JSON.stringify({ en: ahora, previo: null })})
+          ON CONFLICT (clave) DO UPDATE SET valor = jsonb_build_object('en', ${ahora}::text, 'previo', dm_config.valor->>'en'),
+            actualizado = NOW()
+          RETURNING valor`
+      : await sql`
+          INSERT INTO dm_config (clave, valor) VALUES ('qa_ultimo', ${JSON.stringify({ en: ahora, previo: null })})
+          ON CONFLICT (clave) DO UPDATE SET valor = jsonb_build_object('en', ${ahora}::text, 'previo', dm_config.valor->>'en'),
+            actualizado = NOW()
+          WHERE (dm_config.valor->>'en')::timestamptz < NOW() - make_interval(hours => ${QA_CADA_HORAS - 1}::int)
+          RETURNING valor`;
+    if (!rows.length) return res.status(200).json({ ok: false });
+    const previo = rows[0].valor?.previo || null;
+    const desde = previo || new Date(Date.now() - QA_CADA_HORAS * 3600000).toISOString();
+    return res.status(200).json({ ok: true, desde, previo });
+  }
+  if (b.accion === "qa_soltar") {
+    await tablas();
+    const previo = b.previo ? String(b.previo) : new Date(0).toISOString();
+    await guardarConfig("qa_ultimo", { en: previo, previo: null });
+    return res.status(200).json({ ok: true });
+  }
+  if (b.accion === "qa_charlas") {
+    await tablas();
+    const desde = new Date(String(b.desde || ""));
+    if (Number.isNaN(desde.getTime())) return res.status(400).json({ error: "falta desde" });
+    return res.status(200).json({ charlas: await charlasParaQa(desde), pendientes_codigo: await pendientesDeCodigo(desde), ventas: await ventasDesde(desde) });
+  }
+  if (b.accion === "qa_enviar") {
+    const texto = cortarParaTelegram(b.texto);
+    if (!texto) return res.status(400).json({ error: "falta texto" });
+    const r = await llamarTelegram(tokenBotDm(), "sendMessage", { chat_id: chatDuena(), text: texto });
+    const id = await guardarQa({
+      respuestaId: r?.messageId ?? null, resumen: String(b.resumen || "").slice(0, 20000),
+      propuestas: Array.isArray(b.propuestas) ? b.propuestas.slice(0, 12) : [], desde: b.desde || null, hasta: b.hasta || null,
+    });
+    return res.status(200).json({ ok: true, avisada: Boolean(r?.ok), id });
   }
   return res.status(400).json({ error: "accion desconocida" });
 }
