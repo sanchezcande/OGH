@@ -4820,3 +4820,61 @@ test("cuando el agente pasa una charla, por qué la pasó queda escrito en la ba
   // Devolverle la charla al agente borra el motivo: si no, queda el de la vez pasada y confunde.
   assert.match(base, /pase_motivo = CASE WHEN EXCLUDED\.dueno = 'agente' THEN NULL/);
 });
+
+// Reacciones (08/11, Cande: "no contestes reacciones de emojis"). Una reacción a una historia llegaba como un adjunto sin
+// texto y el agente la tomaba por una foto; a un 😂 se le contestaba "Graciasss".
+const { esReaccion, REACCION_HISTORIA } = await import("../lib/dm/agente.js");
+
+test("qué es una reacción: la de una historia o puros emojis; un ?, un !!, una palabra o un número no", () => {
+  for (const t of ["😂", "🔥🔥", "❤️", "👍🏻", " 😍 ", REACCION_HISTORIA, "😂😂😂😂"]) assert.equal(esReaccion(t), true, JSON.stringify(t));
+  for (const t of ["?", "!!", "jaja 😂", "27 🔥", "", SIN_TEXTO, "hola", "ok", null]) assert.equal(esReaccion(t), false, JSON.stringify(t));
+  assert.equal(esFoto(REACCION_HISTORIA), false, "una reacción no es una foto: no sale el aviso URGENTE");
+});
+
+test("una reacción a una historia o un emoji suelto: al lead nada, ni aviso, ni modelo; el turno queda atendido y la charla sigue del agente", async () => {
+  for (const texto of [REACCION_HISTORIA, "😂"]) {
+    const { agente, m } = armar({ responde: () => { throw new Error("a una reacción no se le pide nada al modelo"); } });
+    m.mensajes[1].creado = new Date(AHORA.getTime() - 3600000);
+    m.mensajes.push({ id: 3, quien: "agente", texto: "Genial! Contame más de lo que estás armando", creado: new Date(AHORA.getTime() - 3000000) });
+    m.contacto.respondido_hasta = 3;
+    const id = mandaLead(m, texto);
+    const r = await agente.procesar("77", id);
+    assert.equal(r.hecho, "solo reacción", texto);
+    assert.equal(m.enviados.length, 0, texto);
+    assert.equal(m.pedidos.length, 0, texto);
+    assert.equal(m.avisos.length, 0, texto);
+    assert.equal(m.contacto.dueno, "agente", texto);
+    assert.equal(m.contacto.respondido_hasta, id, `${texto}: el turno queda atendido, la espera no lo vuelve a tomar`);
+    assert.equal(m.salidas.length, 0, texto);
+  }
+});
+
+test("un emoji que contesta una pregunta de la cuenta sí va al modelo; la reacción a una historia no, aunque haya pregunta", async () => {
+  const pregunta = (texto) => {
+    const { agente, m } = armar({});
+    m.mensajes[1].creado = new Date(AHORA.getTime() - 3600000);
+    m.mensajes.push({ id: 3, quien: "agente", texto: "Te paso el link? 🙂", creado: new Date(AHORA.getTime() - 3000000) });
+    m.contacto.respondido_hasta = 3;
+    return { agente, m, id: mandaLead(m, texto) };
+  };
+  const conEmoji = pregunta("👍");
+  assert.notEqual((await conEmoji.agente.procesar("77", conEmoji.id)).hecho, "solo reacción");
+  assert.ok(conEmoji.m.pedidos.length > 0, "el 👍 a una pregunta es una respuesta: se le pide al modelo");
+  const conHistoria = pregunta(REACCION_HISTORIA);
+  assert.equal((await conHistoria.agente.procesar("77", conHistoria.id)).hecho, "solo reacción");
+  assert.equal(conHistoria.m.pedidos.length, 0);
+});
+
+test("una reacción a una historia que abre la charla no se contesta; un emoji que la abre es un saludo y sí", async () => {
+  const abre = (texto) => {
+    const { agente, m } = armar({ conAviso: false, avisoIa: false, toques: true, responde: () => salida(["Respuesta de prueba"], { seguimiento_en_horas: 6 }) });
+    m.mensajes.find((x) => x.id === m.disparo).texto = texto;
+    return { agente, m };
+  };
+  const historia = abre(REACCION_HISTORIA);
+  assert.equal((await historia.agente.procesar("77", historia.m.disparo)).hecho, "solo reacción");
+  assert.equal(historia.m.enviados.length, 0);
+  const emoji = abre("🙂");
+  assert.equal((await emoji.agente.procesar("77", emoji.m.disparo)).hecho, "enviada");
+  assert.equal(emoji.m.proximo, null, "como cualquier saludo solo: sin toque");
+});

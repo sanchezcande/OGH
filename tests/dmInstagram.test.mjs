@@ -1361,3 +1361,18 @@ test("en una charla retomada, \"Cande aquí\" es su código: no se toma como lo 
   assert.equal(seAnotaComoRetomada(c, [codigo], marcas), false, "Cande aquí saca al agente");
   assert.equal(seAnotaComoRetomada(c, [pegado, { ...codigo, texto: "cande aqui, sigo yo" }], marcas), false, "aunque venga con lo pegado y sin tilde");
 });
+
+test("la bandeja: de los mensajes sin texto de la otra persona al final de la charla se pregunta si son de una historia; la lista no pide story", async () => {
+  const { pedir, pedidos } = instagramFalso(rutasDeSiempre({
+    "/me/conversations": () => ({ data: [hiloCrudo(1, [msj(3, ""), msj(2, "", { min: 2 }), msj(1, "Holaa", { deCuenta: true, min: 3 }), msj(0, "", { min: 4 })])] }),
+    "/m3": () => ({ id: "m3", story: { reply_to: { id: "s1" } } }),
+    "/m2": () => ({ id: "m2" }),
+    "/m0": () => { throw new Error("ese ya tuvo respuesta: no se pregunta"); },
+  }));
+  const ig = crearInstagram({ pedir, ...configFalso(), tokenEnv: () => "t" });
+  const [h] = await ig.hilos({ limite: 50, mensajes: 10 });
+  assert.doesNotMatch(pedidos.find((p) => p.ruta === "/me/conversations").params.fields, /story/, "la lista grande no pide story: Meta se queja del tamaño");
+  assert.deepEqual(pedidos.filter((p) => /^\/m\d$/.test(p.ruta)).map((p) => p.ruta).sort(), ["/m2", "/m3"]);
+  assert.equal(h.mensajes[0].historia, true, "m3 es una reacción a una historia");
+  assert.equal(h.mensajes[1].historia, false, "m2 es una foto o un audio");
+});
