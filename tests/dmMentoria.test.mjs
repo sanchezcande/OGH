@@ -523,3 +523,14 @@ test("controlador: la agenda del 1 a 1 después de que opinó del video es un pa
   const cierre = charla([["agente", `Lo vemos 1 a 1\nwww.${AGENDA_1A1}`, 60], ["lead", "lo voy a rumiar", 50], ["agente", "Sin drama", 49]]);
   assert.equal(C.cierrePrematuro(cierre, { ahora: AHORA.getTime(), patrones: P })[0]?.regla, "F4");
 });
+
+test("lo que dice la historia no sale copiado en un DM: lo frena el sitio, con otra vuelta para el agente", () => {
+  // 09/11: se coló en una charla aunque el prompt ya lo prohibía. Ahora lo frena el código.
+  const motivo = (m) => revisar(salida(m, "dev"), opciones(conLead(["busco empleo de prueba", "si contame"]))).motivo;
+  const MOTIVO = "copia la historia en el DM";
+  assert.equal(motivo([`Te cuento algo: busco 5 devs para ayudarlos con su búsqueda\nwww.${AGENDA_1A1}`]), MOTIVO);
+  assert.equal(motivo(["Y vas a ser vos o otra persona?"]), MOTIVO);
+  assert.equal(motivo(["VAS A SER VOS O OTRO?"]), MOTIVO);
+  pasa([`Dale! Te dejo mi agenda de prueba\nwww.${AGENDA_1A1}`], "dev", conLead(["si contame"]));
+  assert.equal(FRENOS.FRENOS_DE_CANDE.has(MOTIVO), false, "el agente lo reescribe, no pasa a Cande");
+});
