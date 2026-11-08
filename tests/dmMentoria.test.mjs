@@ -19,6 +19,7 @@ import assert from "node:assert/strict";
 import { base as pg } from "./dobles/postgres.mjs";
 
 const { revisar, sinSeguimiento, charlaParaLaPlata, ofertaDe, DOC_1A1, LINK_PAGO_1A1, AGENDA_1A1 } = await import("../lib/dm/frenos.js");
+const FRENOS = await import("../lib/dm/frenos.js");
 const { esParaCande } = await import("../lib/dm/resumen.js");
 const C = await import("../lib/dm/controlador.js");
 const { NOTA_COMPRO, notaPerfil } = await import("../lib/dm/pagina.js");
@@ -415,4 +416,110 @@ test("controlador: con precio_dicho del 473 (sin el 27 en la charla), F2 corrige
   const con27 = charla([["agente", `Va el detalle de prueba:\n${DOC_1A1}`, 500], ["agente", "Sale 27 dólares, frase de prueba", 450],
     ["lead", "uhh no lo puedo pagar ahora", 390], ["agente", "Miraste el video de prueba?", 100], ["lead", "sii lo vi, me gustó mucho", 60], ["agente", "Sin drama", 59]]);
   assert.deepEqual(C.videoSinPrecio(con27, { contacto: { ...c, respondido_hasta: con27.at(-2).id }, ahora: AHORA.getTime(), patrones: P }), []);
+});
+
+/* ---------- señales débiles de empresa y la agenda del 1 a 1 (QA del 08/11) ---------- */
+
+// Devs que buscan trabajo frenados como empresa por tener un emprendimiento o por preguntar cuánto sale el 1 a 1, y
+// pasados a Cande sin otra vuelta. Textos inventados: el repo es público.
+const TURNO_1A1 = [`Lo de prueba lo vemos 1 a 1\nwww.${AGENDA_1A1}`];
+const conLead = (charlaDelLead, extra = {}) => ({ charlaDelLead, textosDelLead: charlaDelLead.slice(-1), ...extra });
+
+test("un dev que busca: el emprendimiento propio, 'cuánto me sale' o 'esa asesoría' no frenan el 1 a 1", () => {
+  for (const dicho of [
+    "tengo mi emprendimiento de prueba al costado y busco trabajo fijo",
+    "ese tipo de asesoría de prueba tiene algún costo?",
+    "cuánto me sale el acompañamiento de prueba?",
+    "la asesoría de prueba es por zoom?",
+    "tengo una agencia de prueba pero quiero un trabajo fijo",
+  ]) {
+    pasa(TURNO_1A1, "dev", conLead([dicho]));
+  }
+});
+
+test("las mismas palabras siguen frenando si no es un dev que busca, y las señales fuertes frenan siempre", () => {
+  const { MOTIVO_SENAL_EMPRESA, MOTIVO_EMPRESA } = FRENOS;
+  const motivo = (mensajes, quien, extra) => revisar(salida(mensajes, quien), opciones(extra)).motivo;
+  // El modelo todavía no sabe si busca: la débil frena como antes.
+  const sinBusca = { ...salida(TURNO_1A1, "dev"), estado: { ...estado("dev"), busca: "no_se_sabe" } };
+  assert.equal(revisar(sinBusca, opciones(conLead(["tengo mi emprendimiento de prueba"]))).motivo, MOTIVO_SENAL_EMPRESA);
+  // Dice que no busca: frena.
+  const noBusca = { ...salida(TURNO_1A1, "dev"), estado: { ...estado("dev"), busca: "no" } };
+  assert.equal(revisar(noBusca, opciones(conLead(["cuánto me sale lo de prueba?"]))).motivo, MOTIVO_SENAL_EMPRESA);
+  // El modelo dice que construye o es una empresa: frena por eso.
+  assert.equal(motivo(TURNO_1A1, "construye", conLead(["tengo mi emprendimiento de prueba"])), MOTIVO_EMPRESA);
+  // Fuertes, aunque el modelo diga dev que busca.
+  for (const dicho of ["necesito asesoría de prueba para contratar 2 devs en mi empresa", "soy founder de una app de prueba", "estamos contratando devs de prueba"]) {
+    assert.equal(motivo(TURNO_1A1, "dev", conLead([dicho])), MOTIVO_SENAL_EMPRESA, dicho);
+  }
+});
+
+test("'no puedo pagar sueldos' de su proyecto no es falta de plata; 'no lo puedo pagar' sí", () => {
+  const conMonto = [`Son 473 dólares de entrada para lo de prueba 1 a 1\nwww.${AGENDA_1A1}`];
+  pasa(conMonto, "dev", conLead(["por ahora no puedo pagar sueldos en mi proyecto de prueba"]));
+  pasa(conMonto, "dev", conLead(["no puedo pagar a mis empleados de prueba todavía"]));
+  frena(conMonto, "dev", conLead(["no lo puedo pagar"]));
+  frena(conMonto, "dev", conLead(["no puedo pagar eso ahora"]));
+});
+
+test("controlador: después del sí a la oferta, la agenda del 1 a 1 es una entrega (no se corrige)", () => {
+  const conAgenda = charla([["agente", "Y si te muestro el atajo?", 60], ["lead", "dale", 50], ["agente", `Lo vemos 1 a 1\nwww.${AGENDA_1A1}`, 49]]);
+  assert.deepEqual(C.puenteSinEntregar(conAgenda, { contacto: contacto(conAgenda), ahora: AHORA.getTime(), patrones: P }), []);
+});
+
+test("un negocio propio solo deja de frenar si el lead escribió que busca trabajo", () => {
+  frena(TURNO_1A1, "dev", conLead(["tengo una startup de prueba"]));
+  frena(TURNO_1A1, "dev", conLead(["tengo mi emprendimiento de prueba y no busco trabajo"]));
+  pasa(TURNO_1A1, "dev", conLead(["tengo mi emprendimiento de prueba", "pero estoy buscando trabajo hace meses"]));
+});
+
+// Revisión del PR (equipo rojo y corrección): lo que el arreglo no tiene que aflojar.
+test("revisión: 'no puedo pagar a nadie', 'un equipo' (la compu) o 'sueldos ni nada' siguen siendo falta de plata", () => {
+  const conMonto = [`Son 473 dólares de entrada para lo de prueba 1 a 1\nwww.${AGENDA_1A1}`];
+  for (const dicho of ["no puedo pagar a nadie que me enseñe", "no puedo pagar un equipo nuevo, programo con una notebook vieja",
+    "NO PUEDO PAGAR SUELDOS NI NADA, estoy re justo", "no puedo pagar programadores ni cursos"]) {
+    frena(conMonto, "dev", conLead([dicho]));
+  }
+  pasa(conMonto, "dev", conLead(["no puedo pagar un sueldo todavía en mi proyecto de prueba"]));
+});
+
+test("revisión: un negocio propio con 'busco trabajo para mi equipo', una negación o un pasado sigue frenando", () => {
+  for (const dicho of ["Soy programador, tengo mi propia software factory y busco trabajo para el equipo",
+    "tengo una agencia y busco trabajo freelance para mi agencia", "TENGO UNA STARTUP Y QUIERO CONSEGUIR TRABAJO PARA MIS DEVS",
+    "estoy en busqueda activa de programadores para mi startup", "no ando buscando empleo hoy, tengo mi agencia de prueba",
+    "tengo mi negocio y no ando buscando trabajo", "la verdad nunca estuve buscando trabajo, manejo una consultora",
+    "tengo mi emprendimiento de prueba, ya no ando en búsqueda activa", "hace un año pude conseguir trabajo y ahora tengo mi propia startup",
+    "necesito un trabajo de programacion para mi negocio"]) {
+    frena(TURNO_1A1, "dev", conLead([dicho]));
+  }
+});
+
+test("revisión: preguntar cuánto sale contratar o reclutar, o una asesoría para el área de tecnología, frena siempre", () => {
+  for (const dicho of ["cuanto me sale contratar un dev con ustedes?", "cuanto cobras por buscarme programadores?",
+    "hola cuanto cobras x reclutar perfiles tech", "cuánto me sale tercerizar el desarrollo de mi app?",
+    "necesito una asesoria para armar el area de tecnologia"]) {
+    frena(TURNO_1A1, "dev", conLead([dicho]));
+  }
+});
+
+test("revisión: la agenda de reuniones de empresas sigue valiendo si la charla dio cualquier señal de empresa", () => {
+  pasa(["Te paso la agenda de reuniones de prueba strategy.opengatehub.com"], "dev", conLead(["tengo una agencia de prueba y busco trabajo para mi equipo"]));
+});
+
+test("revisión: la vuelta de más y las correcciones deciden la señal de empresa igual que los frenos", async () => {
+  const { puedeReescribir } = await import("../lib/dm/agente.js");
+  const devSi = salida(TURNO_1A1, "dev");
+  assert.equal(puedeReescribir(devSi, ["ese tipo de asesoría de prueba tiene costo?"], { motivo: "otro freno de prueba" }), true);
+  assert.equal(puedeReescribir(devSi, ["estamos contratando devs de prueba"], { motivo: "otro freno de prueba" }), false);
+  const { senalDeEmpresa } = FRENOS;
+  assert.equal(senalDeEmpresa(["cuánto me sale el 1 a 1 de prueba?"], { quien: "dev", busca: "no_se_sabe", previo: { quien: "dev", busca: "si" } }), false,
+    "si ahora no se sabe, vale lo de antes");
+  assert.equal(senalDeEmpresa(["cuánto me sale el 1 a 1 de prueba?"], { quien: "dev", busca: "no" }), true);
+});
+
+test("controlador: la agenda del 1 a 1 después de que opinó del video es un paso dado (F2), y un cierre después de ella es F4", () => {
+  const vio = charla([["agente", "Miraste el video de prueba?", 100], ["lead", "sii lo vi, me gustó mucho", 60], ["agente", `Lo vemos 1 a 1\nwww.${AGENDA_1A1}`, 59]]);
+  assert.deepEqual(C.videoSinPrecio(vio, { contacto: contacto(vio), ahora: AHORA.getTime(), patrones: P }).filter((x) => x.tipo === "otra_cosa"), []);
+  const cierre = charla([["agente", `Lo vemos 1 a 1\nwww.${AGENDA_1A1}`, 60], ["lead", "lo voy a rumiar", 50], ["agente", "Sin drama", 49]]);
+  assert.equal(C.cierrePrematuro(cierre, { ahora: AHORA.getTime(), patrones: P })[0]?.regla, "F4");
 });
