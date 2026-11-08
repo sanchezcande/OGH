@@ -157,6 +157,17 @@ Cande`,
 
 const COLS = TOQUES.map((t) => t.col);
 
+// Presupuesto de mails de este cron, compartido por las DOS cadenas que manda (la de developers
+// y la oferta del 1 a 1). El cupo de Resend es de la cuenta entera: 100 mails por día y 3.000 por
+// mes en el plan gratis. Antes de esto la cadena podía armar una fila de 240 (6 toques por 40) y
+// la oferta otros 120, así que el cron se comía el cupo del día y los mails que manda la web (el
+// recibo de una compra, el pedido de CV) se rechazaban hasta la medianoche. Pasó el 02/11/2026,
+// el día que arrancó la oferta del 1 a 1: 153 mails. Y el 05/11: 122. Resend avisó "100% of your
+// daily quota" los días 05 y 06, y "80% of your monthly quota" el 07.
+// Con 80 acá y 10 en la cadena de founders (su propio cron) quedan 10 por día para la web.
+// Lo que no sale hoy no se pierde: queda sin anotar y sale mañana, y la fila va por atraso.
+const TOPE_DIARIO = Number(process.env.DRIP_TOPE_DIARIO || 80);
+
 export default async function handler(req, res) {
   // Solo el cron de Vercel (manda "Bearer CRON_SECRET"): sin esto, cualquiera que pegara
   // la URL varias veces le mandaba toda la secuencia de mails a todos en minutos.
@@ -181,7 +192,7 @@ export default async function handler(req, res) {
   // La corrida (un mail por persona, qué se anota, cuándo se corta) vive en
   // lib/mandarMail.js, igual para las dos cadenas. Acá va solo lo propio de esta.
   const corrida = await correrGoteo({
-    cadena: "developers", toques: TOQUES, resend, avisar, limite,
+    cadena: "developers", toques: TOQUES, resend, avisar, limite, tope: TOPE_DIARIO,
     // Solo aplicantes del formulario (tienen email), que no estén silenciados,
     // que no hayan recibido ESTE toque, con la antigüedad que corresponde.
     // Primero los que más esperan: si la corrida se corta, no quedan siempre los mismos afuera.
@@ -208,7 +219,10 @@ export default async function handler(req, res) {
   // 130 lo recibieron, así que si el cupo alcanza para una sola, que sea la de todos los días.
   await sql`ALTER TABLE red_devs ADD COLUMN IF NOT EXISTS mail_1a1 TIMESTAMPTZ`;
   const oferta1a1 = await correrGoteo({
+    // Lo que la cadena de todos los días no usó del presupuesto. La prioridad es la de ella:
+    // la cadena corre siempre y esta se termina sola cuando todos lo recibieron.
     cadena: "devs con inglés fluido (1 a 1)", toques: [TOQUE_1A1], resend, avisar, limite,
+    tope: TOPE_DIARIO - corrida.salieron,
     buscar: async (t) => (await sql.query(BUSCAR_1A1, [t.dias])).rows.filter((r) => !yaLesMande.has(r.id)),
     armar: (t, r) => {
       const cuerpo = t.cuerpo(primerNombre(r.nombre));
@@ -223,8 +237,8 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, ...corrida, oferta1a1 });
 }
 
-// Hasta 240 mails por corrida (6 toques de 40) con una pausa entre cada uno: unos 50
-// segundos si Resend contesta rápido, bastante más si anda lento. Sin esto la función
+// Hasta TOPE_DIARIO mails por corrida entre las dos cadenas, con una pausa entre cada uno: unos
+// 50 segundos si Resend contesta rápido, bastante más si anda lento. Sin esto la función
 // corre con el tope por defecto de Vercel y puede quedar cortada a mitad de camino.
 // Mismo tope que la cola de publicación (plan Pro).
 export const config = { maxDuration: 300 };

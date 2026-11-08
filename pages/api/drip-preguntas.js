@@ -180,6 +180,11 @@ Cande`,
 
 const COLS = TOQUES.map((t) => t.col);
 
+// Presupuesto de este cron. Comparte el cupo de Resend (100 mails por día en toda la cuenta) con
+// el cron del goteo de devs, que tiene 80. Con 10 acá quedan 10 por día para los mails que manda
+// la web. Lo que no sale hoy queda sin anotar y sale mañana.
+const TOPE_DIARIO = Number(process.env.DRIP_PREGUNTAS_TOPE_DIARIO || 10);
+
 export default async function handler(req, res) {
   // Solo el cron de Vercel (manda "Bearer CRON_SECRET"): sin esto, cualquiera que pegara
   // la URL varias veces le mandaba toda la secuencia de mails a todos en minutos.
@@ -203,7 +208,7 @@ export default async function handler(req, res) {
   // La corrida (un mail por persona, qué se anota, cuándo se corta) vive en
   // lib/mandarMail.js, igual que en el goteo de devs.
   const corrida = await correrGoteo({
-    cadena: "founders", toques: TOQUES, resend, avisar, limite,
+    cadena: "founders", toques: TOQUES, resend, avisar, limite, tope: TOPE_DIARIO,
     // Primero los que más esperan: si la corrida se corta, no quedan siempre los mismos afuera.
     buscar: async (t) => (await sql.query(
       `SELECT id, nombre, email, creado FROM leads_preguntas

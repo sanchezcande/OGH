@@ -186,6 +186,62 @@ for (const { cadena, handler, tabla } of CADENAS) {
   });
 }
 
+// El cupo de Resend es de la cuenta entera, no de una cadena: 100 mails por dia y 3.000 por mes
+// en el plan gratis. Este cron manda DOS cadenas (la de developers y la oferta del 1 a 1) y antes
+// podia armar 240 mas 120, asi que se comia el cupo del dia y los mails que manda la web (recibo
+// de compra, pedido de CV) se rechazaban hasta la medianoche. Paso el 02/11/2026, el dia que
+// arranco la oferta del 1 a 1: 153 mails. Y el 05/11: 122.
+
+/** Alguien que ya recibio toda la cadena, con ingles fluido: solo le puede tocar el 1 a 1. */
+const soloParaEl1a1 = (id, dias) => ({ ...conToquesHasta(id, dias, 99), ingles: "Fluido" });
+
+test("el cron del goteo no manda mas de 80 mails entre sus dos cadenas", async () => {
+  // 120 esperando la cadena (40 por cada uno de los tres primeros toques) y 50 esperando el 1 a 1.
+  const gente = [];
+  let id = 1;
+  for (const [toque, dias] of [[1, 1.5], [2, 2.5], [3, 3.5]]) {
+    for (let i = 0; i < 40; i++) gente.push(conToquesHasta(id++, dias, toque));
+  }
+  const desde1a1 = id;
+  for (let i = 0; i < 50; i++) gente.push(soloParaEl1a1(id++, 5));
+  base.reiniciar({ red_devs: gente, compras: [] });
+
+  const r = await correr(drip);
+
+  // 80 en total, no 170.
+  assert.equal(resendFalso.pedidos.length, 80);
+  assert.equal(r.salieron, 80);
+  assert.equal(r.frenadosPorTope, 40);
+  // La cadena de todos los dias tiene la prioridad: se llevo los 80 y al 1 a 1 no le quedo nada.
+  assert.equal(r.oferta1a1.salieron, 0);
+  assert.equal(r.oferta1a1.frenadosPorTope, 50);
+  assert.equal(anotados("red_devs", "mail_1a1").length, 0);
+  // Lo que no salio queda sin anotar: sale en la corrida siguiente.
+  const debe = (f) => (f.id >= desde1a1 ? "mail_1a1" : f.id <= 40 ? "drip_d1" : f.id <= 80 ? "drip_d2" : "drip_d3");
+  assert.equal(base.tablas.red_devs.filter((f) => !f[debe(f)]).length, 90);
+  // El tope es parte del funcionamiento normal: no se corta por error ni se avisa por Telegram.
+  assert.equal(r.cortado, null);
+  assert.equal(avisos.length, 0);
+});
+
+test("la oferta del 1 a 1 usa lo que la cadena de todos los dias no gasto", async () => {
+  const gente = [];
+  let id = 1;
+  for (let i = 0; i < 5; i++) gente.push(persona(id++, 1.5));
+  for (let i = 0; i < 100; i++) gente.push(soloParaEl1a1(id++, 5));
+  base.reiniciar({ red_devs: gente, compras: [] });
+
+  const r = await correr(drip);
+
+  assert.equal(r.salieron, 5);
+  assert.equal(r.frenadosPorTope, 0);
+  // 80 menos los 5 de la cadena.
+  assert.equal(r.oferta1a1.salieron, 75);
+  assert.equal(anotados("red_devs", "mail_1a1").length, 75);
+  assert.equal(resendFalso.pedidos.length, 80);
+  assert.equal(avisos.length, 0);
+});
+
 test("pedirCV: devuelve false cuando Resend rechaza el mail", async () => {
   resendFalso.responder = () => rechazo("daily_quota_exceeded");
 
