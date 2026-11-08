@@ -262,3 +262,18 @@ test("/api/devs-red agenda el turno del formulario solo si la nota quedó recié
   const p = await leer("../pages/api/devs-red.js");
   assert.match(p, /if \(charla\?\.anotada === 1 && charla\.dueno === "agente"\) await agendarCaliente\(d\.ig, "formulario", MINUTOS_CALIENTE\.formulario\);/);
 });
+
+test("el botón de compra de /devs/gracias sale cuando el video lo pide: a los 110 s o a la mitad, lo que llegue primero", async () => {
+  const { botonVisible, BOTON_SEGUNDOS } = await import("../lib/botonCompra.js");
+  assert.equal(BOTON_SEGUNDOS < 119, true, "antes del 'Andá a buscarla acá abajo' del video, a 1:59");
+  assert.equal(botonVisible(0, 579), false, "sin reproducir, todavía no");
+  assert.equal(botonVisible(109, 579), false);
+  assert.equal(botonVisible(110, 579), true, "video de 9:39: a los 110 s, no a las 4:49");
+  assert.equal(botonVisible(64, 127), true, "video de 2:07: a la mitad, como siempre");
+  assert.equal(botonVisible(60, 127), false);
+  assert.equal(botonVisible(120, NaN), true, "sin la duración, por los segundos");
+  const p = await leer("../pages/devs/gracias.jsx");
+  assert.match(p, /if \(botonVisible\(p\.currentTime, p\.duration\)\) \{/);
+  assert.doesNotMatch(p, /frac >= 0\.5\) setTermino/, "la mitad sola corre el botón cuando el video se alarga");
+  assert.match(p, /window\.localStorage\.getItem\(CLAVE_BOTON_VISTO\)/, "el que ya lo vio lo tiene desde que entra");
+});
