@@ -11,9 +11,10 @@ import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
 // Video único de Gumroad, actualizado por Cande el 28/10/2026: los cuatro testimonios en video (Martiniano, Francisco,
 // Eduardo y Andrés) y el muro de escritos. El anterior era gzpbw7xoib.
-const WISTIA_A = "geluy2vcuu";
+const WISTIA_A = "jsuv1v61g0";   // 08/11: video de Gumroad nuevo (9:39, con Manrique segundo). El anterior era geluy2vcuu.
 const TESTIMONIOS_VIDEO = [
   { nombre: "Martiniano Olivera", lugar: "Concepción del Uruguay, Argentina", id: "c6yuoqzkm2" },
+  { nombre: "Manrique Ulate", lugar: "San José, Costa Rica", id: "bk8t9jduhd" },
   { nombre: "Francisco Peña", lugar: "Mérida, Venezuela", id: "06y0i47nkb" },
   { nombre: "Eduardo Hidalgo", lugar: "Ambato, Ecuador", id: "rqqzkavkxe" },
   { nombre: "Andrés Murillo", lugar: "Soledad, Colombia", id: "0mib7zqd5d" },
@@ -261,10 +262,11 @@ const TestimoniosTitulo = styled.h2`
 `;
 const TestimoniosIntro = styled.p`margin: 10px 0 0; color: #625b5e; font-size: 15px; line-height: 1.5;`;
 const VideosGrid = styled.div`
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-bottom: 28px;
-  @media (max-width: 1000px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 5 videos: tres arriba y dos abajo, centrados (con grilla de 4 quedaba uno solo abajo) */
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-bottom: 28px;
+  > * { flex: 0 0 calc((100% - 36px) / 3); min-width: 0; }
   @media (max-width: 720px) {
-    display: flex; overflow-x: auto; gap: 12px; padding: 0 0 10px;
+    display: flex; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; gap: 12px; padding: 0 0 10px;
     scroll-snap-type: x mandatory; overscroll-behavior-inline: contain;
     scrollbar-width: thin; scrollbar-color: #c9bebb transparent;
     > * { flex: 0 0 min(72vw, 270px); scroll-snap-align: start; }
