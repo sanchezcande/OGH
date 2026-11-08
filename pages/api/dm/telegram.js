@@ -13,9 +13,14 @@
 //
 // Contesta 200 aunque algo falle: con otro código Telegram reintenta. Igual cada novedad se
 // reclama una sola vez (base.reclamarNovedad), así un reintento no manda dos veces.
+//
+// Correcciones (09/11, lib/dm/correcciones.js): una captura, un texto suelto o un "wtf" respondiendo un aviso no es un
+// mensaje para el lead: se guarda para que el cerebro de la nube corrija al agente y le conteste a ella por acá.
 import { waitUntil } from "@vercel/functions";
 import { agente, envio, mismoSecreto } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
+import { RECIBIDA, leerCorreccion } from "../../../lib/dm/correcciones";
+import { guardarCorreccion } from "../../../lib/dm/correccionesBase";
 import { crearRespuestaTelegram, leerRespuesta } from "../../../lib/dm/respuestas";
 import { chatDuena, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
 
@@ -29,6 +34,23 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "no" });
   }
   const novedad = req.body || {};
+  const correccion = leerCorreccion(novedad, { duena: chatDuena() });
+  if (correccion) {
+    try {
+      // "Lo miro" una sola vez por tanda: si ya había otra parte esperando, ya se lo dijo.
+      const g = await guardarCorreccion(correccion);
+      if (g.nueva && g.primera) {
+        await llamarTelegram(token, "sendMessage", {
+          chat_id: chatDuena(), text: correccion.deshacer ? `${RECIBIDA.split(",")[0]}, lo vuelvo atrás` : RECIBIDA,
+          reply_to_message_id: novedad.message?.message_id, allow_sending_without_reply: true,
+        });
+      }
+    } catch (e) {
+      console.error("dm telegram, corrección:", e.message);
+      await llamarTelegram(token, "sendMessage", { chat_id: chatDuena(), text: `No pude guardar la corrección: ${String(e.message).slice(0, 150)}` });
+    }
+    return res.status(200).json({ ok: true });
+  }
   const r = leerRespuesta(novedad, { duena: chatDuena() });
   if (r.ignorar) return res.status(200).json({ ok: true });
   // El bot le contesta como respuesta a lo que ella escribió, en texto plano.
@@ -36,7 +58,8 @@ export default async function handler(req, res) {
     chat_id: chatDuena(), text: texto, reply_to_message_id: novedad.message?.message_id, allow_sending_without_reply: true,
   });
   if (r.ayuda) {
-    await decir(r.ayuda);
+    // Un texto suelto que no arranca como queja no corrige nada: la ayuda de siempre, y cómo se corrige (09/11).
+    await decir(r.ayuda.startsWith("Para contestarle a alguien") ? `${r.ayuda}\nPara corregir al agente, mandame la captura o escribí wtf y qué pasó.` : r.ayuda);
     return res.status(200).json({ ok: true });
   }
   // Una indicación espera a que el agente la redacte (hasta un minuto y pico con la Mac): Telegram
