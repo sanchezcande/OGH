@@ -1940,3 +1940,20 @@ test("la lista de seguidos gana sin pedirle el perfil a Instagram: a una amiga n
   assert.equal(r.altas, 0, "está en dm_seguidos: es una amiga y el agente no se mete");
   assert.equal(w.contactos.has("5001"), false);
 });
+
+test("una reacción a una historia no queda pendiente ni se guarda como foto; un mensaje con texto sobre la historia sí cuenta", async () => {
+  const { leerHilo } = await import("../lib/dm/instagram.js");
+  const { textoDe } = await import("../lib/dm/bandeja.js");
+  const yo = { user_id: "900", username: "cuenta" };
+  const hilo = leerHilo({ id: "h1", messages: { data: [
+    { id: "m3", created_time: "2026-11-07T10:55:06+0000", from: { id: "555", username: "lead" }, message: "", story: { reply_to: { id: "s1" } } },
+    { id: "m2", created_time: "2026-11-07T10:50:00+0000", from: { id: "555", username: "lead" }, message: "qué buen dato", story: { reply_to: { id: "s0" } } },
+    { id: "m1", created_time: "2026-11-07T10:00:00+0000", from: { id: "900", username: "cuenta" }, message: "Holaa" },
+  ] } }, yo);
+  assert.equal(hilo.mensajes[0].historia, true);
+  assert.deepEqual(sinRespuesta(hilo, yo).map((m) => m.id), ["m2"], "la reacción se saltea; la respuesta con texto queda pendiente");
+  assert.equal(textoDe(hilo.mensajes[0]), "[reacción a tu historia]");
+  const soloReaccion = { mensajes: [hilo.mensajes[0], hilo.mensajes[2]] };
+  assert.deepEqual(sinRespuesta(soloReaccion, yo), [], "con solo una reacción no queda nada pendiente");
+  assert.equal(textoDe({ texto: "" }), "[adjunto o mensaje sin texto]", "un adjunto sin texto sigue siendo un adjunto");
+});
