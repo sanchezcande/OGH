@@ -3,6 +3,7 @@ import Head from "next/head";
 import styled from "styled-components";
 import { evento } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
+import { CLAVE_BOTON_VISTO, botonVisible } from "../../lib/botonCompra";
 
 // Página post-formulario (rediseño Cande sept 2026):
 // "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
@@ -80,6 +81,12 @@ export default function Gracias() {
     const ev = f => evento(WISTIA_B ? f + "_" + v : f, f === "video_fin" ? ch : null);
     const id = v === "b" ? WISTIA_B : WISTIA_A;
     ev("gracias_vista");
+    // El que ya vio el botón en este navegador lo tiene desde que entra (lib/botonCompra.js).
+    try {
+      if (window.localStorage.getItem(CLAVE_BOTON_VISTO)) setTermino(true);
+    } catch {
+      // sin localStorage (navegador privado): sale con el video, como a todos
+    }
 
     // Los dos scripts de Wistia, a mano. Con next/script el del media (type=module)
     // no llegaba nunca al DOM y el <wistia-player> se quedaba sin definir.
@@ -108,9 +115,16 @@ export default function Gracias() {
       if (frac >= 0.25) ev("video_25");
       if (frac >= 0.5) ev("video_50");
       if (frac >= 0.75) ev("video_75");
-      // El botón de compra aparece a la MITAD del video (decisión Cande 17/09:
-      // su primer candidato vio 65% y se fue sin haber visto nunca el botón).
-      if (frac >= 0.5) setTermino(true);
+      // El botón de compra aparece cuando el video lo pide: a los 110 s o a la mitad, lo que llegue primero
+      // (lib/botonCompra.js, 08/11). Antes era solo la mitad, y con el video de 9:39 salía a las 4:49.
+      if (botonVisible(p.currentTime, p.duration)) {
+        setTermino(true);
+        try {
+          window.localStorage.setItem(CLAVE_BOTON_VISTO, "1");
+        } catch {
+          // sin localStorage: la próxima vez sale con el video
+        }
+      }
       if (p.currentTime >= p.duration - 1.5) {
         ev("video_fin");
         clearInterval(reloj);
