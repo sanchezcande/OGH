@@ -79,6 +79,10 @@ async function codigoUnico(id) {
   return crearCodigo100(nombre);
 }
 
+/** El 1 a 1 en pesos (pagar-1a1.js): su `external_reference` empieza con "1a1-". No lleva código del curso. */
+const PRODUCTO_1A1 = "Conseguí trabajo de dev en 4 semanas";
+const es1a1 = (pago) => String(pago?.external_reference || "").startsWith("1a1-");
+
 /** Anota la venta y dice si es la PRIMERA vez que vemos este pago.
  *
  *  MercadoPago manda más de un aviso por el mismo pago (el 20/10 llegaron dos en el mismo minuto,
@@ -89,6 +93,7 @@ async function codigoUnico(id) {
  *  Si la base falla, devuelve true y el mail sale igual: un mail repetido molesta, quedarse sin
  *  el código después de pagar no. */
 async function anotarVenta(pago, id) {
+  const producto = es1a1(pago) ? PRODUCTO_1A1 : "Acelerador de Carrera Tech";
   if (!hayBase()) return true;
   try {
     await asegurarTablaCompras();
@@ -96,7 +101,7 @@ async function anotarVenta(pago, id) {
       INSERT INTO compras (email, nombre, producto, precio, moneda, recurrencia, baja, origen, como_llego, pais, codigo, venta_id)
       VALUES (${(pago.payer?.email || "").trim().toLowerCase()},
               ${[pago.payer?.first_name, pago.payer?.last_name].filter(Boolean).join(" ").trim() || null},
-              'Acelerador de Carrera Tech', ${pago.transaction_amount}, ${(pago.currency_id || "ars").toLowerCase()},
+              ${producto}, ${pago.transaction_amount}, ${(pago.currency_id || "ars").toLowerCase()},
               NULL, FALSE, 'mercadopago', 'pagó en pesos', NULL,
               NULL, ${`mp-${id}`})
       ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING
@@ -107,6 +112,14 @@ async function anotarVenta(pago, id) {
     return true;
   }
 }
+
+const cuerpoMail1a1 = (nombre) => `Hola${nombre ? " " + nombre : ""},
+
+Ya me llegó tu pago, gracias 🤍
+
+Te escribo yo por WhatsApp para arrancar. Si querés adelantarte, contestame este mail con tu WhatsApp y tu LinkedIn.
+
+Cande`;
 
 const cuerpoMail = (nombre, link) => `Hola${nombre ? " " + nombre : ""},
 
@@ -156,8 +169,34 @@ export default async function handler(req, res) {
 
     // Primero el candado: si este pago ya se procesó, este aviso es un repetido de MercadoPago y
     // el código ya salió. Contestar 200 y no hacer nada más.
+    const uno = es1a1(pago);
     const primera = await anotarVenta(pago, id);
     if (!primera) return res.status(200).json({ ok: true, repetido: true });
+
+    // El 1 a 1 no lleva código del curso: un mail corto y el aviso a ella, que lo contacta.
+    if (uno) {
+      if (hayBase()) {
+        try { await guardarEvento("mp_pagado_1a1", `mp-${id}`); } catch (e) { console.error("mp-webhook evento:", e.message); }
+      }
+      let ok1 = false, motivo1 = "sin mail del pagador";
+      if (mail && process.env.RESEND_API_KEY) {
+        const r = await mandarMail(new Resend(process.env.RESEND_API_KEY), {
+          from: DE, to: mail, reply_to: "cande@opengatehub.com",
+          subject: "Arrancamos con el 1 a 1",
+          text: cuerpoMail1a1(nombre),
+        });
+        ok1 = r.ok; motivo1 = r.ok ? "" : r.motivo;
+      }
+      const f1 = await ficha(mail);
+      await avisar("YA: pagó el 1 a 1 en pesos 💸", camposCompra({
+        que: "Pagó el 1 a 1 en pesos por MercadoPago",
+        email: mail, nombre, ficha: f1,
+        plata: `$${monto} ${(pago.currency_id || "ARS").toUpperCase()}`,
+        deDonde: f1 ? null : "todavía no está en la red de devs",
+        extra: { Mail: ok1 ? "le mandé que le escribís por WhatsApp" : `NO salió el mail (${motivo1}), escribile vos` },
+      }), VENTAS);
+      return res.status(200).json({ ok: true, unoAUno: true, mail: ok1 });
+    }
 
     if (hayBase()) {
       // Queda en el mismo embudo que el resto, para poder contar cuántos pagan en pesos.
