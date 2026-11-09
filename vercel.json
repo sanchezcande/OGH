@@ -30,7 +30,7 @@
     },
     {
       "path": "/api/dm/bandeja-rapida",
-      "schedule": "1-59/3 * * * *"
+      "schedule": "1-59/6 * * * *"
     },
     {
       "path": "/api/dm/controlador",
