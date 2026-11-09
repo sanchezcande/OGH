@@ -320,18 +320,14 @@ test("la llamada primero no se le escapa a quien contrata ni a quien está en cr
   assert.equal(alArrancar(ARRANQUE, { charlaDelLead: ["estoy con depresión de prueba"] }).motivo, MOTIVO_CRISIS);
 });
 
-test("el toque de la hora y lo que sigue: 'ya reservaste?', el 'te esperoooo' y el 27 con su precio y su link", () => {
-  // El toque no lleva link ni monto, así que no toca ningún freno; lo que importa es lo de después.
+test("el toque de la hora y lo que sigue: el que no reservó recibe el 27 con su precio y su link", () => {
+  // El toque no lleva link ni monto, así que no toca ningún freno.
   pasa(["Holii! Ya reservaste?"], "dev");
-  pasa(["Joyi daleee! te esperoooo"], "dev");
-  // Dijo que no reservó: recién ahí el programa de 27, con el precio y el link (decisión de Cande, 09/11).
-  pasa([
-    "Por ahora está en 27 dólares porque recién lo estoy lanzando, está re barato",
-    `Te lo dejo acá\n${LINK_27}`,
-    "Te abre bien?",
-  ], "dev");
+  // Dijo que no reservó: recién ahí el programa de 27, con el precio y el link (decisión de Cande, 09/11). El turno
+  // de verdad lo arma el prompt; acá importa que el monto y el link juntos pasen a un dev.
+  pasa(["Son 27 dólares de prueba", `Te lo dejo acá\n${LINK_27}`, "Te abre bien?"], "dev");
   // Lo que no cambia: ese mismo turno a quien no se sabe que es dev, o a quien contó que no tiene plata, sigue frenado.
-  frena(["Por ahora está en 27 dólares porque recién lo estoy lanzando, está re barato"], "no_se_sabe");
+  frena(["Son 27 dólares de prueba"], "no_se_sabe");
   frena([`Te lo dejo acá\n${LINK_27}`], "dev", { charlaDelLead: ["no tengo plata ahora"] });
 });
 
