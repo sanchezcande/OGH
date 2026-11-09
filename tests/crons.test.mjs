@@ -2,9 +2,9 @@
 // Neon se despierta una vez por vuelta y duerme entre una y la otra. Con crons cada 2 o 3 minutos no dormía nunca y se
 // quedó sin las horas de cómputo del plan gratis. Las cadenas de mails corren una vez por día y no se tocan.
 //
-// La única excepción es la pasada rápida de la bandeja (30/10, cada 3 minutos): es el aviso de que hay un mensaje
+// La única excepción es la pasada rápida de la bandeja (30/10, cada 3 minutos; desde el 09/11 cada 6, por el gasto de Vercel): es el aviso de que hay un mensaje
 // nuevo, que antes daba ManyChat, y ya no hay cuota que cuidar (Cande pagó el plan de Neon el 21/10). Sus minutos
-// (1, 4, 7… 58) no caen nunca en los del resto, así que ninguna vuelta del barrido se cruza con una rápida.
+// (1, 7, 13… 55) no caen nunca en los del resto, así que ninguna vuelta del barrido se cruza con una rápida.
 //
 // Correr:  node --test tests/*.test.mjs
 import "./dobles/preparar.mjs";
@@ -41,10 +41,10 @@ test("vercel.json: todos los crons que tocan la base van cada 15 minutos, en los
   }
 });
 
-test("la pasada rápida va cada 3 minutos y en minutos que no son los del barrido", () => {
-  assert.equal(RAPIDA_CRON_MIN, 3);
-  assert.equal(RAPIDA_CRON_MS, 3 * 60000);
-  assert.equal(HORARIO_RAPIDA, "1-59/3 * * * *");
+test("la pasada rápida va cada 6 minutos y en minutos que no son los del barrido", () => {
+  assert.equal(RAPIDA_CRON_MIN, 6);
+  assert.equal(RAPIDA_CRON_MS, 6 * 60000);
+  assert.equal(HORARIO_RAPIDA, "1-59/6 * * * *");
   // Los minutos de cada reloj, para que no se pisen: la rápida arranca en el 1 y el barrido, en el 0.
   const rapidos = new Set();
   for (let m = 1; m <= 59; m += RAPIDA_CRON_MIN) rapidos.add(m);

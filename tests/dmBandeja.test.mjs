@@ -225,7 +225,7 @@ function mundo({
   w.avisar = async (titulo, campos, opciones) => { w.avisos.push({ titulo, campos, opciones }); return true; };
   w.resumenes = () => w.avisos.filter((a) => a.titulo === TITULO_RESUMEN);
   w.revisar = (extra = {}) => revisarBandeja({ ig: w.ig, base: w.base, manychat: w.manychat, aj: w.aj, avisar: w.avisar, ahora: () => w.ahora, ...extra });
-  /** La pasada rápida (pages/api/dm/bandeja-rapida.js, cada 3 minutos): la primera página y nada del cursor. */
+  /** La pasada rápida (pages/api/dm/bandeja-rapida.js, cada 6 minutos): la primera página y nada del cursor. */
   w.rapida = (extra = {}) => w.revisar({ rapida: true, ...extra });
   w.delContacto = (id) => w.mensajes.filter((m) => m.contacto === id);
   w.pasar = (min) => { w.ahora = new Date(w.ahora.getTime() + min * MIN); };
@@ -1103,7 +1103,7 @@ test("después de la primera vez, cada vuelta lee solo lo movido desde la anteri
 
 // Desde que ManyChat pausó sus automatizaciones nadie le avisa al agente de un mensaje nuevo: el único camino es esta
 // red, que barre de a 10 páginas desde un cursor que gira, así que un mensaje que acaba de llegar podía tardar media
-// hora en verse. La pasada rápida lee una sola página (la de arriba) cada 3 minutos. Lo que no puede hacer es pisar el
+// hora en verse. La pasada rápida lee una sola página (la de arriba) cada 6 minutos. Lo que no puede hacer es pisar el
 // cursor del barrido: si lo pisara, el barrido empezaría de nuevo en cada vuelta y el fondo de la bandeja no se
 // miraría nunca.
 
@@ -1431,7 +1431,7 @@ test("el cron de la bandeja no entra sin CRON_SECRET, corre cada 15 minutos y no
   assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja"), { path: "/api/dm/bandeja", schedule: "*/15 * * * *" });
 });
 
-test("el cron de la pasada rápida: la misma guarda del secreto, cada 3 minutos, en minutos que no son los del barrido, y sin ids", async () => {
+test("el cron de la pasada rápida: la misma guarda del secreto, cada 6 minutos, en minutos que no son los del barrido, y sin ids", async () => {
   const { default: handler, config } = await import("../pages/api/dm/bandeja-rapida.js");
   const llamar = async (req) => { const res = respuesta(); await handler(req, res); return res; };
   delete process.env.CRON_SECRET;
@@ -1451,12 +1451,12 @@ test("el cron de la pasada rápida: la misma guarda del secreto, cada 3 minutos,
   assert.equal(config.maxDuration, 120);
   assert.match(src, /const MARGEN_S = 40;/);
   assert.match(src, /rapida: true/);
-  // Anotar acá un intento cada 3 minutos le haría avisar "la red no anda" todo el tiempo: el reloj de la red caída
+  // Anotar acá un intento cada 6 minutos le haría avisar "la red no anda" todo el tiempo: el reloj de la red caída
   // mide las vueltas del barrido. Lo que sí avisa es Instagram caído (reglasInstagram.fallo).
   assert.ok(!/vigilarRed\(/.test(src.replace(/^\s*\/\/.*$/gm, "")), "no la llama");
   assert.match(src, /reglasInstagram\.fallo/);
   const crons = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8")).crons;
-  assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja-rapida"), { path: "/api/dm/bandeja-rapida", schedule: "1-59/3 * * * *" });
+  assert.deepEqual(crons.find((c) => c.path === "/api/dm/bandeja-rapida"), { path: "/api/dm/bandeja-rapida", schedule: "1-59/6 * * * *" });
 });
 
 test("las consultas de la red: guardar solo en charlas del agente, sin repetir, con su propio tope, y un eco por mensaje", async () => {
@@ -1723,7 +1723,7 @@ test("lo que había quedado anotado como de Cande (a_cande) se vuelve a mirar en
   assert.equal((await sin.revisar()).altas, 0);
 
   const w = armar();
-  // La pasada rápida corre antes (cada 3 minutos): no las mira, pero tampoco pierde lo anotado.
+  // La pasada rápida corre antes (cada 6 minutos): no las mira, pero tampoco pierde lo anotado.
   await w.rapida();
   assert.equal(w.contactos.size, 0);
   assert.equal(w.config.bandeja_estado.a_cande, undefined, "a_cande no se guarda más");
