@@ -287,6 +287,54 @@ test("la plata dicha después de la oferta del 27, las deudas y el apuro siguen 
   frena(PRECIO_27, "dev", { charlaDelLead: ["no lo puedo pagar"] });
 });
 
+/* ---------- la llamada primero, desde el arranque (Cande, 09/11) ---------- */
+
+// Cande, 09/11: "ofrecer la llamada 1 a 1 SIEMPRE primero, desde el principio de la charla, sin esperar mensajes".
+// Hasta ese día la agenda salía recién en el turno 2 del puente y solo a quien ya había dicho que buscaba trabajo: en
+// 30 días salió en 33 charlas de 938 y unas 460 charlas largas nunca la recibieron. Ahora sale en el primer turno en
+// que el modelo sabe que es dev, con la pregunta del recorrido al lado, y a la hora va el toque "ya reservaste?".
+// Esto es lo que los frenos del sitio tienen que dejar pasar para que el prompt pueda hacerlo. Los textos son
+// inventados menos la agenda, que es la de verdad: el repo es público.
+const ARRANQUE = [
+  `Daleee! Agendá una llamada de 15 min conmigo y te cuento cómo seguimoss\nwww.${AGENDA_1A1}`,
+  "Y qué onda estás buscando trabajo de prueba?",
+];
+const alArrancar = (mensajes, extra = {}) => revisar(
+  { ...salida(mensajes, "dev"), estado: { ...estado("dev"), busca: "no_se_sabe", etapa: "si_busca" } },
+  opciones(extra),
+);
+
+test("la llamada primero: la agenda sale en el primer turno, con la pregunta al lado y sin saber todavía si busca", () => {
+  assert.deepEqual(alArrancar(ARRANQUE, { textosDelLead: ["holaa, soy dev de prueba"] }), { ok: true });
+  // Y al que ya contó que busca, igual que siempre.
+  pasa(ARRANQUE.slice(0, 1), "dev");
+  pasa(ARRANQUE, "estudia");
+});
+
+test("la llamada primero no se le escapa a quien contrata ni a quien está en crisis", () => {
+  const { MOTIVO_SENAL_EMPRESA, MOTIVO_EMPRESA, MOTIVO_CRISIS } = FRENOS;
+  assert.equal(revisar(salida(ARRANQUE, "empresa"), opciones()).motivo, MOTIVO_EMPRESA);
+  assert.equal(alArrancar(ARRANQUE, {
+    charlaDelLead: ["tengo una agencia de prueba y contrato devs"], textosDelLead: ["contrato devs"],
+  }).motivo, MOTIVO_SENAL_EMPRESA);
+  assert.equal(alArrancar(ARRANQUE, { charlaDelLead: ["estoy con depresión de prueba"] }).motivo, MOTIVO_CRISIS);
+});
+
+test("el toque de la hora y lo que sigue: 'ya reservaste?', el 'te esperoooo' y el 27 con su precio y su link", () => {
+  // El toque no lleva link ni monto, así que no toca ningún freno; lo que importa es lo de después.
+  pasa(["Holii! Ya reservaste?"], "dev");
+  pasa(["Joyi daleee! te esperoooo"], "dev");
+  // Dijo que no reservó: recién ahí el programa de 27, con el precio y el link (decisión de Cande, 09/11).
+  pasa([
+    "Por ahora está en 27 dólares porque recién lo estoy lanzando, está re barato",
+    `Te lo dejo acá\n${LINK_27}`,
+    "Te abre bien?",
+  ], "dev");
+  // Lo que no cambia: ese mismo turno a quien no se sabe que es dev, o a quien contó que no tiene plata, sigue frenado.
+  frena(["Por ahora está en 27 dólares porque recién lo estoy lanzando, está re barato"], "no_se_sabe");
+  frena([`Te lo dejo acá\n${LINK_27}`], "dev", { charlaDelLead: ["no tengo plata ahora"] });
+});
+
 /* ---------- el seniority del formulario ---------- */
 
 test("el seniority y el rol del formulario van al contexto, solo como una de sus opciones", () => {
