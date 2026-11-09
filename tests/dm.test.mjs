@@ -31,6 +31,7 @@ import assert from "node:assert/strict";
 
 const {
   revisar, proximoToque, ventanaAbierta, normalizar, senales, sinSeguimiento, avisaQueEsAutomatico, plano, horaDeToques,
+  TOQUE_MIN_H,
 } = await import("../lib/dm/frenos.js");
 const { crearAgente, armarTurno, esFoto, SIN_TEXTO, NOTA_HILO_PREVIO } = await import("../lib/dm/agente.js");
 const { MAX_PREVIO } = await import("../lib/dm/instagram.js");
@@ -277,11 +278,30 @@ test("no hay seguimiento para quien ya contestó que no, no tiene plata, no busc
   assert.equal(sinSeguimiento({ estado: { ...temprana, etapa: "si_busca" }, charlaDelLead: ["no me escribas más"] }), true);
 });
 
+test("la agenda del 1 a 1 deja su toque a la hora, no a las cuatro (Cande, 09/11)", () => {
+  // Cande, 09/11: a quien recibe la agenda se le pregunta "ya reservaste?" "a la hora como máximo, no al día
+  // siguiente". El prompt pide seguimiento_en_horas 1 solo en ese turno (freno 17); hasta el 09/11 el piso de 4 horas
+  // lo convertía en un toque de la tarde, y la llamada que no se reserva mientras todavía la está leyendo no se
+  // reserva más. Si alguien vuelve a subir el piso, esta prueba se cae.
+  assert.equal(TOQUE_MIN_H, 1);
+  const ultimoLead = new Date(AHORA);
+  const en = (horas, resto) => proximoToque({ ahora: AHORA, ultimoLead, horas, toquesHechos: 0, maxToques: 1, ...resto });
+  assert.equal(en(1).getTime(), ultimoLead.getTime() + HORA);
+  assert.equal(en(0.25).getTime(), ultimoLead.getTime() + HORA);   // nunca antes de la hora
+  // Sigue siendo un solo toque por charla (Cande, 02/11): con el "ya reservaste?" hecho no se agenda otro.
+  assert.equal(en(1, { toquesHechos: 1 }), null);
+  // Y la charla del 1 a 1 llega al toque sin el formulario: alcanza con que sea un dev al que todavía se le preguntó
+  // si busca (etapa "si_busca"), que es el turno en que sale la agenda.
+  assert.equal(sinSeguimiento({
+    estado: { quien: "dev", busca: "no_se_sabe", dolor: "", etapa: "si_busca", link_formulario_enviado: false, precio_dicho: false },
+  }), false);
+});
+
 test("el seguimiento se cuenta desde el último mensaje del lead y solo dentro de sus 24 horas", () => {
   const ultimoLead = new Date(AHORA - 2 * HORA);
   const en = (o) => proximoToque({ ahora: AHORA, ultimoLead, toquesHechos: 0, ...o });
   assert.equal(en({ horas: 6 }).getTime(), ultimoLead.getTime() + 6 * HORA);
-  assert.equal(en({ horas: 0.2 }).getTime(), ultimoLead.getTime() + 4 * HORA);   // nunca antes de las 4 horas
+  assert.equal(en({ horas: 0.2 }), null);                                        // el piso es una hora (TOQUE_MIN_H) y esta ya pasó
   assert.equal(en({ horas: 6, toquesHechos: 2 }), null);                            // ya hizo los dos
   assert.equal(en({ horas: 6, toquesHechos: 1, maxToques: 1 }), null);              // antes del link va uno solo
   assert.equal(en({ horas: null }), null);
