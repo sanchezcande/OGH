@@ -8,6 +8,7 @@ import { revisar } from "../../lib/antispam";
 import { avisar } from "../../lib/notificar";
 import { normalizarOrigen } from "../../lib/origenForm";
 import { pedirCV } from "../../lib/pedirCV";
+import { botonChat } from "../../lib/ofertaWhatsapp";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Sin "cv" ni "proyecto": el form nuevo no los pide (el CV se pide por email después).
@@ -95,7 +96,8 @@ export default async function handler(req, res) {
       : igDelLink ? "vino con un id de charla que no coincide con su firma (cambiado a mano?): no lo até a ninguna charla" : null,
     Guardado: guardado ? "sí" : "NO",
     "Mail CV": mailCV ? "enviado" : "NO salió",
-  });
+    WhatsApp: d.whatsapp,
+  }, { boton: botonChat({ whatsapp: d.whatsapp, pais: d.pais }) });
 
   // _debug: solo para diagnóstico manual; no expone secretos, solo el mensaje de error.
   if (d._debug === "claude") return res.status(200).json({ ok: true, guardado, errBase });

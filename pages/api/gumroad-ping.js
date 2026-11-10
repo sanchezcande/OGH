@@ -18,7 +18,7 @@ import { sql } from "@vercel/postgres";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
 import { asegurarTablaCompras, esCodigoDeCuba, esCodigoDePesos } from "../../lib/compras";
 import { avisar } from "../../lib/notificar";
-import { PAGO_EN_PESOS, correspondeOferta, linkOferta, mensajeOferta } from "../../lib/ofertaWhatsapp";
+import { PAGO_EN_PESOS, botonChat, correspondeOferta, linkOferta, mensajeOferta } from "../../lib/ofertaWhatsapp";
 
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
     },
   }), {
     token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS,
-    boton: wa ? { texto: `Ofrecerle el 1 a 1 por WhatsApp (+${wa.numero})`, url: wa.url } : null,
+    boton: wa ? { texto: `Ofrecerle el 1 a 1 por WhatsApp (+${wa.numero})`, url: wa.url } : botonChat({ whatsapp: f?.whatsapp, pais: f?.pais }),
   });
   if (!ok) console.error("gumroad-ping: el aviso no salió", { email });
 

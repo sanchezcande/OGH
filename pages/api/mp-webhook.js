@@ -27,6 +27,7 @@ import { BASE_LINK, CODIGO_URL, crearCodigo100 } from "../../lib/gumroadCodigos"
 import { guardarEvento, hayBase } from "../../lib/db";
 import { mandarMail } from "../../lib/mandarMail";
 import { avisar } from "../../lib/notificar";
+import { botonChat } from "../../lib/ofertaWhatsapp";
 
 const DE = "Cande de OpenGateHub <cande@opengatehub.com>";
 // Las ventas van al bot de ventas (@oghventas_bot), igual que las de Gumroad: ahí es donde ella
@@ -194,7 +195,7 @@ export default async function handler(req, res) {
         plata: `$${monto} ${(pago.currency_id || "ARS").toUpperCase()}`,
         deDonde: f1 ? null : "todavía no está en la red de devs",
         extra: { Mail: ok1 ? "le mandé que le escribís por WhatsApp" : `NO salió el mail (${motivo1}), escribile vos` },
-      }), VENTAS);
+      }), { ...VENTAS, boton: botonChat({ whatsapp: f1?.whatsapp, pais: f1?.pais }) });
       return res.status(200).json({ ok: true, unoAUno: true, mail: ok1 });
     }
 
@@ -234,7 +235,7 @@ export default async function handler(req, res) {
           ? `ya se lo mandé por mail${propio ? ", es solo suyo y de un solo uso" : " (el general, no pude crear uno propio)"}`
           : `NO salió el mail (${motivo}), mandáselo vos: ${link}`,
       },
-    }), VENTAS);
+    }), { ...VENTAS, boton: botonChat({ whatsapp: f?.whatsapp, pais: f?.pais }) });
     return res.status(200).json({ ok: true, mail: mailOk });
   } catch (e) {
     console.error("mp-webhook:", e.message);
