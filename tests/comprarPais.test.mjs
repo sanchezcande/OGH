@@ -130,3 +130,31 @@ test("el desplegable no tiene paises repetidos ni codigos repetidos", () => {
   assert.equal(new Set(nombres).size, nombres.length);
   assert.equal(PAISES[PAISES.length - 1].codigo, OTRO, '"Otro país" va al final de la lista');
 });
+
+test("no se le pregunta el pais a quien ya lo contesto en el formulario", () => {
+  // Cande, 10/11: "qué es ese form aparte, agregalo al form normal". El formulario de /devs pide
+  // "País y ciudad" obligatorio desde siempre: volver a preguntarlo antes de pagar es un paso de
+  // más justo donde menos se lo banca.
+  const src = readFileSync(new URL("../pages/comprar.jsx", import.meta.url), "utf8");
+  assert.match(src, /delFormulario \|\| paisDeCabecera/,
+    "lo que puso en el formulario tiene que ganarle a la IP de Vercel");
+  assert.match(src, /firmaValida\(ig, firmaDeLink\(query\?\.f\)\)/,
+    "sin la firma del id no se mira ninguna ficha: el id viaja en claro");
+  assert.match(src, /Pusiste que sos de/);
+});
+
+test("el pais sale del texto libre del formulario, con UNA sola lista en el repo", async () => {
+  const { paisDeTextoLibre } = await import("../lib/paisCompra.js");
+  assert.equal(paisDeTextoLibre("Argentina, Córdoba"), "AR");
+  assert.equal(paisDeTextoLibre("CABA"), "AR");
+  assert.equal(paisDeTextoLibre("Buenos Aires"), "AR");
+  assert.equal(paisDeTextoLibre("México DF"), "MX");
+  assert.equal(paisDeTextoLibre("madrid"), "ES");
+  assert.equal(paisDeTextoLibre("La Habana, Cuba"), "CU");
+  assert.equal(paisDeTextoLibre("Marte"), null, "lo que no se reconoce no se adivina");
+  assert.equal(paisDeTextoLibre(""), null);
+  // Y el agente usa ESTA lista, no una copia suya: dos listas se separan solas.
+  const pagina = readFileSync(new URL("../lib/dm/pagina.js", import.meta.url), "utf8");
+  assert.match(pagina, /import \{ nombreDePais, paisDeTextoLibre \} from "\.\.\/paisCompra"/);
+  assert.equal(/\["Argentina", \//.test(pagina), false, "quedó la copia vieja de la lista de países");
+});

@@ -4,7 +4,10 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { evento } from "../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana, sinIg } from "../lib/dm/linkFormulario";
-import { PAISES, destinoDePago, faseDePago, nombreDePais, pagaEnPesos, paisDeCabecera } from "../lib/paisCompra";
+import { PAISES, destinoDePago, faseDePago, nombreDePais, pagaEnPesos, paisDeCabecera, paisDeTextoLibre } from "../lib/paisCompra";
+import { paisDelLead } from "../lib/db";
+import { firmaValida } from "../lib/dm/firmaIg";
+import { firmaDeLink, idDeLink } from "../lib/dm/linkFormulario";
 
 // La puerta única de pago del programa de 27 (Cande, 09/11: "un solo link para el agente").
 //
@@ -22,7 +25,7 @@ const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.
 const MERCADOPAGO = "/api/pagar-pesos";
 const INSTAGRAM = "https://ig.me/m/candelaria.sanchezg";
 
-export default function Comprar({ paisDetectado, precioArs, precioUsd }) {
+export default function Comprar({ paisDetectado, delFormulario, precioArs, precioUsd }) {
   const router = useRouter();
   const [pais, setPais] = useState(paisDetectado);
   // La charla de Instagram, si llegó con el link del agente: va con el clic en pagar, así el agente
@@ -63,10 +66,18 @@ export default function Comprar({ paisDetectado, precioArs, precioUsd }) {
         <Caja>
           <Kicker>Acelerador de Carrera Tech</Kicker>
           <H1>Un paso y entrás</H1>
-          <Bajada>Decime de dónde sos y te llevo a donde podés pagar.</Bajada>
+          <Bajada>
+            {delFormulario
+              ? "Te llevo a donde podés pagar."
+              : "Decime de dónde sos y te llevo a donde podés pagar."}
+          </Bajada>
 
           <Campo>
-            <Etiqueta htmlFor="pais">De dónde sos</Etiqueta>
+            <Etiqueta htmlFor="pais">
+              {/* A quien llenó el formulario no se le pregunta de nuevo: se le muestra lo que puso,
+                  por si se mudó o escribió cualquier cosa. */}
+              {delFormulario ? "Pusiste que sos de" : "De dónde sos"}
+            </Etiqueta>
             <Select id="pais" value={pais} onChange={(e) => setPais(e.target.value)}>
               {PAISES.map((p) => (
                 <option key={p.codigo} value={p.codigo}>{p.nombre}</option>
@@ -121,10 +132,25 @@ export default function Comprar({ paisDetectado, precioArs, precioUsd }) {
  * El precio también sale de acá: el de pesos lo decide la misma variable que cobra MercadoPago
  * (`MP_PRECIO_ARS`), así la página nunca muestra un número distinto al que va a pagar.
  */
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req, query }) {
+  // Primero, lo que la persona YA contestó en el formulario. Llega acá por el id de la charla que
+  // el agente le pone al link (?ig=, con su firma), igual que /devs. Si la firma no es la de ese
+  // id no se mira nada: el id viaja en claro y cualquiera podría poner el de otro.
+  let delFormulario = null;
+  try {
+    const ig = idDeLink(query?.ig);
+    if (ig && firmaValida(ig, firmaDeLink(query?.f))) {
+      delFormulario = paisDeTextoLibre(await paisDelLead(ig));
+    }
+  } catch (e) {
+    console.error("comprar: no pude ver el país del formulario:", e.message);
+  }
   return {
     props: {
-      paisDetectado: paisDeCabecera(req.headers["x-vercel-ip-country"]),
+      // El del formulario gana: lo dijo ella misma. La cabecera de Vercel es la IP, que miente
+      // seguido (VPN, viajando, vivir afuera), y es solo el plan B.
+      paisDetectado: delFormulario || paisDeCabecera(req.headers["x-vercel-ip-country"]),
+      delFormulario: Boolean(delFormulario),
       precioArs: Number(process.env.MP_PRECIO_ARS || 39750),
       precioUsd: Number(process.env.PRECIO_USD || 27),
     },
