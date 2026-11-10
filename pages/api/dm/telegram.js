@@ -16,6 +16,12 @@
 //
 // Correcciones (09/11, lib/dm/correcciones.js): una captura, un texto suelto o un "wtf" respondiendo un aviso no es un
 // mensaje para el lead: se guarda para que el cerebro de la nube corrija al agente y le conteste a ella por acá.
+//
+// WhatsApp (10/11, lib/whatsapp/respuestas.js): por el mismo bot entran los avisos del WhatsApp de la empresa
+// (pages/api/whatsapp/webhook.js), y lo que ella responde ahí sale TAL CUAL por WhatsApp, sin pasar por el agente.
+// Se mira antes que una respuesta de Instagram y después de una corrección: el aviso de WhatsApp se reconoce por el
+// prefijo "wa:" del renglón "Quién", que ningún aviso de una charla de DM tiene. Una captura o un "wtf" respondiendo
+// un aviso de WhatsApp siguen siendo una corrección del agente, como cualquier captura que le mande al bot.
 import { waitUntil } from "@vercel/functions";
 import { agente, envio, mismoSecreto } from "../../../lib/dm/armado";
 import * as base from "../../../lib/dm/base";
@@ -23,6 +29,9 @@ import { RECIBIDA, leerCorreccion } from "../../../lib/dm/correcciones";
 import { guardarCorreccion } from "../../../lib/dm/correccionesBase";
 import { crearRespuestaTelegram, leerRespuesta } from "../../../lib/dm/respuestas";
 import { chatDuena, llamarTelegram, tokenBotDm } from "../../../lib/notificar";
+import * as whatsapp from "../../../lib/whatsapp/api";
+import * as waBase from "../../../lib/whatsapp/base";
+import { crearRespuestaWhatsapp, leerRespuestaWa } from "../../../lib/whatsapp/respuestas";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -51,12 +60,39 @@ export default async function handler(req, res) {
     }
     return res.status(200).json({ ok: true });
   }
-  const r = leerRespuesta(novedad, { duena: chatDuena() });
-  if (r.ignorar) return res.status(200).json({ ok: true });
   // El bot le contesta como respuesta a lo que ella escribió, en texto plano.
   const decir = (texto) => llamarTelegram(token, "sendMessage", {
     chat_id: chatDuena(), text: texto, reply_to_message_id: novedad.message?.message_id, allow_sending_without_reply: true,
   });
+
+  // Un aviso de WhatsApp: lo que ella escribe sale tal cual por WhatsApp y no pasa por el agente.
+  const wa = leerRespuestaWa(novedad, { duena: chatDuena() });
+  if (!wa.ignorar) {
+    // Una ayuda se contesta acá y no toca la base: no hay por qué despertar a Neon para decirle cómo se usa.
+    if (wa.ayuda) {
+      await decir(wa.ayuda);
+      return res.status(200).json({ ok: true });
+    }
+    try {
+      await waBase.tablas();
+    } catch (e) {
+      // Si la base no está, el 500 lo reintentaría Telegram y ella no se enteraría de nada.
+      console.error("whatsapp desde telegram, base:", e.message);
+      await decir(`No salió: no pude llegar a la base (${String(e.message).slice(0, 150)})`);
+      return res.status(200).json({ ok: false });
+    }
+    waitUntil(
+      crearRespuestaWhatsapp({ base: waBase, wa: whatsapp, decir, reclamarNovedad: base.reclamarNovedad })(wa, { updateId: novedad.update_id })
+        .catch(async (e) => {
+          console.error("whatsapp desde telegram:", e.message);
+          await decir(`No salió: algo falló del lado del sitio (${String(e.message).slice(0, 150)})`);
+        }),
+    );
+    return res.status(200).json({ ok: true });
+  }
+
+  const r = leerRespuesta(novedad, { duena: chatDuena() });
+  if (r.ignorar) return res.status(200).json({ ok: true });
   if (r.ayuda) {
     // Un texto suelto que no arranca como queja no corrige nada: la ayuda de siempre, y cómo se corrige (09/11).
     await decir(r.ayuda.startsWith("Para contestarle a alguien") ? `${r.ayuda}\nPara corregir al agente, mandame la captura o escribí wtf y qué pasó.` : r.ayuda);
