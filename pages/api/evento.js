@@ -11,6 +11,10 @@ const FASES = new Set([
   "form_visto", "paso_2", "paso_3", "enviado",
   "gracias_vista", "video_play", "video_25", "video_50", "video_75", "video_fin",
   "click_gumroad", "click_mp",
+  // La puerta única de pago (/comprar, 10/11): cuántos llegan al desplegable de país. El clic en
+  // pagar sigue siendo click_mp o click_gumroad, los mismos de /devs/gracias, así el embudo cuenta
+  // los dos caminos juntos y el agente ve la misma nota en la charla (lib/dm/pagina.js).
+  "comprar_vista",
   "preguntas_vista", "preguntas_pdf_click", "preguntas_llamada_click",
   // preguntas_email_enviado la manda /preguntas desde el 18/09 y NUNCA estuvo en esta lista:
   // la API le contestaba 400 y el paso más importante del embudo de founders, el de completar

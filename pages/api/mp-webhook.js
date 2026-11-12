@@ -23,6 +23,7 @@ import { sql } from "@vercel/postgres";
 import { Resend } from "resend";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
 import { asegurarTablaCompras, codigoDePesos } from "../../lib/compras";
+import { paisDeReferencia } from "../../lib/paisCompra";
 import { BASE_LINK, CODIGO_URL, crearCodigo100 } from "../../lib/gumroadCodigos";
 import { guardarEvento, hayBase } from "../../lib/db";
 import { mandarMail } from "../../lib/mandarMail";
@@ -103,7 +104,7 @@ async function anotarVenta(pago, id) {
       VALUES (${(pago.payer?.email || "").trim().toLowerCase()},
               ${[pago.payer?.first_name, pago.payer?.last_name].filter(Boolean).join(" ").trim() || null},
               ${producto}, ${pago.transaction_amount}, ${(pago.currency_id || "ars").toLowerCase()},
-              NULL, FALSE, 'mercadopago', 'pagó en pesos', NULL,
+              NULL, FALSE, 'mercadopago', 'pagó en pesos', ${paisDeReferencia(pago.external_reference)},
               NULL, ${`mp-${id}`})
       ON CONFLICT (venta_id) WHERE venta_id IS NOT NULL DO NOTHING
       RETURNING id`;
