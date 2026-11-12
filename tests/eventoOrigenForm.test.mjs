@@ -52,7 +52,7 @@ test("la puerta se guarda en la fila del lead y la primera no se pisa", async ()
   const fs = await import("node:fs/promises");
   const db = await fs.readFile(new URL("../lib/db.js", import.meta.url), "utf8");
   assert.ok(/ADD COLUMN IF NOT EXISTS puerta TEXT/.test(db), "falta la columna puerta");
-  assert.ok(/ig_contacto, puerta\)/.test(db), "el INSERT no manda puerta");
+  assert.ok(/ig_contacto, puerta, sid\)/.test(db), "el INSERT no manda puerta y sid");
   assert.ok(/puerta = COALESCE\(red_devs\.puerta, EXCLUDED\.puerta\)/.test(db),
             "al volver a llenar el formulario se pisaría la puerta original");
 

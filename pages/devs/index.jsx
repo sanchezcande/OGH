@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { evento } from "../../lib/embudo";
+import { evento, sid } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana, sinIg } from "../../lib/dm/linkFormulario";
 import { normalizarOrigen } from "../../lib/origenForm";
 import { useTrampa } from "../../lib/trampaForm";
@@ -221,7 +221,9 @@ export default function RedDeDevs() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Sin ?ig= el pedido es el de siempre. La firma va solo con su id.
-        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}), ...camposTrampa() }),
+        // El sid va con la ficha para poder atar después los eventos del embudo (tocó pagar y no
+        // pagó) a una persona con mail y WhatsApp: funnel_eventos solo guarda el sid (lib/db.js).
+        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}), ...(sid() ? { sid: sid() } : {}), ...camposTrampa() }),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
       evento("enviado");

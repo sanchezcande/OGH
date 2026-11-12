@@ -364,7 +364,7 @@ test("/devs lee ?ig= con el mismo validador, lo saca de la barra con el router l
   assert.match(efecto[0], /try \{[\s\S]*\} catch \(e\)/, "nunca rompe la página");
   // Desde el 24/10 también viaja la puerta (?de=), aparte del id y su firma.
   // Y desde el 30/10, el reloj y la trampa del antispam (lib/trampaForm.js), que no tocan nada de esto.
-  assert.match(src, /body: JSON\.stringify\(\{ \.\.\.\(ig \? \{ \.\.\.f, ig, firma \} : f\), \.\.\.\(puerta \? \{ puerta \} : \{\}\), \.\.\.camposTrampa\(\) \}\),/);
+  assert.match(src, /body: JSON\.stringify\(\{ \.\.\.\(ig \? \{ \.\.\.f, ig, firma \} : f\), \.\.\.\(puerta \? \{ puerta \} : \{\}\), \.\.\.\(sid\(\) \? \{ sid: sid\(\) \} : \{\}\), \.\.\.camposTrampa\(\) \}\),/);
   // Medir por qué puerta entró (?de=) sigue igual, y sinIg no le saca el ?de= a la barra.
   assert.match(src, /const de = normalizarOrigen\(new URLSearchParams\(window\.location\.search\)\.get\("de"\)\);\s*if \(de\) \{ setPuerta\(de\); evento\("form_visto_" \+ de\); \}/);
 });
@@ -442,7 +442,7 @@ function baseDelFormulario({
 } = {}) {
   const h = { insert: null, notas: [] };
   pg.otras = async (t, params) => {
-    if (/^CREATE (TABLE|UNIQUE INDEX) IF NOT EXISTS/.test(t) || /^ALTER TABLE red_devs ALTER COLUMN/.test(t)) return { rows: [] };
+    if (/^CREATE (TABLE|UNIQUE INDEX|INDEX) IF NOT EXISTS/.test(t) || /^ALTER TABLE red_devs ALTER COLUMN/.test(t)) return { rows: [] };
     if (/^ALTER TABLE red_devs ADD COLUMN IF NOT EXISTS ig_contacto TEXT$/.test(t)) {
       if (alterFalla) throw alterFalla;
       return { rows: [] };
