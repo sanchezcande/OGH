@@ -24,7 +24,7 @@ const {
   RESPUESTAS_PUBLICAS, respuestaPublica, responderEnPublico,
   AUTOMATICO_CV_MANYCHAT, AUTOMATICO_DEV_MANYCHAT, FRESCO_MINUTOS, MENSAJES_HONDOS, MENSAJES_POR_HILO, TEXTO_CV, TEXTO_DEV, VENTANA_DIAS,
   comentariosParaContestar, contestadoDesde, contestarComentarios, enVentana, esDmDeCV, esDmDeDev, esPalabraCV, esPalabraDEV, mediosParaLeer, motivoDelError,
-  tipoDelComentario,
+  tipoDelComentario, TEXTO_FORMULARIO, LINK_FORMULARIO, PALABRA_FORMULARIO, esPalabraFormulario, esDmDeFormulario,
 } = await import("../lib/dm/comentarios.js");
 const { esAutomatico, claveTexto } = await import("../lib/dm/instagram.js");
 
@@ -116,7 +116,7 @@ test("los motivos de los errores de Instagram", () => {
  * Un cliente de Instagram y una base de mentira. `fallas` dice con qué error contesta cada
  * comentario; `bandeja` son las charlas que ya existen (para la traba del automático de ManyChat).
  */
-function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Set(), bandeja = null, hondas = {}, conDm = null } = {}) {
+function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Set(), bandeja = null, hondas = {}, conDm = null, conDmForm = null } = {}) {
   const base = { filas: new Map(), tomados };
   // Sin bandeja: una sola charla vieja, de alguien que no comentó. Así nadie queda tapado por la
   // traba y la bandeja cubre desde antes de todos los comentarios.
@@ -187,7 +187,8 @@ function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Se
       base.tomados.add(id);
       base.filas.set(id, { ...datos, estado: "ya_tenia" });
     },
-    ...(conDm ? { usuariosConDm: async () => conDm } : {}),
+    // Como la base: con "formulario", los que ya tienen el del formulario; sin tipo, los de CV y DEV.
+    ...(conDm || conDmForm ? { usuariosConDm: async (tipo = null) => (tipo === "formulario" ? conDmForm : conDm) || [] } : {}),
     soltarComentario: async (id) => {
       if (base.filas.get(id)?.estado === "enviando") {
         base.filas.delete(id);
@@ -1113,4 +1114,156 @@ test("el cliente lista los posts de a páginas, siguiendo el cursor, hasta las q
   assert.equal(pedidos.filter((p) => p.includes("/ig1/media")).length, 3);
   // Por defecto, una sola página, como antes.
   assert.equal((await ig.medios()).length, 1);
+});
+
+// ---- FORMULARIO: el formulario "Contame tu realidad" (13/11) ----
+//
+// Tercer pedido por comentario, con la misma regla estricta y las mismas trabas que CV y DEV. Dos diferencias: arranca
+// apagado (sin `formulario`, el cron hace exactamente lo de antes), y no se tapa con CV: el dev que ya recibió la
+// lista es justo el que tiene que recibir el formulario.
+
+const PRENDIDO = { desde: null };
+const FORMS = [
+  { id: "f1", text: "FORMULARIO", timestamp: "2026-10-29T18:00:00+0000", username: "devuno" },
+  { id: "f2", text: "Formulario 🙌 porfa", timestamp: "2026-10-29T17:50:00+0000", username: "devdos" },
+  { id: "f3", text: "qué formulario?", timestamp: "2026-10-29T17:40:00+0000", username: "devtres" },
+];
+
+test("FORMULARIO: la palabra sola, o con relleno, pide el formulario; adentro de una frase no", () => {
+  assert.equal(PALABRA_FORMULARIO, "formulario");
+  for (const t of ["FORMULARIO", "Formulario", "formulario", "  FORMULARIO  ", "Formulario!", "FORMULARIO 🙌🏼", "formulario porfa", "Hola, formulario please", "Formulário"]) {
+    assert.equal(esPalabraFormulario(t), true, `tendría que disparar con ${JSON.stringify(t)}`);
+  }
+  const no = [
+    "qué formulario?", "ya llené el formulario", "formularios", "el formulario no anda", "formulario cv", "cv formulario",
+    "", "   ", null, undefined, "🙌🏼",
+  ];
+  for (const t of no) assert.equal(esPalabraFormulario(t), false, `no tendría que disparar con ${JSON.stringify(t)}`);
+});
+
+test("FORMULARIO: apagado es una charla más; prendido es su propio pedido, y CV y DEV no cambian", () => {
+  assert.equal(tipoDelComentario("FORMULARIO"), null, "apagado no dispara nada");
+  assert.equal(tipoDelComentario("FORMULARIO", { formulario: true }), "formulario");
+  assert.equal(tipoDelComentario("CV", { formulario: true }), "cv");
+  assert.equal(tipoDelComentario("DEV", { formulario: true }), "dev");
+  assert.equal(tipoDelComentario("cv formulario", { formulario: true }), null, "dos pedidos: es una charla");
+});
+
+test("FORMULARIO: el texto lleva el link limpio de la bio, entra en un mensaje y la bandeja lo toma por automático", () => {
+  assert.equal(LINK_FORMULARIO, "https://forms.gle/Kw2uyAMzTizsnr7V7");
+  assert.ok(TEXTO_FORMULARIO.includes(LINK_FORMULARIO), "el link va adentro: Instagram deja un solo mensaje por comentario");
+  assert.ok(!/\?|utm_|[?&]de=/.test(LINK_FORMULARIO), "el link va limpio");
+  assert.ok(TEXTO_FORMULARIO.length <= 1000, "Instagram corta a los 1.000 caracteres");
+  assert.ok(!TEXTO_FORMULARIO.includes("—"), TEXTO_FORMULARIO);
+  assert.ok(!/[¿¡]/.test(TEXTO_FORMULARIO), TEXTO_FORMULARIO);
+  // Si la bandeja no lo reconoce como automático, el agente se sale de la charla del dev que contesta (lib/dm/bandeja.js).
+  assert.equal(esAutomatico(TEXTO_FORMULARIO, [claveTexto(AUTOMATICO_CV_MANYCHAT)]), true);
+  // Y no pasa por el DM de CV ni por el de DEV, ni al revés.
+  assert.equal(esDmDeCV(TEXTO_FORMULARIO), false);
+  assert.equal(esDmDeDev(TEXTO_FORMULARIO), false);
+  assert.equal(esDmDeFormulario(TEXTO_FORMULARIO), true);
+  assert.equal(esDmDeFormulario("te dejo el link: forms.gle/Kw2uyAMzTizsnr7V7"), true);
+  assert.equal(esDmDeFormulario(TEXTO_CV), false);
+  assert.equal(esDmDeFormulario(TEXTO_DEV), false);
+  assert.equal(esDmDeFormulario(""), false);
+});
+
+test("FORMULARIO apagado: el cron no le contesta a nadie que lo comente, y CV sale como siempre", async () => {
+  const d = armar({ comentarios: [...CS, ...FORMS] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["c1", "c2", "c4"]);
+  assert.ok(d.ig.pedidos.every((p) => p.texto === TEXTO_CV));
+  assert.equal(r.formulario, undefined, "la cuenta de antes, sin nada nuevo");
+  assert.equal(d.base.filas.has("f1"), false);
+});
+
+test("FORMULARIO prendido: cada pedido recibe su texto, y lo que no pide nada no se toca", async () => {
+  const d = armar({ comentarios: [...CS, ...DEVS, ...FORMS] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, formulario: PRENDIDO });
+  const por = Object.fromEntries(d.ig.pedidos.map((p) => [p.id, p.texto]));
+  assert.deepEqual(Object.keys(por).sort(), ["c1", "c2", "c4", "d1", "d2", "f1", "f2"]);
+  assert.equal(por.f1, TEXTO_FORMULARIO);
+  assert.equal(por.f2, TEXTO_FORMULARIO);
+  assert.equal(por.c1, TEXTO_CV);
+  assert.equal(por.d1, TEXTO_DEV);
+  assert.equal(r.enviadas, 7);
+  assert.equal(r.formulario, 2);
+  assert.equal(d.base.filas.get("f1").tipo, "formulario", "queda anotado qué pidió");
+  assert.equal(d.base.filas.get("c1").tipo, "cv");
+  assert.equal(d.base.filas.has("f3"), false, "'qué formulario?' es una pregunta, no un pedido");
+});
+
+test("FORMULARIO: los comentarios de antes de prenderlo no reciben nada", async () => {
+  const d = armar({ comentarios: FORMS });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, formulario: { desde: "2026-10-29T17:55:00Z" } });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["f1"], "f2 es de 17:50, antes de prenderlo");
+  // Una fecha mal escrita no abre la puerta a todos los de la semana: no sale ninguno.
+  const e = armar({ comentarios: [...FORMS, ...CS] });
+  await contestarComentarios({ ig: e.ig, base: e.dobleBase, avisar: e.avisar, ahora: () => ahora, formulario: { desde: "ayer" } });
+  assert.deepEqual(e.ig.pedidos.map((p) => p.id), ["c1", "c2", "c4"], "CV sale igual");
+});
+
+test("FORMULARIO: tener la lista de CV no saca el formulario, y tener el formulario no saca la lista", async () => {
+  // devuno ya tiene el DM de CV (otra vuelta) y devdos ya tiene el del formulario.
+  const comentarios = [
+    FORMS[0],
+    FORMS[1],
+    { id: "c9", text: "CV", timestamp: "2026-10-29T17:00:00+0000", username: "devdos" },
+  ];
+  const d = armar({ comentarios, conDm: ["devuno"], conDmForm: ["devdos"] });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, formulario: PRENDIDO });
+  assert.deepEqual(d.ig.pedidos.map((p) => [p.id, p.texto]), [["f1", TEXTO_FORMULARIO], ["c9", TEXTO_CV]]);
+});
+
+test("FORMULARIO: la misma persona con CV y FORMULARIO en la vuelta recibe los dos; con dos FORMULARIO, uno", async () => {
+  const comentarios = [
+    { id: "y1", text: "CV", timestamp: "2026-10-29T10:00:00+0000", username: "mismapersona" },
+    { id: "y2", text: "FORMULARIO", timestamp: "2026-10-29T12:00:00+0000", username: "MismaPersona" },
+    { id: "y3", text: "formulario", timestamp: "2026-10-29T13:00:00+0000", username: "mismapersona" },
+  ];
+  const d = armar({ comentarios });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, formulario: PRENDIDO });
+  assert.deepEqual(d.ig.pedidos.map((p) => [p.id, p.texto]), [["y3", TEXTO_FORMULARIO], ["y1", TEXTO_CV]]);
+});
+
+test("FORMULARIO: el que ya recibió el formulario no lo recibe otra vez; el DM de CV de antes no lo frena", () => {
+  const t = Date.parse("2026-10-29T17:32:15Z");
+  const m = (texto) => [{ igsid: "x", pedidos: MENSAJES_POR_HILO, mensajes: [{ deLaCuenta: true, creado: new Date("2026-10-20T12:00:00Z"), texto }] }];
+  assert.equal(contestadoDesde(m(TEXTO_FORMULARIO), t, "formulario"), "si", "ya recibió el nuestro");
+  assert.equal(contestadoDesde(m(TEXTO_CV), t, "formulario"), "no", "la lista de CV es otra cosa");
+  assert.equal(contestadoDesde(m(TEXTO_DEV), t, "formulario"), "no");
+  assert.equal(contestadoDesde(m(TEXTO_FORMULARIO), t), "no", "y el formulario no cuenta como el DM de CV");
+  assert.equal(contestadoDesde(m(TEXTO_CV), t), "si", "CV sigue como estaba");
+  // Lo que la cuenta le escribió DESPUÉS del comentario sí frena, como con CV: alguien ya le contestó.
+  const despues = [{ igsid: "x", pedidos: MENSAJES_POR_HILO, mensajes: [{ deLaCuenta: true, creado: new Date("2026-10-29T18:00:00Z"), texto: "hola!" }] }];
+  assert.equal(contestadoDesde(despues, t, "formulario"), "si");
+});
+
+test("FORMULARIO: a quien ya le contestaron desde que comentó no se le manda nada", async () => {
+  const bandeja = [
+    hilo("devuno", "2026-10-29T18:00:20Z", true),     // la cuenta le escribió después del comentario
+    hilo("devdos", "2026-10-29T17:50:00Z", false),    // escribió él y nadie le contestó
+    hilo("otracualquiera", "2026-10-29T06:00:00Z", true),
+  ];
+  const d = armar({ comentarios: FORMS, bandeja });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, formulario: PRENDIDO });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["f2"]);
+  assert.equal(r.ya_tenia, 1);
+});
+
+test("FORMULARIO: si el DM queda en una solicitud sin aceptar, el aviso habla del formulario", async () => {
+  const fallas = { f1: Object.assign(new Error("La página no es propietaria del hilo"), { code: 100, subcode: 2534037 }) };
+  const d = armar({ comentarios: FORMS, fallas });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, formulario: PRENDIDO });
+  assert.equal(r.sin_aceptar, 1);
+  assert.match(d.avisos[0].titulo, /FORMULARIO/);
+  assert.match(d.avisos[0].campos.Hacé, /formulario/);
+  assert.equal(r.enviadas, 1, "el otro no se frena por eso");
+  assert.equal(r.formulario, 1);
+});
+
+test("el cron prende el formulario solo desde dm_config y con la columna tipo en la base", async () => {
+  const fuente = await readFile(new URL("../pages/api/dm/comentarios.js", import.meta.url), "utf8");
+  assert.match(fuente, /ajuste\.formulario\?\.activo === true && conTipos\(\)/);
+  assert.match(fuente, /formulario,\n/);
 });
