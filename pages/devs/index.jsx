@@ -218,7 +218,7 @@ export default function RedDeDevs() {
       return;
     }
     if (!acepto) {
-      setError(en ? "Tick the box to receive emails" : "Te falta tildar que aceptás recibir los mails");
+      setError(en ? "Tick the box to continue" : "Marcá la casilla para continuar");
       document.getElementById("acepto")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -386,9 +386,10 @@ export default function RedDeDevs() {
                 <input id="acepto" type="checkbox" checked={acepto}
                        onChange={(ev) => { setAcepto(ev.target.checked); if (ev.target.checked) setError(""); }} />
                 <span>
-                  {en
-                    ? "I agree to receive emails with jobs, CV and interview tips. I can unsubscribe any time."
-                    : "Acepto recibir mails con búsquedas, tips de CV y entrevistas. Me doy de baja cuando quiera."}
+                  {en ? "I agree to receive emails from OpenGateHub. I can unsubscribe any time. " : "Acepto recibir emails de OpenGateHub. Me puedo dar de baja cuando quiera. "}
+                  <a href="/privacy-policy" target="_blank" rel="noreferrer">
+                    {en ? "Privacy policy" : "Política de privacidad"}
+                  </a>
                 </span>
               </Acepto>
             )}
@@ -508,10 +509,13 @@ const Sacar = styled.button`
   background: none; border: 0; padding: 6px 4px;
   &:hover { color: #b03a2e }
 `;
+// La letra chica de siempre: el tilde de consentimiento con el tamaño y el gris de la Nota,
+// no un bloque aparte. Pedido de Cande (13/11): "el standard que ponen todos".
 const Acepto = styled.label`
-  display: flex; align-items: flex-start; gap: 10px;
-  margin: 22px 0 16px; font-size: 14px; line-height: 1.45; color: #5c4f54; cursor: pointer;
-  input { margin: 2px 0 0; width: 18px; height: 18px; flex: none; accent-color: #7b1e3c; cursor: pointer; }
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: 18px 0 14px; font-size: 13px; line-height: 1.5; color: #8e7e85; cursor: pointer;
+  input { margin: 1px 0 0; width: 15px; height: 15px; flex: none; accent-color: #cc5a50; cursor: pointer; }
+  a { color: #8e7e85; text-decoration: underline; }
 `;
 const Botonera = styled.div` display: flex; gap: 12px; `;
 const Volver = styled.button`
