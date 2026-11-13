@@ -386,7 +386,7 @@ export default function RedDeDevs() {
                 <input id="acepto" type="checkbox" checked={acepto}
                        onChange={(ev) => { setAcepto(ev.target.checked); if (ev.target.checked) setError(""); }} />
                 <span>
-                  {en ? "I agree to receive emails from OpenGateHub. I can unsubscribe any time. " : "Acepto recibir emails de OpenGateHub. Me puedo dar de baja cuando quiera. "}
+                  {en ? "I agree to receive emails from OpenGateHub. " : "Acepto recibir emails de OpenGateHub. "}
                   <a href="/privacy-policy" target="_blank" rel="noreferrer">
                     {en ? "Privacy policy" : "Política de privacidad"}
                   </a>
