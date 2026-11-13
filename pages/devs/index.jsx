@@ -159,6 +159,9 @@ export default function RedDeDevs() {
   const { campos: camposTrampa, trampa } = useTrampa();
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
+  // El consentimiento de mails. Sin esto no sale el formulario: el CV se pide por mail
+  // despues, asi que entrar a la lista es entrar a la casilla y tiene que decirlo ella.
+  const [acepto, setAcepto] = useState(false);
 
   const set = (id) => (e) => setF((p) => ({ ...p, [id]: e.target.value }));
   const pick = (id, v) => () => setF((p) => ({ ...p, [id]: p[id] === v ? "" : v }));
@@ -212,6 +215,11 @@ export default function RedDeDevs() {
     const falta = faltaEnPaso(paso);
     if (falta) {
       setError(en ? `Missing: ${tx(falta.label)}` : `Te falta: ${tx(falta.label)}`);
+      return;
+    }
+    if (!acepto) {
+      setError(en ? "Tick the box to receive emails" : "Te falta tildar que aceptás recibir los mails");
+      document.getElementById("acepto")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     setError("");
@@ -373,6 +381,18 @@ export default function RedDeDevs() {
               ))}
             </Bloque>
 
+            {ultimo && (
+              <Acepto htmlFor="acepto">
+                <input id="acepto" type="checkbox" checked={acepto}
+                       onChange={(ev) => { setAcepto(ev.target.checked); if (ev.target.checked) setError(""); }} />
+                <span>
+                  {en
+                    ? "I agree to receive emails with jobs, CV and interview tips. I can unsubscribe any time."
+                    : "Acepto recibir mails con búsquedas, tips de CV y entrevistas. Me doy de baja cuando quiera."}
+                </span>
+              </Acepto>
+            )}
+
             {error && <Error role="alert">{error}</Error>}
 
             <Botonera>
@@ -487,6 +507,11 @@ const Sacar = styled.button`
   font: inherit; font-size: 15px; line-height: 1; cursor: pointer; color: #a99ba1;
   background: none; border: 0; padding: 6px 4px;
   &:hover { color: #b03a2e }
+`;
+const Acepto = styled.label`
+  display: flex; align-items: flex-start; gap: 10px;
+  margin: 22px 0 16px; font-size: 14px; line-height: 1.45; color: #5c4f54; cursor: pointer;
+  input { margin: 2px 0 0; width: 18px; height: 18px; flex: none; accent-color: #7b1e3c; cursor: pointer; }
 `;
 const Botonera = styled.div` display: flex; gap: 12px; `;
 const Volver = styled.button`
