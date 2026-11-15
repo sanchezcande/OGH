@@ -155,8 +155,16 @@ export default function Gracias() {
             <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
           </VideoMarco>
 
-          {termino && (
+          {/* 15/11/2026: el boton ya NO espera al video. Estaba atado a botonVisible() (110 s o la
+              mitad), y de 2.940 personas que entraron a la pagina en 30 dias solo 217 le dieron play:
+              el 93% no tenia donde comprar aunque quisiera. El video queda igual para el que lo quiera
+              mirar, pero el que ya decidio tiene que poder pagar apenas entra. `termino` se sigue
+              calculando porque lo usa la prueba A/B y el evento video_fin. */}
+          {true && (
             <Cierre>
+              <Precio>
+                <strong>USD 27</strong> · 11 módulos y 2 PDFs · o en 2 pagos de 13,50
+              </Precio>
               <Comprar
                 href={GUMROAD || undefined}
                 target={GUMROAD ? "_blank" : undefined}
@@ -327,6 +335,10 @@ const Cierre = styled.div`
   animation: entrar .5s cubic-bezier(.32,.72,0,1) both;
   @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { animation: none; }
+`;
+const Precio = styled.p`
+  margin: 0 0 16px; font-size: 15px; color: #625b5e;
+  strong { color: #171416; font-size: 17px; }
 `;
 const PesosBoton = styled.a`
   display: block; margin: 16px auto 0; background: none; border: 0; cursor: pointer;
