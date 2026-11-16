@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import styled from "styled-components";
-import { evento } from "../../lib/embudo";
+import { evento, conIdentidad } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 import { CLAVE_BOTON_VISTO, botonVisible } from "../../lib/botonCompra";
 import {
@@ -172,7 +172,7 @@ export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
                 target={enPesos ? undefined : "_blank"}
                 rel={enPesos ? undefined : "noopener noreferrer"}
                 $listo
-                onClick={() => evento(WISTIA_B ? faseDePago(pais) + "_" + ver : faseDePago(pais), charla)}
+                onClick={(e) => { if (enPesos) e.currentTarget.href = conIdentidad(destino, charla); evento(WISTIA_B ? faseDePago(pais) + "_" + ver : faseDePago(pais), charla); }}
               >
                 🔥 SÍ, LO QUIERO YA!
               </Comprar>

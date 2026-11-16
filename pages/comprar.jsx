@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { evento } from "../lib/embudo";
+import { evento, conIdentidad } from "../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana, sinIg } from "../lib/dm/linkFormulario";
 import { PAISES, destinoDePago, faseDePago, nombreDePais, pagaEnPesos, paisDeCabecera, paisDeTextoLibre } from "../lib/paisCompra";
 import { paisDelLead } from "../lib/db";
@@ -98,7 +98,7 @@ export default function Comprar({ paisDetectado, delFormulario, precioArs, preci
                    el pago en MercadoPago. */
                 target={enPesos ? undefined : "_blank"}
                 rel={enPesos ? undefined : "noopener noreferrer"}
-                onClick={() => evento(faseDePago(pais), charla)}
+                onClick={(e) => { if (enPesos) e.currentTarget.href = conIdentidad(destino, charla); evento(faseDePago(pais), charla); }}
               >
                 Quiero entrar
               </Boton>

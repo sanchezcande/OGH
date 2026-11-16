@@ -19,7 +19,7 @@
 //
 // Si MercadoPago no contesta, NO se muestra un error: se manda al checkout en dólares de siempre.
 // Alguien que ya decidió comprar no puede quedarse sin dónde pagar porque se cayó una API.
-import { guardarEvento, hayBase } from "../../lib/db";
+import { guardarEvento, hayBase, quienPaga } from "../../lib/db";
 import { paisDeclarado, referenciaDePesos } from "../../lib/paisCompra";
 import { avisar } from "../../lib/notificar";
 
@@ -27,6 +27,19 @@ const SITIO = "https://www.opengatehub.com";
 const PRECIO = Number(process.env.MP_PRECIO_ARS || 39750);
 const CODIGO_URL = process.env.MP_CODIGO_URL || "https://get.opengatehub.com/l/acelerador-de-carrera/PARAVOS";
 const DOLARES = "https://get.opengatehub.com/l/acelerador-de-carrera";
+
+// Quién apretó, para que el aviso de falla no sea anónimo: el sid y la charla de Instagram viajan en
+// el link (lib/embudo.js, conIdentidad). Sin ellos, al menos el país que ve Vercel y de dónde vino.
+async function quienFue(req) {
+  const q = await quienPaga({ sid: req.query?.sid, ig: req.query?.ig });
+  return {
+    Quién: q.nombre, Email: q.email, Instagram: q.instagram,
+    "País que declaró": q.pais,
+    "País (IP)": req.headers["x-vercel-ip-country"],
+    "Vino de": req.headers.referer,
+    Sid: req.query?.sid,
+  };
+}
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -36,6 +49,7 @@ export default async function handler(req, res) {
     try {
       await avisar("Alguien quiso pagar en pesos y no pudo", {
         "Qué pasó": "falta MP_ACCESS_TOKEN en Vercel",
+        ...(await quienFue(req)),
         "Mientras tanto": "lo mandé al checkout en dólares",
       }, { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
     } catch (_) {}
@@ -72,6 +86,7 @@ export default async function handler(req, res) {
       try {
         await avisar("Alguien quiso pagar en pesos y no pudo", {
           "Qué pasó": `MercadoPago contestó ${r.status}`,
+          ...(await quienFue(req)),
           Detalle: (d.message || d.error || "sin detalle").toString().slice(0, 200),
           "Mientras tanto": "lo mandé al checkout en dólares",
         }, { token: process.env.TELEGRAM_BOT_VENTAS, chat: process.env.TELEGRAM_CHAT_VENTAS });
