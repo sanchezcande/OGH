@@ -133,6 +133,31 @@ export default function Gracias() {
     return () => clearInterval(reloj);
   }, []);
 
+  const compra = (
+        <Cierre>
+          <Precio>
+            <strong>USD 27</strong> · 11 módulos y 2 PDFs · o en 2 pagos de 13,50
+          </Precio>
+          <Comprar
+            href={GUMROAD || undefined}
+            target={GUMROAD ? "_blank" : undefined}
+            rel={GUMROAD ? "noopener noreferrer" : undefined}
+            $listo={!!GUMROAD}
+            onClick={e => { evento(WISTIA_B ? "click_gumroad_" + ver : "click_gumroad", charla); if (!GUMROAD) e.preventDefault(); }}
+          >
+            🔥 SÍ, LO QUIERO YA!
+          </Comprar>
+          {MERCADOPAGO && (
+            <PesosBoton
+              href={MERCADOPAGO}
+              onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp", charla)}
+            >
+              Si sos de Argentina, apretá acá
+            </PesosBoton>
+          )}
+        </Cierre>
+  );
+
   return (
     <>
       <Head>
@@ -151,31 +176,20 @@ export default function Gracias() {
               "para el funnel no suma, que quede chiquito"). */}
           <Chico>Ah, y mandame tu CV respondiendo el mail que te llegó.</Chico>
 
+          {compra}
+
           <VideoMarco>
             <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
           </VideoMarco>
 
-          {termino && (
-            <Cierre>
-              <Comprar
-                href={GUMROAD || undefined}
-                target={GUMROAD ? "_blank" : undefined}
-                rel={GUMROAD ? "noopener noreferrer" : undefined}
-                $listo={!!GUMROAD}
-                onClick={e => { evento(WISTIA_B ? "click_gumroad_" + ver : "click_gumroad", charla); if (!GUMROAD) e.preventDefault(); }}
-              >
-                🔥 SÍ, LO QUIERO YA!
-              </Comprar>
-              {MERCADOPAGO && (
-                <PesosBoton
-                  href={MERCADOPAGO}
-                  onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp", charla)}
-                >
-                  Si sos de Argentina, apretá acá
-                </PesosBoton>
-              )}
-            </Cierre>
-          )}
+          {/* 15/11/2026: los botones van ARRIBA del video y tambien abajo. Antes aparecian
+              recien a los 110 s (botonVisible), asi que cerca de la mitad de los que entraban no
+              llegaba a verlos, y los clicks por visita cayeron de 30 y 46% a 9 y 11% cuando el
+              video se alargo a 9:39. Cande, 15/11: "pone los botones de compra al principio". El
+              que ya decidio compra sin mirar nada, y el que duda baja, mira el video y se encuentra
+              el mismo bloque al final. `termino` se sigue calculando porque lo usan la prueba A/B y
+              el evento video_fin. */}
+          {compra}
 
           <Testimonios aria-labelledby="testimonios-titulo">
             <TestimoniosHeader>
@@ -323,10 +337,16 @@ const Nombre = styled.p`margin: 0; color: #211c1f; font-size: 13px; line-height:
 const Lugar = styled.p`margin: 3px 0 0; color: #756b6f; font-size: 11px; line-height: 1.35;`;
 
 const Cierre = styled.div`
-  margin-top: 30px;
+  /* El bloque va dos veces (arriba y abajo del video), asi que lleva aire de los dos lados:
+     sin el de abajo, el "Si sos de Argentina" del de arriba queda pegado al marco del video. */
+  margin: 30px 0 28px;
   animation: entrar .5s cubic-bezier(.32,.72,0,1) both;
   @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { animation: none; }
+`;
+const Precio = styled.p`
+  margin: 0 0 16px; font-size: 15px; color: #625b5e;
+  strong { color: #171416; font-size: 17px; }
 `;
 const PesosBoton = styled.a`
   display: block; margin: 16px auto 0; background: none; border: 0; cursor: pointer;

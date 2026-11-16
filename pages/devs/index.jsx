@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { evento } from "../../lib/embudo";
+import { evento, sid } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana, sinIg } from "../../lib/dm/linkFormulario";
 import { normalizarOrigen } from "../../lib/origenForm";
 import { useTrampa } from "../../lib/trampaForm";
@@ -159,6 +159,9 @@ export default function RedDeDevs() {
   const { campos: camposTrampa, trampa } = useTrampa();
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
+  // El consentimiento de mails. Sin esto no sale el formulario: el CV se pide por mail
+  // despues, asi que entrar a la lista es entrar a la casilla y tiene que decirlo ella.
+  const [acepto, setAcepto] = useState(false);
 
   const set = (id) => (e) => setF((p) => ({ ...p, [id]: e.target.value }));
   const pick = (id, v) => () => setF((p) => ({ ...p, [id]: p[id] === v ? "" : v }));
@@ -214,6 +217,11 @@ export default function RedDeDevs() {
       setError(en ? `Missing: ${tx(falta.label)}` : `Te falta: ${tx(falta.label)}`);
       return;
     }
+    if (!acepto) {
+      setError(en ? "Tick the box to continue" : "Marcá la casilla para continuar");
+      document.getElementById("acepto")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     setError("");
     setEnviando(true);
     try {
@@ -221,7 +229,9 @@ export default function RedDeDevs() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Sin ?ig= el pedido es el de siempre. La firma va solo con su id.
-        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}), ...camposTrampa() }),
+        // El sid va con la ficha para poder atar después los eventos del embudo (tocó pagar y no
+        // pagó) a una persona con mail y WhatsApp: funnel_eventos solo guarda el sid (lib/db.js).
+        body: JSON.stringify({ ...(ig ? { ...f, ig, firma } : f), ...(puerta ? { puerta } : {}), ...(sid() ? { sid: sid() } : {}), ...camposTrampa() }),
       });
       if (!r.ok) throw new Error((await r.json()).error || (en ? "Something failed" : "Falló el envío"));
       evento("enviado");
@@ -373,6 +383,19 @@ export default function RedDeDevs() {
               ))}
             </Bloque>
 
+            {ultimo && (
+              <Acepto htmlFor="acepto">
+                <input id="acepto" type="checkbox" checked={acepto}
+                       onChange={(ev) => { setAcepto(ev.target.checked); if (ev.target.checked) setError(""); }} />
+                <span>
+                  {en ? "I agree to receive emails from OpenGateHub. " : "Acepto recibir emails de OpenGateHub. "}
+                  <a href="/privacy-policy" target="_blank" rel="noreferrer">
+                    {en ? "Privacy policy" : "Política de privacidad"}
+                  </a>
+                </span>
+              </Acepto>
+            )}
+
             {error && <Error role="alert">{error}</Error>}
 
             <Botonera>
@@ -487,6 +510,14 @@ const Sacar = styled.button`
   font: inherit; font-size: 15px; line-height: 1; cursor: pointer; color: #a99ba1;
   background: none; border: 0; padding: 6px 4px;
   &:hover { color: #b03a2e }
+`;
+// La letra chica de siempre: el tilde de consentimiento con el tamaño y el gris de la Nota,
+// no un bloque aparte. Pedido de Cande (13/11): "el standard que ponen todos".
+const Acepto = styled.label`
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: 18px 0 14px; font-size: 13px; line-height: 1.5; color: #8e7e85; cursor: pointer;
+  input { margin: 1px 0 0; width: 15px; height: 15px; flex: none; accent-color: #cc5a50; cursor: pointer; }
+  a { color: #8e7e85; text-decoration: underline; }
 `;
 const Botonera = styled.div` display: flex; gap: 12px; `;
 const Volver = styled.button`
