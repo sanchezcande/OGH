@@ -4,6 +4,13 @@ import styled from "styled-components";
 import { evento } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 import { CLAVE_BOTON_VISTO, botonVisible } from "../../lib/botonCompra";
+import {
+  checkoutDirecto, destinoDePago, faseDePago, nombreDePais, pagaEnPesos,
+  paisDeCabecera, paisDeTextoLibre,
+} from "../../lib/paisCompra";
+import { paisDelLead } from "../../lib/db";
+import { firmaValida } from "../../lib/dm/firmaIg";
+import { firmaDeLink, idDeLink } from "../../lib/dm/linkFormulario";
 
 // Página post-formulario (rediseño Cande sept 2026):
 // "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
@@ -42,7 +49,7 @@ function versionDelVisitante() {
 // aparece nada (mejor eso que un botón que no lleva a ningún lado).
 // Mientras no esté el link de Gumroad el botón igual aparece, pero no navega:
 // sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
-const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera";
+const GUMROAD = checkoutDirecto(process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera");
 // Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
 // que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, apretá
 // acá" (Cande, 19/10: "no pagá en pesos"), para todos (así lo ven también los que entran por un link que
@@ -55,7 +62,7 @@ const GUMROAD = process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.
 // El precio y la garantía los muestra el checkout, no hace falta repetirlos en un cartel.
 const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "/api/pagar-pesos";
 
-export default function Gracias() {
+export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
   const [termino, setTermino] = useState(false);
   // El sorteo pasa en el navegador, no en el render del servidor: si no, Next devuelve la misma
   // versión cacheada a todo el mundo y la prueba no reparte.
@@ -64,6 +71,11 @@ export default function Gracias() {
   // video entero y con el clic en pagar, así el agente sabe qué pasó acá (lib/dm/pagina.js, 22/10).
   const [charla, setCharla] = useState(null);
   const WISTIA_ID = ver === "b" ? WISTIA_B : WISTIA_A;   // lo usa el <wistia-player> de abajo
+  // El pais lo resuelve el servidor (lo que la persona puso en el formulario, o la cabecera de
+  // Vercel como plan B). No se pregunta de nuevo: a esta pagina se llega habiendo contestado.
+  const pais = paisDetectado;
+  const PRECIO_PESOS = "$" + Number(precioArs).toLocaleString("es-AR") + " ARS";
+  const PRECIO_DOLARES = "USD " + precioUsd;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -133,27 +145,50 @@ export default function Gracias() {
     return () => clearInterval(reloj);
   }, []);
 
+  // El botón lleva al checkout del país de la persona, no al de dólares para todos.
+  //
+  // 16/11/2026, sobre funnel_eventos: 181 personas tocaron comprar en esta página y pagaron 22. De
+  // los 41 argentinos que tocaron comprar, NINGUNO pagó en dólares (medición del 18/10), y son el
+  // 46% de los que llenan el formulario (339 de 731). El checkout de pesos convierte ~1 de 4 y el
+  // de dólares ~1 de 8. El PR 206 construyó la puerta que elige por país (/comprar), pero esta
+  // página, que es donde pasan TODOS los clics, seguía mandando a Gumroad en dólares con el de
+  // pesos como un renglón chico abajo: el argentino apretaba el botón grande y chocaba con una
+  // tarjeta que no le funciona.
+  const enPesos = pagaEnPesos(pais);
+  const destino = destinoDePago(pais, { pesos: MERCADOPAGO, gumroad: GUMROAD });
   const compra = (
         <Cierre>
           <Precio>
-            <strong>USD 27</strong> · 11 módulos y 2 PDFs · o en 2 pagos de 13,50
+            <strong>{enPesos ? PRECIO_PESOS : PRECIO_DOLARES}</strong>
+            {" · 11 módulos y 2 PDFs"}
+            {enPesos ? " · en pesos, con MercadoPago" : " · o en 2 pagos de 13,50"}
           </Precio>
-          <Comprar
-            href={GUMROAD || undefined}
-            target={GUMROAD ? "_blank" : undefined}
-            rel={GUMROAD ? "noopener noreferrer" : undefined}
-            $listo={!!GUMROAD}
-            onClick={e => { evento(WISTIA_B ? "click_gumroad_" + ver : "click_gumroad", charla); if (!GUMROAD) e.preventDefault(); }}
-          >
-            🔥 SÍ, LO QUIERO YA!
-          </Comprar>
-          {MERCADOPAGO && (
-            <PesosBoton
-              href={MERCADOPAGO}
-              onClick={() => evento(WISTIA_B ? "click_mp_" + ver : "click_mp", charla)}
-            >
-              Si sos de Argentina, apretá acá
-            </PesosBoton>
+          {destino ? (
+            <>
+              <Comprar
+                href={destino}
+                /* El de pesos lo arma nuestra propia API y redirige: va en la misma pestaña, si no
+                   la persona queda mirando una pestaña en blanco mientras se crea el pago. */
+                target={enPesos ? undefined : "_blank"}
+                rel={enPesos ? undefined : "noopener noreferrer"}
+                $listo
+                onClick={() => evento(WISTIA_B ? faseDePago(pais) + "_" + ver : faseDePago(pais), charla)}
+              >
+                🔥 SÍ, LO QUIERO YA!
+              </Comprar>
+              <PesosBoton href="/comprar">
+                {enPesos ? "No sos de Argentina? Elegí tu país" : "Sos de Argentina? Pagá en pesos"}
+              </PesosBoton>
+            </>
+          ) : (
+            /* Desde donde Gumroad no cobra (Cuba) no hay botón: un checkout que rechaza la tarjeta
+               sin decir por qué es peor que una explicación. Misma salida que /comprar. */
+            <Pendiente>
+              Desde {nombreDePais(pais)} el checkout no cobra.{" "}
+              <a href="https://ig.me/m/candelaria.sanchezg" target="_blank" rel="noopener noreferrer">
+                Escribime por Instagram y lo vemos
+              </a>
+            </Pendiente>
           )}
         </Cierre>
   );
@@ -373,3 +408,25 @@ const Comprar = styled.a`
   &:active { transform: translateY(0); }
   &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 `;
+
+// El pais de quien mira, para que el boton lleve al checkout donde puede pagar. Mismo criterio que
+// /comprar (lib/paisCompra.js): primero lo que ella misma contesto en el formulario, y la IP solo
+// como plan B, porque miente seguido (VPN, viajando, vivir afuera).
+export async function getServerSideProps({ req, query }) {
+  let delFormulario = null;
+  try {
+    const ig = idDeLink(query?.ig);
+    if (ig && firmaValida(ig, firmaDeLink(query?.f))) {
+      delFormulario = paisDeTextoLibre(await paisDelLead(ig));
+    }
+  } catch (e) {
+    console.error("gracias: no pude ver el pais del formulario:", e.message);
+  }
+  return {
+    props: {
+      paisDetectado: delFormulario || paisDeCabecera(req.headers["x-vercel-ip-country"]),
+      precioArs: Number(process.env.MP_PRECIO_ARS || 39750),
+      precioUsd: Number(process.env.PRECIO_USD || 27),
+    },
+  };
+}

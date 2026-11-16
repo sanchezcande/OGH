@@ -158,3 +158,30 @@ test("el pais sale del texto libre del formulario, con UNA sola lista en el repo
   assert.match(pagina, /import \{ nombreDePais, paisDeTextoLibre \} from "\.\.\/paisCompra"/);
   assert.equal(/\["Argentina", \//.test(pagina), false, "quedó la copia vieja de la lista de países");
 });
+
+/* ---------- el checkout directo y la puerta en /devs/gracias ---------- */
+
+test("checkoutDirecto manda al checkout de Gumroad, no a la segunda página de venta", async () => {
+  const { checkoutDirecto } = await import("../lib/paisCompra.js");
+  // Verificado el 16/11: /l/acelerador-de-carrera?wanted=true redirige a gumroad.com/checkout.
+  assert.equal(checkoutDirecto("https://get.opengatehub.com/l/x"), "https://get.opengatehub.com/l/x?wanted=true");
+  assert.equal(checkoutDirecto("https://x.com/l/y?a=1"), "https://x.com/l/y?a=1&wanted=true");
+  assert.equal(checkoutDirecto("https://x.com/l/y?wanted=true"), "https://x.com/l/y?wanted=true", "no lo repite");
+  assert.equal(checkoutDirecto(""), "", "sin link no inventa uno");
+  assert.equal(checkoutDirecto(null), "");
+});
+
+test("/devs/gracias lleva al checkout del país de la persona, que es donde pasan los clics", async () => {
+  const p = readFileSync(new URL("../pages/devs/gracias.jsx", import.meta.url), "utf8");
+  // El botón no puede volver a apuntar a Gumroad para todos: de 41 argentinos que tocaron comprar
+  // ninguno pagó en dólares (18/10) y son el 46% de los que llenan el formulario.
+  assert.match(p, /destinoDePago\(pais, \{ pesos: MERCADOPAGO, gumroad: GUMROAD \}\)/);
+  assert.match(p, /checkoutDirecto\(process\.env\.NEXT_PUBLIC_DEVS_COMPRA/);
+  assert.match(p, /href=\{destino\}/);
+  assert.equal(/href=\{GUMROAD/.test(p), false, "el botón no va derecho a dólares");
+  // El país lo resuelve el servidor con el mismo criterio que /comprar: el formulario primero.
+  assert.match(p, /export async function getServerSideProps/);
+  assert.match(p, /delFormulario \|\| paisDeCabecera\(req\.headers\["x-vercel-ip-country"\]\)/);
+  // Desde donde Gumroad no cobra no hay botón, hay explicación.
+  assert.match(p, /nombreDePais\(pais\)\} el checkout no cobra/);
+});
