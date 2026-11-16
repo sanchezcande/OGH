@@ -17,10 +17,20 @@
 import { sql } from "@vercel/postgres";
 import { camposCompra, ficha } from "../../lib/avisoCompra";
 import { asegurarTablaCompras, esCodigoDeCuba, esCodigoDePesos } from "../../lib/compras";
+import { paisDeclarado } from "../../lib/paisCompra";
 import { avisar } from "../../lib/notificar";
 import { PAGO_EN_PESOS, correspondeOferta, linkOferta, mensajeOferta } from "../../lib/ofertaWhatsapp";
 
 const limpiar = (v, max = 300) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+
+/** El país que la persona eligió en /comprar (10/11). Gumroad devuelve en el ping los parámetros que
+ *  llevaba el link del producto, dentro de `url_params`: form-encoded llegan como la clave literal
+ *  `url_params[pais]`, y si algún parser los anida, como un objeto. Se miran las dos formas.
+ *
+ *  Le gana al país de la IP porque es el que la persona declaró estando parada en su país, y la IP
+ *  miente seguido (VPN, un argentino viviendo afuera, que es justo por lo que el desplegable existe).
+ *  Si no vino ninguno, queda el de la IP, como antes. */
+const paisElegido = (b) => paisDeclarado(b?.["url_params[pais]"] ?? b?.url_params?.pais);
 
 // Los códigos de 100% que NO son una venta nueva: son alguien entrando a la plataforma después
 // de haber pagado por otro lado, o un acceso que Cande regaló.
@@ -145,7 +155,7 @@ export default async function handler(req, res) {
     plata: plata(b.price, b.currency) + (b.recurrence ? ` (${limpiar(b.recurrence, 20)})` : ""),
     producto, ficha: f,
     deDonde: f ? null : limpiar(b.referrer, 120) || null,
-    pais: limpiar(b.ip_country, 60) || null,
+    pais: paisElegido(b) || limpiar(b.ip_country, 60) || null,
     extra: {
       ...(porQue ? { "Ojo": "no es una venta nueva, es la misma persona entrando a la plataforma" } : {}),
       ...oferta,
@@ -166,7 +176,7 @@ export default async function handler(req, res) {
         moneda: (limpiar(b.currency, 10) || "usd").toLowerCase(),
         recurrencia: limpiar(b.recurrence, 20) || null, baja,
         origen: f?.origen || null, como_llego: f?.como_llegaste || null,
-        pais: f?.pais || limpiar(b.ip_country, 60) || null,
+        pais: paisElegido(b) || f?.pais || limpiar(b.ip_country, 60) || null,
         codigo: codigo ? codigo.toUpperCase() : null,
         ventaId,
       });

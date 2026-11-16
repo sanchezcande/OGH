@@ -20,6 +20,7 @@
 // Si MercadoPago no contesta, NO se muestra un error: se manda al checkout en dólares de siempre.
 // Alguien que ya decidió comprar no puede quedarse sin dónde pagar porque se cayó una API.
 import { guardarEvento, hayBase } from "../../lib/db";
+import { paisDeclarado, referenciaDePesos } from "../../lib/paisCompra";
 import { avisar } from "../../lib/notificar";
 
 const SITIO = "https://www.opengatehub.com";
@@ -58,7 +59,10 @@ export default async function handler(req, res) {
         back_urls: { success: CODIGO_URL, pending: `${SITIO}/`, failure: `${SITIO}/` },
         auto_return: "approved",
         statement_descriptor: "OPENGATEHUB",
-        external_reference: `curso-pesos-${Date.now()}`,
+        // El país que la persona eligió en /comprar viaja acá adentro: es lo único que MercadoPago
+        // nos devuelve en el webhook, y es lo que termina en compras.pais (10/11). Sin ?pais= sale
+        // como salía antes.
+        external_reference: referenciaDePesos(paisDeclarado(req.query?.pais)),
       }),
     });
     const d = await r.json().catch(() => ({}));
