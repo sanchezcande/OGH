@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { evento } from "../../lib/embudo";
+import { evento, sid } from "../../lib/embudo";
 import { useTrampa } from "../../lib/trampaForm";
 
 // Versión en inglés de /devs (mismo form, mismos pasos, misma API): la
@@ -164,7 +164,7 @@ export default function ApplyEn() {
       const r = await fetch("/api/devs-red", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...f, ...camposTrampa() }),
+        body: JSON.stringify({ ...f, ...(sid() ? { sid: sid() } : {}), ...camposTrampa() }),
       });
       if (!r.ok) throw new Error((await r.json()).error || "Something failed");
       evento("enviado_en");
