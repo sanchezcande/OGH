@@ -1277,7 +1277,7 @@ test("lo que anota el controlador nunca cuenta como respuesta: ni para la red, n
     assert.ok(i > -1, `falta ${nombre}`);
     return src.slice(i, src.indexOf("\n}\n", i));
   };
-  assert.match(cuerpo("corridasEnUnDia"), /accion NOT IN \('codigo_mp', 'nota', 'control'\)/);
+  assert.match(cuerpo("corridasEnUnDia"), /accion NOT IN \('codigo_mp', 'nota', 'control', 'aviso'\)/);
   for (const n of ["enviadosEnLaCharla", "textosDeLaCuenta", "salidaSinLlegar", "salidasDesde"]) assert.match(cuerpo(n), /accion <> 'control'/, n);
   assert.equal((cuerpo("sinContestar").match(/accion <> 'control'/g) || []).length, 2, "ni quizás salió ni una respuesta esperando retiro");
   assert.match(cuerpo("reclamarEspera"), /accion <> 'control'/);
