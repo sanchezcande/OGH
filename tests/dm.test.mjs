@@ -59,6 +59,19 @@ const salida = (mensajes, extra = {}) => ({
   accion: "responder", mensajes, estado: estadoDev, aviso_para_cande: "", seguimiento_en_horas: null, motivo: "", ...extra,
 });
 const como = (quien) => ({ estado: { ...estadoDev, quien } });
+/**
+ * Un aviso que ya no suena (la política de avisos, lib/dm/avisos.js, 17/11: "este chat se llena y al final no leo nada"):
+ * por Telegram no salió nada y quedó la nota con la que sale en el resumen de las notas, que dice qué pasaba y por qué no
+ * se lo pasé al momento. Devuelve la nota.
+ */
+function soloNota(m, dice = null) {
+  assert.deepEqual(m.avisos.map((a) => a.titulo), [], "esto ya no suena en Telegram: va al resumen");
+  const callados = m.salidas.filter((x) => x.accion === "aviso" && x.estado === "callado");
+  assert.equal(callados.length, 1, "quedó una sola nota para el resumen");
+  assert.match(callados[0].aviso, /^NOTA: no te lo pasé al momento \(/);
+  if (dice) assert.match(callados[0].aviso, dice);
+  return callados[0].aviso;
+}
 const frena = (r, que) => assert.equal(r.ok, false, `tenía que frenar: ${que}`);
 const pasa = (r, que) => assert.deepEqual(r, { ok: true }, `tenía que pasar: ${que}`);
 
@@ -381,6 +394,9 @@ function armar({
   prompt = "PROMPT {LINK_DE_PAGO}", conAviso = true, responde, mandar, avisoSale = true, pausaManyChat = true,
   ahora = AHORA, alEsperar, sinContacto = false, altas = false, topeAltas = 25, contextoAlta = "", altaAjena = false,
   hayManyChat = true, instagram = null, avisarCon = null, codigoGratis = null, campoManyChat = null,
+  // Lo que la base sabía de la persona antes de este turno: de fábrica, un dev que dijo que busca trabajo (es lo que
+  // son casi todas estas charlas). Lo mira la política de avisos (lib/dm/avisos.js) para saber si puede ser clienta.
+  estadoPrevio = { quien: "dev", busca: "si" },
 } = {}) {
   const m = {
     ajustes: {
@@ -389,7 +405,7 @@ function armar({
     },
     contacto: {
       id: "77", nombre: "Lead de prueba", dueno, toques: 0, proximo_toque: null, respondido_hasta: 0, contexto: null,
-      estado: {}, ultimo_lead: new Date(ahora - ultimoLeadHace * HORA),
+      estado: estadoPrevio, ultimo_lead: new Date(ahora - ultimoLeadHace * HORA),
     },
     mensajes: [...(conAviso ? [{ id: 1, quien: "agente", texto: AVISO }] : []), { id: 2, quien: "lead", texto: "mensaje de prueba" }],
     disparo: 2, tomado: null, proximo: undefined, altasHoy: 0,
@@ -427,7 +443,9 @@ function armar({
       if (m.fallaHistorial) throw new Error("base caída al leer la charla");
       return m.mensajes.slice(-tope);
     },
-    corridasEnUnDia: async () => m.salidas.filter((s) => !["aviso_fallido", "error"].includes(s.estado)).length,
+    corridasEnUnDia: async () => m.salidas.filter(
+      (s) => !["aviso_fallido", "error"].includes(s.estado) && !["codigo_mp", "nota", "control", "aviso"].includes(s.accion),
+    ).length,
     tomar: async (id, marca, { cualquierDueno = false } = {}) => {
       if (m.tomado || (m.contacto.dueno !== "agente" && !cualquierDueno)) return null;
       m.tomado = marca;
@@ -437,6 +455,13 @@ function armar({
     descartarPendientes: async () => { m.descartados = (m.descartados || 0) + 1; },
     ponerDueno: async (id, d) => { m.contacto.dueno = d; m.contacto.proximo_toque = null; },
     guardarSalida: async (s) => { m.salidas.push({ ...s }); return m.salidas.length; },
+    // Los avisos del modelo que ya salieron, como la consulta de verdad (base.avisosDeLaCharla): el agente no manda dos
+    // veces el mismo aviso de la misma charla (lib/dm/avisos.js).
+    avisosDeLaCharla: async () => m.salidas
+      .map((x, i) => ({ id: i + 1, aviso: x.aviso, estado: x.estado }))
+      .filter((x) => x.aviso && !["frenada", "descartada", "error", "aviso_fallido"].includes(x.estado))
+      .reverse(),
+    perfilDeLaRed: async () => m.perfilDeLaRed ?? null,
     marcarSalida: async (idSalida, estado, detalle) => { Object.assign(m.salidas[idSalida - 1], { estado, detalle }); },
     anotar: async (id, quien, texto) => {
       if (m.fallaAnotar) throw new Error("base caída al anotar");
@@ -652,8 +677,7 @@ test("si Cande escribió en la charla mientras el agente no podía, el reintento
   assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "pasada a Cande");
   assert.equal(m.pedidos.length + m.enviados.length, 0);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos.length, 1);
-  assert.match(m.avisos[0].campos["Lo último que dijo"], /mensaje de prueba/);
+  soloNota(m, /mensaje de prueba/);
 });
 
 test("un mensaje del agente después del mensaje sin atender no lo da por contestado (el orden de los ids no dice eso)", async () => {
@@ -829,14 +853,15 @@ test("la espera: si el modelo falla para todas (la Mac se fue, o sin uso) no arr
   assert.deepEqual([tira.llamados, registrados], [["1", "2", "3"], ["2"]]);
 });
 
-test("cualquier otra falla termina igual: sin prompt cargado, la charla pasa a Cande con aviso", async () => {
+test("cualquier otra falla termina igual: sin prompt cargado, la charla pasa a Cande y la falla va al resumen", async () => {
   const { agente, m } = armar({ prompt: "" });
   const r = await agente.procesar("77", m.disparo);
   assert.equal(r.hecho, "error");
   assert.match(r.error, /no hay prompt/);
   assert.equal(m.pedidos.length + m.enviados.length, 0);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos.length, 1);
+  // 17/11: que el agente no pudiera seguir no suena por sí solo. La charla igual pasa a ella, y la nota lo dice.
+  soloNota(m, /no contestó nada/);
   assert.equal(m.tomado, null);
 });
 
@@ -846,7 +871,7 @@ test("si ManyChat no manda, la charla pasa a Cande con el código del error", as
   assert.equal(r.hecho, "error al mandar");
   assert.equal(m.contacto.dueno, "cande");
   assert.equal(m.salidas[0].estado, "error");
-  assert.match(m.avisos[0].campos.Motivo, /3011/);
+  soloNota(m, /No pude mandar/);
   assert.equal(m.mensajes.filter((x) => x.quien === "agente").length, 1); // solo el aviso que ya estaba
 });
 
@@ -857,7 +882,7 @@ test("si ManyChat tarda y no se sabe si salió, queda anotado y Cande lo mira an
   assert.equal(m.salidas[0].estado, "incierta");
   assert.equal(m.mensajes.at(-1).quien, "agente");
   assert.equal(m.contacto.dueno, "cande");
-  assert.match(m.avisos[0].campos.Aviso, /No sé si salió/);
+  soloNota(m, /No sé si salió/);
 });
 
 test("sombra: no manda, deja el borrador, cierra el turno y le avisa a Cande con lo que mandaría", async () => {
@@ -925,7 +950,7 @@ test("quien escribe sin parar mientras se genera también llega al tope del día
   assert.equal(m.pedidos.length, 3);
   assert.equal(m.enviados.length, 0);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos.length, 1);
+  soloNota(m, /tope de turnos del día/);
 });
 
 test("envío por campo: queda lista para que ManyChat la retire, el servidor no manda ni la anota todavía", async () => {
@@ -989,7 +1014,7 @@ test("si la traba no se libera nunca, el mensaje no se pierde callado: pasa a Ca
   assert.equal(r.hecho, "otra corrida lo tiene");
   assert.equal(m.pedidos.length, 0);
   assert.equal(m.contacto.dueno, "cande");
-  assert.match(m.avisos[0].campos.Aviso, /sin contestar/);
+  soloNota(m, /sin contestar/);
   assert.equal(m.tomado, "una corrida que murió"); // la traba ajena no se toca
 });
 
@@ -1479,7 +1504,7 @@ test("un toque que salió no se repite aunque la base falle después de mandar",
   assert.deepEqual(m.enviados, ["Mensaje de seguimiento?"]);
   assert.equal(m.contacto.toques, 1);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos.length, 1);
+  soloNota(m, /no lo pude guardar/);
 });
 
 test("si falla la constancia antes de mandar, no sale nada y la salida queda marcada con el error", async () => {
@@ -2812,8 +2837,8 @@ test("solo las fallas propias de la charla cuentan para el tope: las generales n
   });
   assert.equal(pasadas, 1);
   assert.equal(m.contacto.dueno, "cande");
-  assert.equal(m.avisos.length, 1);
-  assert.match(m.avisos[0].campos.Aviso, /falló 3 veces con esta charla/);
+  // 17/11: el pase es el mismo, pero no suena: la charla ya figura de ella y la ve en la red de la bandeja.
+  soloNota(m, /falló 3 veces con esta charla/);
   // Un toque o una indicación que fallan no cuentan: no hay un mensaje del lead esperando.
   const t = armarToque({ responde: () => { throw propia("el modelo no quiso contestar este turno"); } });
   await toque(t.agente);
@@ -3619,8 +3644,8 @@ test("una respuesta que ManyChat no retiró sale por la API si todavía correspo
     m.salidas.push({ accion: "responder", estado: "vencida" });
     assert.equal(await agente.rescatarVencida(fila(extra)), "pasada a Cande", caso);
     assert.equal(m.contacto.dueno, "cande", caso);
-    assert.equal(m.avisos.length, 1, caso);
-    assert.match(m.avisos[0].campos.Aviso, /ManyChat no la vino a retirar/, caso);
+    // 17/11: el pase no suena por sí solo, va al resumen, con lo que decía el aviso.
+    assert.match(soloNota(m), /ManyChat no la vino a retirar/, caso);
   }
 });
 
@@ -3769,8 +3794,8 @@ test("una respuesta vencida no sale por la API si se escribió en la charla desp
     assert.equal(m.enviados.length, 0, caso);
     assert.equal(m.salidas[0].estado, "vencida", `${caso}: no figura enviada`);
     assert.equal(m.contacto.dueno, "cande", caso);
-    assert.equal(m.avisos.length, 1, caso);
-    if (porIg) assert.match(m.avisos[0].campos.Motivo, new RegExp(porIg), caso);
+    const nota = soloNota(m);
+    if (porIg) assert.match(nota, new RegExp(porIg), caso);
   }
   // Sin nada de eso, sale como antes.
   const instagram = { conApi: true, porQueSale: async () => null, sacar: async () => {} };
@@ -3920,7 +3945,7 @@ test("rescate en una charla retomada: si lo que cambió después de la respuesta
     if (extra) x.m.mensajes.push({ id: x.m.mensajes.length + 1, quien: "sistema", texto: "nota de prueba", creado: aLos(-1) });
     assert.equal(await x.agente.rescatarVencida(vencida({ charla_cambio: true })), "pasada a Cande", caso);
     assert.equal(x.m.contacto.dueno, "cande", caso);
-    assert.equal(x.m.avisos.length, 1, caso);
+    soloNota(x.m, /ManyChat no la vino a retirar/);
   }
 });
 
@@ -4087,8 +4112,7 @@ test("como en main: en una respuesta tarde de una charla sin la marca, si Cande 
     w.m.ajustes.instagram = true;
     const r = await w.agente.procesar("77", 2, { tarde: true });
     assert.equal(r.hecho, "pasada a Cande", caso);
-    assert.equal(w.m.avisos.length, 1, caso);
-    assert.match(w.m.avisos[0].campos.Aviso, /le escribiste mientras el agente no podía contestar/, caso);
+    assert.match(soloNota(w.m), /le escribiste mientras el agente no podía contestar/, caso);
     assert.equal(w.m.pedidos.length, 0, caso);
   }
 });
@@ -4447,7 +4471,8 @@ test("CUBA: si Gumroad no crea el código, no sale nada y la charla pasa a Cande
   assert.equal(r.hecho, "regalo sin código");
   assert.deepEqual(m.enviados, []);
   assert.equal(m.contacto.dueno, "cande");
-  assert.ok(m.avisos.some((a) => /no pude crear su código/.test(JSON.stringify(a))), JSON.stringify(m.avisos));
+  // 17/11: que el agente no pudiera no suena por sí solo; la nota del resumen lo dice y la charla ya es de ella.
+  soloNota(m, /no pude crear su código/);
 });
 
 test("CUBA dos veces: el mismo link, sin crear otro código", async () => {
@@ -4563,15 +4588,15 @@ test("si escribió desde Solicitudes y Cande no la aceptó, la charla sigue del 
   assert.equal(m.contacto.respondido_hasta, 0, "el turno queda abierto: la espera lo vuelve a intentar");
   assert.equal(m.salidas[0].estado, "error");
   assert.match(m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `));
-  assert.equal(m.avisos.length, 1);
-  assert.match(m.avisos[0].titulo, /aceptale la solicitud y le contesto/);
-  assert.match(m.avisos[0].campos.Aviso, /Solicitudes/);
+  // 17/11: aceptar una solicitud no es urgente y de quien escribió desde Solicitudes no se sabe nada todavía: va al
+  // resumen, con lo que decía el aviso.
+  assert.match(soloNota(m), /aceptale la solicitud y le contesto · te escribió desde Solicitudes/);
   assert.equal(m.mensajes.filter((x) => x.quien === "agente" && x.texto !== AVISO).length, 0, "no se anota como mandado");
 
-  // La espera lo vuelve a intentar: si sigue sin aceptar, no sale otro aviso.
+  // La espera lo vuelve a intentar: si sigue sin aceptar, no queda otra nota ni sale otro aviso.
   const r2 = await agente.procesar("77", m.disparo, { tarde: true });
   assert.equal(r2.hecho, "sin aceptar");
-  assert.equal(m.avisos.length, 1, "un solo aviso por lo que escribió");
+  soloNota(m, /aceptale la solicitud/);
 
   // Cuando la acepta, sale.
   const listo = armar();
@@ -4584,7 +4609,7 @@ test("una solicitud sin aceptar en un pase a Cande o en un toque sigue como siem
   const pasa = armar({ mandar, responde: () => salida(["Ya te paso con ella, de prueba"], { accion: "pasar_a_cande" }) });
   assert.equal((await pasa.agente.procesar("77", pasa.m.disparo)).hecho, "error al mandar");
   assert.equal(pasa.m.contacto.dueno, "cande");
-  assert.match(pasa.m.avisos[0].campos.Aviso, /Solicitudes/);
+  assert.match(soloNota(pasa.m), /Solicitudes/);
   const unToque = armarToque({ mandar });
   assert.equal((await toque(unToque.agente)).hecho, "error al mandar");
   assert.equal(unToque.m.avisos.length, 0);
@@ -4641,12 +4666,11 @@ test("TRABAJO desde Solicitudes: el turno queda abierto, un solo aviso de acepta
   assert.equal(m.contacto.dueno, "agente", "no le llega una charla que no puede contestar");
   assert.equal(m.contacto.respondido_hasta, 0, "el turno queda abierto: la espera lo vuelve a intentar");
   assert.match(m.salidas[0].detalle, new RegExp(`^${SIN_ACEPTAR}: `), "con la marca: no es el envío roto");
-  assert.equal(m.avisos.length, 1);
-  assert.match(m.avisos[0].titulo, /aceptale la solicitud y le contesto/);
-  assert.match(m.avisos[0].campos.Aviso, /TRABAJO desde Solicitudes/);
-  // La espera lo vuelve a intentar y sigue sin aceptar: no sale otro aviso.
+  // 17/11: va al resumen, con lo que decía el aviso (de quien escribió desde Solicitudes no se sabe nada todavía).
+  assert.match(soloNota(m), /aceptale la solicitud y le contesto · escribió TRABAJO desde Solicitudes/);
+  // La espera lo vuelve a intentar y sigue sin aceptar: no queda otra nota ni sale otro aviso.
   assert.equal((await agente.procesar("77", m.disparo, { tarde: true })).hecho, "sin aceptar");
-  assert.equal(m.avisos.length, 1);
+  soloNota(m, /aceptale la solicitud/);
   // La acepta: salen los mensajes de TRABAJO y la charla sigue del agente (05/11: antes pasaba a
   // Cande y quedaba sin contestar, 116 de 124). Lo urgente se le pasa por los frenos.
   aceptar();
@@ -4672,7 +4696,7 @@ test("CUBA desde Solicitudes: si escribe otra cosa mientras espera, al aceptarla
   assert.equal((await agente.procesar("77", m.disparo)).hecho, "sin aceptar");
   const otro = m.entraLead("hola? me llegó algo?");
   assert.equal((await agente.procesar("77", otro)).hecho, "sin aceptar", "sigue esperando que la acepte");
-  assert.equal(m.avisos.length, 1, "un solo aviso");
+  soloNota(m, /aceptale la solicitud/); // una sola nota, y no suena
   aceptar();
   assert.equal((await agente.procesar("77", otro, { tarde: true })).hecho, "palabra clave");
   assert.deepEqual(creados, ["CUBA77"], "el código ya existe en Gumroad: no se pide otro");
@@ -4746,9 +4770,13 @@ test("CV desde Solicitudes y después otra cosa: al aceptarla sale CV y la charl
     assert.equal(m.pedidos.length, 0);
     assert.equal(m.contacto.dueno, "cande", "lo que escribió después no queda sin que nadie lo vea");
     assert.equal(m.contacto.respondido_hasta, otro);
-    const aviso = m.avisos.at(-1);
-    assert.match(aviso.campos.Aviso || aviso.titulo, /Mientras esperaba escribió más/, JSON.stringify(aviso));
-    assert.ok(JSON.stringify(aviso).includes(despues), "el aviso trae lo que escribió");
+    // Los dos avisos (aceptar la solicitud y el pase) van al resumen: ninguno es urgente y de esta persona no se
+    // sabe más que la palabra que escribió. La nota del pase trae lo que escribió mientras esperaba.
+    assert.deepEqual(m.avisos, [], "ya no suenan en Telegram");
+    const notas = m.salidas.filter((x) => x.accion === "aviso" && x.estado === "callado").map((x) => x.aviso);
+    assert.equal(notas.length, 2, JSON.stringify(notas));
+    assert.match(notas.at(-1), /Mientras esperaba escribió más/);
+    assert.ok(notas.at(-1).includes(despues), "la nota trae lo que escribió");
   }
 });
 
@@ -4775,7 +4803,7 @@ test("CV o CUBA desde Solicitudes y mientras espera solo repite la palabra o pre
     aceptar();
     assert.equal((await agente.procesar("77", otro, { tarde: true })).hecho, "palabra clave", `${palabra} / ${despues}`);
     assert.equal(m.contacto.dueno, "agente", `${palabra} / ${despues}: a Cande solo le llega quien contrata`);
-    assert.equal(m.avisos.length, 1, "solo el de aceptar la solicitud");
+    soloNota(m, /aceptale la solicitud/); // el de aceptar la solicitud, y ya no suena
   }
   assert.equal(esperaVacia("hola? me llegó algo?", "cuba"), false, "eso pide algo");
   assert.equal(esperaVacia("TRABAJO", "cv"), false);
@@ -4897,4 +4925,88 @@ test("una reacción a una historia que abre la charla no se contesta; un emoji q
   const emoji = abre("🙂");
   assert.equal((await emoji.agente.procesar("77", emoji.m.disparo)).hecho, "enviada");
   assert.equal(emoji.m.proximo, null, "como cualquier saludo solo: sin toque");
+});
+
+/* ---------- la política de avisos (17/11): el chat de Telegram, solo para posibles clientas ---------- */
+// 17/11, Cande: "el chat de mensajes debería ser únicamente para gente que tiene empresas y que puede llegar a ser mi
+// clienta", "me estás mandando cosas muy raras que no sabes cómo contestar", "este chat se llena y al final no leo nada
+// porque tengo 8.000 mensajes innecesarios". La regla está en lib/dm/avisos.js (tests/dmAvisos.test.mjs); acá, cómo
+// pega en cada aviso del agente.
+
+test("un freno en la charla de alguien que no puede ser clienta: la charla pasa igual, el aviso va al resumen", async () => {
+  const { agente, m } = armar({
+    estadoPrevio: { quien: "no_dev", busca: "no" },
+    responde: () => salida(["Mañana te escribo"], { estado: { ...estadoDev, quien: "no_dev", busca: "no" } }),
+  });
+  m.mensajes.find((x) => x.id === m.disparo).texto = "que linda foto";
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada");
+  assert.equal(m.enviados.length, 0);
+  assert.equal(m.contacto.dueno, "cande", "el pase es el mismo: nadie queda sin dueño");
+  assert.equal(m.salidas[0].estado, "frenada");
+  assert.match(soloNota(m, /Frené lo que iba a mandar/), /no supe seguir la charla/);
+});
+
+test("el mismo freno con una empresa suena al toque: lo de ella no cambió", async () => {
+  const { agente, m } = armar({
+    estadoPrevio: { quien: "empresa" },
+    responde: () => salida(["Mañana te escribo"], { estado: { ...estadoDev, quien: "empresa" } }),
+  });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "frenada");
+  assert.equal(m.avisos.length, 1);
+  assert.equal(m.avisos[0].titulo, "Lead de prueba · DM: te paso una charla");
+  assert.equal(m.salidas.filter((x) => x.accion === "aviso").length, 0, "lo que suena no deja nota");
+});
+
+test("una foto de alguien de quien no se sabe nada no suena: va al resumen; si en la charla hay plata, suena", async () => {
+  const sinSenal = armar({ estadoPrevio: {}, responde: () => { throw new Error("con solo una foto no se le pide nada al modelo"); } });
+  sinSenal.m.contacto.respondido_hasta = sinSenal.m.disparo;
+  sinSenal.m.mensajes.find((x) => x.id === sinSenal.m.disparo).texto = "hola!";
+  assert.equal((await sinSenal.agente.procesar("77", mandaLead(sinSenal.m, ADJUNTO_IG))).hecho, "solo foto");
+  assert.match(soloNota(sinSenal.m, /Mandó una foto/), /no se sabe quién es/);
+
+  const pago = armar({ estadoPrevio: {}, responde: () => { throw new Error("con solo una foto no se le pide nada al modelo"); } });
+  pago.m.contacto.respondido_hasta = pago.m.disparo;
+  pago.m.mensajes.find((x) => x.id === pago.m.disparo).texto = "ya pague, te mando el comprobante";
+  assert.equal((await pago.agente.procesar("77", mandaLead(pago.m, ADJUNTO_IG))).hecho, "solo foto");
+  assert.equal(pago.m.avisos.length, 1, "plata en la charla: suena como siempre");
+  assert.match(pago.m.avisos[0].titulo, /URGENTE/);
+});
+
+test("el mismo aviso del modelo de la misma charla no suena dos veces en el día", async () => {
+  const uno = "YA: quiere el 1 a 1, le pasé tu agenda";
+  const otro = "YA: quiere el 1 a 1, le pasé tu agenda de nuevo (no le aparecía el link)";
+  let aviso = uno;
+  const { agente, m } = armar({ responde: () => salida(["Respuesta de prueba?"], { aviso_para_cande: aviso }) });
+  assert.equal((await agente.procesar("77", m.disparo)).hecho, "enviada");
+  assert.equal(m.avisos.length, 1, "la primera vez suena");
+  assert.equal(m.avisos[0].titulo, "Lead de prueba · DM URGENTE: aviso del agente");
+  aviso = otro;
+  assert.equal((await agente.procesar("77", m.entraLead("otro mensaje de prueba"))).hecho, "enviada");
+  assert.equal(m.avisos.length, 1, "el mismo aviso dicho de otra forma no suena de nuevo");
+  const notas = m.salidas.filter((x) => x.accion === "aviso" && x.estado === "callado");
+  assert.equal(notas.length, 1, "queda su nota para el resumen");
+  assert.match(notas[0].aviso, /ya te pasé este mismo aviso/);
+  assert.match(notas[0].aviso, /quiere el 1 a 1/);
+  // Uno que dice otra cosa sí suena (de los que ella pidió que le lleguen: resumen.esParaCande).
+  aviso = "HOY: preguntó si es un bot";
+  assert.equal((await agente.procesar("77", m.entraLead("y otro mensaje de prueba"))).hecho, "enviada");
+  assert.equal(m.avisos.length, 2);
+});
+
+test("lo que llenó en el formulario de la red alcanza para que suene: semi senior o más que no dijo que busca", async () => {
+  const armarSenior = (perfil) => {
+    const w = armar({
+      estadoPrevio: { quien: "dev", busca: "no_se_sabe" },
+      responde: () => salida(["Mañana te escribo"], { estado: { ...estadoDev, busca: "no_se_sabe" } }),
+    });
+    w.m.perfilDeLaRed = perfil;
+    return w;
+  };
+  const senior = armarSenior({ seniority: "Senior", situacion: "Empleado pero escucho" });
+  assert.equal((await senior.agente.procesar("77", senior.m.disparo)).hecho, "frenada");
+  assert.equal(senior.m.avisos.length, 1, "es el target del 16/11: suena");
+  const junior = armarSenior({ seniority: "Junior", situacion: "Buscando activamente" });
+  assert.equal((await junior.agente.procesar("77", junior.m.disparo)).hecho, "frenada");
+  // Un junior que no dijo que busca no entra por el formulario: la charla pasa igual y el aviso va al resumen.
+  soloNota(junior.m, /Frené lo que iba a mandar/);
 });
