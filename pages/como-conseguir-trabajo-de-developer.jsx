@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import styled from "styled-components";
+import DATOS from "../data/datos-devs.json";
 
 /**
  * La pagina que contesta la pregunta que de verdad escribe un dev: como consigo trabajo.
@@ -19,9 +20,22 @@ import styled from "styled-components";
  * Si se cambia un numero, se cambia tambien en /datos-developers-latam y al reves.
  */
 
-const ACTUALIZADO = "2026-11-19";
+// Los numeros salen del mismo dato que /datos-developers-latam, que rearma
+// `node scripts/datos_devs.mjs` desde la base. Nada escrito a mano: si cambian alla, cambian aca.
+const ACTUALIZADO = DATOS.generado;
+const MES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+             "septiembre", "octubre", "noviembre", "diciembre"];
+const fecha = (iso) => { const [a, m, d] = iso.split("-").map(Number); return `${d} de ${MES[m - 1]} de ${a}`; };
+const nro = (n) => n.toLocaleString("es-AR");
+const coma = (n) => String(n).replace(".", ",");
+const niv = (q) => DATOS.tarifaPorNivel.find((t) => t.nivel === q) || {};
+const ing = (q) => DATOS.ingles.find((i) => i.nivel === q) || {};
+const flu = (q) => DATOS.fluidoPorNivel.find((f) => f.nivel === q) || {};
+const SALTO = [...DATOS.tarifaPorNivel].sort((a, b) => b.mediana - a.mediana)[0] || {};
+const BRECHA = (niv("Senior").mediana || 0) - (niv("Semi-senior").mediana || 0);
+const DIF_INGLES = (ing("Conversacional").mediana || 0) - (ing("Básico").mediana || 0);
 const IG = "https://www.instagram.com/candelaria.sanchezg";
-const DATOS = "/datos-developers-latam";
+const RUTA_DATOS = "/datos-developers-latam";
 
 const BLOQUES = [
   {
@@ -45,18 +59,18 @@ const BLOQUES = [
   {
     id: "cuanto-cobrar",
     q: "Cuánto debería cobrar por hora",
-    r: "La mediana de los 679 developers de LatAm que pusieron una tarifa en nuestra red es de 25 dólares la hora. Junior 18, semi-senior 23, senior 25, lead 35. Si estás muy abajo de la mediana de tu nivel, el problema casi nunca es tu nivel.",
+    r: `La mediana de los ${nro(DATOS.tarifa.n)} developers de LatAm que pusieron una tarifa en nuestra red es de ${DATOS.tarifa.mediana} dólares la hora. Junior ${niv("Junior").mediana}, semi-senior ${niv("Semi-senior").mediana}, senior ${niv("Senior").mediana}, lead ${niv("Lead").mediana}. Si estás muy abajo de la mediana de tu nivel, el problema casi nunca es tu nivel.`,
     mas: [
       "El precio bajo no te hace más contratable, te hace más sospechoso. Cuando alguien me pide mucho menos de lo que vale, lo primero que pienso es qué no me está contando.",
-      "Lo más raro de esos datos: el senior pide 25 y el semi-senior 23. Dos dólares de diferencia por varios años. El senior que no revisa su tarifa se queda clavado en el precio del escalón de abajo.",
+      `Lo más raro de esos datos: el senior pide ${niv("Senior").mediana} y el semi-senior ${niv("Semi-senior").mediana}. ${BRECHA === 1 ? "Un dólar" : BRECHA + " dólares"} de diferencia por varios años, y el salto real recién aparece en ${SALTO.nivel}, con ${SALTO.mediana}. El senior que no revisa su tarifa se queda clavado en el precio del escalón de abajo.`,
     ],
   },
   {
     id: "ingles",
     q: "Cuánto inglés necesito para trabajar en remoto",
-    r: "El suficiente para sostener una llamada de treinta minutos sin que el otro cambie de idioma. En nuestra red, el que dice tener inglés básico pide 20 dólares la hora y el conversacional 25. Son 5 dólares por hora por algo que no es técnico.",
+    r: `El suficiente para sostener una llamada de treinta minutos sin que el otro cambie de idioma. En nuestra red, el que dice tener inglés básico pide ${ing("Básico").mediana} dólares la hora y el conversacional ${ing("Conversacional").mediana}. Son ${DIF_INGLES} dólares por hora por algo que no es técnico.`,
     mas: [
-      "Y es lo que menos gente tiene: solo el 23,7% dice tener inglés fluido, y entre los juniors el 13,8%. O sea que es la cosa más barata de arreglar que más te separa del resto.",
+      `Y es lo que menos gente tiene: solo el ${coma(ing("Fluido").pct)}% dice tener inglés fluido, y entre los juniors el ${coma(flu("Junior").pct)}%. O sea que es la cosa más barata de arreglar que más te separa del resto.`,
     ],
   },
   {
@@ -105,7 +119,7 @@ const BLOQUES = [
 export default function ComoConseguirTrabajo() {
   const titulo = "Cómo conseguir trabajo de developer, por alguien que contrata";
   const descripcion =
-    "Qué mira en un CV, cuánto cobrar por hora, cuánto inglés hace falta y cómo preparar la entrevista. Lo contesta Candelaria Sanchez, que entrevista y selecciona developers de LatAm, con los datos de 744 perfiles.";
+    `Qué mira en un CV, cuánto cobrar por hora, cuánto inglés hace falta y cómo preparar la entrevista. Lo contesta Candelaria Sanchez, que entrevista y selecciona developers de LatAm, con los datos de ${nro(DATOS.n)} perfiles.`;
 
   const schema = [
     {
@@ -148,12 +162,12 @@ export default function ComoConseguirTrabajo() {
       </Head>
 
       <Wrap>
-        <Eyebrow>Para developers · actualizado el 19 de noviembre de 2026</Eyebrow>
+        <Eyebrow>Para developers · actualizado el {fecha(ACTUALIZADO)}</Eyebrow>
         <H1>{titulo}</H1>
         <Lead>
           Esto no es una lista de consejos sacada de internet. Es lo que miro yo cuando me llega tu
           CV y lo que pasa del otro lado del escritorio, con los números de los{" "}
-          <Link href={DATOS}>744 developers de LatAm</Link> que se anotaron en nuestra red entre
+          <Link href={RUTA_DATOS}>{nro(DATOS.n)} developers de LatAm</Link> que se anotaron en nuestra red entre
           septiembre y noviembre de 2026.
         </Lead>
         <Firma>

@@ -1,0 +1,231 @@
+{
+ "generado": "2026-11-19",
+ "n": 745,
+ "desde": "2026-09-03",
+ "hasta": "2026-11-17",
+ "tarifa": {
+  "n": 680,
+  "mediana": 25,
+  "p10": 10,
+  "p90": 40
+ },
+ "tarifaPorNivel": [
+  {
+   "nivel": "Junior",
+   "n": 236,
+   "mediana": 18,
+   "p25": 10,
+   "p75": 25
+  },
+  {
+   "nivel": "Semi-senior",
+   "n": 204,
+   "mediana": 24,
+   "p25": 15,
+   "p75": 30
+  },
+  {
+   "nivel": "Senior",
+   "n": 185,
+   "mediana": 25,
+   "p25": 23,
+   "p75": 32
+  },
+  {
+   "nivel": "Architect",
+   "n": 20,
+   "mediana": 34,
+   "p25": 30,
+   "p75": 42
+  },
+  {
+   "nivel": "Lead",
+   "n": 35,
+   "mediana": 35,
+   "p25": 28,
+   "p75": 50
+  }
+ ],
+ "ingles": [
+  {
+   "nivel": "Básico",
+   "n": 265,
+   "pct": 35.6,
+   "mediana": 20
+  },
+  {
+   "nivel": "Conversacional",
+   "n": 304,
+   "pct": 40.8,
+   "mediana": 25
+  },
+  {
+   "nivel": "Fluido",
+   "n": 176,
+   "pct": 23.6,
+   "mediana": 25
+  }
+ ],
+ "fluidoPorNivel": [
+  {
+   "nivel": "Junior",
+   "fluido": 35,
+   "total": 253,
+   "pct": 13.8
+  },
+  {
+   "nivel": "Semi-senior",
+   "fluido": 37,
+   "total": 223,
+   "pct": 16.6
+  },
+  {
+   "nivel": "Senior",
+   "fluido": 78,
+   "total": 211,
+   "pct": 37
+  },
+  {
+   "nivel": "Lead",
+   "fluido": 19,
+   "total": 36,
+   "pct": 52.8
+  },
+  {
+   "nivel": "Architect",
+   "fluido": 7,
+   "total": 22,
+   "pct": 31.8
+  }
+ ],
+ "situacion": [
+  {
+   "que": "Buscando activamente",
+   "n": 376,
+   "pct": 50.5
+  },
+  {
+   "que": "Abierto a ofertas",
+   "n": 153,
+   "pct": 20.5
+  },
+  {
+   "que": "Empleado pero escucho",
+   "n": 139,
+   "pct": 18.7
+  },
+  {
+   "que": "Freelance con capacidad",
+   "n": 77,
+   "pct": 10.3
+  }
+ ],
+ "seniority": [
+  {
+   "que": "Junior",
+   "n": 253
+  },
+  {
+   "que": "Semi-senior",
+   "n": 223
+  },
+  {
+   "que": "Senior",
+   "n": 211
+  },
+  {
+   "que": "Lead",
+   "n": 36
+  },
+  {
+   "que": "Architect",
+   "n": 22
+  }
+ ],
+ "experiencia": [
+  {
+   "que": "2 a 4",
+   "n": 240
+  },
+  {
+   "que": "Menos de 2",
+   "n": 210
+  },
+  {
+   "que": "Más de 8",
+   "n": 150
+  },
+  {
+   "que": "5 a 8",
+   "n": 145
+  }
+ ],
+ "dedicacion": [
+  {
+   "que": "Full-time",
+   "n": 537,
+   "pct": 72.1
+  },
+  {
+   "que": "Depende del proyecto",
+   "n": 122,
+   "pct": 16.4
+  },
+  {
+   "que": "Medio tiempo",
+   "n": 68,
+   "pct": 9.1
+  },
+  {
+   "que": "Algunas horas",
+   "n": 18,
+   "pct": 2.4
+  }
+ ],
+ "roles": [
+  {
+   "que": "Full-stack",
+   "n": 218
+  },
+  {
+   "que": "Backend",
+   "n": 192
+  },
+  {
+   "que": "Frontend",
+   "n": 133
+  },
+  {
+   "que": "Data / AI",
+   "n": 53
+  },
+  {
+   "que": "Otro",
+   "n": 41
+  },
+  {
+   "que": "Product Owner / PM",
+   "n": 27
+  },
+  {
+   "que": "Product Designer",
+   "n": 21
+  },
+  {
+   "que": "Mobile",
+   "n": 19
+  },
+  {
+   "que": "QA",
+   "n": 18
+  },
+  {
+   "que": "DevOps",
+   "n": 17
+  },
+  {
+   "que": "Technical Writer",
+   "n": 4
+  }
+ ]
+}
