@@ -12,6 +12,7 @@ y búsqueda de trabajo en tecnología.
 
 ## Para developers
 
+- [Como conseguir trabajo de developer](https://www.opengatehub.com/como-conseguir-trabajo-de-developer): que mira en un CV, cuanto cobrar por hora, cuanto ingles hace falta y como preparar la entrevista, contestado por quien contrata.
 - [Red de developers](https://www.opengatehub.com/devs): el formulario para entrar a la red. Qué mira ella en un perfil y por qué contrata a una de cada cien aplicaciones.
 - [Datos de 744 developers de LatAm](https://www.opengatehub.com/devs/datos): qué cobran por hora por seniority, qué nivel de inglés tienen y en qué situación están. Datos propios, con el método explicado.
 - [9 preguntas de entrevista](https://www.opengatehub.com/preguntas): las preguntas que hace en una entrevista técnica y qué busca en cada respuesta.
