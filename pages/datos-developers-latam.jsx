@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import styled from "styled-components";
+import DATOS from "../data/datos-devs.json";
 
 /**
  * Informe con datos propios: que cobran, que ingles tienen y en que situacion estan los 744
@@ -22,72 +23,76 @@ import styled from "styled-components";
  * - Si se actualizan los numeros, se cambia tambien ACTUALIZADO y el dateModified del schema.
  */
 
-const ACTUALIZADO = "2026-11-19";
-const DESDE = "3 de septiembre de 2026";
-const HASTA = "17 de noviembre de 2026";
-const N = 744;
-const N_TARIFA = 679;
+// Todo sale de data/datos-devs.json, que arma `node scripts/datos_devs.mjs` desde la base.
+// Ningun numero se escribe a mano aca: una foto vieja se deja de citar, y encima el N crece solo.
+const ACTUALIZADO = DATOS.generado;
+const N = DATOS.n;
+const N_TARIFA = DATOS.tarifa.n;
 const IG = "https://www.instagram.com/candelaria.sanchezg";
 
-const TARIFAS = [
-  { nivel: "Junior", n: 236, mediana: 18, p25: 10, p75: 25 },
-  { nivel: "Semi-senior", n: 203, mediana: 23, p25: 15, p75: 30 },
-  { nivel: "Senior", n: 185, mediana: 25, p25: 23, p75: 32 },
-  { nivel: "Architect", n: 20, mediana: 34, p25: 30, p75: 42 },
-  { nivel: "Lead", n: 35, mediana: 35, p25: 28, p75: 50 },
-];
+const MES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+             "septiembre", "octubre", "noviembre", "diciembre"];
+const fecha = (iso) => {
+  const [a, m, d] = iso.split("-").map(Number);
+  return `${d} de ${MES[m - 1]} de ${a}`;
+};
+const nro = (n) => n.toLocaleString("es-AR");
+const coma = (n) => String(n).replace(".", ",");
 
-const INGLES = [
-  { nivel: "Básico", n: 265, pct: 35.6, mediana: 20 },
-  { nivel: "Conversacional", n: 303, pct: 40.7, mediana: 25 },
-  { nivel: "Fluido", n: 176, pct: 23.7, mediana: 25 },
-];
+const DESDE = fecha(DATOS.desde);
+const HASTA = fecha(DATOS.hasta);
+const TARIFAS = DATOS.tarifaPorNivel;
+const INGLES = DATOS.ingles;
+const FLUIDO_POR_NIVEL = DATOS.fluidoPorNivel;
+const SITUACION = DATOS.situacion;
+const ROLES = DATOS.roles;
 
-const FLUIDO_POR_NIVEL = [
-  { nivel: "Junior", fluido: 35, total: 253 },
-  { nivel: "Semi-senior", fluido: 37, total: 222 },
-  { nivel: "Senior", fluido: 78, total: 211 },
-  { nivel: "Lead", fluido: 19, total: 36 },
-  { nivel: "Architect", fluido: 7, total: 22 },
-];
-
-const SITUACION = [
-  { que: "Buscando activamente", n: 376, pct: 50.5 },
-  { que: "Abierto a ofertas", n: 152, pct: 20.4 },
-  { que: "Empleado pero escucha", n: 139, pct: 18.7 },
-  { que: "Freelance con capacidad", n: 77, pct: 10.3 },
-];
-
-const ROLES = [
-  { que: "Full-stack", n: 218 }, { que: "Backend", n: 191 }, { que: "Frontend", n: 133 },
-  { que: "Data / AI", n: 53 }, { que: "Product Designer", n: 21 }, { que: "Mobile", n: 19 },
-  { que: "Product Owner / PM", n: 27 }, { que: "QA", n: 18 }, { que: "DevOps", n: 17 },
-];
+// Lo que antes eran afirmaciones escritas a mano y ahora se calculan, para que la frase siga
+// siendo cierta cuando los numeros se muevan.
+const nivel = (q) => TARIFAS.find((t) => t.nivel === q) || {};
+const SENIOR = nivel("Senior");
+const SEMI = nivel("Semi-senior");
+const JUNIOR = nivel("Junior");
+const BRECHA = (SENIOR.mediana || 0) - (SEMI.mediana || 0);   // el hallazgo: casi no hay salto
+const SALTO = [...TARIFAS].sort((a, b) => b.mediana - a.mediana)[0] || {};   // donde si lo hay
+const ING = (q) => INGLES.find((i) => i.nivel === q) || {};
+const BASICO = ING("Básico");
+const FLUIDO = ING("Fluido");
+const CONV = ING("Conversacional");
+const DIF_INGLES = (CONV.mediana || 0) - (BASICO.mediana || 0);
+const PCT_INGLES = BASICO.mediana ? Math.round((DIF_INGLES / BASICO.mediana) * 100) : 0;
+const FLU_JUNIOR = FLUIDO_POR_NIVEL.find((f) => f.nivel === "Junior") || {};
+const FLU_SENIOR = FLUIDO_POR_NIVEL.find((f) => f.nivel === "Senior") || {};
+const BUSCANDO = SITUACION.find((x) => /buscando/i.test(x.que)) || {};
+const MOVILES = SITUACION.filter((x) => !/freelance/i.test(x.que)).reduce((a, b) => a + b.n, 0);
+const EXP = (q) => (DATOS.experiencia.find((e) => e.que === q) || {}).n || 0;
+const SEN = (q) => (DATOS.seniority.find((e) => e.que === q) || {}).n || 0;
+const FULLTIME = DATOS.dedicacion.find((x) => /full/i.test(x.que)) || {};
 
 const FAQ = [
   {
     q: "Cuánto cobra por hora un developer de Latinoamérica en 2026",
-    a: `La mediana de los ${N_TARIFA} developers de esta muestra que pusieron una tarifa por hora es de 25 dólares. El 10% de abajo pide 10 dólares o menos y el 10% de arriba pide 40 o más. Son tarifas que el developer pide, no sueldos pagados.`,
+    a: `La mediana de los ${nro(N_TARIFA)} developers de esta muestra que pusieron una tarifa por hora es de ${DATOS.tarifa.mediana} dólares. El 10% de abajo pide ${DATOS.tarifa.p10} dólares o menos y el 10% de arriba pide ${DATOS.tarifa.p90} o más. Son tarifas que el developer pide, no sueldos pagados.`,
   },
   {
     q: "Cuánto debería cobrar un developer junior",
-    a: "La mediana de los juniors de esta muestra es 18 dólares la hora, con la mitad del grupo entre 10 y 25. Es lo que piden ellos. El rango es enorme para el mismo nivel, así que el número que elegís dice más de tu información que de tu experiencia.",
+    a: `La mediana de los juniors de esta muestra es ${JUNIOR.mediana} dólares la hora, con la mitad del grupo entre ${JUNIOR.p25} y ${JUNIOR.p75}. Es lo que piden ellos. El rango es enorme para el mismo nivel, así que el número que elegís dice más de tu información que de tu experiencia.`,
   },
   {
     q: "Por qué un senior cobra casi lo mismo que un semi-senior",
-    a: "Porque se subvalúa. En esta muestra el semi-senior pide 23 dólares la hora y el senior 25: dos dólares de diferencia por varios años de experiencia. El salto real recién aparece en Lead, con 35. El senior que no revisa su tarifa se queda clavado en el precio del escalón de abajo.",
+    a: `Porque se subvalúa. En esta muestra el semi-senior pide ${SEMI.mediana} dólares la hora y el senior ${SENIOR.mediana}: ${BRECHA === 1 ? "un dólar" : BRECHA + " dólares"} de diferencia por varios años de experiencia. El salto real recién aparece en ${SALTO.nivel}, con ${SALTO.mediana}. El senior que no revisa su tarifa se queda clavado en el precio del escalón de abajo.`,
   },
   {
     q: "Cuánto importa el inglés para trabajar en remoto como developer",
-    a: "Mucho, y se ve en el precio. El que dice tener inglés básico pide 20 dólares la hora de mediana, y el conversacional y el fluido piden 25. Son 5 dólares por hora de diferencia, o sea cerca de un 25% más, por algo que no es técnico.",
+    a: `Mucho, y se ve en el precio. El que dice tener inglés básico pide ${BASICO.mediana} dólares la hora de mediana, y el conversacional y el fluido piden ${CONV.mediana}. Son ${DIF_INGLES} dólares por hora de diferencia, o sea cerca de un ${PCT_INGLES}% más, por algo que no es técnico.`,
   },
   {
     q: "Cuántos developers de LatAm hablan inglés fluido",
-    a: `De los ${N} developers de esta muestra, 176 dicen tener inglés fluido: el 23,7%. Entre los juniors son 35 de 253, el 13,8%. Entre los seniors, 78 de 211, el 37%. El inglés es lo que más separa a un perfil del resto, y es lo que menos gente tiene.`,
+    a: `De los ${nro(N)} developers de esta muestra, ${FLUIDO.n} dicen tener inglés fluido: el ${coma(FLUIDO.pct)}%. Entre los juniors son ${FLU_JUNIOR.fluido} de ${FLU_JUNIOR.total}, el ${coma(FLU_JUNIOR.pct)}%. Entre los seniors, ${FLU_SENIOR.fluido} de ${FLU_SENIOR.total}, el ${coma(FLU_SENIOR.pct)}%. El inglés es lo que más separa a un perfil del resto, y es lo que menos gente tiene.`,
   },
   {
     q: "Qué porcentaje de developers está buscando trabajo activamente",
-    a: `376 de ${N}, el 50,5%, dicen estar buscando activamente. Otro 20,4% está abierto a ofertas y un 18,7% tiene trabajo pero escucha. O sea que casi 9 de cada 10 se mueven si aparece algo mejor.`,
+    a: `${BUSCANDO.n} de ${nro(N)}, el ${coma(BUSCANDO.pct)}%, dicen estar buscando activamente. Si se suma a los que están abiertos a ofertas y a los que tienen trabajo pero escuchan, son ${nro(MOVILES)} de ${nro(N)}: casi todos se mueven si aparece algo mejor.`,
   },
   {
     q: "Quién es Candelaria Sanchez",
@@ -97,8 +102,8 @@ const FAQ = [
 
 export default function DatosDevelopersLatam() {
   const pct = (a, b) => ((a / b) * 100).toFixed(1).replace(".", ",");
-  const titulo = `Qué cobran y qué inglés tienen ${N} developers de Latinoamérica`;
-  const descripcion = `Datos propios de ${N} developers de LatAm que se anotaron entre el ${DESDE} y el ${HASTA}: tarifa por hora por seniority, nivel de inglés, rol y situación laboral.`;
+  const titulo = `Qué cobran y qué inglés tienen ${nro(N)} developers de Latinoamérica`;
+  const descripcion = `Datos propios de ${nro(N)} developers de LatAm que se anotaron entre el ${DESDE} y el ${HASTA}: tarifa por hora por seniority, nivel de inglés, rol y situación laboral.`;
 
   const schema = [
     {
@@ -116,11 +121,11 @@ export default function DatosDevelopersLatam() {
     {
       "@context": "https://schema.org",
       "@type": "Dataset",
-      "name": `Tarifas, inglés y situación laboral de ${N} developers de Latinoamérica (2026)`,
-      "description": `Respuestas de ${N} developers de Latinoamérica que se anotaron en la red de OpenGateHub entre el ${DESDE} y el ${HASTA}. Incluye seniority, años de experiencia, rol principal, nivel de inglés declarado, situación laboral y tarifa por hora pretendida en dólares. Datos agregados, sin información personal.`,
+      "name": `Tarifas, inglés y situación laboral de ${nro(N)} developers de Latinoamérica (${DATOS.hasta.slice(0, 4)})`,
+      "description": `Respuestas de ${nro(N)} developers de Latinoamérica que se anotaron en la red de OpenGateHub entre el ${DESDE} y el ${HASTA}. Incluye seniority, años de experiencia, rol principal, nivel de inglés declarado, situación laboral y tarifa por hora pretendida en dólares. Datos agregados, sin información personal.`,
       "url": "https://www.opengatehub.com/datos-developers-latam",
       "dateModified": ACTUALIZADO,
-      "temporalCoverage": "2026-09-03/2026-11-17",
+      "temporalCoverage": `${DATOS.desde}/${DATOS.hasta}`,
       "spatialCoverage": "América Latina",
       "inLanguage": "es",
       "creator": { "@id": "https://www.opengatehub.com/#candelaria" },
@@ -154,11 +159,11 @@ export default function DatosDevelopersLatam() {
       </Head>
 
       <Wrap>
-        <Eyebrow>Datos propios · actualizado el 19 de noviembre de 2026</Eyebrow>
+        <Eyebrow>Datos propios · actualizado el {fecha(ACTUALIZADO)}</Eyebrow>
         <H1>{titulo}</H1>
 
         <Lead>
-          Entre el {DESDE} y el {HASTA} se anotaron {N} developers de Latinoamérica en la red de
+          Entre el {DESDE} y el {HASTA} se anotaron {nro(N)} developers de Latinoamérica en la red de
           OpenGateHub. Cada uno dejó su seniority, sus años de experiencia, su rol, su nivel de
           inglés, su situación laboral y cuánto quiere cobrar por hora. Esto es lo que dicen esos
           datos. No hay nombres ni perfiles: todo está agregado.
@@ -172,9 +177,10 @@ export default function DatosDevelopersLatam() {
 
         <H2 id="tarifas">Cuánto cobra por hora un developer de LatAm</H2>
         <Resumen>
-          La mediana de los {N_TARIFA} developers que pusieron una tarifa es de <b>25 dólares la
-          hora</b>. El 10% de abajo pide 10 o menos y el 10% de arriba pide 40 o más. Es lo que
-          piden ellos, no lo que termina pagando una empresa.
+          La mediana de los {nro(N_TARIFA)} developers que pusieron una tarifa es de{" "}
+          <b>{DATOS.tarifa.mediana} dólares la hora</b>. El 10% de abajo pide {DATOS.tarifa.p10} o
+          menos y el 10% de arriba pide {DATOS.tarifa.p90} o más. Es lo que piden ellos, no lo que
+          termina pagando una empresa.
         </Resumen>
         <Tabla>
           <thead>
@@ -190,22 +196,23 @@ export default function DatosDevelopersLatam() {
           </tbody>
         </Tabla>
         <Nota>
-          Tarifa por hora pretendida, en dólares, declarada por el developer. {N_TARIFA} de los {N}{" "}
+          Tarifa por hora pretendida, en dólares, declarada por el developer. {nro(N_TARIFA)} de los {nro(N)}{" "}
           dejaron un número limpio; el resto escribió un rango o lo dejó vacío y queda afuera del cálculo.
         </Nota>
 
         <H3>Lo que más sorprende de esta tabla</H3>
         <Resumen>
-          Un senior pide <b>25 dólares</b> la hora y un semi-senior <b>23</b>. Dos dólares de
-          diferencia por varios años de experiencia. El salto real recién aparece en Lead, con 35.
-          El senior que no revisa su tarifa se queda clavado en el precio del escalón de abajo.
+          Un senior pide <b>{SENIOR.mediana} dólares</b> la hora y un semi-senior <b>{SEMI.mediana}</b>.{" "}
+          {BRECHA === 1 ? "Un dólar" : `${BRECHA} dólares`} de diferencia por varios años de
+          experiencia. El salto real recién aparece en {SALTO.nivel}, con {SALTO.mediana}. El senior
+          que no revisa su tarifa se queda clavado en el precio del escalón de abajo.
         </Resumen>
 
         <H2 id="ingles">Cuánto pesa el inglés</H2>
         <Resumen>
-          El que dice tener inglés básico pide <b>20 dólares</b> la hora de mediana. El
-          conversacional y el fluido piden <b>25</b>. Son 5 dólares por hora, cerca de un 25% más,
-          por algo que no tiene nada de técnico.
+          El que dice tener inglés básico pide <b>{BASICO.mediana} dólares</b> la hora de mediana.
+          El conversacional y el fluido piden <b>{CONV.mediana}</b>. Son {DIF_INGLES} dólares por
+          hora, cerca de un {PCT_INGLES}% más, por algo que no tiene nada de técnico.
         </Resumen>
         <Tabla>
           <thead><tr><th>Inglés</th><th>Developers</th><th>Del total</th><th>Mediana que piden</th></tr></thead>
@@ -219,9 +226,11 @@ export default function DatosDevelopersLatam() {
           </tbody>
         </Tabla>
         <Resumen>
-          Solo <b>176 de {N}</b> dicen tener inglés fluido, el 23,7%. Y se reparte muy desparejo
-          por nivel: entre los juniors son 35 de 253, el 13,8%, y entre los seniors 78 de 211, el
-          37%. Es lo que más separa a un perfil del resto y es lo que menos gente tiene.
+          Solo <b>{FLUIDO.n} de {nro(N)}</b> dicen tener inglés fluido, el {coma(FLUIDO.pct)}%. Y se
+          reparte muy desparejo por nivel: entre los juniors son {FLU_JUNIOR.fluido} de{" "}
+          {FLU_JUNIOR.total}, el {coma(FLU_JUNIOR.pct)}%, y entre los seniors {FLU_SENIOR.fluido} de{" "}
+          {FLU_SENIOR.total}, el {coma(FLU_SENIOR.pct)}%. Es lo que más separa a un perfil del resto
+          y es lo que menos gente tiene.
         </Resumen>
         <Tabla>
           <thead><tr><th>Seniority</th><th>Con inglés fluido</th><th>Del nivel</th></tr></thead>
@@ -236,9 +245,9 @@ export default function DatosDevelopersLatam() {
 
         <H2 id="situacion">En qué situación está la gente</H2>
         <Resumen>
-          <b>376 de {N}</b>, el 50,5%, están buscando activamente. Si se suma a los que están
-          abiertos a ofertas y a los que tienen trabajo pero escuchan, casi 9 de cada 10 se mueven
-          si aparece algo mejor.
+          <b>{BUSCANDO.n} de {nro(N)}</b>, el {coma(BUSCANDO.pct)}%, están buscando activamente. Si
+          se suma a los que están abiertos a ofertas y a los que tienen trabajo pero escuchan, son{" "}
+          {nro(MOVILES)}: casi todos se mueven si aparece algo mejor.
         </Resumen>
         <Tabla>
           <thead><tr><th>Situación</th><th>Developers</th><th>Del total</th></tr></thead>
@@ -251,9 +260,10 @@ export default function DatosDevelopersLatam() {
 
         <H2 id="perfil">Quién se anota</H2>
         <Resumen>
-          Por nivel: 253 juniors, 222 semi-seniors, 211 seniors, 36 leads y 22 architects. Por
-          experiencia: 210 tienen menos de 2 años, 239 entre 2 y 4, 145 entre 5 y 8 y 150 más de 8.
-          El 72% busca full-time.
+          Por nivel: {SEN("Junior")} juniors, {SEN("Semi-senior")} semi-seniors, {SEN("Senior")}{" "}
+          seniors, {SEN("Lead")} leads y {SEN("Architect")} architects. Por experiencia:{" "}
+          {EXP("Menos de 2")} tienen menos de 2 años, {EXP("2 a 4")} entre 2 y 4, {EXP("5 a 8")} entre
+          5 y 8 y {EXP("Más de 8")} más de 8. El {Math.round(FULLTIME.pct)}% busca full-time.
         </Resumen>
         <Tabla>
           <thead><tr><th>Rol principal</th><th>Developers</th></tr></thead>
@@ -263,11 +273,11 @@ export default function DatosDevelopersLatam() {
         <H2 id="metodo">Cómo se midió</H2>
         <Metodo>
           <li>Fuente: el formulario de <Link href="/devs">la red de developers de OpenGateHub</Link>, que se completa solo.</li>
-          <li>Periodo: {DESDE} al {HASTA}. {N} respuestas.</li>
+          <li>Periodo: {DESDE} al {HASTA}. {nro(N)} respuestas. Los números se rearman solos desde la base.</li>
           <li>Todo lo que está acá lo declara el propio developer. La tarifa es la que pide, no la que cobra.</li>
-          <li>Para las tarifas se usan las {N_TARIFA} respuestas con un número limpio. Un rango como 25 a 50 queda afuera.</li>
+          <li>Para las tarifas se usan las {nro(N_TARIFA)} respuestas con un número limpio. Un rango como 25 a 50 queda afuera.</li>
           <li>Mediana y percentiles, no promedio: con tarifas sueltas de 100 o más el promedio engañaría.</li>
-          <li>Datos agregados. No se publica ningun nombre, mail, perfil ni CV.</li>
+          <li>Datos agregados. No se publica ningún nombre, mail, perfil ni CV.</li>
           <li>Es una muestra de quién se anota en esta red, no un censo de Latinoamérica.</li>
         </Metodo>
 
