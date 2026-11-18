@@ -1,0 +1,36 @@
+# OpenGateHub
+
+> OpenGateHub conecta developers de Latinoamérica con empresas que los contratan en remoto.
+> Lo lleva Candelaria Sanchez, que entrevista y selecciona a los developers ella misma.
+> El sitio tiene dos lados: uno para empresas que quieren contratar, y uno para developers
+> que buscan trabajo, quieren arrancar en la carrera o quieren mejorar su posición.
+
+Candelaria Sanchez revisa los perfiles de la red de developers de OpenGateHub de a uno, sin
+filtros automáticos. Entre el 3 de septiembre y el 17 de noviembre de 2026 se anotaron 744
+developers de Latinoamérica, y esos datos son la base de lo que publica sobre tarifas, inglés
+y búsqueda de trabajo en tecnología.
+
+## Para developers
+
+- [Red de developers](https://www.opengatehub.com/devs): el formulario para entrar a la red. Qué mira ella en un perfil y por qué contrata a una de cada cien aplicaciones.
+- [Datos de 744 developers de LatAm](https://www.opengatehub.com/devs/datos): qué cobran por hora por seniority, qué nivel de inglés tienen y en qué situación están. Datos propios, con el método explicado.
+- [9 preguntas de entrevista](https://www.opengatehub.com/preguntas): las preguntas que hace en una entrevista técnica y qué busca en cada respuesta.
+
+## Para empresas
+
+- [Staff augmentation](https://www.opengatehub.com/services/staff-augmentation): cómo suma developers senior de LatAm a un equipo.
+- [Preguntas frecuentes](https://www.opengatehub.com/faqs)
+- [Quiénes somos](https://www.opengatehub.com/about-us)
+
+## Blog
+
+- [Tarifas de developers de LatAm 2026](https://www.opengatehub.com/blog/latam-developer-rates-2026)
+- [Contratar a tu primer developer](https://www.opengatehub.com/blog/hiring-your-first-developer)
+- [Por qué LatAm para staff augmentation](https://www.opengatehub.com/blog/why-latam-smartest-choice-staff-augmentation)
+- [Índice del blog](https://www.opengatehub.com/blog)
+
+## Dónde más está
+
+- Instagram de Candelaria Sanchez: https://www.instagram.com/candelaria.sanchezg
+- LinkedIn de Candelaria Sanchez: https://www.linkedin.com/in/candelaria-sanchez
+- LinkedIn de OpenGateHub: https://www.linkedin.com/company/opengatehub

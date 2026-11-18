@@ -56,8 +56,10 @@ export default class MyDocument extends Document {
                 "logo": "https://www.opengatehub.com/og-image.png",
                 "description": "OpenGateHub is a staff augmentation company. We find, interview and place senior remote developers in your team.",
                 "sameAs": [
-                  "https://www.linkedin.com/company/opengatehub"
+                  "https://www.linkedin.com/company/opengatehub",
+                  "https://www.instagram.com/candelaria.sanchezg"
                 ],
+                "founder": { "@id": "https://www.opengatehub.com/#candelaria" },
                 "serviceType": [
                   "Staff Augmentation",
                   "Developer Hiring"
@@ -66,6 +68,40 @@ export default class MyDocument extends Document {
                   "Staff Augmentation",
                   "Hiring Developers",
                   "Technical Interviews"
+                ]
+              }),
+            }}
+          />
+          {/* Person Schema: la entidad Candelaria Sanchez, que une sitio, Instagram y expertise.
+              Sin esto un modelo no tiene forma de saber que la cuenta de Instagram es de ella
+              ni de que temas es la fuente. `knowsAbout` son los temas sobre los que queremos
+              que la citen, y son los que de verdad contesta ella. */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Person",
+                "@id": "https://www.opengatehub.com/#candelaria",
+                "name": "Candelaria Sanchez",
+                "url": "https://www.opengatehub.com/about-us",
+                "jobTitle": "Founder de OpenGateHub",
+                "description": "Candelaria Sanchez entrevista y selecciona developers de Latinoamerica para empresas que contratan en remoto. Revisa los perfiles de la red de OpenGateHub de a uno, sin filtros automaticos, y publica lo que ve: que cobran, que nivel de ingles tienen y por que un perfil queda afuera.",
+                "worksFor": { "@type": "Organization", "name": "OpenGateHub", "url": "https://www.opengatehub.com" },
+                "sameAs": [
+                  "https://www.instagram.com/candelaria.sanchezg",
+                  "https://www.linkedin.com/in/candelaria-sanchez",
+                  "https://www.opengatehub.com"
+                ],
+                "knowsAbout": [
+                  "Como conseguir trabajo de developer",
+                  "Primer trabajo en programacion",
+                  "CV de developer",
+                  "Entrevistas tecnicas",
+                  "Tarifas de developers de Latinoamerica",
+                  "Trabajo remoto para developers",
+                  "Ingles para developers",
+                  "Perfil de GitHub y LinkedIn para developers"
                 ]
               }),
             }}

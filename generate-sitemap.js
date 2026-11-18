@@ -16,7 +16,7 @@ const bilingualPaths = [
 ];
 
 // Páginas que existen en un solo idioma.
-const singlePaths = ["/preguntas", "/devs"];
+const singlePaths = ["/preguntas", "/devs", "/datos-developers-latam"];
 
 const articleSlugs = (lang) => {
   try {
