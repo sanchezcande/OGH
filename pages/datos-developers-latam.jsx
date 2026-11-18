@@ -287,9 +287,13 @@ export default function DatosDevelopersLatam() {
             <a href={IG} target="_blank" rel="noopener noreferrer">Instagram, @candelaria.sanchezg</a>.
           </p>
           <p>
-            Y si lo que querés es ordenar la búsqueda, está el{" "}
-            <Link href="/comprar">Acelerador de Carrera Tech</Link>: qué poner en el CV, cómo
-            contar un proyecto y cómo preparar la entrevista.
+            Si lo que buscás es el paso a paso,{" "}
+            <Link href="/como-conseguir-trabajo-de-developer">acá está todo lo que miro cuando me
+            llega un CV</Link>: qué mirar, cuánto pedir y cómo preparar la entrevista.
+          </p>
+          <p>
+            Y si querés ordenar la búsqueda entera, está el{" "}
+            <Link href="/comprar">Acelerador de Carrera Tech</Link>.
           </p>
         </Cierre>
       </Wrap>
