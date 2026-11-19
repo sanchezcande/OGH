@@ -126,6 +126,16 @@ const BLOQUES = [
     ],
   },
   {
+    // 20/11/2026: "Solo es para argentina? O aplican otros paises", de un dev en los DMs.
+    // Todo sale de lo ya publicado: la red es de LatAm y el ingles sale de red_devs.
+    id: "otro-pais",
+    q: "Es solo para Argentina o entro desde otro país",
+    r: "Entrás desde cualquier país. Entrevisto y selecciono developers de toda Latinoamérica para empresas que contratan en remoto, y el formulario para anotarte en la red es el mismo estés donde estés. En remoto no me importa en qué ciudad te despertás, me importa si podés sostener una llamada con el equipo.",
+    mas: [
+      `Lo que más te separa del resto no es el país, es el inglés: solo el ${coma(ing("Fluido").pct)}% de los que se anotaron dice tenerlo fluido. Lo que cuento acá del CV, la tarifa y la entrevista vale igual en Argentina que en cualquier otro lado.`,
+    ],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
