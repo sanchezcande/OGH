@@ -23,6 +23,8 @@ const WISTIA_A = "jsuv1v61g0";   // 08/11: video de Gumroad nuevo (9:39, con Man
 const TESTIMONIOS_VIDEO = [
   { nombre: "Martiniano Olivera", lugar: "Concepción del Uruguay, Argentina", id: "c6yuoqzkm2" },
   { nombre: "Manrique Ulate", lugar: "San José, Costa Rica", id: "bk8t9jduhd" },
+  // 19/11: Daiana Quiroz (CRM 310). Versión vertical de su corte del editor (historias/historia_daiana.py).
+  { nombre: "Daiana Quiroz", lugar: "Buenos Aires, Argentina", id: "sx25rk5qjv" },
   { nombre: "Francisco Peña", lugar: "Mérida, Venezuela", id: "06y0i47nkb" },
   { nombre: "Eduardo Hidalgo", lugar: "Ambato, Ecuador", id: "rqqzkavkxe" },
   { nombre: "Andrés Murillo", lugar: "Soledad, Colombia", id: "0mib7zqd5d" },
@@ -325,7 +327,7 @@ const TestimoniosTitulo = styled.h2`
 `;
 const TestimoniosIntro = styled.p`margin: 10px 0 0; color: #625b5e; font-size: 15px; line-height: 1.5;`;
 const VideosGrid = styled.div`
-  /* 5 videos: tres arriba y dos abajo, centrados (con grilla de 4 quedaba uno solo abajo) */
+  /* 6 videos: dos filas de tres (con 5 eran tres arriba y dos abajo, centrados) */
   display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-bottom: 28px;
   > * { flex: 0 0 calc((100% - 36px) / 3); min-width: 0; }
   @media (max-width: 720px) {
