@@ -134,7 +134,7 @@ if (process.argv.includes("--publicar")) {
     execSync("git push -q origin HEAD", { stdio: "inherit" });
     console.log("publicado · Vercel lo levanta solo");
     try {
-      execSync("node scripts/indexnow.mjs /datos-developers-latam /como-conseguir-trabajo-de-developer", { stdio: "inherit" });
+      execSync("node scripts/indexnow.mjs /datos-developers-latam /como-conseguir-trabajo-de-developer /en/hire-developers-latin-america", { stdio: "inherit" });
     } catch { console.log("el aviso a los buscadores fallo, pero el dato ya esta publicado"); }
   }
 }

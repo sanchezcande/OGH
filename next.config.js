@@ -35,6 +35,18 @@ const nextConfig = {
       { source: "/en/apply/:path*", destination: "/apply/:path*", permanent: false, locale: false },
       { source: "/en/hola", destination: "/hola", permanent: false, locale: false },
       { source: "/en/preguntas", destination: "/preguntas", permanent: false, locale: false },
+      // Esta pagina esta escrita en ingles y vive solo bajo /en, que es donde el sitio sirve el
+      // nav en ingles y <html lang="en">. Servirla tambien desde la raiz la dejaria con texto
+      // ingles abajo de lang="es", que es la senal contraria a la que la pagina existe para dar.
+      // OJO con el source: va con el prefijo "/es/" aunque esa URL no exista para nadie. Con
+      // locale:false el match se hace contra la ruta YA normalizada por Next, y ahi el locale por
+      // defecto si lleva prefijo. Con source "/hire-developers-latin-america" no matchea nada y
+      // el redirect se ignora en silencio. Verificado el 20/11/2026.
+      { source: "/es/hire-developers-latin-america", destination: "/en/hire-developers-latin-america", permanent: false, locale: false },
+      // Y al reves: las dos paginas que estan escritas en castellano no tienen version /en, o
+      // quedaria texto castellano abajo de un <html lang="en">, que es la senal contraria.
+      { source: "/en/datos-developers-latam", destination: "/datos-developers-latam", permanent: false, locale: false },
+      { source: "/en/como-conseguir-trabajo-de-developer", destination: "/como-conseguir-trabajo-de-developer", permanent: false, locale: false },
       { source: "/en/labsmail", destination: "/labsmail", permanent: false, locale: false },
       // Automatización y calculadora salieron del sitio (05/10/2026): solo staff augmentation.
       { source: "/services/workflow-automation", destination: "/", permanent: true },
