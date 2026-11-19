@@ -38,6 +38,9 @@ const BRECHA = (niv("Senior").mediana || 0) - (niv("Semi-senior").mediana || 0);
 const DIF_INGLES = (ing("Conversacional").mediana || 0) - (ing("Básico").mediana || 0);
 const IG = "https://www.instagram.com/candelaria.sanchezg";
 const RUTA_DATOS = "/datos-developers-latam";
+const rol = (q) => (DATOS.roles.find((r) => r.que === q) || {}).n || 0;
+const TRES_GRANDES = rol("Full-stack") + rol("Backend") + rol("Frontend");
+const PCT_TRES = Math.round((TRES_GRANDES / DATOS.n) * 100);
 
 const BLOQUES = [
   {
@@ -90,6 +93,18 @@ const BLOQUES = [
     r: "Nosotros para el proyecto, yo para tu parte. Si decís todo nosotros no sé qué tocaste, y si decís todo yo en un proyecto de ocho personas tampoco te creo. Decí qué decidiste vos, aunque sea chico: elegí la base, escribí el deploy, armé los tests.",
     mas: [
       "Si heredaste algo, decilo. Mantener lo que escribió otro es más difícil que empezar de cero y casi nadie lo cuenta.",
+    ],
+  },
+  {
+    // 20/11/2026: la pregunta mas repetida en los DMs de esta semana, en tres versiones distintas
+    // ("tenes alguna posicion abierta para SRE/Devops", "soy backend y usted contrata cierto",
+    // "dime si buscas devs, que tecnologias"). La respuesta sale entera de red_devs.
+    id: "mi-rol",
+    q: "Entra mi rol en la red o solo buscás full-stack",
+    r: `Entran todos. Lo que cambia es contra cuántos competís adentro. De los ${nro(DATOS.n)} que se anotaron, ${rol("Full-stack")} son full-stack, ${rol("Backend")} backend y ${rol("Frontend")} frontend: el ${PCT_TRES}% está ahí. Mobile son ${rol("Mobile")}, QA ${rol("QA")} y DevOps ${rol("DevOps")}.`,
+    mas: [
+      "Si tu rol es de los finos, eso juega a favor tuyo. Cuando me piden ese perfil tengo diez carpetas para abrir, no doscientas, y la tuya se mira entera.",
+      `Y si sos full-stack o backend, lo que te separa no es el rol, porque ahí somos todos iguales. Es el inglés, que solo el ${coma(ing("Fluido").pct)}% tiene fluido, y tener una sola cosa terminada que yo pueda abrir.`,
     ],
   },
   {
