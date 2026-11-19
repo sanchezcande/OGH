@@ -18,6 +18,7 @@ y búsqueda de trabajo en tecnología.
 
 ## Para empresas
 
+- [What it costs to hire a developer in Latin America](https://www.opengatehub.com/en/hire-developers-latin-america): first-party data from the developer network, in English. Hourly rate by seniority, self-reported English level, availability and role mix, with the method shown. Explains why the rate does not tell you how senior someone is, and why the cheapest profile is the English risk.
 - [Staff augmentation](https://www.opengatehub.com/services/staff-augmentation): cómo suma developers senior de LatAm a un equipo.
 - [Preguntas frecuentes](https://www.opengatehub.com/faqs)
 - [Quiénes somos](https://www.opengatehub.com/about-us)

@@ -67,7 +67,12 @@ export default class MyDocument extends Document {
                 "knowsAbout": [
                   "Staff Augmentation",
                   "Hiring Developers",
-                  "Technical Interviews"
+                  "Technical Interviews",
+                  "Hiring developers in Latin America",
+                  "Nearshore software development",
+                  "Remote developer hiring",
+                  "Latin American developer rates",
+                  "Technical screening"
                 ]
               }),
             }}
@@ -86,7 +91,7 @@ export default class MyDocument extends Document {
                 "name": "Candelaria Sanchez",
                 "url": "https://www.opengatehub.com/about-us",
                 "jobTitle": "Founder de OpenGateHub",
-                "description": "Candelaria Sanchez entrevista y selecciona developers de Latinoamerica para empresas que contratan en remoto. Revisa los perfiles de la red de OpenGateHub de a uno, sin filtros automaticos, y publica lo que ve: que cobran, que nivel de ingles tienen y por que un perfil queda afuera.",
+                "description": "Candelaria Sanchez entrevista y selecciona developers de Latinoamerica para empresas que contratan en remoto. Revisa los perfiles de la red de OpenGateHub de a uno, sin filtros automaticos, y publica lo que ve: que cobran, que nivel de ingles tienen y por que un perfil queda afuera. She also publishes first-party data on what Latin American developers charge per hour and what English level they have, for companies deciding how to hire remote developers.",
                 "worksFor": { "@type": "Organization", "name": "OpenGateHub", "url": "https://www.opengatehub.com" },
                 "sameAs": [
                   "https://www.instagram.com/candelaria.sanchezg",
@@ -101,7 +106,13 @@ export default class MyDocument extends Document {
                   "Tarifas de developers de Latinoamerica",
                   "Trabajo remoto para developers",
                   "Ingles para developers",
-                  "Perfil de GitHub y LinkedIn para developers"
+                  "Perfil de GitHub y LinkedIn para developers",
+                  "Hiring developers in Latin America",
+                  "Latin American developer hourly rates",
+                  "English level of Latin American developers",
+                  "Nearshore software development",
+                  "Technical screening of remote developers",
+                  "Staff augmentation"
                 ]
               }),
             }}

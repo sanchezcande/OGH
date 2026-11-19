@@ -1,7 +1,9 @@
 import React from "react";
 import Head from "next/head";
 import Link from "next/link";
-import styled from "styled-components";
+import {
+  Wrap, Eyebrow, H1, H2, H3Tight as H3, Lead, Firma, Resp, P, Cierre,
+} from "../components/prosa";
 import DATOS from "../data/datos-devs.json";
 
 /**
@@ -201,32 +203,3 @@ export default function ComoConseguirTrabajo() {
     </>
   );
 }
-
-const Wrap = styled.main`
-  max-width: 760px; margin: 0 auto; padding: 56px 20px 96px;
-  font-family: Inter, system-ui, sans-serif; color: #16110f; line-height: 1.6;
-  @media (max-width: 600px) { padding: 32px 16px 64px; }
-`;
-const Eyebrow = styled.p`
-  margin: 0 0 12px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: #8a7c76;
-`;
-const H1 = styled.h1`
-  font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: 42px; line-height: 1.15;
-  margin: 0 0 24px; @media (max-width: 600px) { font-size: 30px; }
-`;
-const H2 = styled.h2`
-  font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: 27px; line-height: 1.25;
-  margin: 52px 0 14px; @media (max-width: 600px) { font-size: 22px; }
-`;
-const H3 = styled.h3` font-size: 18px; font-weight: 600; margin: 0 0 10px; `;
-const Lead = styled.p` font-size: 19px; margin: 0 0 24px; color: #3a312d; a { color: #7a2f52; } `;
-const Firma = styled.p`
-  font-size: 15px; color: #3a312d; border-left: 3px solid #d9cfc9; padding: 10px 0 10px 16px;
-  margin: 0; a { color: #7a2f52; }
-`;
-const Resp = styled.p` font-size: 18px; margin: 0 0 14px; font-weight: 500; `;
-const P = styled.p` font-size: 17px; margin: 0 0 12px; color: #3a312d; `;
-const Cierre = styled.section`
-  margin-top: 56px; padding: 24px; background: #faf6f3; border-radius: 10px;
-  p { font-size: 17px; margin: 0 0 12px; } a { color: #7a2f52; font-weight: 600; }
-`;
