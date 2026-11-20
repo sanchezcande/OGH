@@ -136,6 +136,15 @@ const BLOQUES = [
     ],
   },
   {
+    // 21/11/2026: dos devs en los DMs de esta semana ("trabajas para algunas empresas en
+    // particular o como es", "que tipos de proyectos hacen") y un tercero con "que proceso con
+    // los chicos que postulas". Sale entero de DATOS del agente y de lo ya publicado aca.
+    id: "como-funciona",
+    q: "Trabajás para algunas empresas en particular o cómo es",
+    r: "No trabajo para una sola empresa. Me escriben empresas que contratan developers en remoto, y cuando me entra un proyecto busco en la red. Los perfiles los miro yo, de a uno, sin filtros automáticos, y entrevisto a los que encajan con lo que piden. Anotarte es gratis y lleva tres minutos, pero no es postularte a un puesto ni te garantiza nada: es estar en el lugar donde busco. Las búsquedas que me entran no son tantas y hoy se reparten entre backend, frontend e IA. Te hablo de lo que veo yo, no del mercado.",
+    mas: [],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
