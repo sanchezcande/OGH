@@ -171,17 +171,11 @@ test("checkoutDirecto manda al checkout de Gumroad, no a la segunda página de v
   assert.equal(checkoutDirecto(null), "");
 });
 
-test("/devs/gracias lleva al checkout del país de la persona, que es donde pasan los clics", async () => {
+test("/devs/gracias ya no vende: manda a la agenda de 15 minutos, la misma que pasa el agente", async () => {
   const p = readFileSync(new URL("../pages/devs/gracias.jsx", import.meta.url), "utf8");
-  // El botón no puede volver a apuntar a Gumroad para todos: de 41 argentinos que tocaron comprar
-  // ninguno pagó en dólares (18/10) y son el 46% de los que llenan el formulario.
-  assert.match(p, /destinoDePago\(pais, \{ pesos: MERCADOPAGO, gumroad: GUMROAD \}\)/);
-  assert.match(p, /checkoutDirecto\(process\.env\.NEXT_PUBLIC_DEVS_COMPRA/);
-  assert.match(p, /href=\{destino\}/);
-  assert.equal(/href=\{GUMROAD/.test(p), false, "el botón no va derecho a dólares");
-  // El país lo resuelve el servidor con el mismo criterio que /comprar: el formulario primero.
-  assert.match(p, /export async function getServerSideProps/);
-  assert.match(p, /delFormulario \|\| paisDeCabecera\(req\.headers\["x-vercel-ip-country"\]\)/);
-  // Desde donde Gumroad no cobra no hay botón, hay explicación.
-  assert.match(p, /nombreDePais\(pais\)\} el checkout no cobra/);
+  // 21/11/2026, Cande: "poné en vez de los links a gumroad, link a mi calendario que pasamos por ig".
+  assert.match(p, /const AGENDA = "\/15min";/);
+  assert.match(p, /href=\{AGENDA\}/);
+  assert.equal(/GUMROAD|destinoDePago|MERCADOPAGO|get\.opengatehub\.com|gumroad\.com|href="\/comprar"/.test(p), false, "ni Gumroad ni checkout");
+  assert.equal(/SÍ, LO QUIERO YA/.test(p), false);
 });

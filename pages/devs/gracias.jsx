@@ -1,25 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import styled from "styled-components";
-import { evento, conIdentidad } from "../../lib/embudo";
+import { evento } from "../../lib/embudo";
 import { firmaDeLaPestana, idDeLaPestana } from "../../lib/dm/linkFormulario";
 import { CLAVE_BOTON_VISTO, botonVisible } from "../../lib/botonCompra";
-import {
-  checkoutDirecto, destinoDePago, faseDePago, nombreDePais, pagaEnPesos,
-  paisDeCabecera, paisDeTextoLibre,
-} from "../../lib/paisCompra";
-import { paisDelLead } from "../../lib/db";
-import { firmaValida } from "../../lib/dm/firmaIg";
-import { firmaDeLink, idDeLink } from "../../lib/dm/linkFormulario";
 
 // Página post-formulario (rediseño Cande sept 2026):
 // "Recibimos tu aplicación" → "Una cosa SÚPER importante" → el video.
 // El video está en Wistia. Su player es un web component: hay que cargar dos
 // scripts (el runtime y el del media) y recién ahí <wistia-player> se define.
 // Mientras no está definido, el propio CSS de Wistia muestra el frame borroso.
-// Video único de Gumroad, actualizado por Cande el 28/10/2026: los cuatro testimonios en video (Martiniano, Francisco,
-// Eduardo y Andrés) y el muro de escritos. El anterior era gzpbw7xoib.
-const WISTIA_A = "jsuv1v61g0";   // 08/11: video de Gumroad nuevo (9:39, con Manrique segundo). El anterior era geluy2vcuu.
+// 21/11/2026: el video post formulario (guion de Hooman, 84 s, editado en Videos/Editor/GRACIAS_1): cuenta qué pasa
+// ahora con su perfil y lo manda a la agenda de 15 minutos. El anterior era jsuv1v61g0, el video de Gumroad de 9:39
+// (sigue en Wistia, no se borró).
+const WISTIA_A = "ruxfpqaqfx";
 const TESTIMONIOS_VIDEO = [
   { nombre: "Martiniano Olivera", lugar: "Concepción del Uruguay, Argentina", id: "c6yuoqzkm2" },
   { nombre: "Manrique Ulate", lugar: "San José, Costa Rica", id: "bk8t9jduhd" },
@@ -47,24 +41,14 @@ function versionDelVisitante() {
     return "a";   // sin localStorage (modo privado) no se sortea: va el que ya conocemos
   }
 }
-// Link de compra. Cuando el video termina aparece el botón; si está vacío, no
-// aparece nada (mejor eso que un botón que no lleva a ningún lado).
-// Mientras no esté el link de Gumroad el botón igual aparece, pero no navega:
-// sirve para ver el comportamiento sin mandar a nadie a una página que no existe.
-const GUMROAD = checkoutDirecto(process.env.NEXT_PUBLIC_DEVS_COMPRA || "https://get.opengatehub.com/l/acelerador-de-carrera");
-// Pago en pesos (18/10/2026: de 41 argentinos que tocaron comprar, ninguno pagó en dólares, y el único
-// que pagó lo hizo en pesos por MercadoPago). Abajo del botón de compra va "Si sos de Argentina, apretá
-// acá" (Cande, 19/10: "no pagá en pesos"), para todos (así lo ven también los que entran por un link que
-// les pasó Cande).
-//
-// 19/10, de noche: antes esto abría un cartelito con tres pasos (pagás, mandás el comprobante por
-// Instagram, ella te pasa el código). Esos pasos ya no existen: `/api/pagar-pesos` arma el checkout y el
-// código sale solo cuando MercadoPago confirma el pago, así que el botón va DERECHO a MercadoPago.
-// Cande: "debería solamente decir si sos de argentina apretá acá y ya abrir directo mercadopago".
-// El precio y la garantía los muestra el checkout, no hace falta repetirlos en un cartel.
-const MERCADOPAGO = process.env.NEXT_PUBLIC_DEVS_COMPRA_MP || "/api/pagar-pesos";
+// 21/11/2026: la página ya no vende. Cande: "poné en vez de los links a gumroad, link a mi calendario que
+// pasamos por ig". El video nuevo (guion de Hooman) dice "abajo de este video te dejo horarios en mi
+// calendario. Son 15 minutos conmigo, en vivo", así que el botón va a la misma agenda que pasa el agente
+// por Instagram: /15min, que cuenta el clic del lado del servidor y redirige a Google (pages/15min.js).
+// Antes acá había checkout por país (Gumroad en dólares, MercadoPago en pesos): está en el historial de git.
+const AGENDA = "/15min";
 
-export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
+export default function Gracias() {
   const [termino, setTermino] = useState(false);
   // El sorteo pasa en el navegador, no en el render del servidor: si no, Next devuelve la misma
   // versión cacheada a todo el mundo y la prueba no reparte.
@@ -73,11 +57,6 @@ export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
   // video entero y con el clic en pagar, así el agente sabe qué pasó acá (lib/dm/pagina.js, 22/10).
   const [charla, setCharla] = useState(null);
   const WISTIA_ID = ver === "b" ? WISTIA_B : WISTIA_A;   // lo usa el <wistia-player> de abajo
-  // El pais lo resuelve el servidor (lo que la persona puso en el formulario, o la cabecera de
-  // Vercel como plan B). No se pregunta de nuevo: a esta pagina se llega habiendo contestado.
-  const pais = paisDetectado;
-  const PRECIO_PESOS = "$" + Number(precioArs).toLocaleString("es-AR") + " ARS";
-  const PRECIO_DOLARES = "USD " + precioUsd;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -147,51 +126,20 @@ export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
     return () => clearInterval(reloj);
   }, []);
 
-  // El botón lleva al checkout del país de la persona, no al de dólares para todos.
-  //
-  // 16/11/2026, sobre funnel_eventos: 181 personas tocaron comprar en esta página y pagaron 22. De
-  // los 41 argentinos que tocaron comprar, NINGUNO pagó en dólares (medición del 18/10), y son el
-  // 46% de los que llenan el formulario (339 de 731). El checkout de pesos convierte ~1 de 4 y el
-  // de dólares ~1 de 8. El PR 206 construyó la puerta que elige por país (/comprar), pero esta
-  // página, que es donde pasan TODOS los clics, seguía mandando a Gumroad en dólares con el de
-  // pesos como un renglón chico abajo: el argentino apretaba el botón grande y chocaba con una
-  // tarjeta que no le funciona.
-  const enPesos = pagaEnPesos(pais);
-  const destino = destinoDePago(pais, { pesos: MERCADOPAGO, gumroad: GUMROAD });
-  const compra = (
+  // El botón va a la agenda en otra pestaña, así el video queda abierto. El clic se cuenta dos veces a
+  // propósito: /15min lo cuenta para todas las puertas juntas, y click_agenda dice que vino de esta página.
+  const agenda = (
         <Cierre>
-          <Precio>
-            <strong>{enPesos ? PRECIO_PESOS : PRECIO_DOLARES}</strong>
-            {" · 11 módulos y 2 PDFs"}
-            {enPesos ? " · en pesos, con MercadoPago" : " · o en 2 pagos de 13,50"}
-          </Precio>
-          {destino ? (
-            <>
-              <Comprar
-                href={destino}
-                /* El de pesos lo arma nuestra propia API y redirige: va en la misma pestaña, si no
-                   la persona queda mirando una pestaña en blanco mientras se crea el pago. */
-                target={enPesos ? undefined : "_blank"}
-                rel={enPesos ? undefined : "noopener noreferrer"}
-                $listo
-                onClick={(e) => { if (enPesos) e.currentTarget.href = conIdentidad(destino, charla); evento(WISTIA_B ? faseDePago(pais) + "_" + ver : faseDePago(pais), charla); }}
-              >
-                🔥 SÍ, LO QUIERO YA!
-              </Comprar>
-              <PesosBoton href="/comprar">
-                {enPesos ? "No sos de Argentina? Elegí tu país" : "Sos de Argentina? Pagá en pesos"}
-              </PesosBoton>
-            </>
-          ) : (
-            /* Desde donde Gumroad no cobra (Cuba) no hay botón: un checkout que rechaza la tarjeta
-               sin decir por qué es peor que una explicación. Misma salida que /comprar. */
-            <Pendiente>
-              Desde {nombreDePais(pais)} el checkout no cobra.{" "}
-              <a href="https://ig.me/m/candelaria.sanchezg" target="_blank" rel="noopener noreferrer">
-                Escribime por Instagram y lo vemos
-              </a>
-            </Pendiente>
-          )}
+          <Precio>15 minutos conmigo, en vivo.</Precio>
+          <Comprar
+            href={AGENDA}
+            target="_blank"
+            rel="noopener noreferrer"
+            $listo
+            onClick={() => evento("click_agenda", charla)}
+          >
+            Agendá tus 15 minutos
+          </Comprar>
         </Cierre>
   );
 
@@ -213,7 +161,7 @@ export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
               "para el funnel no suma, que quede chiquito"). */}
           <Chico>Ah, y mandame tu CV respondiendo el mail que te llegó.</Chico>
 
-          {compra}
+          {agenda}
 
           <VideoMarco>
             <wistia-player media-id={WISTIA_ID} aspect="1.7777777777777777"></wistia-player>
@@ -226,7 +174,7 @@ export default function Gracias({ paisDetectado, precioArs, precioUsd }) {
               que ya decidio compra sin mirar nada, y el que duda baja, mira el video y se encuentra
               el mismo bloque al final. `termino` se sigue calculando porque lo usan la prueba A/B y
               el evento video_fin. */}
-          {compra}
+          {agenda}
 
           <Testimonios aria-labelledby="testimonios-titulo">
             <TestimoniosHeader>
@@ -385,17 +333,6 @@ const Precio = styled.p`
   margin: 0 0 16px; font-size: 15px; color: #625b5e;
   strong { color: #171416; font-size: 17px; }
 `;
-const PesosBoton = styled.a`
-  display: block; margin: 16px auto 0; background: none; border: 0; cursor: pointer;
-  font: inherit; font-size: 15px; font-weight: 600; color: #625b5e; text-decoration: underline;
-  text-underline-offset: 3px;
-  &:visited { color: #625b5e; }
-  &:hover { color: #171416; }
-  &:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
-`;
-const Pendiente = styled.p`
-  margin: 12px 0 0; font-size: 13px; color: #8a7f84;
-`;
 const Comprar = styled.a`
   cursor: ${p => (p.$listo ? "pointer" : "not-allowed")};
   display: inline-block; background: #cc5a50; color: #fff; text-decoration: none;
@@ -410,25 +347,3 @@ const Comprar = styled.a`
   &:active { transform: translateY(0); }
   &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 `;
-
-// El pais de quien mira, para que el boton lleve al checkout donde puede pagar. Mismo criterio que
-// /comprar (lib/paisCompra.js): primero lo que ella misma contesto en el formulario, y la IP solo
-// como plan B, porque miente seguido (VPN, viajando, vivir afuera).
-export async function getServerSideProps({ req, query }) {
-  let delFormulario = null;
-  try {
-    const ig = idDeLink(query?.ig);
-    if (ig && firmaValida(ig, firmaDeLink(query?.f))) {
-      delFormulario = paisDeTextoLibre(await paisDelLead(ig));
-    }
-  } catch (e) {
-    console.error("gracias: no pude ver el pais del formulario:", e.message);
-  }
-  return {
-    props: {
-      paisDetectado: delFormulario || paisDeCabecera(req.headers["x-vercel-ip-country"]),
-      precioArs: Number(process.env.MP_PRECIO_ARS || 39750),
-      precioUsd: Number(process.env.PRECIO_USD || 27),
-    },
-  };
-}

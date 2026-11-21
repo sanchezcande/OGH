@@ -245,19 +245,16 @@ test("formularioDeLaCharla: el país solo con un único formulario; la compra co
 
 /* ---------- 5. la página ---------- */
 
-test("/devs/gracias manda la charla con el video entero y con el botón de pagar, y nada más", async () => {
+test("/devs/gracias manda la charla con el video entero y con el botón de la agenda, y nada más", async () => {
   const p = await leer("../pages/devs/gracias.jsx");
   assert.match(p, /idDeLaPestana\("", almacen\)/);
   // 26/10: si la página se abrió en otra pestaña (Instagram abre aparte el link a /devs/gracias), la charla sale de
   // la copia que dejó /devs en el navegador.
   assert.match(p, /const ch = charlaDe\(\(\) => window\.sessionStorage\) \|\| charlaDe\(\(\) => window\.localStorage\);/);
   assert.match(p, /evento\(WISTIA_B \? f \+ "_" \+ v : f, f === "video_fin" \? ch : null\)/);
-  // 16/11: los dos botones son uno solo y la fase la elige el país (faseDePago devuelve
-  // "click_mp" para Argentina y "click_gumroad" para el resto, lib/paisCompra.js). Lo que este
-  // test cuida sigue igual: el clic en pagar va con la charla, así el agente no vuelve a vender.
-  assert.match(p, /evento\(WISTIA_B \? faseDePago\(pais\) \+ "_" \+ ver : faseDePago\(pais\), charla\)/);
-  assert.match(p, /faseDePago,/, "la fase sale de paisCompra, no de un string escrito a mano");
-  assert.equal(/evento\([^)]*"click_gumroad"/.test(p), false, "ninguna fase de pago escrita a mano");
+  // 21/11: la página ya no tiene botón de pagar; el de la agenda manda la charla igual, así el agente sabe que tocó agendar.
+  assert.match(p, /evento\("click_agenda", charla\)/);
+  assert.equal(/faseDePago|"click_gumroad"|"click_mp"/.test(p), false, "sin fases de pago en esta página");
   const e = await leer("../lib/embudo.js");
   assert.match(e, /charla\?\.ig \? \{ ig: String\(charla\.ig\), firma: String\(charla\.firma \|\| ""\) \} : \{\}/);
 });

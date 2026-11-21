@@ -15,6 +15,8 @@ const FASES = new Set([
   // pagar sigue siendo click_mp o click_gumroad, los mismos de /devs/gracias, así el embudo cuenta
   // los dos caminos juntos y el agente ve la misma nota en la charla (lib/dm/pagina.js).
   "comprar_vista",
+  // 21/11/2026: /devs/gracias ya no vende, manda a la agenda de 15 minutos. El clic en ese botón.
+  "click_agenda",
   "preguntas_vista", "preguntas_pdf_click", "preguntas_llamada_click",
   // preguntas_email_enviado la manda /preguntas desde el 18/09 y NUNCA estuvo en esta lista:
   // la API le contestaba 400 y el paso más importante del embudo de founders, el de completar
