@@ -24,7 +24,7 @@ const {
   RESPUESTAS_PUBLICAS, respuestaPublica, responderEnPublico,
   AUTOMATICO_CV_MANYCHAT, AUTOMATICO_DEV_MANYCHAT, FRESCO_MINUTOS, MENSAJES_HONDOS, MENSAJES_POR_HILO, TEXTO_CV, TEXTO_DEV, VENTANA_DIAS,
   comentariosParaContestar, contestadoDesde, contestarComentarios, enVentana, esDmDeCV, esDmDeDev, esPalabraCV, esPalabraDEV, mediosParaLeer, motivoDelError,
-  tipoDelComentario,
+  tipoDelComentario, TEXTO_ENTREVISTA, LINK_WEBINAR, PALABRA_ENTREVISTA, esPalabraEntrevista, esDmDeEntrevista, dentroDe,
 } = await import("../lib/dm/comentarios.js");
 const { esAutomatico, claveTexto } = await import("../lib/dm/instagram.js");
 
@@ -116,7 +116,7 @@ test("los motivos de los errores de Instagram", () => {
  * Un cliente de Instagram y una base de mentira. `fallas` dice con qué error contesta cada
  * comentario; `bandeja` son las charlas que ya existen (para la traba del automático de ManyChat).
  */
-function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Set(), bandeja = null, hondas = {}, conDm = null } = {}) {
+function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Set(), bandeja = null, hondas = {}, conDm = null, conDmEntrevista = null } = {}) {
   const base = { filas: new Map(), tomados };
   // Sin bandeja: una sola charla vieja, de alguien que no comentó. Así nadie queda tapado por la
   // traba y la bandeja cubre desde antes de todos los comentarios.
@@ -187,7 +187,8 @@ function armar({ comentarios, fallas = {}, fallasPublicas = {}, tomados = new Se
       base.tomados.add(id);
       base.filas.set(id, { ...datos, estado: "ya_tenia" });
     },
-    ...(conDm ? { usuariosConDm: async () => conDm } : {}),
+    // Como la base: con "entrevista", los que ya tienen el del webinar; sin tipo, los de CV y DEV.
+    ...(conDm || conDmEntrevista ? { usuariosConDm: async (tipo = null) => (tipo === "entrevista" ? conDmEntrevista : conDm) || [] } : {}),
     soltarComentario: async (id) => {
       if (base.filas.get(id)?.estado === "enviando") {
         base.filas.delete(id);
@@ -1113,4 +1114,165 @@ test("el cliente lista los posts de a páginas, siguiendo el cursor, hasta las q
   assert.equal(pedidos.filter((p) => p.includes("/ig1/media")).length, 3);
   // Por defecto, una sola página, como antes.
   assert.equal((await ig.medios()).length, 1);
+});
+
+// ---- ENTREVISTA: el webinar gratis del 1/12 (22/11) ----
+//
+// Desde el plan v3 de Esteban los reels cierran con "Comentá ENTREVISTA y te mando el link". Mismo camino, misma regla
+// estricta y mismas trabas que CV y DEV. Arranca apagado (sin `entrevista`, el cron hace exactamente lo de antes), corta
+// cuando el webinar ya pasó, y no se tapa con CV: el dev que ya tiene la lista es justo el que tiene que ir al webinar.
+// Nada de esto le manda nada a nadie: Instagram y la base son dobles.
+
+const WEBINAR = { desde: "2026-10-29T00:00:00Z", hasta: "2026-12-02T00:00:00Z" };
+const ENTREVISTAS = [
+  { id: "e1", text: "ENTREVISTA", timestamp: "2026-10-29T18:00:00+0000", username: "devuno" },
+  { id: "e2", text: "holaa entrevista!", timestamp: "2026-10-29T17:50:00+0000", username: "devdos" },
+  { id: "e3", text: "tengo una entrevista mañana", timestamp: "2026-10-29T17:40:00+0000", username: "devtres" },
+  { id: "e4", text: "Entrevista 🙌", timestamp: "2026-10-29T17:30:00+0000", username: "devcuatro" },
+];
+
+test("ENTREVISTA: la palabra sola, o con relleno, pide el link; adentro de una frase no", () => {
+  assert.equal(PALABRA_ENTREVISTA, "entrevista");
+  const piden = [
+    "Entrevista", "ENTREVISTA", "entrevista", "  ENTREVISTA  ", "ENTREVISTA 🙌", "holaa entrevista!", "Entrevista!!",
+    "Entrevísta", "ENTREVISTA porfa", "Hola, entrevista please", "entrevista gracias 🙏", "Entrevistaaa", "jajaja entrevista",
+  ];
+  for (const t of piden) assert.equal(esPalabraEntrevista(t), true, `tendría que disparar con ${JSON.stringify(t)}`);
+  const no = [
+    "tengo una entrevista mañana", "mañana tengo entrevista", "me fue mal en la entrevista", "entrevistas", "entrevistador",
+    "quiero una entrevista", "entrevista cv", "cv entrevista", "entrevista 1", "", "   ", null, undefined, "🙌🏼",
+  ];
+  for (const t of no) assert.equal(esPalabraEntrevista(t), false, `no tendría que disparar con ${JSON.stringify(t)}`);
+});
+
+test("ENTREVISTA: apagado es una charla más; prendido es su propio pedido, y CV y DEV no cambian", () => {
+  assert.equal(tipoDelComentario("ENTREVISTA"), null, "apagado no dispara nada");
+  assert.equal(tipoDelComentario("ENTREVISTA", { entrevista: true }), "entrevista");
+  assert.equal(tipoDelComentario("CV", { entrevista: true }), "cv");
+  assert.equal(tipoDelComentario("DEV", { entrevista: true }), "dev");
+  assert.equal(tipoDelComentario("cv entrevista", { entrevista: true }), null, "dos pedidos: es una charla");
+});
+
+test("ENTREVISTA: el texto es el de Esteban TAL CUAL, con la web del webinar, en un solo mensaje", () => {
+  assert.equal(
+    TEXTO_ENTREVISTA,
+    "Te lo mando por acá. El webinar es gratis, el martes 1 de diciembre a las 19:00 de Argentina. Entrás a un grupo donde te aviso primero con el enlace del directo: https://candelaria-webinar.netlify.app/",
+  );
+  assert.equal(LINK_WEBINAR, "https://candelaria-webinar.netlify.app/");
+  assert.ok(!/utm_|[?&]de=/.test(LINK_WEBINAR), "el link va limpio");
+  assert.ok(TEXTO_ENTREVISTA.length <= 1000, "Instagram corta a los 1.000 caracteres");
+  assert.ok(!TEXTO_ENTREVISTA.includes("—") && !/[¿¡]/.test(TEXTO_ENTREVISTA), TEXTO_ENTREVISTA);
+  assert.equal(esDmDeEntrevista(TEXTO_ENTREVISTA), true);
+  assert.equal(esDmDeEntrevista("te paso la web: candelaria-webinar.netlify.app"), true);
+  assert.equal(esDmDeEntrevista(TEXTO_CV), false);
+  assert.equal(esDmDeEntrevista(TEXTO_DEV), false);
+  assert.equal(esDmDeEntrevista(""), false);
+  // Y no pasa por el DM de CV ni por el de DEV.
+  assert.equal(esDmDeCV(TEXTO_ENTREVISTA), false);
+  assert.equal(esDmDeDev(TEXTO_ENTREVISTA), false);
+});
+
+test("ENTREVISTA: la bandeja lo toma por automático solo si está cargado en dm_config automaticos", () => {
+  // No arranca como ningún automático viejo: sin cargarlo, lo que salió de la cuenta pasaría por algo que escribió Cande a
+  // mano y el agente se saldría de la charla (lib/dm/bandeja.js). Por eso va en dm_config "automaticos".
+  const viejos = [claveTexto(AUTOMATICO_CV_MANYCHAT), claveTexto(AUTOMATICO_DEV_MANYCHAT)];
+  assert.equal(esAutomatico(TEXTO_ENTREVISTA, viejos), false);
+  assert.equal(esAutomatico(TEXTO_ENTREVISTA, [...viejos, claveTexto(TEXTO_ENTREVISTA)]), true);
+});
+
+test("ENTREVISTA: entre desde y hasta; una fecha mal escrita no deja pasar ninguno", () => {
+  const t = (s) => Date.parse(s);
+  assert.equal(dentroDe(WEBINAR, t("2026-11-25T12:00:00Z")), true);
+  assert.equal(dentroDe(WEBINAR, t("2026-10-28T23:59:59Z")), false, "antes de prenderlo");
+  assert.equal(dentroDe(WEBINAR, t("2026-12-02T00:00:00Z")), false, "el webinar ya pasó");
+  assert.equal(dentroDe({}, t("2026-11-25T12:00:00Z")), true, "sin fechas, todo");
+  assert.equal(dentroDe({ desde: "ayer" }, t("2026-11-25T12:00:00Z")), false);
+  assert.equal(dentroDe({ hasta: "el martes" }, t("2026-11-25T12:00:00Z")), false);
+  assert.equal(dentroDe(WEBINAR, NaN), false);
+});
+
+test("ENTREVISTA apagado: el cron no le contesta a nadie que la comente, y CV sale como siempre", async () => {
+  const d = armar({ comentarios: [...CS, ...ENTREVISTAS] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["c1", "c2", "c4"]);
+  assert.ok(d.ig.pedidos.every((p) => p.texto === TEXTO_CV));
+  assert.equal(r.entrevista, undefined, "la cuenta de antes, sin nada nuevo");
+  assert.equal(d.base.filas.has("e1"), false);
+});
+
+test("ENTREVISTA prendida: cada pedido recibe su texto, y la frase con la palabra adentro no se toca", async () => {
+  const d = armar({ comentarios: [...CS, ...DEVS, ...ENTREVISTAS] });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, entrevista: WEBINAR });
+  const por = Object.fromEntries(d.ig.pedidos.map((p) => [p.id, p.texto]));
+  assert.deepEqual(Object.keys(por).sort(), ["c1", "c2", "c4", "d1", "d2", "e1", "e2", "e4"]);
+  for (const id of ["e1", "e2", "e4"]) assert.equal(por[id], TEXTO_ENTREVISTA);
+  assert.equal(por.c1, TEXTO_CV);
+  assert.equal(por.d1, TEXTO_DEV);
+  assert.equal(r.entrevista, 3);
+  assert.equal(d.base.filas.get("e1").tipo, "entrevista", "queda anotado qué pidió");
+  assert.equal(d.base.filas.get("c1").tipo, "cv");
+  assert.equal(d.base.filas.has("e3"), false, "'tengo una entrevista mañana' está contando algo, no pidiendo el link");
+  // La respuesta pública sale igual que con CV: el DM de un desconocido cae en solicitudes.
+  assert.ok(d.ig.publicas.some((p) => p.id === "e1"));
+});
+
+test("ENTREVISTA: los de antes de prenderla y los de después del webinar no reciben nada", async () => {
+  const d = armar({ comentarios: ENTREVISTAS });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, entrevista: { desde: "2026-10-29T17:55:00Z", hasta: null } });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["e1"], "e2 y e4 son de antes de prenderla");
+  const e = armar({ comentarios: [...ENTREVISTAS, ...CS] });
+  await contestarComentarios({ ig: e.ig, base: e.dobleBase, avisar: e.avisar, ahora: () => ahora, entrevista: { hasta: "2026-10-29T17:00:00Z" } });
+  assert.deepEqual(e.ig.pedidos.map((p) => p.id), ["c1", "c2", "c4"], "el webinar ya pasó: solo CV");
+});
+
+test("ENTREVISTA: tener la lista de CV no saca el link del webinar, y tener el link no saca la lista", async () => {
+  // devuno ya tiene el DM de CV (otra vuelta) y devdos ya tiene el del webinar.
+  const comentarios = [
+    ENTREVISTAS[0],
+    ENTREVISTAS[1],
+    { id: "c9", text: "CV", timestamp: "2026-10-29T17:00:00+0000", username: "devdos" },
+  ];
+  const d = armar({ comentarios, conDm: ["devuno"], conDmEntrevista: ["devdos"] });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, entrevista: WEBINAR });
+  assert.deepEqual(d.ig.pedidos.map((p) => [p.id, p.texto]), [["e1", TEXTO_ENTREVISTA], ["c9", TEXTO_CV]]);
+});
+
+test("ENTREVISTA comentada en dos reels: un solo DM", async () => {
+  const comentarios = [
+    { id: "y1", text: "ENTREVISTA", timestamp: "2026-10-29T12:00:00+0000", username: "MismaPersona" },
+    { id: "y2", text: "entrevista", timestamp: "2026-10-29T13:00:00+0000", username: "mismapersona" },
+  ];
+  const d = armar({ comentarios });
+  await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, entrevista: WEBINAR });
+  assert.deepEqual(d.ig.pedidos.map((p) => p.id), ["y2"]);
+});
+
+test("ENTREVISTA: el que ya recibió el link no lo recibe otra vez; el DM de CV de antes no lo frena", () => {
+  const t = Date.parse("2026-10-29T17:32:15Z");
+  const m = (texto) => [{ igsid: "x", pedidos: MENSAJES_POR_HILO, mensajes: [{ deLaCuenta: true, creado: new Date("2026-10-20T12:00:00Z"), texto }] }];
+  assert.equal(contestadoDesde(m(TEXTO_ENTREVISTA), t, "entrevista"), "si", "ya recibió el nuestro");
+  assert.equal(contestadoDesde(m(TEXTO_CV), t, "entrevista"), "no", "la lista de CV es otra cosa");
+  assert.equal(contestadoDesde(m(TEXTO_ENTREVISTA), t), "no", "y el del webinar no cuenta como el DM de CV");
+  assert.equal(contestadoDesde(m(TEXTO_CV), t), "si", "CV sigue como estaba");
+  const despues = [{ igsid: "x", pedidos: MENSAJES_POR_HILO, mensajes: [{ deLaCuenta: true, creado: new Date("2026-10-29T18:00:00Z"), texto: "hola!" }] }];
+  assert.equal(contestadoDesde(despues, t, "entrevista"), "si", "lo que la cuenta le escribió después del comentario frena, como con CV");
+});
+
+test("ENTREVISTA: si el DM queda en una solicitud sin aceptar, el aviso habla del webinar", async () => {
+  const fallas = { e1: Object.assign(new Error("La página no es propietaria del hilo"), { code: 100, subcode: 2534037 }) };
+  const d = armar({ comentarios: ENTREVISTAS, fallas });
+  const r = await contestarComentarios({ ig: d.ig, base: d.dobleBase, avisar: d.avisar, ahora: () => ahora, entrevista: WEBINAR });
+  assert.equal(r.sin_aceptar, 1);
+  assert.equal(d.avisos.length, 1);
+  assert.match(d.avisos[0].titulo, /ENTREVISTA/);
+  assert.match(d.avisos[0].campos.Hacé, /el link del webinar/);
+});
+
+test("ENTREVISTA: el cron y el webhook la prenden con la misma llave, y sin la columna tipo no sale", async () => {
+  const fuente = await readFile(new URL("../pages/api/dm/comentarios.js", import.meta.url), "utf8");
+  assert.match(fuente, /entrevistaPrendida\(ajuste\)/);
+  const hook = await readFile(new URL("../pages/api/ig/webhook.js", import.meta.url), "utf8");
+  assert.match(hook, /entrevistaPrendida\(ajuste\)/);
+  const base = await readFile(new URL("../lib/dm/comentariosBase.js", import.meta.url), "utf8");
+  assert.match(base, /e\?\.activo === true && conTipo/);
 });

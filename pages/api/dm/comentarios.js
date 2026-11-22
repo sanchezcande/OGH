@@ -20,6 +20,11 @@
 // Desde el 02/11 contesta también "DEV" (un founder que pide la llamada): mismo camino, mismas trabas
 // y otro texto (lib/dm/comentarios.js, TEXTO_DEV). Lo último que quedaba en ManyChat.
 //
+// Desde el 22/11 contesta también "ENTREVISTA" (el webinar gratis del 1/12, lib/dm/comentarios.js, TEXTO_ENTREVISTA).
+// Va aparte y apagado: se prende con dm_config "comentarios" en
+// { ..., entrevista: { activo: true, desde: "<fecha ISO>", hasta: "<fecha ISO>" } }: los comentarios de antes de
+// `desde` no se contestan, y desde `hasta` (el webinar ya pasó) tampoco.
+//
 // Arranca apagado: se prende con dm_config "comentarios" en { activo: true }. El tope por vuelta
 // (`tope`, 10 por defecto) está para que la primera vez no salga una tanda entera de una.
 //
@@ -28,8 +33,8 @@ import { avisarDm, instagram, reglasInstagram } from "../../../lib/dm/armado";
 import { ajustes, guardarConfig, hayBase, leerConfig } from "../../../lib/dm/base";
 import { contestarComentarios } from "../../../lib/dm/comentarios";
 import {
-  anotarComentario, anotarEnDuda, anotarYaContestado, comentariosEnLaBase, comentariosParaReintentar, contarComentarios, soltarComentario, soltarDuda, tablaComentarios,
-  tomarComentario, tomarPublica, usuariosConDm,
+  anotarComentario, anotarEnDuda, anotarYaContestado, comentariosEnLaBase, comentariosParaReintentar, contarComentarios, entrevistaPrendida, soltarComentario, soltarDuda,
+  tablaComentarios, tomarComentario, tomarPublica, usuariosConDm,
 } from "../../../lib/dm/comentariosBase";
 
 const TOPE_POR_VUELTA = 10;
@@ -59,6 +64,7 @@ export default async function handler(req, res) {
   // sí sale: el DM de CV es un texto fijo, no lo redacta el modelo.
   const aj = await ajustes();
   if (aj.modo === "apagado") return res.status(200).json({ ok: true, motivo: "el agente está apagado" });
+  const entrevista = entrevistaPrendida(ajuste);
 
   try {
     const cuentas = await contestarComentarios({
@@ -70,11 +76,12 @@ export default async function handler(req, res) {
       // Lo que falta para los 120 segundos queda de margen para el envío que esté saliendo.
       limite: arranque + TIEMPO_MS,
       avisar: avisarDm,
+      entrevista,
       tope: Number.isInteger(ajuste.tope) && ajuste.tope > 0 ? ajuste.tope : TOPE_POR_VUELTA,
       mediosQueMira: MEDIOS_POR_VUELTA,
       paginasDeMedios: PAGINAS_DE_MEDIOS,
       // Sin ids ni textos en el registro: Instagram los repite en sus errores.
-      registrar: (motivo, e) => console.error("dm: un comentario con CV o DEV no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
+      registrar: (motivo, e) => console.error("dm: un comentario con CV, DEV o ENTREVISTA no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
     });
     return res.status(200).json({ ok: true, ...cuentas, total: await contarComentarios() });
   } catch (e) {
