@@ -154,6 +154,15 @@ const BLOQUES = [
     mas: [],
   },
   {
+    // 23/11/2026: un dev en los DMs de esta semana ("se me dificulta al momento de tocar el punto
+    // economico", lo que mas le cuesta es negociar). Sale de tarifaPorNivel y de lo ya publicado
+    // en "cuanto-cobrar" y "mejorar".
+    id: "negociar",
+    q: "Me cuesta hablar de plata en la entrevista, cómo negocio",
+    r: `Llegá con tu número ya mirado, así no lo inventás en el momento. En nuestra red, la mediana de los ${nro(DATOS.tarifa.n)} developers de LatAm que pusieron tarifa es de ${DATOS.tarifa.mediana} dólares la hora: junior ${niv("Junior").mediana}, semi-senior ${niv("Semi-senior").mediana}, senior ${niv("Senior").mediana}. Pedir mucho menos no te hace más contratable, te hace más sospechoso: cuando alguien me pide muy poco, lo primero que pienso es qué no me está contando. Y antes de firmar, preguntá cuál es la banda del puesto y qué hace falta para pasar a la de arriba. El que no pregunta entra con el número que a la empresa le conviene.`,
+    mas: [],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
