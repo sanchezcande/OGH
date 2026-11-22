@@ -145,6 +145,15 @@ const BLOQUES = [
     mas: [],
   },
   {
+    // 22/11/2026: dos devs en los DMs de esta semana ("que rol crees que va a tener mas
+    // crecimiento, seran los roles de datos?" y un analista de datos que quiere pasar a
+    // ingenieria de datos). Sale de DATOS "Que roles le piden las empresas" y de red_devs.
+    id: "que-rol-crece",
+    q: "Qué rol va a crecer más, me conviene pasarme a datos",
+    r: `Predicción no te voy a hacer, porque no la tengo. Te cuento lo que me entra a mí, que son pocas búsquedas: se reparten casi parejo entre backend, frontend e IA, y un rol de datos suelto no me lo pidió nadie nunca. Del otro lado, de los ${nro(DATOS.n)} que se anotaron en la red, ${rol("Data / AI")} son de datos o IA. Si datos te gusta, andá igual, pero no lo elijas porque alguien te dijo que es lo que viene. Te hablo de lo que veo yo, no del mercado.`,
+    mas: [],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
