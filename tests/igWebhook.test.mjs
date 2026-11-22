@@ -20,7 +20,7 @@ import { avisos, respuesta } from "./dobles/preparar.mjs";
 const {
   comentariosDelEvento, contestarDelWebhook, desafioDeVerificacion, firmaDeMeta, firmaValidaDeMeta, webhookConfigurado,
 } = await import("../lib/dm/webhookIg.js");
-const { RESPUESTAS_PUBLICAS, TEXTO_CV } = await import("../lib/dm/comentarios.js");
+const { RESPUESTAS_PUBLICAS, TEXTO_CV, TEXTO_ENTREVISTA } = await import("../lib/dm/comentarios.js");
 
 const SECRETO = "app-secret-de-prueba";
 const TOKEN = "verify-token-de-prueba";
@@ -103,7 +103,7 @@ test("el mismo comentario repetido en el aviso se cuenta una vez", () => {
 /* ---------- contestar ---------- */
 
 /** Dobles de Instagram y de la base. `fallas` es el error que tira el envío de ese comentario. */
-function armar({ fallas = {}, fallasPublicas = {}, conDm = [] } = {}) {
+function armar({ fallas = {}, fallasPublicas = {}, conDm = [], conDmEntrevista = [] } = {}) {
   const publicas = [];
   const tomados = [];
   const anotados = [];
@@ -135,7 +135,8 @@ function armar({ fallas = {}, fallasPublicas = {}, conDm = [] } = {}) {
         if (!anotados.some((a) => a.id === id && a.estado === "enviada") || publicas.some((p) => p.id === id)) return false;
         return true;
       },
-      async tieneDmDeCV(u) { return conDm.includes(String(u).toLowerCase()); },
+      // Como la base: con "entrevista", si ya tiene el DM del webinar; sin tipo, el de CV.
+      async tieneDmDeCV(u, tipo = null) { return (tipo === "entrevista" ? conDmEntrevista : conDm).includes(String(u).toLowerCase()); },
     },
     avisar: async (titulo, campos) => { avisos.push(`${titulo} ${JSON.stringify(campos)}`); },
   };
@@ -146,7 +147,7 @@ test("un comentario que pide la lista recibe su DM", async () => {
   const r = await contestarDelWebhook({ ig: d.ig, base: d.base, comentarios: comentariosDelEvento(aviso(comentario())), avisar: d.avisar });
   assert.deepEqual(d.pedidos, [{ id: "18001", texto: TEXTO_CV }], "el DM sale con el texto de CV");
   // Tomado en la base ANTES de mandar, y con quién es, para que no salga dos veces.
-  assert.deepEqual(d.tomados, [{ id: "18001", medio: "media1", usuario: "undev" }]);
+  assert.deepEqual(d.tomados, [{ id: "18001", medio: "media1", usuario: "undev", tipo: "cv" }]);
   assert.deepEqual(d.anotados, [{ id: "18001", estado: "enviada", igId: "ig-18001" }]);
   assert.equal(r.enviadas, 1);
   assert.equal(r.piden, 1);
@@ -316,4 +317,42 @@ test("el cron de 15 minutos sigue estando: es la red si el webhook pierde un avi
   assert.deepEqual(crons.find((c) => c.path === "/api/dm/comentarios"), { path: "/api/dm/comentarios", schedule: "*/15 * * * *" });
   // Y el webhook no es un cron: no despierta la base en otros minutos (ver tests/crons.test.mjs).
   assert.equal(crons.some((c) => c.path.startsWith("/api/ig/")), false);
+});
+
+/* ---------- ENTREVISTA (22/11) ---------- */
+
+const WEBINAR = { desde: "2026-11-22T03:00:00Z", hasta: "2026-12-02T00:00:00Z" };
+const enLaSemana = () => new Date("2026-11-23T15:00:00Z");
+
+test("ENTREVISTA prendida: el webhook manda el link del webinar, anotado como entrevista", async () => {
+  const d = armar();
+  const eventos = comentariosDelEvento(aviso(comentario({ text: "holaa entrevista!" })));
+  const r = await contestarDelWebhook({ ig: d.ig, base: d.base, comentarios: eventos, avisar: d.avisar, entrevista: WEBINAR, ahora: enLaSemana });
+  assert.deepEqual(d.pedidos, [{ id: "18001", texto: TEXTO_ENTREVISTA }]);
+  assert.deepEqual(d.tomados, [{ id: "18001", medio: "media1", usuario: "undev", tipo: "entrevista" }]);
+  assert.equal(r.enviadas, 1);
+});
+
+test("ENTREVISTA apagada, fuera de fecha, o adentro de una frase: el webhook no manda nada", async () => {
+  const casos = [
+    { text: "ENTREVISTA", entrevista: null, ahora: enLaSemana },
+    { text: "ENTREVISTA", entrevista: WEBINAR, ahora: () => new Date("2026-12-03T12:00:00Z") },
+    { text: "tengo una entrevista mañana", entrevista: WEBINAR, ahora: enLaSemana },
+  ];
+  for (const { text, entrevista, ahora } of casos) {
+    const d = armar();
+    const r = await contestarDelWebhook({ ig: d.ig, base: d.base, comentarios: comentariosDelEvento(aviso(comentario({ text }))), avisar: d.avisar, entrevista, ahora });
+    assert.deepEqual(d.pedidos, [], JSON.stringify({ text, entrevista }));
+    assert.equal(r.piden, 0);
+  }
+});
+
+test("ENTREVISTA: tener la lista de CV no la frena; tener ya el link del webinar sí", async () => {
+  const conCV = armar({ conDm: ["undev"] });
+  await contestarDelWebhook({ ig: conCV.ig, base: conCV.base, comentarios: comentariosDelEvento(aviso(comentario({ text: "ENTREVISTA" }))), avisar: conCV.avisar, entrevista: WEBINAR, ahora: enLaSemana });
+  assert.equal(conCV.pedidos.length, 1);
+  const conLink = armar({ conDmEntrevista: ["undev"] });
+  const r = await contestarDelWebhook({ ig: conLink.ig, base: conLink.base, comentarios: comentariosDelEvento(aviso(comentario({ text: "ENTREVISTA" }))), avisar: conLink.avisar, entrevista: WEBINAR, ahora: enLaSemana });
+  assert.deepEqual(conLink.pedidos, []);
+  assert.equal(r.ya_tenia, 1);
 });

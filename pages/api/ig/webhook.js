@@ -29,7 +29,7 @@ import { waitUntil } from "@vercel/functions";
 import { avisarDm, instagram } from "../../../lib/dm/armado";
 import { ajustes, hayBase, leerConfig } from "../../../lib/dm/base";
 import {
-  anotarComentario, soltarComentario, tablaComentarios, tieneDmDeCV, tomarComentario, tomarPublica,
+  anotarComentario, entrevistaPrendida, soltarComentario, tablaComentarios, tieneDmDeCV, tomarComentario, tomarPublica,
 } from "../../../lib/dm/comentariosBase";
 import { leerCrudo } from "../../../lib/dm/cuerpo";
 import { comentariosDelEvento, contestarDelWebhook, desafioDeVerificacion, firmaValidaDeMeta } from "../../../lib/dm/webhookIg";
@@ -53,9 +53,11 @@ async function atender(comentarios) {
     ig: instagram,
     base: { tomarComentario, anotarComentario, soltarComentario, tieneDmDeCV, tomarPublica },
     comentarios,
+    // ENTREVISTA, si está prendida (22/11): la misma llave que en el cron, después de tablaComentarios (la columna tipo).
+    entrevista: entrevistaPrendida(ajuste),
     avisar: avisarDm,
     // Sin ids ni textos en el registro: Instagram los repite en sus errores.
-    registrar: (motivo, e) => console.error("ig: un comentario con CV no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
+    registrar: (motivo, e) => console.error("ig: un comentario con CV o ENTREVISTA no se pudo contestar", motivo, e?.code ?? "", e?.subcode ?? ""),
   });
   // Solo cantidades: ni ids ni usuarios salen en los registros.
   if (cuentas.piden) console.log("ig: webhook de comentarios", JSON.stringify(cuentas));
