@@ -356,3 +356,32 @@ test("ENTREVISTA: tener la lista de CV no la frena; tener ya el link del webinar
   assert.deepEqual(conLink.pedidos, []);
   assert.equal(r.ya_tenia, 1);
 });
+
+/* ---------- dos apps (23/11): Metrics y PropBot ---------- */
+
+test("vale el aviso firmado por cualquiera de las dos apps, y por ninguna otra", () => {
+  const crudo = JSON.stringify(aviso(comentario()));
+  const deMetrics = firmaDeMeta(crudo, "secreto-metrics");
+  const dePropbot = firmaDeMeta(crudo, "secreto-propbot");
+  assert.equal(firmaValidaDeMeta(crudo, deMetrics, ["secreto-metrics", "secreto-propbot"]), true);
+  assert.equal(firmaValidaDeMeta(crudo, dePropbot, ["secreto-metrics", "secreto-propbot"]), true);
+  assert.equal(firmaValidaDeMeta(crudo, firmaDeMeta(crudo, "otra"), ["secreto-metrics", "secreto-propbot"]), false);
+  assert.equal(firmaValidaDeMeta(crudo, dePropbot, []), false, "sin secretos no entra nada");
+  assert.equal(firmaValidaDeMeta(crudo, undefined, ["secreto-propbot"]), false);
+});
+
+test("la segunda app se toma del entorno, IG_APP_SECRET_2, sin reiniciar", () => {
+  const antes = { a: process.env.IG_APP_SECRET, b: process.env.IG_APP_SECRET_2 };
+  try {
+    process.env.IG_APP_SECRET = "secreto-metrics";
+    process.env.IG_APP_SECRET_2 = "secreto-propbot";
+    const crudo = JSON.stringify(aviso(comentario()));
+    assert.equal(firmaValidaDeMeta(crudo, firmaDeMeta(crudo, "secreto-propbot")), true);
+    assert.equal(firmaValidaDeMeta(crudo, firmaDeMeta(crudo, "secreto-metrics")), true);
+    delete process.env.IG_APP_SECRET_2;
+    assert.equal(firmaValidaDeMeta(crudo, firmaDeMeta(crudo, "secreto-propbot")), false);
+  } finally {
+    if (antes.a === undefined) delete process.env.IG_APP_SECRET; else process.env.IG_APP_SECRET = antes.a;
+    if (antes.b === undefined) delete process.env.IG_APP_SECRET_2; else process.env.IG_APP_SECRET_2 = antes.b;
+  }
+});
