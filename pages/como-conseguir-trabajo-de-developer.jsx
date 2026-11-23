@@ -41,6 +41,7 @@ const RUTA_DATOS = "/datos-developers-latam";
 const rol = (q) => (DATOS.roles.find((r) => r.que === q) || {}).n || 0;
 const TRES_GRANDES = rol("Full-stack") + rol("Backend") + rol("Frontend");
 const PCT_TRES = Math.round((TRES_GRANDES / DATOS.n) * 100);
+const BUSCAN = DATOS.situacion.find((x) => x.que === "Buscando activamente") || {};
 
 const BLOQUES = [
   {
@@ -160,6 +161,16 @@ const BLOQUES = [
     id: "negociar",
     q: "Me cuesta hablar de plata en la entrevista, cómo negocio",
     r: `Llegá con tu número ya mirado, así no lo inventás en el momento. En nuestra red, la mediana de los ${nro(DATOS.tarifa.n)} developers de LatAm que pusieron tarifa es de ${DATOS.tarifa.mediana} dólares la hora: junior ${niv("Junior").mediana}, semi-senior ${niv("Semi-senior").mediana}, senior ${niv("Senior").mediana}. Pedir mucho menos no te hace más contratable, te hace más sospechoso: cuando alguien me pide muy poco, lo primero que pienso es qué no me está contando. Y antes de firmar, preguntá cuál es la banda del puesto y qué hace falta para pasar a la de arriba. El que no pregunta entra con el número que a la empresa le conviene.`,
+    mas: [],
+  },
+  {
+    // 24/11/2026: tres devs en los DMs de esta semana ("nunca se puede estar al 100",
+    // "cuando tenga este curso y algunos proyectos me voy a poner con la busqueda",
+    // "estoy actualizandome para ir tras una mejor oportunidad en un par de meses").
+    // Sale del paso 5 del prompt del agente, de "aplicar" y de situacion en red_devs.
+    id: "cuando-buscar",
+    q: "Todavía no me siento al cien, espero a terminar el curso para empezar a buscar",
+    r: `No esperes. Andá mandando mientras terminás el curso, así ya te vas abriendo a oportunidades. El cien no llega nunca, y del otro lado tampoco lo espero: la lista de requisitos del aviso la escribimos pidiendo todo, y después contratamos al que cumple ocho. Si cumplís once de doce y no mandás el CV, el que cumple cuatro y lo manda te gana el lugar. Y mientras vos esperás, otros no: de los ${nro(DATOS.n)} que se anotaron en la red, el ${coma(BUSCAN.pct)}% dice estar buscando activamente. Lo que sí podés tener listo hoy es una sola cosa terminada que yo pueda abrir.`,
     mas: [],
   },
   {
