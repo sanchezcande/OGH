@@ -1957,3 +1957,84 @@ test("una reacción a una historia no queda pendiente ni se guarda como foto; un
   assert.deepEqual(sinRespuesta(soloReaccion, yo), [], "con solo una reacción no queda nada pendiente");
   assert.equal(textoDe({ texto: "" }), "[adjunto o mensaje sin texto]", "un adjunto sin texto sigue siendo un adjunto");
 });
+
+/* ---------- medio emoji y el #9010 (23/11) ---------- */
+
+// Como Postgres con un JSONB: JSON.stringify deja una mitad de emoji suelta como \ud83d, y eso no entra (22P02).
+const comoPostgres = (w) => {
+  const guardar = w.base.guardarConfig;
+  w.base.guardarConfig = async (k, v) => {
+    if (/\\u[dD][89a-fA-F][0-9a-fA-F]{2}/.test(JSON.stringify(v))) {
+      throw Object.assign(new Error("invalid input syntax for type json"), { code: "22P02" });
+    }
+    return guardar(k, v);
+  };
+};
+// Como Telegram: con una mitad de emoji suelta rechaza el mensaje entero.
+const sinMitad = (s) => !/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(s);
+
+test("23/11: un emoji justo en el carácter 60 no parte el texto: la vuelta guarda su estado y el resumen sale entero", async () => {
+  // 59 letras y el emoji: cortado por unidades de UTF-16 en 60 quedaba la primera mitad del 🙏 suelta.
+  const dijo = `${"a".repeat(59)}🙏 y sigue el mensaje de prueba`;
+  const w = mundo({ hilos: [charla(3, NUEVO, [["lead", dijo, 40 * 60]])], perfiles: NUEVO_PERFIL, directorio: NUEVO_EN_MC });
+  comoPostgres(w);
+  const r = await w.revisar();
+  assert.ok(w.config.bandeja_estado, "el estado se guardó: la vuelta terminó");
+  assert.ok(w.config.bandeja_paginas?.marca, "y dejó su marca: vigilarRed la ve como una vuelta entera");
+  const p = w.config.bandeja_estado.pendientes.h3;
+  assert.equal(p.texto, `${"a".repeat(59)}🙏…`, "corta por letra entera: el emoji queda completo");
+  assert.equal(r.resumen, true);
+  const mano = w.avisos[0].campos[SECCION_MANO];
+  assert.ok(sinMitad(mano), "el resumen no lleva medio emoji: Telegram lo manda");
+  assert.match(mano, /🙏/);
+});
+
+test("23/11: lo que va a la base y a Telegram pasa por jsonSano, que saca las mitades sueltas de cualquier lado", async () => {
+  const { jsonSano, cortar, pasaDe, bienFormado } = await import("../lib/unicode.js");
+  const roto = "hola 🙏".slice(0, 6); // "hola " y la primera mitad del emoji
+  assert.equal(JSON.stringify(roto).includes("\\ud83d"), true, "así lo dejaba JSON.stringify, y así lo rechazaba Postgres");
+  assert.equal(jsonSano({ texto: roto, lista: [roto], n: 3, nada: null }), JSON.stringify({ texto: "hola ", lista: ["hola "], n: 3, nada: null }));
+  assert.equal(jsonSano({ texto: "un 🙏 entero" }), JSON.stringify({ texto: "un 🙏 entero" }), "un emoji entero queda como está");
+  assert.equal(bienFormado("\uDE4Fsolo la segunda mitad"), "solo la segunda mitad");
+  assert.equal(cortar("ab🙏cd", 3), "ab🙏");
+  assert.deepEqual([pasaDe("ab🙏", 3), pasaDe("ab🙏c", 3), pasaDe(null, 3)], [false, true, false], "el emoji cuenta como una letra");
+  // Que de verdad los usen: guardarConfig (la base) y los dos caminos de Telegram.
+  const base = await readFile(new URL("../lib/dm/base.js", import.meta.url), "utf8");
+  assert.match(base, /INSERT INTO dm_config \(clave, valor\) VALUES \(\$\{clave\}, \$\{jsonSano\(valor\)\}::jsonb\)/);
+  const tg = await readFile(new URL("../lib/notificar.js", import.meta.url), "utf8");
+  assert.equal((tg.match(/body: jsonSano\(cuerpo\)/g) || []).length, 2);
+  assert.doesNotMatch(tg, /body: JSON\.stringify\(cuerpo\)/);
+});
+
+test("#9010 (cuenta borrada): el perfil se pide una vez, se anota y no se vuelve a pedir en cada pasada; la charla sigue como antes", async () => {
+  const w = mundo({
+    hilos: [charla(1, NUEVO, [["lead", "hola, consulta de prueba", 12]])],
+    perfiles: { 601: { error: { message: "(#9010) No matching Instagram user", code: 9010 } } },
+    directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }],
+    aj: { modo: "apagado" }, // así no entra y se la vuelve a mirar en cada pasada, como la del registro
+  });
+  const errores = [];
+  const pedidosPerfil = () => w.pedidosIg.filter((x) => x === "/601").length;
+  const r1 = await w.rapida({ registrar: (e) => errores.push(e) });
+  assert.equal(pedidosPerfil(), 1);
+  assert.deepEqual(errores.map((e) => e.code), [9010], "queda en el registro una vez");
+  assert.equal(r1.fallas, 0, "no es una charla que falla: se mira entera");
+  assert.match(w.config.bandeja_estado.pendientes.h1.nota, /el agente está apagado/, "sigue como cualquier perfil que no se puede leer (04/11)");
+  w.pasar(6);
+  await w.rapida({ registrar: (e) => errores.push(e) });
+  w.pasar(15);
+  await w.revisar({ registrar: (e) => errores.push(e) });
+  assert.equal(pedidosPerfil(), 1, "las pasadas siguientes no le vuelven a preguntar a Instagram");
+  assert.equal(errores.length, 1, "ni ensucian el registro");
+});
+
+test("#9010 con el agente prendido: entra igual que antes, con su id de ManyChat", async () => {
+  const w = mundo({
+    hilos: [charla(1, NUEVO, [["lead", "hola, consulta de prueba", 12]])],
+    perfiles: { 601: { error: { message: "(#9010) No matching Instagram user", code: 9010 } } },
+    directorio: [{ id: "5001", nombre: "lead.nuevo", ig_username: "lead.nuevo" }],
+  });
+  const r = await w.revisar();
+  assert.equal(r.altas, 1);
+  assert.equal(w.contactos.get("5001").ig_id, "601");
+});
