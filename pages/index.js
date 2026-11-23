@@ -44,7 +44,7 @@ const COPY = {
       note: "Gratis, 20 minutos. Tomamos pocas búsquedas a la vez.",
       assurances: [
         { title: "Evaluados por ingenieros", text: "No por reclutadores: por gente que programa." },
-        { title: "Solo senior, 100% remoto", text: "Es el único perfil con el que trabajamos." },
+        { title: "Senior y 100% remoto", text: "Es el perfil con el que más trabajamos." },
         { title: "Calidad garantizada", text: "Solo te presentamos a quien contrataríamos nosotros." },
       ],
     },
@@ -69,7 +69,7 @@ const COPY = {
         {
           tag: "Pago",
           name: "El servicio",
-          text: "Buscamos, filtramos y te presentamos solo developers senior que pasaron nuestro filtro técnico y humano. Se suman a tu equipo y facturamos por mes, o cobramos la búsqueda y lo contratás directo.",
+          text: "Buscamos, filtramos y te presentamos developers senior que pasaron nuestro filtro técnico y humano. Se suman a tu equipo y facturamos por mes, o cobramos la búsqueda y lo contratás directo.",
           cta: "Ver cómo funciona",
           href: "/services/staff-augmentation",
         },
@@ -180,7 +180,7 @@ const COPY = {
       note: "Free, 20 minutes. We take on few searches at a time.",
       assurances: [
         { title: "Vetted by engineers", text: "Not by recruiters: by people who code." },
-        { title: "Senior only, fully remote", text: "It's the only profile we work with." },
+        { title: "Senior and fully remote", text: "It's the profile we work with most." },
         { title: "Guaranteed quality", text: "We only present people we'd hire ourselves." },
       ],
     },
@@ -198,7 +198,7 @@ const COPY = {
         {
           tag: "Paid",
           name: "The service",
-          text: "We find, filter and present only senior developers who passed our technical and human filter. They join your team and we bill monthly, or we charge for the search and you hire them directly.",
+          text: "We find, filter and present senior developers who passed our technical and human filter. They join your team and we bill monthly, or we charge for the search and you hire them directly.",
           cta: "See how it works",
           href: "/services/staff-augmentation",
         },

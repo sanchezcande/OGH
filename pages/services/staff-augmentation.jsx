@@ -42,7 +42,7 @@ const COPY = {
       note: "Gratis, 20 minutos. Tomamos pocas búsquedas a la vez.",
       facts: [
         { label: "Quién entrevista", text: "Nosotros, antes de presentarte a nadie." },
-        { label: "Cómo trabajan", text: "100% remoto. Solo developers senior." },
+        { label: "Cómo trabajan", text: "100% remoto. Sobre todo developers senior." },
         { label: "Cómo se cobra", text: "Por mes si se suma a tu equipo. Por la búsqueda si lo contratás directo." },
         { label: "Cuántas tomamos", text: "Pocas búsquedas a la vez." },
       ],
@@ -91,7 +91,7 @@ const COPY = {
           },
           {
             label: "Lo que te llega",
-            text: "Solo developers senior que pasaron esa entrevista. La decisión es tuya. El que elijas se suma a tu equipo y a tu forma de trabajar.",
+            text: "Developers senior que pasaron esa entrevista. La decisión es tuya. El que elijas se suma a tu equipo y a tu forma de trabajar.",
           },
         ],
         cta: "Agendá tu llamada gratis",
@@ -162,7 +162,7 @@ const COPY = {
           q: "Quién entrevista a los developers?",
           a: "Nosotros: la founder o alguien del equipo. Ningún developer te llega sin esa entrevista.",
         },
-        { q: "Dónde trabajan y qué experiencia tienen?", a: "Trabajan en remoto. Trabajamos solo con developers senior." },
+        { q: "Dónde trabajan y qué experiencia tienen?", a: "Trabajan en remoto. Trabajamos sobre todo con developers senior. Si tu búsqueda es de otro nivel, decínoslo en la llamada y vemos." },
         { q: "Quién elige al developer?", a: "Vos. Te presentamos solo a los que pasaron la entrevista y la decisión es tuya." },
         {
           q: "Con quién hablo en la llamada?",
@@ -216,7 +216,7 @@ const COPY = {
           },
           {
             label: "What reaches you",
-            text: "Only senior developers who passed that interview. The decision is yours. Whoever you choose joins your team and the way you work.",
+            text: "Senior developers who passed that interview. The decision is yours. Whoever you choose joins your team and the way you work.",
           },
         ],
         cta: "Book your free call",
@@ -308,7 +308,7 @@ const COPY = {
           q: "Who interviews the developers?",
           a: "We do: the founder or someone else on the team. No developer reaches you without that interview.",
         },
-        { q: "Where do they work and how experienced are they?", a: "They work remotely. We only work with senior developers." },
+        { q: "Where do they work and how experienced are they?", a: "They work remotely. We work mostly with senior developers. If your search is for another level, tell us on the call." },
         { q: "Who chooses the developer?", a: "You do. We only present the ones who passed the interview, and the decision is yours." },
         {
           q: "Who will I talk to on the call?",
