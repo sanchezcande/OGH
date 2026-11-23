@@ -95,6 +95,8 @@ const TOPE_RESERVA = 5000;
 const TOPE_RETOMADAS = 1000;
 const DIA_MS = 86400000;
 const TOPE_AVISO = 3000;   // Telegram corta a los 4096
+/** Cómo empieza el aviso del repaso de cada hora (tracker/dm_repaso.py, texto_de). */
+const ES_REPASO = /^\s*Repaso de las charlas del agente\b/i;
 const SITIO = "https://www.opengatehub.com"; // con www: sin www redirige y Telegram no sigue la redirección
 
 /** Los ids de una tanda de charlas retomadas, sin repetir; null si no es una lista de 1 a TOPE_RETOMADAS ids válidos. */
@@ -383,6 +385,14 @@ export default async function handler(req, res) {
       const link = linkCharlaIg(await usuarioParaAviso(c, { base: { guardarIg }, manychat: { datosDe } }));
       const llego = await avisarDm("DM: charla para mirar", { Quién: `${nombre} (${id})`, Aviso: texto, ...(link ? { Instagram: link } : {}) });
       return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });
+    }
+    // El repaso de cada hora (tracker/dm_repaso.py) ya no suena (24/11). Cande: "estás haciendo qa de las charlas? y me
+    // estás diciendo qué está bien y mal?", "solo lo urgente me tiene que pasar". Lo que marca el repaso es para que el
+    // agente aprenda (lecciones.md) y queda en sus registros; lo urgente de una charla (empresa, plata, crisis, baja) ya
+    // le suena por el aviso del agente (lib/dm/avisos.js). Va a los logs y se contesta ok, así el repaso no lo reintenta.
+    if (ES_REPASO.test(texto)) {
+      console.log("[repaso de las charlas, no sale a Telegram]", texto);
+      return res.status(200).json({ ok: true, callado: true });
     }
     const llego = await avisarDm("DM: repaso de las charlas", { Repaso: texto });
     return res.status(llego ? 200 : 502).json({ ok: Boolean(llego) });

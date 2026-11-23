@@ -81,6 +81,17 @@ export default async function handler(req, res) {
 
   const mailCV = await pedirCV(d.nombre, d.email);
 
+  // 24/11, Cande: "solo lo urgente me tiene que pasar", "me llegan chotomil mensajes al día". Un dev que se anota en
+  // la red no es urgente (eran unos 30 por día): queda en red_devs y en el panel. A Telegram va solo si NO se pudo
+  // guardar, porque ahí el aviso es lo único que queda de ese dev.
+  const instagram = d.ig
+    ? charlaParaAviso(charla, compartido)
+    : igDelLink ? "vino con un id de charla que no coincide con su firma (cambiado a mano?): no lo até a ninguna charla" : null;
+  if (guardado) {
+    console.log(`devs-red: nuevo dev guardado, sin aviso a Telegram${instagram ? `. Instagram: ${instagram}` : ""}`);
+    if (d._debug === "claude") return res.status(200).json({ ok: true, guardado, errBase });
+    return res.status(200).json({ ok: true, guardado });
+  }
   await avisar("Nuevo dev en la red", {
     Nombre: d.nombre,
     Email: d.email,
@@ -91,9 +102,7 @@ export default async function handler(req, res) {
     Arranca: [d.cuandoArrancas, d.dedicacion].filter(Boolean).join(" · "),
     Inglés: d.ingles,
     "Llegó por": d.comoLlegaste,
-    Instagram: d.ig
-      ? charlaParaAviso(charla, compartido)
-      : igDelLink ? "vino con un id de charla que no coincide con su firma (cambiado a mano?): no lo até a ninguna charla" : null,
+    Instagram: instagram,
     Guardado: guardado ? "sí" : "NO",
     "Mail CV": mailCV ? "enviado" : "NO salió",
     WhatsApp: d.whatsapp,
