@@ -38,10 +38,21 @@ const ID = "1234567890";
 const OTRO = "9876543210";
 const leer = (p) => fs.readFile(new URL(p, import.meta.url), "utf8");
 
+// 24/11: un dev guardado ya no avisa por Telegram (solo lo urgente); lo que decía el aviso de su charla queda en el log.
+const logs = [];
+const logOriginal = console.log;
+console.log = (...partes) => {
+  const t = partes.join(" ");
+  if (t.startsWith("devs-red:")) logs.push(t);
+  else logOriginal(...partes);
+};
+const logDev = () => logs.at(-1) ?? "";
+
 beforeEach(() => {
   pg.reiniciar();
   avisos.length = 0;
   registros.length = 0;
+  logs.length = 0;
 });
 
 /* ---------- 1. el id de la charla y el link ---------- */
@@ -484,8 +495,8 @@ test("la API guarda el id en red_devs.ig_contacto, anota el formulario en la cha
   assert.ok(h.notas[0].params.includes(true), "guardado y sin compartir: deja la nota");
   // La nota es de sistema, una sola vez, solo si la charla existe y si le salió el link con ese id.
   assert.match(h.notas[0].t, /INSERT INTO dm_mensajes \(contacto, quien, texto\) SELECT c\.id, 'sistema', \?::text FROM c, l WHERE \?::boolean AND l\.enviado AND NOT EXISTS/);
-  assert.match(avisos[0], /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · ya habla con el agente/);
-  assert.match(avisos[0], /<b>Guardado:<\/b> sí/);
+  assert.match(logDev(), /Instagram: https:\/\/ig\.me\/m\/usuario\.prueba · ya habla con el agente/);
+  assert.equal(avisos.length, 0, "guardado: no sale a Telegram");
 });
 
 test("la migración de ig_contacto aguanta a dos funciones a la vez: si la otra ya la creó, el lead se guarda igual", async () => {
@@ -510,7 +521,7 @@ test("sin ?ig=, o con algo que no es un id, todo como siempre: sin columna llena
     assert.deepEqual(res.cuerpo, { ok: true, guardado: true }, String(ig));
     assert.equal(h.insert.ig_contacto, null, String(ig));
     assert.equal(h.notas.length, 0, String(ig));
-    assert.doesNotMatch(avisos[0], /Instagram:/, String(ig));
+    assert.doesNotMatch(logDev(), /Instagram:/, String(ig));
   }
 });
 
@@ -518,13 +529,13 @@ test("si la charla no está o la nota falla, el formulario anda igual y el aviso
   baseDelFormulario({ charla: null });
   let res = await mandarFormulario({ ig: ID });
   assert.deepEqual(res.cuerpo, { ok: true, guardado: true });
-  assert.match(avisos.at(-1), /<b>Instagram:<\/b> vino del link de una charla que no encuentro en la base del agente/);
+  assert.match(logDev(), /Instagram: vino del link de una charla que no encuentro en la base del agente/);
 
   const h = baseDelFormulario({ charla: new Error("relation dm_contactos does not exist") });
   res = await mandarFormulario({ ig: ID });
   assert.deepEqual(res.cuerpo, { ok: true, guardado: true });
   assert.equal(h.insert.ig_contacto, ID);
-  assert.match(avisos.at(-1), /<b>Instagram:<\/b> vino del link de una charla del agente, pero no la pude mirar en la base/);
+  assert.match(logDev(), /Instagram: vino del link de una charla del agente, pero no la pude mirar en la base/);
   assert.ok(registros.some((r) => /no pude anotar el formulario en la charla/.test(r)));
 });
 
@@ -543,15 +554,15 @@ test("link compartido: si el id ya está en la ficha de otro mail, la charla no 
   assert.equal(h.notas.length, 1);
   assert.ok(h.notas[0].params.includes(false), "mira la charla para el aviso pero no deja la nota");
   assert.ok(!h.notas[0].params.includes(true));
-  assert.match(avisos.at(-1), /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · link compartido: ese link ya lo usó otro mail/);
-  assert.doesNotMatch(avisos.at(-1), /ya habla con el agente/);
+  assert.match(logDev(), /Instagram: https:\/\/ig\.me\/m\/usuario\.prueba · link compartido: ese link ya lo usó otro mail/);
+  assert.doesNotMatch(logDev(), /ya habla con el agente/);
 });
 
 test("si a esa charla nunca le salió el link con ese id, el aviso lo dice en vez de que ya habla con el agente", async () => {
   baseDelFormulario({ charla: { ig_usuario: "usuario.prueba", dueno: "agente", link_enviado: false, anotada: 0 } });
   await mandarFormulario({ ig: ID });
-  assert.match(avisos.at(-1), /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · a esa charla no le salió el link con este id/);
-  assert.doesNotMatch(avisos.at(-1), /ya habla con el agente/);
+  assert.match(logDev(), /Instagram: https:\/\/ig\.me\/m\/usuario\.prueba · a esa charla no le salió el link con este id/);
+  assert.doesNotMatch(logDev(), /ya habla con el agente/);
 });
 
 test("si el lead no se pudo guardar, la charla no recibe la nota", async () => {
@@ -566,7 +577,7 @@ test("si el lead no se pudo guardar, la charla no recibe la nota", async () => {
 test("una charla de Cande o sin usuario guardado también se nombra en el aviso", async () => {
   baseDelFormulario({ charla: { ig_usuario: null, dueno: "cande", link_enviado: true, anotada: 0 } });
   await mandarFormulario({ ig: ID });
-  assert.match(avisos.at(-1), /<b>Instagram:<\/b> sin usuario guardado · la charla es tuya/);
+  assert.match(logDev(), /Instagram: sin usuario guardado · la charla es tuya/);
 });
 
 test("guardarDev: un id que no vale no llega a la base aunque la API no lo hubiera limpiado, y no pisa el que ya estaba", async () => {
@@ -909,7 +920,7 @@ test("con clave, la API guarda ig_contacto y anota la charla solo con la firma d
     assert.deepEqual(res.cuerpo, { ok: true, guardado: true });
     assert.equal(h.insert.ig_contacto, ID);
     assert.equal(h.notas.length, 1);
-    assert.match(avisos.at(-1), /<b>Instagram:<\/b> https:\/\/ig\.me\/m\/usuario\.prueba · ya habla con el agente/);
+    assert.match(logDev(), /Instagram: https:\/\/ig\.me\/m\/usuario\.prueba · ya habla con el agente/);
 
     // Firma cambiada, id cambiado a mano (con la firma del original), firma de otro largo o sin firma: el formulario
     // se guarda igual, sin ig_contacto, sin tocar ninguna charla, y el aviso lo dice.
@@ -922,8 +933,8 @@ test("con clave, la API guarda ig_contacto y anota la charla solo con la firma d
       assert.deepEqual(res.cuerpo, { ok: true, guardado: true }, JSON.stringify(cuerpo));
       assert.equal(h.insert.ig_contacto, null, JSON.stringify(cuerpo));
       assert.equal(h.notas.length, 0, JSON.stringify(cuerpo));
-      assert.match(avisos.at(-1), /<b>Instagram:<\/b> vino con un id de charla que no coincide con su firma/, JSON.stringify(cuerpo));
-      assert.match(avisos.at(-1), /<b>Guardado:<\/b> sí/);
+      assert.match(logDev(), /Instagram: vino con un id de charla que no coincide con su firma/, JSON.stringify(cuerpo));
+      assert.equal(avisos.length, 0, "guardado: no sale a Telegram");
     }
   }));
 
@@ -941,7 +952,7 @@ test("sin clave, la API se comporta como hoy: el id se guarda con o sin firma, y
     await mandarFormulario(firma === undefined ? { ig: ID } : { ig: ID, firma });
     assert.equal(h.insert.ig_contacto, ID, String(firma));
     assert.equal(h.notas.length, 1, String(firma));
-    assert.doesNotMatch(avisos.at(-1), /no coincide con su firma/);
+    assert.doesNotMatch(logDev(), /no coincide con su firma/);
   }
 });
 

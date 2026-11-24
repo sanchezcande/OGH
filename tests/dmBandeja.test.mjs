@@ -224,7 +224,9 @@ function mundo({
   w.ig = crearInstagram({ pedir, leerConfig: async (k) => cfgIg[k] ?? null, guardarConfig: async (k, v) => { cfgIg[k] = v; }, tokenEnv: () => "t" });
   w.avisar = async (titulo, campos, opciones) => { w.avisos.push({ titulo, campos, opciones }); return true; };
   w.resumenes = () => w.avisos.filter((a) => a.titulo === TITULO_RESUMEN);
-  w.revisar = (extra = {}) => revisarBandeja({ ig: w.ig, base: w.base, manychat: w.manychat, aj: w.aj, avisar: w.avisar, ahora: () => w.ahora, ...extra });
+  // soloUrgente: false, el resumen con todo lo que espera (como antes del 24/11): así se ve qué quedó anotado. Lo que llega
+  // de verdad a Telegram (solo lo urgente) se prueba aparte, con soloUrgente en true.
+  w.revisar = (extra = {}) => revisarBandeja({ ig: w.ig, base: w.base, manychat: w.manychat, aj: w.aj, avisar: w.avisar, ahora: () => w.ahora, soloUrgente: false, ...extra });
   /** La pasada rápida (pages/api/dm/bandeja-rapida.js, cada 6 minutos): la primera página y nada del cursor. */
   w.rapida = (extra = {}) => w.revisar({ rapida: true, ...extra });
   w.delContacto = (id) => w.mensajes.filter((m) => m.contacto === id);
@@ -2037,4 +2039,69 @@ test("#9010 con el agente prendido: entra igual que antes, con su id de ManyChat
   const r = await w.revisar();
   assert.equal(r.altas, 1);
   assert.equal(w.contactos.get("5001").ig_id, "601");
+});
+
+/* ---------- 24/11: a Telegram, solo lo urgente ---------- */
+
+const { esUrgenteParaCande } = await import("../lib/dm/bandeja.js");
+
+test("24/11: una charla de Cande sin nada urgente queda anotada pero no le suena; una de empresa, sí", async () => {
+  const w = mundo({
+    contactos: [
+      { id: "70", nombre: "Amiga de prueba", dueno: "cande", ig_id: "701", ig_usuario: "lead.cande" },
+      { id: "80", nombre: "Empresa de prueba", dueno: "cande", ig_id: "801", ig_usuario: "lead.otro", estado: { quien: "empresa" } },
+    ],
+    hilos: [
+      charla(1, DE_CANDE, [["cuenta", "Te escribo yo, de prueba", 120], ["lead", "jaja sí, el finde nos vemos", 40]]),
+      charla(2, OTRO, [["cuenta", "Te escribo yo, de prueba", 120], ["lead", "pregunta de la empresa de prueba", 40]]),
+    ],
+  });
+  const r = await w.revisar({ soloUrgente: true });
+  assert.equal(Object.keys(w.config.bandeja_estado.pendientes).length, 2, "las dos quedan anotadas para el controlador");
+  assert.equal(r.pendientes, 1, "al resumen va solo la de empresa");
+  assert.equal(w.config.bandeja_estado.pendientes.h1.urgente, false);
+  assert.equal(w.config.bandeja_estado.pendientes.h2.urgente, true);
+  assert.equal(w.avisos.length, 1);
+  assert.match(w.avisos[0].campos[SECCION_VOS], /Empresa de prueba/);
+  assert.doesNotMatch(JSON.stringify(w.avisos[0].campos), /Amiga de prueba|el finde/);
+});
+
+test("24/11: sin nada urgente no sale ningún resumen, tampoco el de las etiquetas que faltan", async () => {
+  const w = mundo({
+    contactos: [{ id: "70", nombre: "Lead de Cande", dueno: "cande", ig_id: "701", ig_usuario: "lead.cande" }],
+    hilos: [charla(1, DE_CANDE, [["cuenta", "Te escribo yo, de prueba", 120], ["lead", "una pregunta de prueba para vos", 40]])],
+  });
+  w.config.bandeja_estado = { pendientes: {}, etiquetas: { 99: { nombre: "Sin etiqueta", desde: hace(120).toISOString() } } };
+  const r = await w.revisar({ soloUrgente: true });
+  assert.equal(r.resumen, false);
+  assert.equal(w.avisos.length, 0);
+});
+
+test("24/11: lo anotado antes del cambio (sin la marca de urgente) no suena", async () => {
+  const w = mundo({ hilos: [] });
+  w.config.bandeja_estado = {
+    pendientes: { h9: { hilo: "h9", igsid: "909", mid: "m9", creado: hace(60).toISOString(), usuario: "x", texto: "hola", nombre: "Vieja", nota: null, nueva: false } },
+    etiquetas: {},
+  };
+  const r = await w.revisar({ soloUrgente: true });
+  assert.equal(r.resumen, false);
+  assert.equal(w.avisos.length, 0);
+});
+
+test("24/11: qué es urgente para Cande: la misma vara que un aviso que suena al momento", () => {
+  assert.equal(esUrgenteParaCande(null, [{ texto: "jaja sí, el finde nos vemos" }]), false);
+  assert.equal(esUrgenteParaCande({ estado: { quien: "dev" } }, [{ texto: "gracias por todo!" }]), false);
+  assert.equal(esUrgenteParaCande({ estado: { quien: "empresa" } }, [{ texto: "hola" }]), true);
+  assert.equal(esUrgenteParaCande(null, [{ texto: "sos un bot?" }]), true, "preguntan si es un bot");
+  assert.equal(esUrgenteParaCande({ pase_motivo: "YA: quiere el 1 a 1" }, [{ texto: "dale" }]), true);
+  assert.equal(esUrgenteParaCande(null, []), false);
+});
+
+test("24/11: el repaso de cada hora, los devs nuevos y los CV no salen a Telegram", async () => {
+  const config = await readFile(new URL("../pages/api/dm/config.js", import.meta.url), "utf8");
+  assert.match(config, /if \(ES_REPASO\.test\(texto\)\) \{[\s\S]{0,200}callado: true/);
+  const cv = await readFile(new URL("../pages/api/cv-inbound.js", import.meta.url), "utf8");
+  assert.doesNotMatch(cv, /avisar\(/);
+  const red = await readFile(new URL("../pages/api/devs-red.js", import.meta.url), "utf8");
+  assert.match(red, /if \(guardado\) \{[\s\S]{0,300}return res\.status\(200\)/);
 });

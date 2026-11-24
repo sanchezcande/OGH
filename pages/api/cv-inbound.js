@@ -1,6 +1,5 @@
 import { put } from "@vercel/blob";
 import { sql } from "@vercel/postgres";
-import { avisar } from "../../lib/notificar";
 
 // Recibe el webhook de Resend cuando un dev responde a cv@in.opengatehub.com
 // con su CV adjunto. Guarda el PDF en Blob (privado), lo linkea a su fila de
@@ -50,7 +49,8 @@ export default async function handler(req, res) {
       return n.endsWith(".pdf") || n.endsWith(".doc") || n.endsWith(".docx");
     });
     if (!adjuntos.length) {
-      await avisar("Respuesta de dev SIN CV adjunto", { Nombre: dev.nombre, Email: remitente });
+      // 24/11: no sale a Telegram (solo lo urgente). El mail queda en su casilla.
+      console.log("cv-inbound: respuesta sin CV adjunto, dev", dev.id);
       return res.status(200).json({ ok: true, ignorado: "sin adjunto" });
     }
 
@@ -68,12 +68,10 @@ export default async function handler(req, res) {
       guardados++;
     }
 
-    await avisar(guardados ? "📎 CV guardado y linkeado" : "CV llegó pero no pude bajarlo", {
-      Nombre: dev.nombre,
-      Email: remitente,
-      Archivos: adjuntos.map((a) => a.filename || a.name).join(", "),
-      Guardados: guardados,
-    });
+    // 24/11, Cande: "solo lo urgente me tiene que pasar". Un CV que llegó no es urgente: queda en red_devs (cv_url). Si
+    // no se pudo bajar, va a los logs; el mail con el adjunto sigue en su casilla.
+    if (guardados) console.log("cv-inbound: CV guardado, dev", dev.id);
+    else console.error("cv-inbound: llegó un CV y no lo pude bajar, dev", dev.id, adjuntos.map((a) => a.filename || a.name).join(", "));
     return res.status(200).json({ ok: true, guardados });
   } catch (e) {
     console.error("cv-inbound:", e.message);
