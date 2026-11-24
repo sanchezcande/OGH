@@ -1153,10 +1153,16 @@ test("ENTREVISTA: apagado es una charla más; prendido es su propio pedido, y CV
   assert.equal(tipoDelComentario("cv entrevista", { entrevista: true }), null, "dos pedidos: es una charla");
 });
 
-test("ENTREVISTA: el texto es el de Esteban TAL CUAL, con la web del webinar, en un solo mensaje", () => {
+test("ENTREVISTA: el texto es el de Esteban TAL CUAL, con la web del webinar y la lista fijada en el grupo, en un solo mensaje", () => {
   assert.equal(
     TEXTO_ENTREVISTA,
-    "Te lo mando por acá. El webinar es gratis, el martes 1 de diciembre a las 19:00 de Argentina. Entrás a un grupo donde te aviso primero con el enlace del directo: https://candelaria-webinar.netlify.app/",
+    "Te lo mando por acá. El webinar es gratis, el martes 1 de diciembre a las 19:00 de Argentina. Entrás a un grupo donde te aviso primero con el enlace del directo: https://candelaria-webinar.netlify.app/\n\n" +
+      "La lista de lo que miro antes de llamarte para un puesto está fijada en el grupo :)",
+  );
+  // El de antes del 24/11 (sin la línea de la lista) sigue contando: quien lo recibió ya tiene el link.
+  assert.equal(
+    esDmDeEntrevista("Te lo mando por acá. El webinar es gratis, el martes 1 de diciembre a las 19:00 de Argentina. Entrás a un grupo donde te aviso primero con el enlace del directo: https://candelaria-webinar.netlify.app/"),
+    true,
   );
   assert.equal(LINK_WEBINAR, "https://candelaria-webinar.netlify.app/");
   assert.ok(!/utm_|[?&]de=/.test(LINK_WEBINAR), "el link va limpio");
