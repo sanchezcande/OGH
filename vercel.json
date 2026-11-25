@@ -39,6 +39,10 @@
     {
       "path": "/api/dm/comentarios",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/recordatorios/mandar",
+      "schedule": "*/15 * * * *"
     }
   ]
 }
