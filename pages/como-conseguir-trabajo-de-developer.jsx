@@ -174,6 +174,16 @@ const BLOQUES = [
     mas: [],
   },
   {
+    // 26/11/2026: un dev en los DMs de esta semana ("el nombre de mi puesto dice soporte
+    // tecnico, pero desde que entre hago cosas de programador junior y ahora casi semi senior").
+    // Sale de lo ya publicado aca en "cv" (los diez segundos, el puesto primero, lo que
+    // podes defender) y no lleva numeros.
+    id: "titulo-del-puesto",
+    q: "Mi puesto dice soporte técnico pero hago tareas de programador, cómo lo muestro en el CV",
+    r: "Con lo que hiciste, no con el nombre del cargo. En los diez segundos que le doy a un CV busco para qué puesto servís y qué hiciste vos en el último proyecto, y el título que te puso la empresa no me contesta ninguna de las dos. Arriba de todo poné el puesto al que vas. Abajo dejá el cargo real tal cual, y debajo contá lo que programaste: qué problema había, qué hiciste vos y qué quedó andando. Si hay algo que yo pueda abrir, mejor. Y que sea algo que puedas defender veinte minutos en una entrevista.",
+    mas: [],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
