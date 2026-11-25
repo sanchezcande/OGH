@@ -3,13 +3,16 @@
 // no da la dirección secreta en formato iCal de esta cuenta, así que la lista la trae la Mac.
 //
 // Esto NO manda nada: solo deja anotado a quién le toca y cuándo. El envío es /api/recordatorios/mandar.
-import { mismoSecreto } from "../../../lib/dm/armado";
+import { mismoSecreto, secretoDe } from "../../../lib/dm/armado";
 import { cuandoSale, datosDeLaReserva, usuarioIg } from "../../../lib/recordatorioLlamada";
 import { guardarReserva, vencer } from "../../../lib/dm/recordatoriosBase";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "solo POST" });
-  if (!mismoSecreto(String(req.headers["x-dm-secreto"] || ""), process.env.DM_SECRETO || "")) {
+  // El secreto es el de la cola de publicación (COLA_SECRET), que es con el que la Mac ya habla con
+  // la nube en todo lo demás, igual que /api/dm/config. NO es DM_SECRETO: ese es el que manda
+  // ManyChat en su webhook y la Mac no lo tiene, así que pedirlo acá daba 401 siempre (25/11/2026).
+  if (!mismoSecreto(secretoDe(req), process.env.COLA_SECRET)) {
     return res.status(401).json({ error: "no" });
   }
   const reservas = Array.isArray(req.body?.reservas) ? req.body.reservas : null;
