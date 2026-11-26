@@ -184,6 +184,15 @@ const BLOQUES = [
     mas: [],
   },
   {
+    // 27/11/2026: un dev en los DMs de esta semana ("quiero cambiar de empresa, pero el mercado
+    // esta saturado de bot con claude para mandar cv"). Sale de lo ya publicado aca en "cv",
+    // "aplicar", "primer-trabajo" y "como-funciona" (de a uno, sin filtros automaticos). Sin numeros.
+    id: "cvs-con-ia",
+    q: "Si el mercado está lleno de CVs mandados con IA, sirve que me postule",
+    r: "Sirve. Los perfiles los miro yo, de a uno, sin filtros automáticos, y en los diez segundos que le doy a un CV busco tres cosas: para qué puesto servís, qué hiciste vos en el último proyecto y si puedo hacer clic en algo. Cien CVs iguales mandados en automático no son cien intentos, son un intento repetido cien veces. Lo que te separa del montón es una sola cosa terminada que yo pueda abrir, y que la puedas defender veinte minutos en una entrevista. Te hablo de lo que veo yo, no del mercado.",
+    mas: [],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
