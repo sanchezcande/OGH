@@ -42,6 +42,8 @@ const rol = (q) => (DATOS.roles.find((r) => r.que === q) || {}).n || 0;
 const TRES_GRANDES = rol("Full-stack") + rol("Backend") + rol("Frontend");
 const PCT_TRES = Math.round((TRES_GRANDES / DATOS.n) * 100);
 const BUSCAN = DATOS.situacion.find((x) => x.que === "Buscando activamente") || {};
+const EMPLEADO = DATOS.situacion.find((x) => x.que === "Empleado pero escucho") || {};
+const ABIERTO = DATOS.situacion.find((x) => x.que === "Abierto a ofertas") || {};
 
 const BLOQUES = [
   {
@@ -190,6 +192,16 @@ const BLOQUES = [
     id: "cvs-con-ia",
     q: "Si el mercado está lleno de CVs mandados con IA, sirve que me postule",
     r: "Sirve. Los perfiles los miro yo, de a uno, sin filtros automáticos, y en los diez segundos que le doy a un CV busco tres cosas: para qué puesto servís, qué hiciste vos en el último proyecto y si puedo hacer clic en algo. Cien CVs iguales mandados en automático no son cien intentos, son un intento repetido cien veces. Lo que te separa del montón es una sola cosa terminada que yo pueda abrir, y que la puedas defender veinte minutos en una entrevista. Te hablo de lo que veo yo, no del mercado.",
+    mas: [],
+  },
+  {
+    // 28/11/2026: dos devs en los DMs de esta semana ("el tema es que laburo y se me complica",
+    // busca de manera intermitente; y "estoy estable en mi empleo actual pero quiero oportunidades
+    // de crecimiento"). Sale de situacion en red_devs y de lo ya publicado aca en "cv",
+    // "aplicar", "primer-trabajo" y "como-funciona".
+    id: "buscar-trabajando",
+    q: "Trabajo y se me complica buscar, cómo busco teniendo un trabajo",
+    r: `No hace falta buscar fuerte todos los días. Hace falta tener lo tuyo listo para cuando aparece algo, así no arrancás de cero cada vez: un CV ordenado para el puesto al que vas y una sola cosa terminada que yo pueda abrir. Y no mandes cien iguales: cambiá una sola cosa cada veinte y fijate cuál te trae llamadas. No sos el único en esa: de los ${nro(DATOS.n)} que se anotaron en la red, ${nro(EMPLEADO.n)} tienen trabajo y escuchan, y ${nro(ABIERTO.n)} están abiertos a ofertas. Anotarte lleva tres minutos y es estar en el lugar donde busco cuando me entra un proyecto.`,
     mas: [],
   },
   {
