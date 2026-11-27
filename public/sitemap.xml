@@ -96,6 +96,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.opengatehub.com/blog/senior-developer-stack-latam-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.opengatehub.com/blog/latam-developer-rates-2026</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -147,6 +152,11 @@
   </url>
   <url>
     <loc>https://www.opengatehub.com/blog/top-staff-augmentation-companies-latin-america-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.opengatehub.com/en/blog/senior-developer-stack-latam-2026</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
