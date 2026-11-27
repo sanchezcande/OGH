@@ -15,6 +15,9 @@ import { CLAVE_BOTON_VISTO, botonVisible } from "../../lib/botonCompra";
 // (sigue en Wistia, no se borró).
 const WISTIA_A = "ruxfpqaqfx";
 const TESTIMONIOS_VIDEO = [
+  // 27/11: Martin Porollan (CRM 265) va primero: es el único que cuenta que quedó en un trabajo (una startup de agentes
+  // de IA) con el 1 a 1, que es lo que vende esta página. Vertical de su corte del editor (historias/historia_martin.py).
+  { nombre: "Martin Porollan", lugar: "Mendoza, Argentina", id: "xcd196yjih" },
   { nombre: "Martiniano Olivera", lugar: "Concepción del Uruguay, Argentina", id: "c6yuoqzkm2" },
   { nombre: "Manrique Ulate", lugar: "San José, Costa Rica", id: "bk8t9jduhd" },
   // 19/11: Daiana Quiroz (CRM 310). Versión vertical de su corte del editor (historias/historia_daiana.py).
