@@ -205,6 +205,15 @@ const BLOQUES = [
     mas: [],
   },
   {
+    // 29/11/2026: un dev en los DMs de esta semana ("me cuesta la parte del leet code, porque los
+    // ultimos dos años lo que mas hice fue arquitectura y diseño de sistemas"). Sale de lo ya
+    // publicado aca en "entrevista" y "yo-nosotros". Sin numeros.
+    id: "leetcode",
+    q: "Me cuesta el LeetCode porque los últimos años hice arquitectura, cómo me preparo para la entrevista",
+    r: "Practicá ejercicios, pero no te quedes solo en eso. Cuando resolvés uno en la entrevista, lo que me sirve es escucharte pensar en voz alta: el que se queda callado veinte minutos y acierta me deja solo el resultado. Si algo no te sale, decí no sé y contá cómo lo buscarías. Y lo que hiciste estos años, contalo: qué decidiste vos en esa arquitectura y por qué, en dos minutos y en voz alta. Practicalo una vez antes. Ese es el 80%.",
+    mas: [],
+  },
+  {
     id: "quien-soy",
     q: "Quién escribe esto",
     r: "Candelaria Sanchez, founder de OpenGateHub. Entrevisto y selecciono developers de Latinoamérica para empresas que contratan en remoto, y los perfiles los miro yo, de a uno, sin filtros automáticos. Lo que voy viendo en cada CV lo cuento en Instagram, @candelaria.sanchezg.",
